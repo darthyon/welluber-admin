@@ -16,9 +16,12 @@ The Host Admin (Welluber HQ) operates in **six mental model areas**, not a flat 
 
 | ID | Screen | Entry point | Primary action |
 |---|---|---|---|
-| SCR-DASH-01 | Platform Overview | Initial login | View real-time KPIs: active orgs, active SPs, total tx value, revenue earned this month |
-| SCR-DASH-02 | Transactions Feed (24h) | Sidebar nav | Monitor all platform transactions in real-time: redemptions, walks-ins, expirations, with status badges |
+| SCR-DASH-01 | Platform Overview | Initial login | View real-time KPIs: active orgs, active SPs, total tx value, revenue earned this month (with stacked bar sub-metrics) |
+| SCR-DASH-02 | Service Categories | Dashboard bottom row | Monitor high-performing service categories via horizontal progress bars + MoM trend metrics |
 | SCR-DASH-03 | Settlement Status | Sidebar nav | View current settlement cycle: pending payouts, completed payouts, failed payouts (last 90 days) |
+| SCR-DASH-04 | Top Lists | Dashboard bottom row | View Top Organisations and Top Service Providers with dynamic metric dropdowns (Volume, Check-ins, Commission, Rating) |
+| SCR-DASH-05 | Voucher Lifecycle Chart | Dashboard center | Visualize "Voucher Issued" vs "Verified Check-ins" alongside custom period ranges and Organisation filtering |
+| SCR-GLB-01 | Global Notification Center | Top bar bell icon | Real-time ecosystem stream with triage tabs ("All" vs "Action Required") and popover interface |
 
 **Non-obvious states — SCR-DASH-01:**
 - Empty (day 1): Show banner + onboarding CTA: "No organizations yet. Add your first organization."
@@ -38,18 +41,21 @@ The Host Admin (Welluber HQ) operates in **six mental model areas**, not a flat 
 
 | ID | Screen | Entry point | Primary action |
 |---|---|---|---|
-| SCR-ORG-01 | Organization List | Sidebar nav | Browse all organizations: name, status (Active/Pending/Suspended), branch count, wallet balance, last activity |
+| SCR-ORG-01 | Organization List (Triage) | Sidebar nav | **Workforce Health Dashboard:** Browse and triage organizations using a tactical toolbar (Status, Needs Action, Service Category) and high-density cards with Utilization Rings. |
 | SCR-ORG-02 | Organization Registration (New) | "Add Organization" button on SCR-ORG-01 | Register new org: company name, reg no., industry, org type, financial year start date |
 | SCR-ORG-03 | Organization Approval | Link from SCR-ORG-01 when status=Pending | Review org application → Approve/Reject. On approve, org gets email with portal access. |
-| SCR-ORG-04 | Organization Detail View | Click org row on SCR-ORG-01 | View org summary: profile, PICs, branches, active policies, employee count, wallet status, subscription |
+| SCR-ORG-04 | Organization Detail View | Click org row on SCR-ORG-01 | View org summary: profile, PICs, branches, active benefit policies, employee count, wallet status, subscription |
 | SCR-ORG-05 | Branch Wallet Management | Tab on SCR-ORG-04 | View all branch wallets for this org. Per-branch: current balance, model (Cash/Credit), top-up history, pending deductions |
 | SCR-ORG-06 | Org Suspension / Deactivation | Actions menu on SCR-ORG-04 | Deactivate org: confirm, optional reason. All benefits and vouchers expire immediately. |
 
-**Non-obvious states — SCR-ORG-01:**
-- Filter + sort: By status, industry, branch count, wallet balance, creation date.
-- Search: By org name or registration number.
-- Empty: "No organizations registered yet."
-- Pagination: Assume 50 per page default; adjust based on performance.
+- **Smart Data Table (SCR-ORG-01 Table View):**
+  - **Frozen Identity:** Company Name (First Column) is sticky-frozen to the left for easy reference.
+  - **Frozen Actions:** Three-dot menu (Last Column) is sticky-frozen to the right.
+  - **Needs Action Column:** Repurposed to show colorful condition pills (e.g., `Missing PIC`, `Wallet Low`). Shows `✅ All Good` with a green check for healthy orgs.
+  - **Utilization Column:** Integrates the **Utilization Ring Chart** with internal percentage and external RM balance label.
+  - **Service Categories:** New column displaying the top-tier benefit categories assigned to the org.
+  - **Modular Action Menu:** Synchronized with the card menu (Edit, Invite, Manage Benefit Policies).
+  - **Pagination:** Structured at 10 records per page for optimized performance.
 
 **Non-obvious states — SCR-ORG-02:**
 - File upload: Logo (optional). Image cropping/validation.
@@ -65,10 +71,11 @@ The Host Admin (Welluber HQ) operates in **six mental model areas**, not a flat 
 - Error: If any pre-check fails, flag as "Requires manual review" + escalation queue to a dedicated approvals team.
 
 **Non-obvious states — SCR-ORG-04:**
-- Tabs: Profile | Branches | Policies | Employees | Wallet | Subscription
+- Tabs: Org Details | Branches | Employees | Benefit Policy | Utilization & Claims
 - Status badge: Active (green) / Pending (orange) / Suspended (red) / On Hold.
-- Actions menu: View details, Edit profile, Manage branches, Manage policies, Suspend, View full activity log.
+- Actions menu: View details, Edit profile, Manage branches, Manage benefit policies, Suspend, View full activity log.
 - Breadcrumb: Dashboard > Organizations > [Org Name] — allow quick back navigation.
+- Note: Wallet and Subscription management are not yet surfaced as tabs in the current build. These are deferred to a later sprint.
 
 **Non-obvious states — SCR-ORG-05:**
 - Per-branch table: Branch name | Wallet model | Balance | Consumed % | Pending deductions | Last top-up | Status.
@@ -80,6 +87,28 @@ The Host Admin (Welluber HQ) operates in **six mental model areas**, not a flat 
 **Non-obvious states — SCR-ORG-06:**
 - Confirm dialog: "Deactivate [Org Name]? All benefits will expire immediately. This cannot be undone." + strong CTA style (e.g. disabled by default, enable checkbox to confirm).
 - On deactivate: All associated employees' corporate identities → deactivated status. Benefit assignments marked as expired. All active vouchers → expired status (triggering expired voucher split). Email sent to org's primary PIC.
+
+---
+
+## Benefit Policy Management
+
+| ID | Screen | Entry point | Primary action |
+|---|---|---|---|
+| SCR-POL-01 | Benefit Policies List | Sidebar nav → Policies | Browse all benefit policies with status badges. Empty state prompts wizard launch. |
+| SCR-POL-02 | Benefit Policy Wizard (Create) | "Create New Policy" button on SCR-POL-01 | Multi-step wizard: define eligibility, pool type, utilization mode, refresh cycle, activation mode, benefit groups, and individual benefit allowances. |
+
+**Non-obvious states — SCR-POL-01:**
+- Empty state: Full-page empty state with wizard launch CTA. No table is rendered until at least one policy exists.
+- Policy card: Shows policy name, code (mono), description (clamped to 2 lines), budget pool amount, and assigned org avatar stack.
+- Status badge: Active (emerald) / Draft / Unlisted / Deactivated.
+
+**Non-obvious states — SCR-POL-02:**
+- Step-by-step wizard. Each step must be valid before advancing.
+- Eligibility step: Select eligible roles and employment types (full-time, part-time, contract, internship).
+- Pool type step: Employee pool (Individual | Shared) × Dependent pool (Individual | Shared | None).
+- Utilization mode: Fixed vs Prorated. Fixed hides proration unit. Prorated constrains valid refresh cycle options.
+- Benefit groups: Add one or more named groups. Per group: distribution type (Shared Amount | Individual Benefit Amount), max usage per cycle, and a list of allowed services with amounts and optional co-payment.
+- Policy is saved as Draft until explicitly published.
 
 ---
 

@@ -86,16 +86,16 @@
 
 ---
 
-## Happy Path — Part B: Assign Policies to Employees
+## Happy Path — Part B: Assign Benefit Policies to Employees
 
-**1. Org Admin:** Navigates to Policy Assignment [NAVIGATE]  
-   — From previous confirmation, or direct: "Employee Management" → "Assign Policies"
+**1. Org Admin:** Navigates to Benefit Policy Assignment [NAVIGATE]  
+   — From previous confirmation, or direct: "Employee Management" → "Assign Benefit Policies"
 
 **2. System:** Shows policy assignment wizard (3 steps) [NAVIGATE]
 
-**STEP 1 — Select Policy:**
+**STEP 1 — Select Benefit Policy:**
 
-**3. System:** Displays available policies [API]  
+**3. System:** Displays available benefit policies [API]  
    — Only policies that Host has assigned to this org are shown  
    — Read-only policy contents: groups, benefits, amounts  
    — Selection: radio button (one policy at a time)

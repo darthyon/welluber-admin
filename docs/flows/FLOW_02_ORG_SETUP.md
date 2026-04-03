@@ -14,7 +14,8 @@
 **PHASE 1: HOST ADMIN CREATES ORG ACCOUNT**
 
 **1. Host:** Navigates to Organization Management [NAVIGATE]  
-   — Sees: list of all organizations (active, pending, suspended)  
+   — Sees: **Workforce Health Dashboard** (list of all organizations)
+   — Features: Tactical Triage Toolbar (Status, Needs Action, Service Category), Utilization Ring Charts
    — CTA: "Add Organization"
 
 **2. System:** Displays org account creation form [NAVIGATE]  

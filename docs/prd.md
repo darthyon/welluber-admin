@@ -4,7 +4,6 @@
 > **Version:** 2.2
 > **Last Updated:** 2026-04-03
 > **Owner:** Welluber Sdn Bhd
-> **Source:** `docs/welluber_prd.pdf`
 > **Classification:** Internal Use Only
 
 ---
@@ -56,7 +55,7 @@ Welluber Account (personal, permanent)
 
 Three-level hierarchy managed by Host Admin. Commission rates are configured at the service category level by Host Admin per SP.
 
-| Category | Main Service | Default Sub-services |
+| Category | Service Category (Main Service) | Sub-services (Searchable & Sectioned) |
 |---|---|---|
 | Fitness & Exercise | Gym Access | Daily Pass, Monthly Membership, Annual Membership |
 | | Personal Training | 1-on-1 Sessions, Small Group Training |
@@ -72,7 +71,7 @@ Three-level hierarchy managed by Host Admin. Commission rates are configured at 
 | | Physiotherapy | Injury Rehabilitation, Post-Surgery Recovery |
 | | Nutrition & Diet | Nutritional Counseling, Meal Prep, Diet Planning |
 
-> **Custom sub-services:** SPs can add free-text sub-service labels per voucher service line (e.g. 'Peak Hours Unlimited' under Gym Access). These are member-facing display labels only. They do not enter the global taxonomy. Host promotes taxonomy entries separately.
+> **Sectioned Listing:** The UI implements a categorized dropdown for service selection, allowing users to browse services under their respective categories. Host promotes taxonomy entries separately.
 
 ---
 
@@ -90,9 +89,9 @@ Three-level hierarchy managed by Host Admin. Commission rates are configured at 
 
 ### 4.2 Benefit Configuration
 
-**Policy** — Created and owned by Host Admin. HR cannot create policies. Fields: code (auto), name, created_by (Host Admin FK), cloned_from, assigned_orgs, eligible_roles/employee_types, benefit_pool_type, utilization_mode (Fixed|Prorated), refresh_cycle, refresh_start_reference, activation_mode (After Join Date|After Probation Ends|Custom Date KIV), status (draft|active).
+**Benefit Policy** — Created and owned by Host Admin. HR cannot create policies. Fields: code (auto), name, created_by (Host Admin FK), cloned_from, assigned_orgs, eligible_roles/employee_types, benefit_pool_type, utilization_mode (Fixed|Prorated), refresh_cycle, refresh_start_reference, activation_mode (After Join Date|After Probation Ends|Custom Date KIV), status (draft|active).
 
-> **Portal surface difference:** Host sees: create / edit / clone / assign policy to orgs. HR sees: list of policies assigned to their org + employee assignment wizard. HR cannot edit policy contents.
+> **Portal surface difference:** Host sees: create / edit / clone / assign benefit policy to orgs. HR sees: list of benefit policies assigned to their org + employee assignment wizard. HR cannot edit policy contents.
 
 **Benefit Pool Type Matrix:**
 
@@ -114,11 +113,11 @@ Three-level hierarchy managed by Host Admin. Commission rates are configured at 
 
 > **UI Note:** Compound field — Host UI must enforce valid combinations. Fixed mode hides proration unit.
 
-**Benefit Group:** group_id, policy_id (FK), name, group_distribution_type (Shared Amount | Individual Benefit Amount), maximum_usage_per_cycle.
+**Benefit Group:** group_id, benefit_policy_id (FK), name (e.g., Wellness Allocation, Lifestyle Pocket), group_distribution_type (Shared Amount | Individual Benefit Amount), maximum_usage_per_cycle.
 
 **Benefit (Allowlist Entry):** benefit_id, group_id (FK), service_id (FK → Taxonomy Main Service), benefit_amount/unit_value, co_payment_required, co_payment_value. If a service is not listed as a Benefit, it **cannot** be claimed.
 
-**Benefit Assignment:** assignment_id, employee_id (FK), policy_id (FK), effective_start_date, effective_end_date, calculated_benefit_pool, prorated_factor, last_refresh_date.
+**Benefit Assignment:** assignment_id, employee_id (FK), benefit_policy_id (FK), benefit_group_id (FK), effective_start_date, effective_end_date, calculated_benefit_pool, prorated_factor, last_refresh_date.
 
 > **Architecture Note:** Benefit Assignment is the most load-bearing entity. Prorate + refresh cycle + pool type must be unambiguous before EPIC 05 design starts.
 
@@ -179,10 +178,11 @@ Configured per SP, per service category by Host Admin. Fields: sp_id (FK), servi
 |---|---|
 | SYS-ORG-01 | Configure corporate profile, branches, org structure, and PICs |
 | SYS-ORG-02 | Bulk upload and manage employee profiles via CSV/Excel with row-level validation |
-| SYS-ORG-03 | 3-step policy assignment wizard |
-| SYS-ORG-04 | View utilization dashboard — spend, balance, benefit group breakdown |
+| SYS-ORG-03 | 3-step benefit policy assignment wizard |
+| SYS-ORG-04 | **Workforce Health Dashboard:** View tactical triage of organizations with utilization ring charts, spend, balance, and benefit breakdown |
 | SYS-ORG-05 | Branch wallet management — top-up, view balance, pending deductions |
 | SYS-ORG-06 | Employee offboarding with automatic benefit expiry |
+| SYS-ORG-07 | **Tactical Triage Toolbar:** Filter organizations by Status (Operational), Needs Action (Triage), and Service Category (Sectioned Taxonomy) |
 
 ### 5.3 Service Provider Portal
 

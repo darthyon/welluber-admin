@@ -11,7 +11,7 @@ export default function HostLayout({
       <AppSidebar persona="host" />
       <main className="flex flex-col h-screen flex-1 overflow-hidden">
         <TopBar />
-        <div className="p-8 space-y-6 flex-grow overflow-y-auto bg-background">
+        <div className="px-6 py-6 space-y-6 flex-grow overflow-y-auto">
           {children}
         </div>
       </main>

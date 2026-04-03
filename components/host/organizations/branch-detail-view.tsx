@@ -1,0 +1,293 @@
+"use client";
+
+import { useState } from "react";
+import { 
+  CaretLeft, 
+  Buildings, 
+  MapPin, 
+  Wallet, 
+  Users, 
+  Plus, 
+  TrendUp, 
+  CurrencyCircleDollar, 
+  TreeStructure,
+  Clock,
+  DotsThreeVertical,
+  PencilSimpleLine
+} from "@phosphor-icons/react";
+
+import { Button } from "@/components/ui/button";
+import { DetailSection } from "@/components/shared/detail-section";
+import { DetailField } from "@/components/shared/detail-field";
+import { ActionPopover } from "@/components/shared/action-popover";
+import { InviteAdminModal } from "./invite-admin-modal";
+import { StatusBadge } from "@/components/shared/status-badge";
+import { BackButton } from "@/components/shared/back-button";
+import { EntityHeader } from "@/components/shared/entity-header";
+import { TwoColumnDetailLayout } from "@/components/shared/two-column-detail-layout";
+import { cn } from "@/lib/utils";
+
+interface BranchDetailViewProps {
+  branchId: string;
+  onBack: () => void;
+  onEdit: () => void;
+}
+
+export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewProps) {
+  const [walletType, setWalletType] = useState<"independent" | "shared">("independent");
+
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  
+  // Mock Branch Data
+  const branchData = {
+    name: branchId === "br_1" ? "ACME HQ (Kuala Lumpur)" : "ACME Subang Jaya",
+    type: branchId === "br_1" ? "Headquarters (HQ)" : "Branch Office",
+    status: "Active",
+    address: {
+      line: "Level 12, Menara South",
+      city: "Kuala Lumpur",
+      state: "Wilayah Persekutuan",
+      country: "Malaysia",
+      postalCode: "50450",
+      timezone: "GMT +8:00",
+      coordinates: {
+        lat: "3.1390",
+        lng: "101.7036"
+      }
+    }
+  };
+
+  const handleResetPassword = (email: string) => {
+    // Simulated toast
+    const toast = document.createElement("div");
+    toast.className = "fixed bottom-4 left-1/2 -translate-x-1/2 bg-zinc-900 text-white text-[13px] px-4 py-2 rounded-lg shadow-xl z-[300] animate-in slide-in-from-bottom-2 duration-300";
+    toast.innerText = `Reset password email sent to ${email}`;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+      toast.classList.add("animate-out", "fade-out", "zoom-out-95");
+      setTimeout(() => document.body.removeChild(toast), 300);
+    }, 4000);
+  };
+
+  return (
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      {/* Invite Modal */}
+      <InviteAdminModal 
+        isOpen={isInviteModalOpen}
+        onClose={() => setIsInviteModalOpen(false)}
+        targetId={branchId}
+        title="Invite Org Admin"
+      />
+
+
+      <div className="flex flex-col gap-4">
+        <BackButton 
+          onClick={onBack}
+          label="Back to Regional Branches"
+        />
+        
+        <EntityHeader
+          title={branchData.name}
+          subtitle={branchData.type}
+          status={branchData.status}
+          statusVariant="emerald"
+          icon={<Buildings size={24} weight="fill" />}
+          actions={
+            <Button 
+              variant="secondary" 
+              size="lg" 
+              className="text-[13px] font-medium rounded-full gap-2 transition-all"
+              onClick={onEdit}
+            >
+              <PencilSimpleLine size={16} weight="bold" />
+              Edit Branch
+            </Button>
+          }
+        />
+      </div>
+
+      <TwoColumnDetailLayout
+        sidebar={
+          <>
+            {/* Section 3: Branch Governance (People) */}
+            <DetailSection 
+              title="Branch Governance" 
+              icon={<Users size={18} weight="duotone" />}
+              description="Admins with local management access"
+            >
+              <div className="space-y-3">
+                {[
+                  { name: "John Doe", email: "john.d@acme.com", role: "Branch Admin" },
+                  { name: "Ahmad Faizal", email: "ahmad.f@acme.com", role: "Operations" },
+                ].map((admin, i) => (
+                  <div key={i} className="flex items-center justify-between p-3 rounded-lg border border-border bg-card hover:border-primary/20 transition-all group">
+                     <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-[12px] font-bold text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                          {admin.name.split(' ').map(n=>n[0]).join('')}
+                        </div>
+                        <div>
+                          <p className="text-[13px] font-medium text-foreground">{admin.name}</p>
+                          <p className="text-[11px] text-muted-foreground">{admin.role}</p>
+                        </div>
+                     </div>
+                     <ActionPopover 
+                       actions={[
+                         { label: "View Details", onClick: () => console.log("View", admin.name) },
+                         { label: "Reset Password", onClick: () => handleResetPassword(admin.email) },
+                       ]}
+                     />
+                  </div>
+                ))}
+                <Button 
+                  variant="secondary" 
+                  size="sm"
+                  onClick={() => setIsInviteModalOpen(true)}
+                  className="w-full text-[12px] font-medium rounded-full flex items-center gap-2 mt-2 transition-all"
+                >
+                  <Plus size={14} weight="bold" />
+                  Send Invite
+                </Button>
+              </div>
+            </DetailSection>
+            
+            <div className="bg-indigo-600 rounded-xl p-6 text-white overflow-hidden relative group">
+              <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-1000" />
+              <h4 className="text-[15px] font-semibold mb-2">Branch Quick Stats</h4>
+              <div className="space-y-4 relative z-10">
+                <div>
+                  <p className="text-[11px] text-white/70">Total Employees</p>
+                  <p className="text-xl font-bold">1,240</p>
+                </div>
+                <div>
+                  <p className="text-[11px] text-white/70">Redemption Rate</p>
+                  <p className="text-xl font-bold">92%</p>
+                </div>
+              </div>
+            </div>
+          </>
+        }
+      >
+        {/* Section 1: Office Profile (Identity & Geography) */}
+          <DetailSection 
+            title="Office Profile" 
+            icon={<MapPin size={18} weight="duotone" />}
+            description="Geographic and identification details for this branch"
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
+              <DetailField label="Office Name" value={branchData.name} />
+              <DetailField label="Location Type" value={branchData.type} />
+              <DetailField label="Address Line" value={branchData.address.line} className="md:col-span-2" />
+              
+              <div className="grid grid-cols-2 gap-6 md:col-span-2">
+                <DetailField label="City / Township" value={branchData.address.city} />
+                <DetailField label="State / Province" value={branchData.address.state} />
+              </div>
+
+              <div className="grid grid-cols-2 gap-6 md:col-span-2">
+                <div className="relative group">
+                  <DetailField label="Country" value={branchData.address.country} />
+                  {/* Timezone Instrumentation */}
+                  <div className="absolute top-0 right-0 flex items-center gap-1.5 text-[10px] font-semibold text-primary/60 bg-primary/5 px-2 py-0.5 rounded-full border border-primary/10 select-none transition-all group-hover:bg-primary/10 group-hover:text-primary animate-in fade-in duration-700">
+                    <Clock size={10} weight="bold" />
+                    <span>{branchData.address.timezone}</span>
+                  </div>
+                </div>
+                <DetailField label="Postal Code" value={branchData.address.postalCode} />
+              </div>
+
+              {/* Map Thumbnail */}
+              <div className="md:col-span-2">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-[11px] font-medium text-muted-foreground">Location Mapping</p>
+                  <div className="flex items-center gap-3">
+
+                    <div className="flex items-center gap-1.5 text-[10px] font-mono bg-zinc-50 border border-zinc-200 px-1.5 py-0.5 rounded text-zinc-500">
+                      <span className="opacity-50">LAT</span>
+                      <span>{branchData.address.coordinates.lat}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-[10px] font-mono bg-zinc-50 border border-zinc-200 px-1.5 py-0.5 rounded text-zinc-500">
+                      <span className="opacity-50">LNG</span>
+                      <span>{branchData.address.coordinates.lng}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="relative aspect-[21/9] rounded-xl border border-border bg-muted/30 overflow-hidden group/map cursor-pointer">
+
+                  <div className="absolute inset-0 bg-[url('https://api.mapbox.com/styles/v1/mapbox/light-v10/static/101.7036,3.1390,12/800x400?access_token=pk.eyJ1IjoibW9ja2Rlc2lnbiIsImEiOiJjbGZnbXhsenQwMG1xM3lvM2wwNmwwNmwwIn0')] bg-cover bg-center grayscale group-hover:grayscale-0 transition-all duration-700" />
+                  <div className="absolute inset-0 bg-primary/5 group-hover:bg-transparent transition-colors" />
+                  
+                  {/* Center Marker */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-1 animate-pulse">
+                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center p-1 border border-primary/30">
+                      <div className="w-full h-full rounded-full bg-primary shadow-lg shadow-primary/40 ring-4 ring-white" />
+                    </div>
+                  </div>
+
+                  <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm border border-border px-3 py-1.5 rounded-lg shadow-sm text-[11px] font-medium text-foreground flex items-center gap-2">
+                     <TrendUp size={14} className="text-primary" />
+                     <span>High-Density Coverage Area</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </DetailSection>
+
+          {/* Section 2: Wallet Details */}
+          <DetailSection 
+            title="Wallet Details" 
+            icon={<Wallet size={18} weight="duotone" />}
+            description="Active configuration of the branch's financial resource pool"
+          >
+            {/* View Mode: Active Configuration Card */}
+            <div className="relative group/wallet bg-zinc-50/50 border border-zinc-200 rounded-xl p-6 overflow-hidden transition-all hover:border-primary/30">
+              {/* Decorative Accent */}
+              <div className="absolute -right-8 -top-8 w-32 h-32 bg-primary/5 rounded-full blur-3xl group-hover/wallet:scale-110 transition-transform duration-700" />
+              
+              <div className="relative z-10 space-y-6">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-white border border-zinc-200 text-zinc-500 flex items-center justify-center shadow-sm">
+                      {walletType === "independent" ? (
+                        <CurrencyCircleDollar size={24} weight="fill" />
+                      ) : (
+                        <TreeStructure size={24} weight="fill" />
+                      )}
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-[15px] text-foreground tracking-tight">
+                        {walletType === "independent" ? "New Single Wallet" : "Existing Wallet"}
+                      </h4>
+                      <p className="text-[12px] text-muted-foreground">Active Configuration</p>
+                    </div>
+                  </div>
+                  
+                  <div className="text-right">
+                    <p className="text-[11px] uppercase font-bold tracking-widest text-zinc-400 mb-1">Available Balance</p>
+                    <p className="text-2xl font-bold text-foreground">RM 45,000.00</p>
+                  </div>
+                </div>
+
+                <div className="pt-6 border-t border-zinc-200/60 grid grid-cols-2 lg:grid-cols-3 gap-6">
+                  <DetailField 
+                    label="Wallet ID" 
+                    value={<span className="font-mono text-[11px] bg-white px-1.5 py-0.5 rounded border border-zinc-200">WAL-BR01-2026</span>} 
+                  />
+                  <DetailField 
+                    label="Utilization" 
+                    value={<span className="text-[14px] font-semibold text-zinc-700">68% <span className="text-[11px] font-normal text-muted-foreground ml-1">(RM 30,600 spent)</span></span>} 
+                  />
+                  {walletType === "shared" && (
+                    <DetailField 
+                      label="Source Pool" 
+                      value={<span className="text-[13px] font-medium text-primary">Corporate Master HQ Wallet</span>} 
+                      className="md:col-span-1"
+                    />
+                  )}
+                </div>
+              </div>
+            </div>
+        </DetailSection>
+      </TwoColumnDetailLayout>
+    </div>
+  );
+}

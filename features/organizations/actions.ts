@@ -1,0 +1,57 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { CreateOrganizationData, InviteAdminData } from "./schemas";
+
+export async function createOrganization(data: CreateOrganizationData) {
+  // Simulate API delay
+  await new Promise((resolve) => setTimeout(resolve, 800));
+
+  // In a real app, this would perform a DB insert, generate an ID, create the HQ branch, etc.
+  const mockId = `org_${Date.now().toString().slice(-6)}`;
+  
+  // Revalidate the organizations list
+  revalidatePath("/organizations");
+
+  return { 
+    success: true, 
+    data: { 
+      id: mockId,
+      ...data,
+      status: "active"
+    } 
+  };
+}
+
+export async function inviteOrganizationAdmin(targetId: string, data: InviteAdminData) {
+  // Simulate API delay
+  await new Promise((resolve) => setTimeout(resolve, 600));
+
+  // Simulating the magic link generation and sending email
+  const mockToken = `ml_${Date.now()}_temp`;
+
+  return {
+    success: true,
+    message: `Invite sent to ${data.email}`,
+    data: {
+      token: mockToken,
+      expiresIn: "60 minutes"
+    }
+  };
+}
+
+export async function assignPoliciesToOrganization(orgId: string, policyIds: string[]) {
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  return {
+    success: true,
+    message: `${policyIds.length} policies assigned successfully.`
+  };
+}
+
+export async function sendWalletPaymentLink(orgId: string, amount: number, financeEmail: string) {
+  await new Promise((resolve) => setTimeout(resolve, 600));
+  return {
+    success: true,
+    message: `Payment link for RM ${amount.toLocaleString()} sent to ${financeEmail}`
+  };
+}

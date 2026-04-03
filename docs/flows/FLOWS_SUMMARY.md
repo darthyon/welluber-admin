@@ -11,7 +11,7 @@
 | Flow | Title | Platform | Status |
 |------|-------|----------|--------|
 | 1 | Platform Configuration | Host Portal | ✅ Taxonomy + Cron + Expired Split |
-| 2 | Organization Setup | Host Portal → Org Portal | ✅ Host creates org, Org Admin activates |
+| 2 | Organization Setup & Triage | Host Portal → Org Portal | ✅ **Tactical Dashboard** (Status, Needs Action, Service Category) |
 | 3 | Service Provider Setup | Host Portal → SP Portal | ✅ SP account + commission + tax profile |
 | 4 | Policy Management | Host Portal | ✅ Create/edit/clone/assign policies (merged with Flow 1) |
 
@@ -38,7 +38,7 @@
 | Flow | Title | Platform | Status |
 |------|-------|----------|--------|
 | 13 | Policy Engine: Pool Refresh | Org Portal (manual) + Backend (cron) | ⏳ Deferred (covered in Flow 6) |
-| 14 | HR Utilization Dashboard | Org Portal | ⏳ Deferred (Phase 2 analytics) |
+| 14 | HR Utilization Dashboard (Triage) | Org Portal | ✅ **Workforce Health Dashboard** with Ring Charts |
 | 15 | HR Employee Offboarding | Org Portal | ⏳ Deferred (simple deactivate operation) |
 | 16 | Member Dependent Linking | Member App | ⏳ Deferred (v2 feature) |
 
@@ -46,10 +46,10 @@
 
 ## File Locations
 
-**Generated Flows (in /mnt/user-data/outputs/):**
+**Flow files (in docs/flows/):**
 
 ```
-FLOW_HOST_ADMIN_CONFIGURATION.md      (Flow 1 + 4: Taxonomy, Policy, Commission, Cron)
+FLOW_00_HOST_ADMIN_CONFIGURATION.md   (Flow 1 + 4: Taxonomy, Policy, Commission, Cron)
 FLOW_02_ORG_SETUP.md                  (Flow 2: Organization onboarding, Host ↔ Org Admin)
 FLOW_03_SP_SETUP.md                   (Flow 3: Service Provider account, commission, tax)
 FLOW_05_MEMBER_ACTIVATION.md          (Flow 5: Account creation, corporate identity linking)
