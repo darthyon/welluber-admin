@@ -9,15 +9,13 @@ export default function HostLayout({
 }) {
   return (
     <SidebarProvider>
-      <div className="flex h-svh bg-background text-foreground overflow-hidden w-full">
-        <AppSidebar side="left" variant="sidebar" collapsible="icon" />
-        <SidebarInset className="flex flex-col flex-1 overflow-hidden">
-          <TopBar />
-          <div className="px-6 py-6 space-y-6 flex-grow overflow-y-auto">
-            {children}
-          </div>
-        </SidebarInset>
-      </div>
+      <AppSidebar />
+      <SidebarInset>
+        <TopBar />
+        <main className="flex flex-1 flex-col gap-6 p-8 pt-6">
+          {children}
+        </main>
+      </SidebarInset>
     </SidebarProvider>
   )
 }

@@ -14,7 +14,7 @@
     --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
     --color-sidebar-primary: var(--sidebar-primary);
     --color-sidebar-foreground: var(--sidebar-foreground);
-    --color-sidebar: var(--sidebar);
+    --color-sidebar: oklch(0.12 0.01 260 / 80%);
     --color-chart-5: var(--chart-5);
     --color-chart-4: var(--chart-4);
     --color-chart-3: var(--chart-3);
@@ -73,13 +73,13 @@
     --chart-4: oklch(0.457 0.24 277.023);
     --chart-5: oklch(0.398 0.195 277.366);
     --radius: 0.625rem;
-    --sidebar: oklch(0.985 0.001 106.423);
-    --sidebar-foreground: oklch(0.147 0.004 49.25);
-    --sidebar-primary: oklch(0.511 0.262 276.966);
+    --sidebar: oklch(0.12 0.01 260 / 80%);
+    --sidebar-foreground: oklch(0.985 0.001 106.423);
+    --sidebar-primary: oklch(0.457 0.24 277.023);
     --sidebar-primary-foreground: oklch(0.962 0.018 272.314);
-    --sidebar-accent: oklch(0.97 0.001 106.424);
-    --sidebar-accent-foreground: oklch(0.216 0.006 56.043);
-    --sidebar-border: oklch(0.923 0.003 48.717);
+    --sidebar-accent: oklch(0.457 0.24 277.023 / 8%);
+    --sidebar-accent-foreground: oklch(0.457 0.24 277.023);
+    --sidebar-border: oklch(0 0 0 / 8%);
     --sidebar-ring: oklch(0.709 0.01 56.259);
   }
 
@@ -127,11 +127,11 @@
     --chart-3: oklch(0.511 0.262 276.966);
     --chart-4: oklch(0.457 0.24 277.023);
     --chart-5: oklch(0.398 0.195 277.366);
-    --sidebar: oklch(0.216 0.006 56.043);
+    --sidebar: oklch(0.12 0.01 260 / 80%);
     --sidebar-foreground: oklch(0.985 0.001 106.423);
     --sidebar-primary: oklch(0.585 0.233 277.117);
     --sidebar-primary-foreground: oklch(0.962 0.018 272.314);
-    --sidebar-accent: oklch(0.268 0.007 34.298);
+    --sidebar-accent: oklch(0.585 0.233 277.117 / 15%);
     --sidebar-accent-foreground: oklch(0.985 0.001 106.423);
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.553 0.013 58.071);
@@ -148,4 +148,23 @@
   html {
     @apply font-sans;
     }
+
+  /* Forced Dark Charcoal Glass Sidebar (Stability Fix) */
+  [data-sidebar="sidebar"] {
+    --sidebar: oklch(0.12 0.01 260 / 92%) !important;
+    --sidebar-foreground: oklch(0.985 0.001 106.423) !important;
+    background-color: transparent !important; /* Managed by app-sidebar.tsx for layering */
+    backdrop-filter: blur(60px) saturate(300%) !important;
+    border-right: 0.5px solid oklch(1 0 0 / 15%) !important;
+  }
+
+  .sidebar-floating {
+    top: 0.75rem !important; 
+    bottom: 0.75rem !important;
+    height: calc(100svh - 24px) !important;
+    border-top-right-radius: 32px !important;
+    border-bottom-right-radius: 32px !important;
+    box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.5) !important;
+    overflow: hidden !important;
+  }
 }

@@ -6,22 +6,26 @@ import { usePathname } from "next/navigation"
 import {
   SquaresFour,
   Buildings,
-  ShieldCheck,
   CurrencyCircleDollar,
   Wallet,
   Shield,
-  TreeStructure,
-  Tag,
   Gear,
+  House,
+  Layout,
+  Lifebuoy,
+  List,
   Receipt,
-  ChartBar,
-  UsersFour,
-  ClockCounterClockwise,
-  CaretUpDown,
-  Check,
   Storefront,
-  Buildings as OrganizationIcon,
-  Storefront as ProviderIcon,
+  Tag,
+  TreeStructure,
+  Users,
+  UsersFour,
+  CaretUpDown,
+  CaretDoubleLeft,
+  CaretDoubleRight,
+  Check,
+  ChartBar,
+  ClockCounterClockwise,
   UserGear as HostIcon,
 } from "@phosphor-icons/react"
 
@@ -39,6 +43,7 @@ import {
   SidebarGroupLabel,
   SidebarGroupContent,
   SidebarRail,
+  SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar"
 import {
@@ -54,23 +59,23 @@ import {
 const personas = [
   {
     id: "host",
-    name: "Host Console",
+    name: "Host Admin",
     description: "Platform Infrastructure",
-    icon: HostIcon,
+    icon: Shield,
     active: true,
   },
   {
     id: "org",
-    name: "Organization Console",
+    name: "Organization Admin",
     description: "Corporate Management",
-    icon: OrganizationIcon,
+    icon: Buildings,
     active: false,
   },
   {
     id: "service-provider",
-    name: "Provider Console",
+    name: "Provider Admin",
     description: "Service & Vouchers",
-    icon: ProviderIcon,
+    icon: Storefront,
     active: false,
   },
 ]
@@ -118,128 +123,148 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { state } = useSidebar()
   const [activePersona, setActivePersona] = React.useState(personas[0])
 
-  const handlePersonaSwitch = (persona: typeof personas[0]) => {
-    if (!persona.active) {
-      // Placeholder for toast or alert
-      alert(`${persona.name} coming soon!`)
-      return
-    }
-    setActivePersona(persona)
-  }
-
   return (
-    <Sidebar collapsible="icon" className="border-r border-sidebar-border" {...props}>
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton
-                  size="lg"
-                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                >
-                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                    <activePersona.icon size={18} weight="fill" />
-                  </div>
-                  <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
-                    <span className="truncate font-semibold">WellUber</span>
-                    <span className="truncate text-xs font-medium text-muted-foreground">{activePersona.name}</span>
-                  </div>
-                  <CaretUpDown className="ml-auto size-4 text-muted-foreground group-data-[collapsible=icon]:hidden" />
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                className="w-(--reka-popper-anchor-width) min-w-56 rounded-lg"
-                align="start"
-                side="bottom"
-                sideOffset={4}
-              >
-                <DropdownMenuLabel className="text-xs text-muted-foreground">Personas</DropdownMenuLabel>
-                {personas.map((persona) => (
-                  <DropdownMenuItem
-                    key={persona.id}
-                    onClick={() => handlePersonaSwitch(persona)}
-                    className="gap-2 p-2 focus:bg-accent"
+    <Sidebar 
+      collapsible="icon" 
+      className="sidebar-floating border-r-0 shadow-2xl overflow-hidden group-data-[collapsible=icon]:w-[var(--sidebar-width-icon)]"
+      {...props}
+    >
+      {/* 1. Deep Layer: Solid Silhouette Base */}
+      <div className="absolute inset-0 bg-[#0f1117] z-0" />
+
+      {/* 2. Glow Layer: The "Indigo Bleed" */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-10 opacity-60">
+        <div className="absolute -left-[40%] -top-[10%] w-[250%] h-[60%] bg-[#4f46e5]/40 blur-[130px] rounded-full" />
+        <div className="absolute -left-[30%] bottom-[10%] w-[220%] h-[50%] bg-[#3b82f6]/30 blur-[110px] rounded-full" />
+      </div>
+
+      {/* 3. Glass Layer: The Charcoal Frosted Cover */}
+      <div className="absolute inset-0 z-20 bg-black/60 backdrop-blur-3xl saturate-[300%]" />
+
+      {/* 4. Content Layer: The Navigation UI */}
+      <div className="relative z-30 flex flex-col h-full">
+        <SidebarHeader className="group-data-[collapsible=icon]:p-2 pt-4">
+          <div className="flex items-center justify-between px-2 mb-4">
+            <div className="flex items-center gap-2.5 group-data-[collapsible=icon]:hidden">
+              <div className="flex aspect-square size-7 items-center justify-center rounded-lg bg-primary shadow-lg shadow-primary/20 text-primary-foreground">
+                <Layout size={16} weight="fill" />
+              </div>
+              <span className="font-bold text-white tracking-tight uppercase text-[12px] opacity-70">
+                WellUber™
+              </span>
+            </div>
+            <SidebarTrigger className="h-8 w-8 hover:bg-white/10 transition-colors text-white/40 hover:text-white group-data-[collapsible=icon]:mx-auto">
+              {state === "expanded" ? (
+                <CaretDoubleLeft size={16} weight="bold" />
+              ) : (
+                <CaretDoubleRight size={16} weight="bold" />
+              )}
+            </SidebarTrigger>
+          </div>
+
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <SidebarMenuButton
+                    size="lg"
+                    className="data-[state=open]:bg-white/5 data-[state=open]:text-white hover:bg-white/5 transition-all duration-300"
                   >
-                    <div className="flex size-6 items-center justify-center rounded-sm border border-border bg-background">
-                      <persona.icon className="size-4 shrink-0" weight={persona.id === activePersona.id ? "fill" : "regular"} />
+                    <div className="flex aspect-square size-8.5 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10 shadow-sm text-primary shrink-0 group-data-[collapsible=icon]:size-9">
+                      <activePersona.icon size={19} weight="fill" />
                     </div>
-                    <div className="flex flex-col gap-0.5">
-                      <span className="text-sm font-medium">{persona.name}</span>
-                      <span className="text-[10px] text-muted-foreground">{persona.description}</span>
+                    <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden ml-3">
+                      <span className="truncate font-bold tracking-tight text-[13px] text-white/90">
+                        {activePersona.name}
+                      </span>
+                      <span className="truncate text-[10px] font-medium text-white/40 uppercase tracking-wider">Admin Account</span>
                     </div>
-                    {persona.id === activePersona.id && (
-                      <Check className="ml-auto size-4" />
-                    )}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarHeader>
+                    <CaretUpDown className="ml-auto size-4 text-white/20 group-data-[collapsible=icon]:hidden" />
+                  </SidebarMenuButton>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  className="w-[200px] bg-[#1a1c23] border-white/10 text-white"
+                  align="start"
+                  side="right"
+                  sideOffset={4}
+                >
+                  <DropdownMenuLabel className="text-[10px] uppercase font-bold text-white/40 px-2 py-1.5">
+                    Select Account Type
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-white/5" />
+                  {personas.map((persona) => (
+                    <DropdownMenuItem
+                      key={persona.name}
+                      onClick={() => setActivePersona(persona)}
+                      className="gap-2 p-2 focus:bg-white/5 focus:text-white cursor-pointer"
+                    >
+                      <div className="flex size-6 items-center justify-center rounded-md bg-white/5 ring-1 ring-white/10">
+                        <persona.icon size={14} weight="fill" className="text-primary" />
+                      </div>
+                      <span className="text-[13px] font-medium">{persona.name}</span>
+                      {persona.id === activePersona.id && (
+                        <Check className="ml-auto size-4 text-primary" />
+                      )}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarHeader>
 
-      <SidebarContent>
-        {hostNavigation.map((section) => (
-          <SidebarGroup key={section.title}>
-            <SidebarGroupLabel>{section.title}</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {section.items.map((item) => {
-                  const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
-                  const Icon = item.icon
+        <SidebarContent className="px-2 pt-3 no-scrollbar">
+          {hostNavigation.map((section) => (
+            <SidebarGroup key={section.title} className="py-2.5">
+              <SidebarGroupLabel className="text-[11px] font-bold uppercase tracking-[0.14em] text-white/50 mb-2 px-3 group-data-[collapsible=icon]:hidden">
+                {section.title}
+              </SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu className="gap-1">
+                  {section.items.map((item) => {
+                    const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
+                    const Icon = item.icon
 
-                  return (
-                    <SidebarMenuItem key={item.id}>
-                      <SidebarMenuButton
-                        asChild
-                        isActive={isActive}
-                        tooltip={item.label}
-                        className={cn(
-                          "transition-all duration-200",
-                          isActive ? "bg-accent text-foreground" : "text-muted-foreground"
-                        )}
-                      >
-                        <Link href={item.href}>
-                          <Icon
-                            size={16}
-                            weight={isActive ? "fill" : "regular"}
-                            className={cn(
-                              "shrink-0 transition-colors",
-                              isActive ? "text-foreground" : "text-muted-foreground/70"
-                            )}
-                          />
-                          <span className="font-medium">{item.label}</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  )
-                })}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        ))}
-      </SidebarContent>
-
-      <SidebarFooter className="border-t border-sidebar-border">
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              size="lg"
-              className="hover:bg-transparent cursor-default px-2 py-3"
-            >
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-[11px] font-semibold shrink-0">
-                {user.initials}
-              </div>
-              <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden overflow-hidden ml-1">
-                <span className="truncate font-medium text-foreground">{user.name}</span>
-                <span className="truncate text-xs text-muted-foreground">{user.email}</span>
-              </div>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
-      <SidebarRail />
+                    return (
+                      <SidebarMenuItem key={item.id}>
+                        <SidebarMenuButton
+                          asChild
+                          isActive={isActive}
+                          tooltip={item.label}
+                          className={cn(
+                            "transition-all duration-200 h-11 rounded-lg px-3 relative overflow-hidden",
+                            isActive 
+                              ? "bg-white/10 text-white backdrop-blur-md ring-1 ring-white/10 shadow-lg shadow-black/20" 
+                              : "text-white/60 hover:bg-white/5 hover:text-white"
+                          )}
+                        >
+                          <Link href={item.href} className="flex items-center gap-3.5">
+                            <Icon
+                              size={20}
+                              weight={isActive ? "fill" : "regular"}
+                              className={cn(
+                                "shrink-0 transition-colors",
+                                isActive ? "text-primary" : "text-white/40"
+                              )}
+                            />
+                            <span className={cn(
+                              "text-sm font-medium tracking-tight truncate group-data-[collapsible=icon]:hidden",
+                              isActive ? "text-white" : "text-white/70"
+                            )}>
+                              {item.label}
+                            </span>
+                          </Link>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    )
+                  })}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          ))}
+        </SidebarContent>
+        <SidebarRail />
+      </div>
     </Sidebar>
   )
 }
