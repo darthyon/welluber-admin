@@ -62,14 +62,13 @@ export type CreateBranchData = z.infer<typeof createBranchSchema>;
 // ─── SP Voucher ───────────────────────────────────────────────────────────────
 
 const serviceLineSchema = z.object({
-  serviceCategory: z.string().min(1, "Service category is required"),
-  subServiceLabel: z.string().min(1, "Sub-service label is required"),
+  service: z.string().min(1, "Service is required"),
+  subServices: z.array(z.string()).min(1, "Select at least one sub-service"),
   description: z.string().optional(),
   duration: z.object({
     unit: z.enum(["session", "min", "hr", "day", "month", "year"]),
     value: z.number().min(1, "Duration must be at least 1"),
   }),
-  weight: z.number().min(0).max(1),
 });
 
 export const createVoucherSchema = z.object({
@@ -77,14 +76,7 @@ export const createVoucherSchema = z.object({
   description: z.string().optional(),
   serviceLines: z
     .array(serviceLineSchema)
-    .min(1, "Add at least one service line")
-    .refine(
-      (lines) => {
-        const sum = lines.reduce((acc, l) => acc + l.weight, 0);
-        return Math.abs(sum - 1) < 0.001;
-      },
-      { message: "Service line weights must sum to 1.0" }
-    ),
+    .min(1, "Add at least one service line"),
   currency: z.string().default("MYR"),
   initialPrice: z.number().min(0, "Initial price must be 0 or more"),
   finalPrice: z.number().int("Final price must be a whole number").min(0),
@@ -92,17 +84,12 @@ export const createVoucherSchema = z.object({
     startDate: z.string().min(1, "Start date is required"),
     endDate: z.string().optional(),
   }),
-  validationDuration: z.object({
-    unit: z.enum(["days", "months", "half_year", "year"]),
-    value: z.number().min(1, "Duration value must be at least 1"),
-  }),
   redemptionPeriod: z.object({
     mode: z.enum(["exact_date", "after_purchase"]),
     date: z.string().optional(),
     unit: z.enum(["hr", "day", "month"]).optional(),
     value: z.number().optional(),
   }),
-  membershipStartDay: z.enum(["none", "1st", "15th"]).default("none"),
   branchScope: z.enum(["all", "specific"]).default("all"),
   branchIds: z.array(z.string()).default([]),
 });

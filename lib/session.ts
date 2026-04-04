@@ -18,10 +18,10 @@ export interface SessionUser {
 // Stub user for development — host admin by default
 const STUB_USER: SessionUser = {
   id: "usr_dev_001",
-  name: "Alexander Chen",
-  email: "alex@welluber.com",
+  name: "Yon Yusuf",
+  email: "yon@welluber.com",
   role: "host",
-  initials: "AC",
+  initials: "YY",
 }
 
 /**

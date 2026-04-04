@@ -19,8 +19,8 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: {
-    default: "WellUber Admin",
-    template: "%s | WellUber Admin",
+    default: "WellUber Console",
+    template: "%s | WellUber Console",
   },
   description: "Flexi-benefit management platform for corporate organizations",
 }

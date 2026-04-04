@@ -33,6 +33,29 @@ export const SERVICE_TAXONOMY = [
   }
 ];
 
+export const SERVICE_SPEC_TAXONOMY: Record<string, string[]> = {
+  "Gymnasium Facilities": ["Standard Gym Access", "Boutique Studio Memberships"],
+  "Group Fitness": ["Yoga", "Pilates", "Indoor Cycling", "Zumba", "Martial Arts"],
+  "Personal Coaching": ["Individual Training", "Small Group Training", "Virtual Coaching"],
+  "Recreational Sports": ["Swimming Pool Access", "Court Bookings (Tennis, Badminton)", "Golf"],
+  "Clinical Therapy": ["Psychotherapy", "Cognitive Behavioral Therapy", "Psychiatric Care"],
+  "Mental Fitness": ["Meditation App Subscriptions", "Mindfulness Workshops"],
+  "Crisis Intervention": ["Addiction Recovery Support", "Grief Counseling"],
+  "Life Coaching": ["Behavioral Coaching", "Financial Wellness Counseling"],
+  "Physical Therapy": ["Sports Injury Rehabilitation", "Post-Surgical Recovery"],
+  "Specialized Therapies": ["Occupational Therapy", "Speech Therapy", "Cardiac Rehabilitation"],
+  "Traditional Medicine": ["Traditional Chinese Medicine", "Ayurveda", "Acupuncture"],
+  "Complementary Therapy": ["Chiropractic Care", "Osteopathy", "Homeopathy"],
+  "Musculoskeletal Recovery": ["Deep Tissue Massage", "Sports Massage", "Clinical Reflexology"],
+  "Advanced Recovery": ["Cryotherapy", "Infrared Sauna", "Floatation Therapy", "Hyperbaric Oxygen"],
+  "Dietary Counseling": ["Clinical Dietitian Consultations", "Diabetic Management Planning"],
+  "Nutritional Education": ["Healthy Meal Preparation Workshops", "Weight Management Programs"],
+  "Health Screenings": ["Comprehensive Blood Panels", "Biometric Screenings", "Bone Density"],
+  "Ergonomic Support": ["Posture Assessments", "Ergonomic Equipment Allowances"],
+  "Therapeutic Spa Services": ["Relaxation Massage", "Prenatal Massage", "Hydrotherapy"],
+  "Dermatological Care": ["Clinical Skin Treatments", "Laser Therapy", "Eczema Management"]
+};
+
 export const ALL_SERVICES = SERVICE_TAXONOMY.flatMap(cat => cat.services);
 
 export const WORKFORCE_RANGES = [

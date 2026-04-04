@@ -33,6 +33,13 @@ export async function activateSp(spId: string) {
   return { success: true, message: "Service provider activated." };
 }
 
+export async function removeSp(spId: string) {
+  await new Promise((resolve) => setTimeout(resolve, 700));
+  revalidatePath(`/service-providers/${spId}`);
+  revalidatePath("/service-providers");
+  return { success: true, message: "Service provider removed." };
+}
+
 // ─── SP Branch ────────────────────────────────────────────────────────────────
 
 export async function createBranch(spId: string, data: CreateBranchData) {

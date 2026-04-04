@@ -10,7 +10,7 @@ export type SpBranchContactType = "branch_manager" | "staff" | "reception";
 export type DurationUnit = "session" | "min" | "hr" | "day" | "month" | "year";
 export type ValidationUnit = "days" | "months" | "half_year" | "year";
 export type RedemptionUnit = "hr" | "day" | "month";
-export type MembershipStartDay = "none" | "1st" | "15th";
+export type MembershipStartDay = "immediate" | "1st" | "specific";
 
 // ─── Tax Profile ──────────────────────────────────────────────────────────────
 
@@ -90,14 +90,13 @@ export interface SpBranch {
 // ─── SP Voucher ───────────────────────────────────────────────────────────────
 
 export interface ServiceLine {
-  serviceCategory: string;
-  subServiceLabel: string;
+  service: string;
+  subServices: string[];
   description: string;
   duration: {
     unit: DurationUnit;
     value: number;
   };
-  weight: number; // 0–1, all lines must sum to 1.0
 }
 
 export interface RedemptionPeriod {

@@ -19,15 +19,24 @@ interface TaxProfileFormProps {
 export function TaxProfileForm({ spId, initial }: TaxProfileFormProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [savedMessage, setSavedMessage] = useState<string | null>(null);
-  const [isTaxRegistered, setIsTaxRegistered] = useState(initial.isTaxRegistered);
+  const [savedProfile, setSavedProfile] = useState({
+    isTaxRegistered: initial.isTaxRegistered,
+    taxRegNo: initial.taxRegNo ?? "",
+    taxRate: initial.taxRate,
+  });
 
   const {
     register,
     handleSubmit,
+    getValues,
+    trigger,
+    watch,
     setValue,
+    clearErrors,
     formState: { errors },
   } = useForm<TaxProfileData>({
     resolver: zodResolver(taxProfileSchema as any),
+    shouldUnregister: true,
     defaultValues: {
       isTaxRegistered: initial.isTaxRegistered,
       taxRegNo: initial.taxRegNo ?? "",
@@ -36,9 +45,11 @@ export function TaxProfileForm({ spId, initial }: TaxProfileFormProps) {
   });
 
   const handleToggle = (checked: boolean) => {
-    setIsTaxRegistered(checked);
-    setValue("isTaxRegistered", checked);
-    if (!checked) setValue("taxRegNo", "");
+    setValue("isTaxRegistered", checked, { shouldDirty: true, shouldValidate: false });
+    if (!checked) {
+      setValue("taxRegNo", "");
+      clearErrors("taxRegNo");
+    }
   };
 
   const onSubmit = async (data: TaxProfileData) => {
@@ -46,10 +57,31 @@ export function TaxProfileForm({ spId, initial }: TaxProfileFormProps) {
     setSavedMessage(null);
     try {
       const res = await saveTaxProfile(spId, data);
-      if (res.success) setSavedMessage(res.message ?? "Saved.");
+      if (res.success) {
+        setSavedMessage(res.message ?? "Saved.");
+        setSavedProfile({
+          isTaxRegistered: data.isTaxRegistered,
+          taxRegNo: data.taxRegNo ?? "",
+          taxRate: data.taxRate,
+        });
+      }
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const currentRegistered = watch("isTaxRegistered", initial.isTaxRegistered);
+  const currentTaxRegNo = watch("taxRegNo", initial.taxRegNo ?? "");
+  const currentTaxRate = watch("taxRate", initial.taxRate);
+  const isDirty =
+    currentRegistered !== savedProfile.isTaxRegistered ||
+    currentTaxRate !== savedProfile.taxRate ||
+    (currentRegistered && currentTaxRegNo !== savedProfile.taxRegNo);
+
+  const handleSaveClick = async () => {
+    const valid = await trigger();
+    if (!valid) return;
+    await onSubmit(getValues());
   };
 
   const inputCls = (hasError?: boolean) =>
@@ -68,71 +100,74 @@ export function TaxProfileForm({ spId, initial }: TaxProfileFormProps) {
             Wellness centres above RM 500,000 taxable turnover must register for SST.
           </p>
         </div>
-        <Switch checked={isTaxRegistered} onCheckedChange={handleToggle} />
+        <Switch checked={currentRegistered} onCheckedChange={handleToggle} />
       </div>
 
-      {/* Conditional fields */}
-      {isTaxRegistered && (
+      <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] gap-4 items-end">
+        {currentRegistered && (
+          <div className="space-y-1.5 md:self-stretch">
+            <label className="text-[13px] font-medium text-foreground">SST Registration Number</label>
+            <input
+              {...register("taxRegNo")}
+              className={inputCls(!!errors.taxRegNo)}
+              placeholder="e.g. SST-2024-001234"
+            />
+            {errors.taxRegNo && (
+              <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
+                <WarningCircle size={12} /> {errors.taxRegNo.message}
+              </p>
+            )}
+          </div>
+        )}
+
         <div className="space-y-1.5">
-          <label className="text-[13px] font-medium text-foreground">SST Registration Number</label>
-          <input
-            {...register("taxRegNo")}
-            className={inputCls(!!errors.taxRegNo)}
-            placeholder="e.g. SST-2024-001234"
-          />
-          {errors.taxRegNo && (
+          <label className="text-[13px] font-medium text-foreground flex items-center justify-between">
+            Tax Rate
+            <span className="text-[11px] font-normal text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+              Default: 8% (SST Group C)
+            </span>
+          </label>
+          <div className="relative">
+            <input
+              type="number"
+              step="0.01"
+              min={0}
+              max={1}
+              {...register("taxRate", { valueAsNumber: true })}
+              className={inputCls(!!errors.taxRate)}
+            />
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-muted-foreground pointer-events-none">
+              (decimal, e.g. 0.08 = 8%)
+            </span>
+          </div>
+          {errors.taxRate && (
             <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
-              <WarningCircle size={12} /> {errors.taxRegNo.message}
+              <WarningCircle size={12} /> {errors.taxRate.message}
             </p>
           )}
         </div>
-      )}
 
-      <div className="space-y-1.5">
-        <label className="text-[13px] font-medium text-foreground flex items-center justify-between">
-          Tax Rate
-          <span className="text-[11px] font-normal text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
-            Default: 8% (SST Group C)
-          </span>
-        </label>
-        <div className="relative">
-          <input
-            type="number"
-            step="0.01"
-            min={0}
-            max={1}
-            {...register("taxRate", { valueAsNumber: true })}
-            className={inputCls(!!errors.taxRate)}
-          />
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-muted-foreground pointer-events-none">
-            (decimal, e.g. 0.08 = 8%)
-          </span>
-        </div>
-        {errors.taxRate && (
-          <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
-            <WarningCircle size={12} /> {errors.taxRate.message}
-          </p>
-        )}
-      </div>
-
-      <div className="flex items-center justify-between pt-1">
-        {savedMessage ? (
-          <p className="text-[12px] text-emerald-600 flex items-center gap-1.5 font-medium">
-            <CheckCircle size={14} weight="fill" /> {savedMessage}
-          </p>
-        ) : (
-          <div />
-        )}
-        <Button type="submit" size="sm" disabled={isSaving} className="text-[13px]">
-          {isSaving ? (
-            <>
-              <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-1.5" />
-              Saving...
-            </>
+        <div className="flex flex-col items-start md:items-end gap-2 md:self-end">
+          {isDirty ? (
+            <Button type="button" size="sm" disabled={isSaving} onClick={handleSaveClick} className="text-[13px]">
+              {isSaving ? (
+                <>
+                  <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-1.5" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  Save
+                  <CheckCircle size={14} weight="bold" />
+                </>
+              )}
+            </Button>
           ) : (
-            "Save Tax Profile"
+            <span className="inline-flex items-center gap-1.5 text-[12px] font-medium text-emerald-600">
+              <CheckCircle size={14} weight="fill" /> Saved
+            </span>
           )}
-        </Button>
+        </div>
       </div>
     </form>
   );

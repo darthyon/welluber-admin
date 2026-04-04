@@ -5,8 +5,13 @@ import { Plus, Ticket } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
 import { StatusBadge } from "@/components/shared/status-badge";
+import { DetailSection } from "@/components/shared/detail-section";
+import { DataToolbarContainer } from "@/components/shared/data-toolbar";
+import { SearchBar } from "@/components/shared/search-bar";
+import { FilterItem } from "@/components/shared/filter-item";
 import { SpVoucherForm } from "./sp-voucher-form";
 import type { ServiceProvider, SpVoucher, SpVoucherStatus } from "@/types/provider";
+import { ActionPopover } from "@/components/shared/action-popover";
 import { cn } from "@/lib/utils";
 
 interface SpVouchersTabProps {
@@ -36,11 +41,16 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
   const [view, setView] = useState<VoucherView>("list");
   const [selectedVoucherId, setSelectedVoucherId] = useState<string | null>(null);
   const [statusTab, setStatusTab] = useState<SpVoucherStatus | "all">("all");
+  const [voucherSearch, setVoucherSearch] = useState("");
 
   const selectedVoucher = sp.vouchers.find((v) => v.id === selectedVoucherId);
 
   const filteredVouchers = sp.vouchers.filter(
-    (v) => statusTab === "all" || v.status === statusTab
+    (v) =>
+      (statusTab === "all" || v.status === statusTab) &&
+      [v.name, v.description, v.code].some((field) =>
+        field.toLowerCase().includes(voucherSearch.toLowerCase())
+      )
   );
 
   const handleEdit = (voucher: SpVoucher) => {
@@ -60,10 +70,7 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
 
   if (view === "form") {
     return (
-      <div className="space-y-4">
-        <h3 className="text-[15px] font-semibold text-foreground">
-          {selectedVoucher ? `Edit — ${selectedVoucher.name}` : "Create New Voucher"}
-        </h3>
+      <div className="animate-in fade-in slide-in-from-bottom-2 duration-400">
         <SpVoucherForm
           spId={sp.id}
           spServiceCategories={sp.serviceCategories}
@@ -78,102 +85,107 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
 
   return (
     <div className="space-y-4">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex gap-1 bg-muted/40 border border-border rounded-lg p-1">
-          {STATUS_FILTER_TABS.map(({ label, value }) => {
-            const count = value === "all" ? sp.vouchers.length : sp.vouchers.filter((v) => v.status === value).length;
-            return (
-              <button
-                key={value}
-                onClick={() => setStatusTab(value)}
-                className={cn(
-                  "flex items-center gap-1.5 px-3 py-1.5 rounded text-[12px] font-medium transition-colors",
-                  statusTab === value ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                {label}
-                {count > 0 && (
-                  <span className={cn("text-[9px] font-bold px-1 py-0.5 rounded-full min-w-[16px] text-center", statusTab === value ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground")}>
-                    {count}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </div>
-        <Button size="sm" className="h-9 text-[13px] gap-2" onClick={handleAdd}>
-          <Plus size={15} weight="bold" /> Create Voucher
-        </Button>
-      </div>
-
-      {/* Voucher list */}
-      {filteredVouchers.length === 0 ? (
-        <EmptyState
-          icon={<Ticket size={32} weight="light" />}
-          title={statusTab === "all" ? "No vouchers yet" : `No ${statusTab} vouchers`}
-          description={statusTab === "all" ? "Create your first voucher to make services purchasable." : ""}
-          action={statusTab === "all" ? (
-            <Button onClick={handleAdd} size="sm" className="gap-2">
-              <Plus size={14} /> Create First Voucher
-            </Button>
-          ) : undefined}
-        />
-      ) : (
-        <div className="border border-border rounded-xl overflow-hidden">
-          {/* Table header */}
-          <div className="grid grid-cols-[1fr_120px_140px_120px_100px_80px] gap-3 px-4 py-2.5 bg-muted/30 border-b border-border">
-            {["Voucher", "Code", "Activation", "Price (RM)", "Status", ""].map((h) => (
-              <p key={h} className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{h}</p>
-            ))}
-          </div>
-
-          {filteredVouchers.map((voucher) => (
-            <div
-              key={voucher.id}
-              onClick={() => handleEdit(voucher)}
-              className="grid grid-cols-[1fr_120px_140px_120px_100px_80px] gap-3 px-4 py-3.5 border-b border-border/50 last:border-0 hover:bg-muted/20 transition-colors cursor-pointer items-center"
-            >
-              <div>
-                <p className="text-[13px] font-semibold text-foreground">{voucher.name}</p>
-                <p className="text-[11px] text-muted-foreground line-clamp-1">{voucher.description}</p>
-              </div>
-
-              <span className="text-[11px] font-mono text-muted-foreground bg-muted/50 px-1.5 py-0.5 rounded truncate">
-                {voucher.code}
-              </span>
-
-              <div className="text-[11px] text-muted-foreground">
-                <p>{new Date(voucher.activationPeriod.startDate).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" })}</p>
-                {voucher.activationPeriod.endDate ? (
-                  <p>→ {new Date(voucher.activationPeriod.endDate).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" })}</p>
-                ) : (
-                  <p className="text-muted-foreground/60 italic">Open-ended</p>
-                )}
-              </div>
-
-              <div>
-                {voucher.initialPrice !== voucher.finalPrice && (
-                  <p className="text-[10px] text-muted-foreground line-through">RM {voucher.initialPrice}</p>
-                )}
-                <p className="text-[13px] font-bold text-foreground font-mono">RM {voucher.finalPrice}</p>
-              </div>
-
-              <StatusBadge
-                status={voucher.status}
-                variant={STATUS_VARIANT[voucher.status]}
+      <DetailSection
+        title="Vouchers"
+        icon={<Ticket size={16} weight="fill" />}
+        description="Create and manage provider vouchers, publish states, and activation periods."
+        action={
+          <Button size="sm" variant="secondary" className="h-8 text-[12px] gap-2" onClick={handleAdd}>
+            <Plus size={14} weight="bold" /> Add voucher
+          </Button>
+        }
+      >
+        <div className="space-y-4">
+          <DataToolbarContainer
+            search={<SearchBar placeholder="Search vouchers..." value={voucherSearch} onChange={setVoucherSearch} />}
+            filters={
+              <FilterItem
+                label="Status"
+                value={statusTab}
+                onChange={(value) => setStatusTab(value as SpVoucherStatus | "all")}
+                options={STATUS_FILTER_TABS.map(({ label, value }) => ({
+                  label: `${label}${value === "all" ? "" : ` (${sp.vouchers.filter((v) => v.status === value).length})`}`,
+                  value,
+                }))}
               />
+            }
+          />
 
-              <button
-                onClick={(e) => { e.stopPropagation(); handleEdit(voucher); }}
-                className="text-[11px] text-primary hover:underline font-medium"
-              >
-                Edit
-              </button>
+          {filteredVouchers.length === 0 ? (
+            <EmptyState
+              icon={<Ticket size={32} weight="light" />}
+              title={voucherSearch || statusTab !== "all" ? "No vouchers found" : "No vouchers yet"}
+              description={voucherSearch || statusTab !== "all" ? "Try another search or clear the status filter." : "Create your first voucher to make services purchasable."}
+              action={statusTab === "all" && !voucherSearch ? (
+                <Button onClick={handleAdd} size="sm" className="gap-2">
+                  <Plus size={14} /> Add First Voucher
+                </Button>
+              ) : undefined}
+            />
+          ) : (
+            <div className="border border-border rounded-xl overflow-hidden bg-white shadow-sm">
+              <div className="grid grid-cols-[1.2fr_1.8fr_140px_110px_100px_48px] gap-4 px-5 py-3 bg-muted/40 border-b border-border">
+                {["Voucher", "Description", "Period", "Price (RM)", "Status", ""].map((h) => (
+                  <p key={h} className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{h}</p>
+                ))}
+              </div>
+
+              {filteredVouchers.map((voucher) => (
+                <div
+                  key={voucher.id}
+                  className="grid grid-cols-[1.2fr_1.8fr_140px_110px_100px_48px] gap-4 px-5 py-4 border-b border-border/50 last:border-0 hover:bg-muted/10 transition-colors items-center"
+                >
+                  <div className="space-y-1">
+                    <p className="text-[13px] font-bold text-foreground leading-none">{voucher.name}</p>
+                    <p className="text-[10px] font-mono text-muted-foreground bg-muted/50 w-fit px-1.5 py-0.5 rounded leading-none">
+                      {voucher.code}
+                    </p>
+                  </div>
+
+                  <p className="text-[12px] text-muted-foreground leading-relaxed line-clamp-2">
+                    {voucher.description || "—"}
+                  </p>
+
+                  <div className="text-[11px] text-muted-foreground space-y-0.5">
+                    <p className="font-medium text-foreground/80">{new Date(voucher.activationPeriod.startDate).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" })}</p>
+                    {voucher.activationPeriod.endDate ? (
+                      <p className="opacity-70">→ {new Date(voucher.activationPeriod.endDate).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" })}</p>
+                    ) : (
+                      <p className="text-[10px] text-muted-foreground/60 italic">Open-ended</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-0.5">
+                    {voucher.initialPrice !== voucher.finalPrice && (
+                      <p className="text-[10px] text-muted-foreground/60 line-through">RM {voucher.initialPrice}</p>
+                    )}
+                    <p className="text-[13px] font-bold text-foreground font-mono">RM {voucher.finalPrice}</p>
+                  </div>
+
+                  <div className="flex">
+                    <StatusBadge
+                      status={voucher.status}
+                      variant={STATUS_VARIANT[voucher.status]}
+                      className="w-fit"
+                    />
+                  </div>
+
+                  <div className="flex justify-end pr-1">
+                    <ActionPopover
+                      actions={[
+                        { label: "View Voucher", onClick: () => handleEdit(voucher) }, // Placeholder for View
+                        { label: "Edit Voucher", onClick: () => handleEdit(voucher) },
+                        { label: "Suspend Voucher", onClick: () => console.log("Suspend", voucher.id) },
+                        { label: "Remove Voucher", isDanger: true, onClick: () => console.log("Remove", voucher.id) },
+                      ]}
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
+          )}
         </div>
-      )}
+      </DetailSection>
     </div>
   );
 }

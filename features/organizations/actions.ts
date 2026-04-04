@@ -23,6 +23,27 @@ export async function createOrganization(data: CreateOrganizationData) {
   };
 }
 
+export async function deactivateOrganization(orgId: string) {
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  revalidatePath(`/organizations/${orgId}`);
+  revalidatePath("/organizations");
+  return { success: true, message: "Organization deactivated." };
+}
+
+export async function suspendOrganization(orgId: string) {
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  revalidatePath(`/organizations/${orgId}`);
+  revalidatePath("/organizations");
+  return { success: true, message: "Organization suspended." };
+}
+
+export async function removeOrganization(orgId: string) {
+  await new Promise((resolve) => setTimeout(resolve, 700));
+  revalidatePath(`/organizations/${orgId}`);
+  revalidatePath("/organizations");
+  return { success: true, message: "Organization removed." };
+}
+
 export async function inviteOrganizationAdmin(targetId: string, data: InviteAdminData) {
   // Simulate API delay
   await new Promise((resolve) => setTimeout(resolve, 600));

@@ -3,27 +3,46 @@
 import { useState } from "react";
 import { useForm, useFieldArray, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, Trash, WarningCircle, Info } from "@phosphor-icons/react";
+import { 
+  Plus, 
+  Trash, 
+  WarningCircle, 
+  Info, 
+  CaretLeft, 
+  Ticket, 
+  CalendarBlank, 
+  ListBullets,
+  ClockAfternoon,
+  Buildings,
+  CurrencyCircleDollar,
+  Timer,
+  MapPin,
+  Lightning,
+  CalendarPlus,
+  Clock,
+  Stack
+} from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { createVoucherSchema, CreateVoucherData } from "@/features/providers/schemas";
 import { createVoucher, updateVoucher, publishVoucher } from "@/features/providers/actions";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/shared/switch";
-import { DatePickerField } from "@/components/shared/date-picker-field";
+import { DetailSection } from "@/components/shared/detail-section";
 import { ChoiceCard } from "@/components/shared/choice-card";
 import { SuccessCelebration } from "@/components/shared/success-celebration";
-import {
+import { 
   DURATION_UNITS,
-  VALIDATION_UNITS,
   REDEMPTION_UNITS,
-  MEMBERSHIP_START_DAYS,
   CURRENCIES,
 } from "@/features/providers/constants";
-import { SERVICE_TAXONOMY } from "@/features/organizations/constants";
+import { 
+  SERVICE_TAXONOMY, 
+  SERVICE_SPEC_TAXONOMY 
+} from "@/features/organizations/constants";
+import { SectionedSearchSelect } from "@/components/shared/sectioned-search-select";
+import { SearchableMultiSelect } from "@/components/shared/searchable-multi-select";
+import { CustomMultiSelect } from "@/components/shared/custom-multi-select";
+import { DatePickerField } from "@/components/shared/date-picker-field";
 import type { SpVoucher } from "@/types/provider";
-import { CalendarBlank, Timer } from "@phosphor-icons/react";
-
-const ALL_SERVICES = SERVICE_TAXONOMY.flatMap((c) => c.services);
 
 interface SpVoucherFormProps {
   spId: string;
@@ -51,28 +70,24 @@ export function SpVoucherForm({
   const { register, handleSubmit, control, setValue, watch, formState: { errors } } = useForm<CreateVoucherData>({
     resolver: zodResolver(createVoucherSchema as any),
     defaultValues: {
-      name: voucher?.name ?? "",
-      description: voucher?.description ?? "",
-      serviceLines: voucher?.serviceLines ?? [
-        { serviceCategory: spServiceCategories[0] ?? "", subServiceLabel: "", description: "", duration: { unit: "session", value: 1 }, weight: 1.0 },
+      name: voucher?.name || "",
+      description: voucher?.description || "",
+      serviceLines: voucher?.serviceLines || [
+        { service: "", subServices: [], description: "", duration: { unit: "session", value: 1 } }
       ],
-      currency: voucher?.currency ?? "MYR",
-      initialPrice: voucher?.initialPrice ?? 0,
-      finalPrice: voucher?.finalPrice ?? 0,
-      activationPeriod: {
-        startDate: voucher?.activationPeriod.startDate?.slice(0, 10) ?? "",
-        endDate: voucher?.activationPeriod.endDate?.slice(0, 10) ?? "",
+      currency: voucher?.currency || "MYR",
+      initialPrice: voucher?.initialPrice || 0,
+      finalPrice: voucher?.finalPrice || 0,
+      activationPeriod: voucher?.activationPeriod || {
+        startDate: new Date().toISOString().split("T")[0],
       },
-      validationDuration: { unit: voucher?.validationDuration.unit ?? "months", value: voucher?.validationDuration.value ?? 1 },
-      redemptionPeriod: {
-        mode: voucher?.redemptionPeriod.mode ?? "after_purchase",
-        date: voucher?.redemptionPeriod.date?.slice(0, 10) ?? "",
-        unit: voucher?.redemptionPeriod.unit ?? "day",
-        value: voucher?.redemptionPeriod.value ?? 30,
+      redemptionPeriod: voucher?.redemptionPeriod || {
+        mode: "after_purchase",
+        unit: "day",
+        value: 30,
       },
-      membershipStartDay: voucher?.membershipStartDay ?? "none",
-      branchScope: voucher?.branchScope ?? "all",
-      branchIds: voucher?.branchIds ?? [],
+      branchScope: voucher?.branchScope || "all",
+      branchIds: voucher?.branchIds || [],
     },
   });
 
@@ -82,9 +97,6 @@ export function SpVoucherForm({
   const redemptionMode = watch("redemptionPeriod.mode");
   const branchScope = watch("branchScope");
 
-  const weightSum = watchedLines?.reduce((acc, l) => acc + (Number(l.weight) || 0), 0) ?? 0;
-  const weightValid = Math.abs(weightSum - 1) < 0.001;
-
   const onSave = async (data: CreateVoucherData) => {
     setIsSubmitting(true);
     try {
@@ -92,9 +104,9 @@ export function SpVoucherForm({
         ? await updateVoucher(spId, voucher!.id, data)
         : await createVoucher(spId, data);
       if (res.success) {
-        setSuccessMessage(isEditing ? "Voucher updated." : "Voucher saved as draft.");
+        setSuccessMessage(isEditing ? "Voucher updated successfully." : "A new voucher has been added to your draft.");
         setIsSuccess(true);
-        setTimeout(onSuccess, 1800);
+        setTimeout(onSuccess, 2000);
       }
     } finally {
       setIsSubmitting(false);
@@ -106,353 +118,430 @@ export function SpVoucherForm({
     setIsPublishing(true);
     const res = await publishVoucher(spId, voucher!.id);
     if (res.success) {
-      setSuccessMessage("Voucher published successfully.");
+      setSuccessMessage("Voucher published successfully and is now active.");
       setIsSuccess(true);
-      setTimeout(onSuccess, 1800);
+      setTimeout(onSuccess, 2000);
     }
     setIsPublishing(false);
   };
 
   const inputCls = (hasError?: boolean) =>
     cn(
-      "w-full px-3 py-2 bg-background border rounded-md text-[14px] outline-none transition-colors",
-      hasError ? "border-destructive" : "border-border focus:border-foreground/30 focus:bg-muted/30"
+      "w-full px-3 py-2 bg-white border rounded-lg text-[14px] outline-none transition-all font-medium text-zinc-700",
+      hasError 
+        ? "border-rose-300 ring-2 ring-rose-50" 
+        : "border-zinc-200 focus:ring-2 focus:ring-primary/10 focus:border-primary/30 hover:border-zinc-300"
     );
 
-  const selectCls = () => cn(inputCls(), "appearance-none");
+  const selectCls = () => cn(inputCls(), "appearance-none cursor-pointer bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236b7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1.25rem_1.25rem] bg-[right_0.5rem_center] bg-no-repeat pr-10");
 
   if (isSuccess) {
     return (
-      <div className="py-8">
-        <SuccessCelebration title="Done" message={successMessage} />
+      <div className="bg-white rounded-2xl border border-zinc-200 py-20 animate-in zoom-in-95 duration-300">
+        <SuccessCelebration 
+          title={isEditing ? "Changes Saved!" : "Voucher Added!"} 
+          message={successMessage} 
+        />
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit(onSave)} className="space-y-10">
-
-      {/* Section 1: Basic Info */}
-      <section className="space-y-4">
-        <SectionHeading>Basic Info</SectionHeading>
-        {isEditing && (
-          <div className="space-y-1.5">
-            <label className="text-[13px] font-medium text-foreground">Voucher Code</label>
-            <input value={voucher?.code} disabled className="w-full px-3 py-2 bg-muted border border-border rounded-md text-[14px] font-mono text-muted-foreground cursor-not-allowed" />
-            <p className="text-[11px] text-muted-foreground">Auto-generated. Format: PAC&#123;SPID&#125;NNNN</p>
-          </div>
-        )}
-        <div className="space-y-1.5">
-          <label className="text-[13px] font-medium text-foreground">Voucher Name</label>
-          <input {...register("name")} className={inputCls(!!errors.name)} placeholder="e.g. Monthly Yoga Pass" />
-          {errors.name && <FieldError msg={errors.name.message} />}
-        </div>
-        <div className="space-y-1.5">
-          <label className="text-[13px] font-medium text-foreground">Description <span className="text-muted-foreground font-normal">(optional)</span></label>
-          <textarea {...register("description")} rows={3} className={cn(inputCls(), "resize-none")} placeholder="What does this voucher cover?" />
-        </div>
-      </section>
-
-      {/* Section 2: Service Lines */}
-      <section className="space-y-4">
-        <div className="flex items-center justify-between">
-          <SectionHeading>Included Services</SectionHeading>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="text-[12px] h-7 gap-1"
-            onClick={() => appendLine({ serviceCategory: spServiceCategories[0] ?? "", subServiceLabel: "", description: "", duration: { unit: "session", value: 1 }, weight: 0 })}
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-400">
+      {/* Header */}
+      <div className="flex items-center justify-between pb-4 border-b border-zinc-200/60">
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={onCancel}
+            className="w-10 h-10 rounded-xl border border-zinc-200 flex items-center justify-center hover:bg-zinc-50 transition-colors bg-white shadow-sm"
           >
-            <Plus size={13} /> Add Service Line
+            <CaretLeft size={20} weight="bold" />
+          </button>
+          <div>
+            <h2 className="text-xl font-bold tracking-tight text-zinc-900">
+              {isEditing ? "Edit Voucher" : "Add Voucher"}
+            </h2>
+            <p className="text-[13px] text-zinc-500 mt-1">
+              {isEditing 
+                ? "Update pricing, service lines, and activation periods for this voucher."
+                : "Create a new voucher entry for services purchasable on the marketplace."}
+            </p>
+          </div>
+        </div>
+        
+        <div className="flex items-center gap-3">
+          <Button 
+            variant="ghost" 
+            onClick={onCancel} 
+            disabled={isSubmitting || isPublishing}
+            className="text-zinc-600 font-medium"
+          >
+            Cancel
           </Button>
-        </div>
-
-        {/* Weight sum indicator */}
-        <div className={cn(
-          "flex items-center gap-2 px-3 py-2 rounded-lg border text-[12px] font-medium",
-          weightValid ? "bg-emerald-50 border-emerald-200 text-emerald-700" : "bg-amber-50 border-amber-200 text-amber-700"
-        )}>
-          <Info size={13} />
-          Weight sum: {weightSum.toFixed(2)} / 1.00 — {weightValid ? "Valid" : "Must equal exactly 1.00"}
-        </div>
-
-        {(errors.serviceLines as any)?.message && <FieldError msg={(errors.serviceLines as any).message} />}
-
-        {serviceLineFields.map((field, i) => (
-          <div key={field.id} className="p-4 bg-muted/20 rounded-xl border border-border/60 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">Line {i + 1}</span>
-              {serviceLineFields.length > 1 && (
-                <button type="button" onClick={() => removeLine(i)} className="text-muted-foreground hover:text-destructive transition-colors">
-                  <Trash size={14} />
-                </button>
-              )}
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <label className="text-[11px] font-medium text-muted-foreground">Service Category</label>
-                <select {...register(`serviceLines.${i}.serviceCategory`)} className={selectCls()}>
-                  {spServiceCategories.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
-                </select>
-              </div>
-              <div className="space-y-1">
-                <label className="text-[11px] font-medium text-muted-foreground">Sub-service Label</label>
-                <input {...register(`serviceLines.${i}.subServiceLabel`)} className={inputCls(!!(errors.serviceLines as any)?.[i]?.subServiceLabel)} placeholder="e.g. Group Yoga Class" />
-              </div>
-              <div className="space-y-1 sm:col-span-2">
-                <label className="text-[11px] font-medium text-muted-foreground">Description <span className="font-normal">(optional)</span></label>
-                <input {...register(`serviceLines.${i}.description`)} className={inputCls()} placeholder="e.g. Unlimited drop-in sessions" />
-              </div>
-              <div className="space-y-1">
-                <label className="text-[11px] font-medium text-muted-foreground">Duration</label>
-                <div className="flex gap-2">
-                  <input type="number" min={1} {...register(`serviceLines.${i}.duration.value`, { valueAsNumber: true })} className={cn(inputCls(), "w-20 text-center")} />
-                  <select {...register(`serviceLines.${i}.duration.unit`)} className={cn(selectCls(), "flex-1")}>
-                    {DURATION_UNITS.map((u) => <option key={u.value} value={u.value}>{u.label}</option>)}
-                  </select>
-                </div>
-              </div>
-              <div className="space-y-1">
-                <label className="text-[11px] font-medium text-muted-foreground">
-                  Weight
-                  <span className="text-[10px] font-normal text-muted-foreground ml-1">(0–1, all lines must sum to 1.0)</span>
-                </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  min={0}
-                  max={1}
-                  {...register(`serviceLines.${i}.weight`, { valueAsNumber: true })}
-                  className={cn(inputCls(!!(errors.serviceLines as any)?.[i]?.weight), "font-mono")}
-                  placeholder="e.g. 0.6"
-                />
-              </div>
-            </div>
-          </div>
-        ))}
-      </section>
-
-      {/* Section 3: Pricing */}
-      <section className="space-y-4">
-        <SectionHeading>Pricing</SectionHeading>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="space-y-1.5">
-            <label className="text-[13px] font-medium text-foreground">Currency</label>
-            <select {...register("currency")} className={selectCls()}>
-              {CURRENCIES.map((c) => <option key={c} value={c}>{c}</option>)}
-            </select>
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-[13px] font-medium text-foreground">Initial Price (RM)</label>
-            <input type="number" min={0} step="0.01" {...register("initialPrice", { valueAsNumber: true })} className={inputCls(!!errors.initialPrice)} />
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-[13px] font-medium text-foreground flex items-center gap-1">
-              Final Price (RM)
-              <span className="text-[10px] font-normal text-muted-foreground">(whole number)</span>
-            </label>
-            <input type="number" min={0} step="1" {...register("finalPrice", { valueAsNumber: true })} className={inputCls(!!errors.finalPrice)} />
-            {errors.finalPrice && <FieldError msg={errors.finalPrice.message} />}
-            <p className="text-[10px] text-muted-foreground">Round: ≥0.50 → up, &lt;0.50 → down</p>
-          </div>
-        </div>
-      </section>
-
-      {/* Section 4: Activation Period */}
-      <section className="space-y-4">
-        <SectionHeading>Activation Period</SectionHeading>
-        <p className="text-[12px] text-muted-foreground">When this voucher appears in the Welluber app marketplace.</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="space-y-1.5">
-            <label className="text-[13px] font-medium text-foreground">Start Date</label>
-            <input type="date" {...register("activationPeriod.startDate")} className={inputCls(!!(errors.activationPeriod as any)?.startDate)} />
-            {(errors.activationPeriod as any)?.startDate && <FieldError msg={(errors.activationPeriod as any).startDate.message} />}
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-[13px] font-medium text-foreground">
-              End Date <span className="text-muted-foreground font-normal">(optional — open-ended if blank)</span>
-            </label>
-            <input type="date" {...register("activationPeriod.endDate")} className={inputCls()} />
-          </div>
-        </div>
-      </section>
-
-      {/* Section 5: Validation Duration */}
-      <section className="space-y-4">
-        <SectionHeading>Validation Duration</SectionHeading>
-        <p className="text-[12px] text-muted-foreground">How long the purchased voucher is valid for use.</p>
-        <div className="flex gap-3 items-end">
-          <div className="space-y-1.5 w-24">
-            <label className="text-[13px] font-medium text-foreground">Value</label>
-            <input type="number" min={1} {...register("validationDuration.value", { valueAsNumber: true })} className={inputCls()} />
-          </div>
-          <div className="space-y-1.5 flex-1">
-            <label className="text-[13px] font-medium text-foreground">Unit</label>
-            <select {...register("validationDuration.unit")} className={selectCls()}>
-              {VALIDATION_UNITS.map((u) => <option key={u.value} value={u.value}>{u.label}</option>)}
-            </select>
-          </div>
-        </div>
-      </section>
-
-      {/* Section 6: Redemption Period */}
-      <section className="space-y-4">
-        <SectionHeading>Redemption Period</SectionHeading>
-        <p className="text-[12px] text-muted-foreground">When the voucher can be redeemed at the provider.</p>
-        <div className="grid grid-cols-2 gap-3">
-          <ChoiceCard
-            title="On Exact Date"
-            description="Member must redeem on a specific date"
-            icon={CalendarBlank}
-            selected={redemptionMode === "exact_date"}
-            onSelect={() => setValue("redemptionPeriod.mode", "exact_date")}
-          />
-          <ChoiceCard
-            title="After Purchase"
-            description="Member can redeem within a duration from purchase"
-            icon={Timer}
-            selected={redemptionMode === "after_purchase"}
-            onSelect={() => setValue("redemptionPeriod.mode", "after_purchase")}
-          />
-        </div>
-
-        {redemptionMode === "exact_date" && (
-          <div className="space-y-1.5">
-            <label className="text-[13px] font-medium text-foreground">Redemption Date</label>
-            <input type="date" {...register("redemptionPeriod.date")} className={inputCls()} />
-          </div>
-        )}
-
-        {redemptionMode === "after_purchase" && (
-          <div className="flex gap-3 items-end">
-            <div className="space-y-1.5 w-24">
-              <label className="text-[13px] font-medium text-foreground">Value</label>
-              <input type="number" min={1} {...register("redemptionPeriod.value", { valueAsNumber: true })} className={inputCls()} />
-            </div>
-            <div className="space-y-1.5 flex-1">
-              <label className="text-[13px] font-medium text-foreground">Unit</label>
-              <select {...register("redemptionPeriod.unit")} className={selectCls()}>
-                {REDEMPTION_UNITS.map((u) => <option key={u.value} value={u.value}>{u.label}</option>)}
-              </select>
-            </div>
-          </div>
-        )}
-      </section>
-
-      {/* Section 7: Membership Start Day */}
-      <section className="space-y-4">
-        <SectionHeading>Membership Start Day</SectionHeading>
-        <div className="flex gap-3">
-          {MEMBERSHIP_START_DAYS.map(({ label, value }) => (
-            <button
-              key={value}
-              type="button"
-              onClick={() => setValue("membershipStartDay", value)}
-              className={cn(
-                "flex-1 py-2.5 rounded-xl border text-[12px] font-bold transition-all",
-                watch("membershipStartDay") === value
-                  ? "bg-primary text-white border-primary shadow-md shadow-primary/20"
-                  : "bg-card border-border text-muted-foreground hover:bg-muted/30"
-              )}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      </section>
-
-      {/* Section 8: Branches */}
-      <section className="space-y-4">
-        <SectionHeading>Available At</SectionHeading>
-        <div className="flex gap-3">
-          {(["all", "specific"] as const).map((scope) => (
-            <button
-              key={scope}
-              type="button"
-              onClick={() => setValue("branchScope", scope)}
-              className={cn(
-                "flex-1 py-2.5 rounded-xl border text-[12px] font-bold transition-all capitalize",
-                watch("branchScope") === scope
-                  ? "bg-primary text-white border-primary"
-                  : "bg-card border-border text-muted-foreground hover:bg-muted/30"
-              )}
-            >
-              {scope === "all" ? "All Branches" : "Specific Branches"}
-            </button>
-          ))}
-        </div>
-
-        {branchScope === "specific" && (
-          <div className="space-y-2">
-            {spBranches.length === 0 ? (
-              <p className="text-[12px] text-muted-foreground italic">No branches configured for this SP.</p>
-            ) : (
-              spBranches.map((branch) => {
-                const branchIds = watch("branchIds") ?? [];
-                const isSelected = branchIds.includes(branch.id);
-                return (
-                  <label key={branch.id} className="flex items-center gap-3 py-2.5 px-4 bg-muted/20 rounded-xl border border-border/50 cursor-pointer hover:bg-muted/40 transition-colors">
-                    <input
-                      type="checkbox"
-                      checked={isSelected}
-                      onChange={() => {
-                        const next = isSelected
-                          ? branchIds.filter((id) => id !== branch.id)
-                          : [...branchIds, branch.id];
-                        setValue("branchIds", next);
-                      }}
-                      className="rounded"
-                    />
-                    <span className="text-[13px] font-medium text-foreground">{branch.name}</span>
-                  </label>
-                );
-              })
-            )}
-          </div>
-        )}
-      </section>
-
-      {/* Footer */}
-      <div className="flex items-center justify-between pt-4 border-t border-border">
-        <Button type="button" variant="outline" onClick={onCancel} className="text-[13px]">Cancel</Button>
-        <div className="flex items-center gap-2">
+          
           {isEditing && voucher?.status === "draft" && (
             <Button
               type="button"
               variant="outline"
               onClick={onPublish}
-              disabled={isPublishing}
-              className="text-[13px] text-emerald-600 border-emerald-200 hover:bg-emerald-50 gap-2"
+              disabled={isSubmitting || isPublishing}
+              className="text-emerald-600 border-emerald-200 hover:bg-emerald-50 font-medium px-6 shadow-sm min-w-[120px] gap-2 rounded-full h-10"
             >
-              {isPublishing ? <div className="w-3.5 h-3.5 border-2 border-emerald-300 border-t-emerald-600 rounded-full animate-spin" /> : null}
-              Publish
+              {isPublishing ? (
+                <div className="w-4 h-4 border-2 border-emerald-300 border-t-emerald-600 rounded-full animate-spin" />
+              ) : null}
+              <span>Publish</span>
             </Button>
           )}
-          <Button type="submit" disabled={isSubmitting} className="text-[13px] gap-2">
+
+          <Button 
+            disabled={isSubmitting || isPublishing}
+            onClick={handleSubmit(onSave)}
+            className="bg-primary text-white hover:bg-primary/90 font-semibold px-8 shadow-sm shadow-primary/20 min-w-[160px] rounded-full h-10 gap-2"
+          >
             {isSubmitting ? (
-              <><div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Saving...</>
-            ) : "Save as Draft"}
+              <>
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <span>Saving...</span>
+              </>
+            ) : (
+              isEditing ? "Save Changes" : "Add voucher"
+            )}
           </Button>
         </div>
       </div>
-    </form>
-  );
-}
 
-function SectionHeading({ children }: { children: React.ReactNode }) {
-  return (
-    <h4 className="text-[12px] font-bold uppercase tracking-widest text-muted-foreground pb-1 border-b border-border/50">
-      {children}
-    </h4>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pb-12">
+        {/* Main Column */}
+        <div className="lg:col-span-8 space-y-8">
+          <DetailSection 
+            title="Voucher Identity" 
+            icon={<Ticket size={18} weight="duotone" />}
+            description="Basic naming and description seen by your users"
+          >
+            <div className="space-y-5 p-1">
+              {isEditing && (
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Voucher Code</label>
+                  <div className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-[14px] font-mono text-zinc-500 cursor-not-allowed">
+                    {voucher?.code}
+                  </div>
+                  <p className="text-[10px] text-zinc-400 italic">Auto-generated format. Cannot be changed.</p>
+                </div>
+              )}
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">
+                  Voucher Name <span className="text-rose-500">*</span>
+                </label>
+                <input 
+                  {...register("name")} 
+                  className={inputCls(!!errors.name)} 
+                  placeholder="e.g. Monthly Yoga Pass" 
+                />
+                {errors.name && <FieldError msg={errors.name.message} />}
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Description</label>
+                <textarea 
+                  {...register("description")} 
+                  rows={3} 
+                  className={cn(inputCls(), "resize-none")} 
+                  placeholder="What does this voucher cover?" 
+                />
+              </div>
+            </div>
+          </DetailSection>
+
+          <DetailSection 
+            title="Service Line Items" 
+            icon={<ListBullets size={18} weight="duotone" />}
+            description="Specific services included in this voucher package"
+          >
+            <div className="space-y-5 p-1">
+              {(errors.serviceLines as any)?.message && <FieldError msg={(errors.serviceLines as any).message} />}
+
+              <div className="space-y-4">
+                {serviceLineFields.map((field, i) => (
+                  <div key={field.id} className="p-4 bg-zinc-50/50 rounded-2xl border border-zinc-200/60 space-y-4 animate-in fade-in slide-in-from-top-1 duration-300">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="w-5 h-5 rounded-full bg-zinc-200 flex items-center justify-center text-[10px] font-bold text-zinc-500">
+                          {i + 1}
+                        </span>
+                        <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Service Line</span>
+                      </div>
+                      {serviceLineFields.length > 1 && (
+                        <button 
+                          type="button" 
+                          onClick={() => removeLine(i)} 
+                          className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-300 hover:text-rose-500 hover:bg-rose-50 transition-all"
+                        >
+                          <Trash size={18} />
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Service</label>
+                        <SectionedSearchSelect
+                          taxonomy={SERVICE_TAXONOMY.filter(cat => spServiceCategories.includes(cat.category))}
+                          value={watch(`serviceLines.${i}.service`)}
+                          onChange={(val) => {
+                            setValue(`serviceLines.${i}.service`, val);
+                            setValue(`serviceLines.${i}.subServices`, []);
+                          }}
+                          placeholder="Search service..."
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Sub-services</label>
+                        <CustomMultiSelect
+                          options={SERVICE_SPEC_TAXONOMY[watch(`serviceLines.${i}.service`)] || []}
+                          selected={watch(`serviceLines.${i}.subServices`) || []}
+                          onChange={(val) => setValue(`serviceLines.${i}.subServices`, val)}
+                          placeholder="Select or type custom..."
+                        />
+                      </div>
+                      <div className="space-y-1.5 sm:col-span-2">
+                        <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Item Description</label>
+                        <input 
+                          {...register(`serviceLines.${i}.description`)} 
+                          className={inputCls()} 
+                          placeholder="e.g. Unlimited drop-in sessions" 
+                        />
+                      </div>
+                      <div className="space-y-1.5 sm:col-span-2">
+                        <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Package Quantity</label>
+                        <div className="flex gap-2">
+                          <input 
+                            type="number" 
+                            min={1} 
+                            {...register(`serviceLines.${i}.duration.value`, { valueAsNumber: true })} 
+                            className={cn(inputCls(), "w-24 text-center font-mono")} 
+                          />
+                          <select {...register(`serviceLines.${i}.duration.unit`)} className={cn(selectCls(), "flex-1")}>
+                            {DURATION_UNITS.map((u) => <option key={u.value} value={u.value}>{u.label}</option>)}
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full border-dashed border-zinc-200 h-12 text-zinc-400 hover:text-primary hover:border-primary/30 transition-all bg-white"
+                  onClick={() => appendLine({ service: "", subServices: [], description: "", duration: { unit: "session", value: 1 } })}
+                >
+                  <Plus size={16} className="mr-2" /> Add Another Service Item
+                </Button>
+              </div>
+            </div>
+          </DetailSection>
+
+          {/* Lifecycle & Validity */}
+          <DetailSection 
+            title="Lifecycle & Validity" 
+            icon={<Stack size={18} weight="duotone" />}
+            description="Activation period and redemption settings"
+          >
+            <div className="p-1 space-y-8">
+              {/* Activation Period */}
+              <div className="space-y-4">
+                <div>
+                  <h4 className="text-[14px] font-bold text-zinc-900">Activation Period</h4>
+                  <p className="text-[12px] text-zinc-500 mt-0.5">When is this voucher available for purchase?</p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <DatePickerField
+                    placeholder="Start Date"
+                    value={watch("activationPeriod.startDate")}
+                    onChange={(v: string) => setValue("activationPeriod.startDate", v)}
+                    clearable={false}
+                  />
+                  <DatePickerField
+                    placeholder="End Date (Optional)"
+                    value={watch("activationPeriod.endDate") || ""}
+                    onChange={(v: string) => setValue("activationPeriod.endDate", v)}
+                    clearable
+                  />
+                </div>
+              </div>
+
+              <div className="h-px bg-zinc-100" />
+
+              {/* Redemption Period */}
+              <div className="space-y-4">
+                <div>
+                  <h4 className="text-[14px] font-bold text-zinc-900">Redemption Period</h4>
+                  <p className="text-[12px] text-zinc-500 mt-0.5">When can customers use this voucher?</p>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <ChoiceCard
+                    title="Relative"
+                    description="Valid after purchase."
+                    icon={Clock}
+                    selected={redemptionMode === "after_purchase"}
+                    onSelect={() => setValue("redemptionPeriod.mode", "after_purchase")}
+                    className="p-3"
+                  />
+                  <ChoiceCard
+                    title="Fixed"
+                    description="Set expiry date."
+                    icon={CalendarBlank}
+                    selected={redemptionMode === "exact_date"}
+                    onSelect={() => setValue("redemptionPeriod.mode", "exact_date")}
+                    className="p-3"
+                  />
+                </div>
+
+                {redemptionMode === "after_purchase" && (
+                  <div className="mt-4 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="flex flex-col gap-2">
+                      <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Valid for</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="number"
+                          className="w-16 px-3 py-1.5 bg-white border border-zinc-200 rounded-lg text-[14px] text-center font-bold outline-none focus:ring-2 focus:ring-primary/10"
+                          {...register("redemptionPeriod.value", { valueAsNumber: true })}
+                        />
+                        <select
+                          className="flex-1 px-3 py-1.5 bg-white border border-zinc-200 rounded-lg text-[14px] font-semibold text-zinc-700 outline-none focus:ring-2 focus:ring-primary/10"
+                          {...register("redemptionPeriod.unit")}
+                        >
+                          <option value="hr">Hours</option>
+                          <option value="day">Days</option>
+                          <option value="month">Months</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {redemptionMode === "exact_date" && (
+                  <div className="mt-4 space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest block">Expiry Date</label>
+                    <DatePickerField
+                      value={watch("redemptionPeriod.date") || ""}
+                      onChange={(v: string) => setValue("redemptionPeriod.date", v)}
+                      className="bg-white"
+                      clearable
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+          </DetailSection>
+        </div>
+
+        {/* Sidebar */}
+        <div className="lg:col-span-4 space-y-8">
+          <DetailSection 
+            title="Voucher Hero" 
+            icon={<Info size={18} weight="duotone" />}
+            description="Header image for marketplace listing"
+          >
+            <div className="p-1 space-y-4">
+              <div className="aspect-[16/10] bg-zinc-50 border-2 border-dashed border-zinc-200 rounded-2xl flex flex-col items-center justify-center gap-2 group hover:border-primary/30 transition-all cursor-pointer">
+                <div className="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-400 group-hover:bg-primary/5 group-hover:text-primary transition-colors">
+                  <Plus size={20} weight="bold" />
+                </div>
+                <div className="text-center">
+                  <p className="text-[13px] font-semibold text-zinc-900">Upload Header</p>
+                  <p className="text-[11px] text-zinc-400 mt-0.5">PNG, JPG up to 5MB</p>
+                </div>
+              </div>
+            </div>
+          </DetailSection>
+
+          <DetailSection 
+            title="Assigned Branch" 
+            icon={<Buildings size={18} weight="duotone" />}
+            description="Which locations accept this voucher?"
+          >
+            <div className="p-1 space-y-5">
+              <div className="grid grid-cols-1 gap-2">
+                <ChoiceCard
+                  title="Global"
+                  description="All branch locations"
+                  icon={Buildings}
+                  selected={branchScope === "all"}
+                  onSelect={() => {
+                    setValue("branchScope", "all");
+                    setValue("branchIds", []);
+                  }}
+                  className="p-3"
+                />
+                <ChoiceCard
+                  title="Local"
+                  description="Selected branches only"
+                  icon={MapPin}
+                  selected={branchScope === "specific"}
+                  onSelect={() => setValue("branchScope", "specific")}
+                  className="p-3"
+                />
+              </div>
+
+              {branchScope === "specific" && (
+                <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Select Branches</label>
+                  <CustomMultiSelect
+                    options={spBranches.map(b => b.name)}
+                    selected={watch("branchIds").map(id => spBranches.find(b => b.id === id)?.name || id)}
+                    onChange={(names) => {
+                      const ids = names.map(name => spBranches.find(b => b.name === name)?.id || name);
+                      setValue("branchIds", ids);
+                    }}
+                    placeholder="Search branches..."
+                  />
+                  {(errors as any).branchIds && <FieldError msg={(errors as any).branchIds.message} />}
+                </div>
+              )}
+            </div>
+          </DetailSection>
+
+          <DetailSection 
+            title="Commercials" 
+            icon={<CurrencyCircleDollar size={18} weight="duotone" />}
+            description="Pricing and customer charges"
+          >
+            <div className="p-1 space-y-5">
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Currency</label>
+                <select {...register("currency")} className={selectCls()}>
+                  {Object.entries(CURRENCIES).map(([code, name]) => (
+                    <option key={code} value={code}>{code} - {name}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Initial Price</label>
+                  <input type="number" step="0.01" {...register("initialPrice", { valueAsNumber: true })} className={cn(inputCls(), "font-mono")} />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Final Price</label>
+                  <input type="number" step="0.01" {...register("finalPrice", { valueAsNumber: true })} className={cn(inputCls(!!errors.finalPrice), "font-mono font-bold text-primary bg-primary/5 border-primary/20")} />
+                </div>
+              </div>
+              {errors.finalPrice && <FieldError msg={errors.finalPrice.message} />}
+            </div>
+          </DetailSection>
+        </div>
+      </div>
+    </div>
   );
 }
 
 function FieldError({ msg }: { msg?: string }) {
   if (!msg) return null;
   return (
-    <p className="text-[11px] text-destructive flex items-center gap-1">
-      <WarningCircle size={12} /> {msg}
-    </p>
+    <div className="flex items-center gap-1.5 text-rose-500 text-[11px] mt-1 font-medium animate-in fade-in slide-in-from-top-1">
+      <WarningCircle size={14} weight="fill" />
+      <span>{msg}</span>
+    </div>
   );
 }

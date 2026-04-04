@@ -3,6 +3,8 @@
 import { MagnifyingGlass } from "@phosphor-icons/react"
 import { ThemeToggle } from "./theme-toggle"
 import { NotificationCenter } from "./notification-center"
+import { SidebarTrigger } from "@/components/ui/sidebar"
+import { useSession } from "@/lib/session"
 
 interface TopBarProps {
   user?: {
@@ -11,18 +13,25 @@ interface TopBarProps {
   };
 }
 
-export function TopBar({ user = { name: "Admin", initials: "WU" } }: TopBarProps) {
+export function TopBar({ user: userProp }: TopBarProps) {
+  const { user: sessionUser } = useSession()
+  const user = userProp || sessionUser
+
   return (
-    <header className="flex justify-between items-center h-14 px-6 bg-background/80 backdrop-blur-sm sticky top-0 z-[100] border-b border-border shrink-0">
-      {/* Breadcrumb area — left side placeholder */}
-      <div className="flex items-center">
-        {/* Future: breadcrumbs */}
+    <header className="flex justify-between items-center h-14 px-4 bg-background/80 backdrop-blur-sm sticky top-0 z-[100] border-b border-border shrink-0">
+      {/* Left side: Sidebar Trigger & Greeting */}
+      <div className="flex items-center gap-2">
+        <SidebarTrigger />
+        <div className="w-px h-4 bg-border mx-1" />
+        <span className="text-sm font-medium text-foreground ml-1">
+          Hello, {user.name} 👋
+        </span>
       </div>
 
       {/* Right side actions */}
       <div className="flex items-center gap-2">
         {/* Search */}
-        <div className="relative group">
+        <div className="relative group hidden md:block">
           <MagnifyingGlass
             size={15}
             className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-foreground transition-colors"
@@ -38,7 +47,7 @@ export function TopBar({ user = { name: "Admin", initials: "WU" } }: TopBarProps
         </div>
 
         {/* Divider */}
-        <div className="w-px h-5 bg-border mx-1" />
+        <div className="hidden md:block w-px h-5 bg-border mx-1" />
 
         {/* Theme toggle */}
         <ThemeToggle />

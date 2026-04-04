@@ -4,9 +4,11 @@ import { useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { 
-  Buildings, 
+  Buildings,
+  GitBranch,
   Users, 
   Shield, 
+  Gear,
   CreditCard,
   Plus,
   PencilSimpleLine,
@@ -39,12 +41,15 @@ import { DetailSection } from "@/components/shared/detail-section";
 import { DetailField } from "@/components/shared/detail-field";
 import { BentoGrid, BentoCard } from "@/components/shared/bento-grid";
 import { StatusBadge } from "@/components/shared/status-badge";
+import { ConfirmationModal } from "@/components/shared/confirmation-modal";
 import { DataToolbarContainer } from "@/components/shared/data-toolbar";
 import { SearchBar } from "@/components/shared/search-bar";
 import { FilterItem } from "@/components/shared/filter-item";
 import { ActionPopover } from "@/components/shared/action-popover";
 import { SharedDataTable, Column } from "@/components/shared/data-table";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
+import { deactivateOrganization, removeOrganization, suspendOrganization } from "@/features/organizations/actions";
+import type { OrganizationStatus } from "@/features/organizations/types";
 
 const TABS = [
   { id: "profile", label: "Org Details", icon: Buildings },
@@ -52,6 +57,7 @@ const TABS = [
   { id: "employees", label: "Employees", icon: Users },
   { id: "policies", label: "Benefit Policy", icon: Shield },
   { id: "usage", label: "Utilization & Claims", icon: ChartLineUp },
+  { id: "settings", label: "Settings", icon: Gear },
 ] as const;
 
 type TabId = typeof TABS[number]["id"];
@@ -72,6 +78,10 @@ export default function OrganizationDetailPage() {
   const [isBranchSheetOpen, setIsBranchSheetOpen] = useState(false);
   const [selectedBranchName, setSelectedBranchName] = useState<string | undefined>();
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [orgStatus, setOrgStatus] = useState<OrganizationStatus>("active");
+  const [isDangerModalOpen, setIsDangerModalOpen] = useState(false);
+  const [isDangerSubmitting, setIsDangerSubmitting] = useState(false);
+  const [dangerAction, setDangerAction] = useState<"deactivate" | "suspend" | "remove" | null>(null);
 
   // View modes
   const [branchesView, setBranchesView] = useState<ViewMode>("grid");
@@ -181,6 +191,47 @@ export default function OrganizationDetailPage() {
     setToastMessage("Policy unlinked from organization");
   };
 
+  const openDangerAction = (action: "deactivate" | "suspend" | "remove") => {
+    setDangerAction(action);
+    setIsDangerModalOpen(true);
+  };
+
+  const dangerActionConfig = {
+    deactivate: {
+      title: "Deactivate Organization",
+      confirmLabel: "Deactivate Organization",
+      description: "Temporarily disable this organization without removing its records.",
+      impactPoints: [
+        "Organization admins will lose access until the account is reactivated.",
+        "Employees and branches remain stored, but the workspace becomes read-only.",
+        "New actions across the organization will be paused.",
+      ],
+      run: () => deactivateOrganization(orgId),
+    },
+    suspend: {
+      title: "Suspend Organization",
+      confirmLabel: "Suspend Organization",
+      description: "Suspend operations while keeping the organization data available for recovery.",
+      impactPoints: [
+        "Admins can no longer manage employees, policies, or wallet activity.",
+        "Active operations are paused until the suspension is lifted.",
+        "Historical records remain available for audit and review.",
+      ],
+      run: () => suspendOrganization(orgId),
+    },
+    remove: {
+      title: "Remove Organization",
+      confirmLabel: "Remove Organization",
+      description: "Permanently remove this organization and all associated records.",
+      impactPoints: [
+        "Branches, employees, policies, and admins will be removed from the workspace.",
+        "This action cannot be undone.",
+        "Any dependent references in reporting will be severed.",
+      ],
+      run: () => removeOrganization(orgId),
+    },
+  } as const;
+
   const orgName = orgId === 'org_2' ? 'Global Tech Solutions' : 'Acme Corporation Sdn Bhd';
 
   return (
@@ -226,7 +277,18 @@ export default function OrganizationDetailPage() {
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
                   <h1 className="text-2xl font-bold tracking-tight text-foreground">{orgName}</h1>
-                  <StatusBadge status="Active" variant="emerald" />
+                  <StatusBadge
+                    status={orgStatus}
+                    variant={
+                      orgStatus === "active"
+                        ? "emerald"
+                        : orgStatus === "pending"
+                          ? "amber"
+                          : orgStatus === "removed"
+                            ? "zinc"
+                            : "rose"
+                    }
+                  />
                 </div>
                 <div className="flex items-center gap-3 text-[13px] text-muted-foreground">
                   <span className="font-mono text-[11px] text-zinc-400 bg-white px-2 py-0.5 rounded border border-zinc-200 uppercase tracking-widest">ORG-20260115-0001</span>
@@ -390,8 +452,8 @@ export default function OrganizationDetailPage() {
             ) : (
               <div className="space-y-6">
                 <DetailSection 
-                  title="Regional Branches" 
-                  icon={<Buildings size={18} weight="duotone" />}
+                  title="Branches" 
+                  icon={<GitBranch size={18} weight="duotone" />}
                   description="Manage geographical locations and their specific wallet configurations"
                   action={
                     <div className="flex items-center gap-2">
@@ -877,7 +939,91 @@ export default function OrganizationDetailPage() {
             </DetailSection>
           </div>
         )}
+
+        {activeTab === "settings" && (
+          <div className="space-y-6 animate-in fade-in">
+            <DetailSection
+              title="Danger Zone"
+              icon={<Gear size={18} weight="duotone" />}
+              description="Confirm how you want to change the organisation lifecycle."
+            >
+              <div className="space-y-4">
+                <div className="rounded-xl border border-border bg-muted/20 p-4">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="space-y-1">
+                      <p className="text-[13px] font-semibold text-foreground">Deactivate Organisation</p>
+                      <p className="text-[12px] text-muted-foreground">
+                        Disable access temporarily while keeping data intact.
+                      </p>
+                    </div>
+                    <Button variant="outline" className="text-[12px] h-9" onClick={() => openDangerAction("deactivate")}>
+                      Deactivate
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-border bg-muted/20 p-4">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="space-y-1">
+                      <p className="text-[13px] font-semibold text-foreground">Suspend Organisation</p>
+                      <p className="text-[12px] text-muted-foreground">
+                        Pause operations and access until the suspension is lifted.
+                      </p>
+                    </div>
+                    <Button variant="outline" className="text-[12px] h-9" onClick={() => openDangerAction("suspend")}>
+                      Suspend
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-rose-200 bg-rose-50/60 p-4">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="space-y-1">
+                      <p className="text-[13px] font-semibold text-foreground">Remove Organisation</p>
+                      <p className="text-[12px] text-muted-foreground">
+                        Permanently delete the organisation and all linked records.
+                      </p>
+                    </div>
+                    <Button variant="destructive" className="text-[12px] h-9" onClick={() => openDangerAction("remove")}>
+                      Remove
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </DetailSection>
+          </div>
+        )}
       </div>
+
+      <ConfirmationModal
+        isOpen={isDangerModalOpen}
+        title={dangerAction ? dangerActionConfig[dangerAction].title : "Confirm Action"}
+        description={dangerAction ? dangerActionConfig[dangerAction].description : "Review the impact before proceeding."}
+        impactPoints={dangerAction ? dangerActionConfig[dangerAction].impactPoints : []}
+        confirmLabel={dangerAction ? dangerActionConfig[dangerAction].confirmLabel : "Confirm"}
+        isSubmitting={isDangerSubmitting}
+        onClose={() => {
+          setIsDangerModalOpen(false);
+          setDangerAction(null);
+        }}
+        onConfirm={async () => {
+          if (!dangerAction) return;
+          setIsDangerSubmitting(true);
+          try {
+            const res = await dangerActionConfig[dangerAction].run();
+            if (res.success) {
+              setOrgStatus(
+                dangerAction === "deactivate" ? "deactivated" : dangerAction === "suspend" ? "suspended" : "removed"
+              );
+              setToastMessage(res.message);
+              setIsDangerModalOpen(false);
+              setDangerAction(null);
+            }
+          } finally {
+            setIsDangerSubmitting(false);
+          }
+        }}
+      />
 
       {toastMessage && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-zinc-900 text-white px-6 py-3 rounded-2xl shadow-2xl z-[100] animate-in slide-in-from-bottom-4 duration-300 flex items-center gap-3">

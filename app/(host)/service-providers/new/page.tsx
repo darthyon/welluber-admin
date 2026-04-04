@@ -72,7 +72,7 @@ export default function NewServiceProviderPage() {
         >
           <CaretLeft size={16} /> Back to Service Providers
         </Link>
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">Add New Service Provider</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">Add Service Provider</h1>
         <p className="text-muted-foreground text-[13px] mt-1">Register a wellness service provider on the platform.</p>
       </div>
 
