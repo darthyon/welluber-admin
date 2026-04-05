@@ -11,9 +11,13 @@ import { useSidebar } from "@/components/ui/sidebar"
 
 export function TopBar() {
   const { user } = useSession()
-  const { state } = useSidebar()
+  const { state, isMobile } = useSidebar()
   const isCollapsed = state === "collapsed"
   
+  // Calculate the physical offset based on sidebar state
+  // This matches SIDEBAR_WIDTH and SIDEBAR_WIDTH_ICON from sidebar.tsx
+  const sidebarOffset = isMobile ? "0px" : (isCollapsed ? "70.4px" : "215px")
+
   return (
     <header 
       className={cn(
@@ -22,11 +26,11 @@ export function TopBar() {
       )}
     >
       <div 
-        className={cn(
-          "flex justify-between items-center h-full pr-8 transition-all duration-300 ease-in-out",
-          // The "Snap-Anchor" Logic: Map exactly to sidebar width + internal spacing
-          isCollapsed ? "pl-[70.4px]" : "pl-[215px]" 
-        )}
+        style={{ 
+          paddingLeft: sidebarOffset,
+          transition: 'padding-left 200ms linear' 
+        }}
+        className="flex justify-between items-center h-full pr-8"
       >
         {/* Left side: Personalized Greeting */}
         <div className="flex items-center pl-8">
