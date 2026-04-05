@@ -1,9 +1,10 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
-import { CaretDown, MagnifyingGlass, Check } from "@phosphor-icons/react"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts"
 import { cn } from "@/lib/utils"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { CaretDown, MagnifyingGlass, Check, Info } from "@phosphor-icons/react"
 
 // Dummy data for Month view with dual metrics (Issued vs Checked-in)
 const dataMonth = [
@@ -114,9 +115,20 @@ export function ActivityChart() {
   return (
     <div className="rounded-lg border border-border bg-card p-5 h-full flex flex-col relative overflow-hidden">
       <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-6 gap-4">
-        <div>
-          <h2 className="text-[13px] font-semibold text-foreground mb-0.5">Voucher Lifecycle</h2>
-          <p className="text-[12px] text-muted-foreground">Volume of newly issued vs redeemed vouchers (Check-ins)</p>
+        <div className="flex flex-col">
+          <div className="flex items-center gap-1.5 mb-0.5">
+            <h2 className="text-[13px] font-semibold text-foreground tracking-tight">Voucher Lifecycle</h2>
+            <TooltipProvider>
+              <Tooltip delayDuration={0}>
+                <TooltipTrigger asChild>
+                  <Info size={14} className="text-muted-foreground/60 cursor-help hover:text-primary transition-colors" />
+                </TooltipTrigger>
+                <TooltipContent side="top" className="text-[12px] font-medium leading-relaxed max-w-[220px]">
+                  Volume of newly issued vs redeemed vouchers (Check-ins)
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
         </div>
         
         <div className="flex flex-wrap items-center gap-3">
@@ -157,7 +169,7 @@ export function ActivityChart() {
               tick={{ fontSize: 10, fill: "var(--foreground)", opacity: 0.5 }}
               dx={-10}
             />
-            <Tooltip 
+            <RechartsTooltip 
               cursor={{ fill: "var(--muted)", opacity: 0.4 }}
               contentStyle={{ 
                 backgroundColor: "var(--card)", 

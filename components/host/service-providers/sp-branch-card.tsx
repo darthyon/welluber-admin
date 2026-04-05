@@ -77,14 +77,14 @@ export function SpBranchCard({ branch, onView, onEdit }: SpBranchCardProps) {
           </Badge>
         ))}
         {branch.services.length > 3 && (
-          <span className="text-[10px] text-muted-foreground/60 font-bold ml-0.5">+{branch.services.length - 3} more</span>
+          <span className="text-[10px] text-muted-foreground/60 font-semibold ml-0.5">+{branch.services.length - 3} more</span>
         )}
       </div>
 
       {/* Footer Footer Footer (Operating Hours Matching Org staff/wallet styling) */}
       <div className="mt-auto pt-4 border-t border-border/40 relative z-10">
         <div className="flex flex-col gap-1">
-          <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground/60">Operating Hours</span>
+          <span className="text-[10px] font-semibold tracking-tight text-muted-foreground/60">Operating hours</span>
           <div className="flex items-center gap-1.5 text-[12px] font-semibold text-foreground">
             <Clock size={14} weight="duotone" className="text-primary" />
             <span>{getHoursSummary(branch)}</span>

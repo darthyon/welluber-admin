@@ -90,7 +90,7 @@ const personas = [
 // Navigation Configuration (Host)
 const hostNavigation = [
   {
-    title: "OPERATIONS",
+    title: "Operations",
     items: [
       { id: "dashboard", label: "Dashboard", href: "/dashboard", icon: SquaresFour },
       { id: "organizations", label: "Organizations", href: "/organizations", icon: Buildings },
@@ -100,7 +100,7 @@ const hostNavigation = [
     ],
   },
   {
-    title: "SETUP & CONFIG",
+    title: "Setup & config",
     items: [
       { id: "policies", label: "Benefit Policies", href: "/policies", icon: ShieldCheck },
       { id: "services", label: "Manage Services", href: "/services", icon: TreeStructure },
@@ -109,14 +109,14 @@ const hostNavigation = [
     ],
   },
   {
-    title: "REPORTING & ANALYSIS",
+    title: "Reporting & analysis",
     items: [
       { id: "claims", label: "Claims", href: "/claims", icon: Receipt },
       { id: "reports", label: "Reports", href: "/reports", icon: ChartBar },
     ],
   },
   {
-    title: "ADMIN",
+    title: "Admin",
     items: [
       { id: "team", label: "Team & Permissions", href: "/team", icon: UsersFour },
       { id: "audit", label: "Audit Log", href: "/audit-log", icon: ClockCounterClockwise },
@@ -153,7 +153,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <div className="flex aspect-square size-7 items-center justify-center rounded-lg bg-primary shadow-lg shadow-primary/20 text-primary-foreground">
                 <Layout size={16} weight="fill" />
               </div>
-              <span className="font-bold text-white tracking-tight uppercase text-[12px] opacity-70">
+              <span className="font-bold text-white tracking-tight text-[12px] opacity-70">
                 WellUber™
               </span>
             </div>
@@ -181,7 +181,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       <span className="truncate font-bold tracking-tight text-[13px] text-white/90">
                         {activePersona.name}
                       </span>
-                      <span className="truncate text-[10px] font-medium text-white/40 uppercase tracking-wider">Admin Account</span>
+                      <span className="truncate text-[10px] font-medium text-white/40 tracking-tight">Admin account</span>
                     </div>
                     <CaretUpDown className="ml-auto size-4 text-white/20 group-data-[collapsible=icon]:hidden" />
                   </SidebarMenuButton>
@@ -206,8 +206,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator className="bg-border/50" />
                   <DropdownMenuGroup>
-                    <DropdownMenuLabel className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
-                      Select Account Type
+                    <DropdownMenuLabel className="px-3 py-1.5 text-[10px] font-semibold tracking-tight text-muted-foreground/60">
+                      Select account type
                     </DropdownMenuLabel>
                     {personas.map((persona) => (
                       <DropdownMenuItem
@@ -257,7 +257,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarContent className="px-2 pt-3 no-scrollbar h-full">
           {hostNavigation.map((section) => (
             <SidebarGroup key={section.title} className="py-2.5">
-              <SidebarGroupLabel className="text-[11px] font-bold uppercase tracking-[0.14em] text-white/50 mb-2 px-3 group-data-[collapsible=icon]:hidden">
+              <SidebarGroupLabel className="text-[11px] font-semibold tracking-tight text-white/50 mb-2 px-3 group-data-[collapsible=icon]:hidden">
                 {section.title}
               </SidebarGroupLabel>
               <SidebarGroupContent>

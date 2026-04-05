@@ -99,7 +99,7 @@ export function BentoCard({
     )}>
       <div className="flex items-start justify-between relative z-10">
         <p className={cn(
-          "text-[11px] font-semibold uppercase tracking-widest transition-colors",
+          "text-[13px] font-semibold tracking-tight transition-colors",
           className?.includes("bg-primary") ? "text-primary-foreground/70" : "text-muted-foreground"
         )}>{title}</p>
         {Icon && (

@@ -44,7 +44,7 @@ export function DetailField({
     )}>
       <div className="flex items-center gap-1.5">
         {icon && <span className="text-muted-foreground/60">{icon}</span>}
-        <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+        <p className="text-[11px] font-medium text-muted-foreground/80 tracking-wide">
           {label}
         </p>
       </div>

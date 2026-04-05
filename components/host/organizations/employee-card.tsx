@@ -168,8 +168,8 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
                 </div>
 
                 <div className="space-y-1.5">
-                  <div className="flex items-center justify-between text-[10px] font-bold tracking-tight">
-                    <span className="text-zinc-400 uppercase tracking-wider">Utilisation</span>
+                  <div className="flex items-center justify-between text-[11px] font-semibold tracking-tight">
+                    <span className="text-muted-foreground/80">Utilisation</span>
                     <span className={cn(
                       "px-1.5 py-0.5 rounded shrink-0",
                       currentItem.utilisation > 80 ? "bg-rose-50 text-rose-600" : "bg-primary/5 text-primary"

@@ -29,17 +29,31 @@ description: How to scaffold a new feature module
    │   └── page.tsx     # Detail page
    ```
 
-4. **Create components if needed**
+4. **Design & Typography Standards**
+   - **Case**: Always use **Sentence Case** for all UI labels, headers, and metadata (e.g., "Active policy" instead of "ACTIVE POLICY").
+   - **Typography Matrix**:
+     - **Dashboard Titles (KPIs & Cards)**: `text-[13px] font-semibold tracking-tight`
+     - **Card Descriptions**: Use `Tooltip` with an `Info` icon (`size={14}`) next to the title instead of inline text.
+     - **Entity Card Names**: `text-[14px] font-bold tracking-tight` (Org name, SP name, Branch name)
+     - **Section Headers**: `text-[15px] font-semibold tracking-tight` (Internal page sections)
+     - **Table Headers**: `text-[13px] font-semibold text-muted-foreground/70 tracking-tight`
+     - **Secondary Labels/Metadata**: `text-[11px] font-semibold text-muted-foreground/80 tracking-tight`
+   - **Prohibited**:
+     - NO `uppercase` or `tracking-widest` classes for standard labels.
+     - NO `font-bold` for administrative labels (use `semibold`).
+   - **Components**: Always prefer `DetailField`, `DetailSection`, and `StatusBadge` for data presentation.
+
+5. **Create components if needed**
    ```
    components/shared/    # If reusable across personas
    components/host/      # If host-specific
    ```
 
-5. **Add navigation entry**
+6. **Add navigation entry**
    - Update `lib/navigation.ts` to include the new section
 
 // turbo
-6. **Verify**
+7. **Verify**
    ```bash
    pnpm typecheck && pnpm lint && pnpm build
    ```

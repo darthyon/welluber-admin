@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { ChoiceCard } from "@/components/shared/choice-card";
 import { DetailSection } from "@/components/shared/detail-section";
 import { SuccessCelebration } from "@/components/shared/success-celebration";
+import { LocationPicker } from "@/components/shared/location-picker";
 import { cn } from "@/lib/utils";
 
 interface BranchFormProps {
@@ -39,7 +40,10 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
       line: branchId ? "Level 12, Menara South" : "",
       city: branchId ? "Kuala Lumpur" : "",
       state: branchId ? "Wilayah Persekutuan" : "",
-      coordinates: branchId ? { lat: "3.1390", lng: "101.7036" } : { lat: "", lng: "" }
+      postalCode: branchId ? "55100" : "",
+      country: "Malaysia",
+      lat: branchId ? "3.1390" : "",
+      lon: branchId ? "101.7036" : ""
     }
   });
 
@@ -125,7 +129,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
           >
             <div className="space-y-5 p-1">
               <div className="space-y-1.5">
-                <label className="text-[12px] font-bold text-zinc-400 uppercase tracking-wider">Branch Name</label>
+                <label className="text-[13px] font-medium text-zinc-900">Branch Name</label>
                 <input 
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -136,7 +140,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-[12px] font-bold text-zinc-400 uppercase tracking-wider">Branch Type</label>
+                  <label className="text-[13px] font-medium text-zinc-900">Branch Type</label>
                   <select 
                     value={formData.type}
                     onChange={(e) => setFormData({ ...formData, type: e.target.value })}
@@ -147,7 +151,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[12px] font-bold text-zinc-400 uppercase tracking-wider">Status</label>
+                  <label className="text-[13px] font-medium text-zinc-900">Status</label>
                   <div className="h-[38px] flex items-center px-3 bg-zinc-50 border border-zinc-200 rounded-lg text-[13px] text-zinc-600 font-medium">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 mr-2 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
                     Pending Activation
@@ -162,43 +166,11 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
             icon={<MapPin size={18} weight="duotone" />}
             description="Geographical data and coordinate pinning"
           >
-            <div className="space-y-5 p-1">
-              <div className="space-y-1.5">
-                <label className="text-[12px] font-bold text-zinc-400 uppercase tracking-wider">Address Line</label>
-                <input 
-                  value={formData.address.line}
-                  onChange={(e) => setFormData({ ...formData, address: { ...formData.address, line: e.target.value } })}
-                  placeholder="Street name, building, floor..."
-                  className="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-[14px] outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-medium text-zinc-700 hover:border-zinc-300"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-[12px] font-bold text-zinc-400 uppercase tracking-wider">LATITUDE</label>
-                  <input 
-                    value={formData.address.coordinates.lat}
-                    onChange={(e) => setFormData({ ...formData, address: { ...formData.address, coordinates: { ...formData.address.coordinates, lat: e.target.value } } })}
-                    className="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-[14px] font-mono outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all text-zinc-600"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-[12px] font-bold text-zinc-400 uppercase tracking-wider">LONGITUDE</label>
-                  <input 
-                    value={formData.address.coordinates.lng}
-                    onChange={(e) => setFormData({ ...formData, address: { ...formData.address, coordinates: { ...formData.address.coordinates, lng: e.target.value } } })}
-                    className="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-[14px] font-mono outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all text-zinc-600"
-                  />
-                </div>
-              </div>
-
-              <div className="aspect-video rounded-xl bg-zinc-100 border border-zinc-200 flex items-center justify-center text-zinc-400 group hover:border-primary/20 transition-all cursor-crosshair overflow-hidden relative">
-                 <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]" />
-                 <MapPinLine size={32} weight="duotone" className="z-10 group-hover:text-primary transition-colors duration-500" />
-                 <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur border border-zinc-200 px-2 py-1 rounded text-[10px] font-mono text-zinc-500 z-10 shadow-sm">
-                   Map Preview Mode
-                 </div>
-              </div>
+            <div className="p-1">
+              <LocationPicker 
+                value={formData.address as any}
+                onChange={(addr) => setFormData({ ...formData, address: addr as any })}
+              />
             </div>
           </DetailSection>
 
@@ -228,16 +200,16 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
             <div className="mt-6 space-y-6">
               {walletType === "independent" ? (
                 <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <label className="text-[12px] font-bold text-zinc-400 uppercase tracking-wider">Default Currency</label>
+                  <label className="text-[13px] font-medium text-zinc-900">Default Currency</label>
                   <div className="flex items-center gap-3 w-full px-3 py-2 bg-zinc-50/50 border border-zinc-200 rounded-lg text-[14px]">
-                    <span className="w-6 h-4 bg-zinc-200 rounded-sm flex items-center justify-center text-[10px] font-bold text-zinc-500 uppercase">MYR</span>
+                    <span className="w-8 h-5 bg-zinc-200 rounded-sm flex items-center justify-center text-[10px] font-medium text-zinc-500">MYR</span>
                     <span className="text-zinc-600 font-medium whitespace-nowrap">Malaysian Ringgit (RM)</span>
-                    <span className="ml-auto text-[11px] text-zinc-400 font-medium tracking-widest">LOCKED</span>
+                    <span className="ml-auto text-[11px] text-zinc-400 font-medium tracking-tight">Locked</span>
                   </div>
                 </div>
               ) : (
                 <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <label className="text-[12px] font-bold text-zinc-400 uppercase tracking-wider">Bridge to Existing Wallet</label>
+                  <label className="text-[13px] font-medium text-zinc-900">Bridge to Existing Wallet</label>
                   <select 
                     className="w-full px-3 py-2.5 bg-white border border-zinc-200 rounded-lg text-[14px] outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-medium text-zinc-700 hover:border-zinc-300 cursor-pointer"
                   >
@@ -292,7 +264,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
           </DetailSection>
           
           <div className="p-4 rounded-xl border border-border bg-card shadow-sm space-y-4">
-            <h4 className="text-[13px] font-bold text-zinc-400 uppercase tracking-wider">Branch Setup Guide</h4>
+            <h4 className="text-[13px] font-semibold text-zinc-400 tracking-tight">Branch setup guide</h4>
             <div className="space-y-3">
               {[
                 { label: "Identity Verified", status: true },

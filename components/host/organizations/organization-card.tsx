@@ -82,13 +82,13 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
             <div className="space-y-1.5">
               <Link 
                 href={`/organizations/${org.id}`}
-                className="font-bold text-[16px] text-foreground hover:text-zinc-900 transition-colors block leading-tight tracking-tight"
+                className="font-bold text-[14px] text-foreground hover:text-zinc-900 transition-colors block leading-tight tracking-tight"
               >
                 {org.name}
               </Link>
               <div className="flex items-center gap-2">
                 <PulseStatus status={org.status as any} showLabel={true} className="px-1.5 py-0.5 rounded-md text-[10px]" />
-                <span className="text-[10px] text-zinc-400 font-mono bg-white px-1.5 py-0.5 rounded border border-zinc-200 uppercase tracking-widest">{org.id}</span>
+                <span className="text-[10px] text-zinc-400 font-mono bg-white px-1.5 py-0.5 rounded border border-zinc-200 tracking-tight">{org.id}</span>
               </div>
             </div>
           </div>
@@ -105,7 +105,7 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
             <div className="space-y-2.5">
               <div className="flex items-center gap-1.5 text-zinc-400">
                 <Users size={14} weight="bold" />
-                <span className="text-[10px] font-bold uppercase tracking-widest opacity-60">Workforce</span>
+                <span className="text-[11px] font-semibold tracking-tight text-muted-foreground/80">Workforce</span>
               </div>
               <div className="space-y-2">
                 <span className="text-[14px] font-bold text-zinc-800 block">
@@ -119,7 +119,7 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
             <div className="space-y-2.5">
               <div className="flex items-center gap-1.5 text-zinc-400">
                 <ChartPieSlice size={14} weight="bold" />
-                <span className="text-[10px] font-bold uppercase tracking-widest opacity-60">Utilization</span>
+                <span className="text-[11px] font-semibold tracking-tight text-zinc-500/80">Utilization</span>
               </div>
               <div className="flex items-center gap-3">
                 <UtilizationChart value={org.utilizationRate} mode="ring" size={44} strokeWidth={4} />
@@ -139,7 +139,7 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
           <div className="pt-2">
             <div className="flex items-center gap-1.5 text-zinc-400 mb-3">
               <Shield size={14} weight="bold" />
-              <span className="text-[10px] font-bold uppercase tracking-widest opacity-60">Benefit Policies</span>
+              <span className="text-[11px] font-semibold tracking-tight text-zinc-500/80">Benefit policies</span>
               <span className="h-2 w-2 rounded-full bg-zinc-200 flex items-center justify-center">
                 <span className="h-1 w-1 rounded-full bg-zinc-400" />
               </span>
@@ -173,7 +173,7 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
                         onClick={(e) => e.stopPropagation()}
                       >
                         <div className="flex flex-col gap-1.5">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 px-2 py-1 opacity-50">Benefit Policies</span>
+                          <span className="text-[11px] font-semibold tracking-tight text-zinc-400 px-2 py-1 opacity-80">Benefit policies</span>
                           <div className="max-h-[160px] overflow-y-auto px-1 space-y-1">
                             {org.policies.slice(3).map((policy, i) => (
                               <div key={i} className="text-[12px] px-2 py-1.5 hover:bg-zinc-50 rounded-lg text-zinc-700 transition-colors truncate font-medium">

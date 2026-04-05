@@ -203,7 +203,7 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 p-1">
           <div className="space-y-1.5">
-            <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-1.5">
+            <label className="text-[11px] font-semibold text-muted-foreground/70 flex items-center gap-1.5">
               Employee Full Name
               <span className="text-rose-500">*</span>
             </label>
@@ -219,7 +219,7 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-1.5">
+            <label className="text-[11px] font-semibold text-muted-foreground/70 flex items-center gap-1.5">
               Employee ID
             </label>
             <div className="relative">
@@ -234,7 +234,7 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-1.5">
+            <label className="text-[11px] font-semibold text-muted-foreground/70 flex items-center gap-1.5">
               Corporate Email
             </label>
             <div className="relative">
@@ -250,7 +250,7 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-1.5">
+            <label className="text-[11px] font-semibold text-muted-foreground/70 flex items-center gap-1.5">
               Phone Number
             </label>
             <div className="relative">
@@ -274,7 +274,7 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
         <div className="space-y-6 p-1">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-1.5">
+              <label className="text-[11px] font-semibold text-muted-foreground/70 flex items-center gap-1.5">
                 Join Date
                 <span className="text-rose-500">*</span>
               </label>
@@ -286,13 +286,13 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-1.5">
+              <label className="text-[11px] font-semibold text-muted-foreground/70 flex items-center gap-1.5">
                 Employee Code (Emp. Code)
               </label>
               <div className="relative flex items-center h-[38px] bg-white border border-zinc-200 rounded-lg px-2 group focus-within:ring-2 focus-within:ring-primary/10 focus-within:border-primary/30 transition-all">
                 <input 
                   placeholder="ACM-XXXX"
-                  className="flex-1 bg-transparent border-none outline-none text-[14px] font-medium text-zinc-700 px-1 font-mono uppercase tracking-wider"
+                  className="flex-1 bg-transparent border-none outline-none text-[14px] font-medium text-zinc-700 px-1 font-mono tracking-tight"
                   value={formData.empCode}
                   onChange={(e) => setFormData({ ...formData, empCode: e.target.value })}
                 />
@@ -308,7 +308,7 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Employment Type</label>
+            <label className="text-[11px] font-semibold text-muted-foreground/70">Employment type</label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {EMPLOYMENT_TYPES.map((type) => (
                 <ChoiceCard 
@@ -360,7 +360,7 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
              {/* Specific date picker — only shown when mode = date */}
              {formData.probationMode === "date" && (
                <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-200">
-                 <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Probation End Date</label>
+                 <label className="text-[11px] font-semibold text-muted-foreground/70">Probation end date</label>
                  <DatePickerField
                    value={formData.probationEndDate}
                    onChange={(v) => setFormData({ ...formData, probationEndDate: v })}
@@ -397,7 +397,7 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
             <div key={idx} className="p-4 rounded-xl border border-zinc-200 bg-white shadow-sm flex items-start justify-between gap-4 animate-in fade-in slide-in-from-top-2">
               <div className="flex-1 grid grid-cols-2 gap-4">
                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Select Benefit Policy</label>
+                    <label className="text-[10px] font-semibold text-muted-foreground/70">Select benefit policy</label>
                     <select 
                       className="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-[13px] font-medium text-zinc-700 outline-none focus:ring-2 focus:ring-primary/10 transition-all"
                       value={assigned.policyId}
@@ -414,7 +414,7 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
                     </select>
                  </div>
                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Select Benefit Group</label>
+                    <label className="text-[10px] font-semibold text-muted-foreground/70">Select benefit group</label>
                     <select 
                       className="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-[13px] font-medium text-zinc-700 outline-none focus:ring-2 focus:ring-primary/10 transition-all"
                       value={assigned.benefitGroupId}
@@ -458,7 +458,7 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
           {dependents.map((dep) => (
              <div key={dep.id} className="p-4 rounded-xl border border-zinc-100 bg-zinc-50/30 space-y-4 animate-in fade-in zoom-in-95">
                 <div className="flex items-center justify-between">
-                   <span className="text-[11px] font-bold text-primary uppercase bg-primary/10 px-2 py-0.5 rounded">Dependent Unit</span>
+                   <span className="text-[11px] font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded">Dependent unit</span>
                    <button onClick={() => removeDependent(dep.id)} className="text-zinc-300 hover:text-rose-500 transition-colors">
                      <Trash size={16} />
                    </button>
@@ -466,7 +466,7 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5 col-span-2 sm:col-span-1">
-                    <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Relationship</label>
+                    <label className="text-[11px] font-semibold text-muted-foreground/70">Relationship</label>
                     <select 
                       value={dep.relationship}
                       onChange={(e) => updateDependent(dep.id, 'relationship', e.target.value)}
@@ -476,7 +476,7 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
                     </select>
                   </div>
                   <div className="space-y-1.5 col-span-2 sm:col-span-1">
-                    <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Full Name</label>
+                    <label className="text-[11px] font-semibold text-muted-foreground/70">Full name</label>
                     <input 
                       value={dep.name}
                       onChange={(e) => updateDependent(dep.id, 'name', e.target.value)}
@@ -485,7 +485,7 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Email Address</label>
+                    <label className="text-[11px] font-semibold text-muted-foreground/70">Email address</label>
                     <input 
                       value={dep.email}
                       onChange={(e) => updateDependent(dep.id, 'email', e.target.value)}
@@ -494,7 +494,7 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Phone Number</label>
+                    <label className="text-[11px] font-semibold text-muted-foreground/70">Phone number</label>
                     <input 
                       value={dep.phone}
                       onChange={(e) => updateDependent(dep.id, 'phone', e.target.value)}

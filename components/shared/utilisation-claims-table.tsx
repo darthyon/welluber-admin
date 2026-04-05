@@ -64,11 +64,11 @@ export function UtilisationClaimsTable({ data }: Props) {
     <div className="border border-zinc-200 rounded-2xl overflow-hidden">
       {/* Table header */}
       <div className="grid grid-cols-[2fr_1fr_100px_220px_60px] px-5 py-3 bg-zinc-50 border-b border-zinc-200">
-        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Employee</p>
-        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Branch</p>
-        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest text-right">Allocated</p>
-        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest pl-3">Utilisation</p>
-        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest text-center">Claims</p>
+        <p className="text-[10px] font-semibold text-zinc-400 tracking-tight">Employee</p>
+        <p className="text-[10px] font-semibold text-zinc-400 tracking-tight">Branch</p>
+        <p className="text-[10px] font-semibold text-zinc-400 tracking-tight text-right">Allocated</p>
+        <p className="text-[10px] font-semibold text-zinc-400 tracking-tight pl-3">Utilisation</p>
+        <p className="text-[10px] font-semibold text-zinc-400 tracking-tight text-center">Claims</p>
       </div>
 
       {data.map((emp) => {
@@ -130,7 +130,7 @@ export function UtilisationClaimsTable({ data }: Props) {
                 {/* Claims sub-header */}
                 <div className="grid grid-cols-[140px_1fr_1fr_1fr_110px_90px] gap-3 px-10 py-2 border-b border-zinc-100">
                   {["Voucher", "Service", "Provider", "Location", "Date", "Amount"].map((h) => (
-                    <p key={h} className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">{h}</p>
+                    <p key={h} className="text-[9px] font-semibold text-zinc-400 tracking-tight">{h}</p>
                   ))}
                 </div>
 

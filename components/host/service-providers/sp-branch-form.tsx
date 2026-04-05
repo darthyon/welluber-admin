@@ -14,6 +14,7 @@ import { TwoColumnDetailLayout } from "@/components/shared/two-column-detail-lay
 import { BRANCH_CONTACT_TYPES, OPERATING_DAYS, DEFAULT_OPERATING_HOURS } from "@/features/providers/constants";
 import { buildBranchServiceTaxonomy } from "@/features/providers/service-taxonomy";
 import { SuccessCelebration } from "@/components/shared/success-celebration";
+import { LocationPicker } from "@/components/shared/location-picker";
 import type { SpBranch } from "@/types/provider";
 
 interface SpBranchFormProps {
@@ -213,7 +214,7 @@ export function SpBranchForm({ spId, serviceCategories, branch, onSuccess, onCan
               </DetailSection>
 
               <div className="rounded-xl border border-border bg-card shadow-sm p-4">
-                <h4 className="text-[13px] font-bold uppercase tracking-wider text-muted-foreground mb-3">Branch Notes</h4>
+                <h4 className="text-[13px] font-semibold text-muted-foreground tracking-tight mb-3">Branch notes</h4>
                 <p className="text-[13px] text-muted-foreground leading-6">
                   Branches inherit the service categories from the parent service provider, but each location can still choose which services it offers and how it runs day to day.
                 </p>
@@ -279,7 +280,7 @@ export function SpBranchForm({ spId, serviceCategories, branch, onSuccess, onCan
                         <h4 className="text-[13px] font-semibold text-foreground">{group.category}</h4>
                         <p className="text-[11px] text-muted-foreground">Masterlist services for this provider category.</p>
                       </div>
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+                      <span className="text-[10px] font-medium text-muted-foreground/60 tracking-tight">
                         {group.services.length} options
                       </span>
                     </div>
@@ -347,38 +348,12 @@ export function SpBranchForm({ spId, serviceCategories, branch, onSuccess, onCan
             icon={<MapPin size={16} weight="fill" />}
             description="Address and map coordinates for this branch."
           >
-            <div className="space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-foreground">Street Address</label>
-                <input {...register("address.line")} className={inputCls(!!errors.address?.line)} placeholder="Lot 5, Suria KLCC" />
-                {errors.address?.line && (
-                  <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
-                    <WarningCircle size={12} /> {errors.address.line.message}
-                  </p>
-                )}
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {(["city", "state", "country", "postalCode"] as const).map((field) => (
-                  <div key={field} className="space-y-1.5">
-                    <label className="text-[13px] font-medium text-foreground capitalize">{field === "postalCode" ? "Postal Code" : field}</label>
-                    <input {...register(`address.${field}`)} className={inputCls(!!(errors.address as any)?.[field])} />
-                    {(errors.address as any)?.[field] && (
-                      <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
-                        <WarningCircle size={12} /> {(errors.address as any)[field].message}
-                      </p>
-                    )}
-                  </div>
-                ))}
-                <div className="space-y-1.5">
-                  <label className="text-[13px] font-medium text-foreground">Latitude <span className="text-muted-foreground font-normal">(optional)</span></label>
-                  <input type="number" step="any" {...register("address.lat", { valueAsNumber: true })} className={inputCls()} placeholder="e.g. 3.1579" />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-[13px] font-medium text-foreground">Longitude <span className="text-muted-foreground font-normal">(optional)</span></label>
-                  <input type="number" step="any" {...register("address.lon", { valueAsNumber: true })} className={inputCls()} placeholder="e.g. 101.7123" />
-                </div>
-              </div>
+            <div className="p-1">
+              <LocationPicker 
+                value={watch("address")}
+                onChange={(val) => setValue("address", val as any, { shouldValidate: true })}
+                errors={errors.address}
+              />
             </div>
           </DetailSection>
 

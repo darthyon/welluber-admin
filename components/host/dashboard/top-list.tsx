@@ -28,7 +28,7 @@ export function TopList({ title, type, data }: TopListProps) {
   return (
     <div className="rounded-lg border border-border bg-card p-5 h-full flex flex-col">
       <div className="flex items-start justify-between mb-4 gap-2">
-        <h2 className="text-[13px] font-semibold text-foreground leading-tight pt-1">{title}</h2>
+        <h2 className="text-[13px] font-semibold text-foreground tracking-tight">{title}</h2>
         <select 
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value)}
@@ -54,10 +54,10 @@ export function TopList({ title, type, data }: TopListProps) {
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-border">
-              <th className="pb-2 text-[10px] font-semibold text-muted-foreground/60 uppercase tracking-[0.08em] w-12">Rank</th>
-              <th className="pb-2 text-[10px] font-semibold text-muted-foreground/60 uppercase tracking-[0.08em]">Name</th>
-              <th className="pb-2 text-[10px] font-semibold text-muted-foreground/60 uppercase tracking-[0.08em] text-right">{m1Label}</th>
-              <th className="pb-2 text-[10px] font-semibold text-muted-foreground/60 uppercase tracking-[0.08em] text-right">{m2Label}</th>
+              <th className="pb-2 text-[11px] font-semibold text-muted-foreground/60 tracking-tight w-12">Rank</th>
+              <th className="pb-2 text-[11px] font-semibold text-muted-foreground/60 tracking-tight">Name</th>
+              <th className="pb-2 text-[11px] font-semibold text-muted-foreground/60 tracking-tight text-right">{m1Label}</th>
+              <th className="pb-2 text-[11px] font-semibold text-muted-foreground/60 tracking-tight text-right">{m2Label}</th>
             </tr>
           </thead>
           <tbody>

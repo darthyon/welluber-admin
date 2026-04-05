@@ -35,7 +35,7 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
       render: (org) => (
         <div className="flex flex-col">
           <span className="font-bold text-[14px] text-foreground tracking-tight">{org.name}</span>
-          <span className="text-[11px] text-muted-foreground mt-0.5 font-mono uppercase tracking-widest">{org.id}</span>
+          <span className="text-[11px] text-muted-foreground mt-0.5 font-mono tracking-tight">{org.id}</span>
         </div>
       )
     },
@@ -112,7 +112,7 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
                   </TooltipTrigger>
                   <TooltipContent className="w-52 bg-card rounded-xl border-border shadow-2xl z-[200]">
                     <div className="flex flex-col gap-1">
-                      <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground opacity-60 mb-1 px-1">Service category</span>
+                      <span className="text-[10px] font-semibold text-muted-foreground/70 mb-1 px-1">Service category</span>
                       {org.services.slice(1).map((service, i) => (
                         <div key={i} className="text-[11px] px-2 py-1.5 hover:bg-muted rounded text-foreground transition-colors font-medium">
                           {service}
@@ -153,7 +153,7 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
                   </TooltipTrigger>
                   <TooltipContent className="w-52 bg-card rounded-xl border-border shadow-2xl z-[200]">
                     <div className="flex flex-col gap-1">
-                      <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground opacity-60 mb-1 px-1">Benefit Policies</span>
+                      <span className="text-[10px] font-semibold text-muted-foreground/70 mb-1 px-1">Benefit policies</span>
                       {org.policies.slice(1).map((policy, i) => (
                         <div key={i} className="text-[11px] px-2 py-1.5 hover:bg-muted rounded text-foreground transition-colors font-medium">
                           {policy}
@@ -194,7 +194,7 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
                   </TooltipTrigger>
                   <TooltipContent className="w-52 bg-card rounded-xl border-border shadow-2xl z-[200]">
                     <div className="flex flex-col gap-1">
-                      <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground opacity-60 mb-1 px-1">Branches</span>
+                      <span className="text-[10px] font-semibold text-muted-foreground/70 mb-1 px-1">Branches</span>
                       {org.branches.slice(1).map((branch, i) => (
                         <div key={i} className="text-[11px] px-2 py-1.5 hover:bg-muted rounded text-foreground transition-colors font-medium">
                           {branch}

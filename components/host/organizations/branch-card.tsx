@@ -75,7 +75,7 @@ export function BranchCard({ branch, onView, onEdit }: BranchCardProps) {
       <div className="mt-auto space-y-4 pt-6 relative z-10">
         <div className="flex items-center justify-between border-t border-border/40 pt-4">
           <div className="flex flex-col gap-1">
-            <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground/60">Wallet Model</span>
+            <span className="text-[11px] font-semibold tracking-tight text-zinc-500/80">Wallet model</span>
             <div className="flex items-center gap-1.5 text-[12px] font-semibold text-foreground">
               <Wallet size={14} weight="duotone" className="text-primary" />
               <span>{walletLabel}</span>
@@ -87,7 +87,7 @@ export function BranchCard({ branch, onView, onEdit }: BranchCardProps) {
           
           {branch.employeesCount && (
             <div className="flex flex-col items-end gap-1 text-right">
-              <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground/60">Staff</span>
+              <span className="text-[11px] font-semibold tracking-tight text-zinc-500/80">Workforce</span>
               <div className="flex items-center gap-1.5 text-[12px] font-semibold text-foreground">
                 <Users size={14} weight="duotone" className="text-primary" />
                 <span>{branch.employeesCount.toLocaleString()}</span>
@@ -98,8 +98,8 @@ export function BranchCard({ branch, onView, onEdit }: BranchCardProps) {
 
         {branch.utilizationRate !== undefined && (
           <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-[10px] uppercase font-bold tracking-wider text-muted-foreground/60">
-              <span>Utilization</span>
+            <div className="flex items-center justify-between text-[11px] font-semibold tracking-tight text-muted-foreground/80">
+              <span className="opacity-90">Utilization</span>
               <span className={cn(
                 branch.utilizationRate > 80 ? "text-amber-500" : "text-emerald-500"
               )}>{branch.utilizationRate}%</span>

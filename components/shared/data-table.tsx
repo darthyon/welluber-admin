@@ -63,12 +63,12 @@ export function SharedDataTable<T extends { id: string | number }>({
                   <th 
                     key={i} 
                     className={cn(
-                      "font-bold text-muted-foreground text-[10px] uppercase tracking-widest p-4 whitespace-nowrap bg-zinc-50 dark:bg-muted/30 z-20",
+                      "font-semibold text-muted-foreground text-[13px] p-4 whitespace-nowrap bg-zinc-50 dark:bg-muted/30 z-20 tracking-tight",
                       isFirstCol && "rounded-tl-xl",
                       isLastCol && "rounded-tr-xl",
                       getCellAlignment(col.align),
                       isFirst && "sticky left-0 z-30 shadow-[4px_0_12px_-4px_rgba(0,0,0,0.05)]",
-                      isLast && "sticky right-0 z-30 shadow-[-4px_0_12px_-4px_rgba(0,0,0,0.05)]",
+                      isLast && "sticky right-0 z-30 shadow-[-4px_0_12_px_-4px_rgba(0,0,0,0.05)]",
                       col.headerClassName
                     )}
                   >

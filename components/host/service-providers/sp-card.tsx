@@ -51,10 +51,10 @@ export function SpCard({ sp }: SpCardProps) {
               )}
             </div>
             <div className="space-y-1.5">
-              <p className="font-bold text-[15px] text-foreground leading-tight tracking-tight">{sp.name}</p>
+              <p className="font-bold text-[14px] text-foreground leading-tight tracking-tight">{sp.name}</p>
               <div className="flex items-center gap-2">
                 <PulseStatus status={sp.status as "active" | "pending" | "suspended"} showLabel />
-                <span className="text-[9px] text-zinc-400 font-mono bg-white px-1.5 py-0.5 rounded border border-zinc-200 uppercase tracking-widest">{sp.registrationNo}</span>
+                <span className="text-[9px] text-zinc-400 font-mono bg-white px-1.5 py-0.5 rounded border border-zinc-200 tracking-tight">{sp.registrationNo}</span>
               </div>
             </div>
           </div>
@@ -65,7 +65,7 @@ export function SpCard({ sp }: SpCardProps) {
         {/* Service Categories */}
         <div className="relative z-10 space-y-4">
           <div className="space-y-2">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Service Categories</span>
+            <span className="text-[10px] font-semibold tracking-tight text-zinc-400">Service categories</span>
             <div className="flex flex-wrap gap-1.5">
               {sp.serviceCategories.length === 0 ? (
                 <span className="text-[11px] text-zinc-400 italic">None assigned</span>
@@ -88,7 +88,7 @@ export function SpCard({ sp }: SpCardProps) {
                       </TooltipTrigger>
                       <TooltipContent className="w-52 bg-white rounded-2xl border-zinc-200 shadow-2xl z-[200]" onClick={(e) => e.stopPropagation()}>
                         <div className="flex flex-col gap-1">
-                          <span className="text-[9px] font-bold uppercase tracking-wider text-zinc-400 px-2 py-1 opacity-50">All Categories</span>
+                          <span className="text-[9px] font-semibold tracking-tight text-zinc-400 px-2 py-1 opacity-50">All categories</span>
                           {sp.serviceCategories.slice(3).map((cat, i) => (
                             <div key={i} className="text-[12px] px-2 py-1.5 hover:bg-zinc-50 rounded-lg text-zinc-700 font-medium">{cat}</div>
                           ))}

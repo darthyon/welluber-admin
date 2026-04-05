@@ -222,7 +222,7 @@ export function SpVoucherForm({
             <div className="space-y-5 p-1">
               {isEditing && (
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Voucher Code</label>
+                  <label className="text-[11px] font-semibold text-zinc-400 tracking-tight">Voucher code</label>
                   <div className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-[14px] font-mono text-zinc-500 cursor-not-allowed">
                     {voucher?.code}
                   </div>
@@ -230,8 +230,8 @@ export function SpVoucherForm({
                 </div>
               )}
               <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">
-                  Voucher Name <span className="text-rose-500">*</span>
+                <label className="text-[11px] font-semibold text-zinc-400 tracking-tight">
+                  Voucher name <span className="text-rose-500">*</span>
                 </label>
                 <input 
                   {...register("name")} 
@@ -241,7 +241,7 @@ export function SpVoucherForm({
                 {errors.name && <FieldError msg={errors.name.message} />}
               </div>
               <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Description</label>
+                <label className="text-[11px] font-semibold text-zinc-400 tracking-tight">Description</label>
                 <textarea 
                   {...register("description")} 
                   rows={3} 
@@ -268,7 +268,7 @@ export function SpVoucherForm({
                         <span className="w-5 h-5 rounded-full bg-zinc-200 flex items-center justify-center text-[10px] font-bold text-zinc-500">
                           {i + 1}
                         </span>
-                        <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Service Line</span>
+                        <span className="text-[11px] font-semibold text-zinc-400 tracking-tight">Service line</span>
                       </div>
                       {serviceLineFields.length > 1 && (
                         <button 
@@ -283,7 +283,7 @@ export function SpVoucherForm({
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Service</label>
+                        <label className="text-[10px] font-semibold text-zinc-400 tracking-tight">Service</label>
                         <SectionedSearchSelect
                           taxonomy={SERVICE_TAXONOMY.filter(cat => spServiceCategories.includes(cat.category))}
                           value={watch(`serviceLines.${i}.service`)}
@@ -295,7 +295,7 @@ export function SpVoucherForm({
                         />
                       </div>
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Sub-services</label>
+                        <label className="text-[10px] font-semibold text-zinc-400 tracking-tight">Sub-services</label>
                         <CustomMultiSelect
                           options={SERVICE_SPEC_TAXONOMY[watch(`serviceLines.${i}.service`)] || []}
                           selected={watch(`serviceLines.${i}.subServices`) || []}
@@ -304,7 +304,7 @@ export function SpVoucherForm({
                         />
                       </div>
                       <div className="space-y-1.5 sm:col-span-2">
-                        <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Item Description</label>
+                        <label className="text-[10px] font-semibold text-zinc-400 tracking-tight">Item description</label>
                         <input 
                           {...register(`serviceLines.${i}.description`)} 
                           className={inputCls()} 
@@ -312,7 +312,7 @@ export function SpVoucherForm({
                         />
                       </div>
                       <div className="space-y-1.5 sm:col-span-2">
-                        <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Package Quantity</label>
+                        <label className="text-[10px] font-semibold text-zinc-400 tracking-tight">Package quantity</label>
                         <div className="flex gap-2">
                           <input 
                             type="number" 
@@ -351,7 +351,7 @@ export function SpVoucherForm({
               {/* Activation Period */}
               <div className="space-y-4">
                 <div>
-                  <h4 className="text-[14px] font-bold text-zinc-900">Activation Period</h4>
+                  <h4 className="text-[14px] font-semibold text-zinc-900">Activation period</h4>
                   <p className="text-[12px] text-zinc-500 mt-0.5">When is this voucher available for purchase?</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -375,7 +375,7 @@ export function SpVoucherForm({
               {/* Redemption Period */}
               <div className="space-y-4">
                 <div>
-                  <h4 className="text-[14px] font-bold text-zinc-900">Redemption Period</h4>
+                  <h4 className="text-[14px] font-semibold text-zinc-900">Redemption period</h4>
                   <p className="text-[12px] text-zinc-500 mt-0.5">When can customers use this voucher?</p>
                 </div>
 
@@ -401,7 +401,7 @@ export function SpVoucherForm({
                 {redemptionMode === "after_purchase" && (
                   <div className="mt-4 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
                     <div className="flex flex-col gap-2">
-                      <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Valid for</label>
+                      <label className="text-[11px] font-semibold text-zinc-400 tracking-tight">Valid for</label>
                       <div className="flex items-center gap-2">
                         <input
                           type="number"
@@ -423,7 +423,7 @@ export function SpVoucherForm({
 
                 {redemptionMode === "exact_date" && (
                   <div className="mt-4 space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                    <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest block">Expiry Date</label>
+                    <label className="text-[11px] font-semibold text-zinc-400 tracking-tight block">Expiry date</label>
                     <DatePickerField
                       value={watch("redemptionPeriod.date") || ""}
                       onChange={(v: string) => setValue("redemptionPeriod.date", v)}
@@ -487,7 +487,7 @@ export function SpVoucherForm({
 
               {branchScope === "specific" && (
                 <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Select Branches</label>
+                  <label className="text-[10px] font-semibold text-zinc-400 tracking-tight">Select branches</label>
                   <CustomMultiSelect
                     options={spBranches.map(b => b.name)}
                     selected={watch("branchIds").map(id => spBranches.find(b => b.id === id)?.name || id)}
@@ -510,7 +510,7 @@ export function SpVoucherForm({
           >
             <div className="p-1 space-y-5">
               <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Currency</label>
+                <label className="text-[11px] font-semibold text-zinc-400 tracking-tight">Currency</label>
                 <select {...register("currency")} className={selectCls()}>
                   {Object.entries(CURRENCIES).map(([code, name]) => (
                     <option key={code} value={code}>{code} - {name}</option>
@@ -519,11 +519,11 @@ export function SpVoucherForm({
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Initial Price</label>
+                  <label className="text-[11px] font-semibold text-zinc-400 tracking-tight">Initial price</label>
                   <input type="number" step="0.01" {...register("initialPrice", { valueAsNumber: true })} className={cn(inputCls(), "font-mono")} />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Final Price</label>
+                  <label className="text-[11px] font-semibold text-zinc-400 tracking-tight">Final price</label>
                   <input type="number" step="0.01" {...register("finalPrice", { valueAsNumber: true })} className={cn(inputCls(!!errors.finalPrice), "font-mono font-bold text-primary bg-primary/5 border-primary/20")} />
                 </div>
               </div>

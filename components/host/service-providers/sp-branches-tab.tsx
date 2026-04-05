@@ -169,11 +169,11 @@ export function SpBranchesTab({ sp }: SpBranchesTabProps) {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-border/50 bg-muted/20">
-                  <th className="font-semibold text-muted-foreground text-[11px] uppercase tracking-wider p-4">Branch</th>
-                  <th className="font-semibold text-muted-foreground text-[11px] uppercase tracking-wider p-4">Location</th>
-                  <th className="font-semibold text-muted-foreground text-[11px] uppercase tracking-wider p-4">Services</th>
-                  <th className="font-semibold text-muted-foreground text-[11px] uppercase tracking-wider p-4">Status</th>
-                  <th className="font-semibold text-muted-foreground text-[11px] uppercase tracking-wider p-4 text-right">Actions</th>
+                  <th className="font-semibold text-muted-foreground/80 text-[13px] tracking-tight p-4">Branch</th>
+                  <th className="font-semibold text-muted-foreground/80 text-[13px] tracking-tight p-4">Location</th>
+                  <th className="font-semibold text-muted-foreground/80 text-[13px] tracking-tight p-4">Services</th>
+                  <th className="font-semibold text-muted-foreground/80 text-[13px] tracking-tight p-4">Status</th>
+                  <th className="font-semibold text-muted-foreground/80 text-[13px] tracking-tight p-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
@@ -189,8 +189,8 @@ export function SpBranchesTab({ sp }: SpBranchesTabProps) {
                           <GitBranch size={18} weight="fill" />
                         </div>
                         <div>
-                          <p className="text-[13px] font-medium text-foreground group-hover:text-primary transition-colors">{branch.name}</p>
-                          <p className="text-[11px] text-muted-foreground">{branch.isActive ? "Active branch" : "Inactive branch"}</p>
+                          <p className="text-[13px] font-semibold text-foreground group-hover:text-primary transition-colors">{branch.name}</p>
+                          <p className="text-[11px] font-medium text-muted-foreground">{branch.isActive ? "Active branch" : "Inactive branch"}</p>
                         </div>
                       </div>
                     </td>
@@ -200,12 +200,12 @@ export function SpBranchesTab({ sp }: SpBranchesTabProps) {
                     <td className="p-4">
                       <div className="flex flex-wrap gap-1.5">
                         {branch.services.slice(0, 2).map((service) => (
-                          <span key={service} className="inline-flex items-center px-2 py-0.5 rounded-full bg-muted text-[11px] text-muted-foreground border border-border">
+                          <span key={service} className="inline-flex items-center px-2 py-0.5 rounded-full bg-muted text-[11px] font-medium text-muted-foreground border border-border">
                             {service}
                           </span>
                         ))}
                         {branch.services.length > 2 && (
-                          <span className="text-[11px] text-muted-foreground/60 font-medium">
+                          <span className="text-[11px] font-medium text-muted-foreground/60">
                             +{branch.services.length - 2} more
                           </span>
                         )}

@@ -1,7 +1,8 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { TrendUp, TrendDown, Barbell, Brain, Tooth, Stethoscope, Sparkle } from "@phosphor-icons/react"
+import { TrendUp, TrendDown, Barbell, Brain, Tooth, Stethoscope, Sparkle, Info } from "@phosphor-icons/react"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 const CATEGORIES = [
   { id: "c1", name: "Fitness & Gym", icon: Barbell, value: 14200, percentage: 100, trend: 14 },
@@ -15,8 +16,19 @@ export function TrendingCategories() {
   return (
     <div className="rounded-lg border border-border bg-card p-5 h-full flex flex-col">
       <div className="mb-4">
-        <h2 className="text-[13px] font-semibold text-foreground mb-0.5">Service Categories</h2>
-        <p className="text-[12px] text-muted-foreground">Most utilized across all SPs</p>
+        <div className="flex items-center gap-1.5 mb-0.5">
+          <h2 className="text-[13px] font-semibold text-foreground tracking-tight">Top service categories</h2>
+          <TooltipProvider>
+            <Tooltip delayDuration={0}>
+              <TooltipTrigger asChild>
+                <Info size={14} className="text-muted-foreground/60 cursor-help hover:text-primary transition-colors" />
+              </TooltipTrigger>
+              <TooltipContent side="top" className="text-[12px] font-medium leading-relaxed max-w-[220px]">
+                Most utilized across all SPs
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto min-h-0 -mx-5 px-5">

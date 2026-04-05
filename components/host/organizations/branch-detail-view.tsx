@@ -152,14 +152,14 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
             
             <div className="bg-indigo-600 rounded-xl p-6 text-white overflow-hidden relative group">
               <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-1000" />
-              <h4 className="text-[15px] font-semibold mb-2">Branch Quick Stats</h4>
+              <h4 className="text-[15px] font-semibold mb-2 tracking-tight">Branch quick stats</h4>
               <div className="space-y-4 relative z-10">
                 <div>
-                  <p className="text-[11px] text-white/70">Total Employees</p>
+                  <p className="text-[11px] font-semibold text-white/70 tracking-tight">Total employees</p>
                   <p className="text-xl font-bold">1,240</p>
                 </div>
                 <div>
-                  <p className="text-[11px] text-white/70">Redemption Rate</p>
+                  <p className="text-[11px] font-semibold text-white/70 tracking-tight">Redemption rate</p>
                   <p className="text-xl font-bold">92%</p>
                 </div>
               </div>
@@ -169,64 +169,80 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
       >
         {/* Section 1: Office Profile (Identity & Geography) */}
           <DetailSection 
-            title="Office Profile" 
-            icon={<MapPin size={18} weight="duotone" />}
-            description="Geographic and identification details for this branch"
+            title="Branch Identity" 
+            icon={<Buildings size={18} weight="duotone" />}
+            description="Basic branch identifiers and operational status"
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
-              <DetailField label="Office Name" value={branchData.name} />
-              <DetailField label="Location Type" value={branchData.type} />
-              <DetailField label="Address Line" value={branchData.address.line} className="md:col-span-2" />
-              
-              <div className="grid grid-cols-2 gap-6 md:col-span-2">
-                <DetailField label="City / Township" value={branchData.address.city} />
-                <DetailField label="State / Province" value={branchData.address.state} />
-              </div>
-
-              <div className="grid grid-cols-2 gap-6 md:col-span-2">
-                <div className="relative group">
-                  <DetailField label="Country" value={branchData.address.country} />
-                  {/* Timezone Instrumentation */}
-                  <div className="absolute top-0 right-0 flex items-center gap-1.5 text-[10px] font-semibold text-primary/60 bg-primary/5 px-2 py-0.5 rounded-full border border-primary/10 select-none transition-all group-hover:bg-primary/10 group-hover:text-primary animate-in fade-in duration-700">
-                    <Clock size={10} weight="bold" />
-                    <span>{branchData.address.timezone}</span>
-                  </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <DetailField label="Official Name" value={branchData.name} />
+              <DetailField label="Branch Type" value={branchData.type} />
+              <div className="space-y-1.5">
+                <p className="text-[11px] font-medium text-muted-foreground/80 tracking-tight">Operational status</p>
+                <div className="flex items-center gap-2">
+                  <StatusBadge status={branchData.status} variant="emerald" />
                 </div>
-                <DetailField label="Postal Code" value={branchData.address.postalCode} />
               </div>
+            </div>
+          </DetailSection>
 
-              {/* Map Thumbnail */}
-              <div className="md:col-span-2">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-[11px] font-medium text-muted-foreground">Location Mapping</p>
-                  <div className="flex items-center gap-3">
-
-                    <div className="flex items-center gap-1.5 text-[10px] font-mono bg-zinc-50 border border-zinc-200 px-1.5 py-0.5 rounded text-zinc-500">
-                      <span className="opacity-50">LAT</span>
-                      <span>{branchData.address.coordinates.lat}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-[10px] font-mono bg-zinc-50 border border-zinc-200 px-1.5 py-0.5 rounded text-zinc-500">
-                      <span className="opacity-50">LNG</span>
-                      <span>{branchData.address.coordinates.lng}</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="relative aspect-[21/9] rounded-xl border border-border bg-muted/30 overflow-hidden group/map cursor-pointer">
-
-                  <div className="absolute inset-0 bg-[url('https://api.mapbox.com/styles/v1/mapbox/light-v10/static/101.7036,3.1390,12/800x400?access_token=pk.eyJ1IjoibW9ja2Rlc2lnbiIsImEiOiJjbGZnbXhsenQwMG1xM3lvM2wwNmwwNmwwIn0')] bg-cover bg-center grayscale group-hover:grayscale-0 transition-all duration-700" />
-                  <div className="absolute inset-0 bg-primary/5 group-hover:bg-transparent transition-colors" />
+          <DetailSection 
+            title="Location Mapping" 
+            icon={<MapPin size={18} weight="duotone" />}
+            description="Geographical data and coordinate pinning"
+          >
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Left Column: Map Preview */}
+              <div className="space-y-4">
+                <div className="relative aspect-[16/10] lg:aspect-auto lg:h-full min-h-[300px] rounded-2xl border border-border bg-muted/30 overflow-hidden group/map shadow-sm">
+                  <div className="absolute inset-0 bg-[url('https://api.mapbox.com/styles/v1/mapbox/light-v10/static/101.7036,3.1390,12/800x400?access_token=pk.eyJ1IjoibW9ja2Rlc2lnbiIsImEiOiJjbGZnbXhsenQwMG1xM3lvM2wwNmwwNmwwNmwwIn0')] bg-cover bg-center grayscale group-hover/map:grayscale-0 transition-all duration-1000" />
+                  <div className="absolute inset-0 bg-primary/5 group-hover/map:bg-transparent transition-colors duration-700" />
                   
-                  {/* Center Marker */}
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-1 animate-pulse">
-                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center p-1 border border-primary/30">
-                      <div className="w-full h-full rounded-full bg-primary shadow-lg shadow-primary/40 ring-4 ring-white" />
+                  <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#000000_1px,transparent_1px)] [background-size:16px_16px]" />
+
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-2">
+                    <div className="relative">
+                      <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center p-1.5 border border-primary/30">
+                        <div className="w-full h-full rounded-full bg-primary shadow-lg shadow-primary/40 ring-4 ring-white dark:ring-zinc-900" />
+                      </div>
+                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white dark:border-zinc-900 shadow-sm" />
                     </div>
+                    <span className="text-[10px] font-semibold text-primary bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm px-2 py-0.5 rounded-full border border-primary/20 tracking-tight">
+                      Pinned
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Address Details */}
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <DetailField label="Street Address" value={branchData.address.line} />
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <DetailField label="City" value={branchData.address.city} />
+                    <DetailField label="Postal Code" value={branchData.address.postalCode} />
                   </div>
 
-                  <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm border border-border px-3 py-1.5 rounded-lg shadow-sm text-[11px] font-medium text-foreground flex items-center gap-2">
-                     <TrendUp size={14} className="text-primary" />
-                     <span>High-Density Coverage Area</span>
+                  <DetailField label="State" value={branchData.address.state} />
+
+                  <div className="relative group/tz">
+                    <DetailField label="Country" value={branchData.address.country} />
+                    <div className="absolute top-0 right-0 flex items-center gap-1.5 text-[10px] font-semibold text-primary/60 bg-primary/5 px-2 py-0.5 rounded-full border border-primary/10 select-none opacity-0 group-hover/tz:opacity-100 transition-all duration-300">
+                      <Clock size={10} weight="bold" />
+                      <span>{branchData.address.timezone}</span>
+                    </div>
                   </div>
+                </div>
+
+                <div className="pt-6 border-t border-border/60 grid grid-cols-2 gap-6">
+                  <DetailField 
+                    label="Latitude" 
+                    value={<span className="font-mono text-[13px] text-foreground">{branchData.address.coordinates.lat}</span>} 
+                  />
+                  <DetailField 
+                    label="Longitude" 
+                    value={<span className="font-mono text-[13px] text-foreground">{branchData.address.coordinates.lng}</span>} 
+                  />
                 </div>
               </div>
             </div>
@@ -262,7 +278,7 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
                   </div>
                   
                   <div className="text-right">
-                    <p className="text-[11px] uppercase font-bold tracking-widest text-zinc-400 mb-1">Available Balance</p>
+                    <p className="text-[11px] font-semibold tracking-tight text-zinc-400 mb-1">Available balance</p>
                     <p className="text-2xl font-bold text-foreground">RM 45,000.00</p>
                   </div>
                 </div>

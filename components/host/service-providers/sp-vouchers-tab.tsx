@@ -126,7 +126,7 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
             <div className="border border-border rounded-xl overflow-hidden bg-white shadow-sm">
               <div className="grid grid-cols-[1.2fr_1.8fr_140px_110px_100px_48px] gap-4 px-5 py-3 bg-muted/40 border-b border-border">
                 {["Voucher", "Description", "Period", "Price (RM)", "Status", ""].map((h) => (
-                  <p key={h} className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{h}</p>
+                  <p key={h} className="text-[13px] font-semibold text-muted-foreground/80 tracking-tight">{h}</p>
                 ))}
               </div>
 
@@ -136,8 +136,8 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
                   className="grid grid-cols-[1.2fr_1.8fr_140px_110px_100px_48px] gap-4 px-5 py-4 border-b border-border/50 last:border-0 hover:bg-muted/10 transition-colors items-center"
                 >
                   <div className="space-y-1">
-                    <p className="text-[13px] font-bold text-foreground leading-none">{voucher.name}</p>
-                    <p className="text-[10px] font-mono text-muted-foreground bg-muted/50 w-fit px-1.5 py-0.5 rounded leading-none">
+                    <p className="text-[13px] font-semibold text-foreground leading-none">{voucher.name}</p>
+                    <p className="text-[11px] font-mono text-muted-foreground bg-muted w-fit px-1.5 py-0.5 rounded leading-none border border-border/50">
                       {voucher.code}
                     </p>
                   </div>
@@ -159,7 +159,7 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
                     {voucher.initialPrice !== voucher.finalPrice && (
                       <p className="text-[10px] text-muted-foreground/60 line-through">RM {voucher.initialPrice}</p>
                     )}
-                    <p className="text-[13px] font-bold text-foreground font-mono">RM {voucher.finalPrice}</p>
+                    <p className="text-[13px] font-semibold text-foreground font-mono">RM {voucher.finalPrice}</p>
                   </div>
 
                   <div className="flex">

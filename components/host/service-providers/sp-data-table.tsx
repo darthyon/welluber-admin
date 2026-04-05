@@ -22,7 +22,7 @@ export function SpDataTable({ data }: SpDataTableProps) {
       render: (sp) => (
         <div className="flex flex-col">
           <span className="font-bold text-[14px] text-foreground tracking-tight">{sp.name}</span>
-          <span className="text-[11px] text-muted-foreground mt-0.5 font-mono uppercase tracking-widest">{sp.registrationNo}</span>
+          <span className="text-[11px] text-muted-foreground mt-0.5 font-mono tracking-tight">{sp.registrationNo}</span>
         </div>
       ),
     },
@@ -56,7 +56,7 @@ export function SpDataTable({ data }: SpDataTableProps) {
                   </TooltipTrigger>
                   <TooltipContent className="w-52 bg-card rounded-xl border-border shadow-2xl z-[200]">
                     <div className="flex flex-col gap-1">
-                      <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground opacity-60 mb-1 px-1">Service Categories</span>
+                      <span className="text-[9px] font-semibold tracking-tight text-muted-foreground opacity-60 mb-1 px-1">Service categories</span>
                       {sp.serviceCategories.slice(1).map((cat, i) => (
                         <div key={i} className="text-[11px] px-2 py-1.5 hover:bg-muted rounded text-foreground transition-colors font-medium">{cat}</div>
                       ))}
@@ -73,7 +73,7 @@ export function SpDataTable({ data }: SpDataTableProps) {
       header: "Active Vouchers",
       align: "right",
       render: (sp) => (
-        <span className="text-[13px] font-bold text-foreground/80">{sp.activeVoucherCount}</span>
+        <span className="text-[13px] font-semibold text-foreground/80">{sp.activeVoucherCount}</span>
       ),
     },
     {

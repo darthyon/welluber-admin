@@ -1,4 +1,8 @@
+"use client"
+
 import { cn } from "@/lib/utils"
+import { Info } from "@phosphor-icons/react"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 // Dummy data generator for heatmap
 const generateHeatmapData = (weeks: number, daysPerWeek: number) => {
@@ -34,13 +38,22 @@ export function ActivityHeatmap() {
   return (
     <div className="rounded-lg border border-border bg-card p-5 h-full flex flex-col">
       <div className="flex items-center justify-between mb-4">
-        <div>
-          <h2 className="text-[13px] font-semibold text-foreground mb-0.5">Voucher Redemption Intensity</h2>
-          <p className="text-[12px] text-muted-foreground">Activity density over last 84 days.</p>
+        <div className="flex items-center gap-1.5 min-w-0">
+          <h2 className="text-[13px] font-semibold text-foreground tracking-tight">Voucher redemption intensity</h2>
+          <TooltipProvider>
+            <Tooltip delayDuration={0}>
+              <TooltipTrigger asChild>
+                <Info size={14} className="text-muted-foreground/60 cursor-help hover:text-primary transition-colors shrink-0" />
+              </TooltipTrigger>
+              <TooltipContent side="top" className="text-[12px] font-medium leading-relaxed max-w-[220px]">
+                Activity density over last 84 days.
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
         <div className="text-right">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Total Redemptions</p>
-          <p className="text-xl font-semibold text-foreground tracking-tight">482.4k</p>
+          <p className="text-[11px] font-semibold text-muted-foreground tracking-tight opacity-60">Total redemptions</p>
+          <p className="text-xl font-bold text-foreground tracking-tight">482.4k</p>
         </div>
       </div>
 
