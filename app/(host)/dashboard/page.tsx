@@ -51,17 +51,18 @@ export default function DashboardPage() {
             icon={Users}
             trend={{ value: "+1.2%", label: "growth", isPositive: true }}
           >
-            <div className="flex flex-col items-end gap-1">
-              <div className="flex flex-col items-end text-[10.5px] font-medium text-muted-foreground leading-tight">
-                <span>64% · Employees</span>
-                <span>36% · Dependents</span>
-              </div>
+            <div className="flex items-center gap-3 ml-auto">
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
-                    <div className="w-32 flex gap-0.5 h-1 rounded-full overflow-hidden bg-muted cursor-help">
-                      <div className="bg-primary" style={{ width: '64%' }}></div>
-                      <div className="bg-primary/30" style={{ width: '36%' }}></div>
+                    <div className="relative w-9 h-9 flex items-center justify-center cursor-help shrink-0">
+                      <div 
+                        className="absolute inset-0 rounded-full border-2 border-primary/10 shadow-inner"
+                        style={{ background: `conic-gradient(hsl(var(--primary)) 0% 64%, transparent 64% 100%)` }}
+                      />
+                      <div className="w-6 h-6 bg-card rounded-full flex items-center justify-center z-10 shadow-sm">
+                        <span className="text-[9px] font-black leading-none">64%</span>
+                      </div>
                     </div>
                   </TooltipTrigger>
                   <TooltipContent side="top" className="text-[12px] font-medium leading-relaxed">
@@ -102,17 +103,18 @@ export default function DashboardPage() {
             icon={CurrencyCircleDollar}
             trend={{ value: "+3.2%", label: "growth", isPositive: true }}
           >
-            <div className="flex flex-col items-end gap-1">
-              <div className="flex flex-col items-end text-[10.5px] font-medium text-muted-foreground leading-tight">
-                <span>88% · Claims</span>
-                <span>12% · Net Profit</span>
-              </div>
+            <div className="flex items-center gap-3 ml-auto">
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
-                    <div className="w-32 flex gap-0.5 h-1 rounded-full overflow-hidden bg-muted cursor-help">
-                      <div className="bg-primary" style={{ width: '88%' }}></div>
-                      <div className="bg-primary/30" style={{ width: '12%' }}></div>
+                    <div className="relative w-9 h-9 flex items-center justify-center cursor-help shrink-0">
+                      <div 
+                        className="absolute inset-0 rounded-full border-2 border-primary/10 shadow-inner"
+                        style={{ background: `conic-gradient(hsl(var(--primary)) 0% 88%, transparent 88% 100%)` }}
+                      />
+                      <div className="w-6 h-6 bg-card rounded-full flex items-center justify-center z-10 shadow-sm">
+                        <span className="text-[9px] font-black leading-none">88%</span>
+                      </div>
                     </div>
                   </TooltipTrigger>
                   <TooltipContent side="top" className="text-[12px] font-medium leading-relaxed">
