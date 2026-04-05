@@ -9,6 +9,7 @@ import { SettlementStatus } from "@/components/host/dashboard/settlement-status"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
 import { BentoGrid, BentoCard } from "@/components/shared/bento-grid"
+import { Progress } from "@/components/ui/progress"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 const topOrgs = [
@@ -55,22 +56,19 @@ export default function DashboardPage() {
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
-                    <div className="relative w-10 h-10 flex items-center justify-center cursor-help shrink-0 group/pie">
-                      <div 
-                        className="absolute inset-0 rounded-full shadow-inner transition-transform group-hover/pie:scale-110 duration-300"
-                        style={{ background: `conic-gradient(hsl(var(--primary)) 64%, hsl(var(--primary) / 0.1) 0)` }}
+                    <div className="w-16 cursor-help group/progress">
+                      <Progress 
+                        value={64} 
+                        className="h-1.5 bg-primary/10 shadow-inner group-hover/progress:h-2 transition-all duration-300" 
                       />
-                      <div className="w-7 h-7 bg-card rounded-full flex items-center justify-center z-10 shadow-sm">
-                        <span className="text-[10px] font-black leading-none text-foreground">64%</span>
-                      </div>
                     </div>
                   </TooltipTrigger>
                   <TooltipContent side="top" className="text-[12px] font-medium leading-relaxed">
-                    <p className="flex items-center gap-2">
+                    <p className="flex items-center gap-2 text-primary font-bold">
                        <span className="w-2 h-2 rounded-full bg-primary" />
                        82,402 Employees (64%)
                     </p>
-                    <p className="flex items-center gap-2 mt-1">
+                    <p className="flex items-center gap-2 mt-1 text-muted-foreground">
                        <span className="w-2 h-2 rounded-full bg-primary/30" />
                        46,090 Dependents (36%)
                     </p>
@@ -107,22 +105,19 @@ export default function DashboardPage() {
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
-                    <div className="relative w-10 h-10 flex items-center justify-center cursor-help shrink-0 group/pie">
-                      <div 
-                        className="absolute inset-0 rounded-full shadow-inner transition-transform group-hover/pie:scale-110 duration-300"
-                        style={{ background: `conic-gradient(hsl(var(--primary)) 88%, hsl(var(--primary) / 0.1) 0)` }}
+                    <div className="w-16 cursor-help group/progress">
+                      <Progress 
+                        value={88} 
+                        className="h-1.5 bg-primary/10 shadow-inner group-hover/progress:h-2 transition-all duration-300" 
                       />
-                      <div className="w-7 h-7 bg-card rounded-full flex items-center justify-center z-10 shadow-sm">
-                        <span className="text-[10px] font-black leading-none text-foreground">88%</span>
-                      </div>
                     </div>
                   </TooltipTrigger>
                   <TooltipContent side="top" className="text-[12px] font-medium leading-relaxed">
-                    <p className="flex items-center gap-2">
+                    <p className="flex items-center gap-2 text-primary font-bold">
                        <span className="w-2 h-2 rounded-full bg-primary" />
                        RM 18.2M Claims (88%)
                     </p>
-                    <p className="flex items-center gap-2 mt-1">
+                    <p className="flex items-center gap-2 mt-1 text-muted-foreground">
                        <span className="w-2 h-2 rounded-full bg-primary/30" />
                        RM 2.4M Net Profit (12%)
                     </p>

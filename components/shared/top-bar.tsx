@@ -29,7 +29,7 @@ export function TopBar({ user: userProp }: TopBarProps) {
           </span>
         </div>
 
-        {/* Right side: Global Actions & Profile */}
+        {/* Right side: Global Actions */}
         <div className="flex items-center gap-2">
           {/* Pro Search Bar */}
           <div className="relative group hidden md:block">

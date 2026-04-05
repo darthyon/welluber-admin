@@ -16,25 +16,46 @@ import {
   List,
   Receipt,
   Storefront,
-  Tag,
   TreeStructure,
-  Users,
   UsersFour,
-  CaretUpDown,
   CaretDoubleLeft,
   CaretDoubleRight,
-  Check,
   ChartBar,
   ClockCounterClockwise,
+  SignOut,
+  CaretUpDown,
+  Check,
+  Plus,
+  Users,
+  Tag,
+  Calendar,
+  ChartLineUp,
+  ShieldCheck,
+  Monitor,
   UserGear as HostIcon,
+  Building as OrgIcon,
+  Storefront as ProviderIcon,
 } from "@phosphor-icons/react"
 
 import { cn } from "@/lib/utils"
 import { useSession } from "@/lib/session"
 import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -46,14 +67,6 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 
 // Personas Configuration
 const personas = [
@@ -120,7 +133,7 @@ const hostNavigation = [
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
   const { user } = useSession()
-  const { state } = useSidebar()
+  const { state, isMobile } = useSidebar()
   const [activePersona, setActivePersona] = React.useState(personas[0])
 
   return (
@@ -183,30 +196,57 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   </SidebarMenuButton>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
-                  className="w-[200px] bg-[#1a1c23] border-white/10 text-white"
+                  className="w-[280px] bg-[#1a1c23] border-white/10 text-white"
                   align="start"
-                  side="right"
+                  side={isMobile ? "bottom" : "right"}
                   sideOffset={4}
                 >
-                  <DropdownMenuLabel className="text-[10px] uppercase font-bold text-white/40 px-2 py-1.5">
-                    Select Account Type
+                  <DropdownMenuLabel className="p-0 font-normal">
+                    <div className="flex items-center gap-2 px-3 py-3 text-left text-sm">
+                      <Avatar className="h-8 w-8 rounded-lg">
+                        <AvatarImage src="/avatars/user.jpg" alt={user?.name || "User"} />
+                        <AvatarFallback className="rounded-lg bg-white/10 text-white font-bold">
+                          {user?.name?.slice(0, 2).toUpperCase() || "UN"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="grid flex-1 text-left text-sm leading-tight">
+                        <span className="truncate font-semibold">{user?.name || "User"}</span>
+                        <span className="truncate text-xs text-white/40">{user?.email || "user@welluber.com"}</span>
+                      </div>
+                    </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator className="bg-white/5" />
-                  {personas.map((persona) => (
-                    <DropdownMenuItem
-                      key={persona.name}
-                      onClick={() => setActivePersona(persona)}
-                      className="gap-2 p-2 focus:bg-white/5 focus:text-white cursor-pointer"
-                    >
-                      <div className="flex size-6 items-center justify-center rounded-md bg-white/5 ring-1 ring-white/10">
-                        <persona.icon size={14} weight="fill" className="text-primary" />
-                      </div>
-                      <span className="text-[13px] font-medium">{persona.name}</span>
-                      {persona.id === activePersona.id && (
-                        <Check className="ml-auto size-4 text-primary" />
-                      )}
+                  <DropdownMenuGroup>
+                    <div className="text-[10px] uppercase font-bold text-white/40 px-3 py-2">
+                      Select Account Type
+                    </div>
+                    {personas.map((persona) => (
+                      <DropdownMenuItem
+                        key={persona.name}
+                        onClick={() => setActivePersona(persona)}
+                        className="gap-2 p-2 mx-1 focus:bg-white/5 focus:text-white cursor-pointer"
+                      >
+                        <div className="flex size-6 items-center justify-center rounded-md bg-white/5 ring-1 ring-white/10">
+                          <persona.icon size={14} weight="fill" className="text-primary" />
+                        </div>
+                        <span className="text-[13px] font-medium">{persona.name}</span>
+                        {persona.id === activePersona.id && (
+                          <Check className="ml-auto size-4 text-primary" />
+                        )}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuGroup>
+                  <DropdownMenuSeparator className="bg-white/5" />
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem className="gap-2 p-2 mx-1 cursor-pointer focus:bg-white/5">
+                      <Gear size={16} className="text-white/40" />
+                      <span>Account Settings</span>
                     </DropdownMenuItem>
-                  ))}
+                    <DropdownMenuItem className="gap-2 p-2 mx-1 cursor-pointer text-red-400 focus:bg-red-500/10 focus:text-red-300">
+                      <SignOut size={16} />
+                      <span>Log out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
                 </DropdownMenuContent>
               </DropdownMenu>
             </SidebarMenuItem>
