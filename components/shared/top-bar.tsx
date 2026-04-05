@@ -7,20 +7,29 @@ import { ThemeToggle } from "@/components/shared/theme-toggle"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { useSession } from "@/lib/session"
+import { useSidebar } from "@/components/ui/sidebar"
 
 export function TopBar() {
   const { user } = useSession()
+  const { state } = useSidebar()
+  const isCollapsed = state === "collapsed"
   
   return (
-    <header className={cn(
-      "fixed top-0 right-0 h-14 z-40 transition-[left] duration-200 ease-linear",
-      "left-[var(--sidebar-width)] peer-data-[state=collapsed]:left-[var(--sidebar-width-icon)]",
-      "bg-slate-50/90 backdrop-blur-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05),0_15px_30px_-5px_rgba(0,0,0,0.08)]"
-    )}>
-      <div className="flex justify-between items-center h-full pr-8 pl-12">
-
+    <header 
+      className={cn(
+        "fixed top-0 left-0 right-0 h-14 z-40 transition-all duration-300",
+        "bg-slate-50/90 backdrop-blur-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05),0_15px_30px_-5px_rgba(0,0,0,0.08)]"
+      )}
+    >
+      <div 
+        className={cn(
+          "flex justify-between items-center h-full pr-8 transition-all duration-300 ease-in-out",
+          // The "Snap-Anchor" Logic: Map exactly to sidebar width + internal spacing
+          isCollapsed ? "pl-[70.4px]" : "pl-[215px]" 
+        )}
+      >
         {/* Left side: Personalized Greeting */}
-        <div className="flex items-center">
+        <div className="flex items-center pl-8">
           <span className="text-[13px] font-bold tracking-tight text-foreground/90">
             Hello, {user?.name?.split(' ')[0] || "User"} 👋
           </span>
