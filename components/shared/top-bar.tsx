@@ -13,12 +13,13 @@ export function TopBar() {
   
   return (
     <header className={cn(
-      "fixed top-0 left-0 w-full h-14 z-40 transition-all duration-300",
+      "fixed top-0 right-0 h-14 z-40 transition-[left] duration-200 ease-linear",
+      "left-[var(--sidebar-width)] peer-data-[state=collapsed]:left-[var(--sidebar-width-icon)]",
       "bg-slate-50/90 backdrop-blur-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05),0_15px_30px_-5px_rgba(0,0,0,0.08)]"
     )}>
-      <div className="flex justify-between items-center h-full pr-8 pl-[var(--sidebar-width)] transition-all duration-300">
+      <div className="flex justify-between items-center h-full px-8">
         {/* Left side: Personalized Greeting */}
-        <div className="flex items-center pl-8">
+        <div className="flex items-center">
           <span className="text-[13px] font-bold tracking-tight text-foreground/90">
             Hello, {user?.name?.split(' ')[0] || "User"} 👋
           </span>
