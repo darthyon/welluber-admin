@@ -19,7 +19,7 @@ export function TopBar({ user: userProp }: TopBarProps) {
   return (
     <header className={cn(
       "sticky top-0 z-30 h-14 w-full",
-      "bg-slate-50/90 backdrop-blur-md shadow-[0_20px_50px_rgba(0,0,0,0.12)] transition-all duration-300"
+      "bg-slate-50/90 backdrop-blur-md shadow-[0_20px_50px_-20px_rgba(0,0,0,0.12)] transition-all duration-300"
     )}>
       <div className="flex justify-between items-center h-full px-8 shrink-0">
         {/* Left side: Greeting */}
