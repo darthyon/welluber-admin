@@ -3,7 +3,7 @@
 import * as React from "react"
 import { 
   User, 
-  Settings, 
+  Gear, 
   CreditCard, 
   SignOut,
   Sparkle
@@ -68,7 +68,7 @@ export function UserNav({ user: userProp }: UserNavProps) {
             <span>Billing</span>
           </DropdownMenuItem>
           <DropdownMenuItem className="cursor-pointer">
-            <Settings className="mr-2 h-4 w-4" />
+            <Gear className="mr-2 h-4 w-4" />
             <span>Settings</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
