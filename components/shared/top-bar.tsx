@@ -4,6 +4,7 @@ import * as React from "react"
 import { Bell, MagnifyingGlass } from "@phosphor-icons/react"
 import { useSession } from "@/lib/session"
 import { Button } from "@/components/ui/button"
+import { UserNav } from "@/components/shared/user-nav"
 import { cn } from "@/lib/utils"
 import { useSidebar } from "@/components/ui/sidebar"
 
@@ -15,17 +16,6 @@ export function TopBar({ user: userProp }: TopBarProps) {
   const { user: sessionUser } = useSession()
   const { state } = useSidebar()
   const user = userProp || sessionUser
-
-  // Helper to get initials
-  const initials = React.useMemo(() => {
-    if (!user?.name) return "G"
-    return user.name
-      .split(" ")
-      .map((n: string) => n[0])
-      .join("")
-      .toUpperCase()
-      .substring(0, 2)
-  }, [user?.name])
 
   return (
     <header className={cn(
@@ -51,13 +41,8 @@ export function TopBar({ user: userProp }: TopBarProps) {
           </Button>
           <div className="h-4 w-px bg-border mx-2" />
           
-          {/* Restored Avatar Button */}
-          <button
-            title={user?.name || "Guest"}
-            className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-semibold border border-border hover:ring-2 hover:ring-ring/20 transition-all outline-none"
-          >
-            {initials}
-          </button>
+          {/* Shared User Profile Component */}
+          <UserNav user={user} />
         </div>
       </div>
     </header>
