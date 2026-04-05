@@ -55,13 +55,13 @@ export default function DashboardPage() {
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
-                    <div className="relative w-9 h-9 flex items-center justify-center cursor-help shrink-0">
+                    <div className="relative w-10 h-10 flex items-center justify-center cursor-help shrink-0 group/pie">
                       <div 
-                        className="absolute inset-0 rounded-full border-2 border-primary/10 shadow-inner"
-                        style={{ background: `conic-gradient(hsl(var(--primary)) 0% 64%, transparent 64% 100%)` }}
+                        className="absolute inset-0 rounded-full shadow-inner transition-transform group-hover/pie:scale-110 duration-300"
+                        style={{ background: `conic-gradient(hsl(var(--primary)) 64%, hsl(var(--primary) / 0.1) 0)` }}
                       />
-                      <div className="w-6 h-6 bg-card rounded-full flex items-center justify-center z-10 shadow-sm">
-                        <span className="text-[9px] font-black leading-none">64%</span>
+                      <div className="w-7 h-7 bg-card rounded-full flex items-center justify-center z-10 shadow-sm">
+                        <span className="text-[10px] font-black leading-none text-foreground">64%</span>
                       </div>
                     </div>
                   </TooltipTrigger>
@@ -107,13 +107,13 @@ export default function DashboardPage() {
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
-                    <div className="relative w-9 h-9 flex items-center justify-center cursor-help shrink-0">
+                    <div className="relative w-10 h-10 flex items-center justify-center cursor-help shrink-0 group/pie">
                       <div 
-                        className="absolute inset-0 rounded-full border-2 border-primary/10 shadow-inner"
-                        style={{ background: `conic-gradient(hsl(var(--primary)) 0% 88%, transparent 88% 100%)` }}
+                        className="absolute inset-0 rounded-full shadow-inner transition-transform group-hover/pie:scale-110 duration-300"
+                        style={{ background: `conic-gradient(hsl(var(--primary)) 88%, hsl(var(--primary) / 0.1) 0)` }}
                       />
-                      <div className="w-6 h-6 bg-card rounded-full flex items-center justify-center z-10 shadow-sm">
-                        <span className="text-[9px] font-black leading-none">88%</span>
+                      <div className="w-7 h-7 bg-card rounded-full flex items-center justify-center z-10 shadow-sm">
+                        <span className="text-[10px] font-black leading-none text-foreground">88%</span>
                       </div>
                     </div>
                   </TooltipTrigger>
