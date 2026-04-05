@@ -14,9 +14,10 @@ export function TopBar() {
   const { state, isMobile } = useSidebar()
   const isCollapsed = state === "collapsed"
   
-  // Calculate the physical offset based on sidebar state
-  // This matches SIDEBAR_WIDTH and SIDEBAR_WIDTH_ICON from sidebar.tsx
-  const sidebarOffset = isMobile ? "0px" : (isCollapsed ? "70.4px" : "215px")
+  // High-Buffer Snap Mapping to clear floating sidebar shadow/rounding
+  // Expanded: 215px (base) + 65px (Safety Buffer) = 280px
+  // Collapsed: 70px (base) + 20px (Safety Buffer) = 90px
+  const sidebarOffset = isMobile ? "0px" : (isCollapsed ? "90px" : "280px")
 
   return (
     <header 
@@ -28,13 +29,13 @@ export function TopBar() {
       <div 
         style={{ 
           paddingLeft: sidebarOffset,
-          transition: 'padding-left 200ms linear' 
+          transition: 'padding-left 300ms cubic-bezier(0.4, 0, 0.2, 1)' 
         }}
         className="flex justify-between items-center h-full pr-8"
       >
         {/* Left side: Personalized Greeting */}
-        <div className="flex items-center pl-8">
-          <span className="text-[13px] font-bold tracking-tight text-foreground/90">
+        <div className="flex items-center">
+          <span className="text-[13px] font-bold tracking-tight text-foreground/90 whitespace-nowrap">
             Hello, {user?.name?.split(' ')[0] || "User"} 👋
           </span>
         </div>
