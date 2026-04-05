@@ -52,7 +52,8 @@ export default function DashboardPage() {
             icon={Users}
             trend={{ value: "+1.2%", label: "growth", isPositive: true }}
           >
-            <div className="flex items-center gap-3 ml-auto">
+            <div className="flex flex-col items-end gap-1.5 ml-auto">
+              <span className="text-[9px] font-bold text-muted-foreground/40 uppercase tracking-[0.08em] group-hover:text-primary/60 transition-colors">64% Employees</span>
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
@@ -63,6 +64,7 @@ export default function DashboardPage() {
                       />
                     </div>
                   </TooltipTrigger>
+
                   <TooltipContent side="top" className="text-[12px] font-medium leading-relaxed">
                     <p className="flex items-center gap-2 text-primary font-bold">
                        <span className="w-2 h-2 rounded-full bg-primary" />
@@ -101,7 +103,8 @@ export default function DashboardPage() {
             icon={CurrencyCircleDollar}
             trend={{ value: "+3.2%", label: "growth", isPositive: true }}
           >
-            <div className="flex items-center gap-3 ml-auto">
+            <div className="flex flex-col items-end gap-1.5 ml-auto">
+              <span className="text-[9px] font-bold text-muted-foreground/40 uppercase tracking-[0.08em] group-hover:text-primary/60 transition-colors">88% Claims</span>
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
@@ -112,6 +115,7 @@ export default function DashboardPage() {
                       />
                     </div>
                   </TooltipTrigger>
+
                   <TooltipContent side="top" className="text-[12px] font-medium leading-relaxed">
                     <p className="flex items-center gap-2 text-primary font-bold">
                        <span className="w-2 h-2 rounded-full bg-primary" />

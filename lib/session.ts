@@ -9,6 +9,7 @@ export interface SessionUser {
   id: string
   name: string
   email: string
+  image?: string
   role: UserRole
   initials: string
   orgSlug?: string
@@ -20,6 +21,7 @@ const STUB_USER: SessionUser = {
   id: "usr_dev_001",
   name: "Yon Yusuf",
   email: "yon@welluber.com",
+  image: "https://github.com/shadcn.png",
   role: "host",
   initials: "YY",
 }

@@ -146,7 +146,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
       {/* Content Layer */}
       <div className="relative z-30 flex flex-col h-full">
-        <SidebarHeader className="group-data-[collapsible=icon]:p-2 pt-4">
+        <SidebarHeader className="group-data-[collapsible=icon]:p-2 pt-7 pb-2">
+
           <div className="flex items-center justify-between px-2 mb-4">
             <div className="flex items-center gap-2.5 group-data-[collapsible=icon]:hidden">
               <div className="flex aspect-square size-7 items-center justify-center rounded-lg bg-primary shadow-lg shadow-primary/20 text-primary-foreground">
