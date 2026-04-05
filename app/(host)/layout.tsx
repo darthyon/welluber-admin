@@ -12,7 +12,8 @@ export default function HostLayout({
       <AppSidebar />
       <SidebarInset>
         <TopBar />
-        <main className="flex flex-1 flex-col gap-6 p-8 pt-6">
+        {/* Add mt-14 to account for fixed TopBar */}
+        <main className="flex flex-1 flex-col gap-6 p-8 pt-6 mt-14">
           {children}
         </main>
       </SidebarInset>

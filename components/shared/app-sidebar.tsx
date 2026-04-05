@@ -168,9 +168,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <DropdownMenuTrigger asChild>
                   <SidebarMenuButton
                     size="lg"
-                    className="data-[state=open]:bg-white/5 data-[state=open]:text-white hover:bg-white/5 transition-all duration-300"
+                    className="data-[state=open]:bg-white/5 data-[state=open]:text-white hover:bg-white/5 transition-all duration-300 group-data-[collapsible=icon]:!p-0 group-data-[collapsible=icon]:!justify-center"
                   >
-                    <div className="flex aspect-square size-8.5 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10 shadow-sm text-primary shrink-0 group-data-[collapsible=icon]:size-9">
+                    <div className="flex aspect-square size-8.5 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10 shadow-sm text-primary shrink-0 group-data-[collapsible=icon]:size-7">
                       <activePersona.icon size={19} weight="fill" />
                     </div>
                     <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden ml-3">
@@ -232,13 +232,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           isActive={isActive}
                           tooltip={item.label}
                           className={cn(
-                            "transition-all duration-200 h-11 rounded-lg px-3 relative overflow-hidden",
+                            "transition-all duration-200 h-11 rounded-lg px-3 relative overflow-hidden group-data-[collapsible=icon]:!p-0 group-data-[collapsible=icon]:!justify-center",
                             isActive 
                               ? "bg-white/10 text-white backdrop-blur-md ring-1 ring-white/10 shadow-lg shadow-black/20" 
                               : "text-white/60 hover:bg-white/5 hover:text-white"
                           )}
                         >
-                          <Link href={item.href} className="flex items-center gap-3.5">
+                          <Link href={item.href} className="flex items-center gap-3.5 group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:justify-center">
                             <Icon
                               size={20}
                               weight={isActive ? "fill" : "regular"}
