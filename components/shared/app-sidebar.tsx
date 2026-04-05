@@ -32,9 +32,6 @@ import {
   ChartLineUp,
   ShieldCheck,
   Monitor,
-  UserGear as HostIcon,
-  Building as OrgIcon,
-  Storefront as ProviderIcon,
 } from "@phosphor-icons/react"
 
 import { cn } from "@/lib/utils"
@@ -75,21 +72,18 @@ const personas = [
     name: "Host Admin",
     description: "Platform Infrastructure",
     icon: Shield,
-    active: true,
   },
   {
     id: "org",
     name: "Organization Admin",
     description: "Corporate Management",
     icon: Buildings,
-    active: false,
   },
   {
-    id: "service-provider",
+    id: "provider",
     name: "Provider Admin",
     description: "Service & Vouchers",
     icon: Storefront,
-    active: false,
   },
 ]
 
@@ -108,7 +102,7 @@ const hostNavigation = [
   {
     title: "SETUP & CONFIG",
     items: [
-      { id: "policies", label: "Benefit Policies", href: "/policies", icon: Shield },
+      { id: "policies", label: "Benefit Policies", href: "/policies", icon: ShieldCheck },
       { id: "services", label: "Manage Services", href: "/services", icon: TreeStructure },
       { id: "brands", label: "Manage Brands", href: "/brands", icon: Tag },
       { id: "platform", label: "Platform Configuration", href: "/settings", icon: Gear },
@@ -139,22 +133,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar 
       collapsible="icon" 
-      className="sidebar-floating border-r-0 shadow-2xl overflow-hidden group-data-[collapsible=icon]:w-[var(--sidebar-width-icon)]"
+      className="sidebar-floating border-r-0 shadow-2xl overflow-hidden"
       {...props}
     >
-      {/* 1. Deep Layer: Solid Silhouette Base */}
+      {/* Background Layers */}
       <div className="absolute inset-0 bg-[#0f1117] z-0" />
-
-      {/* 2. Glow Layer: The "Indigo Bleed" */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-10 opacity-60">
         <div className="absolute -left-[40%] -top-[10%] w-[250%] h-[60%] bg-[#4f46e5]/40 blur-[130px] rounded-full" />
         <div className="absolute -left-[30%] bottom-[10%] w-[220%] h-[50%] bg-[#3b82f6]/30 blur-[110px] rounded-full" />
       </div>
-
-      {/* 3. Glass Layer: The Charcoal Frosted Cover */}
       <div className="absolute inset-0 z-20 bg-black/60 backdrop-blur-3xl saturate-[300%]" />
 
-      {/* 4. Content Layer: The Navigation UI */}
+      {/* Content Layer */}
       <div className="relative z-30 flex flex-col h-full">
         <SidebarHeader className="group-data-[collapsible=icon]:p-2 pt-4">
           <div className="flex items-center justify-between px-2 mb-4">
@@ -181,7 +171,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <DropdownMenuTrigger asChild>
                   <SidebarMenuButton
                     size="lg"
-                    className="data-[state=open]:bg-white/5 data-[state=open]:text-white hover:bg-white/5 transition-all duration-300 group-data-[collapsible=icon]:!p-0 group-data-[collapsible=icon]:!justify-center"
+                    className="data-[state=open]:bg-white/5 data-[state=open]:text-white hover:bg-white/5 transition-all duration-300 group-data-[collapsible=icon]:!p-0 group-data-[collapsible=icon]:!justify-center group-data-[collapsible=icon]:!h-10 group-data-[collapsible=icon]:!w-10"
                   >
                     <div className="flex aspect-square size-8.5 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10 shadow-sm text-primary shrink-0 group-data-[collapsible=icon]:size-7">
                       <activePersona.icon size={19} weight="fill" />
@@ -196,55 +186,65 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   </SidebarMenuButton>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
-                  className="w-[280px] bg-[#1a1c23] border-white/10 text-white"
+                  className="w-[280px] bg-popover border-border animate-in fade-in-0 zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
                   align="start"
-                  side={isMobile ? "bottom" : "right"}
-                  sideOffset={4}
+                  side="right"
+                  sideOffset={8}
                 >
                   <DropdownMenuLabel className="p-0 font-normal">
-                    <div className="flex items-center gap-2 px-3 py-3 text-left text-sm">
-                      <Avatar className="h-8 w-8 rounded-lg">
-                        <AvatarImage src="/avatars/user.jpg" alt={user?.name || "User"} />
-                        <AvatarFallback className="rounded-lg bg-white/10 text-white font-bold">
-                          {user?.name?.slice(0, 2).toUpperCase() || "UN"}
-                        </AvatarFallback>
+                    <div className="flex items-center gap-2 px-3 py-2.5 text-left text-sm">
+                      <Avatar className="h-9 w-9 rounded-xl shadow-lg ring-2 ring-primary/10 transition-transform hover:scale-105 active:scale-95 duration-200">
+                        <AvatarImage src={user?.image || ""} alt={user?.name || ""} />
+                        <AvatarFallback className="bg-primary/10 text-primary font-bold text-[13px] tracking-tight">YY</AvatarFallback>
                       </Avatar>
-                      <div className="grid flex-1 text-left text-sm leading-tight">
-                        <span className="truncate font-semibold">{user?.name || "User"}</span>
-                        <span className="truncate text-xs text-white/40">{user?.email || "user@welluber.com"}</span>
+                      <div className="grid flex-1 text-left leading-tight">
+                        <span className="truncate font-bold tracking-tight text-foreground">{user?.name || "Yon Yusuf"}</span>
+                        <span className="truncate text-[11px] text-muted-foreground font-medium">{user?.email || "yon@welluber.com"}</span>
                       </div>
                     </div>
                   </DropdownMenuLabel>
-                  <DropdownMenuSeparator className="bg-white/5" />
+                  <DropdownMenuSeparator className="bg-border/50" />
                   <DropdownMenuGroup>
-                    <div className="text-[10px] uppercase font-bold text-white/40 px-3 py-2">
+                    <DropdownMenuLabel className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
                       Select Account Type
-                    </div>
+                    </DropdownMenuLabel>
                     {personas.map((persona) => (
                       <DropdownMenuItem
-                        key={persona.name}
+                        key={persona.id}
                         onClick={() => setActivePersona(persona)}
-                        className="gap-2 p-2 mx-1 focus:bg-white/5 focus:text-white cursor-pointer"
+                        className="flex items-center gap-3 px-3 py-2 cursor-pointer focus:bg-primary/5 transition-all group/item"
                       >
-                        <div className="flex size-6 items-center justify-center rounded-md bg-white/5 ring-1 ring-white/10">
-                          <persona.icon size={14} weight="fill" className="text-primary" />
+                        <div className={cn(
+                          "flex aspect-square size-7 items-center justify-center rounded-lg ring-1 ring-border group-hover/item:ring-primary/20",
+                          activePersona.id === persona.id ? "bg-primary text-primary-foreground shadow-md shadow-primary/20 ring-0" : "bg-muted/30 text-muted-foreground"
+                        )}>
+                          <persona.icon size={15} weight="fill" />
                         </div>
-                        <span className="text-[13px] font-medium">{persona.name}</span>
-                        {persona.id === activePersona.id && (
-                          <Check className="ml-auto size-4 text-primary" />
+                        <span className={cn(
+                          "text-[13px] font-medium tracking-tight",
+                          activePersona.id === persona.id ? "text-primary font-semibold" : "text-foreground/70"
+                        )}>
+                          {persona.name}
+                        </span>
+                        {activePersona.id === persona.id && (
+                          <Check className="ml-auto size-4 text-primary" weight="bold" />
                         )}
                       </DropdownMenuItem>
                     ))}
                   </DropdownMenuGroup>
-                  <DropdownMenuSeparator className="bg-white/5" />
+                  <DropdownMenuSeparator className="bg-border/50" />
                   <DropdownMenuGroup>
-                    <DropdownMenuItem className="gap-2 p-2 mx-1 cursor-pointer focus:bg-white/5">
-                      <Gear size={16} className="text-white/40" />
-                      <span>Account Settings</span>
+                    <DropdownMenuItem className="flex items-center gap-3 px-3 py-2 cursor-pointer focus:bg-primary/5 group/settings">
+                      <div className="flex aspect-square size-7 items-center justify-center rounded-lg bg-muted/30 text-muted-foreground group-hover/settings:bg-primary/5 group-hover/settings:text-primary transition-colors border border-transparent group-hover/settings:border-primary/10">
+                        <Gear size={15} weight="fill" />
+                      </div>
+                      <span className="text-[13px] font-medium text-foreground/70 group-hover/settings:text-primary transition-colors">Account Settings</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="gap-2 p-2 mx-1 cursor-pointer text-red-400 focus:bg-red-500/10 focus:text-red-300">
-                      <SignOut size={16} />
-                      <span>Log out</span>
+                    <DropdownMenuItem className="flex items-center gap-3 px-3 py-2 cursor-pointer focus:bg-red-500/5 group/logout">
+                      <div className="flex aspect-square size-7 items-center justify-center rounded-xl bg-red-500/5 text-red-500/60 group-hover/logout:bg-red-500 group-hover/logout:text-white transition-all shadow-sm">
+                        <SignOut size={15} weight="fill" />
+                      </div>
+                      <span className="text-[13px] font-medium text-red-500/70 group-hover/logout:text-red-500 transition-colors">Log out</span>
                     </DropdownMenuItem>
                   </DropdownMenuGroup>
                 </DropdownMenuContent>
@@ -253,7 +253,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenu>
         </SidebarHeader>
 
-        <SidebarContent className="px-2 pt-3 no-scrollbar">
+        <SidebarContent className="px-2 pt-3 no-scrollbar h-full">
           {hostNavigation.map((section) => (
             <SidebarGroup key={section.title} className="py-2.5">
               <SidebarGroupLabel className="text-[11px] font-bold uppercase tracking-[0.14em] text-white/50 mb-2 px-3 group-data-[collapsible=icon]:hidden">

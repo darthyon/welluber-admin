@@ -10,12 +10,14 @@ export default function HostLayout({
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset>
+      <div className="flex flex-col min-h-screen w-full">
         <TopBar />
-        <main className="flex flex-1 flex-col gap-6 p-8 pt-6">
-          {children}
-        </main>
-      </SidebarInset>
+        <SidebarInset className="bg-slate-50/50">
+          <main className="flex-1 w-full mt-14">
+            {children}
+          </main>
+        </SidebarInset>
+      </div>
     </SidebarProvider>
   )
 }

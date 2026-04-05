@@ -2,63 +2,42 @@
 
 import * as React from "react"
 import { MagnifyingGlass } from "@phosphor-icons/react"
-import { useSession } from "@/lib/session"
-import { UserNav } from "@/components/shared/user-nav"
 import { NotificationCenter } from "@/components/shared/notification-center"
 import { ThemeToggle } from "@/components/shared/theme-toggle"
+import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
-interface TopBarProps {
-  user?: any
-}
-
-export function TopBar({ user: userProp }: TopBarProps) {
-  const { user: sessionUser } = useSession()
-  const user = userProp || sessionUser
-
+export function TopBar() {
   return (
     <header className={cn(
-      "sticky top-0 z-30 h-14 w-full",
-      "bg-slate-50/90 backdrop-blur-md shadow-[0_15px_30px_-5px_rgba(0,0,0,0.12)] transition-all duration-300"
+      "fixed top-0 left-0 w-full h-14 z-40 transition-all duration-300",
+      "bg-slate-50/90 backdrop-blur-md shadow-[0_15px_30px_-5px_rgba(0,0,0,0.12)]"
     )}>
-      <div className="flex justify-between items-center h-full px-8 shrink-0">
-        {/* Left side: Greeting */}
-        <div className="flex items-center gap-4">
-          <span className="text-sm font-medium text-foreground">
-            Hello, {user?.name || "Guest"} 👋
-          </span>
-        </div>
-
-        {/* Right side: Global Actions */}
-        <div className="flex items-center gap-2">
-          {/* Pro Search Bar */}
-          <div className="relative group hidden md:block">
-            <MagnifyingGlass
-              size={15}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-foreground transition-colors"
+      <div className="flex justify-between items-center h-full pr-8 pl-[var(--sidebar-width)] transition-all duration-300">
+        {/* Left side: Global Search */}
+        <div className="flex-1 max-w-md ml-8">
+          <div className="relative group">
+            <MagnifyingGlass 
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" 
+              size={18} 
+              weight="bold"
             />
-            <input
-              className="pl-9 pr-14 py-1.5 bg-muted/50 border border-border rounded-lg text-sm w-[260px] focus:ring-1 focus:ring-ring focus:bg-background outline-none transition-all placeholder:text-muted-foreground/60"
-              placeholder="Search..."
-              type="text"
+            <Input 
+              placeholder="Search anything... (⌘K)" 
+              className="pl-10 h-9 bg-white/50 border-border focus:bg-white focus:ring-1 focus:ring-primary/20 transition-all placeholder:text-muted-foreground/60 rounded-xl"
             />
-            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-0.5 px-1.5 py-0.5 bg-background border border-border rounded-md pointer-events-none">
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-0.5 px-1.5 py-0.5 bg-muted/50 border border-border rounded-md pointer-events-none opacity-50">
               <span className="text-[10px] font-medium text-muted-foreground">⌘K</span>
             </div>
           </div>
+        </div>
 
-          <div className="h-4 w-px bg-border mx-2" />
-          
-          {/* Theme switcher */}
-          <ThemeToggle />
-
-          {/* Notifications */}
-          <NotificationCenter />
-
-          <div className="h-4 w-px bg-border mx-2" />
-          
-          {/* Shared User Profile Component */}
-          <UserNav user={user} />
+        {/* Right side: Global Actions */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <NotificationCenter />
+            <ThemeToggle />
+          </div>
         </div>
       </div>
     </header>
