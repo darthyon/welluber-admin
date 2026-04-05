@@ -1,10 +1,11 @@
 "use client"
 
 import * as React from "react"
-import { Bell, MagnifyingGlass } from "@phosphor-icons/react"
+import { MagnifyingGlass } from "@phosphor-icons/react"
 import { useSession } from "@/lib/session"
-import { Button } from "@/components/ui/button"
 import { UserNav } from "@/components/shared/user-nav"
+import { NotificationCenter } from "@/components/shared/notification-center"
+import { ThemeToggle } from "@/components/shared/theme-toggle"
 import { cn } from "@/lib/utils"
 import { useSidebar } from "@/components/ui/sidebar"
 
@@ -33,12 +34,30 @@ export function TopBar({ user: userProp }: TopBarProps) {
 
         {/* Right side: Global Actions & Profile */}
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
-            <MagnifyingGlass size={18} />
-          </Button>
-          <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
-            <Bell size={18} />
-          </Button>
+          {/* Pro Search Bar */}
+          <div className="relative group hidden md:block">
+            <MagnifyingGlass
+              size={15}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-foreground transition-colors"
+            />
+            <input
+              className="pl-9 pr-14 py-1.5 bg-muted/50 border border-border rounded-lg text-sm w-[260px] focus:ring-1 focus:ring-ring focus:bg-background outline-none transition-all placeholder:text-muted-foreground/60"
+              placeholder="Search..."
+              type="text"
+            />
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-0.5 px-1.5 py-0.5 bg-background border border-border rounded-md pointer-events-none">
+              <span className="text-[10px] font-medium text-muted-foreground">⌘K</span>
+            </div>
+          </div>
+
+          <div className="h-4 w-px bg-border mx-2" />
+          
+          {/* Theme switcher */}
+          <ThemeToggle />
+
+          {/* Notifications */}
+          <NotificationCenter />
+
           <div className="h-4 w-px bg-border mx-2" />
           
           {/* Shared User Profile Component */}
