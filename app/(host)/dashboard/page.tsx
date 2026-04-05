@@ -51,10 +51,11 @@ export default function DashboardPage() {
             icon={Users}
             trend={{ value: "+1.2%", label: "growth", isPositive: true }}
           >
-            <div className="flex flex-col items-end gap-1.5">
-              <span className="text-[11px] font-medium text-muted-foreground whitespace-nowrap">
-                Employees 64% · Dependents 36%
-              </span>
+            <div className="flex flex-col items-end gap-1">
+              <div className="flex flex-col items-end text-[10.5px] font-medium text-muted-foreground leading-tight">
+                <span>64% · Employees</span>
+                <span>36% · Dependents</span>
+              </div>
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
@@ -101,10 +102,11 @@ export default function DashboardPage() {
             icon={CurrencyCircleDollar}
             trend={{ value: "+3.2%", label: "growth", isPositive: true }}
           >
-            <div className="flex flex-col items-end gap-1.5">
-              <span className="text-[11px] font-medium text-muted-foreground whitespace-nowrap">
-                Claims 88% · Net Profit 12%
-              </span>
+            <div className="flex flex-col items-end gap-1">
+              <div className="flex flex-col items-end text-[10.5px] font-medium text-muted-foreground leading-tight">
+                <span>88% · Claims</span>
+                <span>12% · Net Profit</span>
+              </div>
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>

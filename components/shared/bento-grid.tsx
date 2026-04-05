@@ -91,7 +91,7 @@ export function BentoCard({
 
   return (
     <div className={cn(
-      "group bg-card border border-border rounded-xl p-5 shadow-sm transition-all duration-300",
+      "group bg-card border border-border rounded-xl p-4 shadow-sm transition-all duration-300",
       "hover:shadow-md hover:border-primary/30",
       "flex flex-col justify-between overflow-hidden relative",
       spanClasses[span],
