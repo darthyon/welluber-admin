@@ -7,7 +7,6 @@ import { UserNav } from "@/components/shared/user-nav"
 import { NotificationCenter } from "@/components/shared/notification-center"
 import { ThemeToggle } from "@/components/shared/theme-toggle"
 import { cn } from "@/lib/utils"
-import { useSidebar } from "@/components/ui/sidebar"
 
 interface TopBarProps {
   user?: any
@@ -15,14 +14,12 @@ interface TopBarProps {
 
 export function TopBar({ user: userProp }: TopBarProps) {
   const { user: sessionUser } = useSession()
-  const { state } = useSidebar()
   const user = userProp || sessionUser
 
   return (
     <header className={cn(
-      "fixed top-0 left-0 right-0 z-40 h-14",
-      "bg-slate-50/90 backdrop-blur-md shadow-sm transition-all duration-300",
-      state === "expanded" ? "pl-[215px]" : "pl-[4.4rem]"
+      "sticky top-0 z-30 h-14 w-full",
+      "bg-slate-50/80 backdrop-blur-md transition-all duration-300"
     )}>
       <div className="flex justify-between items-center h-full px-8 shrink-0">
         {/* Left side: Greeting */}
