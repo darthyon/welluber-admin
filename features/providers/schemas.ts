@@ -74,13 +74,10 @@ export type CreateBranchData = z.infer<typeof createBranchSchema>;
 export const createVoucherSchema = z.object({
   name: z.string().min(1, "Voucher name is required"),
   description: z.string().optional(),
-  summary: z.string().optional(),
-  photos: z.array(z.string()).default([]),
+  photo: z.any().optional(),
   bookingRequired: z.boolean().default(false),
   displayLocation: z.object({
     line: z.string().optional(),
-    city: z.string().optional(),
-    state: z.string().optional(),
   }).optional(),
   serviceLines: z
     .array(serviceLineSchema)

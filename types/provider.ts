@@ -117,12 +117,10 @@ export interface SpVoucher {
   name: string;
   description: string;
   summary?: string;
-  photos: string[];
+  photo: string;
   bookingRequired: boolean;
   displayLocation?: {
     line?: string;
-    city?: string;
-    state?: string;
   };
   serviceLines: ServiceLine[];
   status: SpVoucherStatus;

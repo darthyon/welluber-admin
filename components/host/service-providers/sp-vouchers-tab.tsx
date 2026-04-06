@@ -39,6 +39,7 @@ const STATUS_VARIANT: Record<SpVoucherStatus, "emerald" | "amber" | "indigo" | "
 
 export function SpVouchersTab({ sp }: SpVouchersTabProps) {
   const [view, setView] = useState<VoucherView>("list");
+  const [isReadOnly, setIsReadOnly] = useState(false);
   const [selectedVoucherId, setSelectedVoucherId] = useState<string | null>(null);
   const [statusTab, setStatusTab] = useState<SpVoucherStatus | "all">("all");
   const [voucherSearch, setVoucherSearch] = useState("");
@@ -53,18 +54,27 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
       )
   );
 
+  const handleView = (voucher: SpVoucher) => {
+    setSelectedVoucherId(voucher.id);
+    setIsReadOnly(true);
+    setView("form");
+  };
+
   const handleEdit = (voucher: SpVoucher) => {
     setSelectedVoucherId(voucher.id);
+    setIsReadOnly(false);
     setView("form");
   };
 
   const handleAdd = () => {
     setSelectedVoucherId(null);
+    setIsReadOnly(false);
     setView("form");
   };
 
   const handleBack = () => {
     setSelectedVoucherId(null);
+    setIsReadOnly(false);
     setView("list");
   };
 
@@ -76,6 +86,7 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
           spServiceCategories={sp.serviceCategories}
           spBranches={sp.branches.map((b) => ({ id: b.id, name: b.name }))}
           voucher={selectedVoucher}
+          isReadOnly={isReadOnly}
           onSuccess={handleBack}
           onCancel={handleBack}
         />
@@ -143,7 +154,7 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
                   </div>
 
                   <p className="text-[12px] text-muted-foreground leading-relaxed line-clamp-2">
-                    {voucher.summary || voucher.description || "—"}
+                    {voucher.description || "—"}
                     {voucher.bookingRequired && (
                       <span className="ml-2 inline-flex items-center gap-1 text-[10px] font-bold text-primary/70 uppercase tracking-tighter bg-primary/5 px-1.5 py-0.5 rounded border border-primary/10">
                         Booking Required
@@ -178,7 +189,7 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
                   <div className="flex justify-end pr-1">
                     <ActionPopover
                       actions={[
-                        { label: "View Voucher", onClick: () => handleEdit(voucher) }, // Placeholder for View
+                        { label: "View Voucher", onClick: () => handleView(voucher) },
                         { label: "Edit Voucher", onClick: () => handleEdit(voucher) },
                         { label: "Suspend Voucher", onClick: () => console.log("Suspend", voucher.id) },
                         { label: "Remove Voucher", isDanger: true, onClick: () => console.log("Remove", voucher.id) },
