@@ -43,7 +43,17 @@ description: How to scaffold a new feature module
      - NO `font-bold` for administrative labels (use `semibold`).
    - **Components**: Always prefer `DetailField`, `DetailSection`, and `StatusBadge` for data presentation.
 
-5. **Create components if needed**
+5. **Navigation & CRUD Standards**
+   - **Tab Persistence**:
+     - Detail pages with tabs (e.g., `[id]/page.tsx`) **must** use the `useTabPersistence` hook to sync the active tab with the URL search parameter (`?tab=...`).
+     - Sub-views (e.g., internal detail views or visibility states) **must** use the `useQueryState` hook to ensure deep-linking and state persistence on refresh.
+   - **CRUD Navigation Patterns**:
+     - **Create**: Redirect to the **newly created entity's detail page** (e.g., `router.push(`/organizations/${newId}`)`).
+     - **Edit**: Redirect back to the **entity's detail page** (e.g., `router.push(`/organizations/${id}`)`).
+     - **Delete**: Redirect to the **listing or directory page** (e.g., `router.push("/organizations")`).
+   - **Back Navigation**: Consistently implement breadcrumbs or "Back to [Parent]" links using `next/link` or `router.push`.
+
+6. **Create components if needed**
    ```
    components/shared/    # If reusable across personas
    components/host/      # If host-specific

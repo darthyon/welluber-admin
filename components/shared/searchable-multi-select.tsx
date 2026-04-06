@@ -132,9 +132,11 @@ export function SearchableMultiSelect({
                 {filteredTaxonomy.length > 0 ? (
                   filteredTaxonomy.map((group) => (
                     <div key={group.category} className="mb-2">
-                      <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 select-none">
-                        {group.category}
-                      </div>
+                      {taxonomy.length > 1 && (
+                        <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 select-none">
+                          {group.category}
+                        </div>
+                      )}
                       {group.services.map((opt) => (
                         <button
                           key={opt}
@@ -165,9 +167,11 @@ export function SearchableMultiSelect({
                 {filteredTaxonomy.length > 0 ? (
                   filteredTaxonomy.map((group) => (
                     <div key={group.category} className="mb-2">
-                      <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 select-none">
-                        {group.category}
-                      </div>
+                      {taxonomy.length > 1 && (
+                        <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 select-none">
+                          {group.category}
+                        </div>
+                      )}
                       {group.services.map((opt) => (
                         <button
                           key={opt}

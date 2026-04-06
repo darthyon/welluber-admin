@@ -4,9 +4,12 @@ import { useRouter } from "next/navigation";
 import { SharedDataTable, Column } from "@/components/shared/data-table";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ActionPopover } from "@/components/shared/action-popover";
+import { DataFilterBar } from "@/components/shared/data-filter-bar";
+import { FilterItem } from "@/components/shared/filter-item";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import type { ServiceProvider } from "@/types/provider";
+import React, { useMemo, useState } from "react";
 
 interface SpDataTableProps {
   data: ServiceProvider[];
@@ -14,6 +17,18 @@ interface SpDataTableProps {
 
 export function SpDataTable({ data }: SpDataTableProps) {
   const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+
+  const filteredData = useMemo(() => {
+    return data.filter(sp => {
+      const searchMatch = !searchQuery || 
+        sp.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        sp.registrationNo.toLowerCase().includes(searchQuery.toLowerCase());
+      const statusMatch = statusFilter === "all" || sp.status === statusFilter;
+      return searchMatch && statusMatch;
+    });
+  }, [data, searchQuery, statusFilter]);
 
   const columns: Column<ServiceProvider>[] = [
     {
@@ -123,14 +138,34 @@ export function SpDataTable({ data }: SpDataTableProps) {
 
   return (
     <TooltipProvider>
-      <SharedDataTable
-        data={data}
-        columns={columns}
-        freezeFirst
-        freezeLast
-        rowsPerPage={10}
-        onRowClick={(sp) => router.push(`/service-providers/${sp.id}`)}
-      />
+      <div className="space-y-4">
+        <DataFilterBar
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          searchPlaceholder="Search by name or registration number..."
+          filters={
+            <FilterItem
+              label="Status"
+              options={[
+                { label: "All Status", value: "all" },
+                { label: "Active", value: "active" },
+                { label: "Pending", value: "pending" },
+                { label: "Suspended", value: "suspended" },
+              ]}
+              value={statusFilter}
+              onChange={(v) => setStatusFilter(v)}
+            />
+          }
+        />
+        <SharedDataTable
+          data={filteredData}
+          columns={columns}
+          freezeFirst
+          freezeLast
+          rowsPerPage={10}
+          onRowClick={(sp) => router.push(`/service-providers/${sp.id}`)}
+        />
+      </div>
     </TooltipProvider>
   );
 }

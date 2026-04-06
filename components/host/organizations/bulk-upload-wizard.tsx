@@ -18,6 +18,9 @@ import { Button } from "@/components/ui/button";
 import { SuccessCelebration } from "@/components/shared/success-celebration";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { SharedDataTable, Column } from "@/components/shared/data-table";
+import { DataFilterBar } from "@/components/shared/data-filter-bar";
+import { FilterItem } from "@/components/shared/filter-item";
+import { Badge } from "@/components/ui/badge";
 
 interface BulkUploadWizardProps {
   onBack: () => void;
@@ -27,11 +30,11 @@ interface BulkUploadWizardProps {
 type UploadStep = "upload" | "processing" | "preview" | "success";
 
 const MOCK_RECORDS = [
-  { code: "E001", name: "Robert Fox", email: "robert.f@acme.com", dob: "1990-05-12", idType: "IC", idNumber: "900512-14-5231", date: "2026-04-10", policies: "Wellness Allocation", status: "Valid", branch: "ACME HQ" },
-  { code: "E002", name: "Jenny Wilson", email: "jenny.w@acme.com", dob: "1988-11-24", idType: "Passport", idNumber: "A12345678", date: "2026-05-15", policies: "Lifestyle Pocket", status: "Valid", branch: "ACME Subang Jaya" },
-  { code: "E003", name: "Dianne Russell", email: "dianne.r@acme.com", dob: "1995-02-14", idType: "IC", idNumber: "950214-10-6642", date: "2026-04-01", policies: "Wellness Allocation", status: "Valid", branch: "ACME HQ" },
-  { code: "", name: "Unknown User", email: "", dob: "1992-08-30", idType: "IC", idNumber: "920830-14-1123", date: "2026-04-20", policies: "Wellness Allocation", status: "Issue", issue: "Missing code & email", branch: "ACME HQ" },
-  { code: "E005", name: "Guy Hawkins", email: "guy.h@acme.com", dob: "Invalid", idType: "IC", idNumber: "", date: "Invalid Date", policies: "Wellness Allocation", status: "Issue", issue: "Invalid DOB, Join Date & ID", branch: "ACME HQ" },
+  { code: "E001", name: "Robert Fox", email: "robert.f@acme.com", dob: "1990-05-12", gender: "male", mobile: "012-3456789", department: "Engineering", role: "Staff", date: "2026-04-10", policies: "Wellness Allocation", status: "Valid", branch: "ACME HQ" },
+  { code: "E002", name: "Jenny Wilson", email: "jenny.w@acme.com", dob: "1988-11-24", gender: "female", mobile: "012-9876543", department: "Product", role: "Management", date: "2026-05-15", policies: "Lifestyle Pocket", status: "Valid", branch: "ACME Subang Jaya" },
+  { code: "E003", name: "Dianne Russell", email: "dianne.r@acme.com", dob: "1995-02-14", gender: "female", mobile: "017-1112223", department: "Design", role: "Staff", date: "2026-04-01", policies: "Wellness Allocation", status: "Valid", branch: "ACME HQ" },
+  { code: "", name: "Unknown User", email: "", dob: "1992-08-30", gender: "other", mobile: "", department: "HR", role: "Staff", date: "2026-04-20", policies: "Wellness Allocation", status: "Issue", issue: "Missing code & email", branch: "ACME HQ" },
+  { code: "E005", name: "Guy Hawkins", email: "guy.h@acme.com", dob: "Invalid", gender: "male", mobile: "013-4445556", department: "Sales", role: "Executive", date: "Invalid Date", policies: "Wellness Allocation", status: "Issue", issue: "Invalid DOB, Join Date & ID", branch: "ACME HQ" },
 ];
 
 export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
@@ -39,6 +42,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
   const [progress, setProgress] = useState(0);
   const [fileName, setFileName] = useState<string | null>(null);
   const [showIssuesOnly, setShowIssuesOnly] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     if (step === "processing") {
@@ -69,19 +73,24 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
   };
 
   const MOCK_RECORDS = [
-    { id: "rec_0", code: "E001", name: "Robert Fox", email: "robert.f@acme.com", dob: "1990-05-12", idType: "IC", idNumber: "900512-14-5231", date: "2026-04-10", policies: "Standard Health", status: "Valid", branch: "ACME HQ" },
-    { id: "rec_1", code: "E002", name: "Jenny Wilson", email: "jenny.w@acme.com", dob: "1988-11-24", idType: "Passport", idNumber: "A12345678", date: "2026-05-15", policies: "Executive Wellness", status: "Valid", branch: "ACME Subang Jaya" },
-    { id: "rec_2", code: "E003", name: "Dianne Russell", email: "dianne.r@acme.com", dob: "1995-02-14", idType: "IC", idNumber: "950214-10-6642", date: "2026-04-01", policies: "Standard Health", status: "Valid", branch: "ACME HQ" },
-    { id: "rec_3", code: "", name: "Unknown User", email: "", dob: "1992-08-30", idType: "IC", idNumber: "920830-14-1123", date: "2026-04-20", policies: "Standard Health", status: "Issue", issue: "Missing Code & Email", branch: "ACME HQ" },
-    { id: "rec_4", code: "E005", name: "Guy Hawkins", email: "guy.h@acme.com", dob: "Invalid", idType: "IC", idNumber: "", date: "Invalid Date", policies: "Standard Health", status: "Issue", issue: "Invalid DOB, Join Date & ID", branch: "ACME HQ" },
+    { id: "rec_0", code: "E001", name: "Robert Fox", email: "robert.f@acme.com", dob: "1990-05-12", gender: "male", mobile: "012-3456789", department: "Engineering", role: "Staff", date: "2026-04-10", policies: "Standard Health", status: "Valid", branch: "ACME HQ" },
+    { id: "rec_1", code: "E002", name: "Jenny Wilson", email: "jenny.w@acme.com", dob: "1988-11-24", gender: "female", mobile: "012-9876543", department: "Product", role: "Management", date: "2026-05-15", policies: "Executive Wellness", status: "Valid", branch: "ACME Subang Jaya" },
+    { id: "rec_2", code: "E003", name: "Dianne Russell", email: "dianne.r@acme.com", dob: "1995-02-14", gender: "female", mobile: "017-1112223", department: "Design", role: "Staff", date: "2026-04-01", policies: "Standard Health", status: "Valid", branch: "ACME HQ" },
+    { id: "rec_3", code: "", name: "Unknown User", email: "", dob: "1992-08-30", gender: "other", mobile: "", department: "HR", role: "Staff", date: "2026-04-20", policies: "Standard Health", status: "Issue", issue: "Missing Code & Email", branch: "ACME HQ" },
+    { id: "rec_4", code: "E005", name: "Guy Hawkins", email: "guy.h@acme.com", dob: "Invalid", gender: "male", mobile: "013-4445556", department: "Sales", role: "Executive", date: "Invalid Date", policies: "Standard Health", status: "Issue", issue: "Invalid DOB, Join Date & ID", branch: "ACME HQ" },
   ];
 
   const [isEditing, setIsEditing] = useState(false);
   const [records, setRecords] = useState(MOCK_RECORDS.map((r, i) => ({ ...r, id: `rec_${i}` })));
 
-  const filteredRecords = showIssuesOnly 
-    ? records.filter(r => r.status === "Issue")
-    : records;
+  const filteredRecords = records.filter(r => {
+    const matchesIssues = !showIssuesOnly || r.status === "Issue";
+    const matchesSearch = !searchQuery || 
+      [r.name, r.email, r.code, r.department, r.role].some(field => 
+        field.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    return matchesIssues && matchesSearch;
+  });
 
   const validCount = records.filter(r => r.status === "Valid").length;
   const issueCount = records.filter(r => r.status === "Issue").length;
@@ -114,39 +123,90 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
       )
     },
     {
-      header: "Identification",
+      header: "Personal Details",
       render: (row) => (
         <div className="flex flex-col gap-1">
           {isEditing ? (
             <div className="flex flex-col gap-1">
+              <input 
+                value={row.dob} 
+                onChange={(e) => handleRecordChange(row.id, "dob", e.target.value)}
+                className={cn(
+                  "w-full text-[12px] bg-background border border-border rounded px-2 py-0.5 outline-none focus:border-primary/50",
+                  row.dob === "Invalid" && "border-rose-300 text-rose-600 bg-rose-50"
+                )}
+                placeholder="DOB (YYYY-MM-DD)"
+              />
               <select 
-                value={row.idType} 
-                onChange={(e) => handleRecordChange(row.id, "idType", e.target.value)}
+                value={row.gender} 
+                onChange={(e) => handleRecordChange(row.id, "gender", e.target.value)}
                 className="w-full text-[11px] font-bold bg-background border border-border rounded px-1.5 py-0.5"
               >
-                <option value="IC">IC</option>
-                <option value="Passport">Passport</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
               </select>
-              <input 
-                value={row.idNumber} 
-                onChange={(e) => handleRecordChange(row.id, "idNumber", e.target.value)}
-                className={cn(
-                  "w-full text-[12px] font-mono bg-background border border-border rounded px-2 py-1 outline-none",
-                  !row.idNumber && "border-rose-300 bg-rose-50"
-                )}
-                placeholder="Number"
-              />
             </div>
           ) : (
             <>
-              <span className="text-[10px] font-bold text-muted-foreground uppercase opacity-60 leading-none">{row.idType}</span>
-              <span className={cn("text-[12px] font-mono", !row.idNumber ? "text-rose-500 italic" : "text-foreground")}>
-                {row.idNumber || "Missing"}
-              </span>
+              <div className="flex items-center gap-1.5">
+                <Calendar size={12} className="text-muted-foreground opacity-60" />
+                <span className={cn("text-[12px] font-medium", row.dob === "Invalid" ? "text-rose-500 italic" : "text-foreground")}>
+                  {row.dob}
+                </span>
+              </div>
+              <span className="text-[10px] font-bold text-muted-foreground uppercase opacity-60 leading-none">{row.gender}</span>
             </>
           )}
         </div>
       )
+    },
+    {
+      header: "Work Details",
+      render: (row) => (
+        <div className="flex flex-col gap-1">
+          {isEditing ? (
+            <div className="flex flex-col gap-1">
+              <input 
+                value={row.department} 
+                onChange={(e) => handleRecordChange(row.id, "department", e.target.value)}
+                className="w-full text-[11px] font-bold bg-background border border-border rounded px-1.5 py-0.5 outline-none focus:border-primary/50"
+                placeholder="Department"
+              />
+              <input 
+                value={row.role} 
+                onChange={(e) => handleRecordChange(row.id, "role", e.target.value)}
+                className="w-full text-[11px] font-bold bg-background border border-border rounded px-1.5 py-0.5 outline-none focus:border-primary/50"
+                placeholder="Role"
+              />
+            </div>
+          ) : (
+            <>
+              <span className="text-[12px] font-bold text-foreground leading-none">{row.department}</span>
+              <span className="text-[11px] font-medium text-muted-foreground opacity-70 italic">{row.role}</span>
+            </>
+          )}
+        </div>
+      )
+    },
+    {
+       header: "Contact",
+       render: (row) => (
+         <div className="flex flex-col">
+            {isEditing ? (
+              <input 
+                value={row.mobile} 
+                onChange={(e) => handleRecordChange(row.id, "mobile", e.target.value)}
+                className="w-full text-[12px] bg-background border border-border rounded px-2 py-0.5 outline-none focus:border-primary/50"
+                placeholder="Mobile Number"
+              />
+            ) : (
+              <span className={cn("text-[13px] font-medium", !row.mobile ? "text-rose-500 italic" : "text-muted-foreground")}>
+                {row.mobile || "Missing Mobile"}
+              </span>
+            )}
+         </div>
+       )
     },
     {
       header: "Name / Email",
@@ -348,56 +408,18 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
 
         {step === "preview" && (
           <div className="space-y-6 animate-in fade-in duration-500">
-            <div className="flex flex-col items-start md:flex-row md:items-center justify-between gap-4 py-3 border-b border-border/50">
-               <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 shadow-sm shadow-emerald-500/5">
-                     <FileCsv size={28} weight="fill" />
-                  </div>
-                  <div>
-                    <p className="text-[16px] font-bold text-foreground tracking-tight">{fileName}</p>
-                    <p className="text-[12px] text-muted-foreground font-medium">{records.length} total records identified</p>
-                  </div>
-               </div>
-               
-               <div className="flex items-center gap-4 w-full md:w-auto">
-                 <div className="flex items-center gap-4 bg-muted/40 px-3 py-1.5 rounded-lg border border-border/50">
-                    <div className="flex items-center space-x-2">
-                      <input 
-                        type="checkbox"
-                        id="showIssues" 
-                        className="w-4 h-4 rounded border-border text-primary focus:ring-primary/20 cursor-pointer"
-                        checked={showIssuesOnly} 
-                        onChange={(e) => setShowIssuesOnly(e.target.checked)}
-                      />
-                      <label 
-                        htmlFor="showIssues" 
-                        className="text-[12px] font-bold text-muted-foreground cursor-pointer select-none"
-                      >
-                        Issues only
-                      </label>
+             <div className="flex flex-col gap-4 py-3 border-b border-border/50">
+               <div className="flex items-center justify-between gap-4">
+                 <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 shadow-sm shadow-emerald-500/5">
+                       <FileCsv size={28} weight="fill" />
                     </div>
-
-                    <div className="w-px h-4 bg-border/60" />
-
-                    <div className="flex items-center space-x-2">
-                      <div 
-                        onClick={() => setIsEditing(!isEditing)}
-                        className={cn(
-                          "w-8 h-4 rounded-full relative transition-all duration-300 cursor-pointer",
-                          isEditing ? "bg-primary" : "bg-zinc-300"
-                        )}
-                      >
-                        <div className={cn(
-                          "absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all duration-300 shadow-sm",
-                          isEditing ? "left-[17px]" : "left-0.5"
-                        )} />
-                      </div>
-                      <label className="text-[12px] font-bold text-muted-foreground select-none cursor-pointer" onClick={() => setIsEditing(!isEditing)}>
-                        Quick Edit
-                      </label>
+                    <div>
+                      <p className="text-[16px] font-bold text-foreground tracking-tight">{fileName}</p>
+                      <p className="text-[12px] text-muted-foreground font-medium">{records.length} total records identified</p>
                     </div>
                  </div>
-
+                 
                  <div className="flex items-center gap-3">
                     <Button variant="ghost" onClick={() => setStep("upload")} className="text-muted-foreground font-bold hover:bg-muted font-bold transition-all h-10 px-4">Restart</Button>
                     <Button onClick={handleConfirmImport} disabled={showIssuesOnly && issueCount === 0} className="bg-primary text-white font-bold px-10 shadow-lg shadow-primary/20 h-10 animate-in fade-in transition-all">
@@ -405,7 +427,43 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
                     </Button>
                  </div>
                </div>
-            </div>
+
+               <DataFilterBar
+                 searchQuery={searchQuery}
+                 onSearchChange={setSearchQuery}
+                 searchPlaceholder="Search identified records..."
+                 filters={
+                   <div className="flex items-center gap-6">
+                     <FilterItem
+                       label="Issues"
+                       value={showIssuesOnly ? "issues" : "all"}
+                       onChange={(v) => setShowIssuesOnly(v === "issues")}
+                       options={[
+                         { label: "All Records", value: "all" },
+                         { label: "Issues Only", value: "issues" },
+                       ]}
+                     />
+                     <div className="flex items-center space-x-2">
+                       <div 
+                         onClick={() => setIsEditing(!isEditing)}
+                         className={cn(
+                           "w-8 h-4 rounded-full relative transition-all duration-300 cursor-pointer",
+                           isEditing ? "bg-primary" : "bg-zinc-300"
+                         )}
+                       >
+                         <div className={cn(
+                           "absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all duration-300 shadow-sm",
+                           isEditing ? "left-[17px]" : "left-0.5"
+                         )} />
+                       </div>
+                       <label className="text-[12px] font-bold text-muted-foreground select-none cursor-pointer" onClick={() => setIsEditing(!isEditing)}>
+                         Quick Edit
+                       </label>
+                     </div>
+                   </div>
+                 }
+               />
+             </div>
 
             <SharedDataTable 
               data={filteredRecords}

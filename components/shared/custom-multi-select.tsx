@@ -12,6 +12,7 @@ interface CustomMultiSelectProps {
   onChange: (selected: string[]) => void;
   placeholder?: string;
   className?: string;
+  disabled?: boolean;
 }
 
 export function CustomMultiSelect({ 
@@ -19,7 +20,8 @@ export function CustomMultiSelect({
   selected, 
   onChange,
   placeholder = "Select or type to add...",
-  className
+  className,
+  disabled = false
 }: CustomMultiSelectProps) {
   const [query, setQuery] = React.useState("");
   const [isOpen, setIsOpen] = React.useState(false);
@@ -89,39 +91,45 @@ export function CustomMultiSelect({
       <div 
         className={cn(
           "relative min-h-[42px] flex flex-wrap items-center gap-1.5 px-3 py-1.5 rounded-xl border bg-white transition-all cursor-text pr-12",
-          isOpen ? "border-primary ring-2 ring-primary/10" : "border-zinc-200 hover:border-zinc-300"
+          isOpen ? "border-primary ring-2 ring-primary/10" : "border-zinc-200 hover:border-zinc-300",
+          disabled && "opacity-60 cursor-not-allowed bg-zinc-50"
         )}
-        onClick={() => setIsOpen(true)}
+        onClick={() => !disabled && setIsOpen(true)}
       >
         {selected.map((s) => (
-          <Badge 
-            key={s} 
-            variant="secondary" 
-            className="bg-zinc-100 text-zinc-700 border-zinc-200 px-2.5 py-1 text-[12px] font-medium gap-1.5 group whitespace-nowrap h-7 items-center"
-          >
-            {s}
-            <button 
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleOption(s);
-              }}
-              className="hover:text-rose-500 transition-colors shrink-0"
-              type="button"
+            <Badge 
+              key={s} 
+              variant="secondary" 
+              className="bg-zinc-100 text-zinc-700 border-zinc-200 px-2.5 py-1 text-[12px] font-medium gap-1.5 group whitespace-nowrap h-7 items-center"
             >
-              <X size={10} weight="bold" />
-            </button>
-          </Badge>
+              {s}
+              {!disabled && (
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleOption(s);
+                  }}
+                  className="hover:text-rose-500 transition-colors shrink-0"
+                  type="button"
+                >
+                  <X size={10} weight="bold" />
+                </button>
+              )}
+            </Badge>
         ))}
         <input 
           type="text"
           className="flex-1 bg-transparent border-0 outline-none text-[13px] placeholder:text-zinc-400 min-w-[80px] h-7 px-1"
           placeholder={selected.length === 0 ? placeholder : ""}
           value={query}
+          disabled={disabled}
           onChange={(e) => {
+            if (disabled) return;
             setQuery(e.target.value);
             setIsOpen(true);
           }}
           onKeyDown={(e) => {
+            if (disabled) return;
             if (e.key === "Enter" && query) {
               e.preventDefault();
               if (showAddCustom) addCustom();
@@ -130,7 +138,7 @@ export function CustomMultiSelect({
           }}
         />
         <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center text-zinc-400 gap-1.5 pl-2 bg-white/80 backdrop-blur-[2px]">
-          {selected.length > 0 && (
+          {!disabled && selected.length > 0 && (
             <button
               type="button"
               onClick={(e) => {
@@ -143,7 +151,7 @@ export function CustomMultiSelect({
               <X size={12} weight="bold" />
             </button>
           )}
-          <CaretDown size={12} className={cn("transition-transform shrink-0", isOpen && "rotate-180")} />
+          <CaretDown size={12} className={cn("transition-transform shrink-0", isOpen && "rotate-180", disabled && "opacity-40")} />
         </div>
       </div>
 

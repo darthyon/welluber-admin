@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useTabPersistence, useQueryState, useUpdateQueryParams } from "@/hooks/use-tab-persistence";
 import { 
   Buildings,
   GitBranch,
@@ -49,6 +50,7 @@ import { FilterItem } from "@/components/shared/filter-item";
 import { ActionPopover } from "@/components/shared/action-popover";
 import { SharedDataTable, Column } from "@/components/shared/data-table";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
+import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { deactivateOrganization, removeOrganization, suspendOrganization } from "@/features/organizations/actions";
 import type { OrganizationStatus } from "@/features/organizations/types";
 
@@ -72,9 +74,10 @@ const OTHER_ORGS = [
 
 export default function OrganizationDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const orgId = params.id as string;
   
-  const [activeTab, setActiveTab] = useState<TabId>("profile");
+  const [activeTab, setActiveTab] = useTabPersistence<TabId>("profile");
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isBranchSheetOpen, setIsBranchSheetOpen] = useState(false);
   const [selectedBranchName, setSelectedBranchName] = useState<string | undefined>();
@@ -93,24 +96,27 @@ export default function OrganizationDetailPage() {
   // Search states
   const [branchSearch, setBranchSearch] = useState("");
   const [employeeSearch, setEmployeeSearch] = useState("");
+  const [policySearch, setPolicySearch] = useState("");
+  const [policyStatusFilter, setPolicyStatusFilter] = useState("all");
 
   // Sub-navigation state (Branches)
-  const [viewBranchId, setViewBranchId] = useState<string | null>(null);
+  const [viewBranchId, setViewBranchId] = useQueryState("branchId");
   const [isAddingBranch, setIsAddingBranch] = useState(false);
   const [editingBranchId, setEditingBranchId] = useState<string | null>(null);
 
   // Sub-navigation state (Employees)
-  const [viewEmployeeId, setViewEmployeeId] = useState<string | null>(null);
+  const [viewEmployeeId, setViewEmployeeId] = useQueryState("employeeId");
   const [isAddingEmployee, setIsAddingEmployee] = useState(false);
   const [editingEmployeeId, setEditingEmployeeId] = useState<string | null>(null);
   const [isBulkUploading, setIsBulkUploading] = useState(false);
+  const updateQueryParams = useUpdateQueryParams();
 
   // Policies state
   const [isLinkPolicyModalOpen, setIsLinkPolicyModalOpen] = useState(false);
   const [isCreatingPolicy, setIsCreatingPolicy] = useState(false);
-  const [viewingPolicyId, setViewingPolicyId] = useState<string | null>(null);
-  const [editingPolicyId, setEditingPolicyId] = useState<string | null>(null);
-  const [assignedPolicies, setAssignedPolicies] = useState<(BenefitPolicy & { assignedTo: string; employeeCount: number; lastUpdated: string })[]>([
+  const [viewingPolicyId, setViewingPolicyId] = useQueryState("viewingPolicyId");
+  const [editingPolicyId, setEditingPolicyId] = useQueryState("editingPolicyId");
+  const [assignedPolicies, setAssignedPolicies] = useState<(BenefitPolicy & { assignedTo: string; employeeCount: number; lastUpdated: string; categories?: string[]; groups?: string[] })[]>([
     {
       id: "pol_1",
       name: "Wellness Allocation",
@@ -125,7 +131,9 @@ export default function OrganizationDetailPage() {
       status: "Published" as const,
       assignedTo: "All Branches",
       employeeCount: 1240,
-      lastUpdated: "24 Mar 2024"
+      lastUpdated: "24 Mar 2024",
+      categories: ["Physical Wellbeing", "Psychological Wellbeing"],
+      groups: ["Gym Access", "Mental Support"]
     },
     {
       id: "pol_2",
@@ -141,9 +149,42 @@ export default function OrganizationDetailPage() {
       status: "Published" as const,
       assignedTo: "Subang Jaya",
       employeeCount: 450,
-      lastUpdated: "02 Apr 2024"
+      lastUpdated: "02 Apr 2024",
+      categories: ["Nutritional Support", "Personal Care"],
+      groups: ["Flexi-Benefits"]
     }
   ]);
+
+  const [policyFilters, setPolicyFilters] = useState({
+    department: "all",
+    role: "all",
+    mainService: "all",
+    benefitGroup: "all",
+  });
+
+  const filteredPolicies = useMemo(() => {
+    return assignedPolicies.filter(p => {
+      const searchLower = policySearch.toLowerCase();
+      const matchesSearch = !policySearch || 
+        p.name.toLowerCase().includes(searchLower) || 
+        p.code.toLowerCase().includes(searchLower) || 
+        p.description?.toLowerCase().includes(searchLower);
+
+      const matchesStatus = policyStatusFilter === "all" || 
+        (policyStatusFilter === "active" ? p.status === "Published" : p.status !== "Published");
+      
+      const matchesRole = policyFilters.role === "all" || 
+        p.eligibility.roles.includes(policyFilters.role.toLowerCase());
+      
+      const matchesService = policyFilters.mainService === "all" || 
+        p.categories?.includes(policyFilters.mainService);
+
+      const matchesGroup = policyFilters.benefitGroup === "all" || 
+        p.groups?.includes(policyFilters.benefitGroup);
+
+      return matchesSearch && matchesStatus && matchesRole && matchesService && matchesGroup;
+    });
+  }, [assignedPolicies, policySearch, policyStatusFilter, policyFilters]);
 
   // Mock Groups and Benefits for the Detail Sheet
   const [mockGroups] = useState([
@@ -229,7 +270,13 @@ export default function OrganizationDetailPage() {
         "This action cannot be undone.",
         "Any dependent references in reporting will be severed.",
       ],
-      run: () => removeOrganization(orgId),
+      run: async () => {
+        const res = await removeOrganization(orgId);
+        if (res.success) {
+          router.push("/organizations");
+        }
+        return res;
+      },
     },
   } as const;
 
@@ -317,10 +364,13 @@ export default function OrganizationDetailPage() {
                 <button
                   key={tab.id}
                   onClick={() => {
-                    setActiveTab(tab.id);
-                    // Reset subviews when switching main tabs
-                    setViewBranchId(null);
-                    setViewEmployeeId(null);
+                    updateQueryParams({
+                      tab: tab.id === "profile" ? null : tab.id,
+                      branchId: null,
+                      employeeId: null,
+                      viewingPolicyId: null,
+                      editingPolicyId: null
+                    });
                     setIsBulkUploading(false);
                   }}
                   className={cn(
@@ -485,14 +535,11 @@ export default function OrganizationDetailPage() {
                     </div>
                   }
                 >
-                  <DataToolbarContainer 
-                    search={
-                      <SearchBar 
-                        placeholder="Search branches..." 
-                        value={branchSearch} 
-                        onChange={setBranchSearch} 
-                      />
-                    }
+                  <DataFilterBar 
+                    searchQuery={branchSearch} 
+                    onSearchChange={setBranchSearch}
+                    searchPlaceholder="Search branches..."
+                    className="mb-6"
                     filters={
                       <>
                         <FilterItem 
@@ -510,14 +557,13 @@ export default function OrganizationDetailPage() {
                           value="all"
                           onChange={() => {}}
                           options={[
-                            { label: "All", value: "all" },
+                            { label: "All Status", value: "all" },
                             { label: "Active", value: "active" },
                             { label: "Inactive", value: "inactive" }
                           ]} 
                         />
                       </>
                     }
-                    className="mb-6 px-0"
                   />
 
                   {branchesView === "grid" ? (
@@ -662,14 +708,11 @@ export default function OrganizationDetailPage() {
                     </div>
                   }
                 >
-                  <DataToolbarContainer 
-                    search={
-                      <SearchBar 
-                        placeholder="Search employees..." 
-                        value={employeeSearch} 
-                        onChange={setEmployeeSearch} 
-                      />
-                    }
+                  <DataFilterBar 
+                    searchQuery={employeeSearch} 
+                    onSearchChange={setEmployeeSearch}
+                    searchPlaceholder="Search employees..."
+                    className="mb-6"
                     filters={
                       <>
                         <FilterItem 
@@ -677,7 +720,7 @@ export default function OrganizationDetailPage() {
                           value="all" 
                           onChange={() => {}} 
                           options={[
-                            { label: "All", value: "all" },
+                            { label: "All Status", value: "all" },
                             { label: "Linked", value: "linked" },
                             { label: "Pending", value: "pending" }
                           ]} 
@@ -687,7 +730,7 @@ export default function OrganizationDetailPage() {
                           value="all" 
                           onChange={() => {}} 
                           options={[
-                            { label: "None", value: "all" },
+                            { label: "No Action", value: "all" },
                             { label: "Missing Data", value: "missing" },
                           ]} 
                         />
@@ -703,7 +746,6 @@ export default function OrganizationDetailPage() {
                         />
                       </>
                     }
-                    className="mb-6 px-0"
                   />
 
                   {employeesView === "grid" ? (
@@ -925,8 +967,61 @@ export default function OrganizationDetailPage() {
                   </div>
                 }
               >
+                <DataFilterBar
+                  searchQuery={policySearch}
+                  onSearchChange={setPolicySearch}
+                  searchPlaceholder="Search policies..."
+                  className="mb-6"
+                  filters={
+                    <>
+                      <FilterItem
+                        label="Main Service"
+                        options={[
+                          { label: "All Services", value: "all" },
+                          { label: "Physical Wellbeing", value: "Physical Wellbeing" },
+                          { label: "Psychological", value: "Psychological Wellbeing" },
+                          { label: "Nutritional", value: "Nutritional Support" },
+                          { label: "Personal Care", value: "Personal Care" },
+                        ]}
+                        value={policyFilters.mainService}
+                        onChange={(v) => setPolicyFilters({ ...policyFilters, mainService: v })}
+                      />
+                      <FilterItem
+                        label="Benefit Group"
+                        options={[
+                          { label: "All Groups", value: "all" },
+                          { label: "Gym Access", value: "Gym Access" },
+                          { label: "Mental Support", value: "Mental Support" },
+                          { label: "Flexi-Benefits", value: "Flexi-Benefits" },
+                        ]}
+                        value={policyFilters.benefitGroup}
+                        onChange={(v) => setPolicyFilters({ ...policyFilters, benefitGroup: v })}
+                      />
+                      <FilterItem
+                        label="Role Scope"
+                        options={[
+                          { label: "All Roles", value: "all" },
+                          { label: "Management", value: "management" },
+                          { label: "Staff", value: "staff" },
+                        ]}
+                        value={policyFilters.role}
+                        onChange={(v) => setPolicyFilters({ ...policyFilters, role: v })}
+                      />
+                      <FilterItem
+                        label="Status"
+                        options={[
+                          { label: "All Status", value: "all" },
+                          { label: "Active", value: "active" },
+                          { label: "Inactive", value: "inactive" },
+                        ]}
+                        value={policyStatusFilter}
+                        onChange={setPolicyStatusFilter}
+                      />
+                    </>
+                  }
+                />
                 <AssignedPolicyList 
-                  policies={assignedPolicies as any} 
+                  policies={filteredPolicies as any} 
                   onUnlink={handleUnlinkPolicy}
                   onView={(id) => {
                     setViewingPolicyId(id);

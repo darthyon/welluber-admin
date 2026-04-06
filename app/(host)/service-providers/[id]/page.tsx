@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { useTabPersistence } from "@/hooks/use-tab-persistence";
 import {
   Storefront,
   GitBranch,
@@ -48,10 +49,11 @@ const OTHER_SPS = MOCK_SPS.slice(0, 5).map((s) => ({
 
 export default function ServiceProviderDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const spId = params.id as string;
   const sp = MOCK_SPS.find((s) => s.id === spId) ?? MOCK_SPS[0];
 
-  const [activeTab, setActiveTab] = useState<TabId>("details");
+  const [activeTab, setActiveTab] = useTabPersistence<TabId>("details");
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isTogglingStatus, setIsTogglingStatus] = useState(false);
   const [isRemoveSubmitting, setIsRemoveSubmitting] = useState(false);
@@ -107,7 +109,13 @@ export default function ServiceProviderDetailPage() {
         "This action cannot be undone.",
         "Any linked reporting references will remain historical only.",
       ],
-      run: () => removeSp(spId),
+      run: async () => {
+        const res = await removeSp(spId);
+        if (res.success) {
+          router.push("/service-providers");
+        }
+        return res;
+      },
     },
   } as const;
 

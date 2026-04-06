@@ -9,6 +9,7 @@ import { DetailSection } from "@/components/shared/detail-section";
 import { DataToolbarContainer } from "@/components/shared/data-toolbar";
 import { SearchBar } from "@/components/shared/search-bar";
 import { FilterItem } from "@/components/shared/filter-item";
+import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { SpVoucherForm } from "./sp-voucher-form";
 import type { ServiceProvider, SpVoucher, SpVoucherStatus } from "@/types/provider";
 import { ActionPopover } from "@/components/shared/action-popover";
@@ -96,8 +97,10 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
         }
       >
         <div className="space-y-4">
-          <DataToolbarContainer
-            search={<SearchBar placeholder="Search vouchers..." value={voucherSearch} onChange={setVoucherSearch} />}
+          <DataFilterBar
+            searchQuery={voucherSearch}
+            onSearchChange={setVoucherSearch}
+            searchPlaceholder="Search vouchers..."
             filters={
               <FilterItem
                 label="Status"
