@@ -26,6 +26,11 @@ export interface OrganizationBranch {
     email: string;
     contactNo: string;
   }[];
+  claimsCount?: number;
+  utilizationRate?: number;
+  balance?: string;
+  limit?: string;
+  walletModel?: string;
 }
 
 export interface OrganizationWallet {
@@ -65,12 +70,14 @@ export interface Organization {
   employeeCount: number;
   picId: string | null;
   utilizationRate: number; // 0 to 100
+  claimsCount?: number;
   totalWalletBalance: number; // This represents the 'spent' or 'used' amount in this context
   walletLimit: number;
   needsAction: string[]; // Triage status pills (e.g. "Missing PIC")
   services: string[]; // Tier 2 Service Names
   policies: string[];
   branches: string[];
+  documents: string[];
   createdAt: ISODate;
   updatedAt: ISODate;
 }

@@ -137,7 +137,7 @@ export function SectionedSearchSelect({
             {filteredTaxonomy.length > 0 ? (
               filteredTaxonomy.map((group) => (
                 <div key={group.category} className="mb-2 last:mb-0">
-                  <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-zinc-400 select-none">
+                  <div className="px-3 py-2 text-[10px] font-bold text-zinc-500/60 select-none">
                     {group.category}
                   </div>
                   {group.services.map((opt) => (

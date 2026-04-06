@@ -1,0 +1,410 @@
+"use client";
+
+import { useState } from "react";
+import { 
+  TreeStructure, 
+  Plus, 
+  MagnifyingGlass, 
+  DotsThreeVertical,
+  PlusCircle,
+  PencilSimple,
+  Trash,
+  Barbell,
+  Stethoscope,
+  Tooth,
+  Bicycle,
+  Waves,
+  HandFist,
+  FirstAid,
+  Pill,
+  Flower,
+  Sparkle,
+  HandSoap,
+  Scissors,
+  Brain,
+  HandHeart,
+  MusicNotes,
+  BowlFood,
+  Check,
+  House
+} from "@phosphor-icons/react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { BentoGrid } from "@/components/shared/bento-grid";
+import { ActionPopover } from "@/components/shared/action-popover";
+import { CategoryDetailSheet } from "@/components/host/services/category-detail-sheet";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { SERVICE_TAXONOMY, SERVICE_SPEC_TAXONOMY } from "@/features/organizations/constants";
+import { cn } from "@/lib/utils";
+
+// Icon Library for Main Services
+const ICON_LIBRARY = [
+  { name: "Barbell", icon: Barbell },
+  { name: "Bicycle", icon: Bicycle },
+  { name: "Waves", icon: Waves },
+  { name: "HandFist", icon: HandFist },
+  { name: "Stethoscope", icon: Stethoscope },
+  { name: "Tooth", icon: Tooth },
+  { name: "FirstAid", icon: FirstAid },
+  { name: "Pill", icon: Pill },
+  { name: "Flower", icon: Flower },
+  { name: "Sparkle", icon: Sparkle },
+  { name: "HandSoap", icon: HandSoap },
+  { name: "Scissors", icon: Scissors },
+  { name: "Brain", icon: Brain },
+  { name: "HandHeart", icon: HandHeart },
+  { name: "MusicNotes", icon: MusicNotes },
+  { name: "BowlFood", icon: BowlFood },
+];
+
+// Initial Icon Mappings for Main Services
+const INITIAL_SERVICE_ICONS: Record<string, string> = {
+  "Gym Access": "Barbell",
+  "Personal Training": "Barbell",
+  "Yoga": "Flower",
+  "Dental": "Tooth",
+  "Physiotherapy": "Stethoscope",
+  "General Practitioner": "Stethoscope",
+  "Nutritional Counselling": "BowlFood",
+  "Meditation": "Brain",
+};
+
+export default function ServicesPage() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [taxonomy, setTaxonomy] = useState(SERVICE_TAXONOMY);
+  const [specs, setSpecs] = useState(SERVICE_SPEC_TAXONOMY);
+  const [serviceIcons, setServiceIcons] = useState<Record<string, string>>(INITIAL_SERVICE_ICONS);
+  
+  // Sheet & Category Selection State
+  const [selectedCategory, setSelectedCategory] = useState<{ category: string; services: string[] } | null>(null);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+
+  // CRUD State
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [dialogConfig, setDialogConfig] = useState<{
+    type: "category" | "service" | "spec";
+    mode: "add" | "edit";
+    parentId?: string;
+    id?: string;
+    initialValue?: string;
+  } | null>(null);
+  const [inputValue, setInputValue] = useState("");
+  const [selectedIcon, setSelectedIcon] = useState<string | null>(null);
+
+  const handleOpenDialog = (config: typeof dialogConfig) => {
+    setDialogConfig(config);
+    setInputValue(config?.initialValue || "");
+    setSelectedIcon(config?.type === "service" ? serviceIcons[config.id || ""] || null : null);
+    setIsDialogOpen(true);
+  };
+
+  const handleSave = () => {
+    if (!dialogConfig || !inputValue.trim()) return;
+
+    if (dialogConfig.type === "category") {
+      if (dialogConfig.mode === "add") {
+        setTaxonomy(prev => [...prev, { category: inputValue, services: [] }]);
+      } else {
+        setTaxonomy(prev => prev.map(c => c.category === dialogConfig.id ? { ...c, category: inputValue } : c));
+      }
+    } else if (dialogConfig.type === "service") {
+      if (dialogConfig.mode === "add") {
+        setTaxonomy(prev => prev.map(c => c.category === dialogConfig.parentId ? { ...c, services: [...c.services, inputValue] } : c));
+        setSpecs(prev => ({ ...prev, [inputValue]: [] }));
+        if (selectedIcon) setServiceIcons(prev => ({ ...prev, [inputValue]: selectedIcon }));
+      } else {
+        const oldName = dialogConfig.id!;
+        setTaxonomy(prev => prev.map(c => ({ ...c, services: c.services.map(s => s === oldName ? inputValue : s) })));
+        setSpecs(prev => {
+          const newSpecs = { ...prev };
+          newSpecs[inputValue] = newSpecs[oldName] || [];
+          delete newSpecs[oldName];
+          return newSpecs;
+        });
+        setServiceIcons(prev => {
+          const newIcons = { ...prev };
+          if (selectedIcon) newIcons[inputValue] = selectedIcon;
+          if (oldName !== inputValue) delete newIcons[oldName];
+          return newIcons;
+        });
+      }
+    } else if (dialogConfig.type === "spec") {
+      const serviceName = dialogConfig.parentId!;
+      if (dialogConfig.mode === "add") {
+        setSpecs(prev => ({ ...prev, [serviceName]: [...(prev[serviceName] || []), inputValue] }));
+      } else {
+        const oldSpec = dialogConfig.id!;
+        setSpecs(prev => ({ ...prev, [serviceName]: (prev[serviceName] || []).map(s => s === oldSpec ? inputValue : s) }));
+      }
+    }
+
+    setIsDialogOpen(false);
+    setInputValue("");
+    setSelectedIcon(null);
+  };
+
+  const handleDelete = (type: "category" | "service" | "spec", id: string, parentId?: string) => {
+    if (!confirm(`Are you sure you want to delete this ${type}?`)) return;
+
+    if (type === "category") {
+      setTaxonomy(prev => prev.filter(c => c.category !== id));
+    } else if (type === "service") {
+      setTaxonomy(prev => prev.map(c => ({ ...c, services: c.services.filter(s => s !== id) })));
+      setServiceIcons(prev => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
+    } else if (type === "spec") {
+      setSpecs(prev => ({ ...prev, [parentId!]: (prev[parentId!] || []).filter(s => s !== id) }));
+    }
+  };
+
+  const handleOpenCategory = (category: typeof selectedCategory) => {
+    setSelectedCategory(category);
+    setIsSheetOpen(true);
+  };
+
+  const filteredTaxonomy = taxonomy.filter(cat => {
+    const matchesCategory = cat.category.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesServices = cat.services.some(service => {
+      const matchesService = service.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSpecs = (specs[service] || []).some(spec => 
+        spec.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      return matchesService || matchesSpecs;
+    });
+    return matchesCategory || matchesServices;
+  });
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">Services</h1>
+          <p className="text-muted-foreground text-[13px] mt-1 font-normal opacity-80">
+            Define and manage the global service taxonomy. Group services into categories and link them to brands and providers.
+          </p>
+        </div>
+        <Button 
+          className="h-9 text-[13px] font-medium shadow-sm transition-all hover:scale-[1.02]"
+          onClick={() => handleOpenDialog({ type: "category", mode: "add" })}
+        >
+          <Plus size={16} weight="bold" className="mr-1.5" />
+          Add Service Category
+        </Button>
+      </div>
+
+      {/* Toolbar */}
+      <div className="flex items-center gap-3">
+        <div className="relative flex-1 max-w-sm">
+          <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/60" size={16} />
+          <Input 
+            placeholder="Search categories, services or specs..." 
+            className="pl-9 h-10 text-[13px] bg-background/50 focus:bg-background transition-colors"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+        <div className="flex items-center gap-2 text-[11px] font-semibold text-muted-foreground ml-auto">
+          <span>{filteredTaxonomy.length} Categories</span>
+          <span className="w-1 h-1 rounded-full bg-border" />
+          <span>{filteredTaxonomy.reduce((acc, cat) => acc + cat.services.length, 0)} Main Services</span>
+        </div>
+      </div>
+
+      {/* Category Grid */}
+      <TooltipProvider>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredTaxonomy.map((category) => {
+            const categoryActions = [
+              { 
+                label: "Add Main Service", 
+                onClick: () => handleOpenDialog({ type: "service", mode: "add", parentId: category.category }) 
+              },
+              { 
+                label: "Rename Category", 
+                onClick: () => handleOpenDialog({ type: "category", mode: "edit", id: category.category, initialValue: category.category }) 
+              },
+              { 
+                label: "Delete Category", 
+                isDanger: true,
+                onClick: () => handleDelete("category", category.category) 
+              }
+            ];
+
+            const visibleServices = category.services.slice(0, 3);
+            const overflowServices = category.services.slice(3);
+
+            return (
+              <div
+                key={category.category}
+                onClick={() => handleOpenCategory(category)}
+                className="group relative bg-card border border-border rounded-xl p-5 cursor-pointer hover:border-primary/30 hover:shadow-md transition-all duration-200 overflow-hidden"
+              >
+                {/* Decorative accent */}
+                <div className="absolute -right-6 -bottom-6 w-24 h-24 bg-primary/5 rounded-full blur-3xl group-hover:w-32 group-hover:h-32 group-hover:bg-primary/10 transition-all duration-500 pointer-events-none" />
+
+                {/* Header */}
+                <div className="flex items-start justify-between mb-4 relative z-10">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                      <TreeStructure size={16} weight="duotone" />
+                    </div>
+                    <div>
+                      <p className="text-[13px] font-semibold text-foreground leading-tight">{category.category}</p>
+                      <p className="text-[11px] text-muted-foreground">{category.services.length} service{category.services.length !== 1 ? "s" : ""}</p>
+                    </div>
+                  </div>
+                  <div onClick={(e) => e.stopPropagation()} className="relative z-20">
+                    <ActionPopover actions={categoryActions} />
+                  </div>
+                </div>
+
+                {/* Services list */}
+                <div className="relative z-10 flex flex-wrap gap-1.5">
+                  {category.services.length === 0 ? (
+                    <span className="text-[11px] text-muted-foreground italic">No services yet</span>
+                  ) : (
+                    <>
+                      {visibleServices.map((svc, i) => (
+                        <span key={i} className="inline-flex items-center text-[11px] font-medium px-2 py-0.5 rounded-md bg-muted/60 border border-border text-foreground/80">
+                          {svc}
+                        </span>
+                      ))}
+                      {overflowServices.length > 0 && (
+                        <Tooltip delayDuration={0}>
+                          <TooltipTrigger asChild>
+                            <button
+                              onClick={(e) => e.stopPropagation()}
+                              className="text-[11px] font-bold text-primary/70 hover:text-primary px-1.5 underline decoration-primary/20 underline-offset-4 transition-colors"
+                            >
+                              +{overflowServices.length}
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom" className="w-48 bg-white rounded-xl border border-zinc-200 shadow-xl z-[200]" onClick={(e) => e.stopPropagation()}>
+                            <div className="flex flex-col gap-0.5 py-1">
+                              <span className="text-[10px] font-semibold text-zinc-400 px-2 py-0.5">More services</span>
+                              {overflowServices.map((svc, i) => (
+                                <div key={i} className="text-[12px] px-2 py-1 hover:bg-zinc-50 rounded-lg text-zinc-700 font-medium">{svc}</div>
+                              ))}
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </TooltipProvider>
+
+      {/* Detail Slide-over Sheet */}
+      <CategoryDetailSheet
+        isOpen={isSheetOpen}
+        onClose={() => setIsSheetOpen(false)}
+        category={selectedCategory}
+        specs={specs}
+        serviceIcons={serviceIcons}
+        iconLibrary={ICON_LIBRARY}
+        onOpenDialog={handleOpenDialog}
+        onDelete={handleDelete}
+      />
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {dialogConfig?.mode === "add" ? "Add New" : "Rename"} {dialogConfig?.type.charAt(0).toUpperCase()}{dialogConfig?.type.slice(1)}
+            </DialogTitle>
+            <DialogDescription>
+              {dialogConfig?.mode === "add" 
+                ? `Enter the name for the new ${dialogConfig?.type}.`
+                : `Update the name for this ${dialogConfig?.type}.`}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label htmlFor="name" className="text-[12px] font-bold text-zinc-500 block">Name</label>
+                <Input
+                  id="name"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  placeholder={dialogConfig?.type === "category" ? "e.g. Fitness & Exercise" : "e.g. Yoga"}
+                  className="h-10 text-[13px]"
+                  autoFocus
+                />
+              </div>
+
+              {dialogConfig?.type === "service" && (
+                <div className="space-y-3 pb-2 pt-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[12px] font-bold text-zinc-500 block">Service Icon</label>
+                    {selectedIcon && (
+                      <button 
+                        onClick={() => setSelectedIcon(null)}
+                        className="text-[10px] text-primary font-bold hover:underline"
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-5 sm:grid-cols-8 gap-2">
+                    {ICON_LIBRARY.map(({ name, icon: IconComp }) => (
+                      <button
+                        key={name}
+                        type="button"
+                        onClick={() => setSelectedIcon(name)}
+                        title={name}
+                        className={cn(
+                          "w-10 h-10 rounded-xl border flex items-center justify-center transition-all group/icon",
+                          selectedIcon === name 
+                            ? "bg-primary text-white border-primary shadow-lg shadow-primary/20 scale-110 z-10" 
+                            : "bg-zinc-50 border-zinc-200 text-zinc-400 hover:border-primary/30 hover:bg-white hover:text-primary"
+                        )}
+                      >
+                        <IconComp size={20} weight={selectedIcon === name ? "fill" : "duotone"} />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setIsDialogOpen(false)} className="h-10 text-[13px] font-medium">
+              Cancel
+            </Button>
+            <Button onClick={handleSave} className="h-10 px-6 text-[13px] font-bold">
+              {dialogConfig?.mode === "add" ? "Save " + dialogConfig?.type : "Update"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}

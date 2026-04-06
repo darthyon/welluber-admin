@@ -29,6 +29,7 @@ import { DetailSection } from "@/components/shared/detail-section";
 import { DetailField } from "@/components/shared/detail-field";
 import { ActionPopover } from "@/components/shared/action-popover";
 import { StatusBadge } from "@/components/shared/status-badge";
+import { ActivityTimeline } from "@/components/shared/activity-timeline";
 import { cn } from "@/lib/utils";
 
 interface EmployeeDetailViewProps {
@@ -342,25 +343,18 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
             </div>
           </DetailSection>
 
-          <DetailSection 
-            title="Activity Log" 
-            icon={<ClockCounterClockwise size={18} weight="bold" className="text-primary" />}
-          >
-            <div className="space-y-6">
-              {employeeData.auditTrail.map((trail, i) => (
-                <div key={i} className={cn(
-                  "relative pl-6 pb-6 last:pb-0",
-                  i !== employeeData.auditTrail.length - 1 && "before:absolute before:left-[1px] before:top-[18px] before:bottom-0 before:w-[1px] before:bg-zinc-100"
-                )}>
-                  <div className="absolute left-0 top-1 w-2 h-2 rounded-full bg-zinc-300 ring-4 ring-white" />
-                  <div className="text-[13px] font-bold text-zinc-900">{trail.action}</div>
-                  <div className="text-[11px] text-zinc-500 mt-0.5">
-                    by {trail.user} • {trail.date}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </DetailSection>
+          <div className="bg-white rounded-2xl border border-zinc-200 p-6">
+            <ActivityTimeline 
+              items={employeeData.auditTrail.map((trail, i) => ({
+                id: i,
+                title: trail.action,
+                description: `Action performed on employee profile.`,
+                user: trail.user,
+                timestamp: trail.date,
+                type: i === 0 ? "Update" : i === 1 ? "Payout" : "Link"
+              }))} 
+            />
+          </div>
         </div>
       </div>
     </div>

@@ -1,8 +1,7 @@
-"use client";
-
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
+import { CaretUp, CaretDown, ArrowsDownUp } from "@phosphor-icons/react";
 
 export interface Column<T> {
   header: string;
@@ -11,6 +10,14 @@ export interface Column<T> {
   cellClassName?: string;
   align?: "left" | "center" | "right";
   render?: (row: T) => React.ReactNode;
+  sortable?: boolean;
+}
+
+type SortDirection = "asc" | "desc" | null;
+
+interface SortConfig<T> {
+  key: keyof T | null;
+  direction: SortDirection;
 }
 
 interface DataTableProps<T> {
@@ -21,6 +28,10 @@ interface DataTableProps<T> {
   rowsPerPage?: number;
   className?: string;
   onRowClick?: (row: T) => void;
+  defaultSort?: {
+    key: keyof T;
+    direction: SortDirection;
+  };
 }
 
 export function SharedDataTable<T extends { id: string | number }>({ 
@@ -30,13 +41,65 @@ export function SharedDataTable<T extends { id: string | number }>({
   freezeLast = false, 
   rowsPerPage = 10,
   className,
-  onRowClick
+  onRowClick,
+  defaultSort
 }: DataTableProps<T>) {
   const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = Math.ceil(data.length / rowsPerPage);
-  
+  const [sortConfig, setSortConfig] = useState<SortConfig<T>>(
+    defaultSort || { key: null, direction: null }
+  );
+
+  const handleSort = (key: keyof T) => {
+    setSortConfig((prev) => {
+      if (prev.key === key) {
+        if (prev.direction === "asc") return { key, direction: "desc" };
+        if (prev.direction === "desc") return { key: null, direction: null };
+      }
+      return { key, direction: "asc" };
+    });
+    setCurrentPage(1); // Reset to first page on sort
+  };
+
+  const sortedData = useMemo(() => {
+    if (!sortConfig.key || !sortConfig.direction) return data;
+
+    return [...data].sort((a, b) => {
+      const key = sortConfig.key!;
+      let aVal: any = a[key];
+      let bVal: any = b[key];
+
+      // Extract comparison value (handle objects with name property)
+      if (aVal && typeof aVal === "object" && "name" in aVal) aVal = aVal.name;
+      if (bVal && typeof bVal === "object" && "name" in bVal) bVal = bVal.name;
+
+      if (aVal === bVal) return 0;
+      if (aVal === null || aVal === undefined) return 1;
+      if (bVal === null || bVal === undefined) return -1;
+
+      const direction = sortConfig.direction === "asc" ? 1 : -1;
+
+      // Handle simple types
+      if (typeof aVal === "string" && typeof bVal === "string") {
+        // Check if strings are dates
+        const aDate = Date.parse(aVal);
+        const bDate = Date.parse(bVal);
+        if (!isNaN(aDate) && !isNaN(bDate) && (aVal.includes("-") || aVal.includes("/"))) {
+          return (aDate - bDate) * direction;
+        }
+        return aVal.localeCompare(bVal) * direction;
+      }
+
+      if (typeof aVal === "number" && typeof bVal === "number") {
+        return (aVal - bVal) * direction;
+      }
+
+      return 0;
+    });
+  }, [data, sortConfig]);
+
+  const totalPages = Math.ceil(sortedData.length / rowsPerPage);
   const startIndex = (currentPage - 1) * rowsPerPage;
-  const paginatedData = data.slice(startIndex, startIndex + rowsPerPage);
+  const paginatedData = sortedData.slice(startIndex, startIndex + rowsPerPage);
 
   const getCellAlignment = (align?: "left" | "center" | "right") => {
     if (align === "center") return "text-center";
@@ -58,21 +121,40 @@ export function SharedDataTable<T extends { id: string | number }>({
                 const isLast = i === columns.length - 1 && freezeLast;
                 const isFirstCol = i === 0;
                 const isLastCol = i === totalColumns - 1;
+                const isSorted = sortConfig.key === col.accessorKey;
                 
                 return (
                   <th 
                     key={i} 
+                    onClick={() => col.sortable && col.accessorKey && handleSort(col.accessorKey)}
                     className={cn(
-                      "font-semibold text-muted-foreground text-[13px] p-4 whitespace-nowrap bg-zinc-50 dark:bg-muted/30 z-20 tracking-tight",
+                      "font-semibold text-muted-foreground text-[13px] p-4 whitespace-nowrap bg-zinc-50 dark:bg-muted/30 z-20 tracking-tight transition-colors",
+                      col.sortable && "cursor-pointer hover:bg-zinc-100 hover:text-foreground dark:hover:bg-muted/40",
                       isFirstCol && "rounded-tl-xl",
                       isLastCol && "rounded-tr-xl",
                       getCellAlignment(col.align),
                       isFirst && "sticky left-0 z-30 shadow-[4px_0_12px_-4px_rgba(0,0,0,0.05)]",
-                      isLast && "sticky right-0 z-30 shadow-[-4px_0_12_px_-4px_rgba(0,0,0,0.05)]",
+                      isLast && "sticky right-0 z-30 shadow-[-4px_0_12px_-4px_rgba(0,0,0,0.05)]",
+                      isSorted && "text-foreground",
                       col.headerClassName
                     )}
                   >
-                    {col.header}
+                    <div className={cn(
+                      "flex items-center gap-1.5",
+                      col.align === "right" && "justify-end",
+                      col.align === "center" && "justify-center"
+                    )}>
+                      {col.header}
+                      {col.sortable && col.accessorKey && (
+                        <div className="flex-shrink-0 opacity-40 group-hover:opacity-100 transition-opacity">
+                          {isSorted ? (
+                            sortConfig.direction === "asc" ? <CaretUp size={12} weight="bold" /> : <CaretDown size={12} weight="bold" />
+                          ) : (
+                            <ArrowsDownUp size={12} />
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </th>
                 );
               })}
@@ -115,7 +197,7 @@ export function SharedDataTable<T extends { id: string | number }>({
                 </motion.tr>
               ))}
             </AnimatePresence>
-            {data.length === 0 && (
+            {sortedData.length === 0 && (
               <tr>
                 <td colSpan={columns.length} className="p-12 text-center text-muted-foreground text-[14px] font-medium opacity-60">
                   No records found matching your selection.
@@ -133,9 +215,9 @@ export function SharedDataTable<T extends { id: string | number }>({
             <span>Showing</span>
             <span className="text-foreground font-bold">{startIndex + 1}</span>
             <span>to</span>
-            <span className="text-foreground font-bold">{Math.min(startIndex + rowsPerPage, data.length)}</span>
+            <span className="text-foreground font-bold">{Math.min(startIndex + rowsPerPage, sortedData.length)}</span>
             <span>of</span>
-            <span className="text-foreground font-bold">{data.length}</span>
+            <span className="text-foreground font-bold">{sortedData.length}</span>
             <span>records</span>
           </div>
           

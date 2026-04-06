@@ -1,16 +1,16 @@
 "use client"
 
 import { useState } from "react"
-import { Buildings, ShieldCheck, Users, CurrencyCircleDollar, TrendUp, CalendarBlank } from "@phosphor-icons/react"
+import { Buildings, ShieldCheck, Users, CurrencyCircleDollar } from "@phosphor-icons/react"
 import { ActivityChart } from "@/components/host/dashboard/activity-chart"
 import { TopList } from "@/components/host/dashboard/top-list"
 import { TrendingCategories } from "@/components/host/dashboard/trending-categories"
 import { SettlementStatus } from "@/components/host/dashboard/settlement-status"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Calendar } from "@/components/ui/calendar"
 import { BentoGrid, BentoCard } from "@/components/shared/bento-grid"
+import { DateRangePicker } from "@/components/shared/date-range-picker"
 import { Progress } from "@/components/ui/progress"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { type DateRange } from "react-day-picker"
 
 const topOrgs = [
   { id: "o1", rank: 1, name: "TechCorp Global", metric1: "12,402", metric2: "92%" },
@@ -30,6 +30,7 @@ const topSPs = [
 
 export default function DashboardPage() {
   const [period, setPeriod] = useState<"By Month" | "By Quarter" | "By Year">("By Month")
+  const [dateRange, setDateRange] = useState<DateRange | undefined>()
 
   return (
     <div className="space-y-10">
@@ -82,7 +83,7 @@ export default function DashboardPage() {
 
           {/* Organizations */}
           <BentoCard 
-            title="Organizations" 
+            title="Organisations" 
             value="1,042" 
             icon={Buildings}
             trend={{ value: "+12.2%", label: "vs last month", isPositive: true }}
@@ -186,17 +187,12 @@ export default function DashboardPage() {
             </select>
 
             {/* Custom Range using Shadcn Calendar (mocked trigger for layout) */}
-            <Popover>
-              <PopoverTrigger asChild>
-                <button className="flex items-center gap-2 px-3 py-1.5 h-[34px] bg-card border border-border hover:bg-muted/50 rounded-md text-[12px] font-medium text-foreground transition-colors group">
-                  <CalendarBlank size={14} className="text-muted-foreground group-hover:text-foreground transition-colors" />
-                  <span>Custom Range</span>
-                </button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="end">
-                <Calendar mode="range" />
-              </PopoverContent>
-            </Popover>
+            <DateRangePicker 
+              value={dateRange}
+              onChange={setDateRange}
+              placeholder="Custom Range"
+              align="end"
+            />
           </div>
         </div>
 

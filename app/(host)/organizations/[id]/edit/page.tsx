@@ -18,6 +18,8 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { createOrganizationSchema, CreateOrganizationData } from "@/features/organizations/schemas";
 import { Button } from "@/components/ui/button";
+import { DocumentUploadSection } from "@/components/shared/document-upload-section";
+import { Controller } from "react-hook-form";
 
 
 export default function EditOrganizationPage() {
@@ -27,7 +29,7 @@ export default function EditOrganizationPage() {
   
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { register, handleSubmit, formState: { errors } } = useForm<CreateOrganizationData>({
+  const { register, handleSubmit, control, formState: { errors } } = useForm<CreateOrganizationData>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(createOrganizationSchema as any),
     defaultValues: {
@@ -178,6 +180,23 @@ export default function EditOrganizationPage() {
                     )}
                   />
                 </div>
+
+                <div className="space-y-1.5 sm:col-span-2">
+                  <label className="text-[13px] font-medium text-foreground">TIN No.</label>
+                  <input 
+                    {...register("tinNumber")}
+                    className={cn(
+                      "w-full px-3 py-2 bg-background border rounded-md text-[14px] outline-none transition-colors",
+                      errors.tinNumber ? "border-destructive focus:border-destructive" : "border-border focus:border-foreground/30 focus:bg-muted/30"
+                    )}
+                    placeholder="e.g. TR-882910-01"
+                  />
+                  {errors.tinNumber && (
+                    <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
+                      <WarningCircle size={12} /> {errors.tinNumber.message}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -257,23 +276,6 @@ export default function EditOrganizationPage() {
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div className="space-y-1.5 sm:col-span-2">
-                  <label className="text-[13px] font-medium text-foreground">TIN No.</label>
-                  <input 
-                    {...register("tinNumber")}
-                    className={cn(
-                      "w-full px-3 py-2 bg-background border rounded-md text-[14px] outline-none transition-colors",
-                      errors.tinNumber ? "border-destructive focus:border-destructive" : "border-border focus:border-foreground/30 focus:bg-muted/30"
-                    )}
-                    placeholder="e.g. TR-882910-01"
-                  />
-                  {errors.tinNumber && (
-                    <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
-                      <WarningCircle size={12} /> {errors.tinNumber.message}
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-1.5 sm:col-span-2">
                   <label className="text-[13px] font-medium text-foreground">Bank Name</label>
                   <input 
                     {...register("bankAccountDetails.bankName")}
@@ -324,6 +326,21 @@ export default function EditOrganizationPage() {
                   )}
                 </div>
               </div>
+            </div>
+
+            {/* Section: Documents */}
+            <div className="p-6 border-t border-border bg-muted/5">
+              <Controller
+                name="documents"
+                control={control}
+                render={({ field }) => (
+                  <DocumentUploadSection 
+                    documents={field.value || []}
+                    onChange={field.onChange}
+                    error={errors.documents?.message}
+                  />
+                )}
+              />
             </div>
 
             {/* Form Footer */}

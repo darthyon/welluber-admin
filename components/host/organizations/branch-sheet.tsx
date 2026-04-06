@@ -30,7 +30,7 @@ export function BranchSheet({ isOpen, onClose, branchName }: BranchSheetProps) {
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <div>
             <h2 className="text-lg font-semibold tracking-tight text-foreground">
-              {branchName ? `Manage ${branchName}` : "Add New Branch"}
+              {branchName || "Add New Branch"}
             </h2>
             <p className="text-[13px] text-muted-foreground mt-0.5">
               Configure branch details, PICs, and wallet.

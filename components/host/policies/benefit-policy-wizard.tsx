@@ -103,7 +103,7 @@ const STATUS_CONFIG: Record<PolicyStatus, { label: string; color: string; bg: st
 function ReadField({ label, value }: { label: string; value?: string }) {
   return (
     <div className="space-y-1">
-      <p className="text-[11px] font-bold uppercase tracking-widest text-zinc-400">{label}</p>
+      <p className="text-[11px] font-bold text-zinc-500/80">{label}</p>
       <p className="text-[14px] font-medium text-zinc-800">{value || <span className="text-zinc-300 italic">—</span>}</p>
     </div>
   );
@@ -592,7 +592,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
           <div className="space-y-8 p-1">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-3">
-                <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Employee Pool Type</label>
+                <label className="text-[11px] font-bold text-zinc-500/80">Employee pool type</label>
                 <div className="flex gap-2 p-1 bg-zinc-100 rounded-xl">
                   {(["Individual", "Shared"] as const).map((type) => (
                     <button
@@ -604,7 +604,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                 </div>
               </div>
               <div className="space-y-3">
-                <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Dependent Pool Type</label>
+                <label className="text-[11px] font-bold text-zinc-500/80">Dependent Pool Type</label>
                 <div className="flex gap-2 p-1 bg-zinc-100 rounded-xl">
                   {(["None", "Individual", "Shared"] as const).map((type) => (
                     <button
@@ -617,7 +617,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
               </div>
             </div>
             <div className="space-y-3">
-              <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Utilisation Mode</label>
+              <label className="text-[11px] font-bold text-zinc-500/80">Utilisation Mode</label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <ChoiceCard title="Fixed Allocation" description="Full benefit amounts granted upfront upon assignment." icon={Gear} selected={policyData.utilisationMode === "Fixed"} onSelect={() => setPolicyData({ ...policyData, utilisationMode: "Fixed" })} />
                 <ChoiceCard title="Prorated Allocation" description="Benefit amounts calculated based on join date/time." icon={Gear} selected={policyData.utilisationMode === "Prorated"} onSelect={() => setPolicyData({ ...policyData, utilisationMode: "Prorated" })} />
@@ -629,7 +629,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
         <DetailSection title="Cycle & Lifecycle" icon={<Gear size={18} weight="duotone" />} description="Refresh intervals and activation triggers">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-1">
             <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Refresh Cycle</label>
+              <label className="text-[11px] font-bold text-zinc-500/80">Refresh Cycle</label>
               <select
                 className="w-full px-4 py-2 bg-white border border-zinc-200 rounded-xl text-[14px] font-medium outline-none focus:ring-2 focus:ring-primary/10"
                 value={policyData.refreshCycle}
@@ -639,7 +639,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
               </select>
             </div>
             <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Refresh Start Reference</label>
+              <label className="text-[11px] font-bold text-zinc-500/80">Refresh Start Reference</label>
               <select
                 className="w-full px-4 py-2 bg-white border border-zinc-200 rounded-xl text-[14px] font-medium outline-none focus:ring-2 focus:ring-primary/10"
                 value={policyData.refreshStartReference}
@@ -651,7 +651,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
               </select>
             </div>
             <div className="space-y-1.5 md:col-span-2">
-              <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Activation Mode</label>
+              <label className="text-[11px] font-bold text-zinc-500/80">Activation Mode</label>
               <div className="grid grid-cols-1 gap-2 mt-2">
                 {(["JoinDate", "ProbationEnds", "CustomDate"] as const).map((m) => (
                   <button
@@ -741,7 +741,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                 {/* Distribution type + max usage */}
                 <div className="flex items-center gap-4 flex-wrap">
                   <div className="space-y-1">
-                    <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Distribution</p>
+                    <p className="text-[10px] font-bold text-zinc-500/80">Distribution</p>
                     {isViewMode ? (
                       <p className="text-[12px] font-semibold text-zinc-700">{group.distributionType === "SharedAmount" ? "Shared Pool" : "Individual Per Service"}</p>
                     ) : (
@@ -758,7 +758,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                   </div>
                   {group.distributionType === "SharedAmount" && (
                     <div className="space-y-1">
-                      <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Max Usage</p>
+                      <p className="text-[10px] font-bold text-zinc-500/80">Max Usage</p>
                       {isViewMode ? (
                         <p className="text-[12px] font-semibold text-zinc-700">{group.maxUsagePerCycle ? `RM ${group.maxUsagePerCycle.toFixed(2)}` : "—"}</p>
                       ) : (
@@ -770,7 +770,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
 
                 {/* Services */}
                 <div className="space-y-2">
-                  <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Services</p>
+                  <p className="text-[10px] font-bold text-zinc-500/80">Services</p>
                   <div className="space-y-1.5">
                     {benefits.filter(b => b.groupId === group.id).map((benefit) => (
                       <div key={benefit.id} className="flex items-center gap-3 px-3 py-2 rounded-xl bg-zinc-50 border border-zinc-100">

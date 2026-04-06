@@ -13,6 +13,15 @@ import { Button } from "@/components/ui/button";
 import { SearchableMultiSelect } from "@/components/shared/searchable-multi-select";
 import { SERVICE_TAXONOMY } from "@/features/organizations/constants";
 import { MOCK_SPS } from "@/features/providers/mock-data";
+import { DocumentUploadSection } from "@/components/shared/document-upload-section";
+import { Controller } from "react-hook-form";
+import { Article, Files, Info } from "@phosphor-icons/react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function EditServiceProviderPage() {
   const router = useRouter();
@@ -27,6 +36,7 @@ export default function EditServiceProviderPage() {
     register,
     handleSubmit,
     setValue,
+    control,
     formState: { errors },
   } = useForm<CreateSpData>({
     resolver: zodResolver(createSpSchema as any),
@@ -37,6 +47,10 @@ export default function EditServiceProviderPage() {
       description: sp.description ?? "",
       serviceCategories: sp.serviceCategories,
       isActive: sp.isActive,
+      tinNumber: sp.tinNumber ?? "",
+      classificationCode: sp.classificationCode ?? "",
+      classificationDescriptor: sp.classificationDescriptor ?? "",
+      documents: sp.documents ?? [],
     },
   });
 
@@ -125,6 +139,16 @@ export default function EditServiceProviderPage() {
               </div>
 
               <div className="space-y-1.5 sm:col-span-2">
+                <label className="text-[13px] font-medium text-foreground">TIN No.</label>
+                <input {...register("tinNumber")} className={inputCls(!!errors.tinNumber)} placeholder="e.g. TR-882910-01" />
+                {errors.tinNumber && (
+                  <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
+                    <WarningCircle size={12} /> {errors.tinNumber.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-1.5 sm:col-span-2">
                 <label className="text-[13px] font-medium text-foreground">
                   Description <span className="text-muted-foreground font-normal">(optional)</span>
                 </label>
@@ -156,6 +180,63 @@ export default function EditServiceProviderPage() {
                 <WarningCircle size={12} /> {errors.serviceCategories.message}
               </p>
             )}
+          </div>
+
+          {/* Section: e-Invoice Malaysia */}
+          <div className="p-6 border-b border-border space-y-5">
+            <div className="flex items-center gap-2 pb-2">
+              <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500">
+                <Article size={16} weight="fill" />
+              </div>
+              <h3 className="text-[15px] font-semibold text-foreground">e-Invoice Malaysia</h3>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="ml-1 flex items-center gap-1 text-[11px] font-medium text-primary cursor-default">
+                      <Info size={13} weight="fill" className="text-primary/70" />
+                      Submitted by Welluber
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent side="right" className="max-w-[220px] text-center text-[12px]">
+                    Welluber will submit for SP on behalf to the org.
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div className="space-y-1.5">
+                <label className="text-[13px] font-medium text-foreground">Classification Code</label>
+                <input {...register("classificationCode")} className={inputCls(!!errors.classificationCode)} placeholder="e.g. 001" />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[13px] font-medium text-foreground">Classification Descriptor</label>
+                <input {...register("classificationDescriptor")} className={inputCls(!!errors.classificationDescriptor)} placeholder="e.g. General" />
+              </div>
+            </div>
+          </div>
+
+          {/* Section: Documents */}
+          <div className="p-6 space-y-4">
+            <div className="flex items-center gap-2 pb-2">
+              <div className="w-8 h-8 rounded-full bg-zinc-500/10 flex items-center justify-center text-zinc-500">
+                <Files size={16} weight="fill" />
+              </div>
+              <h3 className="text-[15px] font-semibold text-foreground">Documents</h3>
+            </div>
+
+            <Controller
+              name="documents"
+              control={control}
+              render={({ field }) => (
+                <DocumentUploadSection 
+                  documents={field.value || []}
+                  onChange={field.onChange}
+                  error={errors.documents?.message}
+                />
+              )}
+            />
           </div>
 
           {/* Footer */}

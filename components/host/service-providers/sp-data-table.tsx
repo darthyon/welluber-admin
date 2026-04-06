@@ -17,22 +17,12 @@ interface SpDataTableProps {
 
 export function SpDataTable({ data }: SpDataTableProps) {
   const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-
-  const filteredData = useMemo(() => {
-    return data.filter(sp => {
-      const searchMatch = !searchQuery || 
-        sp.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        sp.registrationNo.toLowerCase().includes(searchQuery.toLowerCase());
-      const statusMatch = statusFilter === "all" || sp.status === statusFilter;
-      return searchMatch && statusMatch;
-    });
-  }, [data, searchQuery, statusFilter]);
 
   const columns: Column<ServiceProvider>[] = [
     {
       header: "Service Provider",
+      accessorKey: "name",
+      sortable: true,
       headerClassName: "min-w-[220px]",
       render: (sp) => (
         <div className="flex flex-col">
@@ -43,6 +33,8 @@ export function SpDataTable({ data }: SpDataTableProps) {
     },
     {
       header: "Status",
+      accessorKey: "status",
+      sortable: true,
       render: (sp) => (
         <StatusBadge
           status={sp.status}
@@ -52,7 +44,6 @@ export function SpDataTable({ data }: SpDataTableProps) {
     },
     {
       header: "Service Categories",
-      headerClassName: "min-w-[180px]",
       render: (sp) => (
         <div className="flex items-center gap-1 overflow-hidden max-w-[200px]">
           {sp.serviceCategories.length === 0 ? (
@@ -86,6 +77,8 @@ export function SpDataTable({ data }: SpDataTableProps) {
     },
     {
       header: "Active Vouchers",
+      accessorKey: "activeVoucherCount",
+      sortable: true,
       align: "right",
       render: (sp) => (
         <span className="text-[13px] font-semibold text-foreground/80">{sp.activeVoucherCount}</span>
@@ -93,6 +86,8 @@ export function SpDataTable({ data }: SpDataTableProps) {
     },
     {
       header: "Branches",
+      accessorKey: "branches",
+      sortable: true,
       align: "right",
       render: (sp) => (
         <span className="text-[13px] font-medium text-muted-foreground">{sp.branches.length}</span>
@@ -108,6 +103,8 @@ export function SpDataTable({ data }: SpDataTableProps) {
     },
     {
       header: "Since",
+      accessorKey: "createdAt",
+      sortable: true,
       headerClassName: "text-right",
       align: "right",
       render: (sp) => (
@@ -139,26 +136,8 @@ export function SpDataTable({ data }: SpDataTableProps) {
   return (
     <TooltipProvider>
       <div className="space-y-4">
-        <DataFilterBar
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          searchPlaceholder="Search by name or registration number..."
-          filters={
-            <FilterItem
-              label="Status"
-              options={[
-                { label: "All Status", value: "all" },
-                { label: "Active", value: "active" },
-                { label: "Pending", value: "pending" },
-                { label: "Suspended", value: "suspended" },
-              ]}
-              value={statusFilter}
-              onChange={(v) => setStatusFilter(v)}
-            />
-          }
-        />
         <SharedDataTable
-          data={filteredData}
+          data={data}
           columns={columns}
           freezeFirst
           freezeLast

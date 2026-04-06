@@ -72,7 +72,7 @@ export default function ServiceProvidersPage() {
           <Button asChild className="h-9 text-[13px] font-medium shadow-sm">
             <Link href="/service-providers/new">
               <Plus size={16} weight="bold" className="mr-1.5" />
-              Add SP
+              Add Service Provider
             </Link>
           </Button>
         </div>

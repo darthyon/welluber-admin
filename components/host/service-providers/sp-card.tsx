@@ -4,11 +4,11 @@ import { Storefront, Ticket } from "@phosphor-icons/react";
 import type { ServiceProvider } from "@/types/provider";
 import { PulseStatus } from "@/components/shared/pulse-status";
 import { ActionPopover } from "@/components/shared/action-popover";
-import { Badge } from "@/components/ui/badge";
+import { OverflowTags } from "@/components/shared/overflow-tags";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 interface SpCardProps {
   sp: ServiceProvider;
@@ -66,39 +66,11 @@ export function SpCard({ sp }: SpCardProps) {
         <div className="relative z-10 space-y-4">
           <div className="space-y-2">
             <span className="text-[10px] font-semibold tracking-tight text-zinc-400">Service categories</span>
-            <div className="flex flex-wrap gap-1.5">
-              {sp.serviceCategories.length === 0 ? (
-                <span className="text-[11px] text-zinc-400 italic">None assigned</span>
-              ) : (
-                <>
-                  {sp.serviceCategories.slice(0, 3).map((cat, i) => (
-                    <Badge key={i} variant="secondary" className="text-[10px] font-medium bg-white border-zinc-200 text-zinc-600 px-2 py-0.5 h-5">
-                      {cat}
-                    </Badge>
-                  ))}
-                  {sp.serviceCategories.length > 3 && (
-                    <Tooltip delayDuration={0}>
-                      <TooltipTrigger asChild>
-                        <button
-                          onClick={(e) => e.stopPropagation()}
-                          className="text-[10px] text-zinc-500 hover:text-zinc-900 font-bold px-1.5 underline decoration-zinc-200 underline-offset-4 transition-colors"
-                        >
-                          +{sp.serviceCategories.length - 3} more
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent className="w-52 bg-white rounded-2xl border-zinc-200 shadow-2xl z-[200]" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex flex-col gap-1">
-                          <span className="text-[9px] font-semibold tracking-tight text-zinc-400 px-2 py-1 opacity-50">All categories</span>
-                          {sp.serviceCategories.slice(3).map((cat, i) => (
-                            <div key={i} className="text-[12px] px-2 py-1.5 hover:bg-zinc-50 rounded-lg text-zinc-700 font-medium">{cat}</div>
-                          ))}
-                        </div>
-                      </TooltipContent>
-                    </Tooltip>
-                  )}
-                </>
-              )}
-            </div>
+            {sp.serviceCategories.length === 0 ? (
+              <span className="text-[11px] text-zinc-400 italic">None assigned</span>
+            ) : (
+              <OverflowTags items={sp.serviceCategories} />
+            )}
           </div>
 
           {/* Active Vouchers */}
