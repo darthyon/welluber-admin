@@ -70,7 +70,7 @@ export function BrandDataTable({ data, onRemove }: BrandDataTableProps) {
         <ActionPopover
           actions={[
             { label: "View details", onClick: () => router.push(`/brands/${brand.id}`) },
-            { label: "Edit brand", onClick: () => console.log("edit brand", brand.id) },
+            { label: "Edit brand", onClick: () => router.push(`/brands/${brand.id}/edit`) },
             { label: "Actions", isSectionTitle: true },
             {
               label: brand.status === "inactive" ? "Activate Brand" : "Deactivate Brand",

@@ -56,6 +56,12 @@ export interface Organization {
     status: OrganizationStatus;
   };
   status: OrganizationStatus;
+  tinNumber: string;
+  bankAccountDetails: {
+    bankName: string;
+    accountNumber: string;
+    accountName: string;
+  };
   employeeCount: number;
   picId: string | null;
   utilizationRate: number; // 0 to 100

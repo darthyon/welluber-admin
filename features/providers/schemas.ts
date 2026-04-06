@@ -14,10 +14,20 @@ export const createSpSchema = z.object({
 
 export type CreateSpData = z.infer<typeof createSpSchema>;
 
+// ─── Shared Schemas ───────────────────────────────────────────────────────────
+
+const serviceLineSchema = z.object({
+  service: z.string().min(1, "Service is required"),
+  subServices: z.array(z.string()).min(1, "Select at least one sub-service"),
+  description: z.string().optional(),
+  descriptionList: z.string().optional(), // WYSIWYG list
+});
+
 // ─── SP Branch ────────────────────────────────────────────────────────────────
 
 const branchContactSchema = z.object({
   name: z.string().min(1, "Name is required"),
+  email: z.string().email("Enter a valid email address"),
   type: z.enum(["branch_manager", "staff", "reception"]),
   phone: z.string().min(1, "Phone is required"),
   isPublic: z.boolean().default(false),
@@ -41,7 +51,7 @@ const operatingHoursSchema = z.object({
 
 export const createBranchSchema = z.object({
   name: z.string().min(1, "Branch name is required"),
-  services: z.array(z.string()).min(1, "Select at least one service"),
+  services: z.array(serviceLineSchema).min(1, "Select at least one service"),
   address: z.object({
     line: z.string().min(1, "Address is required"),
     city: z.string().min(1, "City is required"),
@@ -54,26 +64,24 @@ export const createBranchSchema = z.object({
   contacts: z.array(branchContactSchema).min(1, "Add at least one contact"),
   isActive: z.boolean().default(true),
   operatingHours: operatingHoursSchema,
-  facilities: z.array(z.string()).default([]),
+  benefits: z.array(z.string()).default([]),
 });
 
 export type CreateBranchData = z.infer<typeof createBranchSchema>;
 
 // ─── SP Voucher ───────────────────────────────────────────────────────────────
 
-const serviceLineSchema = z.object({
-  service: z.string().min(1, "Service is required"),
-  subServices: z.array(z.string()).min(1, "Select at least one sub-service"),
-  description: z.string().optional(),
-  duration: z.object({
-    unit: z.enum(["session", "min", "hr", "day", "month", "year"]),
-    value: z.number().min(1, "Duration must be at least 1"),
-  }),
-});
-
 export const createVoucherSchema = z.object({
   name: z.string().min(1, "Voucher name is required"),
   description: z.string().optional(),
+  summary: z.string().optional(),
+  photos: z.array(z.string()).default([]),
+  bookingRequired: z.boolean().default(false),
+  displayLocation: z.object({
+    line: z.string().optional(),
+    city: z.string().optional(),
+    state: z.string().optional(),
+  }).optional(),
   serviceLines: z
     .array(serviceLineSchema)
     .min(1, "Add at least one service line"),
@@ -99,18 +107,32 @@ export type CreateVoucherData = z.infer<typeof createVoucherSchema>;
 
 // ─── Commission Schema ────────────────────────────────────────────────────────
 
-export const commissionSchemaRowSchema = z.object({
-  serviceCategory: z.string(),
-  commissionRate: z
+export const commissionTierSchema = z.object({
+  limit: z.number().min(0, "Limit must be 0 or more"), // e.g. 100 redemptions
+  rate: z
     .number()
-    .min(COMMISSION_RATE_MIN, `Min rate is ${COMMISSION_RATE_MIN * 100}%`)
-    .max(COMMISSION_RATE_MAX, `Max rate is ${COMMISSION_RATE_MAX * 100}%`),
-  expiredCommissionRate: z
-    .number()
-    .min(COMMISSION_RATE_MIN, `Min rate is ${COMMISSION_RATE_MIN * 100}%`)
-    .max(COMMISSION_RATE_MAX, `Max rate is ${COMMISSION_RATE_MAX * 100}%`),
-  effectiveFrom: z.string().optional(),
+    .min(0, "Rate must be 0 or more")
+    .max(1, "Rate cannot exceed 100%"), // 0.10 = 10%
 });
+
+export const commissionSchemaRowSchema = z
+  .object({
+    mainService: z.string(),
+    tiers: z.array(commissionTierSchema).min(1, "Add at least one tier"),
+    effectiveFrom: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      for (let i = 1; i < data.tiers.length; i++) {
+        if (data.tiers[i].limit <= data.tiers[i - 1].limit) return false;
+      }
+      return true;
+    },
+    {
+      message: "Each tier limit must be greater than the previous",
+      path: ["tiers"],
+    }
+  );
 
 export const commissionSchemaSchema = z.object({
   rows: z.array(commissionSchemaRowSchema),

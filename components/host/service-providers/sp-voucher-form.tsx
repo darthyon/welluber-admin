@@ -23,6 +23,8 @@ import {
   Stack
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
+import { inputCls } from "@/components/shared/styles";
+import { Switch } from "@/components/shared/switch";
 import { createVoucherSchema, CreateVoucherData } from "@/features/providers/schemas";
 import { createVoucher, updateVoucher, publishVoucher } from "@/features/providers/actions";
 import { Button } from "@/components/ui/button";
@@ -72,8 +74,12 @@ export function SpVoucherForm({
     defaultValues: {
       name: voucher?.name || "",
       description: voucher?.description || "",
-      serviceLines: voucher?.serviceLines || [
-        { service: "", subServices: [], description: "", duration: { unit: "session", value: 1 } }
+      summary: voucher?.summary || "",
+      bookingRequired: voucher?.bookingRequired || false,
+      displayLocation: voucher?.displayLocation || { line: "", city: "", state: "" },
+      photos: voucher?.photos || [],
+      serviceLines: (voucher?.serviceLines as any) || [
+        { service: "", subServices: [], description: "", descriptionList: "" }
       ],
       currency: voucher?.currency || "MYR",
       initialPrice: voucher?.initialPrice || 0,
@@ -88,6 +94,7 @@ export function SpVoucherForm({
       },
       branchScope: voucher?.branchScope || "all",
       branchIds: voucher?.branchIds || [],
+      membershipStartDay: voucher?.membershipStartDay || "none",
     },
   });
 
@@ -124,14 +131,6 @@ export function SpVoucherForm({
     }
     setIsPublishing(false);
   };
-
-  const inputCls = (hasError?: boolean) =>
-    cn(
-      "w-full px-3 py-2 bg-white border rounded-lg text-[14px] outline-none transition-all font-medium text-zinc-700",
-      hasError 
-        ? "border-rose-300 ring-2 ring-rose-50" 
-        : "border-zinc-200 focus:ring-2 focus:ring-primary/10 focus:border-primary/30 hover:border-zinc-300"
-    );
 
   const selectCls = () => cn(inputCls(), "appearance-none cursor-pointer bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236b7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1.25rem_1.25rem] bg-[right_0.5rem_center] bg-no-repeat pr-10");
 
@@ -241,13 +240,29 @@ export function SpVoucherForm({
                 {errors.name && <FieldError msg={errors.name.message} />}
               </div>
               <div className="space-y-1.5">
-                <label className="text-[11px] font-semibold text-zinc-400 tracking-tight">Description</label>
+                <label className="text-[11px] font-semibold text-zinc-400 tracking-tight">Summary</label>
+                <textarea 
+                  {...register("summary")} 
+                  rows={2} 
+                  className={cn(inputCls(), "resize-none")} 
+                  placeholder="Short catchy summary (max 120 chars)" 
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-semibold text-zinc-400 tracking-tight">Voucher description</label>
                 <textarea 
                   {...register("description")} 
-                  rows={3} 
+                  rows={4} 
                   className={cn(inputCls(), "resize-none")} 
-                  placeholder="What does this voucher cover?" 
+                  placeholder="Detailed breakdown of what's included..." 
                 />
+              </div>
+              <div className="flex items-center justify-between p-4 bg-primary/5 rounded-2xl border border-primary/10">
+                <div className="space-y-0.5">
+                  <p className="text-[14px] font-semibold text-zinc-900">Booking Required</p>
+                  <p className="text-[12px] text-zinc-500">Enable this if members must book a slot before redemption.</p>
+                </div>
+                <Switch checked={watch("bookingRequired")} onCheckedChange={(v) => setValue("bookingRequired", v)} />
               </div>
             </div>
           </DetailSection>
@@ -304,26 +319,16 @@ export function SpVoucherForm({
                         />
                       </div>
                       <div className="space-y-1.5 sm:col-span-2">
-                        <label className="text-[10px] font-semibold text-zinc-400 tracking-tight">Item description</label>
-                        <input 
-                          {...register(`serviceLines.${i}.description`)} 
-                          className={inputCls()} 
-                          placeholder="e.g. Unlimited drop-in sessions" 
+                        <label className="text-[10px] font-semibold text-zinc-400 tracking-tight">Voucher features (Description List)</label>
+                        <textarea 
+                          {...register(`serviceLines.${i}.descriptionList`)} 
+                          rows={3} 
+                          className={cn(inputCls(), "resize-none font-mono text-[13px]")} 
+                          placeholder="List features separated by lines, e.g.
+• Includes 5 sessions
+• Peak hours access
+• Valid at KL branches" 
                         />
-                      </div>
-                      <div className="space-y-1.5 sm:col-span-2">
-                        <label className="text-[10px] font-semibold text-zinc-400 tracking-tight">Package quantity</label>
-                        <div className="flex gap-2">
-                          <input 
-                            type="number" 
-                            min={1} 
-                            {...register(`serviceLines.${i}.duration.value`, { valueAsNumber: true })} 
-                            className={cn(inputCls(), "w-24 text-center font-mono")} 
-                          />
-                          <select {...register(`serviceLines.${i}.duration.unit`)} className={cn(selectCls(), "flex-1")}>
-                            {DURATION_UNITS.map((u) => <option key={u.value} value={u.value}>{u.label}</option>)}
-                          </select>
-                        </div>
                       </div>
                     </div>
                   </div>
@@ -333,7 +338,7 @@ export function SpVoucherForm({
                   type="button"
                   variant="outline"
                   className="w-full border-dashed border-zinc-200 h-12 text-zinc-400 hover:text-primary hover:border-primary/30 transition-all bg-white"
-                  onClick={() => appendLine({ service: "", subServices: [], description: "", duration: { unit: "session", value: 1 } })}
+                  onClick={() => appendLine({ service: "", subServices: [], description: "", descriptionList: "" })}
                 >
                   <Plus size={16} className="mr-2" /> Add Another Service Item
                 </Button>
@@ -440,19 +445,47 @@ export function SpVoucherForm({
         {/* Sidebar */}
         <div className="lg:col-span-4 space-y-8">
           <DetailSection 
-            title="Voucher Hero" 
-            icon={<Info size={18} weight="duotone" />}
-            description="Header image for marketplace listing"
+            title="Marketplace Display" 
+            icon={<MapPin size={18} weight="duotone" />}
+            description="How the voucher appears in listings"
           >
             <div className="p-1 space-y-4">
-              <div className="aspect-[16/10] bg-zinc-50 border-2 border-dashed border-zinc-200 rounded-2xl flex flex-col items-center justify-center gap-2 group hover:border-primary/30 transition-all cursor-pointer">
-                <div className="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-400 group-hover:bg-primary/5 group-hover:text-primary transition-colors">
-                  <Plus size={20} weight="bold" />
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-semibold text-zinc-400 uppercase">City</label>
+                  <input {...register("displayLocation.city")} className={inputCls()} placeholder="e.g. Kuala Lumpur" />
                 </div>
-                <div className="text-center">
-                  <p className="text-[13px] font-semibold text-zinc-900">Upload Header</p>
-                  <p className="text-[11px] text-zinc-400 mt-0.5">PNG, JPG up to 5MB</p>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-semibold text-zinc-400 uppercase">State</label>
+                  <input {...register("displayLocation.state")} className={inputCls()} placeholder="e.g. Selangor" />
                 </div>
+              </div>
+              
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-semibold text-zinc-400 uppercase tracking-tight">Header photos (URLs)</label>
+                <textarea 
+                  value={watch("photos").join("\n")}
+                  onChange={(e) => setValue("photos", e.target.value.split("\n").filter(Boolean))}
+                  rows={2} 
+                  className={cn(inputCls(), "resize-none text-[12px] font-mono")} 
+                  placeholder="Paste image URLs, one per line" 
+                />
+              </div>
+
+              <div className="aspect-[16/10] bg-zinc-50 border-2 border-dashed border-zinc-200 rounded-2xl flex flex-col items-center justify-center gap-2 group hover:border-primary/30 transition-all cursor-pointer overflow-hidden">
+                {watch("photos").length > 0 ? (
+                  <img src={watch("photos")[0]} className="w-full h-full object-cover" alt="Hero Preview" />
+                ) : (
+                  <>
+                    <div className="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-400 group-hover:bg-primary/5 group-hover:text-primary transition-colors">
+                      <Plus size={20} weight="bold" />
+                    </div>
+                    <div className="text-center">
+                      <p className="text-[13px] font-semibold text-zinc-900">Upload Header</p>
+                      <p className="text-[11px] text-zinc-400 mt-0.5">PNG, JPG up to 5MB</p>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </DetailSection>

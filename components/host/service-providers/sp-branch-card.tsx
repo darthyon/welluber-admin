@@ -73,7 +73,7 @@ export function SpBranchCard({ branch, onView, onEdit }: SpBranchCardProps) {
       <div className="flex flex-wrap gap-1.5 mb-6 relative z-10">
         {branch.services.slice(0, 3).map((s, i) => (
           <Badge key={i} variant="secondary" className="text-[10px] font-medium bg-muted/50 border-border/40 text-muted-foreground px-2 h-5">
-            {s}
+            {s.service}
           </Badge>
         ))}
         {branch.services.length > 3 && (

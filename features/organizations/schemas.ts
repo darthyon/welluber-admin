@@ -22,6 +22,12 @@ export const createOrganizationSchema = z.object({
     endDate: z.date().optional(),
     status: z.enum(["active", "pending", "suspended", "on_hold"]).default("pending"),
   }),
+  tinNumber: z.string().min(4, "TIN Number is required"),
+  bankAccountDetails: z.object({
+    bankName: z.string().min(2, "Bank name is required"),
+    accountNumber: z.string().min(8, "Account number is required"),
+    accountName: z.string().min(2, "Account name is required"),
+  }),
 });
 
 export type CreateOrganizationData = z.infer<typeof createOrganizationSchema>;

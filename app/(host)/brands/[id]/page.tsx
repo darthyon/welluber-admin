@@ -42,7 +42,7 @@ export default function BrandDetailPage() {
       <BrandDetailView
         brand={brand}
         onBack={() => router.push("/brands")}
-        onEdit={(id) => console.log("edit brand", id)}
+        onEdit={(id) => router.push(`/brands/${id}/edit`)}
         onRemove={() => setRemovingBrand(brand)}
       />
 

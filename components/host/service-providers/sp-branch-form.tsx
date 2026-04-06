@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CaretLeft, Building, MapPin, Clock, Tag, Users, Plus, Trash, WarningCircle, CheckCircle } from "@phosphor-icons/react";
+import { CaretLeft, Building, MapPin, Clock, Tag, Users, Plus, Trash, WarningCircle, CheckCircle, PaperPlaneTilt } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { createBranchSchema, CreateBranchData } from "@/features/providers/schemas";
 import { createBranch, updateBranch } from "@/features/providers/actions";
@@ -12,93 +12,83 @@ import { Switch } from "@/components/shared/switch";
 import { DetailSection } from "@/components/shared/detail-section";
 import { TwoColumnDetailLayout } from "@/components/shared/two-column-detail-layout";
 import { BRANCH_CONTACT_TYPES, OPERATING_DAYS, DEFAULT_OPERATING_HOURS } from "@/features/providers/constants";
-import { buildBranchServiceTaxonomy } from "@/features/providers/service-taxonomy";
+import { buildBranchServiceCatalog } from "@/features/providers/service-taxonomy";
 import { SuccessCelebration } from "@/components/shared/success-celebration";
 import { LocationPicker } from "@/components/shared/location-picker";
-import type { SpBranch } from "@/types/provider";
+import type { SpBranch, ServiceLine, CommissionSchemaRow } from "@/types/provider";
 
 interface SpBranchFormProps {
   spId: string;
-  serviceCategories: string[]; // SP-level categories to constrain branch service options
+  serviceCategories: string[]; // SP-level categories for grouping
+  portfolio: CommissionSchemaRow[]; // The defined service portfolio
   branch?: SpBranch; // if editing
   onSuccess: () => void;
   onCancel: () => void;
 }
 
-export function SpBranchForm({ spId, serviceCategories, branch, onSuccess, onCancel }: SpBranchFormProps) {
+export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuccess, onCancel }: SpBranchFormProps) {
   const isEditing = !!branch;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [selectedServices, setSelectedServices] = useState<string[]>(branch?.services ?? []);
   const [customServiceInputs, setCustomServiceInputs] = useState<Record<string, string>>({});
 
   const { register, handleSubmit, control, setValue, watch, formState: { errors } } = useForm<CreateBranchData>({
     resolver: zodResolver(createBranchSchema as any),
     defaultValues: {
       name: branch?.name ?? "",
-      services: branch?.services ?? [],
+      services: (branch?.services as any) ?? [],
       address: branch?.address ?? { line: "", city: "", state: "", country: "Malaysia", postalCode: "" },
       contacts: branch?.contacts ?? [{ name: "", type: "branch_manager", phone: "", isPublic: false }],
       isActive: branch?.isActive ?? true,
       operatingHours: branch?.operatingHours ?? DEFAULT_OPERATING_HOURS,
-      facilities: branch?.facilities ?? [],
+      benefits: (branch as any)?.benefits ?? (branch as any)?.facilities ?? [],
     },
   });
+
+  const selectedServices = watch("services") || [];
 
   const { fields: contactFields, append: appendContact, remove: removeContact } = useFieldArray({
     control,
     name: "contacts",
   });
 
-  const [facilityInput, setFacilityInput] = useState("");
-  const [facilities, setFacilities] = useState<string[]>(branch?.facilities ?? []);
+  const [benefitInput, setBenefitInput] = useState("");
+  const [benefits, setBenefits] = useState<string[]>((branch as any)?.benefits ?? (branch as any)?.facilities ?? []);
 
-  const addFacility = () => {
-    const val = facilityInput.trim();
-    if (val && !facilities.includes(val)) {
-      const updated = [...facilities, val];
-      setFacilities(updated);
-      setValue("facilities", updated);
+  const addBenefit = () => {
+    const val = benefitInput.trim();
+    if (val && !benefits.includes(val)) {
+      const updated = [...benefits, val];
+      setBenefits(updated);
+      setValue("benefits", updated);
     }
-    setFacilityInput("");
+    setBenefitInput("");
   };
 
-  const removeFacility = (i: number) => {
-    const updated = facilities.filter((_, idx) => idx !== i);
-    setFacilities(updated);
-    setValue("facilities", updated);
+  const removeBenefit = (i: number) => {
+    const updated = benefits.filter((_, idx) => idx !== i);
+    setBenefits(updated);
+    setValue("benefits", updated);
   };
 
-  const handleServicesChange = (svcs: string[]) => {
-    setSelectedServices(svcs);
-    setValue("services", svcs);
-  };
-
-  const serviceTaxonomy = buildBranchServiceTaxonomy(serviceCategories);
-
-  const toggleService = (service: string) => {
-    const next = selectedServices.includes(service)
-      ? selectedServices.filter((item) => item !== service)
-      : [...selectedServices, service];
-    handleServicesChange(next);
-  };
-
-  const addCustomService = (category: string) => {
-    const raw = customServiceInputs[category]?.trim();
-    if (!raw) return;
-
-    const next = selectedServices.includes(raw) ? selectedServices : [...selectedServices, raw];
-    handleServicesChange(next);
-    setCustomServiceInputs((prev) => ({ ...prev, [category]: "" }));
-  };
+  const serviceCatalog = useMemo(() => {
+    const fullCatalog = buildBranchServiceCatalog(serviceCategories);
+    const portfolioServiceNames = portfolio.map((r) => r.mainService);
+    
+    // Filter the catalog to only include Main Services in the portfolio
+    return fullCatalog.map(category => ({
+      ...category,
+      services: category.services.filter(s => portfolioServiceNames.includes(s.name))
+    })).filter(category => category.services.length > 0);
+  }, [serviceCategories, portfolio]);
 
   const onSubmit = async (data: CreateBranchData) => {
     setIsSubmitting(true);
     try {
-      const payload = { ...data, services: selectedServices, facilities };
+      const payload = { ...data, benefits };
       const res = isEditing
-        ? await updateBranch(spId, branch!.id, payload)
-        : await createBranch(spId, payload);
+        ? await updateBranch(spId, branch!.id, payload as any)
+        : await createBranch(spId, payload as any);
       if (res.success) {
         setIsSuccess(true);
         setTimeout(onSuccess, 1800);
@@ -251,85 +241,127 @@ export function SpBranchForm({ spId, serviceCategories, branch, onSuccess, onCan
           <DetailSection
             title="Services at this Branch"
             icon={<Tag size={16} weight="fill" />}
-            description="Choose from the master service list allowed by the provider's account categories."
+            description="Select the services offered at this location and manage specific sub-types."
           >
-            <div className="space-y-4">
-              <div className="flex flex-wrap gap-2">
-                {selectedServices.map((service) => (
-                  <span
-                    key={service}
-                    className="inline-flex items-center gap-1.5 text-[12px] px-2.5 py-1 bg-muted border border-border rounded-lg font-medium"
-                  >
-                    {service}
-                    <button
-                      type="button"
-                      onClick={() => toggleService(service)}
-                      className="text-muted-foreground hover:text-destructive transition-colors"
-                    >
-                      <Trash size={11} />
-                    </button>
-                  </span>
-                ))}
-              </div>
-
-              <div className="space-y-3">
-                {serviceTaxonomy.map((group) => (
-                  <div key={group.category} className="rounded-xl border border-border bg-muted/20 p-4 space-y-3">
-                    <div className="flex items-center justify-between gap-3">
-                      <div>
-                        <h4 className="text-[13px] font-semibold text-foreground">{group.category}</h4>
-                        <p className="text-[11px] text-muted-foreground">Masterlist services for this provider category.</p>
-                      </div>
-                      <span className="text-[10px] font-medium text-muted-foreground/60 tracking-tight">
-                        {group.services.length} options
+            <div className="space-y-6">
+              <div className="space-y-8">
+                {(serviceCatalog as any[]).map((group: any) => (
+                  <div key={group.category} className="space-y-3">
+                    <div className="flex items-center justify-between px-1">
+                      <h4 className="text-[12px] font-bold text-muted-foreground uppercase tracking-wider">{group.category}</h4>
+                      <span className="text-[10px] font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+                        {group.services.filter((s: any) => selectedServices.some(ls => ls.service === s.name)).length} Main Services
                       </span>
                     </div>
 
-                    <div className="flex flex-wrap gap-2">
-                      {group.services.map((service) => {
-                        const isSelected = selectedServices.includes(service);
+                    <div className="space-y-1 border-t border-border/40 pt-1">
+                      {group.services.map((service: any) => {
+                        const line = selectedServices.find(ls => ls.service === service.name);
+                        const isSelected = !!line;
+
                         return (
-                          <button
-                            key={service}
-                            type="button"
-                            onClick={() => toggleService(service)}
-                            className={cn(
-                              "px-3 py-1.5 rounded-lg border text-[12px] font-medium transition-colors",
-                              isSelected
-                                ? "bg-primary/10 border-primary/30 text-primary"
-                                : "bg-card border-border text-muted-foreground hover:text-foreground hover:border-primary/20"
+                          <div key={service.name} className={cn(
+                            "group p-4 rounded-2xl border transition-all duration-200",
+                            isSelected ? "bg-primary/[0.02] border-primary/20" : "bg-transparent border-transparent hover:bg-muted/30"
+                          )}>
+                            <div className="flex items-center justify-between gap-4">
+                              <div className="flex items-center gap-3">
+                                <Switch 
+                                  checked={isSelected} 
+                                  onCheckedChange={() => {
+                                    if (isSelected) {
+                                      setValue("services", selectedServices.filter(ls => ls.service !== service.name));
+                                    } else {
+                                      setValue("services", [...selectedServices, { service: service.name, subServices: service.subServices }]);
+                                    }
+                                  }} 
+                                />
+                                <span className={cn(
+                                  "text-[14px] font-semibold",
+                                  isSelected ? "text-foreground" : "text-muted-foreground"
+                                )}>
+                                  {service.name}
+                                </span>
+                              </div>
+                            </div>
+
+                            {isSelected && (
+                              <div className="mt-4 pl-11 space-y-3 animate-in slide-in-from-top-2 duration-200">
+                                <div className="flex flex-wrap gap-2">
+                                  {line.subServices.map((sub: string) => {
+                                    const isMasterlist = service.subServices.includes(sub);
+                                    return (
+                                      <span 
+                                        key={sub} 
+                                        className={cn(
+                                          "inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-lg font-medium border transition-colors",
+                                          isMasterlist 
+                                            ? "bg-muted/50 text-muted-foreground border-border" 
+                                            : "bg-primary/5 text-primary border-primary/20"
+                                        )}
+                                      >
+                                        {sub}
+                                        {!isMasterlist && (
+                                          <button 
+                                            type="button" 
+                                            onClick={() => {
+                                              const newSubServices = line.subServices.filter(s => s !== sub);
+                                              setValue("services", selectedServices.map(ls => 
+                                                ls.service === service.name ? { ...ls, subServices: newSubServices } : ls
+                                              ));
+                                            }}
+                                            className="hover:text-destructive"
+                                          >
+                                            <Trash size={11} />
+                                          </button>
+                                        )}
+                                      </span>
+                                    );
+                                  })}
+                                </div>
+
+                                <div className="flex gap-2 max-w-md mt-2">
+                                  <input
+                                    value={customServiceInputs[service.name] ?? ""}
+                                    onChange={(e) => setCustomServiceInputs(prev => ({ ...prev, [service.name]: e.target.value }))}
+                                    onKeyDown={(e) => {
+                                      if (e.key === "Enter") {
+                                        e.preventDefault();
+                                        const val = customServiceInputs[service.name]?.trim();
+                                        if (val && !line.subServices.includes(val)) {
+                                          setValue("services", selectedServices.map(ls => 
+                                            ls.service === service.name ? { ...ls, subServices: [...ls.subServices, val] } : ls
+                                          ));
+                                          setCustomServiceInputs(prev => ({ ...prev, [service.name]: "" }));
+                                        }
+                                      }
+                                    }}
+                                    className={cn(inputCls(), "h-8 text-[12px]")}
+                                    placeholder={`Add custom ${service.name} sub-service...`}
+                                  />
+                                  <Button 
+                                    type="button" 
+                                    variant="outline" 
+                                    size="sm" 
+                                    className="h-8 w-8 p-0 shrink-0"
+                                    onClick={() => {
+                                      const val = customServiceInputs[service.name]?.trim();
+                                      if (val && !line.subServices.includes(val)) {
+                                        setValue("services", selectedServices.map(ls => 
+                                          ls.service === service.name ? { ...ls, subServices: [...ls.subServices, val] } : ls
+                                        ));
+                                        setCustomServiceInputs(prev => ({ ...prev, [service.name]: "" }));
+                                      }
+                                    }}
+                                  >
+                                    <Plus size={14} />
+                                  </Button>
+                                </div>
+                              </div>
                             )}
-                          >
-                            {service}
-                          </button>
+                          </div>
                         );
                       })}
-                    </div>
-
-                    <div className="flex gap-2">
-                      <input
-                        value={customServiceInputs[group.category] ?? ""}
-                        onChange={(e) =>
-                          setCustomServiceInputs((prev) => ({ ...prev, [group.category]: e.target.value }))
-                        }
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            e.preventDefault();
-                            addCustomService(group.category);
-                          }
-                        }}
-                        className={cn(inputCls(), "flex-1")}
-                        placeholder="Add custom subservice..."
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="shrink-0 h-10"
-                        onClick={() => addCustomService(group.category)}
-                      >
-                        <Plus size={14} />
-                      </Button>
                     </div>
                   </div>
                 ))}
@@ -367,7 +399,7 @@ export function SpBranchForm({ spId, serviceCategories, branch, onSuccess, onCan
                 variant="ghost"
                 size="sm"
                 className="h-8 text-[12px] gap-1"
-                onClick={() => appendContact({ name: "", type: "staff", phone: "", isPublic: false })}
+                onClick={() => appendContact({ name: "", email: "", type: "staff", phone: "", isPublic: false })}
               >
                 <Plus size={13} /> Add Administrator
               </Button>
@@ -375,10 +407,14 @@ export function SpBranchForm({ spId, serviceCategories, branch, onSuccess, onCan
           >
             <div className="space-y-3">
               {contactFields.map((field, i) => (
-                <div key={field.id} className="grid grid-cols-1 md:grid-cols-[1fr_140px_1fr_auto_auto] gap-3 items-end bg-muted/20 rounded-xl p-3 border border-border/50">
+                <div key={field.id} className="grid grid-cols-1 md:grid-cols-[1.2fr_1.5fr_140px_130px_auto_auto_auto] gap-3 items-end bg-muted/20 rounded-xl p-3 border border-border/50">
                   <div className="space-y-1">
                     <label className="text-[11px] font-medium text-muted-foreground">Name</label>
-                    <input {...register(`contacts.${i}.name`)} className={inputCls(!!(errors.contacts as any)?.[i]?.name)} placeholder="Administrator name" />
+                    <input {...register(`contacts.${i}.name`)} className={inputCls(!!(errors.contacts as any)?.[i]?.name)} placeholder="Full name" />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-medium text-muted-foreground">Corporate Email</label>
+                    <input type="email" {...register(`contacts.${i}.email`)} className={inputCls(!!(errors.contacts as any)?.[i]?.email)} placeholder="name@company.com" />
                   </div>
                   <div className="space-y-1">
                     <label className="text-[11px] font-medium text-muted-foreground">Role</label>
@@ -394,12 +430,26 @@ export function SpBranchForm({ spId, serviceCategories, branch, onSuccess, onCan
                   </div>
                   <div className="space-y-1 text-center">
                     <label className="text-[11px] font-medium text-muted-foreground block">Public</label>
-                    <Switch checked={watch(`contacts.${i}.isPublic`)} onCheckedChange={(v) => setValue(`contacts.${i}.isPublic`, v)} />
+                    <div className="flex items-center justify-center h-10">
+                      <Switch checked={watch(`contacts.${i}.isPublic`)} onCheckedChange={(v) => setValue(`contacts.${i}.isPublic`, v)} />
+                    </div>
+                  </div>
+                  <div className="pb-1">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      size="sm" 
+                      className="h-10 px-3 gap-2 text-[12px]"
+                      onClick={() => console.log("Invite sent to", watch(`contacts.${i}.email`))}
+                    >
+                      <PaperPlaneTilt size={14} />
+                      Invite
+                    </Button>
                   </div>
                   <button
                     type="button"
                     onClick={() => removeContact(i)}
-                    className="text-muted-foreground hover:text-destructive transition-colors pb-1.5 justify-self-end"
+                    className="text-muted-foreground hover:text-destructive transition-colors h-10 flex items-center justify-center px-1"
                   >
                     <Trash size={15} />
                   </button>
@@ -441,34 +491,34 @@ export function SpBranchForm({ spId, serviceCategories, branch, onSuccess, onCan
           </DetailSection>
 
           <DetailSection
-            title="Facilities"
+            title="Benefits"
             icon={<CheckCircle size={16} weight="fill" />}
-            description="Optional amenities available at this branch."
+            description="Optional amenities and benefits available at this branch."
           >
             <div className="space-y-4">
               <div className="flex gap-2">
                 <input
-                  value={facilityInput}
-                  onChange={(e) => setFacilityInput(e.target.value)}
+                  value={benefitInput}
+                  onChange={(e) => setBenefitInput(e.target.value)}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       e.preventDefault();
-                      addFacility();
+                      addBenefit();
                     }
                   }}
                   className={inputCls()}
                   placeholder="e.g. Free WiFi"
                 />
-                <Button type="button" variant="outline" size="sm" className="shrink-0 h-10" onClick={addFacility}>
+                <Button type="button" variant="outline" size="sm" className="shrink-0 h-10" onClick={addBenefit}>
                   <Plus size={14} />
                 </Button>
               </div>
-              {facilities.length > 0 && (
+              {benefits.length > 0 && (
                 <div className="flex flex-wrap gap-2">
-                  {facilities.map((f, i) => (
+                  {benefits.map((f, i) => (
                     <span key={i} className="inline-flex items-center gap-1.5 text-[12px] px-2.5 py-1 bg-muted border border-border rounded-lg font-medium">
                       {f}
-                      <button type="button" onClick={() => removeFacility(i)} className="text-muted-foreground hover:text-destructive transition-colors">
+                      <button type="button" onClick={() => removeBenefit(i)} className="text-muted-foreground hover:text-destructive transition-colors">
                         <Trash size={11} />
                       </button>
                     </span>

@@ -245,6 +245,86 @@ export default function EditOrganizationPage() {
                 </div>
               </div>
             </div>
+            
+            {/* Section: Tax & Banking Details */}
+            <div className="p-6 space-y-6 pt-0">
+              <div className="flex items-center gap-2 pb-2">
+                <div className="w-8 h-8 rounded-full bg-violet-500/10 flex items-center justify-center text-violet-500">
+                  <Article size={16} weight="fill" />
+                </div>
+                <h3 className="text-[15px] font-semibold text-foreground">Tax & Banking Details</h3>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div className="space-y-1.5 sm:col-span-2">
+                  <label className="text-[13px] font-medium text-foreground">TIN No.</label>
+                  <input 
+                    {...register("tinNumber")}
+                    className={cn(
+                      "w-full px-3 py-2 bg-background border rounded-md text-[14px] outline-none transition-colors",
+                      errors.tinNumber ? "border-destructive focus:border-destructive" : "border-border focus:border-foreground/30 focus:bg-muted/30"
+                    )}
+                    placeholder="e.g. TR-882910-01"
+                  />
+                  {errors.tinNumber && (
+                    <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
+                      <WarningCircle size={12} /> {errors.tinNumber.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-1.5 sm:col-span-2">
+                  <label className="text-[13px] font-medium text-foreground">Bank Name</label>
+                  <input 
+                    {...register("bankAccountDetails.bankName")}
+                    className={cn(
+                      "w-full px-3 py-2 bg-background border rounded-md text-[14px] outline-none transition-colors",
+                      errors.bankAccountDetails?.bankName ? "border-destructive focus:border-destructive" : "border-border focus:border-foreground/30 focus:bg-muted/30"
+                    )}
+                    placeholder="e.g. Maybank Berhad"
+                  />
+                  {errors.bankAccountDetails?.bankName && (
+                    <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
+                      <WarningCircle size={12} /> {errors.bankAccountDetails.bankName.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[13px] font-medium text-foreground">Account Number</label>
+                  <input 
+                    {...register("bankAccountDetails.accountNumber")}
+                    className={cn(
+                      "w-full px-3 py-2 bg-background border rounded-md text-[14px] outline-none transition-colors",
+                      errors.bankAccountDetails?.accountNumber ? "border-destructive focus:border-destructive" : "border-border focus:border-foreground/30 focus:bg-muted/30"
+                    )}
+                    placeholder="e.g. 5140 1234 5678"
+                  />
+                  {errors.bankAccountDetails?.accountNumber && (
+                    <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
+                      <WarningCircle size={12} /> {errors.bankAccountDetails.accountNumber.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[13px] font-medium text-foreground">Account Name</label>
+                  <input 
+                    {...register("bankAccountDetails.accountName")}
+                    className={cn(
+                      "w-full px-3 py-2 bg-background border rounded-md text-[14px] outline-none transition-colors",
+                      errors.bankAccountDetails?.accountName ? "border-destructive focus:border-destructive" : "border-border focus:border-foreground/30 focus:bg-muted/30"
+                    )}
+                    placeholder="e.g. Acme Corporation Sdn Bhd"
+                  />
+                  {errors.bankAccountDetails?.accountName && (
+                    <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
+                      <WarningCircle size={12} /> {errors.bankAccountDetails.accountName.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
 
             {/* Form Footer */}
             <div className="p-6 border-t border-border bg-muted/10 flex items-center justify-end gap-3">

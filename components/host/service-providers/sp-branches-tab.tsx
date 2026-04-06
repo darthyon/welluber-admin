@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Plus, GitBranch } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -34,7 +34,7 @@ export function SpBranchesTab({ sp }: SpBranchesTabProps) {
   const selectedBranch = sp.branches.find((b) => b.id === selectedBranchId);
   const filteredBranches = sp.branches.filter((branch) => {
     const matchesSearch =
-      [branch.name, branch.address.city, branch.address.state, branch.services.join(" ")]
+      [branch.name, branch.address.city, branch.address.state, branch.services.map(s => s.service).join(" ")]
         .join(" ")
         .toLowerCase()
         .includes(branchSearch.toLowerCase());
@@ -83,6 +83,7 @@ export function SpBranchesTab({ sp }: SpBranchesTabProps) {
         <SpBranchForm
           spId={sp.id}
           serviceCategories={sp.serviceCategories}
+          portfolio={sp.commissionSchema}
           branch={view === "edit" ? selectedBranch : undefined}
           onSuccess={handleBack}
           onCancel={handleBack}
@@ -200,8 +201,8 @@ export function SpBranchesTab({ sp }: SpBranchesTabProps) {
                     <td className="p-4">
                       <div className="flex flex-wrap gap-1.5">
                         {branch.services.slice(0, 2).map((service) => (
-                          <span key={service} className="inline-flex items-center px-2 py-0.5 rounded-full bg-muted text-[11px] font-medium text-muted-foreground border border-border">
-                            {service}
+                          <span key={service.service} className="inline-flex items-center px-2 py-0.5 rounded-full bg-muted text-[11px] font-medium text-muted-foreground border border-border">
+                            {service.service}
                           </span>
                         ))}
                         {branch.services.length > 2 && (

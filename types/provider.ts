@@ -22,11 +22,15 @@ export interface TaxProfile {
 
 // ─── Commission Schema ────────────────────────────────────────────────────────
 
+export interface CommissionTier {
+  limit: number;
+  rate: number;
+}
+
 export interface CommissionSchemaRow {
-  serviceCategory: string;
-  commissionRate: number;        // 0.10–0.30
-  expiredCommissionRate: number; // 0.10–0.30
-  effectiveFrom?: ISODate;       // if future-dated
+  mainService: string;
+  tiers: CommissionTier[];
+  effectiveFrom?: ISODate;
   lastUpdated?: ISODate;
 }
 
@@ -45,6 +49,7 @@ export interface SpAdmin {
 
 export interface SpBranchContact {
   name: string;
+  email: string;
   type: SpBranchContactType;
   phone: string;
   isPublic: boolean;
@@ -70,7 +75,7 @@ export interface SpBranch {
   id: string;
   spId: string;
   name: string;
-  services: string[]; // subset of SP's serviceCategories
+  services: ServiceLine[]; // hierarchical services
   address: {
     line: string;
     city: string;
@@ -83,7 +88,7 @@ export interface SpBranch {
   contacts: SpBranchContact[];
   isActive: boolean;
   operatingHours: OperatingHours;
-  facilities: string[];
+  benefits: string[];
   rating?: number; // Phase 2
 }
 
@@ -92,11 +97,8 @@ export interface SpBranch {
 export interface ServiceLine {
   service: string;
   subServices: string[];
-  description: string;
-  duration: {
-    unit: DurationUnit;
-    value: number;
-  };
+  description?: string;
+  descriptionList?: string; // WYSIWYG rich content
 }
 
 export interface RedemptionPeriod {
@@ -114,6 +116,14 @@ export interface SpVoucher {
   code: string; // PAC{SPID}NNNN
   name: string;
   description: string;
+  summary?: string;
+  photos: string[];
+  bookingRequired: boolean;
+  displayLocation?: {
+    line?: string;
+    city?: string;
+    state?: string;
+  };
   serviceLines: ServiceLine[];
   status: SpVoucherStatus;
   isActive: boolean;
@@ -124,7 +134,7 @@ export interface SpVoucher {
   currency: string; // "MYR" for v1; dropdown-selectable
   initialPrice: number;
   finalPrice: number; // integer, rounded per standard rounding
-  validationDuration: {
+  validationDuration?: {
     unit: ValidationUnit;
     value: number;
     startDate?: ISODate;

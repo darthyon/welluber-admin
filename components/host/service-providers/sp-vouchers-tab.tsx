@@ -143,7 +143,12 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
                   </div>
 
                   <p className="text-[12px] text-muted-foreground leading-relaxed line-clamp-2">
-                    {voucher.description || "—"}
+                    {voucher.summary || voucher.description || "—"}
+                    {voucher.bookingRequired && (
+                      <span className="ml-2 inline-flex items-center gap-1 text-[10px] font-bold text-primary/70 uppercase tracking-tighter bg-primary/5 px-1.5 py-0.5 rounded border border-primary/10">
+                        Booking Required
+                      </span>
+                    )}
                   </p>
 
                   <div className="text-[11px] text-muted-foreground space-y-0.5">

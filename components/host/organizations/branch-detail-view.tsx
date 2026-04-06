@@ -12,6 +12,7 @@ import {
   CurrencyCircleDollar, 
   TreeStructure,
   Clock,
+  ClockCounterClockwise,
   DotsThreeVertical,
   PencilSimpleLine
 } from "@phosphor-icons/react";
@@ -26,6 +27,8 @@ import { BackButton } from "@/components/shared/back-button";
 import { EntityHeader } from "@/components/shared/entity-header";
 import { TwoColumnDetailLayout } from "@/components/shared/two-column-detail-layout";
 import { cn } from "@/lib/utils";
+import { ManualTopUpModal } from "./manual-topup-modal";
+import { TopUpHistoryModal } from "./topup-history-modal";
 
 interface BranchDetailViewProps {
   branchId: string;
@@ -37,6 +40,8 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
   const [walletType, setWalletType] = useState<"independent" | "shared">("independent");
 
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [isTopUpModalOpen, setIsTopUpModalOpen] = useState(false);
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   
   // Mock Branch Data
   const branchData = {
@@ -278,24 +283,45 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
                   </div>
                   
                   <div className="text-right">
-                    <p className="text-[11px] font-semibold tracking-tight text-zinc-400 mb-1">Available balance</p>
-                    <p className="text-2xl font-bold text-foreground">RM 45,000.00</p>
+                    <p className="text-[11px] font-semibold tracking-tight text-zinc-400 mb-1 uppercase">Available balance</p>
+                    <p className="text-2xl font-bold text-foreground tracking-tight">RM 45,000.00</p>
+                    
+                    <div className="flex items-center justify-end gap-2 mt-3">
+                      <Button 
+                        variant="secondary" 
+                        size="sm" 
+                        onClick={() => setIsHistoryModalOpen(true)}
+                        className="h-8 text-[11px] font-semibold rounded-full gap-1.5 px-3 border-zinc-200 hover:bg-zinc-100 transition-all shadow-sm"
+                      >
+                        <ClockCounterClockwise size={14} weight="bold" />
+                        History
+                      </Button>
+                      <Button 
+                        variant="default" 
+                        size="sm" 
+                        onClick={() => setIsTopUpModalOpen(true)}
+                        className="h-8 text-[11px] font-semibold rounded-full gap-1.5 px-3 bg-indigo-600 hover:bg-indigo-700 transition-all shadow-sm"
+                      >
+                        <Plus size={14} weight="bold" />
+                        Top-Up
+                      </Button>
+                    </div>
                   </div>
                 </div>
 
                 <div className="pt-6 border-t border-zinc-200/60 grid grid-cols-2 lg:grid-cols-3 gap-6">
                   <DetailField 
                     label="Wallet ID" 
-                    value={<span className="font-mono text-[11px] bg-white px-1.5 py-0.5 rounded border border-zinc-200">WAL-BR01-2026</span>} 
+                    value={<span className="font-mono text-[11px] bg-white px-1.5 py-0.5 rounded border border-zinc-200 tracking-tight">WAL-BR01-2026</span>} 
                   />
                   <DetailField 
                     label="Utilization" 
-                    value={<span className="text-[14px] font-semibold text-zinc-700">68% <span className="text-[11px] font-normal text-muted-foreground ml-1">(RM 30,600 spent)</span></span>} 
+                    value={<span className="text-[14px] font-semibold text-zinc-700 tracking-tight">68% <span className="text-[11px] font-normal text-muted-foreground ml-1">(RM 30,600 spent)</span></span>} 
                   />
                   {walletType === "shared" && (
                     <DetailField 
                       label="Source Pool" 
-                      value={<span className="text-[13px] font-medium text-primary">Corporate Master HQ Wallet</span>} 
+                      value={<span className="text-[13px] font-medium text-primary tracking-tight">Corporate Master HQ Wallet</span>} 
                       className="md:col-span-1"
                     />
                   )}
@@ -304,6 +330,23 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
             </div>
         </DetailSection>
       </TwoColumnDetailLayout>
+
+      {/* Manual Top-Up Modal */}
+      <ManualTopUpModal 
+        isOpen={isTopUpModalOpen}
+        onClose={() => setIsTopUpModalOpen(false)}
+        orgName="Acme Corporation Sdn Bhd"
+        branchName={branchData.name}
+        walletId="WAL-BR01-2026"
+      />
+
+      {/* Top-Up History Modal */}
+      <TopUpHistoryModal 
+        isOpen={isHistoryModalOpen}
+        onClose={() => setIsHistoryModalOpen(false)}
+        branchId={branchId}
+        branchName={branchData.name}
+      />
     </div>
   );
 }

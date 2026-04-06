@@ -359,6 +359,20 @@ export default function OrganizationDetailPage() {
               </div>
             </DetailSection>
 
+            {/* Tax & Banking Details */}
+            <DetailSection 
+              title="Tax & Banking" 
+              icon={<CreditCard size={18} weight="duotone" />}
+              description="Financial reporting and settlement identifiers"
+            >
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-8">
+                <DetailField label="TIN No." value="TR-882910-01" />
+                <DetailField label="Bank Name" value="Maybank Berhad" />
+                <DetailField label="Account Number" value="5140 1234 5678" />
+                <DetailField label="Account Name" value="Acme Corporation Sdn Bhd" />
+              </div>
+            </DetailSection>
+
             {/* Administrators */}
             <DetailSection 
               title="Administrators" 

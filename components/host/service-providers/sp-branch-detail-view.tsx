@@ -1,6 +1,6 @@
 "use client";
 
-import { CaretLeft, PencilSimpleLine, MapPin, Phone, Globe, Clock, Buildings, Users, TrendUp } from "@phosphor-icons/react";
+import { CaretLeft, PencilSimpleLine, MapPin, Phone, Globe, Clock, Buildings, Users, TrendUp, CheckCircle } from "@phosphor-icons/react";
 import { DetailSection } from "@/components/shared/detail-section";
 import { DetailField } from "@/components/shared/detail-field";
 import { Button } from "@/components/ui/button";
@@ -237,6 +237,19 @@ export function SpBranchDetailView({ branch, serviceCategories, onBack, onEdit }
             )}
           </div>
         </DetailSection>
+
+        {/* Benefits */}
+        {(branch.benefits?.length ?? 0) > 0 && (
+          <DetailSection title="Benefits" icon={<CheckCircle size={16} weight="fill" />}>
+            <div className="flex flex-wrap gap-2">
+              {branch.benefits?.map((benefit) => (
+                <Badge key={benefit} variant="secondary" className="text-[12px] px-3 py-1">
+                  {benefit}
+                </Badge>
+              ))}
+            </div>
+          </DetailSection>
+        )}
 
         {/* Operating Hours */}
         <DetailSection title="Operating Hours" icon={<Clock size={16} weight="fill" />}>

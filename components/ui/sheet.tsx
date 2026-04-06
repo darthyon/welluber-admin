@@ -12,7 +12,14 @@ interface SheetProps {
   description?: string;
   children: React.ReactNode;
   footer?: React.ReactNode;
+  size?: "md" | "lg" | "xl";
 }
+
+const sizeClasses = {
+  md: "sm:w-[440px]",
+  lg: "sm:w-[600px]",
+  xl: "sm:w-[800px]",
+};
 
 export function Sheet({ 
   isOpen, 
@@ -20,7 +27,8 @@ export function Sheet({
   title, 
   description, 
   children, 
-  footer 
+  footer,
+  size = "md"
 }: SheetProps) {
   return (
     <AnimatePresence>
@@ -41,7 +49,10 @@ export function Sheet({
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed inset-y-0 right-0 z-[150] w-full sm:w-[440px] bg-card border-l border-border shadow-2xl flex flex-col pt-0"
+            className={cn(
+              "fixed inset-y-0 right-0 z-[150] w-full bg-card border-l border-border shadow-2xl flex flex-col pt-0",
+              sizeClasses[size]
+            )}
           >
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-5 border-b border-border shrink-0">
