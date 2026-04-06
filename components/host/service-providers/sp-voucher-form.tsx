@@ -46,6 +46,7 @@ import { SearchableMultiSelect } from "@/components/shared/searchable-multi-sele
 import { CustomMultiSelect } from "@/components/shared/custom-multi-select";
 import { DatePickerField } from "@/components/shared/date-picker-field";
 import { LogoUpload } from "@/components/shared/logo-upload";
+import { ItemSection } from "@/components/shared/item-section";
 import type { SpVoucher } from "@/types/provider";
 
 interface SpVoucherFormProps {
@@ -279,28 +280,15 @@ export function SpVoucherForm({
 
               <div className="space-y-4">
                 {serviceLineFields.map((field, i) => (
-                  <div key={field.id} className="p-4 bg-zinc-50/50 rounded-2xl border border-zinc-200/60 space-y-4 animate-in fade-in slide-in-from-top-1 duration-300">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="w-5 h-5 rounded-full bg-zinc-200 flex items-center justify-center text-[10px] font-bold text-zinc-500">
-                          {i + 1}
-                        </span>
-                        <span className="text-[11px] font-semibold text-zinc-400 tracking-tight">Service line</span>
-                      </div>
-                      {serviceLineFields.length > 1 && (
-                        <button 
-                          type="button" 
-                          onClick={() => removeLine(i)} 
-                          className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-300 hover:text-rose-500 hover:bg-rose-50 transition-all"
-                        >
-                          <Trash size={18} />
-                        </button>
-                      )}
-                    </div>
-
+                  <ItemSection
+                    key={field.id}
+                    index={i + 1}
+                    label="Service Line Item"
+                    onRemove={serviceLineFields.length > 1 ? () => removeLine(i) : undefined}
+                  >
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-semibold text-zinc-400 tracking-tight">Service</label>
+                        <label className="text-[10px] font-semibold text-zinc-400 uppercase tracking-tight">Service</label>
                         <SectionedSearchSelect
                           taxonomy={SERVICE_TAXONOMY.filter(cat => spServiceCategories.includes(cat.category))}
                           value={watch(`serviceLines.${i}.service`)}
@@ -314,7 +302,7 @@ export function SpVoucherForm({
                         />
                       </div>
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-semibold text-zinc-400 tracking-tight">Sub-services</label>
+                        <label className="text-[10px] font-semibold text-zinc-400 uppercase tracking-tight">Sub-services</label>
                         <CustomMultiSelect
                           options={SERVICE_SPEC_TAXONOMY[watch(`serviceLines.${i}.service`)] || []}
                           selected={watch(`serviceLines.${i}.subServices`) || []}
@@ -324,11 +312,11 @@ export function SpVoucherForm({
                         />
                       </div>
                       <div className="space-y-1.5 sm:col-span-2">
-                        <label className="text-[10px] font-semibold text-zinc-400 tracking-tight">Voucher features (Description List)</label>
+                        <label className="text-[10px] font-semibold text-zinc-400 uppercase tracking-tight">Voucher features</label>
                         <textarea 
                           {...register(`serviceLines.${i}.descriptionList`)} 
                           rows={3} 
-                          className={cn(inputCls(), "resize-none font-mono text-[13px]")} 
+                          className={cn(inputCls(), "resize-none font-mono text-[13px] bg-white")} 
                           placeholder="List features separated by lines, e.g.
 • Includes 5 sessions
 • Peak hours access
@@ -337,17 +325,18 @@ export function SpVoucherForm({
                         />
                       </div>
                     </div>
-                  </div>
+                  </ItemSection>
                 ))}
 
                 {!isReadOnly && (
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full border-dashed border-zinc-200 h-12 text-zinc-400 hover:text-primary hover:border-primary/30 transition-all bg-white"
+                    className="w-full border-dashed border-zinc-200 h-14 text-zinc-500 hover:text-primary hover:border-primary/30 transition-all bg-white rounded-2xl font-bold shadow-sm"
                     onClick={() => appendLine({ service: "", subServices: [], description: "", descriptionList: "" })}
                   >
-                    <Plus size={16} className="mr-2" /> Add Another Service Item
+                    <Plus size={18} weight="bold" className="mr-2" /> 
+                    <span>Add Service Item</span>
                   </Button>
                 )}
               </div>

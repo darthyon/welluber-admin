@@ -103,9 +103,15 @@ const hostNavigation = [
     title: "Setup & config",
     items: [
       { id: "policies", label: "Benefit Policies", href: "/policies", icon: ShieldCheck },
-      { id: "services", label: "Manage Services", href: "/services", icon: TreeStructure },
-      { id: "brands", label: "Manage Brands", href: "/brands", icon: Tag },
-      { id: "platform", label: "Platform Configuration", href: "/settings", icon: Gear },
+      { id: "services", label: "Services", href: "/services", icon: TreeStructure },
+      { id: "brands", label: "Brands", href: "/brands", icon: Tag },
+    ],
+  },
+  {
+    title: "User Management",
+    items: [
+      { id: "members", label: "Members", href: "/users/members", icon: Users },
+      { id: "administrators", label: "Administrators", href: "/users/administrators", icon: Shield },
     ],
   },
   {
@@ -115,14 +121,8 @@ const hostNavigation = [
       { id: "reports", label: "Reports", href: "/reports", icon: ChartBar },
     ],
   },
-  {
-    title: "Admin",
-    items: [
-      { id: "team", label: "Team & Permissions", href: "/team", icon: UsersFour },
-      { id: "audit", label: "Audit Log", href: "/audit-log", icon: ClockCounterClockwise },
-    ],
-  },
 ]
+
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()

@@ -61,14 +61,14 @@ export function UtilisationClaimsTable({ data }: Props) {
   }
 
   return (
-    <div className="border border-zinc-200 rounded-2xl overflow-hidden">
+    <div className="border border-border rounded-xl bg-card shadow-sm overflow-hidden flex flex-col">
       {/* Table header */}
-      <div className="grid grid-cols-[2fr_1fr_100px_220px_60px] px-5 py-3 bg-zinc-50 border-b border-zinc-200">
-        <p className="text-[10px] font-semibold text-zinc-400 tracking-tight">Employee</p>
-        <p className="text-[10px] font-semibold text-zinc-400 tracking-tight">Branch</p>
-        <p className="text-[10px] font-semibold text-zinc-400 tracking-tight text-right">Allocated</p>
-        <p className="text-[10px] font-semibold text-zinc-400 tracking-tight pl-3">Utilisation</p>
-        <p className="text-[10px] font-semibold text-zinc-400 tracking-tight text-center">Claims</p>
+      <div className="grid grid-cols-[2.5fr_1.5fr_140px_260px_80px] p-4 bg-zinc-50 dark:bg-muted/30 border-b border-border/60">
+        <p className="text-[13px] font-semibold text-muted-foreground tracking-tight whitespace-nowrap">Employee</p>
+        <p className="text-[13px] font-semibold text-muted-foreground tracking-tight whitespace-nowrap">Branch</p>
+        <p className="text-[13px] font-semibold text-muted-foreground tracking-tight whitespace-nowrap text-right pr-4">Allocated</p>
+        <p className="text-[13px] font-semibold text-muted-foreground tracking-tight whitespace-nowrap pl-3 text-left">Utilisation & Claims</p>
+        <p className="text-[13px] font-semibold text-muted-foreground tracking-tight whitespace-nowrap text-center">Claims</p>
       </div>
 
       {data.map((emp) => {
@@ -80,17 +80,17 @@ export function UtilisationClaimsTable({ data }: Props) {
           <div key={emp.id} className={cn("border-b border-zinc-100 last:border-0")}>
             {/* Employee row */}
             <button
-              className="w-full grid grid-cols-[2fr_1fr_100px_220px_60px] px-5 py-4 text-left hover:bg-zinc-50/80 transition-colors items-center"
+              className="w-full grid grid-cols-[2.5fr_1.5fr_140px_260px_80px] p-4 text-left hover:bg-muted/30 transition-all items-center"
               onClick={() => toggle(emp.id)}
             >
               <div>
-                <p className="text-[13px] font-semibold text-zinc-900">{emp.name}</p>
-                <p className="text-[11px] text-zinc-400 mt-0.5">{emp.empCode}</p>
+                <p className="text-[13px] font-bold text-foreground group-hover:text-primary transition-colors">{emp.name}</p>
+                <p className="text-[11px] text-muted-foreground font-medium mt-0.5">{emp.empCode}</p>
               </div>
 
-              <p className="text-[13px] text-zinc-600">{emp.branch}</p>
+              <p className="text-[12px] font-semibold px-2 py-0.5 rounded-md bg-zinc-100/80 text-zinc-600 border border-zinc-200 w-fit">{emp.branch}</p>
 
-              <p className="text-[13px] font-mono font-semibold text-zinc-900 text-right pr-4">
+              <p className="text-[13px] font-mono font-bold text-foreground text-right pr-4">
                 RM {emp.allocated.toLocaleString("en-MY", { minimumFractionDigits: 2 })}
               </p>
 
@@ -126,11 +126,11 @@ export function UtilisationClaimsTable({ data }: Props) {
 
             {/* Claims rows */}
             {isExpanded && (
-              <div className="border-t border-zinc-100 bg-zinc-50/60">
+              <div className="border-t border-border/40 bg-zinc-50/40">
                 {/* Claims sub-header */}
-                <div className="grid grid-cols-[140px_1fr_1fr_1fr_110px_90px] gap-3 px-10 py-2 border-b border-zinc-100">
+                <div className="grid grid-cols-[140px_1fr_1fr_1fr_110px_90px] gap-3 px-10 py-2.5 border-b border-border/40">
                   {["Voucher", "Service", "Provider", "Location", "Date", "Amount"].map((h) => (
-                    <p key={h} className="text-[9px] font-semibold text-zinc-400 tracking-tight">{h}</p>
+                    <p key={h} className="text-[11px] font-bold text-muted-foreground/60 uppercase tracking-wider">{h}</p>
                   ))}
                 </div>
 

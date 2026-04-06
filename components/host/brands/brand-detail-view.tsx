@@ -108,7 +108,7 @@ export function BrandDetailView({ brand, onBack, onEdit, onRemove }: BrandDetail
         <ActionPopover
           actions={[
             { label: "View SP Portal", onClick: () => console.log("view portal", sp.id) },
-            { label: "Manage Branches", onClick: () => console.log("manage branches", sp.id) },
+            { label: "Branches", onClick: () => console.log("manage branches", sp.id) },
           ]}
         />
       ),

@@ -1,8 +1,9 @@
 "use client";
 
-import { Buildings, Wallet, Users } from "@phosphor-icons/react";
+import { Buildings, Wallet, Users, ChartPieSlice } from "@phosphor-icons/react";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ActionPopover } from "@/components/shared/action-popover";
+import { UtilizationChart } from "./utilization-chart";
 import { cn } from "@/lib/utils";
 
 interface BranchCardProps {
@@ -18,7 +19,9 @@ interface BranchCardProps {
     employeesCount?: number;
     status?: string;
     balance?: string;
+    limit?: string;
     utilizationRate?: number;
+    claimsCount?: number;
   };
   onView?: (id: string) => void;
   onEdit?: (id: string) => void;
@@ -97,21 +100,33 @@ export function BranchCard({ branch, onView, onEdit }: BranchCardProps) {
         </div>
 
         {branch.utilizationRate !== undefined && (
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-[11px] font-semibold tracking-tight text-muted-foreground/80">
-              <span className="opacity-90">Utilization</span>
-              <span className={cn(
-                branch.utilizationRate > 80 ? "text-amber-500" : "text-emerald-500"
-              )}>{branch.utilizationRate}%</span>
+          <div className="space-y-2.5 pt-4 border-t border-border/40">
+            <div className="flex items-center gap-1.5 text-zinc-400">
+              <ChartPieSlice size={14} weight="bold" />
+              <span className="text-[11px] font-semibold tracking-tight text-zinc-500/80">Utilisation & Claims</span>
             </div>
-            <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
-              <div 
-                className={cn(
-                  "h-full transition-all duration-1000 ease-out",
-                  branch.utilizationRate > 80 ? "bg-amber-500/60" : "bg-emerald-500/60"
+            <div className="flex items-center gap-3">
+              <UtilizationChart value={branch.utilizationRate} mode="ring" size={40} strokeWidth={4} />
+              <div className="flex flex-col justify-center">
+                <div className="flex items-center gap-1.5 leading-tight">
+                  <span className={cn(
+                    "text-[13px] font-bold text-foreground",
+                    branch.utilizationRate > 80 ? "text-rose-500" : branch.utilizationRate > 50 ? "text-amber-500" : "text-emerald-500"
+                  )}>
+                    {branch.balance}
+                  </span>
+                  {branch.claimsCount !== undefined && (
+                    <span className="text-[10px] font-bold px-1.5 rounded-full bg-zinc-100 text-zinc-500 border border-zinc-200 tabular-nums">
+                      {branch.claimsCount}
+                    </span>
+                  )}
+                </div>
+                {branch.limit && (
+                  <span className="text-[10px] text-muted-foreground/60 font-medium tabular-nums mt-0.5">
+                    / {branch.limit}
+                  </span>
                 )}
-                style={{ width: `${branch.utilizationRate}%` }} 
-              />
+              </div>
             </div>
           </div>
         )}

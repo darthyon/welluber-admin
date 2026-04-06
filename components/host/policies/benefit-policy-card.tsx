@@ -1,0 +1,123 @@
+"use client";
+
+import { IdentificationCard } from "@phosphor-icons/react";
+import { StatusBadge } from "@/components/shared/status-badge";
+import { ActionPopover } from "@/components/shared/action-popover";
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
+
+interface BenefitPolicy {
+  id: string;
+  name: string;
+  code: string;
+  description?: string;
+  utilisationMode: string;
+  status: string;
+}
+
+interface BenefitPolicyCardProps {
+  policy: BenefitPolicy;
+  onView: (id: string) => void;
+  onClone: (e: React.MouseEvent, policy: BenefitPolicy) => void;
+}
+
+export function BenefitPolicyCard({ policy, onView, onClone }: BenefitPolicyCardProps) {
+  const actions = [
+    { 
+      label: "View policy details", 
+      onClick: (e: React.MouseEvent) => {
+        e.stopPropagation();
+        onView(policy.id);
+      }
+    },
+    {
+      label: "Clone policy",
+      onClick: (e: React.MouseEvent) => {
+        e.stopPropagation();
+        onClone(e, policy);
+      },
+      className: "text-primary font-semibold"
+    },
+    {
+      label: "Management",
+      isSectionTitle: true
+    },
+    {
+      label: "Archived policy",
+      onClick: () => console.log("Archive"),
+      isDanger: true
+    }
+  ];
+
+  return (
+    <motion.div
+      whileHover={{ y: -2 }}
+      transition={{ duration: 0.2, ease: "easeOut" }}
+      onClick={() => onView(policy.id)}
+      className="group relative p-5 rounded-xl border border-zinc-200 bg-zinc-50/50 hover:bg-white hover:border-primary/30 hover:shadow-md transition-all cursor-pointer overflow-hidden"
+    >
+      {/* Bento-style Decorative Accent */}
+      <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-primary/5 rounded-full blur-3xl group-hover:w-40 group-hover:h-40 group-hover:bg-primary/10 transition-all duration-500 pointer-events-none" />
+
+      {/* Top Section: Header & Actions */}
+      <div className="flex items-start justify-between mb-8 relative z-10">
+        <div className="flex items-center gap-3.5">
+          <div className="w-12 h-12 rounded-2xl bg-zinc-100/80 border border-zinc-200/60 text-zinc-500 flex items-center justify-center transition-all duration-300 group-hover:bg-primary group-hover:text-white group-hover:border-primary/20">
+            <IdentificationCard size={24} weight="fill" />
+          </div>
+
+          <div className="space-y-1.5">
+            <h4 className="font-bold text-[14px] text-foreground block leading-tight tracking-tight group-hover:text-primary transition-colors">
+              {policy.name}
+            </h4>
+            <div className="flex items-center gap-2">
+              <StatusBadge
+                status={policy.status}
+                variant={policy.status === "Published" ? "emerald" : "amber"}
+              />
+              <span className="text-[10px] text-zinc-400 font-mono bg-white px-1.5 py-0.5 rounded border border-zinc-200 tracking-tight">
+                {policy.code}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <ActionPopover actions={actions} />
+      </div>
+
+      {/* Content Section */}
+      <div className="relative z-10">
+        <p className="text-[13px] text-zinc-500 line-clamp-2 leading-relaxed font-normal opacity-90">
+          {policy.description || "No description provided."}
+        </p>
+
+        <div className="mt-8 pt-6 border-t border-zinc-100 flex items-center justify-between">
+          <div className="flex -space-x-2">
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="w-7 h-7 rounded-full border-2 border-white bg-zinc-100 flex items-center justify-center text-[10px] font-bold text-zinc-400 overflow-hidden shadow-sm"
+              >
+                <img
+                  src={`https://i.pravatar.cc/100?img=${parseInt(policy.id) + i + 10}`}
+                  alt="User"
+                />
+              </div>
+            ))}
+            <div className="w-7 h-7 rounded-full border-2 border-white bg-zinc-100 flex items-center justify-center text-[9px] font-bold text-zinc-400 shadow-sm">
+              +12
+            </div>
+          </div>
+          <div className="text-right">
+            <p className="text-[14px] font-bold text-zinc-800 tracking-tight">
+              RM {policy.utilisationMode === "Fixed" ? "2,400.00" : "Prorated"}
+            </p>
+            <p className="text-[10px] text-zinc-400 font-bold tracking-tight">
+              Budget pool
+            </p>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}

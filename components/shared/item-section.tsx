@@ -1,0 +1,80 @@
+"use client";
+
+import * as React from "react";
+import { Trash } from "@phosphor-icons/react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+
+interface ItemSectionProps {
+  /**
+   * The 1-based index to display in the circle.
+   */
+  index: number;
+  /**
+   * The label to display next to the index.
+   */
+  label: string;
+  /**
+   * Optional callback when the remove button is clicked.
+   * If omitted, the remove button is not rendered.
+   */
+  onRemove?: () => void;
+  /**
+   * The content of the section.
+   */
+  children: React.ReactNode;
+  /**
+   * Optional additional class names for the container.
+   */
+  className?: string;
+}
+
+/**
+ * A standardized component for indexed line items in forms.
+ * Matches the 'Service Line Item' pattern with a numeric badge and removal action.
+ */
+export function ItemSection({
+  index,
+  label,
+  onRemove,
+  children,
+  className
+}: ItemSectionProps) {
+  return (
+    <div 
+      className={cn(
+        "p-5 bg-zinc-50/40 rounded-2xl border border-zinc-200/80 space-y-5 animate-in fade-in slide-in-from-top-1 duration-300", 
+        className
+      )}
+    >
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <div className="w-6 h-6 rounded-full bg-zinc-200/80 flex items-center justify-center">
+            <span className="text-[11px] font-bold text-zinc-600">
+              {index}
+            </span>
+          </div>
+          <span className="text-[12px] font-semibold text-zinc-500 tracking-tight">
+            {label}
+          </span>
+        </div>
+        
+        {onRemove && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={onRemove}
+            className="w-8 h-8 rounded-lg text-zinc-300 hover:text-destructive hover:bg-destructive/5 transition-all"
+          >
+            <Trash size={18} />
+          </Button>
+        )}
+      </div>
+
+      <div className="space-y-4">
+        {children}
+      </div>
+    </div>
+  );
+}

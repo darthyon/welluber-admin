@@ -21,23 +21,7 @@ interface OrganizationsDataTableProps {
 
 export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
   const router = useRouter();
-  const [searchQuery, setSearchQuery] = React.useState("");
-  const [filters, setFilters] = React.useState({
-    status: "all",
-    needsAction: "all",
-  });
 
-  const filteredData = React.useMemo(() => {
-    return data.filter(org => {
-      const searchMatch = !searchQuery || 
-        org.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        org.id.toLowerCase().includes(searchQuery.toLowerCase());
-      const statusMatch = filters.status === "all" || org.status === filters.status;
-      const needsActionMatch = filters.needsAction === "all" || 
-        (filters.needsAction === "needs_action" ? org.needsAction.length > 0 : org.needsAction.length === 0);
-      return searchMatch && statusMatch && needsActionMatch;
-    });
-  }, [data, searchQuery, filters]);
   const formatCurrency = (val: number) => {
     return new Intl.NumberFormat('en-MY', { 
       style: 'currency', 
@@ -50,6 +34,8 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
   const columns: Column<Organization>[] = [
     {
       header: "Organisation name",
+      accessorKey: "name",
+      sortable: true,
       headerClassName: "min-w-[220px]",
       render: (org) => (
         <div className="flex flex-col">
@@ -60,6 +46,8 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
     },
     {
       header: "Status",
+      accessorKey: "status",
+      sortable: true,
       render: (org) => (
         <StatusBadge 
           status={org.status} 
@@ -69,6 +57,8 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
     },
     {
       header: "Needs Action",
+      accessorKey: "needsAction",
+      sortable: true,
       headerClassName: "min-w-[160px]",
       render: (org) => {
         if (org.needsAction.length === 0) {
@@ -89,15 +79,24 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
       }
     },
     {
-      header: "Utilization",
+      header: "Utilisation & Claims",
+      accessorKey: "utilizationRate",
+      sortable: true,
       headerClassName: "min-w-[180px]",
       render: (org) => (
         <div className="flex items-center gap-2.5">
           <UtilizationChart value={org.utilizationRate} mode="ring" size={32} strokeWidth={3} />
           <div className="flex flex-col justify-center">
-            <span className="text-[12px] font-bold text-foreground leading-tight">
-              {formatCurrency(org.totalWalletBalance)}
-            </span>
+            <div className="flex items-center gap-1.5 leading-tight">
+              <span className="text-[12px] font-bold text-foreground">
+                {formatCurrency(org.totalWalletBalance)}
+              </span>
+              {org.claimsCount !== undefined && (
+                <span className="text-[10px] font-bold px-1.5 rounded-full bg-zinc-100 text-zinc-500 border border-zinc-200 tabular-nums">
+                  {org.claimsCount}
+                </span>
+              )}
+            </div>
             <span className="text-[10px] text-muted-foreground/60 font-medium tabular-nums mt-0.5">
               / {formatCurrency(org.walletLimit)}
             </span>
@@ -107,7 +106,6 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
     },
     {
       header: "Service category",
-      headerClassName: "min-w-[160px]",
       render: (org) => (
         <div className="flex items-center gap-1 overflow-hidden max-w-[200px]">
           {org.services.length === 0 ? (
@@ -189,6 +187,8 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
     },
     {
       header: "Branches",
+      accessorKey: "branches",
+      sortable: true,
       headerClassName: "min-w-[120px]",
       render: (org) => (
         <div className="flex items-center gap-1 overflow-hidden">
@@ -230,11 +230,15 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
     },
     {
       header: "Employees",
+      accessorKey: "employeeCount",
+      sortable: true,
       align: "right",
       render: (org) => <span className="text-[13px] font-bold text-foreground/80">{org.employeeCount.toLocaleString()}</span>
     },
     {
       header: "Joined",
+      accessorKey: "createdAt",
+      sortable: true,
       headerClassName: "text-right",
       align: "right",
       render: (org) => (
@@ -255,7 +259,7 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
             { label: "Edit Organisation", href: `/organizations/${org.id}/edit` },
             { label: "Quick Invite Admin", onClick: () => console.log("Invite clicked") },
             { label: "Settings", isSectionTitle: true },
-            { label: "Manage Benefit Policies", href: `/organizations/${org.id}?tab=policies`, className: "text-indigo-600 font-semibold" }
+            { label: "Benefit Policies", href: `/organizations/${org.id}?tab=policies`, className: "text-indigo-600 font-semibold" }
           ]} 
         />
       )
@@ -265,38 +269,8 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
   return (
     <TooltipProvider>
       <div className="space-y-4">
-        <DataFilterBar
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          searchPlaceholder="Search by organization name or ID..."
-          filters={
-            <>
-              <FilterItem
-                label="Status"
-                options={[
-                  { label: "All Status", value: "all" },
-                  { label: "Active", value: "active" },
-                  { label: "Pending", value: "pending" },
-                  { label: "Deactivated", value: "deactivated" },
-                ]}
-                value={filters.status}
-                onChange={(v) => setFilters({ ...filters, status: v })}
-              />
-              <FilterItem
-                label="Triage"
-                options={[
-                  { label: "All", value: "all" },
-                  { label: "Needs Action", value: "needs_action" },
-                  { label: "Healthy", value: "healthy" },
-                ]}
-                value={filters.needsAction}
-                onChange={(v) => setFilters({ ...filters, needsAction: v })}
-              />
-            </>
-          }
-        />
         <SharedDataTable 
-          data={filteredData} 
+          data={data} 
           columns={columns} 
           freezeFirst={true} 
           freezeLast={true}

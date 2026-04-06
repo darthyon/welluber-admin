@@ -57,7 +57,7 @@ export function PolicyDetailSheet({ isOpen, onClose, policy, groups, benefits, o
         <div className="flex-1 overflow-y-auto custom-scrollbar p-8 pt-6 space-y-10">
           {/* Section 1: Overview & Rules */}
           <section className="space-y-6">
-            <h4 className="text-[11px] font-bold text-zinc-400 uppercase tracking-[0.1em]">Policy Rules & Lifecycle</h4>
+            <h4 className="text-[11px] font-bold text-zinc-500/80">Policy rules & lifecycle</h4>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
               <RuleItem icon={Users} label="Target Workforce" value={policy.eligibility.roles.length > 0 ? policy.eligibility.roles.join(", ") : "All Roles"} />
               <RuleItem icon={Briefcase} label="Employment" value={policy.eligibility.employeeTypes.join(", ")} />
@@ -70,7 +70,7 @@ export function PolicyDetailSheet({ isOpen, onClose, policy, groups, benefits, o
 
           {/* Section 2: Benefit Structure (Groups > Benefits) */}
           <section className="space-y-6">
-            <h4 className="text-[11px] font-bold text-zinc-400 uppercase tracking-[0.1em]">Nested Benefit Structure</h4>
+            <h4 className="text-[11px] font-bold text-zinc-500/80">Nested benefit structure</h4>
             <div className="space-y-6">
               {groups.map((group) => (
                 <div key={group.id} className="rounded-2xl border border-zinc-100 bg-zinc-50/50 p-6 space-y-5">
@@ -88,7 +88,7 @@ export function PolicyDetailSheet({ isOpen, onClose, policy, groups, benefits, o
                        <p className="text-[13px] font-bold text-primary">
                          {group.distributionType === "SharedAmount" ? `€${group.maxUsagePerCycle?.toFixed(2)} Shared` : "Individual Per Service"}
                        </p>
-                       <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-tighter mt-0.5">Budget Logic</p>
+                       <p className="text-[10px] text-zinc-400 font-bold tracking-tight mt-0.5">Budget logic</p>
                     </div>
                   </div>
 
@@ -105,7 +105,7 @@ export function PolicyDetailSheet({ isOpen, onClose, policy, groups, benefits, o
                              <div className="flex items-center gap-2 mt-0.5">
                                {benefit.coPayment.required && (
                                  <Badge variant="outline" className="text-[9px] h-4 bg-rose-50 text-rose-600 border-rose-100 px-1 font-bold">
-                                   CO-PAY ACTIVE
+                                   Co-pay active
                                  </Badge>
                                )}
                              </div>
@@ -164,7 +164,7 @@ function RuleItem({ icon: Icon, label, value }: { icon: any, label: string, valu
     <div className="space-y-1.5 p-3 rounded-xl border border-zinc-100 bg-white shadow-sm">
       <div className="flex items-center gap-2 text-zinc-400">
         <Icon size={14} weight="bold" />
-        <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest leading-none">{label}</span>
+        <span className="text-[10px] font-bold text-zinc-400 leading-none">{label}</span>
       </div>
       <p className="text-[13px] font-bold text-zinc-800 truncate">{value}</p>
     </div>

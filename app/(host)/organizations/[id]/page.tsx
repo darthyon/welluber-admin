@@ -19,7 +19,8 @@ import {
   TrendUp,
   Funnel,
   DotsThreeVertical,
-  MagnifyingGlass
+  MagnifyingGlass,
+  Article
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
@@ -53,6 +54,7 @@ import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/comp
 import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { deactivateOrganization, removeOrganization, suspendOrganization } from "@/features/organizations/actions";
 import type { OrganizationStatus } from "@/features/organizations/types";
+import { UtilizationChart } from "@/components/host/organizations/utilization-chart";
 
 const TABS = [
   { id: "profile", label: "Org Details", icon: Buildings },
@@ -402,6 +404,7 @@ export default function OrganizationDetailPage() {
             >
               <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-8">
                 <DetailField label="Registration No." value="1234567-T" />
+                <DetailField label="TIN No." value="TR-882910-01" />
                 <DetailField label="Industry" value="Technology" />
                 <DetailField label="Sub-industry" value="Software Development" />
                 <DetailField label="Financial Year Start Date" value="01 January" />
@@ -416,7 +419,6 @@ export default function OrganizationDetailPage() {
               description="Financial reporting and settlement identifiers"
             >
               <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-8">
-                <DetailField label="TIN No." value="TR-882910-01" />
                 <DetailField label="Bank Name" value="Maybank Berhad" />
                 <DetailField label="Account Number" value="5140 1234 5678" />
                 <DetailField label="Account Name" value="Acme Corporation Sdn Bhd" />
@@ -442,48 +444,96 @@ export default function OrganizationDetailPage() {
                 </div>
               }
             >
-              <div className="border border-border rounded-lg overflow-hidden">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="border-b border-border/50 bg-muted/20">
-                      <th className="font-semibold text-muted-foreground text-[12px] p-4 text-nowrap">Name</th>
-                      <th className="font-semibold text-muted-foreground text-[12px] p-4 text-nowrap">Email</th>
-                      <th className="font-semibold text-muted-foreground text-[12px] p-4 text-nowrap">Role</th>
-                      <th className="font-semibold text-muted-foreground text-[12px] p-4 text-nowrap">Branch</th>
-                      <th className="font-semibold text-muted-foreground text-[12px] p-4 text-nowrap">Status</th>
-                      <th className="font-semibold text-muted-foreground text-[12px] p-4 text-nowrap text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border/50">
-                    <tr className="hover:bg-muted/30 transition-colors group">
-                      <td className="p-4 text-[13px] font-medium text-foreground">John Doe</td>
-                      <td className="p-4 text-[13px] text-muted-foreground">john.doe@acme.com</td>
-                      <td className="p-4 text-[13px] text-muted-foreground">Org Admin</td>
-                      <td className="p-4 text-[12px]">
-                        <button 
-                          onClick={() => {
-                            setActiveTab("branches");
-                            setViewBranchId("br_1");
-                          }}
-                          className="text-primary hover:underline font-medium"
-                        >
-                          ACME HQ
-                        </button>
-                      </td>
-                      <td className="p-4">
-                        <StatusBadge status="Active" variant="emerald" />
-                      </td>
-                      <td className="p-4 text-right">
-                        <ActionPopover 
-                          actions={[
-                            { label: "Resend Invite", onClick: () => console.log("Resend") },
-                            { label: "Revoke Access", isDanger: true, onClick: () => console.log("Revoke") }
-                          ]}
-                        />
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+              <SharedDataTable 
+                columns={[
+                  {
+                    header: "Name",
+                    accessorKey: "name",
+                    sortable: true,
+                    render: (admin: any) => (
+                      <span className="text-[13px] font-medium text-foreground">{admin.name}</span>
+                    )
+                  },
+                  {
+                    header: "Email",
+                    accessorKey: "email",
+                    sortable: true,
+                    render: (admin: any) => (
+                      <span className="text-[13px] text-muted-foreground">{admin.email}</span>
+                    )
+                  },
+                  {
+                    header: "Role",
+                    accessorKey: "role",
+                    sortable: true,
+                    render: (admin: any) => (
+                      <span className="text-[13px] text-muted-foreground">{admin.role}</span>
+                    )
+                  },
+                  {
+                    header: "Branch",
+                    accessorKey: "branchName",
+                    sortable: true,
+                    render: (admin: any) => (
+                      <button 
+                        onClick={() => {
+                          setActiveTab("branches");
+                          setViewBranchId(admin.branchId);
+                        }}
+                        className="text-primary hover:underline font-medium text-[12px]"
+                      >
+                        {admin.branchName}
+                      </button>
+                    )
+                  },
+                  {
+                    header: "Status",
+                    accessorKey: "status",
+                    sortable: true,
+                    render: (admin: any) => (
+                      <StatusBadge status={admin.status} variant="emerald" />
+                    )
+                  },
+                  {
+                    header: "Actions",
+                    align: "right",
+                    render: (admin: any) => (
+                      <ActionPopover 
+                        actions={[
+                          { label: "Resend Invite", onClick: () => console.log("Resend") },
+                          { label: "Revoke Access", isDanger: true, onClick: () => console.log("Revoke") }
+                        ]}
+                      />
+                    )
+                  }
+                ]}
+                data={[
+                  { id: "adm_1", name: "John Doe", email: "john.doe@acme.com", role: "Org Admin", branchName: "ACME HQ", branchId: "br_1", status: "Active" }
+                ]}
+              />
+            </DetailSection>
+
+            {/* Documents */}
+            <DetailSection
+              title="Documents"
+              icon={<Article size={18} weight="duotone" />}
+              description="Legal and registration documents for this organization"
+            >
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {[
+                  { name: "SSM_Registration_2024.pdf", size: "1.2 MB" },
+                  { name: "Form_49_Directors.pdf", size: "850 KB" },
+                ].map((doc, i) => (
+                  <div key={i} className="flex items-center gap-3 p-3 bg-muted/20 border border-border rounded-xl">
+                    <div className="w-9 h-9 rounded-lg bg-white border border-zinc-100 flex items-center justify-center text-zinc-400">
+                      <Article size={18} weight="duotone" />
+                    </div>
+                    <div className="flex-1 overflow-hidden">
+                      <p className="text-[12px] font-bold text-foreground truncate">{doc.name}</p>
+                      <p className="text-[10px] text-muted-foreground font-medium">{doc.size}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </DetailSection>
           </div>
@@ -535,11 +585,15 @@ export default function OrganizationDetailPage() {
                     </div>
                   }
                 >
-                  <DataFilterBar 
-                    searchQuery={branchSearch} 
-                    onSearchChange={setBranchSearch}
-                    searchPlaceholder="Search branches..."
-                    className="mb-6"
+                  <DataToolbarContainer
+                    search={
+                      <SearchBar 
+                        placeholder="Search branches..." 
+                        value={branchSearch} 
+                        onChange={setBranchSearch}
+                        className="max-w-sm"
+                      />
+                    }
                     filters={
                       <>
                         <FilterItem 
@@ -578,7 +632,9 @@ export default function OrganizationDetailPage() {
                           employeesCount: 1240,
                           status: "Active",
                           balance: "RM 45,000.00",
-                          utilizationRate: 68
+                          limit: "RM 60,000.00",
+                          utilizationRate: 68,
+                          claimsCount: 12
                         }}
                         onView={() => setViewBranchId("br_1")}
                         onEdit={() => setEditingBranchId("br_1")}
@@ -593,55 +649,103 @@ export default function OrganizationDetailPage() {
                           employeesCount: 450,
                           status: "Active",
                           balance: "RM 12,500.00",
-                          utilizationRate: 42
+                          limit: "RM 30,000.00",
+                          utilizationRate: 42,
+                          claimsCount: 5
                         }}
                         onView={() => setViewBranchId("br_2")}
                         onEdit={() => setEditingBranchId("br_2")}
                       />
                     </div>
                   ) : (
-                    <div className="border border-border rounded-lg overflow-hidden">
-                      <table className="w-full text-left border-collapse">
-                        <thead>
-                          <tr className="border-b border-border/50 bg-muted/20">
-                            <th className="font-semibold text-muted-foreground text-[11px] uppercase tracking-wider p-4 text-nowrap">Branch Name</th>
-                            <th className="font-semibold text-muted-foreground text-[11px] uppercase tracking-wider p-4 text-nowrap">Status</th>
-                            <th className="font-semibold text-muted-foreground text-[11px] uppercase tracking-wider p-4 text-nowrap">Type</th>
-                            <th className="font-semibold text-muted-foreground text-[11px] uppercase tracking-wider p-4 text-nowrap">Employees</th>
-                            <th className="font-semibold text-muted-foreground text-[11px] uppercase tracking-wider p-4 text-nowrap">Wallet</th>
-                            <th className="font-semibold text-muted-foreground text-[11px] uppercase tracking-wider p-4 text-nowrap text-right">Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-border/50">
-                          {[
-                            { id: "br_1", name: "ACME HQ (Kuala Lumpur)", type: "HQ", status: "Active", employees: 1240, walletModel: "Single Wallet", balance: "RM 45,000" },
-                            { id: "br_2", name: "ACME Subang Jaya", type: "Branch", status: "Active", employees: 450, walletModel: "Existing Wallet", balance: "RM 12,500" }
-                          ].map((branch) => (
-                            <tr key={branch.id} className="hover:bg-muted/30 transition-colors group cursor-pointer" onClick={() => setViewBranchId(branch.id)}>
-                              <td className="p-4 text-[13px] font-medium text-foreground group-hover:text-primary transition-colors">{branch.name}</td>
-                              <td className="p-4"><StatusBadge status={branch.status} variant="emerald" /></td>
-                              <td className="p-4 text-[13px] text-muted-foreground">{branch.type}</td>
-                              <td className="p-4 text-[13px] text-muted-foreground">{branch.employees}</td>
-                              <td className="p-4">
-                                <div className="flex flex-col">
-                                  <span className="text-[12px] font-medium text-foreground">{branch.walletModel}</span>
-                                  <span className="text-[11px] text-muted-foreground">{branch.balance}</span>
+                    <SharedDataTable 
+                      onRowClick={(branch) => setViewBranchId(branch.id)}
+                      columns={[
+                        {
+                          header: "Branch name",
+                          accessorKey: "name",
+                          sortable: true,
+                          render: (branch: any) => (
+                            <span className="text-[13px] font-medium text-foreground group-hover:text-primary transition-colors">{branch.name}</span>
+                          )
+                        },
+                        {
+                          header: "Status",
+                          accessorKey: "status",
+                          sortable: true,
+                          render: (branch: any) => <StatusBadge status={branch.status} variant="emerald" />
+                        },
+                        {
+                          header: "Type",
+                          accessorKey: "type",
+                          sortable: true,
+                          render: (branch: any) => <span className="text-[13px] text-muted-foreground">{branch.type}</span>
+                        },
+                        {
+                          header: "Employees",
+                          accessorKey: "employees",
+                          sortable: true,
+                          render: (branch: any) => <span className="text-[13px] text-muted-foreground">{branch.employees}</span>
+                        },
+                        {
+                          header: "Wallet",
+                          accessorKey: "walletModel",
+                          sortable: true,
+                          headerClassName: "min-w-[150px]",
+                          render: (branch: any) => (
+                            <div className="flex flex-col">
+                              <span className="text-[13px] font-bold text-foreground tracking-tight">{branch.walletModel}</span>
+                              <span className="text-[11px] text-muted-foreground font-medium mt-0.5">{branch.balance}</span>
+                            </div>
+                          )
+                        },
+                        {
+                          header: "Utilisation / Claims",
+                          accessorKey: "utilizationRate",
+                          sortable: true,
+                          headerClassName: "min-w-[180px]",
+                          render: (branch: any) => (
+                            <div className="flex items-center gap-2.5">
+                              <UtilizationChart value={branch.utilizationRate} mode="ring" size={32} strokeWidth={3} />
+                              <div className="flex flex-col justify-center">
+                                <div className="flex items-center gap-1.5 leading-tight">
+                                  <span className="text-[12px] font-bold text-foreground">
+                                    {branch.balance}
+                                  </span>
+                                  {branch.claimsCount !== undefined && (
+                                    <span className="text-[10px] font-bold px-1.5 rounded-full bg-zinc-100 text-zinc-500 border border-zinc-200 tabular-nums">
+                                      {branch.claimsCount}
+                                    </span>
+                                  )}
                                 </div>
-                              </td>
-                              <td className="p-4 text-right">
-                                <ActionPopover 
-                                  actions={[
-                                    { label: "View Details", onClick: () => setViewBranchId(branch.id) },
-                                    { label: "Edit Branch", onClick: () => setEditingBranchId(branch.id) },
-                                    { label: "Deactivate", isDanger: true }
-                                  ]}
-                                />
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
+                                <span className="text-[10px] text-muted-foreground/60 font-medium tabular-nums mt-0.5">
+                                  / {branch.limit || "RM 0.00"}
+                                </span>
+                              </div>
+                            </div>
+                          )
+                        },
+                        {
+                          header: "Actions",
+                          align: "right",
+                          render: (branch: any) => (
+                            <div onClick={(e) => e.stopPropagation()}>
+                              <ActionPopover 
+                                actions={[
+                                  { label: "View Details", onClick: () => setViewBranchId(branch.id) },
+                                  { label: "Edit Branch", onClick: () => setEditingBranchId(branch.id) },
+                                  { label: "Deactivate", isDanger: true }
+                                ]}
+                              />
+                            </div>
+                          )
+                        }
+                      ]}
+                      data={[
+                        { id: "br_1", name: "ACME HQ (Kuala Lumpur)", type: "HQ", status: "Active", employees: 1240, walletModel: "Single Wallet", balance: "RM 45,000", limit: "RM 60,000", utilizationRate: 68, claimsCount: 12 },
+                        { id: "br_2", name: "ACME Subang Jaya", type: "Branch office", status: "Active", employees: 450, walletModel: "Existing Wallet", balance: "RM 12,500", limit: "RM 30,000", utilizationRate: 42, claimsCount: 5 }
+                      ]}
+                    />
                   )}
                 </DetailSection>
               </div>
@@ -708,11 +812,15 @@ export default function OrganizationDetailPage() {
                     </div>
                   }
                 >
-                  <DataFilterBar 
-                    searchQuery={employeeSearch} 
-                    onSearchChange={setEmployeeSearch}
-                    searchPlaceholder="Search employees..."
-                    className="mb-6"
+                  <DataToolbarContainer
+                    search={
+                      <SearchBar 
+                        placeholder="Search employees..." 
+                        value={employeeSearch} 
+                        onChange={setEmployeeSearch}
+                        className="max-w-sm"
+                      />
+                    }
                     filters={
                       <>
                         <FilterItem 
@@ -770,6 +878,8 @@ export default function OrganizationDetailPage() {
                         columns={[
                           {
                             header: "Employee",
+                            accessorKey: "name",
+                            sortable: true,
                             render: (emp) => (
                               <div className="flex flex-col">
                                 <span className="text-[13px] font-bold text-foreground group-hover:text-primary transition-colors">{emp.name}</span>
@@ -779,10 +889,14 @@ export default function OrganizationDetailPage() {
                           },
                           {
                             header: "ID / Code",
+                            accessorKey: "empCode",
+                            sortable: true,
                             render: (emp) => <span className="text-[13px] font-medium text-muted-foreground">{emp.empCode}</span>
                           },
                           {
                             header: "Branch",
+                            accessorKey: "branch",
+                            sortable: true,
                             render: (emp) => <span className="text-[12px] font-semibold px-2 py-0.5 rounded-md bg-zinc-100/80 text-zinc-600 border border-zinc-200">{emp.branch}</span>
                           },
                           {
@@ -835,7 +949,7 @@ export default function OrganizationDetailPage() {
                                           </button>
                                         </TooltipTrigger>
                                         <TooltipContent side="right" className="w-56 p-2 z-[200] flex flex-col gap-2">
-                                          <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground opacity-60 px-1">Other Policies</div>
+                                          <div className="text-[11px] font-semibold tracking-tight text-muted-foreground opacity-60 px-1">Other policies</div>
                                           {emp.benefitPolicies.slice(2).map((policy: any, i: number) => (
                                             <div key={i} className="flex flex-col gap-1.5 border-b border-border/50 pb-2.5 px-1 last:border-0 last:pb-0">
                                               <div className="text-[12px] font-bold text-foreground mt-1">
@@ -867,6 +981,8 @@ export default function OrganizationDetailPage() {
                           },
                           {
                             header: "Status",
+                            accessorKey: "status",
+                            sortable: true,
                             render: (emp) => <StatusBadge status={emp.status} variant={emp.status === "Linked" ? "emerald" : "amber"} />
                           },
                           {
@@ -967,11 +1083,15 @@ export default function OrganizationDetailPage() {
                   </div>
                 }
               >
-                <DataFilterBar
-                  searchQuery={policySearch}
-                  onSearchChange={setPolicySearch}
-                  searchPlaceholder="Search policies..."
-                  className="mb-6"
+                <DataToolbarContainer
+                  search={
+                    <SearchBar 
+                      placeholder="Search policies..." 
+                      value={policySearch} 
+                      onChange={setPolicySearch}
+                      className="max-w-sm"
+                    />
+                  }
                   filters={
                     <>
                       <FilterItem

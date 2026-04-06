@@ -165,6 +165,10 @@ export interface ServiceProvider {
   vouchers: SpVoucher[];
   activeVoucherCount: number;
   status: ServiceProviderStatus;
+  tinNumber?: string;
+  classificationCode?: string;
+  classificationDescriptor?: string;
+  documents?: string[];
   createdAt: ISODate;
   updatedAt: ISODate;
 }

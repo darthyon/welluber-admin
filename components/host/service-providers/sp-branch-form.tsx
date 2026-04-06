@@ -15,6 +15,8 @@ import { BRANCH_CONTACT_TYPES, OPERATING_DAYS, DEFAULT_OPERATING_HOURS } from "@
 import { buildBranchServiceCatalog } from "@/features/providers/service-taxonomy";
 import { SuccessCelebration } from "@/components/shared/success-celebration";
 import { LocationPicker } from "@/components/shared/location-picker";
+import { ServiceToggleCard } from "@/components/shared/service-toggle-card";
+import { ItemSection } from "@/components/shared/item-section";
 import type { SpBranch, ServiceLine, CommissionSchemaRow } from "@/types/provider";
 
 interface SpBranchFormProps {
@@ -254,112 +256,42 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                       </span>
                     </div>
 
-                    <div className="space-y-1 border-t border-border/40 pt-1">
+                    <div className="space-y-2 pt-1">
                       {group.services.map((service: any) => {
                         const line = selectedServices.find(ls => ls.service === service.name);
                         const isSelected = !!line;
 
                         return (
-                          <div key={service.name} className={cn(
-                            "group p-4 rounded-2xl border transition-all duration-200",
-                            isSelected ? "bg-primary/[0.02] border-primary/20" : "bg-transparent border-transparent hover:bg-muted/30"
-                          )}>
-                            <div className="flex items-center justify-between gap-4">
-                              <div className="flex items-center gap-3">
-                                <Switch 
-                                  checked={isSelected} 
-                                  onCheckedChange={() => {
-                                    if (isSelected) {
-                                      setValue("services", selectedServices.filter(ls => ls.service !== service.name));
-                                    } else {
-                                      setValue("services", [...selectedServices, { service: service.name, subServices: service.subServices }]);
-                                    }
-                                  }} 
-                                />
-                                <span className={cn(
-                                  "text-[14px] font-semibold",
-                                  isSelected ? "text-foreground" : "text-muted-foreground"
-                                )}>
-                                  {service.name}
-                                </span>
-                              </div>
-                            </div>
-
-                            {isSelected && (
-                              <div className="mt-4 pl-11 space-y-3 animate-in slide-in-from-top-2 duration-200">
-                                <div className="flex flex-wrap gap-2">
-                                  {line.subServices.map((sub: string) => {
-                                    const isMasterlist = service.subServices.includes(sub);
-                                    return (
-                                      <span 
-                                        key={sub} 
-                                        className={cn(
-                                          "inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-lg font-medium border transition-colors",
-                                          isMasterlist 
-                                            ? "bg-muted/50 text-muted-foreground border-border" 
-                                            : "bg-primary/5 text-primary border-primary/20"
-                                        )}
-                                      >
-                                        {sub}
-                                        {!isMasterlist && (
-                                          <button 
-                                            type="button" 
-                                            onClick={() => {
-                                              const newSubServices = line.subServices.filter(s => s !== sub);
-                                              setValue("services", selectedServices.map(ls => 
-                                                ls.service === service.name ? { ...ls, subServices: newSubServices } : ls
-                                              ));
-                                            }}
-                                            className="hover:text-destructive"
-                                          >
-                                            <Trash size={11} />
-                                          </button>
-                                        )}
-                                      </span>
-                                    );
-                                  })}
-                                </div>
-
-                                <div className="flex gap-2 max-w-md mt-2">
-                                  <input
-                                    value={customServiceInputs[service.name] ?? ""}
-                                    onChange={(e) => setCustomServiceInputs(prev => ({ ...prev, [service.name]: e.target.value }))}
-                                    onKeyDown={(e) => {
-                                      if (e.key === "Enter") {
-                                        e.preventDefault();
-                                        const val = customServiceInputs[service.name]?.trim();
-                                        if (val && !line.subServices.includes(val)) {
-                                          setValue("services", selectedServices.map(ls => 
-                                            ls.service === service.name ? { ...ls, subServices: [...ls.subServices, val] } : ls
-                                          ));
-                                          setCustomServiceInputs(prev => ({ ...prev, [service.name]: "" }));
-                                        }
-                                      }
-                                    }}
-                                    className={cn(inputCls(), "h-8 text-[12px]")}
-                                    placeholder={`Add custom ${service.name} sub-service...`}
-                                  />
-                                  <Button 
-                                    type="button" 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="h-8 w-8 p-0 shrink-0"
-                                    onClick={() => {
-                                      const val = customServiceInputs[service.name]?.trim();
-                                      if (val && !line.subServices.includes(val)) {
-                                        setValue("services", selectedServices.map(ls => 
-                                          ls.service === service.name ? { ...ls, subServices: [...ls.subServices, val] } : ls
-                                        ));
-                                        setCustomServiceInputs(prev => ({ ...prev, [service.name]: "" }));
-                                      }
-                                    }}
-                                  >
-                                    <Plus size={14} />
-                                  </Button>
-                                </div>
-                              </div>
-                            )}
-                          </div>
+                          <ServiceToggleCard
+                            key={service.name}
+                            name={service.name}
+                            isSelected={isSelected}
+                            onToggle={(checked) => {
+                              if (!checked) {
+                                setValue("services", selectedServices.filter(ls => ls.service !== service.name));
+                              } else {
+                                setValue("services", [...selectedServices, { service: service.name, subServices: service.subServices }]);
+                              }
+                            }}
+                            selectedSubServices={line?.subServices || []}
+                            masterlistSubServices={service.subServices}
+                            onAddSubService={(val) => {
+                              if (line && !line.subServices.includes(val)) {
+                                setValue("services", selectedServices.map(ls => 
+                                  ls.service === service.name ? { ...ls, subServices: [...ls.subServices, val] } : ls
+                                ));
+                                setCustomServiceInputs(prev => ({ ...prev, [service.name]: "" }));
+                              }
+                            }}
+                            onRemoveSubService={(val) => {
+                              if (line) {
+                                setValue("services", selectedServices.map(ls => 
+                                  ls.service === service.name ? { ...ls, subServices: ls.subServices.filter(s => s !== val) } : ls
+                                ));
+                              }
+                            }}
+                            placeholder={`Add custom ${service.name} sub-service...`}
+                          />
                         );
                       })}
                     </div>
@@ -405,55 +337,57 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
               </Button>
             }
           >
-            <div className="space-y-3">
+            <div className="space-y-4">
               {contactFields.map((field, i) => (
-                <div key={field.id} className="grid grid-cols-1 md:grid-cols-[1.2fr_1.5fr_140px_130px_auto_auto_auto] gap-3 items-end bg-muted/20 rounded-xl p-3 border border-border/50">
-                  <div className="space-y-1">
-                    <label className="text-[11px] font-medium text-muted-foreground">Name</label>
-                    <input {...register(`contacts.${i}.name`)} className={inputCls(!!(errors.contacts as any)?.[i]?.name)} placeholder="Full name" />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-[11px] font-medium text-muted-foreground">Corporate Email</label>
-                    <input type="email" {...register(`contacts.${i}.email`)} className={inputCls(!!(errors.contacts as any)?.[i]?.email)} placeholder="name@company.com" />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-[11px] font-medium text-muted-foreground">Role</label>
-                    <select {...register(`contacts.${i}.type`)} className={inputCls()}>
-                      {BRANCH_CONTACT_TYPES.map((t) => (
-                        <option key={t.value} value={t.value}>{t.label}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-[11px] font-medium text-muted-foreground">Phone</label>
-                    <input {...register(`contacts.${i}.phone`)} className={inputCls()} placeholder="+601XXXXXXXX" />
-                  </div>
-                  <div className="space-y-1 text-center">
-                    <label className="text-[11px] font-medium text-muted-foreground block">Public</label>
-                    <div className="flex items-center justify-center h-10">
-                      <Switch checked={watch(`contacts.${i}.isPublic`)} onCheckedChange={(v) => setValue(`contacts.${i}.isPublic`, v)} />
+                <ItemSection
+                  key={field.id}
+                  index={i + 1}
+                  label="Branch Administrator"
+                  onRemove={() => removeContact(i)}
+                >
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-tight">Name</label>
+                      <input {...register(`contacts.${i}.name`)} className={inputCls(!!(errors.contacts as any)?.[i]?.name)} placeholder="Full name" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-tight">Corporate Email</label>
+                      <input type="email" {...register(`contacts.${i}.email`)} className={inputCls(!!(errors.contacts as any)?.[i]?.email)} placeholder="name@company.com" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-tight">Role</label>
+                      <select {...register(`contacts.${i}.type`)} className={cn(inputCls(), "appearance-none cursor-pointer bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236b7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1.25rem_1.25rem] bg-[right_0.5rem_center] bg-no-repeat pr-10")}>
+                        {BRANCH_CONTACT_TYPES.map((t) => (
+                          <option key={t.value} value={t.value}>{t.label}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-tight">Phone</label>
+                      <input {...register(`contacts.${i}.phone`)} className={inputCls()} placeholder="+601XXXXXXXX" />
                     </div>
                   </div>
-                  <div className="pb-1">
+
+                  <div className="flex items-center justify-between pt-2 border-t border-zinc-100/60">
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2">
+                        <Switch checked={watch(`contacts.${i}.isPublic`)} onCheckedChange={(v) => setValue(`contacts.${i}.isPublic`, v)} />
+                        <span className="text-[12px] font-medium text-foreground">Public profile</span>
+                      </div>
+                    </div>
+                    
                     <Button 
                       type="button" 
                       variant="outline" 
                       size="sm" 
-                      className="h-10 px-3 gap-2 text-[12px]"
+                      className="h-9 px-4 gap-2 text-[12px] font-semibold border-zinc-200 text-zinc-600 hover:text-primary hover:border-primary/30 transition-all rounded-full"
                       onClick={() => console.log("Invite sent to", watch(`contacts.${i}.email`))}
                     >
-                      <PaperPlaneTilt size={14} />
-                      Invite
+                      <PaperPlaneTilt size={14} weight="bold" />
+                      Send Invite
                     </Button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => removeContact(i)}
-                    className="text-muted-foreground hover:text-destructive transition-colors h-10 flex items-center justify-center px-1"
-                  >
-                    <Trash size={15} />
-                  </button>
-                </div>
+                </ItemSection>
               ))}
               {errors.contacts && typeof errors.contacts === "object" && "message" in errors.contacts && (
                 <p className="text-[11px] text-destructive flex items-center gap-1">

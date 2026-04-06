@@ -10,6 +10,10 @@ export const createSpSchema = z.object({
   description: z.string().optional(),
   website: z.string().url("Enter a valid URL").optional().or(z.literal("")),
   isActive: z.boolean().default(true),
+  tinNumber: z.string().optional(),
+  classificationCode: z.string().optional(),
+  classificationDescriptor: z.string().optional(),
+  documents: z.array(z.string()).default([]),
 });
 
 export type CreateSpData = z.infer<typeof createSpSchema>;

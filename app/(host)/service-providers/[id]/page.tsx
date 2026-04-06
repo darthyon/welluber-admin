@@ -14,6 +14,9 @@ import {
   Globe,
   IdentificationCard,
   EnvelopeSimple,
+  Article,
+  Files,
+  Info
 } from "@phosphor-icons/react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -32,6 +35,14 @@ import { SpVouchersTab } from "@/components/host/service-providers/sp-vouchers-t
 import { MOCK_SPS } from "@/features/providers/mock-data";
 import { suspendSp, activateSp, removeSp, resendSpAdminInvite } from "@/features/providers/actions";
 import { ActionPopover } from "@/components/shared/action-popover";
+import { SharedDataTable } from "@/components/shared/data-table";
+import { CommissionSchemaSheet } from "@/components/host/service-providers/commission-schema-sheet";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const TABS = [
   { id: "details", label: "SP Details", icon: Storefront },
@@ -60,6 +71,7 @@ export default function ServiceProviderDetailPage() {
   const [isDangerModalOpen, setIsDangerModalOpen] = useState(false);
   const [dangerAction, setDangerAction] = useState<"status" | "remove" | null>(null);
   const [currentStatus, setCurrentStatus] = useState(sp.status);
+  const [isCommissionSheetOpen, setIsCommissionSheetOpen] = useState(false);
 
   const handleToggleStatus = async () => {
     setIsTogglingStatus(true);
@@ -208,6 +220,7 @@ export default function ServiceProviderDetailPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <DetailField label="Company Name" value={sp.name} />
                 <DetailField label="Registration No." value={<span className="font-mono">{sp.registrationNo}</span>} />
+                <DetailField label="TIN No." value={sp.tinNumber || "N/A"} />
                 {sp.website && (
                   <DetailField
                     label="Website"
@@ -250,6 +263,31 @@ export default function ServiceProviderDetailPage() {
               title="Commission Schema"
               icon={<IdentificationCard size={16} weight="fill" />}
               description="Rates applied per service category. Valid range: 10%–30%."
+              action={
+                <div className="flex items-center gap-2">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="flex items-center cursor-default text-indigo-500">
+                          <Info size={16} weight="fill" />
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent side="left" className="max-w-[240px] text-[12px]">
+                        Define your service portfolio and configure tiered commission rates.
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7 px-3 text-[12px] font-medium gap-1.5"
+                    onClick={() => setIsCommissionSheetOpen(true)}
+                  >
+                    <PencilSimpleLine size={13} />
+                    Edit
+                  </Button>
+                </div>
+              }
             >
               <CommissionSchemaEditor
                 spId={spId}
@@ -265,6 +303,57 @@ export default function ServiceProviderDetailPage() {
               description="SST registration status and rate applied to this provider's transactions."
             >
               <TaxProfileForm spId={spId} initial={sp.taxProfile} />
+            </DetailSection>
+
+            {/* Section: e-Invoice Malaysia */}
+            <DetailSection
+              title="e-Invoice Malaysia"
+              icon={<Article size={16} weight="fill" />}
+              description="Classification codes for e-invoice submission."
+              action={
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="flex items-center cursor-default text-indigo-500">
+                        <Info size={16} weight="fill" />
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent side="left" className="max-w-[220px] text-center text-[12px]">
+                      Welluber will submit for SP on behalf to the org.
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              }
+            >
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <DetailField label="Classification Code" value={sp.classificationCode || "N/A"} />
+                <DetailField label="Classification Descriptor" value={sp.classificationDescriptor || "N/A"} />
+              </div>
+            </DetailSection>
+
+            {/* Section: Documents */}
+            <DetailSection
+              title="Documents"
+              icon={<Files size={16} weight="fill" />}
+              description="General file attachments and registration documents."
+            >
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {(sp.documents || []).length > 0 ? (
+                  sp.documents?.map((doc, i) => (
+                    <div key={i} className="flex items-center gap-3 p-3 bg-muted/20 border border-border rounded-xl">
+                      <div className="w-9 h-9 rounded-lg bg-white border border-zinc-100 flex items-center justify-center text-zinc-400">
+                        <Files size={18} weight="duotone" />
+                      </div>
+                      <div className="flex-1 overflow-hidden">
+                        <p className="text-[12px] font-bold text-foreground truncate">{doc}</p>
+                        <p className="text-[10px] text-muted-foreground font-medium">Document attached</p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-[12px] text-muted-foreground italic">No documents uploaded.</p>
+                )}
+              </div>
             </DetailSection>
 
             {/* Section 4: Administrators */}
@@ -288,55 +377,71 @@ export default function ServiceProviderDetailPage() {
                     No administrators yet. Send an invite to give portal access.
                   </p>
                 ) : (
-                  <div className="border border-border rounded-lg overflow-hidden">
-                    <table className="w-full text-left border-collapse">
-                      <thead>
-                        <tr className="border-b border-border/50 bg-muted/20">
-                          <th className="font-semibold text-muted-foreground text-[12px] p-4 text-nowrap">Name</th>
-                          <th className="font-semibold text-muted-foreground text-[12px] p-4 text-nowrap">Email</th>
-                          <th className="font-semibold text-muted-foreground text-[12px] p-4 text-nowrap">Role</th>
-                          <th className="font-semibold text-muted-foreground text-[12px] p-4 text-nowrap">Branch</th>
-                          <th className="font-semibold text-muted-foreground text-[12px] p-4 text-nowrap">Status</th>
-                          <th className="font-semibold text-muted-foreground text-[12px] p-4 text-nowrap text-right">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-border/50">
-                        {sp.admins.map((admin) => (
-                          <tr key={admin.id} className="hover:bg-muted/30 transition-colors group">
-                            <td className="p-4 text-[13px] font-medium text-foreground">{admin.name}</td>
-                            <td className="p-4 text-[13px] text-muted-foreground">{admin.email}</td>
-                            <td className="p-4 text-[13px] text-muted-foreground">SP Admin</td>
-                            <td className="p-4 text-[13px] text-muted-foreground">{adminBranchLabel}</td>
-                            <td className="p-4">
-                              <StatusBadge
-                                status={admin.status === "active" ? "Active" : "Pending"}
-                                variant={admin.status === "active" ? "emerald" : "amber"}
+                  <SharedDataTable
+                    columns={[
+                      {
+                        header: "Name",
+                        accessorKey: "name",
+                        sortable: true,
+                        render: (admin: any) => (
+                          <span className="text-[13px] font-medium text-foreground">{admin.name}</span>
+                        ),
+                      },
+                      {
+                        header: "Email",
+                        accessorKey: "email",
+                        sortable: true,
+                        render: (admin: any) => (
+                          <span className="text-[13px] text-muted-foreground">{admin.email}</span>
+                        ),
+                      },
+                      {
+                        header: "Role",
+                        render: () => <span className="text-[13px] text-muted-foreground">SP Admin</span>,
+                      },
+                      {
+                        header: "Branch",
+                        render: () => <span className="text-[13px] text-muted-foreground">{adminBranchLabel}</span>,
+                      },
+                      {
+                        header: "Status",
+                        accessorKey: "status",
+                        sortable: true,
+                        render: (admin: any) => (
+                          <StatusBadge
+                            status={admin.status === "active" ? "Active" : "Pending"}
+                            variant={admin.status === "active" ? "emerald" : "amber"}
+                          />
+                        ),
+                      },
+                      {
+                        header: "Actions",
+                        align: "right",
+                        render: (admin: any) => (
+                          <div className="flex justify-end">
+                            {admin.status === "pending_activation" ? (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 text-[12px] font-medium"
+                                onClick={() => resendSpAdminInvite(spId, admin.id, admin.email)}
+                              >
+                                Resend Invite
+                              </Button>
+                            ) : (
+                              <ActionPopover
+                                actions={[
+                                  { label: "Resend Invite", onClick: () => resendSpAdminInvite(spId, admin.id, admin.email) },
+                                ]}
                               />
-                            </td>
-                            <td className="p-4 text-right">
-                              {admin.status === "pending_activation" ? (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-8 text-[12px] font-medium"
-                                  onClick={() => resendSpAdminInvite(spId, admin.id, admin.email)}
-                                >
-                                  Resend Invite
-                                </Button>
-                              ) : (
-                                <ActionPopover
-                                  actions={[
-                                    { label: "Resend Invite", onClick: () => resendSpAdminInvite(spId, admin.id, admin.email) },
-                                  ]}
-                                />
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
+                            )}
+                          </div>
+                        ),
+                      },
+                    ]}
+                    data={sp.admins}
+                  />
+                                    )}
               </DetailSection>
             </>
           )}
@@ -452,6 +557,15 @@ export default function ServiceProviderDetailPage() {
           setIsDangerModalOpen(false);
           setDangerAction(null);
         }}
+      />
+
+      {/* Commission Schema Sheet */}
+      <CommissionSchemaSheet
+        isOpen={isCommissionSheetOpen}
+        onClose={() => setIsCommissionSheetOpen(false)}
+        spId={spId}
+        serviceCategories={sp.serviceCategories}
+        initialRows={sp.commissionSchema}
       />
 
       {/* Modals */}

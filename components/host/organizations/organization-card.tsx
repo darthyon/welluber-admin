@@ -54,7 +54,7 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
       isSectionTitle: true 
     },
     { 
-      label: "Manage benefit policies", 
+      label: "Benefit policies", 
       href: `/organizations/${org.id}?tab=policies`,
       className: "text-indigo-600 font-semibold"
     }
@@ -119,14 +119,21 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
             <div className="space-y-2.5">
               <div className="flex items-center gap-1.5 text-zinc-400">
                 <ChartPieSlice size={14} weight="bold" />
-                <span className="text-[11px] font-semibold tracking-tight text-zinc-500/80">Utilization</span>
+                <span className="text-[11px] font-semibold tracking-tight text-zinc-500/80">Utilisation & Claims</span>
               </div>
               <div className="flex items-center gap-3">
                 <UtilizationChart value={org.utilizationRate} mode="ring" size={44} strokeWidth={4} />
                 <div className="flex flex-col justify-center">
-                  <span className={cn("text-[14px] font-bold leading-tight", getUtilColor(org.utilizationRate))}>
-                    {formatCurrency(org.totalWalletBalance)}
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className={cn("text-[14px] font-bold leading-tight", getUtilColor(org.utilizationRate))}>
+                      {formatCurrency(org.totalWalletBalance)}
+                    </span>
+                    {org.claimsCount !== undefined && (
+                      <Badge variant="outline" className="h-4 px-1 text-[9px] font-bold bg-zinc-100 border-zinc-200 text-zinc-500 tabular-nums">
+                        {org.claimsCount} claims
+                      </Badge>
+                    )}
+                  </div>
                   <span className="text-[10px] text-zinc-400 font-medium tabular-nums mt-0.5">
                     / {formatCurrency(org.walletLimit)}
                   </span>

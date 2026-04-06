@@ -18,6 +18,7 @@ export const routes = {
     providers: "/providers",
     users: "/users",
     policies: "/policies",
+    wallets: "/wallets",
     transactions: "/transactions",
     settings: "/settings",
   },

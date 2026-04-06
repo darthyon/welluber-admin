@@ -1,7 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { MagnifyingGlass } from "@phosphor-icons/react"
+import { MagnifyingGlass, FileText } from "@phosphor-icons/react"
+import Link from "next/link"
 import { NotificationCenter } from "@/components/shared/notification-center"
 import { ThemeToggle } from "@/components/shared/theme-toggle"
 import { Input } from "@/components/ui/input"
@@ -33,6 +34,13 @@ export function TopBar() {
         </div>
 
         <div className="flex items-center gap-2 border-l border-border/50 pl-6">
+          <Link
+            href="/audit-log"
+            className="w-9 h-9 flex items-center justify-center rounded-lg border border-border hover:bg-accent transition-colors relative"
+            title="Audit Log"
+          >
+            <FileText size={16} className="text-muted-foreground" />
+          </Link>
           <NotificationCenter />
           <ThemeToggle />
         </div>

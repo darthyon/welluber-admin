@@ -67,6 +67,10 @@ interface BentoCardProps {
    * Column span for the card (1-4). Defaults to 1.
    */
   span?: 1 | 2 | 3 | 4;
+  /**
+   * Optional click handler.
+   */
+  onClick?: () => void;
 }
 
 /**
@@ -80,7 +84,8 @@ export function BentoCard({
   icon: Icon,
   children,
   className,
-  span = 1
+  span = 1,
+  onClick
 }: BentoCardProps) {
   const spanClasses = {
     1: "md:col-span-1",
@@ -90,13 +95,17 @@ export function BentoCard({
   };
 
   return (
-    <div className={cn(
-      "group bg-card border border-border rounded-xl p-4 shadow-sm transition-all duration-300",
-      "hover:shadow-md hover:border-primary/30",
-      "flex flex-col justify-between overflow-hidden relative",
-      spanClasses[span],
-      className
-    )}>
+    <div 
+      onClick={onClick}
+      className={cn(
+        "group bg-card border border-border rounded-xl p-4 shadow-sm transition-all duration-300",
+        "hover:shadow-md hover:border-primary/30",
+        "flex flex-col justify-between overflow-hidden relative",
+        spanClasses[span],
+        onClick && "cursor-pointer",
+        className
+      )}
+    >
       <div className="flex items-start justify-between relative z-10">
         <p className={cn(
           "text-[13px] font-semibold tracking-tight transition-colors",

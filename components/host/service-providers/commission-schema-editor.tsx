@@ -1,13 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { CheckCircle, PencilSimpleLine, Info } from "@phosphor-icons/react";
-import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { CommissionSchemaSheet } from "./commission-schema-sheet";
+import { useMemo } from "react";
+import { CheckCircle } from "@phosphor-icons/react";
 import type { CommissionSchemaRow } from "@/types/provider";
-import { MASTER_SERVICE_TAXONOMY } from "@/features/providers/service-taxonomy";
 
 interface CommissionSchemaEditorProps {
   spId: string;
@@ -16,9 +11,6 @@ interface CommissionSchemaEditorProps {
 }
 
 export function CommissionSchemaEditor({ spId, serviceCategories, initialRows }: CommissionSchemaEditorProps) {
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
-
-  // The portfolio is exactly what is stored in initialRows
   const portfolioRows = useMemo(() => initialRows || [], [initialRows]);
 
   if (serviceCategories.length === 0) {
@@ -31,28 +23,6 @@ export function CommissionSchemaEditor({ spId, serviceCategories, initialRows }:
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className="flex items-center gap-2 text-muted-foreground hover:text-foreground cursor-help transition-colors">
-                <Info size={18} weight="fill" className="text-amber-500" />
-                <span className="text-[13px] font-medium leading-none">Portfolio Info</span>
-              </div>
-            </TooltipTrigger>
-            <TooltipContent side="right" className="max-w-[280px]">
-              <p className="text-[12px] leading-relaxed">
-                Define your service portfolio and configure tiered commission rates.
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        </div>
-        <Button onClick={() => setIsSheetOpen(true)} size="sm" variant="outline" className="shrink-0 h-9 px-4 gap-2 border-primary/20 hover:bg-primary/5 text-primary">
-          <PencilSimpleLine size={16} />
-          Edit Portfolio
-        </Button>
-      </div>
-
       <div className="border border-border rounded-xl overflow-hidden bg-background">
         <div className="grid grid-cols-[200px_1fr_120px] gap-4 px-4 py-3 bg-muted/20 border-b border-border">
           <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-left">Main Service</p>
@@ -96,13 +66,6 @@ export function CommissionSchemaEditor({ spId, serviceCategories, initialRows }:
         </div>
       </div>
 
-      <CommissionSchemaSheet
-        isOpen={isSheetOpen}
-        onClose={() => setIsSheetOpen(false)}
-        spId={spId}
-        serviceCategories={serviceCategories}
-        initialRows={portfolioRows}
-      />
     </div>
   );
 }
