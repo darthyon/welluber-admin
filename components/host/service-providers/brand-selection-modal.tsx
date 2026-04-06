@@ -31,7 +31,7 @@ export function BrandSelectionModal({ isOpen, onClose, onSelect, brands }: Brand
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md p-0 overflow-hidden border-none shadow-2xl rounded-2xl bg-card">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader className="p-6 pb-2">
           <DialogTitle className="text-lg font-bold tracking-tight">Select Existing Brand</DialogTitle>
           <DialogDescription className="text-[13px] text-muted-foreground">

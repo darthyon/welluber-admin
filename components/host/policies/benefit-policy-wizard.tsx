@@ -19,6 +19,12 @@ import {
   EyeSlash,
   CaretDown,
   Receipt,
+  Sparkle,
+  Check,
+  MagnifyingGlass,
+  Funnel,
+  SelectionAll,
+  Eraser,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { ChoiceCard } from "@/components/shared/choice-card";
@@ -28,6 +34,9 @@ import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { BenefitPolicy, BenefitGroup, Benefit, PolicyStatus, DistributionType } from "@/types/policy";
 import { UtilisationClaimsTable, type EmployeeUtilisationRow } from "@/components/shared/utilisation-claims-table";
+import { SharedDataTable, type Column } from "@/components/shared/data-table";
+import { FilterItem } from "@/components/shared/filter-item";
+import { DataFilterBar } from "@/components/shared/data-filter-bar";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -39,10 +48,10 @@ const CONTENT_TABS = [
 ];
 
 const CREATE_STEPS = [
-  { id: 1, title: "Benefit Policy Details" },
+  { id: 1, title: "Target Workforce" },
   { id: 2, title: "Benefit Pool & Cycle" },
   { id: 3, title: "Benefit Groups" },
-  { id: 4, title: "Review" },
+  { id: 4, title: "Finalize & Review" },
 ];
 
 const EMPLOYMENT_TYPES = [
@@ -65,6 +74,21 @@ const SERVICES = [
   { id: "s4", category: "Psychological Wellbeing", name: "Mental Fitness", subServices: ["Meditation Apps", "Mindfulness Workshops"] },
   { id: "s5", category: "Nutritional Support", name: "Dietary Counseling", subServices: ["Dietitian Consultations", "Diabetic Management"] },
   { id: "s6", category: "Personal Care", name: "Therapeutic Spa Services", subServices: ["Relaxation Massage", "Hydrotherapy"] },
+];
+
+const MOCK_EMPLOYEES = [
+  { id: "emp-1", name: "Sarah Chen", email: "sarah.chen@welluber.com", department: "Engineering", role: "Staff", gender: "Female", age: 28, status: "Active", needsAction: "None", branch: "HQ (Kuala Lumpur)" },
+  { id: "emp-2", name: "Michael Rodriguez", email: "m.rodriguez@welluber.com", department: "Marketing", role: "Management", gender: "Male", age: 34, status: "Active", needsAction: "None", branch: "HQ (Kuala Lumpur)" },
+  { id: "emp-3", name: "Emily Wong", email: "emily.wong@welluber.com", department: "Product", role: "Staff", gender: "Female", age: 25, status: "Terminated", needsAction: "None", branch: "Subang Jaya" },
+  { id: "emp-4", name: "David Kim", email: "david.kim@welluber.com", department: "Engineering", role: "Management", gender: "Male", age: 41, status: "Active", needsAction: "Missing Info", branch: "HQ (Kuala Lumpur)" },
+  { id: "emp-5", name: "Jessica Taylor", email: "j.taylor@welluber.com", department: "Sales", role: "Staff", gender: "Female", age: 31, status: "Active", needsAction: "None", branch: "Penang Office" },
+  { id: "emp-6", name: "Alex Rivera", email: "alex.rivera@welluber.com", department: "Marketing", role: "Executive", gender: "Non-binary", age: 39, status: "Active", needsAction: "None", branch: "HQ (Kuala Lumpur)" },
+  { id: "emp-7", name: "Hassan Al-Fayed", email: "hassan.a@welluber.com", department: "Engineering", role: "Staff", gender: "Male", age: 27, status: "Active", needsAction: "None", branch: "Subang Jaya" },
+  { id: "emp-8", name: "Sophie Mueller", email: "sophie.m@welluber.com", department: "HR", role: "Management", gender: "Female", age: 36, status: "Active", needsAction: "Missing Info", branch: "HQ (Kuala Lumpur)" },
+  { id: "emp-9", name: "James Wilson", email: "james.w@welluber.com", department: "Sales", role: "Staff", gender: "Male", age: 29, status: "Active", needsAction: "None", branch: "Penang Office" },
+  { id: "emp-10", name: "Chloe Dupont", email: "chloe.d@welluber.com", department: "Product", role: "Staff", gender: "Female", age: 24, status: "Terminated", needsAction: "None", branch: "HQ (Kuala Lumpur)" },
+  { id: "emp-11", name: "Ryan Gupta", email: "ryan.g@welluber.com", department: "Engineering", role: "Staff", gender: "Male", age: 33, status: "Active", needsAction: "None", branch: "Subang Jaya" },
+  { id: "emp-12", name: "Maria Garcia", email: "maria.g@welluber.com", department: "Marketing", role: "Staff", gender: "Female", age: 30, status: "Active", needsAction: "None", branch: "HQ (Kuala Lumpur)" },
 ];
 
 const STATUS_CONFIG: Record<PolicyStatus, { label: string; color: string; bg: string; icon: React.ElementType }> = {
@@ -161,6 +185,8 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [genContext, setGenContext] = useState("");
 
   const [policyData, setPolicyData] = useState<Partial<BenefitPolicy>>(initialData?.policy || {
     code: "",
@@ -177,6 +203,106 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
 
   const [groups, setGroups] = useState<BenefitGroup[]>(initialData?.groups || []);
   const [benefits, setBenefits] = useState<Benefit[]>(initialData?.benefits || []);
+
+  const [selectedEmployeeIds, setSelectedEmployeeIds] = useState<Set<string>>(new Set());
+  const [assignmentFilters, setAssignmentFilters] = useState({
+    department: "all",
+    role: "all",
+    gender: "all",
+    status: "all",
+    needsAction: "all",
+    branch: "all",
+    ageRange: "all",
+  });
+  const [isGenerated, setIsGenerated] = useState(false);
+  const [assignmentSearchQuery, setAssignmentSearchQuery] = useState("");
+
+  const filteredWorkforce = useMemo(() => {
+    return MOCK_EMPLOYEES.filter(emp => {
+      const searchMatch = !assignmentSearchQuery || 
+        emp.name.toLowerCase().includes(assignmentSearchQuery.toLowerCase()) || 
+        emp.email.toLowerCase().includes(assignmentSearchQuery.toLowerCase());
+      const deptMatch = assignmentFilters.department === "all" || emp.department === assignmentFilters.department;
+      const roleMatch = assignmentFilters.role === "all" || emp.role === assignmentFilters.role;
+      const genderMatch = assignmentFilters.gender === "all" || emp.gender === assignmentFilters.gender;
+      const statusMatch = assignmentFilters.status === "all" || emp.status === assignmentFilters.status;
+      const needsActionMatch = assignmentFilters.needsAction === "all" || emp.needsAction === assignmentFilters.needsAction;
+      const branchMatch = assignmentFilters.branch === "all" || emp.branch === assignmentFilters.branch;
+      
+      let ageMatch = true;
+      if (assignmentFilters.ageRange !== "all") {
+        if (assignmentFilters.ageRange === "20-30") ageMatch = emp.age >= 20 && emp.age <= 30;
+        else if (assignmentFilters.ageRange === "31-40") ageMatch = emp.age >= 31 && emp.age <= 40;
+        else if (assignmentFilters.ageRange === "41plus") ageMatch = emp.age > 40;
+      }
+
+      return searchMatch && deptMatch && roleMatch && genderMatch && statusMatch && needsActionMatch && branchMatch && ageMatch;
+    });
+  }, [assignmentSearchQuery, assignmentFilters]);
+
+  const toggleEmployeeSelection = useCallback((id: string) => {
+    setSelectedEmployeeIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const assignVisibleWorkforce = useCallback(() => {
+    setSelectedEmployeeIds(prev => {
+      const next = new Set(prev);
+      filteredWorkforce.forEach(emp => next.add(emp.id));
+      return next;
+    });
+  }, [filteredWorkforce]);
+
+  const clearVisibleWorkforce = useCallback(() => {
+    setSelectedEmployeeIds(prev => {
+      const next = new Set(prev);
+      filteredWorkforce.forEach(emp => next.delete(emp.id));
+      return next;
+    });
+  }, [filteredWorkforce]);
+
+  const workforceColumns = useMemo(() => {
+    const cols: Column<typeof MOCK_EMPLOYEES[0]>[] = [
+      {
+        header: "Employee Name",
+        accessorKey: "name",
+        render: (row) => (
+          <div className="flex flex-col">
+            <span className="font-bold text-zinc-900">{row.name}</span>
+            <span className="text-[11px] text-zinc-400 font-medium">{row.email}</span>
+          </div>
+        )
+      },
+      { header: "Department", accessorKey: "department" },
+      { header: "Role", accessorKey: "role" },
+      { header: "Gender", accessorKey: "gender" },
+      { header: "Age", accessorKey: "age", align: "center" },
+    ];
+
+    if (!isViewMode) {
+      cols.unshift({
+        header: "",
+        headerClassName: "w-[50px]",
+        render: (row) => (
+          <button 
+            onClick={(e) => { e.stopPropagation(); toggleEmployeeSelection(row.id); }}
+            className={cn(
+              "w-5 h-5 rounded border flex items-center justify-center transition-all",
+              selectedEmployeeIds.has(row.id) ? "bg-primary border-primary text-white" : "border-zinc-300 hover:border-primary/50 bg-white"
+            )}
+          >
+            {selectedEmployeeIds.has(row.id) && <Check size={12} weight="bold" />}
+          </button>
+        )
+      });
+    }
+
+    return cols;
+  }, [isViewMode, selectedEmployeeIds, toggleEmployeeSelection]);
 
   useEffect(() => {
     if (initialData) {
@@ -252,8 +378,53 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
     setBenefits(benefits.filter(b => b.id !== benefitId));
   };
 
-  const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, 4));
+  const nextStep = async () => {
+    if (currentStep === 3 && !isGenerated) {
+      await generateIdentitySuggestions();
+    }
+    setCurrentStep(prev => Math.min(prev + 1, 4));
+  };
   const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 1));
+
+  const goToStep = async (stepId: number) => {
+    if (isSubmitting || isGenerating) return;
+    
+    // If moving to step 4 for the first time, generate suggestions
+    if (stepId === 4 && !isGenerated) {
+      setCurrentStep(4);
+      await generateIdentitySuggestions();
+      return;
+    }
+    
+    setCurrentStep(stepId);
+  };
+
+  const generateIdentitySuggestions = async () => {
+    // Collect context for generation
+    const mainServices = benefits.map(b => SERVICES.find(s => s.id === b.serviceId)?.name).filter(Boolean);
+    const uniqueServices = Array.from(new Set(mainServices));
+    const deptFilter = assignmentFilters.department !== "all" ? assignmentFilters.department : "Whole Team";
+    
+    setGenContext(uniqueServices.slice(0, 2).join(" & ") + (uniqueServices.length > 2 ? "..." : ""));
+    setIsGenerating(true);
+    
+    await new Promise(resolve => setTimeout(resolve, 2200));
+
+    const primaryService = uniqueServices[0] || "Health";
+    const suggestedName = `${primaryService} ${new Date().getFullYear()} - ${deptFilter}`;
+    const suggestedCode = `BEN-${primaryService.substring(0, 3).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
+    const suggestedDesc = `A ${policyData.utilisationMode?.toLowerCase() || "standard"} wellbeing policy designed specifically for the ${deptFilter === "Whole Team" ? "workforce" : deptFilter + " department"}, focusing on ${uniqueServices.join(", ") || "essential services"}.`;
+
+    setPolicyData(prev => ({ 
+      ...prev, 
+      name: prev.name || suggestedName, 
+      code: prev.code || suggestedCode,
+      description: prev.description || suggestedDesc
+    }));
+    
+    setIsGenerated(true);
+    setIsGenerating(false);
+  };
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
@@ -278,130 +449,105 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
 
   // ─ Step rendering helpers ─────────────────────────────────────────────────
 
-  const renderIdentityStep = () => {
-    if (isViewMode) {
-      const empTypeLabels = EMPLOYMENT_TYPES.filter(t => policyData.eligibility?.employeeTypes.includes(t.id)).map(t => t.title);
-      const roleLabels = ROLES.filter(r => policyData.eligibility?.roles.includes(r.id)).map(r => r.title);
-      return (
-        <div className="space-y-8 animate-in fade-in duration-300">
-          <DetailSection title="Policy Identity" icon={<IdentificationCard size={18} weight="duotone" />} description="Primary administrative details">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-1">
-              <ReadField label="Policy Name" value={policyData.name} />
-              <ReadField label="Policy Code" value={policyData.code} />
-              <div className="md:col-span-2">
-                <ReadField label="Description" value={policyData.description} />
-              </div>
-            </div>
-          </DetailSection>
-
-          <DetailSection title="Target Audience (Eligibility)" icon={<Users size={18} weight="duotone" />} description="Who this policy applies to">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-1">
-              <div className="space-y-1">
-                <p className="text-[11px] font-bold uppercase tracking-widest text-zinc-400">Employment Types</p>
-                <div className="flex flex-wrap gap-1.5 mt-1">
-                  {empTypeLabels.length > 0 ? empTypeLabels.map(t => (
-                    <span key={t} className="px-2.5 py-1 bg-primary/5 border border-primary/20 text-primary text-[12px] font-bold rounded-full">{t}</span>
-                  )) : <span className="text-zinc-300 italic text-[13px]">None selected</span>}
-                </div>
-              </div>
-              <div className="space-y-1">
-                <p className="text-[11px] font-bold uppercase tracking-widest text-zinc-400">Eligible Roles</p>
-                <div className="flex flex-wrap gap-1.5 mt-1">
-                  {roleLabels.length > 0 ? roleLabels.map(r => (
-                    <span key={r} className="px-2.5 py-1 bg-indigo-50 border border-indigo-100 text-indigo-600 text-[12px] font-bold rounded-full">{r}</span>
-                  )) : <span className="text-zinc-300 italic text-[13px]">None selected</span>}
-                </div>
-              </div>
-            </div>
-          </DetailSection>
-        </div>
-      );
-    }
-
+  const renderWorkforceStep = () => {
     return (
-      <div className="space-y-8">
-        <DetailSection title="Policy Identity" icon={<IdentificationCard size={18} weight="duotone" />} description="Primary administrative details">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-1">
-            <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-1.5">
-                Policy Name <span className="text-rose-500">*</span>
-              </label>
-              <input
-                placeholder="e.g. Wellness Premium 2026"
-                className="w-full px-4 py-2.5 bg-white border border-zinc-200 rounded-xl text-[14px] outline-none transition-all font-medium text-zinc-700 focus:ring-2 focus:ring-primary/10 focus:border-primary/30"
-                value={policyData.name}
-                onChange={(e) => setPolicyData({ ...policyData, name: e.target.value })}
-              />
+      <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+        <DetailSection 
+          title="Target Workforce" 
+          icon={<Users size={18} weight="duotone" />} 
+          description="Identify and assign employees to this benefit policy"
+          action={
+            <div className="flex items-center gap-3">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={assignVisibleWorkforce}
+                className="h-8 px-3 gap-2 text-[11px] font-bold text-primary hover:bg-primary/5 transition-all"
+              >
+                <SelectionAll size={14} />
+                Assign Filtered
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={clearVisibleWorkforce}
+                className="h-8 px-3 gap-2 text-[11px] font-bold text-rose-500 hover:bg-rose-50 transition-all border-l border-zinc-200"
+              >
+                <Eraser size={14} />
+                Clear
+              </Button>
+              <span className="text-[12px] font-bold text-primary bg-primary/10 px-3 py-1.5 rounded-full ring-1 ring-primary/20">
+                {selectedEmployeeIds.size} Assigned
+              </span>
             </div>
-            <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-1.5">
-                Policy Code <span className="text-rose-500">*</span>
-              </label>
-              <input
-                placeholder="e.g. BEN-W-01"
-                className="w-full px-4 py-2.5 bg-white border border-zinc-200 rounded-xl text-[14px] outline-none transition-all font-medium font-mono text-zinc-800 focus:ring-2 focus:ring-primary/10 focus:border-primary/30"
-                value={policyData.code}
-                onChange={(e) => setPolicyData({ ...policyData, code: e.target.value })}
-              />
-            </div>
-            <div className="space-y-1.5 md:col-span-2">
-              <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Description</label>
-              <div className="relative">
-                <Quotes size={16} className="absolute left-3 top-3 text-zinc-300" />
-                <textarea
-                  placeholder="What makes this policy unique?"
-                  className="w-full pl-10 pr-4 py-3 bg-white border border-zinc-200 rounded-xl text-[14px] outline-none transition-all font-medium text-zinc-700 min-h-[100px] resize-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30"
-                  value={policyData.description}
-                  onChange={(e) => setPolicyData({ ...policyData, description: e.target.value })}
-                />
-              </div>
-            </div>
-          </div>
-        </DetailSection>
-
-        <DetailSection title="Target Audience (Eligibility)" icon={<Users size={18} weight="duotone" />} description="Define who can be assigned to this policy">
-          <div className="space-y-8 p-1">
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <Briefcase size={16} className="text-primary" />
-                <span className="text-[13px] font-bold text-zinc-700">Employment Types</span>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {EMPLOYMENT_TYPES.map((type) => (
-                  <ChoiceCard
-                    key={type.id}
-                    title={type.title}
-                    description={type.description}
-                    icon={Briefcase}
-                    selected={policyData.eligibility?.employeeTypes.includes(type.id) || false}
-                    onSelect={() => toggleEligibility("employeeTypes", type.id)}
+          }
+        >
+          <div className="space-y-5">
+            {/* Filter Bar - Reusable DataFilterBar component */}
+            <DataFilterBar
+              searchQuery={assignmentSearchQuery}
+              onSearchChange={setAssignmentSearchQuery}
+              searchPlaceholder="Search employees..."
+              filters={
+                <>
+                  <FilterItem
+                    label="Department"
+                    options={[
+                      { label: "All Depts", value: "all" },
+                      { label: "Engineering", value: "Engineering" },
+                      { label: "Marketing", value: "Marketing" },
+                      { label: "Product", value: "Product" },
+                      { label: "Sales", value: "Sales" },
+                      { label: "HR", value: "HR" },
+                    ]}
+                    value={assignmentFilters.department}
+                    onChange={(v) => setAssignmentFilters({ ...assignmentFilters, department: v })}
                   />
-                ))}
-              </div>
-            </div>
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <IdentificationCard size={16} className="text-primary" />
-                <span className="text-[13px] font-bold text-zinc-700">Eligible Roles</span>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {ROLES.map((role) => (
-                  <button
-                    key={role.id}
-                    onClick={() => toggleEligibility("roles", role.id)}
-                    className={cn(
-                      "flex flex-col items-start px-4 py-3 rounded-xl border text-left transition-all",
-                      policyData.eligibility?.roles.includes(role.id)
-                        ? "border-primary/40 bg-primary/5 ring-1 ring-primary/20"
-                        : "border-zinc-200 bg-white hover:border-zinc-300"
-                    )}
-                  >
-                    <span className={cn("text-[14px] font-bold", policyData.eligibility?.roles.includes(role.id) ? "text-primary" : "text-zinc-700")}>{role.title}</span>
-                    <span className="text-[10px] text-zinc-400 mt-0.5">{role.description}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
+                  <FilterItem
+                    label="Role"
+                    options={[
+                      { label: "All Roles", value: "all" },
+                      { label: "Executive", value: "Executive" },
+                      { label: "Management", value: "Management" },
+                      { label: "Staff", value: "Staff" },
+                    ]}
+                    value={assignmentFilters.role}
+                    onChange={(v) => setAssignmentFilters({ ...assignmentFilters, role: v })}
+                  />
+                  <FilterItem
+                    label="Age Range"
+                    options={[
+                      { label: "Any Age", value: "all" },
+                      { label: "20 - 30", value: "20-30" },
+                      { label: "31 - 40", value: "31-40" },
+                      { label: "41+", value: "41plus" },
+                    ]}
+                    value={assignmentFilters.ageRange}
+                    onChange={(v) => setAssignmentFilters({ ...assignmentFilters, ageRange: v })}
+                  />
+                  <FilterItem
+                    label="Branch"
+                    options={[
+                      { label: "All Branches", value: "all" },
+                      { label: "HQ (KL)", value: "HQ (Kuala Lumpur)" },
+                      { label: "Subang Jaya", value: "Subang Jaya" },
+                      { label: "Penang", value: "Penang Office" },
+                    ]}
+                    value={assignmentFilters.branch}
+                    onChange={(v) => setAssignmentFilters({ ...assignmentFilters, branch: v })}
+                  />
+                </>
+              }
+            />
+
+            {/* Employee Table */}
+            <SharedDataTable 
+              data={filteredWorkforce} 
+              columns={workforceColumns}
+              rowsPerPage={6}
+              className="border-zinc-200/60"
+              onRowClick={(row) => toggleEmployeeSelection(row.id)}
+            />
           </div>
         </DetailSection>
       </div>
@@ -677,52 +823,159 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
   );
 
   const renderReviewStep = () => (
-    <div className="space-y-8">
-      <div className="text-center mb-10">
-        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary mx-auto mb-4">
-          <ShieldCheck size={32} weight="duotone" />
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 relative">
+      {/* Inline Generation Overlay */}
+      <AnimatePresence>
+        {isGenerating && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-50 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center rounded-3xl"
+          >
+            <motion.div
+              animate={{ 
+                scale: [1, 1.2, 1],
+                rotate: [0, 10, -10, 0]
+              }}
+              transition={{ repeat: Infinity, duration: 2 }}
+              className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-6 shadow-2xl shadow-primary/20 ring-4 ring-primary/5"
+            >
+              <Sparkle size={40} weight="fill" className="animate-pulse" />
+            </motion.div>
+            <h3 className="text-xl font-bold text-zinc-900">Crafting Policy Identity...</h3>
+            <p className="text-zinc-500 mt-2 flex items-center gap-2">
+              Optimizing for <span className="text-primary font-bold">{genContext || "Workforce"}</span>
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="text-center mb-8">
+        <div className="w-14 h-14 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 mx-auto mb-4 shadow-sm">
+          <ShieldCheck size={28} weight="duotone" />
         </div>
-        <h3 className="text-2xl font-bold text-zinc-900">Review & Launch Policy</h3>
-        <p className="text-zinc-500 mt-1">Ensure all details are correct before activating the policy.</p>
+        <h3 className="text-2xl font-bold text-zinc-900 tracking-tight">Finalize & Launch Policy</h3>
+        <p className="text-zinc-500 mt-1">Review the AI-suggested identity and verify configured benefits.</p>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-1 space-y-6">
-          <div className="p-5 rounded-2xl border border-zinc-100 bg-zinc-50/50 space-y-4">
-            <h4 className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">General Info</h4>
-            <div className="space-y-3">
-              {[
-                { label: "Code", value: policyData.code },
-                { label: "Refresh", value: policyData.refreshCycle },
-                { label: "Mode", value: policyData.utilisationMode },
-                { label: "Status", value: policyData.status },
-              ].map(({ label, value }) => (
-                <div key={label} className="flex justify-between items-center text-[13px]">
-                  <span className="text-zinc-500">{label}</span>
-                  <span className="font-bold text-zinc-900 font-mono">{value}</span>
+
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+        {/* Left Column: AI Identity */}
+        <div className="lg:col-span-3 space-y-6">
+          <DetailSection 
+            title="Policy Identity" 
+            icon={<IdentificationCard size={18} weight="duotone" />} 
+            description="AI-generated suggestions based on your configuration"
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 p-1">
+              <div className="space-y-1.5 flex-1">
+                <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest pl-1">Policy Name</label>
+                <div className={cn(
+                  "relative group transition-all",
+                  !isGenerated && "opacity-50 grayscale pointer-events-none"
+                )}>
+                  <input
+                    placeholder="e.g. Wellness Premium 2026"
+                    className="w-full px-4 py-3 bg-white border border-border rounded-xl text-[14px] outline-none transition-all font-bold text-zinc-900 focus:ring-4 focus:ring-primary/10 focus:border-primary/40 group-hover:border-primary/30"
+                    value={policyData.name}
+                    onChange={(e) => setPolicyData({ ...policyData, name: e.target.value })}
+                  />
+                  {isGenerated && <Sparkle size={14} weight="fill" className="absolute right-3 top-1/2 -translate-y-1/2 text-primary opacity-40 group-hover:opacity-100 transition-opacity" />}
                 </div>
-              ))}
+              </div>
+
+              <div className="space-y-1.5 flex-1">
+                <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest pl-1">Benefit ID</label>
+                <input
+                  placeholder="e.g. BEN-W-01"
+                  className="w-full px-4 py-3 bg-white border border-border rounded-xl text-[14px] outline-none transition-all font-bold font-mono text-zinc-800 focus:ring-4 focus:ring-zinc-500/5 focus:border-zinc-400"
+                  value={policyData.code}
+                  onChange={(e) => setPolicyData({ ...policyData, code: e.target.value })}
+                />
+              </div>
+
+              <div className="space-y-1.5 md:col-span-2">
+                <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest pl-1">Suggested Description</label>
+                <div className="relative group">
+                  <Quotes size={16} className="absolute left-3 top-4 text-zinc-300" />
+                  <textarea
+                    placeholder="Describe the purpose of this benefit..."
+                    className="w-full pl-10 pr-4 py-3.5 bg-white border border-border rounded-xl text-[13px] leading-relaxed outline-none transition-all font-medium text-zinc-600 min-h-[100px] resize-none focus:ring-4 focus:ring-primary/5 focus:border-primary/20 group-hover:border-primary/10"
+                    value={policyData.description}
+                    onChange={(e) => setPolicyData({ ...policyData, description: e.target.value })}
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        <div className="md:col-span-2 space-y-4">
-          <h4 className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest pl-1">Structure Summary</h4>
-          {groups.map(group => (
-            <div key={group.id} className="p-4 rounded-xl border border-zinc-200 flex items-center justify-between bg-white">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                  <TreeStructure size={16} />
+          </DetailSection>
+
+          <DetailSection 
+            title="Workforce Summary" 
+            icon={<Users size={18} weight="duotone" />} 
+            description="Individuals assigned to this policy"
+          >
+            <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-100 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center border border-zinc-200">
+                  <SelectionAll size={20} className="text-zinc-500" />
                 </div>
                 <div>
-                  <p className="text-[14px] font-bold text-zinc-900">{group.name}</p>
-                  <p className="text-[11px] text-zinc-400">{benefits.filter(b => b.groupId === group.id).length} services</p>
+                  <p className="text-[14px] font-bold text-zinc-900">{selectedEmployeeIds.size} Employees Selected</p>
+                  <p className="text-[11px] text-zinc-400 font-medium tracking-tight">Assignment will be effective immediately upon activation</p>
                 </div>
               </div>
-              <div className="text-right">
-                <p className="text-[14px] font-bold text-primary">{group.distributionType === "SharedAmount" ? `RM ${group.maxUsagePerCycle?.toFixed(2)}` : "Individual Caps"}</p>
-                <p className="text-[10px] text-zinc-400 uppercase font-bold tracking-tighter">Budget Model</p>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => goToStep(1)}
+                className="text-primary font-bold text-[12px] hover:bg-primary/5 transition-colors"
+              >
+                Change Selection
+              </Button>
+            </div>
+          </DetailSection>
+        </div>
+
+        {/* Right Column: Structure Preview */}
+        <div className="lg:col-span-2 space-y-6">
+          <DetailSection 
+            title="Benefits Recap" 
+            icon={<TreeStructure size={18} weight="duotone" />} 
+            description="Budget and service breakdown"
+          >
+            <div className="space-y-3">
+              {groups.length === 0 ? (
+                <p className="text-center py-8 text-[13px] text-zinc-400 font-medium bg-zinc-50/50 rounded-xl border border-dashed border-zinc-200">No benefit groups configured.</p>
+              ) : groups.map(group => (
+                <div key={group.id} className="p-4 rounded-2xl border border-zinc-100 flex items-center justify-between bg-zinc-50 hover:bg-white hover:border-zinc-200 hover:shadow-sm transition-all cursor-default">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-primary shadow-sm border border-zinc-100">
+                      <TreeStructure size={16} />
+                    </div>
+                    <div>
+                      <p className="text-[13px] font-bold text-zinc-900">{group.name}</p>
+                      <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-tight">{benefits.filter(b => b.groupId === group.id).length} services</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[14px] font-bold text-primary">{group.distributionType === "SharedAmount" ? `RM ${group.maxUsagePerCycle?.toFixed(2)}` : "Individual"}</p>
+                  </div>
+                </div>
+              ))}
+              
+              <div className="mt-4 p-4 rounded-2xl bg-indigo-50/40 border border-indigo-100 flex items-center justify-between">
+                <div>
+                  <p className="text-[11px] font-bold text-indigo-400 uppercase tracking-widest leading-none">Global Refresh</p>
+                  <p className="text-[14px] font-bold text-indigo-700 mt-1">{policyData.refreshCycle}</p>
+                </div>
+                <div className="h-8 w-px bg-indigo-200 mx-2" />
+                <div className="flex-1 text-right">
+                  <p className="text-[11px] font-bold text-indigo-400 uppercase tracking-widest leading-none">Trigger</p>
+                  <p className="text-[14px] font-bold text-indigo-700 mt-1 truncate">{policyData.activationMode === "JoinDate" ? "On Joining" : "Post-probation"}</p>
+                </div>
               </div>
             </div>
-          ))}
+          </DetailSection>
         </div>
       </div>
     </div>
@@ -791,7 +1044,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                 {mode === "create" && currentStep < 4 ? (
                   <Button
                     onClick={nextStep}
-                    disabled={currentStep === 1 && (!policyData.name || !policyData.code)}
+                    disabled={currentStep === 1 && selectedEmployeeIds.size === 0}
                     className="rounded-full px-8 bg-primary text-white shadow-sm shadow-primary/20"
                   >
                     Next Step
@@ -834,21 +1087,35 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
 
         {/* Numbered stepper — create only */}
         {mode === "create" && (
-          <div className="flex items-center gap-2 pb-4">
+          <div className="flex items-center gap-4 pb-4">
             {CREATE_STEPS.map((step) => (
-              <div
+              <button
                 key={step.id}
-                className={cn("flex items-center gap-1.5 transition-all text-[12px]", currentStep === step.id ? "opacity-100" : "opacity-35")}
+                onClick={() => goToStep(step.id)}
+                className={cn(
+                  "flex items-center gap-2 group transition-all cursor-pointer",
+                  currentStep === step.id ? "opacity-100" : "opacity-40 hover:opacity-100"
+                )}
               >
-                <div className={cn("w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold", currentStep === step.id ? "bg-primary text-white" : "bg-zinc-200 text-zinc-600")}>{step.id}</div>
-                <span className="font-medium hidden sm:inline">{step.title}</span>
-                {step.id < 4 && <div className="w-4 h-[1px] bg-zinc-200 ml-1" />}
-              </div>
+                <div className={cn(
+                  "w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-bold shadow-sm transition-all group-hover:shadow-md",
+                  currentStep === step.id ? "bg-primary text-white ring-2 ring-primary/20 ring-offset-2" : "bg-zinc-100 text-zinc-500 group-hover:bg-zinc-200"
+                )}>
+                  {currentStep > step.id ? "✓" : step.id}
+                </div>
+                <span className={cn(
+                  "text-[13px] font-bold whitespace-nowrap transition-colors",
+                  currentStep === step.id ? "text-primary" : "text-zinc-500 group-hover:text-zinc-800"
+                )}>
+                  {step.title}
+                </span>
+                {step.id < 4 && <div className="w-6 h-[1.5px] bg-zinc-100 ml-2" />}
+              </button>
             ))}
           </div>
         )}
       </div>
-
+      
       {/* Content */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden px-1 pt-8">
         <AnimatePresence mode="wait">
@@ -861,7 +1128,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
           >
             {currentStep === 1 && (
               <>
-                {renderIdentityStep()}
+                {renderWorkforceStep()}
                 {(isViewMode || mode === "edit") && renderStatusSection()}
               </>
             )}

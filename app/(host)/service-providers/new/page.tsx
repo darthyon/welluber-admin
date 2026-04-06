@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   CaretLeft,
@@ -18,13 +18,14 @@ import { cn } from "@/lib/utils";
 import { createSpSchema, CreateSpData } from "@/features/providers/schemas";
 import { createSp } from "@/features/providers/actions";
 import { Button } from "@/components/ui/button";
+import { MASTER_SERVICE_TAXONOMY } from "@/features/providers/service-taxonomy";
 import { SearchableMultiSelect } from "@/components/shared/searchable-multi-select";
-import { SERVICE_TAXONOMY } from "@/features/organizations/constants";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MOCK_BRANDS } from "@/features/brands/mock-data";
 import { BrandSelectionModal } from "@/components/host/service-providers/brand-selection-modal";
 import { Brand } from "@/types/brand";
+import { LogoUpload } from "@/components/shared/logo-upload";
 
 type Step = "selection" | "details";
 type BrandType = "new" | "existing";
@@ -43,8 +44,9 @@ export default function NewServiceProviderPage() {
     handleSubmit,
     setValue,
     watch,
+    control,
     formState: { errors },
-  } = useForm<CreateSpData & { brandName?: string; brandLogo?: string }>({
+  } = useForm<CreateSpData & { brandName?: string; brandLogo?: any }>({
     resolver: zodResolver(createSpSchema as any),
     defaultValues: { isActive: true, serviceCategories: [] },
   });
@@ -85,6 +87,13 @@ export default function NewServiceProviderPage() {
         ? "border-destructive focus:border-destructive"
         : "border-border focus:border-foreground/30 focus:bg-muted/30"
     );
+
+  const CATEGORY_TAXONOMY = [
+    {
+      category: "Service Categories",
+      services: MASTER_SERVICE_TAXONOMY.map((group) => group.category),
+    },
+  ];
 
   if (step === "selection") {
     return (
@@ -187,12 +196,18 @@ export default function NewServiceProviderPage() {
                             placeholder="e.g. Zenith Wellness"
                         />
                     </div>
-                    <div className="space-y-1.5 sm:col-span-1">
-                        <label className="text-[13px] font-medium text-foreground">Brand Logo URL</label>
-                        <input
-                            {...register("brandLogo")}
-                            className={inputCls()}
-                            placeholder="https://..."
+                    <div className="space-y-1.5 sm:col-span-2">
+                        <Controller
+                            control={control}
+                            name="brandLogo"
+                            render={({ field }) => (
+                                <LogoUpload
+                                    value={field.value}
+                                    onChange={field.onChange}
+                                    error={errors.brandLogo?.message as string}
+                                    label="Brand Logo"
+                                />
+                            )}
                         />
                     </div>
                 </div>
@@ -270,25 +285,26 @@ export default function NewServiceProviderPage() {
 
           {/* Section: Service Categories */}
           <div className="p-6 border-b border-border space-y-4">
-            <div className="flex items-center gap-2 pb-2">
+            <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500">
                 <Tag size={16} weight="fill" />
               </div>
-              <h3 className="text-[15px] font-semibold text-foreground">Service Categories</h3>
+              <div className="space-y-0.5">
+                <h3 className="text-[15px] font-bold text-foreground">Service Categories</h3>
+                <p className="text-[12px] text-muted-foreground leading-relaxed">
+                  Select all primary categories this provider belongs to according to the Masterlist.
+                </p>
+              </div>
             </div>
 
-            <p className="text-[12px] text-muted-foreground">
-              Select all service categories this provider offers. Commission rates are configured per category after creation.
-            </p>
-
             <SearchableMultiSelect
-              taxonomy={SERVICE_TAXONOMY}
+              taxonomy={CATEGORY_TAXONOMY}
               selected={selectedCategories}
               onChange={handleCategoriesChange}
-              placeholder="Search and select service categories..."
+              placeholder="Search categories (e.g. Fitness, Medical)..."
             />
             {errors.serviceCategories && (
-              <p className="text-[11px] text-destructive flex items-center gap-1">
+              <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
                 <WarningCircle size={12} /> {errors.serviceCategories.message}
               </p>
             )}

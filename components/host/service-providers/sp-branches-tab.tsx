@@ -5,9 +5,8 @@ import { Plus, GitBranch } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
 import { DetailSection } from "@/components/shared/detail-section";
-import { DataToolbarContainer } from "@/components/shared/data-toolbar";
-import { SearchBar } from "@/components/shared/search-bar";
 import { FilterItem } from "@/components/shared/filter-item";
+import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { ViewToggle, type ViewMode } from "@/components/shared/view-toggle";
 import { SpBranchCard } from "./sp-branch-card";
 import { SpBranchDetailView } from "./sp-branch-detail-view";
@@ -114,27 +113,23 @@ export function SpBranchesTab({ sp }: SpBranchesTabProps) {
           </div>
         }
       >
-        <DataToolbarContainer
-          search={
-            <SearchBar
-              placeholder="Search branches..."
-              value={branchSearch}
-              onChange={setBranchSearch}
-            />
-          }
+        <DataFilterBar
+          searchQuery={branchSearch}
+          onSearchChange={setBranchSearch}
+          searchPlaceholder="Search branches..."
+          className="mb-6"
           filters={
             <FilterItem
               label="Status"
               value={statusFilter}
               onChange={(value) => setStatusFilter(value as BranchStatusFilter)}
               options={[
-                { label: "All", value: "all" },
+                { label: "All Status", value: "all" },
                 { label: "Active", value: "active" },
                 { label: "Inactive", value: "inactive" },
               ]}
             />
           }
-          className="mb-6 px-0"
         />
 
         {filteredBranches.length === 0 ? (

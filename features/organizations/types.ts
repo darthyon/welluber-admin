@@ -94,6 +94,11 @@ export interface Employee {
   name: string;
   email: string;
   empCode: string;
+  department?: string;
+  role?: string;
+  dateOfBirth?: ISODate;
+  gender?: "male" | "female" | "other";
+  mobileNumber?: string;
   joinDate: ISODate;
   probationEndDate?: ISODate;
   employmentType: EmploymentType;

@@ -4,10 +4,13 @@ import { useRouter } from "next/navigation";
 import { SharedDataTable, Column } from "@/components/shared/data-table";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ActionPopover } from "@/components/shared/action-popover";
+import { DataFilterBar } from "@/components/shared/data-filter-bar";
+import { FilterItem } from "@/components/shared/filter-item";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { Brand } from "@/types/brand";
+import React, { useMemo, useState } from "react";
 
 interface BrandDataTableProps {
   data: Brand[];
@@ -16,6 +19,18 @@ interface BrandDataTableProps {
 
 export function BrandDataTable({ data, onRemove }: BrandDataTableProps) {
   const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+
+  const filteredData = useMemo(() => {
+    return data.filter(brand => {
+      const searchMatch = !searchQuery || 
+        brand.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        brand.id.toLowerCase().includes(searchQuery.toLowerCase());
+      const statusMatch = statusFilter === "all" || brand.status === statusFilter;
+      return searchMatch && statusMatch;
+    });
+  }, [data, searchQuery, statusFilter]);
 
   const columns: Column<Brand>[] = [
     {
@@ -90,14 +105,33 @@ export function BrandDataTable({ data, onRemove }: BrandDataTableProps) {
 
   return (
     <TooltipProvider>
-      <SharedDataTable
-        data={data}
-        columns={columns}
-        freezeFirst
-        freezeLast
-        rowsPerPage={10}
-        onRowClick={(brand) => router.push(`/brands/${brand.id}`)}
-      />
+      <div className="space-y-4">
+        <DataFilterBar
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          searchPlaceholder="Search by brand name or ID..."
+          filters={
+            <FilterItem
+              label="Status"
+              options={[
+                { label: "All Status", value: "all" },
+                { label: "Active", value: "active" },
+                { label: "Inactive", value: "inactive" },
+              ]}
+              value={statusFilter}
+              onChange={(v) => setStatusFilter(v)}
+            />
+          }
+        />
+        <SharedDataTable
+          data={filteredData}
+          columns={columns}
+          freezeFirst
+          freezeLast
+          rowsPerPage={10}
+          onRowClick={(brand) => router.push(`/brands/${brand.id}`)}
+        />
+      </div>
     </TooltipProvider>
   );
 }

@@ -15,7 +15,7 @@ export default function NewBrandPage() {
     console.log("Creating brand:", data);
     await new Promise((resolve) => setTimeout(resolve, 1000));
     setIsSubmitting(false);
-    router.push("/brands");
+    router.push("/brands/brand_1");
   };
 
   return (

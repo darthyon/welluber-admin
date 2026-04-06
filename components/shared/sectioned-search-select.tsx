@@ -17,6 +17,7 @@ interface SectionedSearchSelectProps {
   placeholder?: string;
   className?: string;
   clearable?: boolean;
+  disabled?: boolean;
 }
 
 export function SectionedSearchSelect({ 
@@ -25,7 +26,8 @@ export function SectionedSearchSelect({
   onChange,
   placeholder = "Select service...",
   className,
-  clearable = true
+  clearable = true,
+  disabled = false
 }: SectionedSearchSelectProps) {
   const [query, setQuery] = React.useState("");
   const [isOpen, setIsOpen] = React.useState(false);
@@ -88,18 +90,20 @@ export function SectionedSearchSelect({
     <div className={cn("relative w-full", className)} ref={containerRef}>
       <button
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => !disabled && setIsOpen(!isOpen)}
+        disabled={disabled}
         className={cn(
           "w-full flex items-center justify-between px-4 py-2.5 rounded-xl border bg-white text-[13px] transition-all text-left pr-12",
           isOpen ? "border-primary ring-2 ring-primary/10" : "border-zinc-200 hover:border-zinc-300",
-          !value && "text-zinc-400"
+          !value && "text-zinc-400",
+          disabled && "opacity-60 cursor-not-allowed bg-zinc-50"
         )}
       >
         <span className="truncate">{value || placeholder}</span>
       </button>
 
       <div className="absolute right-3 top-[22px] -translate-y-1/2 flex items-center gap-1.5 px-0.5 pointer-events-none">
-        {clearable && value && (
+        {!disabled && clearable && value && (
           <button
             type="button"
             onClick={handleClear}
@@ -109,7 +113,7 @@ export function SectionedSearchSelect({
             <X size={12} weight="bold" />
           </button>
         )}
-        <CaretDown size={14} className={cn("text-zinc-400 transition-transform shrink-0", isOpen && "rotate-180")} />
+        <CaretDown size={14} className={cn("text-zinc-400 transition-transform shrink-0", isOpen && "rotate-180", disabled && "opacity-40")} />
       </div>
 
       {isOpen && typeof document !== "undefined" && createPortal(

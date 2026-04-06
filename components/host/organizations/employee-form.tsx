@@ -84,6 +84,9 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
     startTerminationDate: "",
     hasDependents: false,
     probationMode: "3m" as "3m" | "6m" | "date",
+    department: "",
+    role: "",
+    gender: "male" as "male" | "female" | "other",
   });
 
   const [dependents, setDependents] = useState<Dependent[]>([]);
@@ -248,6 +251,22 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
 
           <div className="space-y-1.5">
             <label className="text-[11px] font-semibold text-muted-foreground/70 flex items-center gap-1.5">
+              Gender
+              <span className="text-rose-500">*</span>
+            </label>
+            <select 
+              className="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-[14px] outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-medium text-zinc-700"
+              value={formData.gender}
+              onChange={(e) => setFormData({ ...formData, gender: e.target.value as any })}
+            >
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-semibold text-muted-foreground/70 flex items-center gap-1.5">
               Corporate Email
             </label>
             <div className="relative">
@@ -313,6 +332,26 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
                   <DiceFive size={16} />
                 </button>
               </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-semibold text-muted-foreground/70">Department</label>
+              <input 
+                placeholder="e.g. Engineering"
+                className="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-[14px] outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-medium text-zinc-700"
+                value={formData.department}
+                onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-semibold text-muted-foreground/70">Role / Designation</label>
+              <input 
+                placeholder="e.g. Senior Software Engineer"
+                className="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-[14px] outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-medium text-zinc-700"
+                value={formData.role}
+                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+              />
             </div>
           </div>
 

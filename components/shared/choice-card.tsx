@@ -11,6 +11,7 @@ interface ChoiceCardProps {
   selected: boolean;
   onSelect: () => void;
   className?: string;
+  disabled?: boolean;
 }
 
 export function ChoiceCard({
@@ -19,16 +20,18 @@ export function ChoiceCard({
   icon: Icon,
   selected,
   onSelect,
-  className
+  className,
+  disabled = false
 }: ChoiceCardProps) {
   return (
     <div
-      onClick={onSelect}
+      onClick={() => !disabled && onSelect()}
       className={cn(
-        "relative flex items-center gap-4 p-4 rounded-xl border-2 transition-all cursor-pointer group",
+        "relative flex items-center gap-4 p-4 rounded-xl border-2 transition-all group",
         selected
           ? "border-primary bg-primary/5 shadow-sm"
           : "border-border bg-card hover:border-border/80 hover:bg-muted/30",
+        !disabled ? "cursor-pointer" : "cursor-not-allowed opacity-60 grayscale-[0.2]",
         className
       )}
     >
