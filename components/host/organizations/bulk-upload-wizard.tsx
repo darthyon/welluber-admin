@@ -27,11 +27,11 @@ interface BulkUploadWizardProps {
 type UploadStep = "upload" | "processing" | "preview" | "success";
 
 const MOCK_RECORDS = [
-  { name: "Robert Fox", email: "robert.f@acme.com", date: "2026-04-10", policies: "Wellness Allocation", status: "Valid", branch: "ACME HQ" },
-  { name: "Jenny Wilson", email: "jenny.w@acme.com", date: "2026-05-15", policies: "Lifestyle Pocket", status: "Valid", branch: "ACME Subang Jaya" },
-  { name: "Dianne Russell", email: "dianne.r@acme.com", date: "2026-04-01", policies: "Wellness Allocation", status: "Valid", branch: "ACME HQ" },
-  { name: "Unknown User", email: "", date: "2026-04-20", policies: "Wellness Allocation", status: "Issue", issue: "Missing email", branch: "ACME HQ" },
-  { name: "Guy Hawkins", email: "guy.h@acme.com", date: "Invalid Date", policies: "Wellness Allocation", status: "Issue", issue: "Invalid join date", branch: "ACME HQ" },
+  { code: "E001", name: "Robert Fox", email: "robert.f@acme.com", dob: "1990-05-12", idType: "IC", idNumber: "900512-14-5231", date: "2026-04-10", policies: "Wellness Allocation", status: "Valid", branch: "ACME HQ" },
+  { code: "E002", name: "Jenny Wilson", email: "jenny.w@acme.com", dob: "1988-11-24", idType: "Passport", idNumber: "A12345678", date: "2026-05-15", policies: "Lifestyle Pocket", status: "Valid", branch: "ACME Subang Jaya" },
+  { code: "E003", name: "Dianne Russell", email: "dianne.r@acme.com", dob: "1995-02-14", idType: "IC", idNumber: "950214-10-6642", date: "2026-04-01", policies: "Wellness Allocation", status: "Valid", branch: "ACME HQ" },
+  { code: "", name: "Unknown User", email: "", dob: "1992-08-30", idType: "IC", idNumber: "920830-14-1123", date: "2026-04-20", policies: "Wellness Allocation", status: "Issue", issue: "Missing code & email", branch: "ACME HQ" },
+  { code: "E005", name: "Guy Hawkins", email: "guy.h@acme.com", dob: "Invalid", idType: "IC", idNumber: "", date: "Invalid Date", policies: "Wellness Allocation", status: "Issue", issue: "Invalid DOB, Join Date & ID", branch: "ACME HQ" },
 ];
 
 export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
@@ -69,11 +69,11 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
   };
 
   const MOCK_RECORDS = [
-    { name: "Robert Fox", email: "robert.f@acme.com", date: "2026-04-10", policies: "Standard Health", status: "Valid", branch: "ACME HQ" },
-    { name: "Jenny Wilson", email: "jenny.w@acme.com", date: "2026-05-15", policies: "Executive Wellness", status: "Valid", branch: "ACME Subang Jaya" },
-    { name: "Dianne Russell", email: "dianne.r@acme.com", date: "2026-04-01", policies: "Standard Health", status: "Valid", branch: "ACME HQ" },
-    { name: "Unknown User", email: "", date: "2026-04-20", policies: "Standard Health", status: "Issue", issue: "Missing Email", branch: "ACME HQ" },
-    { name: "Guy Hawkins", email: "guy.h@acme.com", date: "Invalid Date", policies: "Standard Health", status: "Issue", issue: "Invalid Join Date", branch: "ACME HQ" },
+    { id: "rec_0", code: "E001", name: "Robert Fox", email: "robert.f@acme.com", dob: "1990-05-12", idType: "IC", idNumber: "900512-14-5231", date: "2026-04-10", policies: "Standard Health", status: "Valid", branch: "ACME HQ" },
+    { id: "rec_1", code: "E002", name: "Jenny Wilson", email: "jenny.w@acme.com", dob: "1988-11-24", idType: "Passport", idNumber: "A12345678", date: "2026-05-15", policies: "Executive Wellness", status: "Valid", branch: "ACME Subang Jaya" },
+    { id: "rec_2", code: "E003", name: "Dianne Russell", email: "dianne.r@acme.com", dob: "1995-02-14", idType: "IC", idNumber: "950214-10-6642", date: "2026-04-01", policies: "Standard Health", status: "Valid", branch: "ACME HQ" },
+    { id: "rec_3", code: "", name: "Unknown User", email: "", dob: "1992-08-30", idType: "IC", idNumber: "920830-14-1123", date: "2026-04-20", policies: "Standard Health", status: "Issue", issue: "Missing Code & Email", branch: "ACME HQ" },
+    { id: "rec_4", code: "E005", name: "Guy Hawkins", email: "guy.h@acme.com", dob: "Invalid", idType: "IC", idNumber: "", date: "Invalid Date", policies: "Standard Health", status: "Issue", issue: "Invalid DOB, Join Date & ID", branch: "ACME HQ" },
   ];
 
   const [isEditing, setIsEditing] = useState(false);
@@ -91,6 +91,63 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
   };
 
   const columns: Column<any>[] = [
+    {
+      header: "Employee ID",
+      render: (row) => (
+        <div className="flex flex-col">
+          {isEditing ? (
+            <input 
+              value={row.code} 
+              onChange={(e) => handleRecordChange(row.id, "code", e.target.value)}
+              className={cn(
+                "w-20 text-[12px] font-bold bg-background border border-border rounded px-2 py-1 outline-none focus:border-primary/50",
+                !row.code && "border-rose-300 text-rose-600 bg-rose-50"
+              )}
+              placeholder="ID"
+            />
+          ) : (
+            <span className={cn("text-[13px] font-bold tracking-tight", !row.code ? "text-rose-500 italic" : "text-foreground")}>
+              {row.code || "Missing"}
+            </span>
+          )}
+        </div>
+      )
+    },
+    {
+      header: "Identification",
+      render: (row) => (
+        <div className="flex flex-col gap-1">
+          {isEditing ? (
+            <div className="flex flex-col gap-1">
+              <select 
+                value={row.idType} 
+                onChange={(e) => handleRecordChange(row.id, "idType", e.target.value)}
+                className="w-full text-[11px] font-bold bg-background border border-border rounded px-1.5 py-0.5"
+              >
+                <option value="IC">IC</option>
+                <option value="Passport">Passport</option>
+              </select>
+              <input 
+                value={row.idNumber} 
+                onChange={(e) => handleRecordChange(row.id, "idNumber", e.target.value)}
+                className={cn(
+                  "w-full text-[12px] font-mono bg-background border border-border rounded px-2 py-1 outline-none",
+                  !row.idNumber && "border-rose-300 bg-rose-50"
+                )}
+                placeholder="Number"
+              />
+            </div>
+          ) : (
+            <>
+              <span className="text-[10px] font-bold text-muted-foreground uppercase opacity-60 leading-none">{row.idType}</span>
+              <span className={cn("text-[12px] font-mono", !row.idNumber ? "text-rose-500 italic" : "text-foreground")}>
+                {row.idNumber || "Missing"}
+              </span>
+            </>
+          )}
+        </div>
+      )
+    },
     {
       header: "Name / Email",
       render: (row) => (
@@ -120,6 +177,27 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
       )
     },
     {
+      header: "Birth Date",
+      render: (row) => (
+        <div className="flex items-center gap-2">
+          {isEditing ? (
+            <input 
+              value={row.dob} 
+              onChange={(e) => handleRecordChange(row.id, "dob", e.target.value)}
+              className={cn(
+                "w-full text-[12px] font-mono bg-background border border-border rounded px-2 py-1 outline-none focus:border-primary/50",
+                row.dob === "Invalid" && "border-rose-300 text-rose-600 bg-rose-50"
+              )}
+            />
+          ) : (
+            <span className={cn("font-mono text-[12px]", row.dob === "Invalid" && "text-rose-600 font-bold underline decoration-wavy")}>
+              {row.dob}
+            </span>
+          )}
+        </div>
+      )
+    },
+    {
       header: "Join Date",
       render: (row) => (
         <div className="flex items-center gap-2">
@@ -130,7 +208,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
               onChange={(e) => handleRecordChange(row.id, "date", e.target.value)}
               className={cn(
                 "w-full text-[12px] font-mono bg-background border border-border rounded px-2 py-1 outline-none focus:border-primary/50",
-                row.date === "Invalid Date" && "border-rose-300 text-rose-600"
+                row.date === "Invalid Date" && "border-rose-300 text-rose-600 bg-rose-50"
               )}
             />
           ) : (
@@ -226,7 +304,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
                   </div>
                   <div className="space-y-1">
                     <p className="text-[12px] font-bold text-primary">Required Columns</p>
-                    <p className="text-[11px] text-primary/80 leading-relaxed">Name, Email, Join Date, Branch ID, Staff Code.</p>
+                    <p className="text-[11px] text-primary/80 leading-relaxed">Code, Email, First Name, Last Name, DOB, ID Type, ID Number, Join Date, Branch ID.</p>
                   </div>
                </div>
                <div className="bg-zinc-50 rounded-xl p-4 border border-zinc-200 flex flex-col gap-2 justify-center">

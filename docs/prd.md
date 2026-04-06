@@ -55,7 +55,7 @@ Welluber Account (personal, permanent)
 
 Three-level hierarchy managed by Host Admin. Commission rates are configured at the service category level by Host Admin per SP.
 
-| Category | Service Category (Main Service) | Sub-services (Searchable & Sectioned) |
+| Service Category (Tier 1) | Main Service (Tier 2) | Sub-Service Specifications (Tier 3) |
 |---|---|---|
 | Fitness & Exercise | Gym Access | Daily Pass, Monthly Membership, Annual Membership |
 | | Personal Training | 1-on-1 Sessions, Small Group Training |
@@ -83,7 +83,7 @@ Three-level hierarchy managed by Host Admin. Commission rates are configured at 
 
 **Org Branch:** ID, Name, Type (HQ|Branch Office), Address (full + lat/lon), Timezone, PIC List, Branch Wallet (FK).
 
-**Employee:** ID, Join Date (mandatory — used for prorate), Employee Code, Corporate Email (magic link verification), Probation End Date, Employment Type (Full-time|Part-time|Contract|Internship), Start & Termination Dates.
+**Employee:** ID, Join Date (mandatory — used for prorate), Employee Code (mandatory — unique), Corporate Email (magic link verification), Date of Birth (mandatory), Identification (mandatory — Type: IC|Passport, Number), Mobile Phone (mandatory — Country Prefix + Number), Probation End Date, Employment Type (Full-time|Part-time|Contract|Internship), Start & Termination Dates.
 
 **Dependent:** Child of Employee. Relationship types: spouse, child, mother, father, brother, sister, mother-in-law, father-in-law.
 

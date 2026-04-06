@@ -11,7 +11,7 @@
 ## Overview
 
 Flow 8 has **three parallel configuration workflows** (run at different times, not sequentially):
-1. **Taxonomy Management** (Service categories, main services, sub-services) — run once at launch, then add new categories as needed
+1. **Taxonomy Management** (Service categories, main services (Tier 2), sub-services) — run once at launch, then add new categories as needed
 2. **Policy Management** (Create, clone, assign policies to orgs) — ongoing, as new client contracts arrive or annual refreshes happen
 3. **Commission & Cron Config** (Per-SP rates, expired voucher split, global defaults) — run per-SP onboarding and for ongoing tweaks
 
@@ -24,7 +24,7 @@ All three are **Host Admin only**. No approval workflow. No multi-step confirmat
 ### Happy Path
 
 **1. Host:** Navigates to SCR-CFG-01 (Service Taxonomy Management) [NAVIGATE]  
-   — Sees three-level tree: Categories → Main Services → Sub-services.  
+   — Sees three-level tree: Categories (Tier 1) → Main Services (Tier 2) → Sub-services (Tier 3).  
    — Current taxonomy shown as collapsible tree view or flat list with hierarchy badges.
 
 **2. System:** Loads taxonomy from database [API]  
@@ -66,7 +66,7 @@ From step 3 (if Host clicks "Add Category"):
 
 ---
 
-### Branch B: Edit or Add Main Service
+### Branch B: Edit or Add Main Service (Tier 2)
 
 From step 3 (if Host clicks on a main service or "Add Main Service" under a category):
 

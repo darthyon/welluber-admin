@@ -1,0 +1,109 @@
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> welluber-admin@0.0.1 lint
+> eslint --quiet
+
+
+/Users/yonyusuff/Projects/welluber-admin-console/app/(host)/dashboard/page.tsx
+  152:49  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/yonyusuff/Projects/welluber-admin-console/app/(host)/organizations/[id]/page.tsx
+  703:44  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  737:83  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  782:86  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  914:49  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/yonyusuff/Projects/welluber-admin-console/app/(host)/policies/page.tsx
+  11:44  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/yonyusuff/Projects/welluber-admin-console/app/(host)/service-providers/[id]/edit/page.tsx
+  32:45  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/yonyusuff/Projects/welluber-admin-console/app/(host)/service-providers/new/page.tsx
+  48:45  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  52:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/yonyusuff/Projects/welluber-admin-console/components/host/dashboard/activity-chart.tsx
+  145:58  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/yonyusuff/Projects/welluber-admin-console/components/host/organizations/branch-form.tsx
+   26:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  171:44  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  172:81  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/yonyusuff/Projects/welluber-admin-console/components/host/organizations/bulk-upload-wizard.tsx
+  93:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/yonyusuff/Projects/welluber-admin-console/components/host/organizations/employee-form.tsx
+  47:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/yonyusuff/Projects/welluber-admin-console/components/host/organizations/organization-card.tsx
+  90:52  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/yonyusuff/Projects/welluber-admin-console/components/host/organizations/policy-detail-sheet.tsx
+  162:57  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/yonyusuff/Projects/welluber-admin-console/components/host/policies/benefit-policy-wizard.tsx
+  147:21   error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          @typescript-eslint/no-explicit-any
+  148:24   error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          @typescript-eslint/no-explicit-any
+  220:75   error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          @typescript-eslint/no-explicit-any
+  226:22   error  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+/Users/yonyusuff/Projects/welluber-admin-console/components/host/policies/benefit-policy-wizard.tsx:226:22
+  224 |   const addBenefit = (groupId: string) => {
+  225 |     setBenefits([...benefits, {
+> 226 |       id: `ben-svc-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      |                      ^^^^^^^^^^ Cannot call impure function
+  227 |       groupId,
+  228 |       serviceId: SERVICES[0].id,
+  229 |       amount: 0,                                 react-hooks/purity
+  226:47   error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+/Users/yonyusuff/Projects/welluber-admin-console/components/host/policies/benefit-policy-wizard.tsx:226:47
+  224 |   const addBenefit = (groupId: string) => {
+  225 |     setBenefits([...benefits, {
+> 226 |       id: `ben-svc-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      |                                               ^^^^^^^^^^^^^ Cannot call impure function
+  227 |       groupId,
+  228 |       serviceId: SERVICES[0].id,
+  229 |       amount: 0,  react-hooks/purity
+  234:67   error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          @typescript-eslint/no-explicit-any
+  239:45   error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          @typescript-eslint/no-explicit-any
+  484:97   error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          @typescript-eslint/no-explicit-any
+  494:106  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          @typescript-eslint/no-explicit-any
+
+/Users/yonyusuff/Projects/welluber-admin-console/components/host/service-providers/commission-schema-editor.tsx
+   44:53  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  117:45  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/yonyusuff/Projects/welluber-admin-console/components/host/service-providers/sp-branch-form.tsx
+   36:49   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  354:63   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  381:106  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  410:68   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/yonyusuff/Projects/welluber-admin-console/components/host/service-providers/sp-voucher-form.tsx
+   71:50  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  261:40  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  261:98  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  500:31  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  500:77  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/yonyusuff/Projects/welluber-admin-console/components/host/service-providers/tax-profile-form.tsx
+  38:47  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/yonyusuff/Projects/welluber-admin-console/components/shared/data-table.tsx
+  111:83  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/yonyusuff/Projects/welluber-admin-console/components/shared/location-picker.tsx
+  33:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/yonyusuff/Projects/welluber-admin-console/components/shared/user-nav.tsx
+  24:10  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 41 problems (41 errors, 0 warnings)
+

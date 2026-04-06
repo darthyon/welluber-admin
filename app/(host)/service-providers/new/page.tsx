@@ -21,25 +21,43 @@ import { Button } from "@/components/ui/button";
 import { SearchableMultiSelect } from "@/components/shared/searchable-multi-select";
 import { SERVICE_TAXONOMY } from "@/features/organizations/constants";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { MOCK_BRANDS } from "@/features/brands/mock-data";
+import { BrandSelectionModal } from "@/components/host/service-providers/brand-selection-modal";
+import { Brand } from "@/types/brand";
+
+type Step = "selection" | "details";
+type BrandType = "new" | "existing";
+
 export default function NewServiceProviderPage() {
   const router = useRouter();
+  const [step, setStep] = useState<Step>("selection");
+  const [brandType, setBrandType] = useState<BrandType | null>(null);
+  const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [isBrandModalOpen, setIsBrandModalOpen] = useState(false);
 
   const {
     register,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors },
-  } = useForm<CreateSpData>({
+  } = useForm<CreateSpData & { brandName?: string; brandLogo?: string }>({
     resolver: zodResolver(createSpSchema as any),
     defaultValues: { isActive: true, serviceCategories: [] },
   });
 
-  const onSubmit = async (data: CreateSpData) => {
+  const onSubmit = async (data: any) => {
     setIsSubmitting(true);
     try {
-      const res = await createSp({ ...data, serviceCategories: selectedCategories });
+      // In a real app, logic would differ based on brandType (new vs existing)
+      const res = await createSp({ 
+        ...data, 
+        brandId: selectedBrand?.id || "NEW-BRAND-ID",
+        serviceCategories: selectedCategories 
+      });
       if (res.success) {
         router.push(`/service-providers/${res.data.id}`);
       }
@@ -54,6 +72,12 @@ export default function NewServiceProviderPage() {
     setValue("serviceCategories", cats);
   };
 
+  const handleBrandSelect = (brand: Brand) => {
+    setSelectedBrand(brand);
+    setIsBrandModalOpen(false);
+    setStep("details");
+  };
+
   const inputCls = (hasError?: boolean) =>
     cn(
       "w-full px-3 py-2 bg-background border rounded-md text-[14px] outline-none transition-colors",
@@ -62,22 +86,118 @@ export default function NewServiceProviderPage() {
         : "border-border focus:border-foreground/30 focus:bg-muted/30"
     );
 
+  if (step === "selection") {
+    return (
+      <div className="max-w-2xl mx-auto space-y-6 pb-12">
+        <div>
+          <Link
+            href="/service-providers"
+            className="inline-flex items-center gap-1.5 text-[13px] font-medium text-muted-foreground hover:text-foreground transition-colors mb-4"
+          >
+            <CaretLeft size={16} /> Back to Service Providers
+          </Link>
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">Add Service Provider</h1>
+          <p className="text-muted-foreground text-[13px] mt-1 font-normal">Select how you want to categorize this service provider account.</p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
+          <button
+            onClick={() => { setBrandType("new"); setStep("details"); }}
+            className="group flex flex-col p-6 bg-card border border-border/60 rounded-xl hover:border-primary/50 hover:bg-primary/[0.02] transition-all text-left space-y-3 shadow-sm hover:shadow-md"
+          >
+            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+              <Plus size={20} weight="bold" />
+            </div>
+            <div>
+              <h3 className="text-[15px] font-bold text-foreground">New Brand</h3>
+              <p className="text-[12px] text-muted-foreground mt-1 leading-relaxed">Create a fresh brand record and link this service provider account to it.</p>
+            </div>
+          </button>
+
+          <button
+            onClick={() => { setBrandType("existing"); setIsBrandModalOpen(true); }}
+            className="group flex flex-col p-6 bg-card border border-border/60 rounded-xl hover:border-primary/50 hover:bg-primary/[0.02] transition-all text-left space-y-3 shadow-sm hover:shadow-md"
+          >
+            <div className="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-500 group-hover:scale-110 transition-transform">
+              <Tag size={20} weight="fill" />
+            </div>
+            <div>
+              <h3 className="text-[15px] font-bold text-foreground">Existing Brand</h3>
+              <p className="text-[12px] text-muted-foreground mt-1 leading-relaxed">Select from your existing portfolio of brands to link this service provider.</p>
+            </div>
+          </button>
+        </div>
+
+        <BrandSelectionModal 
+          isOpen={isBrandModalOpen}
+          onClose={() => setIsBrandModalOpen(false)}
+          onSelect={handleBrandSelect}
+          brands={MOCK_BRANDS}
+        />
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-2xl mx-auto space-y-6 pb-12">
+    <div className="max-w-2xl mx-auto space-y-6 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Back */}
-      <div>
-        <Link
-          href="/service-providers"
-          className="inline-flex items-center gap-1.5 text-[13px] font-medium text-muted-foreground hover:text-foreground transition-colors mb-4"
+      <div className="flex flex-col gap-4">
+        <button
+          onClick={() => setStep("selection")}
+          className="inline-flex items-center gap-1.5 text-[13px] font-medium text-muted-foreground hover:text-foreground transition-colors w-fit"
         >
-          <CaretLeft size={16} /> Back to Service Providers
-        </Link>
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">Add Service Provider</h1>
-        <p className="text-muted-foreground text-[13px] mt-1">Register a wellness service provider on the platform.</p>
+          <CaretLeft size={16} /> Change Brand Selection
+        </button>
+        <div className="flex items-center justify-between">
+            <div>
+                <h1 className="text-xl font-semibold tracking-tight text-foreground">Account Details</h1>
+                <p className="text-muted-foreground text-[13px] mt-1">
+                    {brandType === "new" ? "Registering a new brand and its first service provider." : `Adding a new provider under the ${selectedBrand?.name} brand.`}
+                </p>
+            </div>
+            {selectedBrand && (
+                <div className="flex items-center gap-2 bg-muted/40 px-3 py-1.5 rounded-lg border border-border/40">
+                    <Avatar className="h-6 w-6 rounded">
+                        <AvatarImage src={selectedBrand.logo} />
+                        <AvatarFallback className="text-[9px] font-bold">{selectedBrand.name.substring(0,2)}</AvatarFallback>
+                    </Avatar>
+                    <span className="text-[12px] font-bold text-foreground/80">{selectedBrand.name}</span>
+                </div>
+            )}
+        </div>
       </div>
 
       <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
         <form id="newSpForm" onSubmit={handleSubmit(onSubmit)}>
+
+          {brandType === "new" && (
+            <div className="p-6 border-b border-border space-y-5 bg-muted/5">
+                <div className="flex items-center gap-2 pb-2">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                        <Tag size={16} weight="fill" />
+                    </div>
+                    <h3 className="text-[15px] font-bold text-foreground">Brand Identity</h3>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div className="space-y-1.5 sm:col-span-1">
+                        <label className="text-[13px] font-medium text-foreground">Brand Name</label>
+                        <input
+                            {...register("brandName")}
+                            className={inputCls()}
+                            placeholder="e.g. Zenith Wellness"
+                        />
+                    </div>
+                    <div className="space-y-1.5 sm:col-span-1">
+                        <label className="text-[13px] font-medium text-foreground">Brand Logo URL</label>
+                        <input
+                            {...register("brandLogo")}
+                            className={inputCls()}
+                            placeholder="https://..."
+                        />
+                    </div>
+                </div>
+            </div>
+          )}
 
           {/* Section: Basic Info */}
           <div className="p-6 border-b border-border space-y-5">
@@ -85,12 +205,12 @@ export default function NewServiceProviderPage() {
               <div className="w-8 h-8 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-500">
                 <Storefront size={16} weight="fill" />
               </div>
-              <h3 className="text-[15px] font-semibold text-foreground">Provider Profile</h3>
+              <h3 className="text-[15px] font-bold text-foreground">Provider Profile</h3>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="space-y-1.5 sm:col-span-2">
-                <label className="text-[13px] font-medium text-foreground">Company Name</label>
+                <label className="text-[13px] font-medium text-foreground">Service Provider Name</label>
                 <input
                   {...register("name")}
                   className={inputCls(!!errors.name)}

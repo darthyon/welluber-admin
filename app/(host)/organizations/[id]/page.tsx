@@ -37,6 +37,7 @@ import { BulkUploadWizard } from "@/components/host/organizations/bulk-upload-wi
 import { AssignedPolicyList } from "@/components/host/organizations/assigned-policy-list";
 import { LinkPolicyModal } from "@/components/host/organizations/link-policy-modal";
 import { BenefitPolicyWizard } from "@/components/host/policies/benefit-policy-wizard";
+import { BenefitPolicy } from "@/types/policy";
 import { DetailSection } from "@/components/shared/detail-section";
 import { DetailField } from "@/components/shared/detail-field";
 import { BentoGrid, BentoCard } from "@/components/shared/bento-grid";
@@ -109,7 +110,7 @@ export default function OrganizationDetailPage() {
   const [isCreatingPolicy, setIsCreatingPolicy] = useState(false);
   const [viewingPolicyId, setViewingPolicyId] = useState<string | null>(null);
   const [editingPolicyId, setEditingPolicyId] = useState<string | null>(null);
-  const [assignedPolicies, setAssignedPolicies] = useState([
+  const [assignedPolicies, setAssignedPolicies] = useState<(BenefitPolicy & { assignedTo: string; employeeCount: number; lastUpdated: string })[]>([
     {
       id: "pol_1",
       name: "Wellness Allocation",
@@ -874,10 +875,10 @@ export default function OrganizationDetailPage() {
                   }}
                   onSuccess={(data) => {
                     if (editingPolicyId) {
-                      setAssignedPolicies(prev => prev.map(p => p.id === editingPolicyId ? { ...p, ...data } : p));
+                      setAssignedPolicies(prev => prev.map(p => p.id === editingPolicyId ? { ...p, ...data.policy } : p));
                       setToastMessage("Policy updated successfully");
                     } else {
-                      handleLinkPolicy(data.id || "new_pol");
+                      handleLinkPolicy(data.policy.id || "new_pol");
                     }
                     setIsCreatingPolicy(false);
                     setEditingPolicyId(null);

@@ -108,7 +108,7 @@ export function CustomComboBox({
               className="w-full text-left px-3 py-2 rounded-lg text-[13px] bg-primary/5 text-primary font-semibold flex items-center gap-2 mb-1 border-b border-zinc-50"
             >
               <Plus size={14} weight="bold" />
-              <span>Add custom: "{value}"</span>
+              <span>Add custom: &quot;{value}&quot;</span>
             </button>
           )}
 

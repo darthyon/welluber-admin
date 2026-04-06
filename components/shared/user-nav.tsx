@@ -21,7 +21,11 @@ import {
 import { cn } from "@/lib/utils"
 
 interface UserNavProps {
-  user?: any
+  user?: {
+    name?: string;
+    email?: string;
+    image?: string;
+  }
 }
 
 export function UserNav({ user: userProp }: UserNavProps) {
@@ -36,7 +40,7 @@ export function UserNav({ user: userProp }: UserNavProps) {
       .join("")
       .toUpperCase()
       .substring(0, 2)
-  }, [user?.name])
+  }, [user])
 
   return (
     <DropdownMenu>

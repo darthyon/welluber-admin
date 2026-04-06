@@ -71,7 +71,7 @@ export default function EditOrganizationPage() {
             <CaretLeft size={16} /> Back to Detail Profile
           </Link>
           <h1 className="text-xl font-semibold tracking-tight text-foreground">Edit Organisation</h1>
-          <p className="text-muted-foreground text-[13px] mt-1">Make changes to the corporate client's core identity.</p>
+          <p className="text-muted-foreground text-[13px] mt-1">Make changes to the corporate client&apos;s core identity.</p>
         </div>
 
         {/* Form Card */}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   ShieldCheck,
   CaretLeft,
@@ -26,7 +26,7 @@ import { DetailSection } from "@/components/shared/detail-section";
 import { SuccessCelebration } from "@/components/shared/success-celebration";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
-import { BenefitPolicy, BenefitGroup, Benefit, PolicyStatus } from "@/types/policy";
+import { BenefitPolicy, BenefitGroup, Benefit, PolicyStatus, DistributionType } from "@/types/policy";
 import { UtilisationClaimsTable, type EmployeeUtilisationRow } from "@/components/shared/utilisation-claims-table";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -144,8 +144,8 @@ function StatusPicker({ value, onChange, disabled }: { value: PolicyStatus; onCh
 
 interface BenefitPolicyWizardProps {
   onCancel: () => void;
-  onSuccess: (data: any) => void;
-  onSaveDraft?: (data: any) => void;
+  onSuccess: (data: { policy: Partial<BenefitPolicy>; groups: BenefitGroup[]; benefits: Benefit[] }) => void;
+  onSaveDraft?: (data: { policy: Partial<BenefitPolicy>; groups: BenefitGroup[]; benefits: Benefit[] }) => void;
   onEdit?: () => void;
   mode?: "create" | "edit" | "view";
   initialData?: {
@@ -201,41 +201,47 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
     });
   };
 
-  const addGroup = () => {
+  const addGroup = useCallback(() => {
     const newGroup: BenefitGroup = {
-      id: Math.random().toString(36).substr(2, 9),
+      id: `ben-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
       policyId: policyData.id || "temp",
       name: "New Benefit Group",
       description: "",
       distributionType: "IndividualBenefitAmount",
     };
     setGroups([...groups, newGroup]);
-  };
+  }, [groups, policyData.id]);
 
   const removeGroup = (groupId: string) => {
     setGroups(groups.filter(g => g.id !== groupId));
     setBenefits(benefits.filter(b => b.groupId !== groupId));
   };
 
-  const updateGroup = (groupId: string, field: keyof BenefitGroup, value: any) => {
+  const updateGroup = (groupId: string, field: keyof BenefitGroup, value: string | number | DistributionType) => {
     setGroups(groups.map(g => g.id === groupId ? { ...g, [field]: value } : g));
   };
 
-  const addBenefit = (groupId: string) => {
+  const addBenefit = useCallback((groupId: string) => {
     setBenefits([...benefits, {
-      id: Math.random().toString(36).substr(2, 9),
+      id: `ben-svc-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
       groupId,
       serviceId: SERVICES[0].id,
       amount: 0,
       coPayment: { required: false, type: "Percentage", value: 0 },
     }]);
-  };
+  }, [benefits]);
 
-  const updateBenefit = (benefitId: string, field: string, value: any) => {
+  const updateBenefit = (benefitId: string, field: string, value: string | number | boolean) => {
     setBenefits(benefits.map(b => {
       if (b.id !== benefitId) return b;
       if (field.includes(".")) {
         const [parent, child] = field.split(".");
+        if (parent === "coPayment") {
+          return { 
+            ...b, 
+            coPayment: { ...b.coPayment, [child]: value } 
+          } as Benefit;
+        }
         return { ...b, [parent]: { ...(b as any)[parent], [child]: value } };
       }
       return { ...b, [field]: value };
@@ -254,7 +260,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
     await new Promise(resolve => setTimeout(resolve, 2000));
     setIsSubmitting(false);
     setIsSuccess(true);
-    setTimeout(() => onSuccess({ ...policyData, groups, benefits }), 2000);
+    setTimeout(() => onSuccess({ policy: policyData, groups, benefits }), 2000);
   };
 
   // ── Success ────────────────────────────────────────────────────────────────
@@ -774,7 +780,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
             ) : (
               <>
                 <button
-                  onClick={() => onSaveDraft?.({ ...policyData, groups, benefits })}
+                  onClick={() => onSaveDraft?.({ policy: policyData, groups, benefits })}
                   className="text-zinc-500 font-medium text-[14px] px-4 py-2 rounded-full hover:bg-zinc-100 transition-colors"
                 >
                   Save as Draft

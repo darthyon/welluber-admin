@@ -18,7 +18,7 @@
    — System: shows template download + file picker
 
 **3. Org Admin:** Downloads template (optional) [DOWNLOAD]  
-   — CSV headers: Employee Code, Corporate Email, First Name, Last Name, Employment Type, Join Date, Probation End Date, Branch, Termination Date (optional)
+   — CSV headers: Employee Code, Corporate Email, First Name, Last Name, Date of Birth, ID Type (IC|Passport), ID Number, Employment Type, Join Date, Probation End Date, Branch, Termination Date (optional)
 
 **4. Org Admin:** Prepares CSV file  
    — Fills in employee data  
@@ -29,6 +29,9 @@
 
 **6. System:** Parses CSV [VALIDATE] [API]  
    — Row-by-row validation:  
+   — Check: employee_code is unique within organization and not empty
+   — Check: date_of_birth is valid date (YYYY-MM-DD) and in the past
+   — Check: id_type in (IC, Passport) and id_number is not empty
    — Check: corporate_email is valid format (email regex)  
    — Check: employment_type in (Full-time, Part-time, Contract, Internship)  
    — Check: join_date is valid date and ≤ today  

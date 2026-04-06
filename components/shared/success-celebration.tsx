@@ -14,19 +14,16 @@ interface SuccessCelebrationProps {
 const COLORS = ["#10b981", "#3b82f6", "#f59e0b", "#6366f1", "#ec4899", "#8b5cf6"];
 
 export function SuccessCelebration({ title, message, className }: SuccessCelebrationProps) {
-  const [particles, setParticles] = useState<{ id: number; x: number; y: number; color: string; size: number }[]>([]);
-
-  useEffect(() => {
-    // Generate particles for confetti burst
-    const newParticles = Array.from({ length: 40 }).map((_, i) => ({
+  const [particles] = useState(() => 
+    Array.from({ length: 40 }).map((_, i) => ({
       id: i,
-      x: 0,
-      y: 0,
+      x: (Math.random() - 0.5) * 400,
+      y: (Math.random() - 0.5) * 400 - 50,
+      rotate: Math.random() * 360,
       color: COLORS[Math.floor(Math.random() * COLORS.length)],
       size: Math.random() * 8 + 4,
-    }));
-    setParticles(newParticles);
-  }, []);
+    }))
+  );
 
   return (
     <div className={cn("flex flex-col items-center justify-center py-12 text-center overflow-hidden relative", className)}>
@@ -37,11 +34,11 @@ export function SuccessCelebration({ title, message, className }: SuccessCelebra
             key={p.id}
             initial={{ x: 0, y: 0, opacity: 1, scale: 0 }}
             animate={{ 
-              x: (Math.random() - 0.5) * 400, 
-              y: (Math.random() - 0.5) * 400 - 50,
+              x: p.x, 
+              y: p.y,
               opacity: 0,
               scale: 1,
-              rotate: Math.random() * 360
+              rotate: p.rotate
             }}
             transition={{ duration: 1.5, ease: "easeOut" }}
             className="absolute z-0 rounded-sm"

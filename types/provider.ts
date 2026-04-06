@@ -10,7 +10,7 @@ export type SpBranchContactType = "branch_manager" | "staff" | "reception";
 export type DurationUnit = "session" | "min" | "hr" | "day" | "month" | "year";
 export type ValidationUnit = "days" | "months" | "half_year" | "year";
 export type RedemptionUnit = "hr" | "day" | "month";
-export type MembershipStartDay = "immediate" | "1st" | "specific";
+export type MembershipStartDay = "none" | "1st" | "15th";
 
 // ─── Tax Profile ──────────────────────────────────────────────────────────────
 
@@ -142,6 +142,7 @@ export interface SpVoucher {
 
 export interface ServiceProvider {
   id: string;
+  brandId: string; // Links to Brand
   logo?: string;
   name: string;
   registrationNo: string;

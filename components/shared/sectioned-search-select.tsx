@@ -154,7 +154,7 @@ export function SectionedSearchSelect({
               ))
             ) : (
               <div className="p-4 text-center text-zinc-400 text-[12px]">
-                No services found matching "{query}"
+                No services found matching &quot;{query}&quot;
               </div>
             )}
           </div>

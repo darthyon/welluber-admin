@@ -22,6 +22,8 @@ import { DetailSection } from "@/components/shared/detail-section";
 import { DetailField } from "@/components/shared/detail-field";
 import { SuccessCelebration } from "@/components/shared/success-celebration";
 import { DatePickerField } from "@/components/shared/date-picker-field";
+import { PhoneInput } from "@/components/shared/phone-input";
+import { IdentificationInput } from "@/components/shared/identification-input";
 import { cn } from "@/lib/utils";
 
 interface Dependent {
@@ -69,9 +71,11 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
 
   const [formData, setFormData] = useState({
     name: "",
-    employeeId: "",
+    dateOfBirth: "",
+    idType: "IC",
+    idNumber: "",
     email: "",
-    phone: "",
+    phone: "+60 ",
     joinDate: "",
     empCode: "",
     probationMonths: "3",
@@ -91,14 +95,13 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
     setFormData(prev => ({ ...prev, empCode: `ACM-${random}` }));
   };
 
-  // Calculate probation end date when join date or months change
-  useEffect(() => {
-    if (formData.joinDate && formData.probationMonths) {
-      const date = new Date(formData.joinDate);
-      date.setMonth(date.getMonth() + parseInt(formData.probationMonths));
-      setFormData(prev => ({ ...prev, probationEndDate: date.toISOString().split('T')[0] }));
-    }
-  }, [formData.joinDate, formData.probationMonths]);
+  // Helper to get probation end date
+  const getProbationEndDate = (joinDate: string, months: string) => {
+    if (!joinDate || !months) return "";
+    const date = new Date(joinDate + "T00:00:00");
+    date.setMonth(date.getMonth() + parseInt(months));
+    return date.toISOString().split('T')[0];
+  };
 
   const addDependent = () => {
     setDependents([...dependents, { id: Math.random().toString(36).substr(2, 9), relationship: "Spouse", name: "", email: "", phone: "" }]);
@@ -179,7 +182,7 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
             Cancel
           </button>
           <button
-            disabled={isSubmitting || isSuccess || !formData.name || !formData.joinDate}
+            disabled={isSubmitting || isSuccess || !formData.name || !formData.joinDate || !formData.dateOfBirth || !formData.idNumber}
             onClick={handleSubmit}
             className="bg-primary text-white hover:bg-primary/90 font-semibold text-[14px] px-6 py-2 rounded-full shadow-sm shadow-primary/20 transition-all disabled:opacity-40 disabled:cursor-not-allowed min-w-[160px] flex items-center justify-center gap-2"
           >
@@ -218,19 +221,29 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
             </div>
           </div>
 
+          <div className="space-y-1.5 flex flex-col">
+            <label className="text-[11px] font-semibold text-muted-foreground/70 flex items-center gap-1.5">
+              Date of Birth
+              <span className="text-rose-500">*</span>
+            </label>
+            <DatePickerField
+              value={formData.dateOfBirth}
+              onChange={(v) => setFormData({ ...formData, dateOfBirth: v })}
+              placeholder="Select date of birth"
+            />
+          </div>
+
           <div className="space-y-1.5">
             <label className="text-[11px] font-semibold text-muted-foreground/70 flex items-center gap-1.5">
-              Employee ID
+              Identification (IC / Passport)
+              <span className="text-rose-500">*</span>
             </label>
-            <div className="relative">
-              <IdentificationCard size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
-              <input 
-                placeholder="E-100234"
-                className="w-full pl-10 pr-3 py-2 bg-white border border-zinc-200 rounded-lg text-[14px] outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-medium text-zinc-700 font-mono"
-                value={formData.employeeId}
-                onChange={(e) => setFormData({ ...formData, employeeId: e.target.value })}
-              />
-            </div>
+            <IdentificationInput 
+              type={formData.idType}
+              number={formData.idNumber}
+              onTypeChange={(v) => setFormData({ ...formData, idType: v })}
+              onNumberChange={(v) => setFormData({ ...formData, idNumber: v })}
+            />
           </div>
 
           <div className="space-y-1.5">
@@ -242,7 +255,7 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
               <input 
                 type="email"
                 placeholder="sarah.j@acme.com"
-                className="w-full pl-10 pr-3 py-2 bg-white border border-zinc-200 rounded-lg text-[14px] outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-medium text-zinc-700"
+                className="w-full pl-10 pr-3 py-2 bg-white border border-zinc-200 rounded-lg text-[14px] outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-medium text-zinc-700 font-mono"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               />
@@ -251,17 +264,13 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
 
           <div className="space-y-1.5">
             <label className="text-[11px] font-semibold text-muted-foreground/70 flex items-center gap-1.5">
-              Phone Number
+              Mobile Phone Number
+              <span className="text-rose-500">*</span>
             </label>
-            <div className="relative">
-              <Phone size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
-              <input 
-                placeholder="+60 12-345 6789"
-                className="w-full pl-10 pr-3 py-2 bg-white border border-zinc-200 rounded-lg text-[14px] outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-medium text-zinc-700 font-mono"
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              />
-            </div>
+            <PhoneInput 
+              value={formData.phone}
+              onChange={(v) => setFormData({ ...formData, phone: v })}
+            />
           </div>
         </div>
       </DetailSection>

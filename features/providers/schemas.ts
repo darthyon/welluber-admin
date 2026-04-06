@@ -92,6 +92,7 @@ export const createVoucherSchema = z.object({
   }),
   branchScope: z.enum(["all", "specific"]).default("all"),
   branchIds: z.array(z.string()).default([]),
+  membershipStartDay: z.enum(["none", "1st", "15th"]).default("none"),
 });
 
 export type CreateVoucherData = z.infer<typeof createVoucherSchema>;

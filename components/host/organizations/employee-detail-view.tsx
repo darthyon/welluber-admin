@@ -8,6 +8,7 @@ import {
   Buildings, 
   Shield,
   IdentificationBadge,
+  IdentificationCard,
   EnvelopeSimple,
   CalendarBlank,
   DotsThreeVertical,
@@ -44,8 +45,10 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
     email: "robert.fox@acme.com",
     avatar: "RF",
     status: "Linked",
-    empCode: "EMP-001",
-    externalId: "EXT-88291",
+    empCode: "ACM-1002",
+    dateOfBirth: "12 May 1990",
+    idType: "IC",
+    idNumber: "900512-14-5231",
     joinDate: "12 Oct 2023",
     branch: "ACME HQ (Kuala Lumpur)",
     workType: "Full-time",
@@ -181,9 +184,14 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
                 icon={<IdentificationBadge size={16} />}
               />
               <DetailField 
-                label="External ID" 
-                value={employeeData.externalId} 
-                icon={<Globe size={16} />}
+                label="Date of Birth" 
+                value={employeeData.dateOfBirth} 
+                icon={<Calendar size={16} />}
+              />
+              <DetailField 
+                label={`Identification (${employeeData.idType})`} 
+                value={employeeData.idNumber} 
+                icon={<IdentificationCard size={16} />}
               />
               <DetailField 
                 label="Mobile Number" 

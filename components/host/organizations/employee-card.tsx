@@ -43,20 +43,23 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
   const [dragConstraints, setDragConstraints] = useState({ left: 0, right: 0 });
-  const initials = employee.name.split(" ").map(n => n[0]).join("");
   
+  const initials = employee.name.split(" ").map(n => n[0]).join("");
   const hasMultipleItems = employee.benefitPolicies.length > 1;
   const currentItem = employee.benefitPolicies[policyIndex] || employee.benefitPolicies[0];
 
   useEffect(() => {
-    if (scrollRef.current && innerRef.current) {
-      const outerWidth = scrollRef.current.offsetWidth;
-      const innerWidth = innerRef.current.scrollWidth;
-      setDragConstraints({
-        left: outerWidth > innerWidth ? 0 : outerWidth - innerWidth,
-        right: 0
-      });
-    }
+    const timer = setTimeout(() => {
+      if (scrollRef.current && innerRef.current) {
+        const outerWidth = scrollRef.current.offsetWidth;
+        const innerWidth = innerRef.current.scrollWidth;
+        setDragConstraints({
+          left: outerWidth > innerWidth ? 0 : outerWidth - innerWidth,
+          right: 0
+        });
+      }
+    }, 100);
+    return () => clearTimeout(timer);
   }, [currentItem]);
 
   const nextItem = () => {
@@ -152,7 +155,7 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
                       dragElastic={0.05}
                       whileTap={{ cursor: "grabbing" }}
                     >
-                      {currentItem.benefitGroups.map((group, idx) => (
+                      {currentItem.benefitGroups.map((group: string, idx: number) => (
                         <div 
                           key={idx}
                           className="bg-white border border-zinc-200 text-zinc-500 px-2.5 py-1 rounded-full text-[10px] font-bold shadow-sm whitespace-nowrap shrink-0 hover:border-primary/20 hover:text-primary transition-all duration-300 pointer-events-none"

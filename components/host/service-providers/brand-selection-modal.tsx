@@ -1,0 +1,93 @@
+"use client";
+
+import { useState } from "react";
+import { MagnifyingGlass, Check, CaretRight } from "@phosphor-icons/react";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle,
+  DialogDescription 
+} from "@/components/ui/dialog";
+import { SearchBar } from "@/components/shared/search-bar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Brand } from "@/types/brand";
+import { cn } from "@/lib/utils";
+
+interface BrandSelectionModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSelect: (brand: Brand) => void;
+  brands: Brand[];
+}
+
+export function BrandSelectionModal({ isOpen, onClose, onSelect, brands }: BrandSelectionModalProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredBrands = brands.filter(brand => 
+    brand.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    brand.id.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md p-0 overflow-hidden border-none shadow-2xl rounded-2xl bg-card">
+        <DialogHeader className="p-6 pb-2">
+          <DialogTitle className="text-lg font-bold tracking-tight">Select Existing Brand</DialogTitle>
+          <DialogDescription className="text-[13px] text-muted-foreground">
+            Search and choose a brand to link this service provider account.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="px-6 pb-4">
+          <SearchBar 
+            placeholder="Search brands by name or ID..."
+            value={searchQuery}
+            onChange={setSearchQuery}
+            className="h-10 bg-muted/40 border-border/40 focus:bg-background"
+          />
+        </div>
+
+        <div className="max-h-[350px] overflow-y-auto px-2 pb-4 space-y-1 custom-scrollbar">
+          {filteredBrands.length > 0 ? (
+            filteredBrands.map((brand) => (
+              <button
+                key={brand.id}
+                onClick={() => onSelect(brand)}
+                className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-muted/60 transition-all group text-left"
+              >
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-9 w-9 rounded-lg border border-border/40 shadow-sm">
+                    <AvatarImage src={brand.logo} />
+                    <AvatarFallback className="text-[10px] font-bold bg-muted-foreground/10 text-muted-foreground">
+                        {brand.name.substring(0, 2).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col">
+                    <span className="text-[14px] font-bold text-foreground group-hover:text-primary transition-colors leading-tight">
+                        {brand.name}
+                    </span>
+                    <span className="text-[11px] text-muted-foreground opacity-70">
+                        {brand.assignedSpCount} SPs • ID: {brand.id}
+                    </span>
+                  </div>
+                </div>
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:bg-primary/10 group-hover:text-primary transition-all">
+                    <CaretRight size={16} weight="bold" />
+                </div>
+              </button>
+            ))
+          ) : (
+            <div className="py-12 text-center">
+                <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto text-muted-foreground mb-3 opacity-40">
+                    <MagnifyingGlass size={24} weight="light" />
+                </div>
+                <p className="text-[13px] font-medium text-muted-foreground">No brands found</p>
+                <p className="text-[11px] text-muted-foreground/60 mt-1">Try a different search term.</p>
+            </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
