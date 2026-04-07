@@ -11,6 +11,7 @@ interface LogoUploadProps {
   error?: string;
   label?: string;
   className?: string;
+  disabled?: boolean;
 }
 
 /**
@@ -22,7 +23,8 @@ export function LogoUpload({
   onChange,
   error,
   label = "Upload Logo",
-  className
+  className,
+  disabled
 }: LogoUploadProps) {
   const [preview, setPreview] = useState<string | null>(
     typeof value === "string" ? value : null
@@ -56,9 +58,10 @@ export function LogoUpload({
       {label && <label className="text-[13px] font-medium text-foreground">{label}</label>}
       
       <div 
-        onClick={() => fileInputRef.current?.click()}
+        onClick={() => !disabled && fileInputRef.current?.click()}
         className={cn(
-          "relative group flex flex-col items-center justify-center border-2 border-dashed rounded-xl transition-all cursor-pointer overflow-hidden",
+          "relative group flex flex-col items-center justify-center border-2 border-dashed rounded-xl transition-all overflow-hidden",
+          disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer",
           preview ? "aspect-square w-32 border-primary/20 bg-primary/[0.02]" : "h-32 w-full border-zinc-200 bg-zinc-50/50 hover:bg-white hover:border-primary/40",
           error && "border-destructive/50 bg-destructive/5"
         )}
@@ -68,18 +71,21 @@ export function LogoUpload({
           type="file" 
           accept="image/*" 
           className="hidden" 
-          onChange={handleFileChange} 
+          onChange={handleFileChange}
+          disabled={disabled}
         />
 
         {preview ? (
           <div className="relative w-full h-full p-2">
             <img src={preview} alt="Logo preview" className="w-full h-full object-contain rounded-lg" />
-            <button
-              onClick={handleClear}
-              className="absolute top-1 right-1 p-1 bg-white border border-zinc-200 rounded-full text-zinc-400 hover:text-destructive hover:border-destructive shadow-sm transition-all opacity-0 group-hover:opacity-100"
-            >
-              <X size={12} weight="bold" />
-            </button>
+            {!disabled && (
+              <button
+                onClick={handleClear}
+                className="absolute top-1 right-1 p-1 bg-white border border-zinc-200 rounded-full text-zinc-400 hover:text-destructive hover:border-destructive shadow-sm transition-all opacity-0 group-hover:opacity-100"
+              >
+                <X size={12} weight="bold" />
+              </button>
+            )}
           </div>
         ) : (
           <div className="flex flex-col items-center gap-2 p-4 text-center">

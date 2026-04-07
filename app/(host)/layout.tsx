@@ -11,7 +11,7 @@ export default function HostLayout({
     <SidebarProvider>
       <AppSidebar />
       <TopBar />
-      <SidebarInset className="bg-slate-50/50">
+      <SidebarInset className="bg-background">
         <main className="flex-1 w-full mt-14 p-8 px-6">
           {children}
         </main>

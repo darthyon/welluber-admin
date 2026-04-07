@@ -456,6 +456,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
           title="Target Workforce" 
           icon={<Users size={18} weight="duotone" />} 
           description="Identify and assign employees to this benefit policy"
+          ghost
           action={
             <div className="flex items-center gap-3">
               <Button 
@@ -546,6 +547,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
               columns={workforceColumns}
               rowsPerPage={6}
               className="border-zinc-200/60"
+              ghost
               onRowClick={(row) => toggleEmployeeSelection(row.id)}
             />
           </div>
@@ -568,14 +570,14 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
       };
       return (
         <div className="space-y-8 animate-in fade-in duration-300">
-          <DetailSection title="Benefit Pool Strategy" icon={<Gear size={18} weight="duotone" />} description="Fund allocation configuration">
+          <DetailSection title="Benefit Pool Strategy" icon={<Gear size={18} weight="duotone" />} description="Fund allocation configuration" ghost>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 p-1">
               <ReadField label="Employee Pool Type" value={policyData.benefitPoolType?.employee} />
               <ReadField label="Dependent Pool Type" value={policyData.benefitPoolType?.dependents} />
               <ReadField label="Utilisation Mode" value={policyData.utilisationMode === "Fixed" ? "Fixed Allocation" : "Prorated Allocation"} />
             </div>
           </DetailSection>
-          <DetailSection title="Cycle & Lifecycle" icon={<Gear size={18} weight="duotone" />} description="Refresh intervals and activation">
+          <DetailSection title="Cycle & Lifecycle" icon={<Gear size={18} weight="duotone" />} description="Refresh intervals and activation" ghost>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 p-1">
               <ReadField label="Refresh Cycle" value={policyData.refreshCycle} />
               <ReadField label="Refresh Start Reference" value={refreshLabels[policyData.refreshStartReference || ""] || policyData.refreshStartReference} />
@@ -588,7 +590,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
 
     return (
       <div className="space-y-8">
-        <DetailSection title="Benefit Pool Strategy" icon={<Gear size={18} weight="duotone" />} description="Choose how funds are allocated across the workforce">
+        <DetailSection title="Benefit Pool Strategy" icon={<Gear size={18} weight="duotone" />} description="Choose how funds are allocated across the workforce" ghost>
           <div className="space-y-8 p-1">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-3">
@@ -626,12 +628,12 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
           </div>
         </DetailSection>
 
-        <DetailSection title="Cycle & Lifecycle" icon={<Gear size={18} weight="duotone" />} description="Refresh intervals and activation triggers">
+        <DetailSection title="Cycle & Lifecycle" icon={<Gear size={18} weight="duotone" />} description="Refresh intervals and activation triggers" ghost>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-1">
             <div className="space-y-1.5">
               <label className="text-[11px] font-bold text-zinc-500/80">Refresh Cycle</label>
               <select
-                className="w-full px-4 py-2 bg-white border border-zinc-200 rounded-xl text-[14px] font-medium outline-none focus:ring-2 focus:ring-primary/10"
+                className="w-full px-4 py-2 bg-transparent border border-zinc-200 rounded-xl text-[14px] font-medium outline-none focus:ring-2 focus:ring-primary/10"
                 value={policyData.refreshCycle}
                 onChange={(e) => setPolicyData({ ...policyData, refreshCycle: e.target.value as any })}
               >
@@ -641,7 +643,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
             <div className="space-y-1.5">
               <label className="text-[11px] font-bold text-zinc-500/80">Refresh Start Reference</label>
               <select
-                className="w-full px-4 py-2 bg-white border border-zinc-200 rounded-xl text-[14px] font-medium outline-none focus:ring-2 focus:ring-primary/10"
+                className="w-full px-4 py-2 bg-transparent border border-zinc-200 rounded-xl text-[14px] font-medium outline-none focus:ring-2 focus:ring-primary/10"
                 value={policyData.refreshStartReference}
                 onChange={(e) => setPolicyData({ ...policyData, refreshStartReference: e.target.value as any })}
               >
@@ -678,6 +680,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
       title="Benefit Groups"
       icon={<TreeStructure size={18} weight="duotone" />}
       description="Organize services into logical groups with budget controls"
+      ghost
       action={
         !isViewMode ? (
           <Button onClick={addGroup} size="sm" className="rounded-full flex items-center gap-2 text-[12px] h-8 px-4">
@@ -698,9 +701,9 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-1">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {groups.map((group) => (
-            <div key={group.id} className="rounded-2xl border border-zinc-200 bg-white overflow-hidden animate-in fade-in zoom-in-95 duration-300">
+            <div key={group.id} className="rounded-2xl border border-zinc-200/60 bg-transparent overflow-hidden animate-in fade-in zoom-in-95 duration-300 h-full flex flex-col hover:border-primary/20 transition-all">
               {/* Card header */}
               <div className="flex items-start justify-between gap-3 p-4 border-b border-zinc-100">
                 <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -866,6 +869,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
             title="Policy Identity" 
             icon={<IdentificationCard size={18} weight="duotone" />} 
             description="AI-generated suggestions based on your configuration"
+            ghost
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 p-1">
               <div className="space-y-1.5 flex-1">
@@ -913,15 +917,16 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
             title="Workforce Summary" 
             icon={<Users size={18} weight="duotone" />} 
             description="Individuals assigned to this policy"
+            ghost
           >
-            <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-100 flex items-center justify-between">
+            <div className="p-5 rounded-2xl border border-zinc-200/50 flex items-center justify-between transition-all hover:border-primary/20 bg-transparent">
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center border border-zinc-200">
+                <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center border border-zinc-200/60">
                   <SelectionAll size={20} className="text-zinc-500" />
                 </div>
                 <div>
                   <p className="text-[14px] font-bold text-zinc-900">{selectedEmployeeIds.size} Employees Selected</p>
-                  <p className="text-[11px] text-zinc-400 font-medium tracking-tight">Assignment will be effective immediately upon activation</p>
+                  <p className="text-[11px] text-zinc-500 font-medium tracking-tight">Assignment effective immediately upon activation</p>
                 </div>
               </div>
               <Button 
@@ -942,19 +947,20 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
             title="Benefits Recap" 
             icon={<TreeStructure size={18} weight="duotone" />} 
             description="Budget and service breakdown"
+            ghost
           >
             <div className="space-y-3">
               {groups.length === 0 ? (
                 <p className="text-center py-8 text-[13px] text-zinc-400 font-medium bg-zinc-50/50 rounded-xl border border-dashed border-zinc-200">No benefit groups configured.</p>
               ) : groups.map(group => (
-                <div key={group.id} className="p-4 rounded-2xl border border-zinc-100 flex items-center justify-between bg-zinc-50 hover:bg-white hover:border-zinc-200 hover:shadow-sm transition-all cursor-default">
+                 <div key={group.id} className="p-4 rounded-2xl border border-zinc-200/60 flex items-center justify-between bg-transparent hover:border-primary/20 transition-all cursor-default">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-primary shadow-sm border border-zinc-100">
+                    <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-primary shadow-sm border border-zinc-200/60">
                       <TreeStructure size={16} />
                     </div>
                     <div>
                       <p className="text-[13px] font-bold text-zinc-900">{group.name}</p>
-                      <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-tight">{benefits.filter(b => b.groupId === group.id).length} services</p>
+                      <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-tight">{benefits.filter(b => b.groupId === group.id).length} services</p>
                     </div>
                   </div>
                   <div className="text-right">
@@ -963,15 +969,15 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                 </div>
               ))}
               
-              <div className="mt-4 p-4 rounded-2xl bg-indigo-50/40 border border-indigo-100 flex items-center justify-between">
+              <div className="mt-4 p-4 rounded-2xl border border-zinc-200/60 bg-transparent flex items-center justify-between">
                 <div>
-                  <p className="text-[11px] font-bold text-indigo-400 uppercase tracking-widest leading-none">Global Refresh</p>
-                  <p className="text-[14px] font-bold text-indigo-700 mt-1">{policyData.refreshCycle}</p>
+                  <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest leading-none">Global Refresh</p>
+                  <p className="text-[14px] font-bold text-zinc-900 mt-1">{policyData.refreshCycle}</p>
                 </div>
-                <div className="h-8 w-px bg-indigo-200 mx-2" />
+                <div className="h-8 w-px bg-zinc-200 mx-2" />
                 <div className="flex-1 text-right">
-                  <p className="text-[11px] font-bold text-indigo-400 uppercase tracking-widest leading-none">Trigger</p>
-                  <p className="text-[14px] font-bold text-indigo-700 mt-1 truncate">{policyData.activationMode === "JoinDate" ? "On Joining" : "Post-probation"}</p>
+                  <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest leading-none">Trigger</p>
+                  <p className="text-[14px] font-bold text-zinc-900 mt-1 truncate">{policyData.activationMode === "JoinDate" ? "On Joining" : "Post-probation"}</p>
                 </div>
               </div>
             </div>
@@ -1001,15 +1007,15 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
   );
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-transparent">
       {/* Sticky header + nav */}
-      <div className="bg-white sticky top-0 z-10 border-b border-zinc-200">
+      <div className="bg-background/80 backdrop-blur-md sticky top-0 z-10 transition-all border-none shadow-none">
         {/* Title + actions row */}
         <div className="flex items-center justify-between py-5">
           <div className="flex items-center gap-4">
             <button
               onClick={onCancel}
-              className="w-10 h-10 rounded-xl border border-zinc-200 flex items-center justify-center hover:bg-zinc-50 transition-colors shadow-sm"
+              className="w-10 h-10 rounded-xl border border-zinc-200/60 flex items-center justify-center hover:bg-zinc-100/50 transition-all shadow-none"
             >
               <CaretLeft size={20} weight="bold" />
             </button>
@@ -1024,7 +1030,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
               onEdit && (
                 <Button
                   onClick={onEdit}
-                  className="rounded-full px-6 flex items-center gap-2 bg-primary text-white shadow-sm shadow-primary/20"
+                  className="rounded-full px-6 flex items-center gap-2 bg-primary text-white shadow-none"
                 >
                   <NotePencil size={16} weight="bold" />
                   Edit Policy
@@ -1045,7 +1051,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                   <Button
                     onClick={nextStep}
                     disabled={currentStep === 1 && selectedEmployeeIds.size === 0}
-                    className="rounded-full px-8 bg-primary text-white shadow-sm shadow-primary/20"
+                    className="rounded-full px-8 bg-primary text-white shadow-none"
                   >
                     Next Step
                     <CaretRight size={16} weight="bold" className="ml-2" />
@@ -1054,7 +1060,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                   <Button
                     onClick={handleSubmit}
                     disabled={isSubmitting}
-                    className="rounded-full px-8 bg-primary text-white shadow-sm shadow-primary/20 min-w-[140px]"
+                    className="rounded-full px-8 bg-primary text-white shadow-none min-w-[140px]"
                   >
                     {isSubmitting ? "Finalizing..." : mode === "edit" ? "Save Changes" : "Launch Policy"}
                   </Button>
@@ -1140,6 +1146,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                 title="Utilisation & Claims"
                 icon={<Receipt size={18} weight="duotone" />}
                 description="Benefit usage and claim history for all employees on this policy"
+                ghost
               >
                 <UtilisationClaimsTable data={MOCK_UTILISATION} />
               </DetailSection>

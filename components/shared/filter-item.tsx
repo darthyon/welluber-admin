@@ -35,7 +35,7 @@ export function FilterItem({ label, options, value, onChange, icon }: FilterItem
             variant="outline"
             size="sm"
             className={cn(
-              "h-9 px-3 gap-2 text-[13px] font-normal border-border/60 bg-card hover:bg-muted/50 hover:border-border transition-all rounded-lg",
+              "h-9 px-3 gap-2 text-[13px] font-normal border-border/60 bg-transparent hover:bg-muted/50 hover:border-border transition-all rounded-lg",
               value !== "all" && "border-indigo-200 bg-indigo-50/30 text-indigo-600 hover:bg-indigo-50/50 hover:border-indigo-300"
             )}
           >

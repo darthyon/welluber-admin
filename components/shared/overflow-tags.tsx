@@ -91,23 +91,23 @@ export function OverflowTags({ items, className }: OverflowTagsProps) {
             <TooltipTrigger asChild>
               <button
                 onClick={(e) => e.stopPropagation()}
-                className="text-[10px] text-zinc-500 hover:text-zinc-900 font-bold px-1 shrink-0 whitespace-nowrap underline decoration-zinc-200 underline-offset-4 transition-colors"
+                className="text-[10px] text-zinc-400 hover:text-primary font-bold px-1.5 shrink-0 whitespace-nowrap transition-colors"
               >
                 +{hiddenItems.length}
               </button>
             </TooltipTrigger>
             <TooltipContent
-              className="w-52 bg-white rounded-2xl border-zinc-200 shadow-2xl z-[200]"
+              className="w-52 bg-white rounded-xl border border-zinc-200 shadow-xl z-[200]"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex flex-col gap-1">
-                <span className="text-[9px] font-semibold tracking-tight text-zinc-400 px-2 py-1 opacity-50">
-                  All categories
+              <div className="flex flex-col gap-0.5 py-1">
+                <span className="text-[10px] font-semibold text-zinc-400 px-2 py-0.5">
+                  More items
                 </span>
-                {items.map((item, i) => (
+                {hiddenItems.map((item, i) => (
                   <div
                     key={i}
-                    className="text-[12px] px-2 py-1.5 hover:bg-zinc-50 rounded-lg text-zinc-700 font-medium"
+                    className="text-[12px] px-2 py-1 hover:bg-zinc-50 rounded-lg text-zinc-700 font-medium"
                   >
                     {item}
                   </div>

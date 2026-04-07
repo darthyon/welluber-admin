@@ -5,6 +5,7 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { ActionPopover } from "@/components/shared/action-popover";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
+import { OverflowTags } from "@/components/shared/overflow-tags";
 import type { SpBranch } from "@/types/provider";
 import { OPERATING_DAYS } from "@/features/providers/constants";
 import { cn } from "@/lib/utils";
@@ -69,15 +70,15 @@ export function SpBranchCard({ branch, onView, onEdit }: SpBranchCardProps) {
         <ActionPopover actions={actions} />
       </div>
 
-      {/* Services (Pills) */}
-      <div className="flex flex-wrap gap-1.5 mb-6 relative z-10">
-        {branch.services.slice(0, 3).map((s, i) => (
-          <Badge key={i} variant="secondary" className="text-[10px] font-medium bg-muted/50 border-border/40 text-muted-foreground px-2 h-5">
-            {s.service}
-          </Badge>
-        ))}
-        {branch.services.length > 3 && (
-          <span className="text-[10px] text-muted-foreground/60 font-semibold ml-0.5">+{branch.services.length - 3} more</span>
+      {/* Services (Pills) - Standardized row height */}
+      <div className="relative z-10 h-7 flex items-center mb-6">
+        {branch.services.length === 0 ? (
+          <span className="text-[11px] text-muted-foreground italic">No services yet</span>
+        ) : (
+          <OverflowTags 
+            items={branch.services.map(s => s.service)} 
+            className="w-full"
+          />
         )}
       </div>
 

@@ -1,45 +1,22 @@
 "use client";
 
-import { Plus, DownloadSimple, MagnifyingGlass } from "@phosphor-icons/react";
+import { Plus, DownloadSimple } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { BrandDataTable } from "@/components/host/brands/brand-data-table";
-import { SearchBar } from "@/components/shared/search-bar";
-import { FilterItem } from "@/components/shared/filter-item";
-import { DataToolbarContainer } from "@/components/shared/data-toolbar";
-import { EmptyState } from "@/components/shared/empty-state";
 import { MOCK_BRANDS } from "@/features/brands/mock-data";
-
 import { ConfirmationModal } from "@/components/shared/confirmation-modal";
 import { Brand } from "@/types/brand";
 
 export default function BrandsPage() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
   const [removingBrand, setRemovingBrand] = useState<Brand | null>(null);
-
-  const filteredBrands = MOCK_BRANDS.filter((brand) => {
-    const matchesSearch =
-      brand.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      brand.id.toLowerCase().includes(searchQuery.toLowerCase());
-
-    const matchesStatus = statusFilter === "all" || brand.status === statusFilter;
-
-    return matchesSearch && matchesStatus;
-  });
 
   const handleRemoveConfirm = () => {
     if (!removingBrand) return;
     console.log("Removing brand:", removingBrand.id);
     setRemovingBrand(null);
   };
-
-  const statusOptions = [
-    { label: "All Status", value: "all" },
-    { label: "Active", value: "active" },
-    { label: "Inactive", value: "inactive" },
-  ];
 
   return (
     <div className="space-y-6">
@@ -69,52 +46,9 @@ export default function BrandsPage() {
         </div>
       </div>
 
-      {/* Toolbar */}
-      <DataToolbarContainer
-        search={
-          <SearchBar
-            placeholder="Search brands..."
-            value={searchQuery}
-            onChange={setSearchQuery}
-            className="max-w-sm"
-          />
-        }
-        filters={
-          <>
-            <FilterItem
-              label="Status"
-              value={statusFilter}
-              onChange={setStatusFilter}
-              options={statusOptions}
-            />
-          </>
-        }
-      />
-
       {/* Content Table */}
       <div className="min-h-[400px]">
-        {filteredBrands.length > 0 ? (
-          <BrandDataTable data={filteredBrands} onRemove={setRemovingBrand} />
-        ) : (
-          <div className="py-12">
-            <EmptyState
-              icon={<MagnifyingGlass size={32} weight="light" />}
-              title="No brands match your search"
-              description="Try adjusting your filters or search query."
-              action={
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setSearchQuery("");
-                    setStatusFilter("all");
-                  }}
-                >
-                  Clear All Filters
-                </Button>
-              }
-            />
-          </div>
-        )}
+        <BrandDataTable data={MOCK_BRANDS} onRemove={setRemovingBrand} />
       </div>
 
       <ConfirmationModal

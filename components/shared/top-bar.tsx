@@ -13,7 +13,7 @@ export function TopBar() {
     <header 
       className={cn(
         "fixed top-0 left-0 right-0 h-14 z-40 transition-all duration-300",
-        "bg-slate-50/90 backdrop-blur-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05),0_15px_30px_-5px_rgba(0,0,0,0.08)]"
+        "bg-background/80 backdrop-blur-md border-b border-border/40 shadow-none"
       )}
     >
       <div className="flex justify-end items-center h-full px-8 gap-6">
@@ -26,7 +26,7 @@ export function TopBar() {
           />
           <Input 
             placeholder="Search anything... (⌘K)" 
-            className="pl-9 h-8 w-[240px] bg-white/50 border-border focus:bg-white focus:ring-1 focus:ring-primary/20 transition-all placeholder:text-muted-foreground/60 rounded-xl text-xs"
+            className="pl-9 h-8 w-[240px] bg-muted/40 border-border/50 focus:bg-muted/60 focus:ring-1 focus:ring-primary/10 transition-all placeholder:text-muted-foreground/60 rounded-xl text-xs shadow-none"
           />
           <div className="absolute right-2 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-0.5 px-1.5 py-0.5 bg-muted/50 border border-border rounded-md pointer-events-none opacity-50">
             <span className="text-[9px] font-medium text-muted-foreground">⌘K</span>

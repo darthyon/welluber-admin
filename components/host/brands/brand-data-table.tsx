@@ -8,7 +8,7 @@ import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { FilterItem } from "@/components/shared/filter-item";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { EntityAvatar } from "@/components/shared/entity-avatar";
 import type { Brand } from "@/types/brand";
 import React, { useMemo, useState } from "react";
 
@@ -38,12 +38,7 @@ export function BrandDataTable({ data, onRemove }: BrandDataTableProps) {
       headerClassName: "min-w-[240px]",
       render: (brand) => (
         <div className="flex items-center gap-3">
-          <Avatar className="h-8 w-8 rounded-lg bg-muted border border-border/40">
-            <AvatarImage src={brand.logo} alt={brand.name} />
-            <AvatarFallback className="rounded-lg text-[10px] bg-muted-foreground/10 text-muted-foreground font-bold">
-              {brand.name.substring(0, 2).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
+          <EntityAvatar name={brand.name} size="sm" />
           <div className="flex flex-col">
             <span className="font-bold text-[14px] text-foreground tracking-tight leading-tight">{brand.name}</span>
             <span className="text-[11px] text-muted-foreground mt-0.5 tracking-tight opacity-70">ID: {brand.id}</span>

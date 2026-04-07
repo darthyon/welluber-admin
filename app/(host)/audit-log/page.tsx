@@ -4,8 +4,7 @@ import React, { useState, useMemo } from "react";
 import { FileText, Download, Clock, Buildings, Shield, Storefront, HardDrive } from "@phosphor-icons/react";
 import { MOCK_AUDIT_LOGS } from "@/features/audit-log/mock-data";
 import { AuditLogEntry } from "@/features/audit-log/types";
-import { SearchBar } from "@/components/shared/search-bar";
-import { DataToolbarContainer } from "@/components/shared/data-toolbar";
+import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { FilterItem } from "@/components/shared/filter-item";
 import { ActivityTimeline } from "@/components/shared/activity-timeline";
 import { DateRangePicker } from "@/components/shared/date-range-picker";
@@ -96,17 +95,12 @@ export default function AuditLogPage() {
         </Button>
       </div>
 
-      <DataToolbarContainer 
-        search={
-          <SearchBar 
-            placeholder="Search activities, descriptions, or users..." 
-            value={searchQuery}
-            onChange={setSearchQuery}
-            className="max-w-sm"
-          />
-        }
+      <DataFilterBar
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Search activities, descriptions, or users..."
         filters={
-          <div className="flex items-center gap-2">
+          <>
             <FilterItem 
               label="Type"
               value={typeFilter}
@@ -125,7 +119,7 @@ export default function AuditLogPage() {
               placeholder="Date Range"
               align="end"
             />
-          </div>
+          </>
         }
       />
 

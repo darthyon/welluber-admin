@@ -11,9 +11,9 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ActionPopover } from "@/components/shared/action-popover";
 import { UtilizationChart } from "./utilization-chart";
+import { EntityAvatar } from "@/components/shared/entity-avatar";
 
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 
@@ -75,9 +75,7 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
         {/* Top Section: Header & Actions */}
         <div className="flex items-start justify-between mb-8 relative z-10">
           <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-zinc-100/80 border border-zinc-200/60 text-zinc-500 flex items-center justify-center transition-all duration-300">
-              <Buildings size={24} weight="fill" />
-            </div>
+            <EntityAvatar name={org.name} size="lg" />
 
             <div className="space-y-1.5">
               <Link 

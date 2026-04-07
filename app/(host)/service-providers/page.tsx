@@ -7,10 +7,9 @@ import { Button } from "@/components/ui/button";
 import { SpCard } from "@/components/host/service-providers/sp-card";
 import { SpDataTable } from "@/components/host/service-providers/sp-data-table";
 import { ViewToggle, ViewMode } from "@/components/shared/view-toggle";
-import { SearchBar } from "@/components/shared/search-bar";
+import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { FilterItem } from "@/components/shared/filter-item";
 import { MultiSelectFilter } from "@/components/shared/multi-select-filter";
-import { DataToolbarContainer } from "@/components/shared/data-toolbar";
 import { EmptyState } from "@/components/shared/empty-state";
 import { AdvancedFilterSheet, AdvancedFilters, DEFAULT_ADVANCED_FILTERS } from "@/components/shared/advanced-filter-sheet";
 import { Badge } from "@/components/ui/badge";
@@ -79,15 +78,10 @@ export default function ServiceProvidersPage() {
       </div>
 
       {/* Toolbar */}
-      <DataToolbarContainer
-        search={
-          <SearchBar
-            placeholder="Search service providers..."
-            value={searchQuery}
-            onChange={setSearchQuery}
-            className="max-w-sm"
-          />
-        }
+      <DataFilterBar
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Search service providers..."
         filters={
           <>
             <FilterItem
@@ -102,25 +96,13 @@ export default function ServiceProvidersPage() {
               selected={advancedFilters.services}
               onChange={(services) => setAdvancedFilters({ ...advancedFilters, services })}
             />
-            <Button
-              variant="ghost"
-              size="sm"
-              className={cn(
-                "h-9 text-[13px] gap-2 rounded-lg border border-border/60 hover:bg-muted/50 transition-all",
-                activeAdvancedCount > 0 && "bg-indigo-50/50 border-indigo-200 text-indigo-600 hover:bg-indigo-100/50"
-              )}
-              onClick={() => setIsFilterSheetOpen(true)}
-            >
-              <FadersHorizontal size={16} weight={activeAdvancedCount > 0 ? "fill" : "bold"} />
-              Advanced Filters
-              {activeAdvancedCount > 0 && (
-                <Badge className="h-4 min-w-[16px] px-1 bg-indigo-600 text-white border-0 text-[10px]">
-                  {activeAdvancedCount}
-                </Badge>
-              )}
-            </Button>
           </>
         }
+        advancedFilter={{
+          isOpen: isFilterSheetOpen,
+          onToggle: () => setIsFilterSheetOpen(true),
+          activeCount: activeAdvancedCount,
+        }}
       />
 
       {/* Content */}

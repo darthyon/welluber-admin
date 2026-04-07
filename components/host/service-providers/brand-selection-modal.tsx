@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogDescription 
 } from "@/components/ui/dialog";
-import { SearchBar } from "@/components/shared/search-bar";
+import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Brand } from "@/types/brand";
 import { cn } from "@/lib/utils";
@@ -40,11 +40,10 @@ export function BrandSelectionModal({ isOpen, onClose, onSelect, brands }: Brand
         </DialogHeader>
 
         <div className="px-6 pb-4">
-          <SearchBar 
-            placeholder="Search brands by name or ID..."
-            value={searchQuery}
-            onChange={setSearchQuery}
-            className="h-10 bg-muted/40 border-border/40 focus:bg-background"
+          <DataFilterBar
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            searchPlaceholder="Search brands by name or ID..."
           />
         </div>
 

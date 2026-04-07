@@ -14,6 +14,7 @@ import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/comp
 import { StatusBadge } from "@/components/shared/status-badge";
 import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { FilterItem } from "@/components/shared/filter-item";
+import { EntityAvatar } from "@/components/shared/entity-avatar";
 
 interface OrganizationsDataTableProps {
   data: Organization[];
@@ -38,9 +39,12 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
       sortable: true,
       headerClassName: "min-w-[220px]",
       render: (org) => (
-        <div className="flex flex-col">
-          <span className="font-bold text-[14px] text-foreground tracking-tight">{org.name}</span>
-          <span className="text-[11px] text-muted-foreground mt-0.5 font-mono tracking-tight">{org.id}</span>
+        <div className="flex items-center gap-3">
+          <EntityAvatar name={org.name} size="sm" />
+          <div className="flex flex-col">
+            <span className="font-bold text-[14px] text-foreground tracking-tight leading-tight">{org.name}</span>
+            <span className="text-[11px] text-muted-foreground mt-0.5 font-mono tracking-tight">{org.id}</span>
+          </div>
         </div>
       )
     },

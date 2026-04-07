@@ -29,6 +29,10 @@ interface DetailSectionProps {
    * Optional additional class names for the container.
    */
   className?: string;
+  /**
+   * If true, removes the card background, border, and shadow.
+   */
+  ghost?: boolean;
 }
 
 /**
@@ -41,11 +45,19 @@ export function DetailSection({
   icon,
   action,
   children,
-  className
+  className,
+  ghost = false
 }: DetailSectionProps) {
   return (
-    <div className={cn("bg-card border border-border rounded-xl overflow-hidden transition-all duration-300", className)}>
-      <div className="px-6 py-4 border-b border-border bg-muted/50 flex items-center justify-between">
+    <div className={cn(
+      "transition-all duration-300",
+      !ghost ? "bg-card border border-border rounded-xl overflow-hidden shadow-sm" : "bg-transparent border-none shadow-none",
+      className
+    )}>
+      <div className={cn(
+        "px-6 py-4 flex items-center justify-between transition-all",
+        !ghost ? "border-b border-border bg-muted/50" : "px-0 border-none bg-transparent pb-3"
+      )}>
         <div className="flex items-center gap-3">
           {icon && (
             <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
@@ -63,7 +75,7 @@ export function DetailSection({
         </div>
         {action && <div className="flex items-center gap-2">{action}</div>}
       </div>
-      <div className="p-6">
+      <div className={cn("p-6", ghost && "px-0 py-2")}>
         {children}
       </div>
     </div>

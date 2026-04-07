@@ -16,11 +16,10 @@ import { DetailSection } from "@/components/shared/detail-section";
 import { DetailField } from "@/components/shared/detail-field";
 import { ActionPopover } from "@/components/shared/action-popover";
 import { StatusBadge } from "@/components/shared/status-badge";
-import { SearchBar } from "@/components/shared/search-bar";
+import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { FilterItem } from "@/components/shared/filter-item";
-import { DataToolbarContainer } from "@/components/shared/data-toolbar";
 import { SharedDataTable, Column } from "@/components/shared/data-table";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { EntityAvatar } from "@/components/shared/entity-avatar";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
@@ -129,12 +128,7 @@ export function BrandDetailView({ brand, onBack, onEdit, onRemove }: BrandDetail
         
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Avatar className="h-14 w-14 rounded-2xl bg-indigo-50 border border-indigo-100 shadow-sm">
-                <AvatarImage src={brand.logo} alt={brand.name} />
-                <AvatarFallback className="rounded-2xl text-lg bg-indigo-50 text-indigo-600 font-bold">
-                    {brand.name.substring(0, 2).toUpperCase()}
-                </AvatarFallback>
-            </Avatar>
+            <EntityAvatar name={brand.name} size="xl" />
             <div>
               <div className="flex items-center gap-3">
                 <h2 className="text-2xl font-bold tracking-tight text-zinc-900">{brand.name}</h2>
@@ -194,15 +188,10 @@ export function BrandDetailView({ brand, onBack, onEdit, onRemove }: BrandDetail
           icon={<Buildings size={18} weight="bold" className="text-primary" />}
         >
           <div className="space-y-4">
-            <DataToolbarContainer
-              search={
-                <SearchBar
-                  placeholder="Search service providers..."
-                  value={searchQuery}
-                  onChange={setSearchQuery}
-                  className="max-w-xs h-9"
-                />
-              }
+            <DataFilterBar
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              searchPlaceholder="Search service providers..."
               filters={
                 <FilterItem
                   label="Status"

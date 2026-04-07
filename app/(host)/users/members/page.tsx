@@ -7,11 +7,10 @@ import { SharedDataTable, Column } from "@/components/shared/data-table";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { MOCK_MEMBERS } from "@/features/users/mock-data";
 import { Member } from "@/features/users/types";
+import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { FilterItem } from "@/components/shared/filter-item";
 import { SearchableFilterItem } from "@/components/shared/searchable-filter-item";
 import { ViewToggle, ViewMode } from "@/components/shared/view-toggle";
-import { SearchBar } from "@/components/shared/search-bar";
-import { DataToolbarContainer } from "@/components/shared/data-toolbar";
 import { MemberCard } from "@/components/host/users/member-card";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -143,15 +142,10 @@ export default function MembersPage() {
       </div>
 
       {/* Toolbar */}
-      <DataToolbarContainer 
-        search={
-          <SearchBar 
-            placeholder="Search members..." 
-            value={searchQuery}
-            onChange={setSearchQuery}
-            className="max-w-sm"
-          />
-        }
+      <DataFilterBar
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Search members..."
         filters={
           <>
             <FilterItem 

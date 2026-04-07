@@ -32,6 +32,10 @@ interface DataTableProps<T> {
     key: keyof T;
     direction: SortDirection;
   };
+  /**
+   * If true, removes the card background, border, and shadow.
+   */
+  ghost?: boolean;
 }
 
 export function SharedDataTable<T extends { id: string | number }>({ 
@@ -42,7 +46,8 @@ export function SharedDataTable<T extends { id: string | number }>({
   rowsPerPage = 10,
   className,
   onRowClick,
-  defaultSort
+  defaultSort,
+  ghost = false
 }: DataTableProps<T>) {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortConfig, setSortConfig] = useState<SortConfig<T>>(
@@ -110,7 +115,11 @@ export function SharedDataTable<T extends { id: string | number }>({
   const totalColumns = columns.length;
 
   return (
-    <div className={cn("rounded-xl border border-border bg-card overflow-hidden flex flex-col shadow-sm", className)}>
+    <div className={cn(
+      "transition-all duration-300 flex flex-col",
+      !ghost ? "rounded-xl border border-border bg-card overflow-hidden shadow-sm" : "bg-transparent border-none shadow-none",
+      className
+    )}>
       {/* Scrollable Container */}
       <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-border hover:scrollbar-thumb-muted-foreground/20">
         <table className="w-full text-left min-w-[800px]">
@@ -128,10 +137,11 @@ export function SharedDataTable<T extends { id: string | number }>({
                     key={i} 
                     onClick={() => col.sortable && col.accessorKey && handleSort(col.accessorKey)}
                     className={cn(
-                      "font-semibold text-muted-foreground text-[13px] p-4 whitespace-nowrap bg-zinc-50 dark:bg-muted/30 z-20 tracking-tight transition-colors",
+                      "font-semibold text-muted-foreground text-[13px] p-4 whitespace-nowrap z-20 tracking-tight transition-colors",
+                      !ghost ? "bg-zinc-50 dark:bg-muted/30" : "bg-transparent dark:bg-transparent",
                       col.sortable && "cursor-pointer hover:bg-zinc-100 hover:text-foreground dark:hover:bg-muted/40",
-                      isFirstCol && "rounded-tl-xl",
-                      isLastCol && "rounded-tr-xl",
+                      (isFirstCol && !ghost) && "rounded-tl-xl",
+                      (isLastCol && !ghost) && "rounded-tr-xl",
                       getCellAlignment(col.align),
                       isFirst && "sticky left-0 z-30 shadow-[4px_0_12px_-4px_rgba(0,0,0,0.05)]",
                       isLast && "sticky right-0 z-30 shadow-[-4px_0_12px_-4px_rgba(0,0,0,0.05)]",
@@ -210,7 +220,10 @@ export function SharedDataTable<T extends { id: string | number }>({
 
       {/* Pagination Footer */}
       {totalPages > 0 && (
-        <div className="p-4 border-t border-border/60 bg-muted/5 flex items-center justify-between text-[12px] text-muted-foreground font-medium">
+        <div className={cn(
+          "p-4 flex items-center justify-between text-[12px] text-muted-foreground font-medium transition-all",
+          !ghost ? "border-t border-border/60 bg-muted/5" : "bg-transparent border-t border-border/40 px-0"
+        )}>
           <div className="flex items-center gap-2">
             <span>Showing</span>
             <span className="text-foreground font-bold">{startIndex + 1}</span>
@@ -225,7 +238,10 @@ export function SharedDataTable<T extends { id: string | number }>({
             <button 
               onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
-              className="px-3 py-1.5 rounded-lg border border-border/80 bg-card hover:bg-muted text-foreground transition-all disabled:opacity-30 disabled:hover:bg-card disabled:cursor-not-allowed"
+              className={cn(
+                "px-3 py-1.5 rounded-lg border border-border/80 text-foreground transition-all disabled:opacity-30 disabled:cursor-not-allowed",
+                !ghost ? "bg-card hover:bg-muted" : "bg-transparent hover:bg-muted/40"
+              )}
             >
               Previous
             </button>
@@ -237,7 +253,10 @@ export function SharedDataTable<T extends { id: string | number }>({
             <button 
               onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
               disabled={currentPage === totalPages}
-              className="px-3 py-1.5 rounded-lg border border-border/80 bg-card hover:bg-muted text-foreground transition-all disabled:opacity-30 disabled:hover:bg-card disabled:cursor-not-allowed"
+              className={cn(
+                "px-3 py-1.5 rounded-lg border border-border/80 text-foreground transition-all disabled:opacity-30 disabled:cursor-not-allowed",
+                !ghost ? "bg-card hover:bg-muted" : "bg-transparent hover:bg-muted/40 dark:hover:bg-white/5"
+              )}
             >
               Next
             </button>

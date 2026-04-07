@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import { MagnifyingGlass, X, Funnel } from "@phosphor-icons/react";
+import { MagnifyingGlass, X, FadersHorizontal } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 interface DataFilterBarProps {
   /** Current search query value */
@@ -49,78 +50,80 @@ export function DataFilterBar({
 
   return (
     <div className={cn(
-      "flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 px-4 py-3 rounded-2xl bg-zinc-50/50 border border-zinc-200/60 shadow-sm transition-all duration-300",
-      isFocused && "bg-white border-primary/20 shadow-md ring-4 ring-primary/5",
+      "flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 py-2 transition-all duration-300",
       className
     )}>
-      {/* Search Section */}
-      <div className="flex-1 relative group">
-        <MagnifyingGlass 
-          size={18} 
-          weight="bold" 
-          className={cn(
-            "absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-200",
-            isFocused || searchQuery ? "text-primary" : "text-zinc-400 group-hover:text-zinc-500"
-          )} 
-        />
-        <input
-          ref={inputRef}
-          type="text"
-          placeholder={searchPlaceholder}
-          value={searchQuery}
-          onChange={(e) => onSearchChange(e.target.value)}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
-          className={cn(
-            "w-full pl-11 pr-10 py-2.5 bg-white border border-zinc-200 rounded-xl text-[14px] font-medium outline-none transition-all placeholder:text-zinc-400",
-            "focus:border-primary/40 focus:bg-white"
+      {/* Container for Search and Filters */}
+      <div className="flex-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+        {/* Search Section */}
+        <div className="flex-1 min-w-[200px] max-w-sm relative group">
+          <MagnifyingGlass 
+            size={18} 
+            weight="bold" 
+            className={cn(
+              "absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-200",
+              isFocused || searchQuery ? "text-primary" : "text-zinc-400 group-hover:text-zinc-500"
+            )} 
+          />
+          <input
+            ref={inputRef}
+            type="text"
+            placeholder={searchPlaceholder}
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            className={cn(
+              "w-full pl-11 pr-10 py-2.5 bg-transparent border border-zinc-200 rounded-xl text-[14px] font-medium outline-none transition-all placeholder:text-zinc-400",
+              "focus:border-primary/40 focus:bg-white focus:shadow-sm"
+            )}
+          />
+          {searchQuery && (
+            <button
+              onClick={handleClear}
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-lg text-zinc-400 hover:text-primary hover:bg-primary/5 transition-all"
+            >
+              <X size={14} weight="bold" />
+            </button>
           )}
-        />
-        {searchQuery && (
-          <button
-            onClick={handleClear}
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-lg text-zinc-400 hover:text-primary hover:bg-primary/5 transition-all"
-          >
-            <X size={14} weight="bold" />
-          </button>
-        )}
-      </div>
+        </div>
 
-      {/* Filters & Actions Section */}
-      <div className="flex items-center gap-4 shrink-0">
         {/* Inline Filters */}
         {filters && (
-          <div className="flex items-center gap-4 border-l md:border-l-0 md:pl-0 pl-4 border-zinc-200">
+          <div className="flex items-center gap-4">
             {filters}
           </div>
         )}
+      </div>
 
+      {/* Advanced Filters & Actions Section */}
+      <div className="flex items-center gap-3 shrink-0">
         {/* Advanced Filter Trigger */}
         {advancedFilter && (
-          <div className="flex items-center pl-2 border-l border-zinc-200/60">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={advancedFilter.onToggle}
-              className={cn(
-                "h-9 px-3 gap-2 text-[12px] font-bold rounded-xl border-zinc-200 relative",
-                advancedFilter.isOpen ? "bg-primary/5 border-primary/30 text-primary" : "bg-white text-zinc-600 hover:bg-zinc-50"
-              )}
-            >
-              <Funnel size={14} weight={advancedFilter.activeCount ? "fill" : "bold"} />
-              Filter
-              {advancedFilter.activeCount ? (
-                <span className="absolute -top-1.5 -right-1.5 h-4 w-4 bg-primary text-white text-[10px] font-bold rounded-full flex items-center justify-center ring-2 ring-white">
-                  {advancedFilter.activeCount}
-                </span>
-              ) : null}
-            </Button>
-          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={advancedFilter.onToggle}
+            className={cn(
+              "h-10 px-4 gap-2 text-[13px] font-semibold rounded-xl border border-border/60 transition-all",
+              advancedFilter.isOpen || (advancedFilter.activeCount ?? 0) > 0 
+                ? "bg-indigo-50/50 border-indigo-200 text-indigo-600 hover:bg-indigo-100/50" 
+                : "bg-white text-zinc-600 hover:bg-zinc-50"
+            )}
+          >
+            <FadersHorizontal size={18} weight={(advancedFilter.activeCount ?? 0) > 0 ? "fill" : "bold"} />
+            Advanced Filters
+            {(advancedFilter.activeCount ?? 0) > 0 && (
+              <Badge className="ml-1 h-5 min-w-[20px] px-1.5 bg-indigo-600 text-white border-0 text-[10px] font-bold">
+                {advancedFilter.activeCount}
+              </Badge>
+            )}
+          </Button>
         )}
 
-        {/* Auxiliary Actions */}
+        {/* Auxiliary Actions division if needed, but usually actions are enough */}
         {actions && (
-          <div className="flex items-center gap-2 pl-2 border-l border-zinc-200/60">
+          <div className="flex items-center gap-2 pl-3 border-l border-zinc-200">
             {actions}
           </div>
         )}

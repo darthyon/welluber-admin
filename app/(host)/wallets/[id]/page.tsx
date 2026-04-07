@@ -27,7 +27,7 @@ import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { DetailSection } from "@/components/shared/detail-section";
 import { DetailField } from "@/components/shared/detail-field";
 import { ActionPopover } from "@/components/shared/action-popover";
-import { SearchBar } from "@/components/shared/search-bar";
+import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
@@ -268,14 +268,13 @@ export default function WalletDetailPage() {
 
             <div className="space-y-4 animate-in fade-in transition-all duration-300">
                <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-                 <div>
-                   <SearchBar 
-                     placeholder="Search transactions..." 
-                     value={searchQuery}
-                     onChange={setSearchQuery}
-                     className="max-w-xs h-9 text-[13px]" 
-                   />
-                 </div>
+                <div className="flex-1">
+                  <DataFilterBar
+                    searchQuery={searchQuery}
+                    onSearchChange={setSearchQuery}
+                    searchPlaceholder="Search transactions..."
+                  />
+                </div>
                  
                  <div className="flex flex-wrap items-center gap-2 shrink-0">
                     <div className="flex bg-muted/50 p-0.5 rounded-lg border border-border">

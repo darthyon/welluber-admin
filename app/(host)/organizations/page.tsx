@@ -11,9 +11,8 @@ import { MultiSelectFilter } from "@/components/shared/multi-select-filter";
 import { ALL_SERVICES, SERVICE_TAXONOMY, WORKFORCE_RANGES, INDUSTRIES } from "@/features/organizations/constants";
 import { Organization } from "@/features/organizations/types";
 import { motion, AnimatePresence } from "framer-motion";
-import { SearchBar } from "@/components/shared/search-bar";
+import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { FilterItem } from "@/components/shared/filter-item";
-import { DataToolbarContainer } from "@/components/shared/data-toolbar";
 import { EmptyState } from "@/components/shared/empty-state";
 import { AdvancedFilterSheet, DEFAULT_ADVANCED_FILTERS, AdvancedFilters } from "@/components/shared/advanced-filter-sheet";
 import { Badge } from "@/components/ui/badge";
@@ -53,6 +52,7 @@ const MOCK_ORGS: Organization[] = [
     services: ["Health Screenings", "Clinical Therapy"],
     policies: ["Comprehensive Health", "Mental Health Support"],
     branches: ["Kuala Lumpur HQ", "Subang Jaya", "Penang Office"],
+    documents: [],
     createdAt: "2026-01-15T10:00:00Z",
     updatedAt: "2026-03-20T10:00:00Z",
   },
@@ -88,6 +88,7 @@ const MOCK_ORGS: Organization[] = [
     services: ["General Practice", "Health Screenings"],
     policies: ["Basic GP", "Group Term Life"],
     branches: ["Petaling Jaya Branch"],
+    documents: [],
     createdAt: "2026-03-01T10:00:00Z",
     updatedAt: "2026-03-01T10:00:00Z",
   },
@@ -123,6 +124,7 @@ const MOCK_ORGS: Organization[] = [
     services: ["Clinical Therapy", "Specialist Care"],
     policies: [],
     branches: ["Singapore HQ", "KL Office"],
+    documents: [],
     createdAt: "2026-02-10T10:00:00Z",
     updatedAt: "2026-03-15T10:00:00Z",
   },
@@ -158,6 +160,7 @@ const MOCK_ORGS: Organization[] = [
     services: ["Occupational Health", "Gymnasium Facilities"],
     policies: ["Standard Medical"],
     branches: ["Main Plant"],
+    documents: [],
     createdAt: "2026-04-01T10:00:00Z",
     updatedAt: "2026-04-01T10:00:00Z",
   } as Organization))
@@ -239,15 +242,10 @@ export default function OrganizationsPage() {
       </div>
 
       {/* Search & Filter Bar */}
-      <DataToolbarContainer 
-        search={
-          <SearchBar 
-            placeholder="Search organizations..." 
-            value={searchQuery}
-            onChange={setSearchQuery}
-            className="max-w-sm"
-          />
-        }
+      <DataFilterBar
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Search organizations..."
         filters={
           <>
             <FilterItem 
@@ -280,25 +278,13 @@ export default function OrganizationsPage() {
               selected={advancedFilters.services}
               onChange={(services) => setAdvancedFilters({ ...advancedFilters, services })}
             />
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className={cn(
-                "h-9 text-[13px] gap-2 rounded-lg border border-border/60 hover:bg-muted/50 transition-all",
-                activeAdvancedCount > 0 && "bg-indigo-50/50 border-indigo-200 text-indigo-600 hover:bg-indigo-100/50"
-              )}
-              onClick={() => setIsFilterSheetOpen(true)}
-            >
-              <FadersHorizontal size={16} weight={activeAdvancedCount > 0 ? "fill" : "bold"} />
-              Advanced Filters
-              {activeAdvancedCount > 0 && (
-                <Badge className="h-4 min-w-[16px] px-1 bg-indigo-600 text-white border-0 text-[10px]">
-                  {activeAdvancedCount}
-                </Badge>
-              )}
-            </Button>
           </>
         }
+        advancedFilter={{
+          isOpen: isFilterSheetOpen,
+          onToggle: () => setIsFilterSheetOpen(true),
+          activeCount: activeAdvancedCount,
+        }}
       />
 
       {/* Main Content Area */}

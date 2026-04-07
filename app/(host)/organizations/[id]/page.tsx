@@ -45,16 +45,15 @@ import { DetailField } from "@/components/shared/detail-field";
 import { BentoGrid, BentoCard } from "@/components/shared/bento-grid";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ConfirmationModal } from "@/components/shared/confirmation-modal";
-import { DataToolbarContainer } from "@/components/shared/data-toolbar";
-import { SearchBar } from "@/components/shared/search-bar";
+import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { FilterItem } from "@/components/shared/filter-item";
 import { ActionPopover } from "@/components/shared/action-popover";
 import { SharedDataTable, Column } from "@/components/shared/data-table";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
-import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { deactivateOrganization, removeOrganization, suspendOrganization } from "@/features/organizations/actions";
-import type { OrganizationStatus } from "@/features/organizations/types";
+import { OrganizationStatus } from "@/features/organizations/types";
 import { UtilizationChart } from "@/components/host/organizations/utilization-chart";
+import { EntityAvatar } from "@/components/shared/entity-avatar";
 
 const TABS = [
   { id: "profile", label: "Org Details", icon: Buildings },
@@ -321,9 +320,7 @@ export default function OrganizationDetailPage() {
           
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
             <div className="flex items-start gap-5">
-              <div className="w-15 h-15 rounded-2xl bg-zinc-100/80 flex items-center justify-center text-zinc-500 border border-zinc-200/60 transition-all">
-                <Buildings size={32} weight="fill" />
-              </div>
+              <EntityAvatar name={orgName} size="xl" />
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
                   <h1 className="text-2xl font-bold tracking-tight text-foreground">{orgName}</h1>
@@ -585,15 +582,10 @@ export default function OrganizationDetailPage() {
                     </div>
                   }
                 >
-                  <DataToolbarContainer
-                    search={
-                      <SearchBar 
-                        placeholder="Search branches..." 
-                        value={branchSearch} 
-                        onChange={setBranchSearch}
-                        className="max-w-sm"
-                      />
-                    }
+                  <DataFilterBar
+                    searchQuery={branchSearch}
+                    onSearchChange={setBranchSearch}
+                    searchPlaceholder="Search branches..."
                     filters={
                       <>
                         <FilterItem 
@@ -812,15 +804,10 @@ export default function OrganizationDetailPage() {
                     </div>
                   }
                 >
-                  <DataToolbarContainer
-                    search={
-                      <SearchBar 
-                        placeholder="Search employees..." 
-                        value={employeeSearch} 
-                        onChange={setEmployeeSearch}
-                        className="max-w-sm"
-                      />
-                    }
+                  <DataFilterBar
+                    searchQuery={employeeSearch}
+                    onSearchChange={setEmployeeSearch}
+                    searchPlaceholder="Search employees..."
                     filters={
                       <>
                         <FilterItem 
@@ -1083,15 +1070,10 @@ export default function OrganizationDetailPage() {
                   </div>
                 }
               >
-                <DataToolbarContainer
-                  search={
-                    <SearchBar 
-                      placeholder="Search policies..." 
-                      value={policySearch} 
-                      onChange={setPolicySearch}
-                      className="max-w-sm"
-                    />
-                  }
+                <DataFilterBar
+                  searchQuery={policySearch}
+                  onSearchChange={setPolicySearch}
+                  searchPlaceholder="Search policies..."
                   filters={
                     <>
                       <FilterItem

@@ -34,6 +34,7 @@ import { Badge } from "@/components/ui/badge";
 import { BentoGrid } from "@/components/shared/bento-grid";
 import { ActionPopover } from "@/components/shared/action-popover";
 import { CategoryDetailSheet } from "@/components/host/services/category-detail-sheet";
+import { OverflowTags } from "@/components/shared/overflow-tags";
 import {
   Tooltip,
   TooltipContent,
@@ -254,9 +255,6 @@ export default function ServicesPage() {
               }
             ];
 
-            const visibleServices = category.services.slice(0, 3);
-            const overflowServices = category.services.slice(3);
-
             return (
               <div
                 key={category.category}
@@ -283,37 +281,11 @@ export default function ServicesPage() {
                 </div>
 
                 {/* Services list */}
-                <div className="relative z-10 flex flex-wrap gap-1.5">
+                <div className="relative z-10 h-7 flex items-center">
                   {category.services.length === 0 ? (
                     <span className="text-[11px] text-muted-foreground italic">No services yet</span>
                   ) : (
-                    <>
-                      {visibleServices.map((svc, i) => (
-                        <span key={i} className="inline-flex items-center text-[11px] font-medium px-2 py-0.5 rounded-md bg-muted/60 border border-border text-foreground/80">
-                          {svc}
-                        </span>
-                      ))}
-                      {overflowServices.length > 0 && (
-                        <Tooltip delayDuration={0}>
-                          <TooltipTrigger asChild>
-                            <button
-                              onClick={(e) => e.stopPropagation()}
-                              className="text-[11px] font-bold text-primary/70 hover:text-primary px-1.5 underline decoration-primary/20 underline-offset-4 transition-colors"
-                            >
-                              +{overflowServices.length}
-                            </button>
-                          </TooltipTrigger>
-                          <TooltipContent side="bottom" className="w-48 bg-white rounded-xl border border-zinc-200 shadow-xl z-[200]" onClick={(e) => e.stopPropagation()}>
-                            <div className="flex flex-col gap-0.5 py-1">
-                              <span className="text-[10px] font-semibold text-zinc-400 px-2 py-0.5">More services</span>
-                              {overflowServices.map((svc, i) => (
-                                <div key={i} className="text-[12px] px-2 py-1 hover:bg-zinc-50 rounded-lg text-zinc-700 font-medium">{svc}</div>
-                              ))}
-                            </div>
-                          </TooltipContent>
-                        </Tooltip>
-                      )}
-                    </>
+                    <OverflowTags items={category.services} className="w-full" />
                   )}
                 </div>
               </div>

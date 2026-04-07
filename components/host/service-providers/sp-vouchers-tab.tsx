@@ -6,8 +6,6 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { DetailSection } from "@/components/shared/detail-section";
-import { DataToolbarContainer } from "@/components/shared/data-toolbar";
-import { SearchBar } from "@/components/shared/search-bar";
 import { FilterItem } from "@/components/shared/filter-item";
 import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { SpVoucherForm } from "./sp-voucher-form";

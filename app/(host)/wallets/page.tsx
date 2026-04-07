@@ -2,9 +2,8 @@
 
 import { Plus, Wallet as WalletIcon, MagnifyingGlass, FadersHorizontal, CreditCard, Bank, ArrowsClockwise, CheckCircle, Ticket, ChartPieSlice } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
-import { SearchBar } from "@/components/shared/search-bar";
+import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { FilterItem } from "@/components/shared/filter-item";
-import { DataToolbarContainer } from "@/components/shared/data-toolbar";
 import { EmptyState } from "@/components/shared/empty-state";
 import { useWallets } from "@/features/wallets/hooks";
 import { WALLET_MODEL_OPTIONS, WALLET_STATUS_OPTIONS } from "@/features/wallets/constants";
@@ -83,15 +82,10 @@ export default function WalletsPage() {
       </BentoGrid>
 
       {/* Search & Filter Bar */}
-      <DataToolbarContainer 
-        search={
-          <SearchBar 
-            placeholder="Search wallets, orgs, or branches..." 
-            value={filters.search}
-            onChange={(v) => setFilters({ ...filters, search: v })}
-            className="max-w-md"
-          />
-        }
+      <DataFilterBar
+        searchQuery={filters.search}
+        onSearchChange={(v) => setFilters({ ...filters, search: v })}
+        searchPlaceholder="Search wallets, orgs, or branches..."
         filters={
           <>
             <FilterItem 
@@ -106,25 +100,13 @@ export default function WalletsPage() {
               onChange={(v) => setFilters({ ...filters, status: v as any })}
               options={[{ label: "All Status", value: "all" }, ...WALLET_STATUS_OPTIONS]}
             />
-            <Button 
-                variant="ghost" 
-                size="sm" 
-                className={cn(
-                    "h-9 text-[13px] gap-2 rounded-lg border border-border/60 hover:bg-muted/50 transition-all",
-                    activeAdvancedCount > 0 && "bg-primary/5 border-primary/20 text-primary hover:bg-primary/10"
-                )}
-                onClick={() => setIsFilterSheetOpen(true)}
-            >
-              <FadersHorizontal size={16} weight={activeAdvancedCount > 0 ? "fill" : "bold"} />
-              Advanced Filters
-              {activeAdvancedCount > 0 && (
-                <Badge className="h-4 min-w-[16px] px-1 bg-primary text-primary-foreground border-0 text-[10px]">
-                  {activeAdvancedCount}
-                </Badge>
-              )}
-            </Button>
           </>
         }
+        advancedFilter={{
+          isOpen: isFilterSheetOpen,
+          onToggle: () => setIsFilterSheetOpen(true),
+          activeCount: activeAdvancedCount,
+        }}
       />
 
       {/* Wallet Grid */}

@@ -7,11 +7,10 @@ import { SharedDataTable, Column } from "@/components/shared/data-table";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { MOCK_ADMINS } from "@/features/users/mock-data";
 import { Administrator } from "@/features/users/types";
+import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { FilterItem } from "@/components/shared/filter-item";
 import { SearchableFilterItem } from "@/components/shared/searchable-filter-item";
 import { ViewToggle, ViewMode } from "@/components/shared/view-toggle";
-import { SearchBar } from "@/components/shared/search-bar";
-import { DataToolbarContainer } from "@/components/shared/data-toolbar";
 import { AdminCard } from "@/components/host/users/admin-card";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -158,15 +157,10 @@ export default function AdministratorsPage() {
       </div>
 
       {/* Toolbar */}
-      <DataToolbarContainer 
-        search={
-          <SearchBar 
-            placeholder="Search administrators..." 
-            value={searchQuery}
-            onChange={setSearchQuery}
-            className="max-w-sm"
-          />
-        }
+      <DataFilterBar
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Search administrators..."
         filters={
           <>
             <FilterItem 

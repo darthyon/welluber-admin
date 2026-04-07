@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { BenefitPolicyWizard } from "@/components/host/policies/benefit-policy-wizard";
 import { BenefitPolicyCard } from "@/components/host/policies/benefit-policy-card";
@@ -20,8 +20,7 @@ import {
 import { cn } from "@/lib/utils";
 import { SectionedSearchSelect } from "@/components/shared/sectioned-search-select";
 import { EmptyState } from "@/components/shared/empty-state";
-import { DataToolbarContainer } from "@/components/shared/data-toolbar";
-import { SearchBar } from "@/components/shared/search-bar";
+import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { FilterItem } from "@/components/shared/filter-item";
 import { StatusBadge } from "@/components/shared/status-badge";
 
@@ -37,7 +36,7 @@ const DEPARTMENTS = ["Engineering", "Product", "Design", "Marketing", "Sales", "
 const ROLES = ["Executive", "Management", "Staff", "Consultant", "Intern"];
 const AGE_RANGES = ["18-25", "26-35", "36-45", "46-55", "56+"];
 
-export default function PoliciesPage() {
+function PoliciesContent() {
   const [wizardStatus, setWizardStatus] = useQueryState("wizard");
   const [wizardMode, setWizardMode] = useQueryState("mode");
   const [activePolicyId, setActivePolicyId] = useQueryState("policyId");
@@ -111,7 +110,7 @@ export default function PoliciesPage() {
 
   if (showWizard) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="flex flex-col flex-1">
         <BenefitPolicyWizard 
           mode={wizardMode as any || "create"}
           initialData={selectedPolicy}
@@ -168,15 +167,10 @@ export default function PoliciesPage() {
       </div>
 
       {/* Toolbar */}
-      <DataToolbarContainer 
-        search={
-          <SearchBar 
-            placeholder="Search policies or benefit IDs..." 
-            value={searchQuery}
-            onChange={setSearchQuery}
-            className="max-w-sm"
-          />
-        }
+      <DataFilterBar
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Search policies or benefit IDs..."
         filters={
           <>
             <div className="w-[180px]">
@@ -218,12 +212,6 @@ export default function PoliciesPage() {
                 ...AGE_RANGES.map(a => ({ label: a, value: a }))
               ]}
             />
-
-            <div className="w-px h-6 bg-border mx-1" />
-
-            <Button variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-xl text-muted-foreground hover:text-foreground">
-              <Funnel size={18} />
-            </Button>
           </>
         }
       />
@@ -263,5 +251,13 @@ export default function PoliciesPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function PoliciesPage() {
+  return (
+    <Suspense fallback={null}>
+      <PoliciesContent />
+    </Suspense>
   );
 }
