@@ -90,9 +90,9 @@ export function CustomMultiSelect({
     <div className={cn("relative w-full", className)} ref={containerRef}>
       <div 
         className={cn(
-          "relative min-h-[42px] flex flex-wrap items-center gap-1.5 px-3 py-1.5 rounded-xl border bg-white transition-all cursor-text pr-12",
-          isOpen ? "border-primary ring-2 ring-primary/10" : "border-zinc-200 hover:border-zinc-300",
-          disabled && "opacity-60 cursor-not-allowed bg-zinc-50"
+          "relative min-h-[42px] flex flex-wrap items-center gap-1.5 px-3 py-1.5 rounded-xl border bg-background/5 transition-all cursor-text pr-12",
+          isOpen ? "border-primary ring-2 ring-primary/10" : "border-border/60 hover:border-primary/30",
+          disabled && "opacity-60 cursor-not-allowed bg-muted/40"
         )}
         onClick={() => !disabled && setIsOpen(true)}
       >
@@ -100,7 +100,7 @@ export function CustomMultiSelect({
             <Badge 
               key={s} 
               variant="secondary" 
-              className="bg-zinc-100 text-zinc-700 border-zinc-200 px-2.5 py-1 text-[12px] font-medium gap-1.5 group whitespace-nowrap h-7 items-center"
+              className="bg-primary/15 text-primary border-primary/20 px-2.5 py-1 text-[12px] font-bold gap-1.5 group whitespace-nowrap h-7 items-center"
             >
               {s}
               {!disabled && (
@@ -117,10 +117,10 @@ export function CustomMultiSelect({
               )}
             </Badge>
         ))}
-        <input 
-          type="text"
-          className="flex-1 bg-transparent border-0 outline-none text-[13px] placeholder:text-zinc-400 min-w-[80px] h-7 px-1"
-          placeholder={selected.length === 0 ? placeholder : ""}
+          <input 
+            type="text"
+            className="flex-1 bg-transparent border-0 outline-none text-[13px] placeholder:text-muted-foreground/40 min-w-[80px] h-7 px-1"
+            placeholder={selected.length === 0 ? placeholder : ""}
           value={query}
           disabled={disabled}
           onChange={(e) => {
@@ -137,7 +137,7 @@ export function CustomMultiSelect({
             }
           }}
         />
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center text-zinc-400 gap-1.5 pl-2 bg-white/80 backdrop-blur-[2px]">
+        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center text-muted-foreground/40 gap-1.5 pl-2">
           {!disabled && selected.length > 0 && (
             <button
               type="button"
@@ -145,7 +145,7 @@ export function CustomMultiSelect({
                 e.stopPropagation();
                 onChange([]);
               }}
-              className="p-1 rounded-md hover:bg-zinc-100 hover:text-zinc-600 transition-colors"
+              className="p-1 rounded-md hover:bg-primary/10 hover:text-primary transition-colors"
               title="Clear all"
             >
               <X size={12} weight="bold" />
@@ -158,13 +158,13 @@ export function CustomMultiSelect({
       {isOpen && (filteredOptions.length > 0 || showAddCustom) && typeof document !== "undefined" && createPortal(
         <div
           ref={dropdownRef}
-          className="z-[1000] overflow-y-auto max-h-[300px] rounded-xl border border-zinc-200 bg-white shadow-2xl animate-in fade-in zoom-in-95 duration-100 p-1"
+          className="z-[1000] overflow-y-auto max-h-[300px] rounded-xl border border-border/60 bg-popover shadow-2xl animate-in fade-in zoom-in-95 duration-100 p-1"
           style={dropdownStyle}
         >
           {showAddCustom && (
             <button
               onClick={addCustom}
-              className="w-full text-left px-3 py-2 rounded-lg text-[13px] bg-primary/5 text-primary font-bold flex items-center gap-2 mb-1 border-b border-zinc-50"
+              className="w-full text-left px-3 py-2 rounded-lg text-[13px] bg-primary/10 text-primary font-bold flex items-center gap-2 mb-1 border-b border-border/20"
             >
               <Plus size={14} weight="bold" />
               <span>Add custom: &quot;{query}&quot;</span>
@@ -176,7 +176,7 @@ export function CustomMultiSelect({
               key={opt}
               onClick={() => toggleOption(opt)}
               type="button"
-              className="w-full text-left px-3 py-2 rounded-lg text-[13px] hover:bg-zinc-50 text-zinc-600 transition-colors flex items-center justify-between group font-medium"
+                className="w-full text-left px-3 py-2 rounded-lg text-[13px] hover:bg-accent/40 text-muted-foreground/80 hover:text-foreground transition-colors flex items-center justify-between group font-semibold"
             >
               <span className="truncate">{opt}</span>
               <Check size={14} className="opacity-0 group-hover:opacity-40" />

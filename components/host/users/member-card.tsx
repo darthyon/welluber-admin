@@ -23,8 +23,9 @@ export function MemberCard({ member }: MemberCardProps) {
     <motion.div
       whileHover={{ y: -2 }}
       transition={{ duration: 0.2 }}
-      className="group relative bg-white border border-zinc-200 rounded-xl p-5 hover:border-primary/30 hover:shadow-md transition-all duration-300"
+      className="group relative bg-card border border-border/60 rounded-2xl p-5 hover:border-primary/30 hover:shadow-xl hover:shadow-black/5 transition-all duration-500 overflow-hidden"
     >
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(var(--primary-rgb),0.03),transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center border border-primary/20">
@@ -45,37 +46,37 @@ export function MemberCard({ member }: MemberCardProps) {
 
       <div className="space-y-3.5 pt-1">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-zinc-400">
+          <div className="flex items-center gap-1.5 text-muted-foreground/40">
             <Buildings size={14} />
-            <span className="text-[11px] font-semibold text-zinc-500/80">Organization</span>
+            <span className="text-[11px] font-bold tracking-tight uppercase opacity-60">Organization</span>
           </div>
-          <span className="text-[12px] font-bold text-zinc-700">{member.organization.name}</span>
+          <span className="text-[12px] font-bold text-foreground">{member.organization.name}</span>
         </div>
 
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-zinc-400">
+          <div className="flex items-center gap-1.5 text-muted-foreground/40">
             <TreeStructure size={14} />
-            <span className="text-[11px] font-semibold text-zinc-500/80">Branch</span>
+            <span className="text-[11px] font-bold tracking-tight uppercase opacity-60">Branch</span>
           </div>
-          <span className="text-[12px] font-medium text-zinc-600">{member.branch?.name || "-"}</span>
+          <span className="text-[13px] font-semibold text-foreground/80">{member.branch?.name || "-"}</span>
         </div>
 
-        <div className="pt-2 flex items-center justify-between border-t border-zinc-100 mt-2">
+        <div className="pt-4 flex items-center justify-between border-t border-border/40 mt-4 relative z-10">
           <div className="flex items-center gap-2">
             <StatusBadge 
               status={member.status} 
               variant={member.status === "Active" ? "emerald" : member.status === "Pending" ? "amber" : "rose"} 
             />
             <span className={cn(
-              "px-2 py-0.5 rounded-md text-[10px] font-bold border",
+              "px-2 py-0.5 rounded-md text-[10px] font-bold border backdrop-blur-sm",
               member.type === "Employee" 
-                ? "bg-blue-50 text-blue-600 border-blue-100" 
-                : "bg-purple-50 text-purple-600 border-purple-100"
+                ? "bg-blue-500/10 text-blue-600 border-blue-500/20" 
+                : "bg-purple-500/10 text-purple-600 border-purple-500/20"
             )}>
               {member.type}
             </span>
           </div>
-          <span className="text-[10px] text-zinc-400 font-medium">{member.joinedDate}</span>
+          <span className="text-[10px] text-muted-foreground font-bold tracking-tight">{member.joinedDate}</span>
         </div>
       </div>
     </motion.div>

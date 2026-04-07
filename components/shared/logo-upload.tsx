@@ -62,8 +62,8 @@ export function LogoUpload({
         className={cn(
           "relative group flex flex-col items-center justify-center border-2 border-dashed rounded-xl transition-all overflow-hidden",
           disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer",
-          preview ? "aspect-square w-32 border-primary/20 bg-primary/[0.02]" : "h-32 w-full border-zinc-200 bg-zinc-50/50 hover:bg-white hover:border-primary/40",
-          error && "border-destructive/50 bg-destructive/5"
+          preview ? "aspect-square w-32 border-primary/20 bg-primary/[0.03]" : "h-32 w-full border-border/60 bg-muted/20 hover:bg-muted/40 hover:border-primary/40",
+          error && "border-destructive/40 bg-destructive/5"
         )}
       >
         <input 
@@ -81,7 +81,7 @@ export function LogoUpload({
             {!disabled && (
               <button
                 onClick={handleClear}
-                className="absolute top-1 right-1 p-1 bg-white border border-zinc-200 rounded-full text-zinc-400 hover:text-destructive hover:border-destructive shadow-sm transition-all opacity-0 group-hover:opacity-100"
+                className="absolute top-1 right-1 p-1 bg-background border border-border/60 rounded-full text-muted-foreground/60 hover:text-destructive hover:border-destructive shadow-sm transition-all opacity-0 group-hover:opacity-100"
               >
                 <X size={12} weight="bold" />
               </button>
@@ -89,12 +89,12 @@ export function LogoUpload({
           </div>
         ) : (
           <div className="flex flex-col items-center gap-2 p-4 text-center">
-            <div className="w-10 h-10 rounded-full bg-white border border-zinc-100 flex items-center justify-center text-zinc-400 group-hover:text-primary transition-colors">
+            <div className="w-10 h-10 rounded-full bg-background border border-border/40 flex items-center justify-center text-muted-foreground/40 group-hover:text-primary transition-colors">
               <UploadSimple size={18} weight="bold" />
             </div>
             <div className="space-y-0.5">
-              <p className="text-[12px] font-bold text-zinc-900">Click to upload</p>
-              <p className="text-[10px] text-zinc-500 font-medium tracking-tight">SVG, PNG or JPG (max. 800x800px)</p>
+              <p className="text-[12px] font-bold text-foreground">Click to upload</p>
+              <p className="text-[10px] text-muted-foreground/60 font-medium tracking-tight">SVG, PNG or JPG (max. 800x800px)</p>
             </div>
           </div>
         )}

@@ -12,11 +12,11 @@ interface StatusBadgeProps {
 }
 
 const colorConfig: Record<StatusColor, string> = {
-  emerald: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
-  amber: "bg-amber-500/10 text-amber-600 border-amber-500/20",
-  rose: "bg-rose-500/10 text-rose-600 border-rose-500/20",
-  indigo: "bg-indigo-500/10 text-indigo-600 border-indigo-500/20",
-  zinc: "bg-zinc-500/10 text-zinc-600 border-zinc-500/20",
+  emerald: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 dark:bg-emerald-500/20 border-emerald-500/20 dark:border-emerald-500/30",
+  amber: "bg-amber-500/10 text-amber-600 dark:text-amber-400 dark:bg-amber-500/20 border-amber-500/20 dark:border-amber-500/30",
+  rose: "bg-rose-500/10 text-rose-600 dark:text-rose-400 dark:bg-rose-500/20 border-rose-500/20 dark:border-rose-500/30",
+  indigo: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 dark:bg-indigo-500/20 border-indigo-500/20 dark:border-indigo-500/30",
+  zinc: "bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 dark:bg-zinc-500/20 border-zinc-500/20 dark:border-zinc-500/30",
 };
 
 const dotConfig: Record<StatusColor, string> = {

@@ -43,18 +43,18 @@ export function ItemSection({
   return (
     <div 
       className={cn(
-        "p-5 bg-zinc-50/40 rounded-2xl border border-zinc-200/80 space-y-5 animate-in fade-in slide-in-from-top-1 duration-300", 
+        "p-5 bg-muted/40 rounded-2xl border border-border/60 space-y-5 animate-in fade-in slide-in-from-top-1 duration-300", 
         className
       )}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="w-6 h-6 rounded-full bg-zinc-200/80 flex items-center justify-center">
-            <span className="text-[11px] font-bold text-zinc-600">
+          <div className="w-6 h-6 rounded-full bg-border flex items-center justify-center">
+            <span className="text-[11px] font-bold text-muted-foreground/80">
               {index}
             </span>
           </div>
-          <span className="text-[12px] font-semibold text-zinc-500 tracking-tight">
+          <span className="text-[12px] font-semibold text-muted-foreground/60 tracking-tight">
             {label}
           </span>
         </div>
@@ -65,7 +65,7 @@ export function ItemSection({
             variant="ghost"
             size="icon"
             onClick={onRemove}
-            className="w-8 h-8 rounded-lg text-zinc-300 hover:text-destructive hover:bg-destructive/5 transition-all"
+            className="w-8 h-8 rounded-lg text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 transition-all font-bold"
           >
             <Trash size={18} />
           </Button>

@@ -104,22 +104,22 @@
   }
 
   .dark {
-    --background: oklch(0.147 0.004 49.25);
+    --background: oklch(0.12 0.01 260);
     --foreground: oklch(0.985 0.001 106.423);
-    --card: oklch(0.216 0.006 56.043);
+    --card: oklch(0.16 0.012 260);
     --card-foreground: oklch(0.985 0.001 106.423);
-    --popover: oklch(0.216 0.006 56.043);
+    --popover: oklch(0.16 0.012 260);
     --popover-foreground: oklch(0.985 0.001 106.423);
-    --primary: oklch(0.398 0.195 277.366);
+    --primary: oklch(0.585 0.233 277.117);
     --primary-foreground: oklch(0.962 0.018 272.314);
-    --secondary: oklch(0.274 0.006 286.033);
+    --secondary: oklch(0.24 0.01 260);
     --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.268 0.007 34.298);
-    --muted-foreground: oklch(0.709 0.01 56.259);
-    --accent: oklch(0.268 0.007 34.298);
+    --muted: oklch(0.18 0.01 260);
+    --muted-foreground: oklch(0.709 0.01 260);
+    --accent: oklch(0.18 0.01 260);
     --accent-foreground: oklch(0.985 0.001 106.423);
     --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
+    --border: oklch(1 0 0 / 12%);
     --input: oklch(1 0 0 / 15%);
     --ring: oklch(0.553 0.013 58.071);
     --chart-1: oklch(0.785 0.115 274.713);
@@ -127,14 +127,40 @@
     --chart-3: oklch(0.511 0.262 276.966);
     --chart-4: oklch(0.457 0.24 277.023);
     --chart-5: oklch(0.398 0.195 277.366);
-    --sidebar: oklch(0.12 0.01 260 / 80%);
+    --sidebar: oklch(0.12 0.01 260 / 92%);
     --sidebar-foreground: oklch(0.985 0.001 106.423);
     --sidebar-primary: oklch(0.585 0.233 277.117);
     --sidebar-primary-foreground: oklch(0.962 0.018 272.314);
     --sidebar-accent: oklch(0.585 0.233 277.117 / 15%);
     --sidebar-accent-foreground: oklch(0.985 0.001 106.423);
-    --sidebar-border: oklch(1 0 0 / 10%);
+    --sidebar-border: oklch(1 0 0 / 15%);
     --sidebar-ring: oklch(0.553 0.013 58.071);
+  }
+}
+
+@layer utilities {
+  .premium-glow {
+    position: relative;
+    overflow: hidden;
+  }
+  .premium-glow::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center, var(--primary) 0%, transparent 70%);
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .glass-card {
+    @apply bg-card/60 backdrop-blur-md border border-border/50 transition-all duration-300;
+  }
+  .glass-card:hover {
+    @apply border-primary/40 -translate-y-0.5 ring-1 ring-primary/10;
   }
 }
 

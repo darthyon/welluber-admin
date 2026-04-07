@@ -67,7 +67,7 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
       render: (org) => {
         if (org.needsAction.length === 0) {
           return (
-            <Badge variant="outline" className="text-[10px] px-2 h-5 bg-emerald-50 text-emerald-600 border-emerald-200 font-bold gap-1 animate-in fade-in duration-500">
+            <Badge variant="outline" className="text-[10px] px-2 h-5 bg-emerald-500/10 text-emerald-400 border-emerald-500/20 font-bold gap-1 animate-in fade-in duration-500">
               <CheckCircle size={12} weight="fill" />
               All good
             </Badge>
@@ -96,7 +96,7 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
                 {formatCurrency(org.totalWalletBalance)}
               </span>
               {org.claimsCount !== undefined && (
-                <span className="text-[10px] font-bold px-1.5 rounded-full bg-zinc-100 text-zinc-500 border border-zinc-200 tabular-nums">
+                <span className="text-[10px] font-bold px-1.5 rounded-full bg-muted text-muted-foreground/60 border border-border tabular-nums leading-none flex items-center">
                   {org.claimsCount}
                 </span>
               )}
@@ -158,7 +158,7 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
           ) : (
             <>
               {org.policies.slice(0, 1).map((policy, i) => (
-                <Badge key={i} variant="secondary" className="bg-indigo-50/50 text-indigo-700 font-medium text-[10px] px-1.5 py-0 h-4 border-indigo-100 whitespace-nowrap">
+                <Badge key={i} variant="secondary" className="bg-indigo-500/10 text-indigo-400 font-bold text-[10px] px-1.5 py-0 h-4 border-indigo-500/20 whitespace-nowrap">
                   {policy}
                 </Badge>
               ))}
@@ -201,7 +201,7 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
           ) : (
             <>
               {org.branches.slice(0, 1).map((branch, i) => (
-                <Badge key={i} variant="secondary" className="bg-sky-50/50 text-sky-700 font-medium text-[10px] px-1.5 py-0 h-4 border-sky-100 whitespace-nowrap">
+                <Badge key={i} variant="secondary" className="bg-sky-500/10 text-sky-400 font-bold text-[10px] px-1.5 py-0 h-4 border-sky-500/20 whitespace-nowrap">
                   {branch}
                 </Badge>
               ))}

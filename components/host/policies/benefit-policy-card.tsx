@@ -51,10 +51,9 @@ export function BenefitPolicyCard({ policy, onView, onClone }: BenefitPolicyCard
 
   return (
     <motion.div
-      whileHover={{ y: -2 }}
       transition={{ duration: 0.2, ease: "easeOut" }}
       onClick={() => onView(policy.id)}
-      className="group relative p-5 rounded-xl border border-zinc-200 bg-zinc-50/50 hover:bg-white hover:border-primary/30 hover:shadow-md transition-all cursor-pointer overflow-hidden"
+      className="group relative glass-card p-5 rounded-xl cursor-pointer overflow-hidden"
     >
       {/* Bento-style Decorative Accent */}
       <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-primary/5 rounded-full blur-3xl group-hover:w-40 group-hover:h-40 group-hover:bg-primary/10 transition-all duration-500 pointer-events-none" />
@@ -62,7 +61,7 @@ export function BenefitPolicyCard({ policy, onView, onClone }: BenefitPolicyCard
       {/* Top Section: Header & Actions */}
       <div className="flex items-start justify-between mb-8 relative z-10">
         <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-2xl bg-zinc-100/80 border border-zinc-200/60 text-zinc-500 flex items-center justify-center transition-all duration-300 group-hover:bg-primary group-hover:text-white group-hover:border-primary/20">
+          <div className="w-12 h-12 rounded-2xl bg-muted border border-border/60 text-muted-foreground flex items-center justify-center transition-all duration-300 group-hover:bg-primary group-hover:text-white group-hover:border-primary/20">
             <IdentificationCard size={24} weight="fill" />
           </div>
 
@@ -75,7 +74,7 @@ export function BenefitPolicyCard({ policy, onView, onClone }: BenefitPolicyCard
                 status={policy.status}
                 variant={policy.status === "Published" ? "emerald" : "amber"}
               />
-              <span className="text-[10px] text-zinc-400 font-mono bg-white px-1.5 py-0.5 rounded border border-zinc-200 tracking-tight">
+              <span className="text-[10px] text-muted-foreground/60 font-mono bg-background/50 px-1.5 py-0.5 rounded border border-border/40 tracking-tight">
                 {policy.code}
               </span>
             </div>
@@ -87,16 +86,16 @@ export function BenefitPolicyCard({ policy, onView, onClone }: BenefitPolicyCard
 
       {/* Content Section */}
       <div className="relative z-10">
-        <p className="text-[13px] text-zinc-500 line-clamp-2 leading-relaxed font-normal opacity-90">
+        <p className="text-[13px] text-muted-foreground/80 line-clamp-2 leading-relaxed font-normal opacity-95">
           {policy.description || "No description provided."}
         </p>
 
-        <div className="mt-8 pt-6 border-t border-zinc-100 flex items-center justify-between">
+        <div className="mt-8 pt-6 border-t border-border/60 flex items-center justify-between">
           <div className="flex -space-x-2">
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="w-7 h-7 rounded-full border-2 border-white bg-zinc-100 flex items-center justify-center text-[10px] font-bold text-zinc-400 overflow-hidden shadow-sm"
+                className="w-7 h-7 rounded-full border-2 border-background bg-muted flex items-center justify-center text-[10px] font-bold text-muted-foreground/60 overflow-hidden shadow-sm ring-1 ring-border/40"
               >
                 <img
                   src={`https://i.pravatar.cc/100?img=${parseInt(policy.id) + i + 10}`}
@@ -104,15 +103,15 @@ export function BenefitPolicyCard({ policy, onView, onClone }: BenefitPolicyCard
                 />
               </div>
             ))}
-            <div className="w-7 h-7 rounded-full border-2 border-white bg-zinc-100 flex items-center justify-center text-[9px] font-bold text-zinc-400 shadow-sm">
+            <div className="w-7 h-7 rounded-full border-2 border-background bg-muted flex items-center justify-center text-[9px] font-bold text-muted-foreground/60 shadow-sm ring-1 ring-border/40">
               +12
             </div>
           </div>
           <div className="text-right">
-            <p className="text-[14px] font-bold text-zinc-800 tracking-tight">
+            <p className="text-[14px] font-bold text-foreground tracking-tight">
               RM {policy.utilisationMode === "Fixed" ? "2,400.00" : "Prorated"}
             </p>
-            <p className="text-[10px] text-zinc-400 font-bold tracking-tight">
+            <p className="text-[10px] text-muted-foreground/60 font-bold tracking-tight">
               Budget pool
             </p>
           </div>

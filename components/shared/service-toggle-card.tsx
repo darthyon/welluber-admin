@@ -70,8 +70,8 @@ export function ServiceToggleCard({
       className={cn(
         "group p-4 rounded-2xl border transition-all duration-300",
         isSelected 
-          ? "bg-primary/[0.02] border-primary/20 shadow-[0_0_15px_-5px_rgba(var(--primary-rgb),0.1)]" 
-          : "bg-transparent border-transparent hover:bg-muted/30"
+          ? "bg-primary/[0.02] border-primary/20" 
+          : "bg-transparent border-border/50 hover:bg-muted/30 hover:border-primary/30"
       )}
     >
       <div className="flex items-center justify-between gap-4">

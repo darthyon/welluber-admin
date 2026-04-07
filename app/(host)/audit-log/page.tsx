@@ -77,7 +77,7 @@ export default function AuditLogPage() {
             <FileText size={20} weight="bold" />
           </div>
           <div>
-            <h1 className="text-xl font-bold tracking-tight text-zinc-900">Audit Log</h1>
+            <h1 className="text-xl font-bold tracking-tight text-foreground">Audit Log</h1>
             <p className="text-muted-foreground text-[13px] mt-0.5 font-medium opacity-80">
               Complete chronological record of all administrative actions and system events.
             </p>
@@ -88,7 +88,7 @@ export default function AuditLogPage() {
           variant="outline" 
           size="sm" 
           onClick={exportToCsv}
-          className="h-10 px-4 font-bold border-zinc-200 hover:bg-zinc-50 transition-all flex items-center gap-2"
+          className="h-10 px-4 font-bold border-border/40 hover:bg-muted/50 transition-all flex items-center gap-2"
         >
           <Download size={18} weight="bold" />
           Export to CSV
@@ -123,8 +123,10 @@ export default function AuditLogPage() {
         }
       />
 
-      <div className="bg-white rounded-2xl border border-zinc-200 p-8 shadow-sm">
+      <div className="bg-card rounded-2xl border border-border p-8 shadow-sm relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(var(--primary-rgb),0.02),transparent_70%)] pointer-events-none" />
         <ActivityTimeline 
+          className="relative z-10"
           items={filteredLogs.map(log => ({
             id: log.id,
             title: log.title,

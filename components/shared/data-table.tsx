@@ -124,7 +124,7 @@ export function SharedDataTable<T extends { id: string | number }>({
       <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-border hover:scrollbar-thumb-muted-foreground/20">
         <table className="w-full text-left min-w-[800px]">
           <thead>
-            <tr className="border-b border-border/60 bg-zinc-50 dark:bg-muted/30">
+            <tr className="border-b border-border/60 bg-muted/30">
               {columns.map((col, i) => {
                 const isFirst = i === 0 && freezeFirst;
                 const isLast = i === columns.length - 1 && freezeLast;
@@ -138,8 +138,8 @@ export function SharedDataTable<T extends { id: string | number }>({
                     onClick={() => col.sortable && col.accessorKey && handleSort(col.accessorKey)}
                     className={cn(
                       "font-semibold text-muted-foreground text-[13px] p-4 whitespace-nowrap z-20 tracking-tight transition-colors",
-                      !ghost ? "bg-zinc-50 dark:bg-muted/30" : "bg-transparent dark:bg-transparent",
-                      col.sortable && "cursor-pointer hover:bg-zinc-100 hover:text-foreground dark:hover:bg-muted/40",
+                      !ghost ? "bg-muted/30" : "bg-transparent",
+                      col.sortable && "cursor-pointer hover:bg-primary/5 hover:text-primary",
                       (isFirstCol && !ghost) && "rounded-tl-xl",
                       (isLastCol && !ghost) && "rounded-tr-xl",
                       getCellAlignment(col.align),
@@ -180,7 +180,7 @@ export function SharedDataTable<T extends { id: string | number }>({
                   exit={{ opacity: 0, y: -5 }}
                   transition={{ duration: 0.15, delay: rowIndex * 0.03 }}
                   className={cn(
-                    "hover:bg-muted/30 transition-all group",
+                    "hover:bg-muted/40 group transition-colors",
                     onRowClick && "cursor-pointer"
                   )}
                   onClick={() => onRowClick?.(row)}
@@ -195,8 +195,8 @@ export function SharedDataTable<T extends { id: string | number }>({
                         className={cn(
                           "p-4 text-[13px] transition-colors",
                           getCellAlignment(col.align),
-                          isFirst && "sticky left-0 bg-card z-10 group-hover:bg-muted/40 shadow-[4px_0_12px_-4px_rgba(0,0,0,0.05)]",
-                          isLast && "sticky right-0 bg-card z-10 group-hover:bg-muted/40 shadow-[-4px_0_12px_-4px_rgba(0,0,0,0.05)]",
+                          isFirst && "sticky left-0 bg-card z-10 group-hover:bg-accent/40 shadow-[4px_0_12px_-4px_rgba(0,0,0,0.1)]",
+                          isLast && "sticky right-0 bg-card z-10 group-hover:bg-accent/40 shadow-[-4px_0_12px_-4px_rgba(0,0,0,0.1)]",
                           col.cellClassName
                         )}
                       >

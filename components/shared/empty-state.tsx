@@ -32,38 +32,45 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <div className={cn(
-      "flex flex-col items-center justify-center text-center rounded-3xl border border-dashed border-zinc-200/80 bg-zinc-50/50 transition-all duration-300",
-      isPageLevel ? "min-h-[500px] p-20" : "p-12",
-      "animate-in fade-in zoom-in-95 duration-500",
+      "relative flex flex-col items-center justify-center text-center rounded-[32px] border border-dashed border-border/40 bg-muted/5 overflow-hidden transition-all duration-500",
+      isPageLevel ? "min-h-[520px] p-24" : "p-12",
+      "animate-in fade-in zoom-in-95 duration-700 ease-out",
       className
     )}>
+      {/* Premium Background Accent */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(var(--primary-rgb),0.03),transparent_70%)] pointer-events-none" />
+      
       {icon && (
         <div className={cn(
-          "flex items-center justify-center rounded-2xl bg-white border border-zinc-100 shadow-sm text-zinc-400 mb-6",
-          isPageLevel ? "size-20 p-5" : "size-14 p-3.5"
+          "flex items-center justify-center rounded-2xl bg-background border border-border/40 shadow-xl shadow-black/5 text-primary/80 mb-8 relative z-10",
+          "backdrop-blur-sm bg-background/50",
+          isPageLevel ? "size-24 p-6" : "size-16 p-4"
         )}>
-          {icon}
+          <div className="absolute inset-0 rounded-2xl bg-primary/5 animate-pulse" />
+          <div className="relative z-10">
+            {icon}
+          </div>
         </div>
       )}
       
       <h3 className={cn(
-        "font-bold text-zinc-900 tracking-tight",
-        isPageLevel ? "text-xl mb-2" : "text-[14px] mb-1"
+        "font-bold text-foreground tracking-tight relative z-10",
+        isPageLevel ? "text-2xl mb-3" : "text-[15px] mb-1.5"
       )}>
         {title}
       </h3>
       
       {description && (
         <p className={cn(
-          "text-zinc-500 font-medium leading-relaxed",
-          isPageLevel ? "text-[15px] max-w-sm mb-8" : "text-[12px] max-w-[240px] mb-6"
+          "text-muted-foreground font-medium leading-relaxed opacity-60 relative z-10",
+          isPageLevel ? "text-[16px] max-w-sm mb-10" : "text-[13px] max-w-[260px] mb-8"
         )}>
           {description}
         </p>
       )}
       
       {action && (
-        <div className="flex items-center justify-center animate-in slide-in-from-bottom-2 duration-700 delay-200 fill-mode-both">
+        <div className="flex items-center justify-center animate-in slide-in-from-bottom-4 duration-1000 delay-300 fill-mode-both relative z-10">
           {action}
         </div>
       )}

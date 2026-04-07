@@ -77,7 +77,7 @@ export function OverflowTags({ items, className }: OverflowTagsProps) {
             data-tag={String(i)}
             variant="secondary"
             className={cn(
-              "text-[10px] font-medium bg-white border-zinc-200 text-zinc-600 px-2 py-0.5 h-5 shrink-0 whitespace-nowrap",
+              "text-[10px] font-bold bg-background/50 border-border/60 text-muted-foreground/80 px-2 py-0.5 h-5 shrink-0 whitespace-nowrap transition-colors hover:text-primary hover:border-primary/30",
               // Keep in DOM for measurement but visually hide overflow items
               i >= visibleCount && "invisible pointer-events-none"
             )}
@@ -91,13 +91,13 @@ export function OverflowTags({ items, className }: OverflowTagsProps) {
             <TooltipTrigger asChild>
               <button
                 onClick={(e) => e.stopPropagation()}
-                className="text-[10px] text-zinc-400 hover:text-primary font-bold px-1.5 shrink-0 whitespace-nowrap transition-colors"
+                className="text-[10px] text-muted-foreground/60 hover:text-primary font-bold px-1.5 shrink-0 whitespace-nowrap transition-colors"
               >
                 +{hiddenItems.length}
               </button>
             </TooltipTrigger>
             <TooltipContent
-              className="w-52 bg-white rounded-xl border border-zinc-200 shadow-xl z-[200]"
+              className="w-52 bg-popover rounded-xl border border-border/60 shadow-2xl z-[200] p-1"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex flex-col gap-0.5 py-1">
@@ -107,7 +107,7 @@ export function OverflowTags({ items, className }: OverflowTagsProps) {
                 {hiddenItems.map((item, i) => (
                   <div
                     key={i}
-                    className="text-[12px] px-2 py-1 hover:bg-zinc-50 rounded-lg text-zinc-700 font-medium"
+                    className="text-[12px] px-2 py-1 hover:bg-accent/40 rounded-lg text-foreground/80 font-medium transition-colors"
                   >
                     {item}
                   </div>

@@ -56,7 +56,7 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
     { 
       label: "Benefit policies", 
       href: `/organizations/${org.id}?tab=policies`,
-      className: "text-indigo-600 font-semibold"
+      className: "text-primary font-bold"
     }
   ];
 
@@ -64,9 +64,8 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
     <TooltipProvider>
       <motion.div 
         onClick={() => router.push(`/organizations/${org.id}`)}
-        whileHover={{ y: -2 }}
         transition={{ duration: 0.2, ease: "easeOut" }}
-        className="group relative bg-zinc-50/50 border border-zinc-200 rounded-xl p-5 hover:border-primary/30 hover:shadow-md transition-all duration-300 cursor-pointer overflow-hidden"
+        className="group relative glass-card rounded-xl p-5 cursor-pointer overflow-hidden"
       >
         {/* Bento-style Decorative Accent */}
         <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-primary/5 rounded-full blur-3xl group-hover:w-40 group-hover:h-40 group-hover:bg-primary/10 transition-all duration-500 pointer-events-none" />
@@ -80,13 +79,13 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
             <div className="space-y-1.5">
               <Link 
                 href={`/organizations/${org.id}`}
-                className="font-bold text-[14px] text-foreground hover:text-zinc-900 transition-colors block leading-tight tracking-tight"
+                className="font-bold text-[14px] text-foreground hover:text-primary transition-colors block leading-tight tracking-tight"
               >
                 {org.name}
               </Link>
               <div className="flex items-center gap-2">
                 <PulseStatus status={org.status as any} showLabel={true} className="px-1.5 py-0.5 rounded-md text-[10px]" />
-                <span className="text-[10px] text-zinc-400 font-mono bg-white px-1.5 py-0.5 rounded border border-zinc-200 tracking-tight">{org.id}</span>
+                <span className="text-[10px] text-muted-foreground/60 font-mono bg-background/50 px-1.5 py-0.5 rounded border border-border/40 tracking-tight">{org.id}</span>
               </div>
             </div>
           </div>
@@ -101,13 +100,13 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
           <div className="grid grid-cols-2 gap-4">
             {/* Workforce / Employees */}
             <div className="space-y-2.5">
-              <div className="flex items-center gap-1.5 text-zinc-400">
+              <div className="flex items-center gap-1.5 text-muted-foreground/30">
                 <Users size={14} weight="bold" />
-                <span className="text-[11px] font-semibold tracking-tight text-muted-foreground/80">Workforce</span>
+                <span className="text-[11px] font-bold tracking-tight text-muted-foreground/40 uppercase">Workforce</span>
               </div>
               <div className="space-y-2">
-                <span className="text-[14px] font-bold text-zinc-800 block">
-                  {org.employeeCount.toLocaleString()} <span className="text-[11px] font-normal text-zinc-400">pax</span>
+                <span className="text-[14px] font-bold text-foreground block">
+                  {org.employeeCount.toLocaleString()} <span className="text-[11px] font-normal text-muted-foreground/60">pax</span>
                 </span>
                 <StackedAvatars count={org.employeeCount} className="mt-1" />
               </div>
@@ -115,26 +114,26 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
 
             {/* Utilization */}
             <div className="space-y-2.5">
-              <div className="flex items-center gap-1.5 text-zinc-400">
+              <div className="flex items-center gap-1.5 text-muted-foreground/30">
                 <ChartPieSlice size={14} weight="bold" />
-                <span className="text-[11px] font-semibold tracking-tight text-zinc-500/80">Utilisation & Claims</span>
+                <span className="text-[11px] font-bold tracking-tight text-muted-foreground/40 uppercase leading-none">Utilisation & Claims</span>
               </div>
               <div className="flex items-center gap-3">
                 <UtilizationChart value={org.utilizationRate} mode="ring" size={44} strokeWidth={4} />
                 <div className="flex flex-col justify-center">
-                  <div className="flex items-center gap-1.5">
-                    <span className={cn("text-[14px] font-bold leading-tight", getUtilColor(org.utilizationRate))}>
-                      {formatCurrency(org.totalWalletBalance)}
+                  <span className={cn("text-[14px] font-bold leading-tight", getUtilColor(org.utilizationRate))}>
+                    {formatCurrency(org.totalWalletBalance)}
+                  </span>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <span className="text-[10px] text-muted-foreground/60 font-medium tabular-nums">
+                      / {formatCurrency(org.walletLimit)}
                     </span>
                     {org.claimsCount !== undefined && (
-                      <Badge variant="outline" className="h-4 px-1 text-[9px] font-bold bg-zinc-100 border-zinc-200 text-zinc-500 tabular-nums">
+                      <Badge variant="outline" className="h-3.5 px-1 text-[8px] font-bold bg-muted/40 border-border/50 text-muted-foreground/80 tabular-nums">
                         {org.claimsCount} claims
                       </Badge>
                     )}
                   </div>
-                  <span className="text-[10px] text-zinc-400 font-medium tabular-nums mt-0.5">
-                    / {formatCurrency(org.walletLimit)}
-                  </span>
                 </div>
               </div>
             </div>
@@ -142,23 +141,23 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
 
           {/* Row 2: Active Policies (Full Width) */}
           <div className="pt-2">
-            <div className="flex items-center gap-1.5 text-zinc-400 mb-3">
+            <div className="flex items-center gap-1.5 text-muted-foreground/30 mb-3">
               <Shield size={14} weight="bold" />
-              <span className="text-[11px] font-semibold tracking-tight text-zinc-500/80">Benefit policies</span>
-              <span className="h-2 w-2 rounded-full bg-zinc-200 flex items-center justify-center">
-                <span className="h-1 w-1 rounded-full bg-zinc-400" />
+              <span className="text-[11px] font-bold tracking-tight text-muted-foreground/40 uppercase leading-none">Benefit policies</span>
+              <span className="h-2 w-2 rounded-full bg-border flex items-center justify-center">
+                <span className="h-1 w-1 rounded-full bg-muted-foreground/40" />
               </span>
             </div>
             <div className="flex flex-wrap gap-2">
               {org.policies.length === 0 ? (
-                <span className="text-[11px] text-zinc-400 font-medium italic">Unassigned</span>
+                <span className="text-[11px] text-muted-foreground/40 font-bold italic">Unassigned</span>
               ) : (
                 <>
                   {org.policies.slice(0, 3).map((policy, i) => (
                     <Badge 
                       key={i} 
                       variant="secondary" 
-                      className="bg-white hover:bg-zinc-50 text-[11px] font-medium px-2.5 py-0.5 border-zinc-200 h-6 transition-colors text-zinc-600"
+                      className="bg-background/40 hover:bg-background/60 text-[11px] font-medium px-2.5 py-0.5 border-border/60 h-6 transition-colors text-foreground/70"
                     >
                       {policy}
                     </Badge>
@@ -168,20 +167,20 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
                       <TooltipTrigger asChild>
                         <button 
                           onClick={(e) => e.stopPropagation()}
-                          className="text-[11px] text-zinc-500 hover:text-zinc-900 font-bold px-1.5 underline decoration-zinc-200 underline-offset-4 transition-colors"
+                          className="text-[11px] text-muted-foreground/80 hover:text-primary font-bold px-1.5 underline decoration-border underline-offset-4 transition-colors"
                         >
                           +{org.policies.length - 3} more
                         </button>
                       </TooltipTrigger>
                       <TooltipContent 
-                        className="w-56 bg-white rounded-2xl border-zinc-200 shadow-2xl z-[200]" 
+                        className="w-56 bg-popover rounded-2xl border border-border shadow-2xl z-[200] p-1" 
                         onClick={(e) => e.stopPropagation()}
                       >
                         <div className="flex flex-col gap-1.5">
-                          <span className="text-[11px] font-semibold tracking-tight text-zinc-400 px-2 py-1 opacity-80">Benefit policies</span>
+                          <span className="text-[11px] font-semibold tracking-tight text-muted-foreground/60 px-2 py-1 opacity-80">Benefit policies</span>
                           <div className="max-h-[160px] overflow-y-auto px-1 space-y-1">
                             {org.policies.slice(3).map((policy, i) => (
-                              <div key={i} className="text-[12px] px-2 py-1.5 hover:bg-zinc-50 rounded-lg text-zinc-700 transition-colors truncate font-medium">
+                              <div key={i} className="text-[12px] px-2 py-1.5 hover:bg-accent rounded-lg text-foreground/80 transition-colors truncate font-medium">
                                 {policy}
                               </div>
                             ))}

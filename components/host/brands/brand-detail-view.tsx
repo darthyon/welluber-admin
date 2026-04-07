@@ -131,7 +131,7 @@ export function BrandDetailView({ brand, onBack, onEdit, onRemove }: BrandDetail
             <EntityAvatar name={brand.name} size="xl" />
             <div>
               <div className="flex items-center gap-3">
-                <h2 className="text-2xl font-bold tracking-tight text-zinc-900">{brand.name}</h2>
+                <h2 className="text-2xl font-bold tracking-tight text-foreground">{brand.name}</h2>
                 <StatusBadge status={brand.status} variant={brand.status === "active" ? "emerald" : "zinc"} />
               </div>
               <p className="text-[14px] text-muted-foreground mt-1 font-medium">
@@ -144,7 +144,7 @@ export function BrandDetailView({ brand, onBack, onEdit, onRemove }: BrandDetail
             <Button 
                variant="outline" 
                size="sm" 
-               className="h-10 px-4 font-bold border-zinc-200 hover:bg-zinc-50"
+               className="h-10 px-4 font-bold border-border/80 hover:bg-muted"
                onClick={() => onEdit(brand.id)}
             >
               <PencilSimpleLine size={18} weight="bold" className="mr-2" />
@@ -206,7 +206,7 @@ export function BrandDetailView({ brand, onBack, onEdit, onRemove }: BrandDetail
               }
             />
             
-            <div className="border border-border/40 rounded-xl overflow-hidden mt-2 bg-white">
+            <div className="border border-border/40 rounded-xl overflow-hidden mt-2 bg-card">
                 <TooltipProvider>
                     <SharedDataTable
                         data={filteredSps}

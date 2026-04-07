@@ -110,7 +110,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
               onChange={(e) => handleRecordChange(row.id, "code", e.target.value)}
               className={cn(
                 "w-20 text-[12px] font-bold bg-background border border-border rounded px-2 py-1 outline-none focus:border-primary/50",
-                !row.code && "border-rose-300 text-rose-600 bg-rose-50"
+                !row.code && "border-rose-500/20 text-rose-400 bg-rose-500/10"
               )}
               placeholder="ID"
             />
@@ -133,7 +133,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
                 onChange={(e) => handleRecordChange(row.id, "dob", e.target.value)}
                 className={cn(
                   "w-full text-[12px] bg-background border border-border rounded px-2 py-0.5 outline-none focus:border-primary/50",
-                  row.dob === "Invalid" && "border-rose-300 text-rose-600 bg-rose-50"
+                  row.dob === "Invalid" && "border-rose-500/20 text-rose-400 bg-rose-500/10"
                 )}
                 placeholder="DOB (YYYY-MM-DD)"
               />
@@ -151,7 +151,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
             <>
               <div className="flex items-center gap-1.5">
                 <Calendar size={12} className="text-muted-foreground opacity-60" />
-                <span className={cn("text-[12px] font-medium", row.dob === "Invalid" ? "text-rose-500 italic" : "text-foreground")}>
+                <span className={cn("text-[12px] font-medium", row.dob === "Invalid" ? "text-rose-400 italic" : "text-foreground")}>
                   {row.dob}
                 </span>
               </div>
@@ -201,7 +201,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
                 placeholder="Mobile Number"
               />
             ) : (
-              <span className={cn("text-[13px] font-medium", !row.mobile ? "text-rose-500 italic" : "text-muted-foreground")}>
+              <span className={cn("text-[13px] font-medium", !row.mobile ? "text-rose-400 italic" : "text-muted-foreground")}>
                 {row.mobile || "Missing Mobile"}
               </span>
             )}
@@ -228,7 +228,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
           ) : (
             <>
               <span className="font-semibold text-foreground text-[14px] leading-tight tracking-tight">{row.name}</span>
-              <span className={cn("text-[11px] font-medium", row.email ? "text-muted-foreground opacity-70" : "text-rose-500 italic")}>
+              <span className={cn("text-[11px] font-medium", row.email ? "text-muted-foreground opacity-70" : "text-rose-400 italic")}>
                 {row.email || "Missing email"}
               </span>
             </>
@@ -246,7 +246,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
               onChange={(e) => handleRecordChange(row.id, "dob", e.target.value)}
               className={cn(
                 "w-full text-[12px] font-mono bg-background border border-border rounded px-2 py-1 outline-none focus:border-primary/50",
-                row.dob === "Invalid" && "border-rose-300 text-rose-600 bg-rose-50"
+                row.dob === "Invalid" && "border-rose-500/20 text-rose-400 bg-rose-500/10"
               )}
             />
           ) : (
@@ -268,7 +268,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
               onChange={(e) => handleRecordChange(row.id, "date", e.target.value)}
               className={cn(
                 "w-full text-[12px] font-mono bg-background border border-border rounded px-2 py-1 outline-none focus:border-primary/50",
-                row.date === "Invalid Date" && "border-rose-300 text-rose-600 bg-rose-50"
+                row.date === "Invalid Date" && "border-rose-500/20 text-rose-400 bg-rose-500/10"
               )}
             />
           ) : (
@@ -297,12 +297,12 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
       header: "Status",
       render: (row) => (
         row.status === "Valid" ? (
-          <div className="flex items-center gap-1.5 text-emerald-600 font-semibold text-[11px] bg-emerald-50/50 w-fit px-2 py-0.5 rounded-full border border-emerald-100">
-            <CheckCircle size={14} weight="fill" /> Valid
+          <div className="flex items-center gap-1.5 text-emerald-400 font-bold text-[10px] uppercase bg-emerald-500/10 w-fit px-2 py-0.5 rounded-full border border-emerald-500/20 leading-none">
+            <CheckCircle size={12} weight="fill" /> Valid
           </div>
         ) : (
-          <div className="flex items-center gap-1.5 text-rose-600 font-semibold text-[11px] bg-rose-50/50 w-fit px-2 py-0.5 rounded-full border border-rose-100">
-            <WarningCircle size={14} weight="fill" /> {row.issue || "Issue"}
+          <div className="flex items-center gap-1.5 text-rose-400 font-bold text-[10px] uppercase bg-rose-500/10 w-fit px-2 py-0.5 rounded-full border border-rose-500/20 leading-none">
+            <WarningCircle size={12} weight="fill" /> {row.issue || "Issue"}
           </div>
         )
       )
@@ -367,8 +367,8 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
                     <p className="text-[11px] text-primary/80 leading-relaxed">Code, Email, First Name, Last Name, DOB, ID Type, ID Number, Join Date, Branch ID.</p>
                   </div>
                </div>
-               <div className="bg-zinc-50 rounded-xl p-4 border border-zinc-200 flex flex-col gap-2 justify-center">
-                  <p className="text-[12px] font-bold text-zinc-900">Need help formatting?</p>
+               <div className="bg-muted/10 rounded-xl p-4 border border-border flex flex-col gap-2 justify-center">
+                  <p className="text-[12px] font-bold text-foreground">Need help formatting?</p>
                   <button className="text-[11px] font-bold text-primary underline text-left hover:text-primary/80">
                     Download Sample Template
                   </button>

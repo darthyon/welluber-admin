@@ -29,6 +29,8 @@ import { TwoColumnDetailLayout } from "@/components/shared/two-column-detail-lay
 import { cn } from "@/lib/utils";
 import { ManualTopUpModal } from "./manual-topup-modal";
 import { TopUpHistoryModal } from "./topup-history-modal";
+import { EntityAvatar } from "@/components/shared/entity-avatar";
+import { Badge } from "@/components/ui/badge";
 
 interface BranchDetailViewProps {
   branchId: string;
@@ -65,7 +67,7 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
   const handleResetPassword = (email: string) => {
     // Simulated toast
     const toast = document.createElement("div");
-    toast.className = "fixed bottom-4 left-1/2 -translate-x-1/2 bg-zinc-900 text-white text-[13px] px-4 py-2 rounded-lg shadow-xl z-[300] animate-in slide-in-from-bottom-2 duration-300";
+    toast.className = "fixed bottom-4 left-1/2 -translate-x-1/2 bg-popover text-popover-foreground text-[13px] px-4 py-2 rounded-lg shadow-2xl z-[300] border border-border/60 animate-in slide-in-from-bottom-2 duration-300";
     toast.innerText = `Reset password email sent to ${email}`;
     document.body.appendChild(toast);
     setTimeout(() => {
@@ -125,22 +127,24 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
                   { name: "John Doe", email: "john.d@acme.com", role: "Branch Admin" },
                   { name: "Ahmad Faizal", email: "ahmad.f@acme.com", role: "Operations" },
                 ].map((admin, i) => (
-                  <div key={i} className="flex items-center justify-between p-3 rounded-lg border border-border bg-card hover:border-primary/20 transition-all group">
-                     <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-[12px] font-bold text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                          {admin.name.split(' ').map(n=>n[0]).join('')}
-                        </div>
+                  <div key={i} className="flex items-center justify-between p-3 rounded-xl border border-border/60 bg-card hover:border-primary/20 transition-all group relative overflow-hidden">
+                     <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/[0.02] transition-colors pointer-events-none" />
+                     <div className="flex items-center gap-3 relative z-10">
+                        <EntityAvatar name={admin.name} size="sm" />
                         <div>
-                          <p className="text-[13px] font-medium text-foreground">{admin.name}</p>
-                          <p className="text-[11px] text-muted-foreground">{admin.role}</p>
+                          <p className="text-[13px] font-bold text-foreground leading-tight tracking-tight">{admin.name}</p>
+                          <p className="text-[11px] text-muted-foreground font-medium opacity-70 mt-0.5">{admin.role}</p>
                         </div>
                      </div>
-                     <ActionPopover 
-                       actions={[
-                         { label: "View Details", onClick: () => console.log("View", admin.name) },
-                         { label: "Reset Password", onClick: () => handleResetPassword(admin.email) },
-                       ]}
-                     />
+                     <div className="flex items-center gap-2 relative z-10">
+                       <Badge variant="outline" className="text-[9px] font-bold border-emerald-500/20 text-emerald-600 bg-emerald-500/5">Admin</Badge>
+                       <ActionPopover 
+                         actions={[
+                           { label: "View Details", onClick: () => console.log("View", admin.name) },
+                           { label: "Reset Password", onClick: () => handleResetPassword(admin.email) },
+                         ]}
+                       />
+                     </div>
                   </div>
                 ))}
                 <Button 
@@ -155,16 +159,16 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
               </div>
             </DetailSection>
             
-            <div className="bg-indigo-600 rounded-xl p-6 text-white overflow-hidden relative group">
-              <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-1000" />
-              <h4 className="text-[15px] font-semibold mb-2 tracking-tight">Branch quick stats</h4>
+            <div className="bg-primary/95 dark:bg-primary/20 rounded-xl p-6 text-primary-foreground dark:text-primary overflow-hidden relative group border border-primary/20 shadow-lg shadow-primary/5">
+              <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-white/10 dark:bg-primary/20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-1000" />
+              <h4 className="text-[15px] font-bold mb-2 tracking-tight">Branch quick stats</h4>
               <div className="space-y-4 relative z-10">
                 <div>
-                  <p className="text-[11px] font-semibold text-white/70 tracking-tight">Total employees</p>
+                  <p className="text-[11px] font-bold opacity-70 tracking-tight">Total employees</p>
                   <p className="text-xl font-bold">1,240</p>
                 </div>
                 <div>
-                  <p className="text-[11px] font-semibold text-white/70 tracking-tight">Redemption rate</p>
+                  <p className="text-[11px] font-bold opacity-70 tracking-tight">Redemption rate</p>
                   <p className="text-xl font-bold">92%</p>
                 </div>
               </div>
@@ -207,11 +211,11 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-2">
                     <div className="relative">
                       <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center p-1.5 border border-primary/30">
-                        <div className="w-full h-full rounded-full bg-primary shadow-lg shadow-primary/40 ring-4 ring-white dark:ring-zinc-900" />
+                        <div className="w-full h-full rounded-full bg-primary shadow-lg shadow-primary/40 ring-4 ring-background" />
                       </div>
-                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white dark:border-zinc-900 shadow-sm" />
+                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-background shadow-sm" />
                     </div>
-                    <span className="text-[10px] font-semibold text-primary bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm px-2 py-0.5 rounded-full border border-primary/20 tracking-tight">
+                    <span className="text-[10px] font-semibold text-primary bg-background/90 backdrop-blur-sm px-2 py-0.5 rounded-full border border-primary/20 tracking-tight">
                       Pinned
                     </span>
                   </div>
@@ -260,14 +264,14 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
             description="Active configuration of the branch's financial resource pool"
           >
             {/* View Mode: Active Configuration Card */}
-            <div className="relative group/wallet bg-zinc-50/50 border border-zinc-200 rounded-xl p-6 overflow-hidden transition-all hover:border-primary/30">
+            <div className="relative group/wallet bg-muted/20 border border-border/60 rounded-xl p-6 overflow-hidden transition-all hover:border-primary/30">
               {/* Decorative Accent */}
               <div className="absolute -right-8 -top-8 w-32 h-32 bg-primary/5 rounded-full blur-3xl group-hover/wallet:scale-110 transition-transform duration-700" />
               
               <div className="relative z-10 space-y-6">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-white border border-zinc-200 text-zinc-500 flex items-center justify-center shadow-sm">
+                    <div className="w-12 h-12 rounded-xl bg-background border border-border text-muted-foreground flex items-center justify-center shadow-md shadow-black/5">
                       {walletType === "independent" ? (
                         <CurrencyCircleDollar size={24} weight="fill" />
                       ) : (
@@ -283,7 +287,7 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
                   </div>
                   
                   <div className="text-right">
-                    <p className="text-[11px] font-semibold tracking-tight text-zinc-400 mb-1 uppercase">Available balance</p>
+                    <p className="text-[11px] font-bold tracking-tight text-muted-foreground/60 mb-1 uppercase">Available balance</p>
                     <p className="text-2xl font-bold text-foreground tracking-tight">RM 45,000.00</p>
                     
                     <div className="flex items-center justify-end gap-2 mt-3">
@@ -291,7 +295,7 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
                         variant="secondary" 
                         size="sm" 
                         onClick={() => setIsHistoryModalOpen(true)}
-                        className="h-8 text-[11px] font-semibold rounded-full gap-1.5 px-3 border-zinc-200 hover:bg-zinc-100 transition-all shadow-sm"
+                        className="h-8 text-[11px] font-bold rounded-full gap-1.5 px-3 border-border/60 hover:bg-muted transition-all shadow-sm"
                       >
                         <ClockCounterClockwise size={14} weight="bold" />
                         History
@@ -300,7 +304,7 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
                         variant="default" 
                         size="sm" 
                         onClick={() => setIsTopUpModalOpen(true)}
-                        className="h-8 text-[11px] font-semibold rounded-full gap-1.5 px-3 bg-indigo-600 hover:bg-indigo-700 transition-all shadow-sm"
+                        className="h-8 text-[11px] font-bold rounded-full gap-1.5 px-3 bg-primary hover:bg-primary/90 transition-all shadow-lg shadow-primary/10"
                       >
                         <Plus size={14} weight="bold" />
                         Top-Up
@@ -309,15 +313,15 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
                   </div>
                 </div>
 
-                <div className="pt-6 border-t border-zinc-200/60 grid grid-cols-2 lg:grid-cols-3 gap-6">
-                  <DetailField 
-                    label="Wallet ID" 
-                    value={<span className="font-mono text-[11px] bg-white px-1.5 py-0.5 rounded border border-zinc-200 tracking-tight">WAL-BR01-2026</span>} 
-                  />
-                  <DetailField 
-                    label="Utilization" 
-                    value={<span className="text-[14px] font-semibold text-zinc-700 tracking-tight">68% <span className="text-[11px] font-normal text-muted-foreground ml-1">(RM 30,600 spent)</span></span>} 
-                  />
+                  <div className="pt-6 border-t border-border/40 grid grid-cols-2 lg:grid-cols-3 gap-6">
+                    <DetailField 
+                      label="Wallet ID" 
+                      value={<span className="font-mono text-[11px] bg-background px-1.5 py-0.5 rounded border border-border/60 tracking-tight text-foreground/70">WAL-BR01-2026</span>} 
+                    />
+                    <DetailField 
+                      label="Utilization" 
+                      value={<span className="text-[14px] font-bold text-foreground/80 tracking-tight">68% <span className="text-[11px] font-normal text-muted-foreground ml-1">(RM 30,600 spent)</span></span>} 
+                    />
                   {walletType === "shared" && (
                     <DetailField 
                       label="Source Pool" 

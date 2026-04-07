@@ -199,7 +199,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                   ].map((step) => (
                     <div key={step.label} className="flex items-center justify-between text-[13px]">
                       <span className="text-muted-foreground">{step.label}</span>
-                      <div className={cn("w-2 h-2 rounded-full", step.status ? "bg-emerald-500" : "bg-zinc-200")} />
+                      <div className={cn("w-2 h-2 rounded-full", step.status ? "bg-emerald-500" : "bg-muted")} title={step.status ? "Completed" : "Pending"} />
                     </div>
                   ))}
                 </div>
@@ -368,7 +368,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-2 border-t border-zinc-100/60">
+                  <div className="flex items-center justify-between pt-2 border-t border-border/40">
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-2">
                         <Switch checked={watch(`contacts.${i}.isPublic`)} onCheckedChange={(v) => setValue(`contacts.${i}.isPublic`, v)} />
@@ -380,7 +380,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                       type="button" 
                       variant="outline" 
                       size="sm" 
-                      className="h-9 px-4 gap-2 text-[12px] font-semibold border-zinc-200 text-zinc-600 hover:text-primary hover:border-primary/30 transition-all rounded-full"
+                      className="h-9 px-4 gap-2 text-[12px] font-bold border-border text-muted-foreground hover:text-primary hover:border-primary/30 transition-all rounded-full"
                       onClick={() => console.log("Invite sent to", watch(`contacts.${i}.email`))}
                     >
                       <PaperPlaneTilt size={14} weight="bold" />

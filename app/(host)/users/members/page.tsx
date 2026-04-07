@@ -16,6 +16,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { EmptyState } from "@/components/shared/empty-state";
+import { EntityAvatar } from "@/components/shared/entity-avatar";
 
 export default function MembersPage() {
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
@@ -46,9 +47,12 @@ export default function MembersPage() {
       accessorKey: "name",
       sortable: true,
       render: (row) => (
-        <div className="flex flex-col">
-          <span className="font-bold text-zinc-900 text-[14px] tracking-tight">{row.name}</span>
-          <span className="text-[11px] text-zinc-500 font-medium">{row.email}</span>
+        <div className="flex items-center gap-3">
+          <EntityAvatar name={row.name} size="sm" />
+          <div className="flex flex-col">
+            <span className="font-bold text-foreground text-[14px] tracking-tight hover:text-primary transition-colors cursor-pointer">{row.name}</span>
+            <span className="text-[11px] text-muted-foreground font-medium opacity-70">{row.email}</span>
+          </div>
         </div>
       )
     },
@@ -58,10 +62,10 @@ export default function MembersPage() {
       sortable: true,
       render: (row) => (
         <span className={cn(
-          "px-2 py-0.5 rounded-md text-[10px] font-bold border",
+          "px-2 py-0.5 rounded-md text-[10px] font-bold border backdrop-blur-sm",
           row.type === "Employee" 
-            ? "bg-blue-50 text-blue-600 border-blue-100" 
-            : "bg-purple-50 text-purple-600 border-purple-100"
+            ? "bg-blue-500/10 text-blue-600 border-blue-500/20" 
+            : "bg-purple-500/10 text-purple-600 border-purple-500/20"
         )}>
           {row.type}
         </span>
@@ -73,8 +77,8 @@ export default function MembersPage() {
       sortable: true,
       render: (row) => (
         <div className="flex items-center gap-2">
-          <Buildings size={16} className="text-zinc-400" />
-          <span className="text-[13px] font-semibold text-zinc-700">{row.organization.name}</span>
+          <Buildings size={16} className="text-muted-foreground/40" />
+          <span className="text-[13px] font-semibold text-foreground/80">{row.organization.name}</span>
         </div>
       )
     },
@@ -84,8 +88,8 @@ export default function MembersPage() {
       sortable: true,
       render: (row) => (
         <div className="flex items-center gap-2">
-          <TreeStructure size={16} className="text-zinc-400" />
-          <span className="text-[13px] font-medium text-zinc-600">{row.branch?.name || "-"}</span>
+          <TreeStructure size={16} className="text-muted-foreground/40" />
+          <span className="text-[13px] font-medium text-muted-foreground">{row.branch?.name || "-"}</span>
         </div>
       )
     },
@@ -107,7 +111,7 @@ export default function MembersPage() {
       headerClassName: "text-right",
       align: "right",
       render: (row) => (
-        <span className="text-[12px] font-medium text-zinc-500">{row.joinedDate}</span>
+        <span className="text-[12px] font-bold text-muted-foreground/50 tracking-tight">{row.joinedDate}</span>
       )
     }
   ];

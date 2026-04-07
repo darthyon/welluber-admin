@@ -79,14 +79,14 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
           {/* Map Preview Container */}
           <div className="aspect-[16/10] lg:aspect-auto lg:h-full min-h-[300px] rounded-2xl border-2 border-border bg-muted/30 flex items-center justify-center relative overflow-hidden transition-all duration-500 group-hover:border-primary/20">
             {/* Map Grid Pattern */}
-            <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#000000_1px,transparent_1px)] [background-size:16px_16px] dark:bg-[radial-gradient(#ffffff_1px,transparent_1px)]" />
+            <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] bg-[radial-gradient(var(--foreground)_1px,transparent_1px)] [background-size:24px_24px]" />
             
             {/* Info Icon with Tooltip (Top Right) */}
             <div className="absolute top-4 right-4 z-20">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <button type="button" className="p-2 bg-background/80 backdrop-blur border border-border rounded-lg text-muted-foreground hover:text-primary hover:border-primary/30 transition-all shadow-sm">
+                    <button type="button" className="p-2 bg-background/60 backdrop-blur-md border border-border/60 rounded-lg text-muted-foreground hover:text-primary hover:border-primary/40 transition-all shadow-sm">
                       <Info size={18} weight="bold" />
                     </button>
                   </TooltipTrigger>
@@ -110,7 +110,7 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
                   value.lat && value.lon ? "text-primary" : "text-muted-foreground/40"
                 )} />
                 {value.lat && value.lon && !isSearching && (
-                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white dark:border-zinc-900 shadow-sm" />
+                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-background shadow-sm" />
                 )}
               </div>
               <span className={cn(
@@ -139,12 +139,12 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
                   type="button"
                   onClick={handleMockSearch}
                   disabled={!searchQuery || isSearching}
-                  className="absolute right-2 top-1.5 bottom-1.5 w-10 bg-primary text-white rounded-lg flex items-center justify-center hover:bg-primary/90 transition-all disabled:opacity-30 disabled:cursor-not-allowed group/btn"
+                  className="absolute right-2 top-1.5 bottom-1.5 w-10 bg-primary text-primary-foreground rounded-lg flex items-center justify-center hover:bg-primary/90 transition-all disabled:opacity-30 disabled:cursor-not-allowed group/btn shadow-[0_4px_12px_rgba(var(--primary-rgb),0.2)]"
                 >
                   <Check size={18} weight="bold" className={cn("transition-transform", isSearching ? "scale-0" : "scale-100")} />
                   {isSearching && (
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
                     </div>
                   )}
                 </button>

@@ -29,8 +29,8 @@ export function ChoiceCard({
       className={cn(
         "relative flex items-center gap-4 p-4 rounded-xl border-2 transition-all group",
         selected
-          ? "border-primary bg-primary/5 shadow-sm"
-          : "border-border bg-card hover:border-border/80 hover:bg-muted/30",
+          ? "border-primary bg-primary/5"
+          : "border-border/50 bg-card hover:border-primary/30 hover:bg-muted/30",
         !disabled ? "cursor-pointer" : "cursor-not-allowed opacity-60 grayscale-[0.2]",
         className
       )}

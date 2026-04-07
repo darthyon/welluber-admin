@@ -50,7 +50,7 @@ export function ActivityTimeline({ items, title, icon, className }: ActivityTime
       {(title || icon) && (
         <div className="flex items-center gap-2 mb-6">
           {icon || <ClockCounterClockwise size={18} weight="bold" className="text-primary" />}
-          {title && <h3 className="text-[14px] font-bold text-zinc-900">{title}</h3>}
+          {title && <h3 className="text-[14px] font-bold text-foreground">{title}</h3>}
         </div>
       )}
 
@@ -64,13 +64,13 @@ export function ActivityTimeline({ items, title, icon, className }: ActivityTime
               key={item.id} 
               className={cn(
                 "relative pl-8 pb-8 last:pb-0 group",
-                !isLast && "before:absolute before:left-[4.5px] before:top-[22px] before:bottom-0 before:w-[1px] before:bg-zinc-100 before:transition-colors group-hover:before:bg-zinc-200"
+                !isLast && "before:absolute before:left-[4.5px] before:top-[22px] before:bottom-0 before:w-[1px] before:bg-border before:transition-colors group-hover:before:bg-primary/20"
               )}
             >
               {/* Timeline Dot/Icon */}
               <div className={cn(
-                "absolute left-0 top-1 w-2.5 h-2.5 rounded-full ring-4 ring-white z-10 transition-all duration-300",
-                item.type ? `${TYPE_COLORS[type]} shadow-sm` : "bg-zinc-300"
+                "absolute left-[1px] top-1.5 w-2 h-2 rounded-full ring-[4px] ring-background z-10 transition-all duration-300",
+                item.type ? `${TYPE_COLORS[type]} shadow-[0_0_8px_rgba(var(--primary-rgb),0.2)]` : "bg-muted-foreground/30"
               )}>
                 {item.type && (
                   <div className="absolute inset-0 flex items-center justify-center text-white scale-0 group-hover:scale-100 transition-transform duration-200">
@@ -82,7 +82,7 @@ export function ActivityTimeline({ items, title, icon, className }: ActivityTime
               {/* Content */}
               <div className="flex flex-col gap-0.5">
                 <div className="flex items-center justify-between gap-4">
-                  <h4 className="text-[13.5px] font-bold text-zinc-900 group-hover:text-primary transition-colors duration-200">
+                  <h4 className="text-[13.5px] font-bold text-foreground group-hover:text-primary transition-colors duration-200 tracking-tight">
                     {item.title}
                   </h4>
                   <span className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-wider tabular-nums">
@@ -90,25 +90,25 @@ export function ActivityTimeline({ items, title, icon, className }: ActivityTime
                   </span>
                 </div>
                 
-                <p className="text-[12.5px] text-zinc-600 leading-relaxed font-medium">
-                  {item.description}
+                <p className="text-[12.5px] text-muted-foreground leading-relaxed font-medium opacity-80">
+                    {item.description}
                 </p>
 
                 <div className="flex items-center gap-2 mt-1.5 font-medium">
                   {item.user && (
                     <div className="flex items-center gap-1.5">
-                      <div className="w-4 h-4 rounded-full bg-zinc-100 border border-zinc-200 flex items-center justify-center overflow-hidden">
-                        <User size={10} className="text-zinc-500" />
+                      <div className="w-4 h-4 rounded-full bg-muted border border-border flex items-center justify-center overflow-hidden">
+                        <User size={10} className="text-muted-foreground" />
                       </div>
-                      <span className="text-[11px] text-zinc-500">
-                        by <span className="text-zinc-700 font-bold">{item.user}</span>
+                      <span className="text-[11px] text-muted-foreground/60">
+                        by <span className="text-foreground font-bold">{item.user}</span>
                       </span>
                     </div>
                   )}
                   {item.user && item.timestamp.includes(',') && (
-                    <span className="text-[10px] text-zinc-300">•</span>
+                    <span className="text-[10px] text-muted-foreground/30">•</span>
                   )}
-                  <span className="text-[11px] text-zinc-400">
+                  <span className="text-[11px] text-muted-foreground/50">
                     {item.timestamp.includes(',') ? item.timestamp.split(',')[0] : item.timestamp}
                   </span>
                 </div>

@@ -30,27 +30,27 @@ export function PolicyDetailSheet({ isOpen, onClose, policy, groups, benefits, o
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[110] flex justify-end bg-zinc-900/40 backdrop-blur-[2px] animate-in fade-in duration-300">
-      <div className="bg-white w-full max-w-2xl h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-500 border-l border-zinc-200">
+    <div className="fixed inset-0 z-[110] flex justify-end bg-black/60 backdrop-blur-[2px] animate-in fade-in duration-300">
+      <div className="bg-card w-full max-w-2xl h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-500 border-l border-border">
         {/* Header */}
-        <div className="p-8 pb-6 border-b border-zinc-100 flex items-center justify-between sticky top-0 bg-white z-10">
+        <div className="p-8 pb-6 border-b border-border flex items-center justify-between sticky top-0 bg-card z-10">
           <div className="flex items-center gap-5">
              <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
                <ShieldCheck size={28} weight="duotone" />
              </div>
              <div>
-               <h3 className="text-xl font-bold text-zinc-900 tracking-tight">{policy.name}</h3>
+               <h3 className="text-xl font-bold text-foreground tracking-tight">{policy.name}</h3>
                <div className="flex items-center gap-3 mt-1">
-                 <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-widest">{policy.code}</span>
-                 <div className="w-1 h-1 rounded-full bg-zinc-300" />
-                 <Badge variant="secondary" className="bg-emerald-50 text-emerald-600 border-emerald-100 font-bold uppercase text-[10px] tracking-wider h-5">
+                 <span className="text-[11px] font-mono text-muted-foreground/40 uppercase tracking-widest leading-none">{policy.code}</span>
+                 <div className="w-1.5 h-1.5 rounded-full bg-muted" />
+                 <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 font-bold uppercase text-[10px] tracking-wider h-5">
                    {policy.status}
                  </Badge>
                </div>
              </div>
           </div>
-          <button onClick={onClose} className="p-2.5 hover:bg-zinc-100 rounded-full transition-colors">
-            <X size={22} className="text-zinc-400" />
+          <button onClick={onClose} className="p-2.5 hover:bg-muted rounded-full transition-colors group">
+            <X size={22} className="text-muted-foreground/50 group-hover:text-foreground" />
           </button>
         </div>
 
@@ -88,7 +88,7 @@ export function PolicyDetailSheet({ isOpen, onClose, policy, groups, benefits, o
                        <p className="text-[13px] font-bold text-primary">
                          {group.distributionType === "SharedAmount" ? `€${group.maxUsagePerCycle?.toFixed(2)} Shared` : "Individual Per Service"}
                        </p>
-                       <p className="text-[10px] text-zinc-400 font-bold tracking-tight mt-0.5">Budget logic</p>
+                       <p className="text-[10px] text-muted-foreground/40 font-bold tracking-tight mt-0.5">Budget logic</p>
                     </div>
                   </div>
 
@@ -124,9 +124,9 @@ export function PolicyDetailSheet({ isOpen, onClose, policy, groups, benefits, o
                 </div>
               ))}
               {groups.length === 0 && (
-                <div className="text-center py-12 bg-zinc-50/50 rounded-3xl border border-dashed border-zinc-200">
-                  <TreeStructure size={48} className="text-zinc-200 mx-auto mb-3" />
-                  <p className="text-[14px] font-medium text-zinc-400">No benefit groups configured for this policy.</p>
+                <div className="text-center py-12 bg-muted/10 rounded-3xl border border-dashed border-border/60">
+                   <TreeStructure size={48} className="text-muted/20 mx-auto mb-3" />
+                   <p className="text-[14px] font-medium text-muted-foreground/40">No benefit groups configured for this policy.</p>
                 </div>
               )}
             </div>
@@ -134,10 +134,10 @@ export function PolicyDetailSheet({ isOpen, onClose, policy, groups, benefits, o
         </div>
 
         {/* Footer Actions */}
-        <div className="p-8 border-t border-zinc-100 flex items-center gap-4 bg-zinc-50/20 sticky bottom-0 z-10">
+        <div className="p-8 border-t border-border flex items-center gap-4 bg-muted/30 sticky bottom-0 z-10">
           <Button 
             variant="outline" 
-            className="flex-1 rounded-2xl h-12 border-zinc-200 font-bold"
+            className="flex-1 rounded-2xl h-12 border-border font-bold hover:bg-muted"
             onClick={onClose}
           >
             Close View
@@ -161,12 +161,12 @@ export function PolicyDetailSheet({ isOpen, onClose, policy, groups, benefits, o
 
 function RuleItem({ icon: Icon, label, value }: { icon: any, label: string, value: string }) {
   return (
-    <div className="space-y-1.5 p-3 rounded-xl border border-zinc-100 bg-white shadow-sm">
-      <div className="flex items-center gap-2 text-zinc-400">
+    <div className="space-y-1.5 p-3 rounded-xl border border-border bg-card shadow-sm">
+      <div className="flex items-center gap-2 text-muted-foreground/30">
         <Icon size={14} weight="bold" />
-        <span className="text-[10px] font-bold text-zinc-400 leading-none">{label}</span>
+        <span className="text-[10px] font-bold text-muted-foreground/40 leading-none">{label}</span>
       </div>
-      <p className="text-[13px] font-bold text-zinc-800 truncate">{value}</p>
+      <p className="text-[13px] font-bold text-foreground truncate">{value}</p>
     </div>
   );
 }

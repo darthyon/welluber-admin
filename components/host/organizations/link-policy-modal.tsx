@@ -44,30 +44,30 @@ export function LinkPolicyModal({ isOpen, onClose, onLink }: LinkPolicyModalProp
   );
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/40 backdrop-blur-[2px] animate-in fade-in duration-300">
-      <div className="bg-white rounded-[32px] w-full max-w-lg shadow-2xl overflow-hidden border border-zinc-200/50 animate-in zoom-in-95 duration-300">
-        <div className="p-8 pb-4 flex items-center justify-between border-b border-zinc-100">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-[2px] animate-in fade-in duration-300">
+      <div className="bg-card rounded-[24px] w-full max-w-lg shadow-2xl overflow-hidden border border-border animate-in zoom-in-95 duration-300">
+        <div className="p-8 pb-4 flex items-center justify-between border-b border-border">
           <div className="flex items-center gap-4">
-             <div className="w-12 h-12 rounded-2xl bg-zinc-100 flex items-center justify-center text-zinc-400 border border-zinc-200/60">
+             <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center text-muted-foreground/40 border border-border">
                <ShieldCheck size={24} weight="duotone" />
              </div>
              <div>
-               <h3 className="text-[18px] font-bold text-zinc-900 tracking-tight">Link Benefit Policy</h3>
-               <p className="text-[13px] text-zinc-500 font-medium">Assign a policy to this organization</p>
+               <h3 className="text-[18px] font-bold text-foreground tracking-tight">Link benefit policy</h3>
+               <p className="text-[13px] text-muted-foreground font-medium">Assign a policy to this organisation</p>
              </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-zinc-100 rounded-full transition-colors">
-            <X size={20} className="text-zinc-400" />
+          <button onClick={onClose} className="p-2 hover:bg-muted rounded-full transition-colors group">
+            <X size={20} className="text-muted-foreground/50 group-hover:text-foreground" />
           </button>
         </div>
 
         <div className="p-8 pt-6 space-y-6">
           <div className="relative group">
-            <MagnifyingGlass size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-primary transition-colors" />
+            <MagnifyingGlass size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/40 group-focus-within:text-primary transition-colors" />
             <input 
               type="text"
               placeholder="Search by policy name or code..."
-              className="w-full h-12 pl-11 pr-4 bg-zinc-50 border border-zinc-200 rounded-2xl text-[14px] focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+              className="w-full h-12 pl-11 pr-4 bg-muted/10 border border-border rounded-xl text-[14px] text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -83,23 +83,23 @@ export function LinkPolicyModal({ isOpen, onClose, onLink }: LinkPolicyModalProp
                   className={cn(
                     "p-4 rounded-2xl border transition-all cursor-pointer group",
                     isSelected 
-                      ? "bg-primary/5 border-primary shadow-sm" 
-                      : "bg-white border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50/50"
+                      ? "bg-primary/10 border-primary shadow-sm" 
+                      : "bg-card border-border hover:border-primary/30 hover:bg-muted/50"
                   )}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex gap-3">
                       <div className={cn(
                         "w-10 h-10 rounded-xl flex items-center justify-center border transition-colors",
-                        isSelected ? "bg-primary text-white border-primary" : "bg-zinc-100 text-zinc-400 border-zinc-200 group-hover:bg-zinc-200"
+                        isSelected ? "bg-primary text-white border-primary" : "bg-muted text-muted-foreground/30 border-border group-hover:bg-muted/80"
                       )}>
                         <IdentificationCard size={20} weight={isSelected ? "fill" : "duotone"} />
                       </div>
                       <div className="space-y-1">
-                        <p className={cn("text-[14px] font-bold transition-colors", isSelected ? "text-primary" : "text-zinc-900")}>
+                        <p className={cn("text-[14px] font-bold transition-colors", isSelected ? "text-primary" : "text-foreground")}>
                           {policy.name}
                         </p>
-                        <p className="text-[11px] font-mono text-zinc-400 uppercase tracking-widest leading-none">
+                        <p className="text-[11px] font-mono text-muted-foreground/40 uppercase tracking-widest leading-none">
                           {policy.code}
                         </p>
                       </div>
@@ -108,14 +108,14 @@ export function LinkPolicyModal({ isOpen, onClose, onLink }: LinkPolicyModalProp
                       <CheckCircle size={20} weight="fill" className="text-primary animate-in zoom-in-50" />
                     )}
                   </div>
-                  <p className="text-[12px] text-zinc-500 mt-3 leading-relaxed">
+                  <p className="text-[12px] text-muted-foreground mt-3 leading-relaxed">
                     {policy.description}
                   </p>
                 </div>
               );
             })}
             {filteredPolicies.length === 0 && (
-              <div className="text-center py-10 text-zinc-400 space-y-2">
+              <div className="text-center py-10 text-muted-foreground/40 space-y-2">
                 <MagnifyingGlass size={32} className="mx-auto opacity-20" />
                 <p className="text-[13px] font-medium">No matching policies found.</p>
               </div>
@@ -123,16 +123,16 @@ export function LinkPolicyModal({ isOpen, onClose, onLink }: LinkPolicyModalProp
           </div>
         </div>
 
-        <div className="p-8 pt-4 bg-zinc-50/50 border-t border-zinc-100 flex items-center gap-3">
+        <div className="p-8 pt-4 bg-muted/30 border-t border-border flex items-center gap-3">
           <Button 
             variant="outline" 
-            className="flex-1 rounded-2xl h-12 border-zinc-200 font-bold"
+            className="flex-1 rounded-xl h-12 border-border font-bold hover:bg-muted"
             onClick={onClose}
           >
             Cancel
           </Button>
           <Button 
-            className="flex-1 rounded-2xl h-12 font-bold shadow-lg shadow-primary/20"
+            className="flex-1 rounded-xl h-12 font-bold shadow-lg shadow-primary/20"
             disabled={!selectedId}
             onClick={() => {
               if (selectedId) {

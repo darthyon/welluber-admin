@@ -82,9 +82,9 @@ export function CustomComboBox({
           }}
           onFocus={() => setIsOpen(true)}
           className={cn(
-            "w-full px-4 py-2.5 rounded-xl border bg-white text-[13px] transition-all outline-none pr-10",
-            isOpen ? "border-primary ring-2 ring-primary/10" : "border-zinc-200 hover:border-zinc-300 transition-all",
-            !value && "placeholder:text-zinc-400"
+            "w-full px-4 py-2.5 rounded-xl border bg-background/5 text-[13px] transition-all outline-none pr-10",
+            isOpen ? "border-primary ring-2 ring-primary/10" : "border-border/60 hover:border-primary/30 transition-all",
+            !value && "placeholder:text-muted-foreground/40"
           )}
           placeholder={placeholder}
         />
@@ -92,20 +92,20 @@ export function CustomComboBox({
           className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer flex items-center justify-center h-full w-8"
           onClick={() => setIsOpen(!isOpen)}
         >
-          <CaretDown size={14} className={cn("text-zinc-400 transition-transform", isOpen && "rotate-180")} />
+          <CaretDown size={14} className={cn("text-muted-foreground/40 transition-transform", isOpen && "rotate-180")} />
         </div>
       </div>
 
       {isOpen && (filteredOptions.length > 0 || showAddCustom) && typeof document !== "undefined" && createPortal(
         <div
           ref={dropdownRef}
-          className="z-[1000] overflow-y-auto max-h-[300px] rounded-xl border border-zinc-200 bg-white shadow-2xl animate-in fade-in zoom-in-95 duration-100 p-1"
+          className="z-[1000] overflow-y-auto max-h-[300px] rounded-xl border border-border/60 bg-popover shadow-2xl animate-in fade-in zoom-in-95 duration-100 p-1"
           style={dropdownStyle}
         >
           {showAddCustom && (
             <button
               onClick={() => handleSelect(value)}
-              className="w-full text-left px-3 py-2 rounded-lg text-[13px] bg-primary/5 text-primary font-semibold flex items-center gap-2 mb-1 border-b border-zinc-50"
+            className="w-full text-left px-3 py-2 rounded-lg text-[13px] bg-primary/10 text-primary font-bold flex items-center gap-2 mb-1 border-b border-border/20"
             >
               <Plus size={14} weight="bold" />
               <span>Add custom: &quot;{value}&quot;</span>
@@ -119,7 +119,7 @@ export function CustomComboBox({
               type="button"
               className={cn(
                 "w-full text-left px-3 py-2 rounded-lg text-[13px] transition-colors flex items-center justify-between group",
-                value === opt ? "bg-primary/5 text-primary font-bold" : "hover:bg-zinc-50 text-zinc-600"
+                value === opt ? "bg-primary/10 text-primary font-bold" : "hover:bg-accent/40 text-muted-foreground/80 hover:text-foreground"
               )}
             >
               <span className="truncate">{opt}</span>

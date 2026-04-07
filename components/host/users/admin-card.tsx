@@ -22,13 +22,13 @@ export function AdminCard({ admin }: AdminCardProps) {
   const getRoleStyle = (role: string) => {
     switch (role) {
       case "HostAdmin":
-        return "bg-indigo-50 text-indigo-600 border-indigo-100";
+        return "bg-indigo-500/10 text-indigo-500 border-indigo-500/20";
       case "OrgAdmin":
-        return "bg-emerald-50 text-emerald-600 border-emerald-100";
+        return "bg-emerald-500/10 text-emerald-500 border-emerald-500/20";
       case "SPAdmin":
-        return "bg-amber-50 text-amber-600 border-amber-100";
+        return "bg-amber-500/10 text-amber-500 border-amber-500/20";
       default:
-        return "bg-zinc-50 text-zinc-600 border-zinc-100";
+        return "bg-muted text-muted-foreground border-border";
     }
   };
 
@@ -45,11 +45,11 @@ export function AdminCard({ admin }: AdminCardProps) {
     <motion.div
       whileHover={{ y: -2 }}
       transition={{ duration: 0.2 }}
-      className="group relative bg-white border border-zinc-200 rounded-xl p-5 hover:border-primary/30 hover:shadow-md transition-all duration-300"
+      className="group relative bg-card border border-border rounded-2xl p-5 hover:border-primary/30 hover:shadow-md transition-all duration-300"
     >
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-zinc-100 text-zinc-500 flex items-center justify-center border border-zinc-200">
+          <div className="w-10 h-10 rounded-full bg-muted text-muted-foreground/60 flex items-center justify-center border border-border">
             {admin.role === "HostAdmin" ? <Shield size={20} weight="fill" /> : 
              admin.role === "OrgAdmin" ? <Buildings size={20} weight="fill" /> : 
              <Storefront size={20} weight="fill" />}
@@ -69,9 +69,9 @@ export function AdminCard({ admin }: AdminCardProps) {
 
       <div className="space-y-3.5 pt-1">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-zinc-400">
+          <div className="flex items-center gap-1.5 text-muted-foreground/30">
             <Shield size={14} />
-            <span className="text-[11px] font-semibold text-zinc-500/80">Role</span>
+            <span className="text-[11px] font-semibold text-muted-foreground/60">Role</span>
           </div>
           <span className={cn(
             "px-2 py-0.5 rounded-md text-[10px] font-bold border",
@@ -82,21 +82,21 @@ export function AdminCard({ admin }: AdminCardProps) {
         </div>
 
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-zinc-400">
+          <div className="flex items-center gap-1.5 text-muted-foreground/30">
             <Buildings size={14} />
-            <span className="text-[11px] font-semibold text-zinc-500/80">Entity</span>
+            <span className="text-[11px] font-semibold text-muted-foreground/60">Entity</span>
           </div>
-          <span className="text-[12px] font-bold text-zinc-700 truncate max-w-[140px]">
+          <span className="text-[12px] font-bold text-foreground truncate max-w-[140px]">
             {admin.entity?.name || "Platform Core"}
           </span>
         </div>
 
-        <div className="pt-2 flex items-center justify-between border-t border-zinc-100 mt-2">
+        <div className="pt-2 flex items-center justify-between border-t border-border/50 mt-2">
           <StatusBadge 
             status={admin.status} 
             variant={admin.status === "Active" ? "emerald" : "rose"} 
           />
-          <div className="flex items-center gap-1.5 text-[10px] text-zinc-400 font-medium">
+          <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground/40 font-medium">
             <Clock size={12} />
             {admin.lastLogin}
           </div>

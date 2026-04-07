@@ -156,19 +156,19 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-400">
       {/* Header — same pattern as BranchForm */}
-      <div className="flex items-center justify-between pb-4 border-b border-zinc-200/60">
+      <div className="flex items-center justify-between pb-6 border-b border-border/80">
         <div className="flex items-center gap-4">
           <button
             onClick={onCancel}
-            className="w-10 h-10 rounded-xl border border-zinc-200 flex items-center justify-center hover:bg-zinc-50 transition-colors bg-white shadow-sm"
+            className="w-10 h-10 rounded-xl border border-border flex items-center justify-center hover:bg-muted/50 transition-all bg-card shadow-sm"
           >
             <CaretLeft size={20} weight="bold" />
           </button>
           <div>
-            <h2 className="text-xl font-bold tracking-tight text-zinc-900">
+            <h2 className="text-xl font-bold tracking-tight text-foreground">
               {isEditing ? "Edit Employee" : "Add New Employee"}
             </h2>
-            <p className="text-[13px] text-zinc-500 mt-1">
+            <p className="text-[13px] text-muted-foreground mt-0.5 font-medium opacity-80">
               {isEditing
                 ? "Update identity, employment details, and benefit policy assignments."
                 : "Register a new employee and assign them to a branch and benefit policy."}
@@ -180,7 +180,7 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
           <button
             onClick={onCancel}
             disabled={isSubmitting || isSuccess}
-            className="text-zinc-500 font-medium text-[14px] px-4 py-2 rounded-full hover:bg-zinc-100 transition-colors disabled:opacity-40"
+            className="text-muted-foreground font-bold text-[14px] px-5 py-2.5 rounded-full hover:bg-muted transition-all disabled:opacity-40"
           >
             Cancel
           </button>
@@ -214,10 +214,10 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
               <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
-              <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
+              <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/40" />
               <input 
                 placeholder="e.g. Sarah Jenkins"
-                className="w-full pl-10 pr-3 py-2 bg-white border border-zinc-200 rounded-lg text-[14px] outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-medium text-zinc-700"
+                className="w-full pl-10 pr-3 py-2 bg-card border border-border/80 rounded-lg text-[14px] outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-bold text-foreground placeholder:text-muted-foreground/30"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               />
@@ -255,7 +255,7 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
               <span className="text-rose-500">*</span>
             </label>
             <select 
-              className="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-[14px] outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-medium text-zinc-700"
+              className="w-full px-3 py-2 bg-card border border-border/80 rounded-lg text-[14px] font-bold text-foreground outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all"
               value={formData.gender}
               onChange={(e) => setFormData({ ...formData, gender: e.target.value as any })}
             >
@@ -270,11 +270,11 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
               Corporate Email
             </label>
             <div className="relative">
-              <Envelope size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
+              <Envelope size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/40" />
               <input 
                 type="email"
                 placeholder="sarah.j@acme.com"
-                className="w-full pl-10 pr-3 py-2 bg-white border border-zinc-200 rounded-lg text-[14px] outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-medium text-zinc-700 font-mono"
+                className="w-full pl-10 pr-3 py-2 bg-card border border-border/80 rounded-lg text-[14px] font-bold text-foreground outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-mono placeholder:text-muted-foreground/30"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               />
@@ -317,16 +317,16 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
               <label className="text-[11px] font-semibold text-muted-foreground/70 flex items-center gap-1.5">
                 Employee Code (Emp. Code)
               </label>
-              <div className="relative flex items-center h-[38px] bg-white border border-zinc-200 rounded-lg px-2 group focus-within:ring-2 focus-within:ring-primary/10 focus-within:border-primary/30 transition-all">
+              <div className="relative flex items-center h-[38px] bg-card border border-border/80 rounded-lg px-2 group focus-within:ring-2 focus-within:ring-primary/10 focus-within:border-primary/30 transition-all">
                 <input 
                   placeholder="ACM-XXXX"
-                  className="flex-1 bg-transparent border-none outline-none text-[14px] font-medium text-zinc-700 px-1 font-mono tracking-tight"
+                  className="flex-1 bg-transparent border-none outline-none text-[14px] font-bold text-foreground px-1 font-mono tracking-tight placeholder:text-muted-foreground/30"
                   value={formData.empCode}
                   onChange={(e) => setFormData({ ...formData, empCode: e.target.value })}
                 />
                 <button 
                   onClick={generateEmpCode}
-                  className="w-7 h-7 rounded bg-zinc-50 flex items-center justify-center text-zinc-400 hover:bg-primary/10 hover:text-primary transition-all ml-1 tooltip"
+                  className="w-7 h-7 rounded bg-muted flex items-center justify-center text-muted-foreground/50 hover:bg-primary/10 hover:text-primary transition-all ml-1 tooltip"
                   title="Auto-generate"
                 >
                   <DiceFive size={16} />
@@ -338,7 +338,7 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
               <label className="text-[11px] font-semibold text-muted-foreground/70">Department</label>
               <input 
                 placeholder="e.g. Engineering"
-                className="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-[14px] outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-medium text-zinc-700"
+                className="w-full px-3 py-2 bg-card border border-border/80 rounded-lg text-[14px] outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-bold text-foreground placeholder:text-muted-foreground/30"
                 value={formData.department}
                 onChange={(e) => setFormData({ ...formData, department: e.target.value })}
               />
@@ -348,7 +348,7 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
               <label className="text-[11px] font-semibold text-muted-foreground/70">Role / Designation</label>
               <input 
                 placeholder="e.g. Senior Software Engineer"
-                className="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-[14px] outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-medium text-zinc-700"
+                className="w-full px-3 py-2 bg-card border border-border/80 rounded-lg text-[14px] font-bold text-foreground outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all placeholder:text-muted-foreground/30"
                 value={formData.role}
                 onChange={(e) => setFormData({ ...formData, role: e.target.value })}
               />
@@ -371,11 +371,11 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
             </div>
           </div>
 
-          <div className="p-4 rounded-xl border border-zinc-100 bg-zinc-50/50 space-y-4">
+          <div className="p-5 rounded-2xl border border-border/80 bg-muted/10 space-y-4">
              <div className="flex items-center justify-between">
                 <div>
-                  <h5 className="text-[13px] font-bold text-zinc-900">Probation Details</h5>
-                  <p className="text-[11px] text-zinc-400 mt-0.5">Choose how the probation period is defined</p>
+                  <h5 className="text-[14px] font-bold text-foreground tracking-tight">Probation Details</h5>
+                  <p className="text-[11px] text-muted-foreground mt-0.5 font-medium opacity-70">Choose how the probation period is defined</p>
                 </div>
              </div>
 
@@ -393,14 +393,14 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
                      "flex flex-col items-start px-3 py-2.5 rounded-lg border text-left transition-all",
                      formData.probationMode === opt.id
                        ? "border-primary/40 bg-primary/5 ring-1 ring-primary/20"
-                       : "border-zinc-200 bg-white hover:border-zinc-300"
+                       : "border-border bg-card hover:border-primary/20 transition-colors"
                    )}
                  >
                    <span className={cn(
                      "text-[13px] font-semibold",
-                     formData.probationMode === opt.id ? "text-primary" : "text-zinc-700"
+                     formData.probationMode === opt.id ? "text-primary" : "text-foreground"
                    )}>{opt.label}</span>
-                   <span className="text-[10px] text-zinc-400 mt-0.5">{opt.desc}</span>
+                   <span className="text-[10px] text-muted-foreground/40 mt-0.5 font-medium">{opt.desc}</span>
                  </button>
                ))}
              </div>
@@ -419,9 +419,9 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
 
              {/* Computed preview for period modes */}
              {(formData.probationMode === "3m" || formData.probationMode === "6m") && formData.joinDate && (
-               <div className="flex items-center gap-2 text-[12px] text-zinc-500 bg-white border border-zinc-100 rounded-lg px-3 py-2 animate-in fade-in duration-200">
-                 <CalendarBlank size={14} className="text-primary shrink-0" />
-                 <span>Probation ends on <strong className="text-zinc-700">
+               <div className="flex items-center gap-2 text-[12px] text-muted-foreground bg-card border border-border rounded-xl px-4 py-3 animate-in fade-in duration-500 shadow-sm transition-all hover:border-primary/20">
+                 <CalendarBlank size={16} weight="bold" className="text-primary shrink-0" />
+                 <span className="font-medium">Probation ends on <strong className="text-foreground font-bold underline underline-offset-4 decoration-primary/30">
                    {(() => {
                      const d = new Date(formData.joinDate + "T00:00:00");
                      d.setMonth(d.getMonth() + (formData.probationMode === "3m" ? 3 : 6));
@@ -442,12 +442,12 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
       >
         <div className="space-y-4 p-1">
           {assignedPolicies.map((assigned, idx) => (
-            <div key={idx} className="p-4 rounded-xl border border-zinc-200 bg-white shadow-sm flex items-start justify-between gap-4 animate-in fade-in slide-in-from-top-2">
+            <div key={idx} className="p-4 rounded-xl border border-border bg-card shadow-sm flex items-start justify-between gap-4 animate-in fade-in slide-in-from-top-2 hover:border-primary/20 transition-all">
               <div className="flex-1 grid grid-cols-2 gap-4">
                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-semibold text-muted-foreground/70">Select benefit policy</label>
+                    <label className="text-[10px] font-bold text-muted-foreground/60 tracking-tight uppercase">Select benefit policy</label>
                     <select 
-                      className="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-[13px] font-medium text-zinc-700 outline-none focus:ring-2 focus:ring-primary/10 transition-all"
+                      className="w-full px-3 py-2 bg-background border border-border/80 rounded-lg text-[13px] font-bold text-foreground outline-none focus:ring-2 focus:ring-primary/10 transition-all"
                       value={assigned.policyId}
                       onChange={(e) => {
                         const pol = MOCK_POLICIES.find(p => p.id === e.target.value);
@@ -462,9 +462,9 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
                     </select>
                  </div>
                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-semibold text-muted-foreground/70">Select benefit group</label>
+                    <label className="text-[10px] font-bold text-muted-foreground/60 tracking-tight uppercase">Select benefit group</label>
                     <select 
-                      className="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-[13px] font-medium text-zinc-700 outline-none focus:ring-2 focus:ring-primary/10 transition-all"
+                      className="w-full px-3 py-2 bg-background border border-border/80 rounded-lg text-[13px] font-bold text-foreground outline-none focus:ring-2 focus:ring-primary/10 transition-all"
                       value={assigned.benefitGroupId}
                       onChange={(e) => {
                          const updated = [...assignedPolicies];
@@ -480,7 +480,7 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
               </div>
               <button 
                 onClick={() => removePolicy(idx)}
-                className="mt-6 p-1.5 text-zinc-300 hover:text-rose-500 transition-colors"
+                className="mt-6 p-1.5 text-muted-foreground/30 hover:text-rose-500 transition-colors"
               >
                 <Trash size={18} />
               </button>
@@ -489,10 +489,10 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
 
           <Button 
             variant="outline" 
-            className="w-full border-dashed border-zinc-200 h-10 text-zinc-500 hover:text-primary hover:border-primary/30 transition-all"
+            className="w-full border-dashed border-border/80 h-12 text-muted-foreground/60 hover:text-primary hover:border-primary/40 hover:bg-muted/30 transition-all font-bold text-[13px]"
             onClick={addPolicy}
           >
-            <Plus size={14} className="mr-2" /> Add Another Benefit Policy
+            <Plus size={16} weight="bold" className="mr-2" /> Add Another Benefit Policy
           </Button>
         </div>
       </DetailSection>
@@ -504,49 +504,49 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
       >
         <div className="space-y-5 p-1">
           {dependents.map((dep) => (
-             <div key={dep.id} className="p-4 rounded-xl border border-zinc-100 bg-zinc-50/30 space-y-4 animate-in fade-in zoom-in-95">
+             <div key={dep.id} className="p-5 rounded-2xl border border-border/80 bg-muted/5 space-y-5 animate-in fade-in zoom-in-95 hover:border-primary/20 transition-all">
                 <div className="flex items-center justify-between">
-                   <span className="text-[11px] font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded">Dependent unit</span>
-                   <button onClick={() => removeDependent(dep.id)} className="text-zinc-300 hover:text-rose-500 transition-colors">
+                   <span className="text-[10px] font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-full uppercase tracking-wider">Dependent unit</span>
+                   <button onClick={() => removeDependent(dep.id)} className="text-muted-foreground/30 hover:text-rose-500 transition-colors">
                      <Trash size={16} />
                    </button>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-5">
                   <div className="space-y-1.5 col-span-2 sm:col-span-1">
-                    <label className="text-[11px] font-semibold text-muted-foreground/70">Relationship</label>
+                    <label className="text-[11px] font-bold text-muted-foreground/60 tracking-tight uppercase">Relationship</label>
                     <select 
                       value={dep.relationship}
                       onChange={(e) => updateDependent(dep.id, 'relationship', e.target.value)}
-                      className="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-[13px] font-medium text-zinc-700 outline-none focus:ring-2 focus:ring-primary/10 transition-all"
+                      className="w-full px-3 py-2 bg-background border border-border/80 rounded-lg text-[13px] font-bold text-foreground outline-none focus:ring-2 focus:ring-primary/10 transition-all"
                     >
                       {RELATIONSHIPS.map(r => <option key={r} value={r}>{r}</option>)}
                     </select>
                   </div>
                   <div className="space-y-1.5 col-span-2 sm:col-span-1">
-                    <label className="text-[11px] font-semibold text-muted-foreground/70">Full name</label>
+                    <label className="text-[11px] font-bold text-muted-foreground/60 tracking-tight uppercase">Full name</label>
                     <input 
                       value={dep.name}
                       onChange={(e) => updateDependent(dep.id, 'name', e.target.value)}
-                      className="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-[13px] font-medium text-zinc-700 outline-none focus:ring-2 focus:ring-primary/10 transition-all"
+                      className="w-full px-3 py-2 bg-background border border-border/80 rounded-lg text-[13px] font-bold text-foreground outline-none focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-muted-foreground/30"
                       placeholder="Full Name"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-semibold text-muted-foreground/70">Email address</label>
+                    <label className="text-[11px] font-bold text-muted-foreground/60 tracking-tight uppercase">Email address</label>
                     <input 
                       value={dep.email}
                       onChange={(e) => updateDependent(dep.id, 'email', e.target.value)}
-                      className="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-[13px] font-medium text-zinc-700 outline-none focus:ring-2 focus:ring-primary/10 transition-all font-mono"
+                      className="w-full px-3 py-2 bg-background border border-border/80 rounded-lg text-[13px] font-bold text-foreground outline-none focus:ring-2 focus:ring-primary/10 transition-all font-mono placeholder:text-muted-foreground/30"
                       placeholder="Email"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-semibold text-muted-foreground/70">Phone number</label>
+                    <label className="text-[11px] font-bold text-muted-foreground/60 tracking-tight uppercase">Phone number</label>
                     <input 
                       value={dep.phone}
                       onChange={(e) => updateDependent(dep.id, 'phone', e.target.value)}
-                      className="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-[13px] font-medium text-zinc-700 outline-none focus:ring-2 focus:ring-primary/10 transition-all font-mono"
+                      className="w-full px-3 py-2 bg-background border border-border/80 rounded-lg text-[13px] font-bold text-foreground outline-none focus:ring-2 focus:ring-primary/10 transition-all font-mono placeholder:text-muted-foreground/30"
                       placeholder="Phone"
                     />
                   </div>
@@ -556,10 +556,10 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
 
           <Button 
             variant="outline" 
-            className="w-full border-dashed border-zinc-200 h-12 text-zinc-500 hover:text-primary hover:border-primary/30 transition-all"
+            className="w-full border-dashed border-border/80 h-14 text-muted-foreground/60 hover:text-primary hover:border-primary/40 hover:bg-muted/30 transition-all font-bold text-[13px]"
             onClick={addDependent}
           >
-            <Plus size={16} className="mr-2" /> Register New Dependent
+            <Plus size={18} weight="bold" className="mr-2" /> Register New Dependent
           </Button>
         </div>
       </DetailSection>

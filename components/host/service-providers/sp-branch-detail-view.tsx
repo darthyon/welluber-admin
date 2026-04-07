@@ -12,6 +12,8 @@ import { TwoColumnDetailLayout } from "@/components/shared/two-column-detail-lay
 import { OPERATING_DAYS } from "@/features/providers/constants";
 import type { SpBranch } from "@/types/provider";
 import { resolveBranchServiceView } from "@/features/providers/service-taxonomy";
+import { EntityAvatar } from "@/components/shared/entity-avatar";
+import { ActionPopover } from "@/components/shared/action-popover";
 
 interface SpBranchDetailViewProps {
   branch: SpBranch;
@@ -69,19 +71,25 @@ export function SpBranchDetailView({ branch, serviceCategories, onBack, onEdit }
               ) : (
                 <div className="space-y-3">
                   {branch.contacts.map((c, i) => (
-                    <div key={i} className="flex items-center justify-between p-3 rounded-lg border border-border bg-card hover:border-primary/20 transition-all group">
-                       <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-[12px] font-bold text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                            {c.name.split(' ').map(n=>n[0]).join('')}
-                          </div>
+                    <div key={i} className="flex items-center justify-between p-3 rounded-xl border border-border/60 bg-card hover:border-primary/20 transition-all group relative overflow-hidden">
+                       <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/[0.02] transition-colors pointer-events-none" />
+                       <div className="flex items-center gap-3 relative z-10">
+                          <EntityAvatar name={c.name} size="sm" />
                           <div>
-                            <p className="text-[13px] font-medium text-foreground">{c.name}</p>
-                            <p className="text-[11px] text-muted-foreground">{CONTACT_TYPE_LABEL[c.type] ?? c.type}</p>
+                            <p className="text-[13px] font-bold text-foreground leading-tight tracking-tight">{c.name}</p>
+                            <p className="text-[11px] text-muted-foreground font-medium opacity-70 mt-0.5">{CONTACT_TYPE_LABEL[c.type] ?? c.type}</p>
                          </div>
                        </div>
-                       {c.isPublic && (
-                         <Badge variant="outline" className="text-[9px] border-emerald-200 text-emerald-600 bg-emerald-50">Portal</Badge>
-                       )}
+                       <div className="flex items-center gap-2 relative z-10">
+                         {c.isPublic && (
+                           <Badge variant="outline" className="text-[9px] font-bold border-emerald-500/20 text-emerald-600 bg-emerald-500/5">Portal</Badge>
+                         )}
+                         <ActionPopover 
+                           actions={[
+                             { label: "View Details", onClick: () => console.log("View", c.name) },
+                           ]}
+                         />
+                       </div>
                     </div>
                   ))}
                 </div>
@@ -89,16 +97,16 @@ export function SpBranchDetailView({ branch, serviceCategories, onBack, onEdit }
             </DetailSection>
 
             {/* Branch Quick Stats (Matching Org Detail) */}
-            <div className="bg-indigo-600 rounded-xl p-6 text-white overflow-hidden relative group">
-              <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-1000" />
-              <h4 className="text-[15px] font-semibold mb-2">Branch Quick Stats</h4>
+            <div className="bg-primary/95 dark:bg-primary/20 rounded-xl p-6 text-primary-foreground dark:text-primary overflow-hidden relative group border border-primary/20 shadow-lg shadow-primary/5">
+              <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-white/10 dark:bg-primary/20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-1000" />
+              <h4 className="text-[15px] font-bold mb-2 tracking-tight">Branch quick stats</h4>
               <div className="space-y-4 relative z-10">
                 <div>
-                  <p className="text-[11px] text-white/70">Services Active</p>
+                  <p className="text-[11px] font-bold opacity-70 tracking-tight text-white/70 dark:text-primary/70">Services Active</p>
                   <p className="text-xl font-bold">{serviceCount}</p>
                 </div>
                 <div>
-                  <p className="text-[11px] text-white/70">Daily Availability</p>
+                  <p className="text-[11px] font-bold opacity-70 tracking-tight text-white/70 dark:text-primary/70">Daily Availability</p>
                   <p className="text-xl font-bold">100%</p>
                 </div>
               </div>
@@ -137,11 +145,11 @@ export function SpBranchDetailView({ branch, serviceCategories, onBack, onEdit }
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-2">
                   <div className="relative">
                     <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center p-1.5 border border-primary/30">
-                      <div className="w-full h-full rounded-full bg-primary shadow-lg shadow-primary/40 ring-4 ring-white dark:ring-zinc-900" />
+                      <div className="w-full h-full rounded-full bg-primary shadow-lg shadow-primary/40 ring-4 ring-background" />
                     </div>
-                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white dark:border-zinc-900 shadow-sm" />
+                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-background shadow-sm" />
                   </div>
-                  <span className="text-[10px] font-semibold text-primary bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm px-2 py-0.5 rounded-full border border-primary/20 tracking-tight">
+                  <span className="text-[10px] font-bold text-primary bg-background/90 backdrop-blur-sm px-2 py-0.5 rounded-full border border-primary/20 tracking-tight">
                     Pinned
                   </span>
                 </div>

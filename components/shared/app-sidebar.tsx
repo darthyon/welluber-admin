@@ -137,10 +137,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       {...props}
     >
       {/* Background Layers */}
-      <div className="absolute inset-0 bg-[#0f1117] z-0" />
+      <div className="absolute inset-0 bg-sidebar z-0" />
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-10 opacity-60">
-        <div className="absolute -left-[40%] -top-[10%] w-[250%] h-[60%] bg-[#4f46e5]/40 blur-[130px] rounded-full" />
-        <div className="absolute -left-[30%] bottom-[10%] w-[220%] h-[50%] bg-[#3b82f6]/30 blur-[110px] rounded-full" />
+        <div className="absolute -left-[40%] -top-[10%] w-[250%] h-[60%] bg-primary/30 blur-[130px] rounded-full" />
+        <div className="absolute -left-[30%] bottom-[10%] w-[220%] h-[50%] bg-blue-500/20 blur-[110px] rounded-full" />
       </div>
       <div className="absolute inset-0 z-20 bg-black/60 backdrop-blur-3xl saturate-[300%]" />
 
@@ -153,11 +153,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <div className="flex aspect-square size-7 items-center justify-center rounded-lg bg-primary shadow-lg shadow-primary/20 text-primary-foreground">
                 <Layout size={16} weight="fill" />
               </div>
-              <span className="font-bold text-white tracking-tight text-[12px] opacity-70">
+              <span className="font-bold text-sidebar-foreground tracking-tight text-[12px] opacity-70">
                 WellUber™
               </span>
             </div>
-            <SidebarTrigger className="h-8 w-8 hover:bg-white/10 transition-colors text-white/40 hover:text-white group-data-[collapsible=icon]:mx-auto">
+            <SidebarTrigger className="h-8 w-8 hover:bg-sidebar-foreground/10 transition-colors text-sidebar-foreground/40 hover:text-sidebar-foreground group-data-[collapsible=icon]:mx-auto">
               {state === "expanded" ? (
                 <CaretDoubleLeft size={16} weight="bold" />
               ) : (
@@ -173,18 +173,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <SidebarMenuButton
                     id="persona-dropdown-trigger"
                     size="lg"
-                    className="data-[state=open]:bg-white/5 data-[state=open]:text-white hover:bg-white/5 transition-all duration-300 group-data-[collapsible=icon]:!p-0 group-data-[collapsible=icon]:!justify-center group-data-[collapsible=icon]:!h-10 group-data-[collapsible=icon]:!w-10"
+                    className="data-[state=open]:bg-sidebar-foreground/5 data-[state=open]:text-sidebar-foreground hover:bg-sidebar-foreground/5 transition-all duration-300 group-data-[collapsible=icon]:!p-0 group-data-[collapsible=icon]:!justify-center group-data-[collapsible=icon]:!h-10 group-data-[collapsible=icon]:!w-10"
                   >
-                    <div className="flex aspect-square size-8.5 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10 shadow-sm text-primary shrink-0 group-data-[collapsible=icon]:size-7">
+                    <div className="flex aspect-square size-8.5 items-center justify-center rounded-xl bg-sidebar-foreground/5 ring-1 ring-sidebar-foreground/10 shadow-sm text-primary shrink-0 group-data-[collapsible=icon]:size-7">
                       <activePersona.icon size={19} weight="fill" />
                     </div>
                     <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden ml-3">
-                      <span className="truncate font-bold tracking-tight text-[13px] text-white/90">
+                      <span className="truncate font-bold tracking-tight text-[13px] text-sidebar-foreground/90">
                         {activePersona.name}
                       </span>
-                      <span className="truncate text-[10px] font-medium text-white/40 tracking-tight">Admin account</span>
+                      <span className="truncate text-[10px] font-medium text-sidebar-foreground/40 tracking-tight">Admin account</span>
                     </div>
-                    <CaretUpDown className="ml-auto size-4 text-white/20 group-data-[collapsible=icon]:hidden" />
+                    <CaretUpDown className="ml-auto size-4 text-sidebar-foreground/20 group-data-[collapsible=icon]:hidden" />
                   </SidebarMenuButton>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
@@ -258,7 +258,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarContent className="px-2 pt-3 no-scrollbar h-full">
           {hostNavigation.map((section) => (
             <SidebarGroup key={section.title} className="py-2.5">
-              <SidebarGroupLabel className="text-[11px] font-semibold tracking-tight text-white/50 mb-2 px-3 group-data-[collapsible=icon]:hidden">
+              <SidebarGroupLabel className="text-[11px] font-bold tracking-tight text-sidebar-foreground/50 mb-2 px-3 group-data-[collapsible=icon]:hidden uppercase">
                 {section.title}
               </SidebarGroupLabel>
               <SidebarGroupContent>
@@ -276,8 +276,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           className={cn(
                             "transition-all duration-200 h-11 rounded-lg px-3 relative overflow-hidden group-data-[collapsible=icon]:!p-0 group-data-[collapsible=icon]:!justify-center",
                             isActive 
-                              ? "bg-white/10 text-white backdrop-blur-md ring-1 ring-white/10 shadow-lg shadow-black/20" 
-                              : "text-white/60 hover:bg-white/5 hover:text-white"
+                              ? "bg-sidebar-foreground/10 text-sidebar-foreground backdrop-blur-md ring-1 ring-sidebar-foreground/10 shadow-lg shadow-black/20" 
+                              : "text-sidebar-foreground/60 hover:bg-sidebar-foreground/5 hover:text-sidebar-foreground"
                           )}
                         >
                           <Link href={item.href} className="flex items-center gap-3.5 group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:justify-center">
@@ -286,12 +286,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                               weight={isActive ? "fill" : "regular"}
                               className={cn(
                                 "shrink-0 transition-colors",
-                                isActive ? "text-primary" : "text-white/40"
+                                isActive ? "text-sidebar-primary" : "text-sidebar-foreground/40"
                               )}
                             />
                             <span className={cn(
-                              "text-sm font-medium tracking-tight truncate group-data-[collapsible=icon]:hidden",
-                              isActive ? "text-white" : "text-white/70"
+                              "text-sm font-bold tracking-tight truncate group-data-[collapsible=icon]:hidden",
+                              isActive ? "text-sidebar-foreground" : "text-sidebar-foreground/70"
                             )}>
                               {item.label}
                             </span>

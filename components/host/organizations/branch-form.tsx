@@ -64,19 +64,19 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-400">
       {/* Header */}
-      <div className="flex items-center justify-between pb-4 border-b border-zinc-200/60">
+      <div className="flex items-center justify-between pb-4 border-b border-border/60">
         <div className="flex items-center gap-4">
           <button 
             onClick={onCancel}
-            className="w-10 h-10 rounded-xl border border-zinc-200 flex items-center justify-center hover:bg-zinc-50 transition-colors bg-white shadow-sm"
+            className="w-10 h-10 rounded-xl border border-border flex items-center justify-center hover:bg-muted transition-colors bg-card shadow-sm"
           >
             <CaretLeft size={20} weight="bold" />
           </button>
           <div>
-            <h2 className="text-xl font-bold tracking-tight text-zinc-900">
+            <h2 className="text-xl font-bold tracking-tight text-foreground">
               {isEditing ? "Edit Branch" : "Add New Branch"}
             </h2>
-            <p className="text-[13px] text-zinc-500 mt-1">
+            <p className="text-[13px] text-muted-foreground mt-1">
               Configure location, personnel, and financial mapping for this branch.
             </p>
           </div>
@@ -87,7 +87,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
             variant="ghost" 
             onClick={onCancel} 
             disabled={isSubmitting || isSuccess}
-            className="text-zinc-600 font-medium"
+            className="text-muted-foreground font-medium hover:bg-muted hover:text-foreground"
           >
             Cancel
           </Button>
@@ -109,7 +109,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
       </div>
 
       {isSuccess ? (
-        <div className="bg-white rounded-2xl border border-zinc-200 py-20 animate-in zoom-in-95 duration-300">
+        <div className="bg-card rounded-2xl border border-border py-20 animate-in zoom-in-95 duration-300">
           <SuccessCelebration 
             title={isEditing ? "Changes Saved!" : "Branch Created!"}
             message={isEditing 
@@ -129,32 +129,32 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
           >
             <div className="space-y-5 p-1">
               <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-zinc-900">Branch Name</label>
+                <label className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-tight">Branch Name</label>
                 <input 
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="e.g. ACME Subang Jaya"
-                  className="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-[14px] outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-medium text-zinc-700 hover:border-zinc-300"
+                  className="w-full px-3 py-2 bg-muted/10 border border-border rounded-lg text-[14px] outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-medium text-foreground hover:border-border/80"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-[13px] font-medium text-zinc-900">Branch Type</label>
+                  <label className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-tight">Branch Type</label>
                   <select 
                     value={formData.type}
                     onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                    className="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-[14px] outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-medium text-zinc-700 hover:border-zinc-300 cursor-pointer"
+                    className="w-full px-3 py-2 bg-muted/10 border border-border rounded-lg text-[14px] outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-medium text-foreground hover:border-border/80 cursor-pointer"
                   >
                     <option value="HQ">Headquarters (HQ)</option>
                     <option value="Branch">Regional Branch</option>
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[13px] font-medium text-zinc-900">Status</label>
-                  <div className="h-[38px] flex items-center px-3 bg-zinc-50 border border-zinc-200 rounded-lg text-[13px] text-zinc-600 font-medium">
+                  <label className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-tight">Status</label>
+                  <div className="h-[38px] flex items-center px-3 bg-muted/20 border border-border rounded-lg text-[13px] text-muted-foreground font-medium">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 mr-2 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-                    Pending Activation
+                    Pending activation
                   </div>
                 </div>
               </div>
@@ -200,36 +200,36 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
             <div className="mt-6 space-y-6">
               {walletType === "independent" ? (
                 <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <label className="text-[13px] font-medium text-zinc-900">Default Currency</label>
-                  <div className="flex items-center gap-3 w-full px-3 py-2 bg-zinc-50/50 border border-zinc-200 rounded-lg text-[14px]">
-                    <span className="w-8 h-5 bg-zinc-200 rounded-sm flex items-center justify-center text-[10px] font-medium text-zinc-500">MYR</span>
-                    <span className="text-zinc-600 font-medium whitespace-nowrap">Malaysian Ringgit (RM)</span>
-                    <span className="ml-auto text-[11px] text-zinc-400 font-medium tracking-tight">Locked</span>
+                  <label className="text-[13px] font-bold text-foreground">Default Currency</label>
+                  <div className="flex items-center gap-3 w-full px-3 py-2 bg-muted/20 border border-border rounded-lg text-[14px]">
+                    <span className="w-8 h-5 bg-muted rounded-sm flex items-center justify-center text-[10px] font-bold text-muted-foreground">MYR</span>
+                    <span className="text-foreground font-bold whitespace-nowrap">Malaysian Ringgit (RM)</span>
+                    <span className="ml-auto text-[11px] text-muted-foreground/40 font-bold tracking-tight">Locked</span>
                   </div>
                 </div>
               ) : (
                 <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <label className="text-[13px] font-medium text-zinc-900">Bridge to Existing Wallet</label>
+                  <label className="text-[13px] font-bold text-foreground">Bridge to Existing Wallet</label>
                   <select 
-                    className="w-full px-3 py-2.5 bg-white border border-zinc-200 rounded-lg text-[14px] outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-medium text-zinc-700 hover:border-zinc-300 cursor-pointer"
+                    className="w-full px-3 py-2.5 bg-card border border-border rounded-lg text-[14px] outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-bold text-foreground hover:border-border/80 cursor-pointer"
                   >
                     <option value="hq">Global Tech HQ - RM 250,000.00 MYR</option>
                     <option value="hub_1">North Regional Hub - RM 45,000.00 MYR</option>
                     <option value="sat_1">Cyberjaya Satellite - RM 12,000.00 MYR</option>
                   </select>
-                  <p className="text-[11px] text-zinc-400 mt-1.5 italic">
+                  <p className="text-[11px] text-muted-foreground/40 mt-1.5 font-medium italic">
                     * This branch will consume funds from the selected centralized liquidity pool.
                   </p>
                 </div>
               )}
 
-              <div className="p-4 rounded-xl border border-zinc-200 bg-zinc-50/50 space-y-3">
-                <div className="flex items-start gap-3 text-[13px] text-zinc-500">
+              <div className="p-4 rounded-xl border border-border bg-muted/20 space-y-3">
+                <div className="flex items-start gap-3 text-[13px] text-muted-foreground">
                   <CheckCircle size={18} weight="fill" className="text-primary mt-0.5 shrink-0" />
                   <span>Administrative fees are consolidated at the parent organization level for all linked accounts.</span>
                 </div>
                 {walletType === "independent" && (
-                  <div className="flex items-start gap-3 text-[13px] text-zinc-500 animate-in fade-in duration-300">
+                  <div className="flex items-start gap-3 text-[13px] text-muted-foreground animate-in fade-in duration-300">
                     <CheckCircle size={18} weight="fill" className="text-primary mt-0.5 shrink-0" />
                     <span>A 1.5% administrative fee applies to all standalone wallets.</span>
                   </div>
@@ -247,24 +247,23 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
             description="Manage branch access roles"
           >
              <div className="p-1">
-               <div className="border-2 border-dashed border-zinc-200 rounded-xl p-8 flex flex-col items-center text-center space-y-3 hover:border-primary/20 hover:bg-zinc-50/50 transition-all cursor-pointer group">
-                  <div className="w-12 h-12 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-400 group-hover:bg-primary/10 group-hover:text-primary transition-all duration-300">
+               <div className="border-2 border-dashed border-border/60 rounded-xl p-8 flex flex-col items-center text-center space-y-3 hover:border-primary/20 hover:bg-muted/30 transition-all cursor-pointer group">
+                  <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground/30 group-hover:bg-primary/10 group-hover:text-primary transition-all duration-300">
                     <PaperPlaneTilt size={20} />
                   </div>
                   <div>
-                    <p className="text-[14px] font-medium text-zinc-900 leading-tight">Invite Org Admin</p>
-                    <p className="text-[12px] text-zinc-500 mt-1">Send an invitation to manage this branch.</p>
+                    <p className="text-[14px] font-bold text-foreground leading-tight">Invite org admin</p>
+                    <p className="text-[12px] text-muted-foreground mt-1">Send an invitation to manage this branch.</p>
                   </div>
-                  <Button variant="secondary" size="sm" className="text-[12px] font-medium rounded-full px-4 transition-all">
+                  <Button variant="secondary" size="sm" className="text-[12px] font-bold rounded-full px-6 transition-all hover:bg-muted">
                     Add Invitation
                   </Button>
-
                </div>
              </div>
           </DetailSection>
           
           <div className="p-4 rounded-xl border border-border bg-card shadow-sm space-y-4">
-            <h4 className="text-[13px] font-semibold text-zinc-400 tracking-tight">Branch setup guide</h4>
+            <h4 className="text-[13px] font-bold text-muted-foreground/40 tracking-tight uppercase">Branch setup guide</h4>
             <div className="space-y-3">
               {[
                 { label: "Identity Verified", status: true },
@@ -273,10 +272,10 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
                 { label: "Admins Invited", status: false }
               ].map((step, i) => (
                 <div key={i} className="flex items-center justify-between text-[13px]">
-                  <span className="text-zinc-600">{step.label}</span>
+                  <span className="text-muted-foreground font-medium">{step.label}</span>
                   <div className={cn(
                     "w-2 h-2 rounded-full",
-                    step.status ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" : "bg-zinc-200"
+                    step.status ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" : "bg-muted"
                   )} />
                 </div>
               ))}
