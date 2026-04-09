@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, Suspense } from "react";
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useTabPersistence, useQueryState, useUpdateQueryParams } from "@/hooks/use-tab-persistence";
@@ -73,15 +73,15 @@ const OTHER_ORGS = [
   { label: "Nexus Innovate", href: "/organizations/org_3" },
 ];
 
-export default function OrganizationDetailPage() {
+function OrganizationDetailContent() {
   const params = useParams();
   const router = useRouter();
   const orgId = params.id as string;
   
   const [activeTab, setActiveTab] = useTabPersistence<TabId>("profile");
-  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
-  const [isBranchSheetOpen, setIsBranchSheetOpen] = useState(false);
-  const [selectedBranchName, setSelectedBranchName] = useState<string | undefined>();
+  const [isInviteModalOpen, setIsInviteModalOpen] = useQueryState("inviteAdmin");
+  const [isBranchSheetOpen, setIsBranchSheetOpen] = useQueryState("branchSheet");
+  const [selectedBranchName, setSelectedBranchName] = useQueryState("branchName");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [orgStatus, setOrgStatus] = useState<OrganizationStatus>("active");
   const [isDangerModalOpen, setIsDangerModalOpen] = useState(false);
@@ -95,26 +95,26 @@ export default function OrganizationDetailPage() {
   const [policiesView, setPoliciesView] = useState<ViewMode>("list");
 
   // Search states
-  const [branchSearch, setBranchSearch] = useState("");
-  const [employeeSearch, setEmployeeSearch] = useState("");
-  const [policySearch, setPolicySearch] = useState("");
-  const [policyStatusFilter, setPolicyStatusFilter] = useState("all");
+  const [branchSearch, setBranchSearch] = useQueryState("branchSearch", "");
+  const [employeeSearch, setEmployeeSearch] = useQueryState("employeeSearch", "");
+  const [policySearch, setPolicySearch] = useQueryState("policySearch", "");
+  const [policyStatusFilter, setPolicyStatusFilter] = useQueryState("policyStatus", "all");
 
   // Sub-navigation state (Branches)
   const [viewBranchId, setViewBranchId] = useQueryState("branchId");
-  const [isAddingBranch, setIsAddingBranch] = useState(false);
-  const [editingBranchId, setEditingBranchId] = useState<string | null>(null);
+  const [isAddingBranch, setIsAddingBranch] = useQueryState("addBranch");
+  const [editingBranchId, setEditingBranchId] = useQueryState("editBranch");
 
   // Sub-navigation state (Employees)
   const [viewEmployeeId, setViewEmployeeId] = useQueryState("employeeId");
-  const [isAddingEmployee, setIsAddingEmployee] = useState(false);
-  const [editingEmployeeId, setEditingEmployeeId] = useState<string | null>(null);
-  const [isBulkUploading, setIsBulkUploading] = useState(false);
+  const [isAddingEmployee, setIsAddingEmployee] = useQueryState("addEmployee");
+  const [editingEmployeeId, setEditingEmployeeId] = useQueryState("editEmployee");
+  const [isBulkUploading, setIsBulkUploading] = useQueryState("bulkUpload");
   const updateQueryParams = useUpdateQueryParams();
 
   // Policies state
-  const [isLinkPolicyModalOpen, setIsLinkPolicyModalOpen] = useState(false);
-  const [isCreatingPolicy, setIsCreatingPolicy] = useState(false);
+  const [isLinkPolicyModalOpen, setIsLinkPolicyModalOpen] = useQueryState("linkPolicy");
+  const [isAddingPolicy, setIsAddingPolicy] = useQueryState("addPolicy");
   const [viewingPolicyId, setViewingPolicyId] = useQueryState("viewingPolicyId");
   const [editingPolicyId, setEditingPolicyId] = useQueryState("editingPolicyId");
   const [assignedPolicies, setAssignedPolicies] = useState<(BenefitPolicy & { assignedTo: string; employeeCount: number; lastUpdated: string; categories?: string[]; groups?: string[] })[]>([
@@ -285,23 +285,24 @@ export default function OrganizationDetailPage() {
 
   return (
     <div className="pb-12">
-      <InviteAdminModal 
-        targetId={orgId} 
-        isOpen={isInviteModalOpen} 
-        onClose={() => setIsInviteModalOpen(false)} 
-      />
+
 
       <LinkPolicyModal 
-        isOpen={isLinkPolicyModalOpen}
-        onClose={() => setIsLinkPolicyModalOpen(false)}
+        isOpen={isLinkPolicyModalOpen === "true"}
+        onClose={() => setIsLinkPolicyModalOpen(null)}
         onLink={handleLinkPolicy}
       />
 
-
       <BranchSheet 
-        isOpen={isBranchSheetOpen}
-        onClose={() => setIsBranchSheetOpen(false)}
-        branchName={selectedBranchName}
+        isOpen={isBranchSheetOpen === "true"}
+        onClose={() => setIsBranchSheetOpen(null)}
+        branchName={selectedBranchName || undefined}
+      />
+      
+      <InviteAdminModal 
+        isOpen={isInviteModalOpen === "true"}
+        onClose={() => setIsInviteModalOpen(null)}
+        targetId={orgId}
       />
 
       {/* Header Banner */}
@@ -370,7 +371,7 @@ export default function OrganizationDetailPage() {
                       viewingPolicyId: null,
                       editingPolicyId: null
                     });
-                    setIsBulkUploading(false);
+                    setIsBulkUploading(null);
                   }}
                   className={cn(
                     "flex items-center gap-2 py-3 border-b-2 text-[14px] font-medium transition-all duration-300",
@@ -431,7 +432,7 @@ export default function OrganizationDetailPage() {
                   <Button 
                     variant="secondary"
                     size="sm"
-                    onClick={() => setIsInviteModalOpen(true)}
+                    onClick={() => setIsInviteModalOpen("true")}
                     className="flex items-center gap-2 text-[12px] font-medium h-8"
                   >
                     <Plus size={14} weight="bold" /> Send Invite
@@ -555,15 +556,15 @@ export default function OrganizationDetailPage() {
         {/* Branches Tab */}
         {activeTab === "branches" && (
           <div className="animate-in fade-in transition-all duration-300">
-            {isAddingBranch || editingBranchId ? (
+            {isAddingBranch === "true" || editingBranchId ? (
               <BranchForm 
                 branchId={editingBranchId}
                 onCancel={() => {
-                  setIsAddingBranch(false);
+                  setIsAddingBranch(null);
                   setEditingBranchId(null);
                 }}
                 onSubmit={() => {
-                  setIsAddingBranch(false);
+                  setIsAddingBranch(null);
                   setEditingBranchId(null);
                   setToastMessage(editingBranchId ? "Branch updated successfully" : "Branch created successfully");
                 }}
@@ -574,7 +575,6 @@ export default function OrganizationDetailPage() {
                 onBack={() => setViewBranchId(null)} 
                 onEdit={() => {
                   setEditingBranchId(viewBranchId);
-                  setViewBranchId(null);
                 }}
               />
             ) : (
@@ -586,12 +586,21 @@ export default function OrganizationDetailPage() {
                   action={
                     <div className="flex items-center gap-2">
                       <Button 
-                        onClick={() => setIsAddingBranch(true)}
+                        onClick={() => setIsInviteModalOpen("true")}
                         variant="secondary"
                         size="sm"
-                        className="flex items-center gap-2 text-[12px] font-medium rounded-full h-8"
+                        className="flex items-center gap-2 text-[12px] font-medium rounded-full h-8 px-4"
                       >
-                        <Plus size={14} weight="bold" /> Add Branch
+                        <Plus size={14} weight="bold" /> Invite Admin
+                      </Button>
+                      <div className="h-4 w-[1px] bg-border" />
+                      <Button 
+                        onClick={() => setIsBranchSheetOpen("true")}
+                        variant="outline"
+                        size="sm"
+                        className="flex items-center gap-2 text-[12px] font-medium rounded-full h-8 px-4 border-primary/20 text-primary hover:bg-primary/5"
+                      >
+                        <Plus size={14} weight="bold" /> Quick Launch Hub
                       </Button>
                       <div className="h-4 w-[1px] bg-border mx-1" />
                       <ViewToggle mode={branchesView} onChange={setBranchesView} />
@@ -764,20 +773,20 @@ export default function OrganizationDetailPage() {
         {/* Employees Tab */}
         {activeTab === "employees" && (
           <div className="animate-in fade-in transition-all duration-300">
-            {isBulkUploading ? (
+            {isBulkUploading === "true" ? (
               <BulkUploadWizard 
-                onBack={() => setIsBulkUploading(false)} 
-                onSuccess={() => setIsBulkUploading(false)}
+                onBack={() => setIsBulkUploading(null)} 
+                onSuccess={() => setIsBulkUploading(null)}
               />
-            ) : isAddingEmployee || editingEmployeeId ? (
+            ) : isAddingEmployee === "true" || editingEmployeeId ? (
               <EmployeeForm
                 employeeId={editingEmployeeId}
                 onCancel={() => {
-                  setIsAddingEmployee(false);
+                  setIsAddingEmployee(null);
                   setEditingEmployeeId(null);
                 }}
                 onSuccess={() => {
-                  setIsAddingEmployee(false);
+                  setIsAddingEmployee(null);
                   setEditingEmployeeId(null);
                   setToastMessage(editingEmployeeId ? "Employee updated successfully" : "Employee registered successfully");
                 }}
@@ -788,7 +797,6 @@ export default function OrganizationDetailPage() {
                 onBack={() => setViewEmployeeId(null)}
                 onEdit={(id) => {
                   setEditingEmployeeId(id);
-                  setViewEmployeeId(null);
                 }}
               />
             ) : (
@@ -803,7 +811,7 @@ export default function OrganizationDetailPage() {
                         variant="secondary" 
                         size="sm" 
                         className="text-[12px] font-medium h-8 gap-1.5"
-                        onClick={() => setIsBulkUploading(true)}
+                        onClick={() => setIsBulkUploading("true")}
                       >
                         <Upload size={14} weight="bold" /> Bulk Upload
                       </Button>
@@ -811,7 +819,7 @@ export default function OrganizationDetailPage() {
                         variant="secondary" 
                         size="sm" 
                         className="text-[12px] font-medium h-8 gap-1.5"
-                        onClick={() => setIsAddingEmployee(true)}
+                        onClick={() => setIsAddingEmployee("true")}
                       >
                         <Plus size={14} weight="bold" /> Add Employee
                       </Button>
@@ -1007,7 +1015,7 @@ export default function OrganizationDetailPage() {
                               <ActionPopover 
                                 actions={[
                                   { label: "View Employee", onClick: () => setViewEmployeeId(emp.id) },
-                                  { label: "Edit Employee", onClick: () => { setEditingEmployeeId(emp.id); setViewEmployeeId(null); } },
+                                  { label: "Edit Employee", onClick: () => { setEditingEmployeeId(emp.id); } },
                                   { label: "Terminate Link", isDanger: true }
                                 ]}
                               />
@@ -1033,9 +1041,9 @@ export default function OrganizationDetailPage() {
         {/* Benefit Policies Tab */}
         {activeTab === "policies" && (
           <div className="animate-in fade-in transition-all duration-300">
-            {isCreatingPolicy ? (
+            {isAddingPolicy || viewingPolicyId || editingPolicyId ? (
               <BenefitPolicyWizard 
-                  mode={viewingPolicyId ? "view" : editingPolicyId ? "edit" : "create"}
+                  mode={editingPolicyId ? "edit" : viewingPolicyId ? "view" : "create"}
                   initialData={
                     (viewingPolicyId || editingPolicyId) ? {
                       policy: assignedPolicies.find(p => p.id === (viewingPolicyId || editingPolicyId))!,
@@ -1046,17 +1054,20 @@ export default function OrganizationDetailPage() {
                   onEdit={() => {
                     if (viewingPolicyId) {
                       setEditingPolicyId(viewingPolicyId);
-                      setViewingPolicyId(null);
                     }
                   }}
                   onCancel={() => {
-                    setIsCreatingPolicy(false);
-                    setViewingPolicyId(null);
-                    setEditingPolicyId(null);
+                    if (editingPolicyId && viewingPolicyId) {
+                      setEditingPolicyId(null);
+                    } else {
+                      setIsAddingPolicy(null);
+                      setViewingPolicyId(null);
+                      setEditingPolicyId(null);
+                    }
                   }}
                   onSaveDraft={(data) => {
                     setToastMessage("Policy saved as draft");
-                    setIsCreatingPolicy(false);
+                    setIsAddingPolicy(null);
                     setEditingPolicyId(null);
                     setViewingPolicyId(null);
                   }}
@@ -1067,7 +1078,7 @@ export default function OrganizationDetailPage() {
                     } else {
                       handleLinkPolicy(data.policy.id || "new_pol");
                     }
-                    setIsCreatingPolicy(false);
+                    setIsAddingPolicy(null);
                     setEditingPolicyId(null);
                   }}
               />
@@ -1080,7 +1091,7 @@ export default function OrganizationDetailPage() {
                 action={
                   <div className="flex items-center gap-2">
                     <Button 
-                      onClick={() => setIsLinkPolicyModalOpen(true)}
+                      onClick={() => setIsLinkPolicyModalOpen("true")}
                       variant="secondary"
                       size="sm"
                       className="flex items-center gap-2 text-[12px] font-medium rounded-full h-8 px-4"
@@ -1088,7 +1099,7 @@ export default function OrganizationDetailPage() {
                       <Plus size={14} weight="bold" /> Link Policy
                     </Button>
                     <Button 
-                      onClick={() => setIsCreatingPolicy(true)}
+                      onClick={() => setIsAddingPolicy("true")}
                       variant="secondary"
                       size="sm"
                       className="flex items-center gap-2 text-[12px] font-medium rounded-full h-8 px-4"
@@ -1156,12 +1167,9 @@ export default function OrganizationDetailPage() {
                   onView={(id) => {
                     setViewingPolicyId(id);
                     setEditingPolicyId(null);
-                    setIsCreatingPolicy(true);
                   }}
                   onEdit={(id) => {
                     setEditingPolicyId(id);
-                    setViewingPolicyId(null);
-                    setIsCreatingPolicy(true);
                   }}
                 />
               </DetailSection>
@@ -1275,6 +1283,14 @@ export default function OrganizationDetailPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function OrganizationDetailPage() {
+  return (
+    <Suspense fallback={<div className="h-[400px] flex items-center justify-center text-muted-foreground animate-pulse">Loading organization details...</div>}>
+      <OrganizationDetailContent />
+    </Suspense>
   );
 }
 

@@ -11,6 +11,7 @@ import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { SpVoucherForm } from "./sp-voucher-form";
 import type { ServiceProvider, SpVoucher, SpVoucherStatus } from "@/types/provider";
 import { ActionPopover } from "@/components/shared/action-popover";
+import { useQueryState, useUpdateQueryParams } from "@/hooks/use-tab-persistence";
 import { SharedDataTable } from "@/components/shared/data-table";
 import { cn } from "@/lib/utils";
 
@@ -38,9 +39,11 @@ const STATUS_VARIANT: Record<SpVoucherStatus, "emerald" | "amber" | "indigo" | "
 };
 
 export function SpVouchersTab({ sp }: SpVouchersTabProps) {
-  const [view, setView] = useState<VoucherView>("list");
-  const [isReadOnly, setIsReadOnly] = useState(false);
-  const [selectedVoucherId, setSelectedVoucherId] = useState<string | null>(null);
+  const [view, setView] = useQueryState("voucherView", "list");
+  const [isReadOnly, setIsReadOnly] = useQueryState("voucherReadOnly", "false");
+  const [selectedVoucherId, setSelectedVoucherId] = useQueryState("voucherId");
+  const updateQueryParams = useUpdateQueryParams();
+  
   const [statusTab, setStatusTab] = useState<SpVoucherStatus | "all">("all");
   const [voucherSearch, setVoucherSearch] = useState("");
 
@@ -55,27 +58,35 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
   );
 
   const handleView = (voucher: SpVoucher) => {
-    setSelectedVoucherId(voucher.id);
-    setIsReadOnly(true);
-    setView("form");
+    updateQueryParams({
+      voucherView: "form",
+      voucherId: voucher.id,
+      voucherReadOnly: "true"
+    });
   };
 
   const handleEdit = (voucher: SpVoucher) => {
-    setSelectedVoucherId(voucher.id);
-    setIsReadOnly(false);
-    setView("form");
+    updateQueryParams({
+      voucherView: "form",
+      voucherId: voucher.id,
+      voucherReadOnly: "false"
+    });
   };
 
   const handleAdd = () => {
-    setSelectedVoucherId(null);
-    setIsReadOnly(false);
-    setView("form");
+    updateQueryParams({
+      voucherView: "form",
+      voucherId: null,
+      voucherReadOnly: "false"
+    });
   };
 
   const handleBack = () => {
-    setSelectedVoucherId(null);
-    setIsReadOnly(false);
-    setView("list");
+    updateQueryParams({
+      voucherView: "list",
+      voucherId: null,
+      voucherReadOnly: null
+    });
   };
 
   if (view === "form") {
@@ -86,8 +97,8 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
           spServiceCategories={sp.serviceCategories}
           spBranches={sp.branches.map((b) => ({ id: b.id, name: b.name }))}
           voucher={selectedVoucher}
-          isReadOnly={isReadOnly}
-          onEdit={() => setIsReadOnly(false)}
+          isReadOnly={isReadOnly === "true"}
+          onEdit={() => setIsReadOnly("false")}
           onSuccess={handleBack}
           onCancel={handleBack}
         />

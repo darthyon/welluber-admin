@@ -18,6 +18,7 @@ interface SearchableMultiSelectProps {
   placeholder?: string;
   isInline?: boolean;
   staticOptions?: string[];
+  title?: string;
 }
 
 export function SearchableMultiSelect({ 
@@ -26,7 +27,8 @@ export function SearchableMultiSelect({
   onChange,
   placeholder = "Search services...",
   isInline = false,
-  staticOptions = []
+  staticOptions = [],
+  title = "Available Options"
 }: SearchableMultiSelectProps) {
   const [query, setQuery] = React.useState("");
   const [isOpen, setIsOpen] = React.useState(false);

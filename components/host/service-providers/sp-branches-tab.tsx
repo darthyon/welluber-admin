@@ -5,6 +5,7 @@ import { Plus, GitBranch } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
 import { DetailSection } from "@/components/shared/detail-section";
+import { useQueryState, useUpdateQueryParams } from "@/hooks/use-tab-persistence";
 import { FilterItem } from "@/components/shared/filter-item";
 import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { ViewToggle, type ViewMode } from "@/components/shared/view-toggle";
@@ -25,8 +26,9 @@ type BranchView = "list" | "detail" | "add" | "edit";
 type BranchStatusFilter = "all" | "active" | "inactive";
 
 export function SpBranchesTab({ sp }: SpBranchesTabProps) {
-  const [view, setView] = useState<BranchView>("list");
-  const [selectedBranchId, setSelectedBranchId] = useState<string | null>(null);
+  const [view, setView] = useQueryState("branchView", "list");
+  const [selectedBranchId, setSelectedBranchId] = useQueryState("branchId");
+  const updateQueryParams = useUpdateQueryParams();
   const [branchesView, setBranchesView] = useState<ViewMode>("grid");
   const [branchSearch, setBranchSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<BranchStatusFilter>("all");
@@ -47,23 +49,31 @@ export function SpBranchesTab({ sp }: SpBranchesTabProps) {
   });
 
   const handleView = (branch: SpBranch) => {
-    setSelectedBranchId(branch.id);
-    setView("detail");
+    updateQueryParams({
+      branchView: "detail",
+      branchId: branch.id
+    });
   };
 
   const handleEdit = (branch: SpBranch) => {
-    setSelectedBranchId(branch.id);
-    setView("edit");
+    updateQueryParams({
+      branchView: "edit",
+      branchId: branch.id
+    });
   };
 
   const handleAdd = () => {
-    setSelectedBranchId(null);
-    setView("add");
+    updateQueryParams({
+      branchView: "add",
+      branchId: null
+    });
   };
 
   const handleBack = () => {
-    setSelectedBranchId(null);
-    setView("list");
+    updateQueryParams({
+      branchView: "list",
+      branchId: null
+    });
   };
 
   if (view === "detail" && selectedBranch) {

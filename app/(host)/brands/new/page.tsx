@@ -70,7 +70,11 @@ export default function NewBrandPage() {
 
       {/* Form Container */}
       <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm">
-        <BrandForm onSubmit={handleSubmit} isSubmitting={isSubmitting} />
+        <BrandForm 
+          onSubmit={handleSubmit} 
+          onCancel={() => router.push("/brands")}
+          isSubmitting={isSubmitting} 
+        />
       </div>
     </div>
   );

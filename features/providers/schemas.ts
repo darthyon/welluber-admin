@@ -38,6 +38,13 @@ const branchContactSchema = z.object({
   isPublic: z.boolean().default(false),
 });
 
+const branchAdminSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Enter a valid email address"),
+  role: z.string().default("Administrator"),
+  designateAsPic: z.boolean().default(false),
+});
+
 const dayHoursSchema = z.object({
   open: z.string(),
   close: z.string(),
@@ -66,7 +73,8 @@ export const createBranchSchema = z.object({
     lat: z.number().optional(),
     lon: z.number().optional(),
   }),
-  contacts: z.array(branchContactSchema).min(1, "Add at least one contact"),
+  contacts: z.array(branchContactSchema).min(1, "Add at least one PIC"),
+  administrators: z.array(branchAdminSchema).default([]),
   isActive: z.boolean().default(true),
   operatingHours: operatingHoursSchema,
   benefits: z.array(z.string()).default([]),

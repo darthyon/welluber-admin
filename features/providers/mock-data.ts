@@ -24,7 +24,7 @@ export const MOCK_SPS: ServiceProvider[] = [
       { mainService: "Therapy & Counselling", tiers: [{ limit: 0, rate: 0.25 }], lastUpdated: "2026-01-10T00:00:00Z" },
     ],
     admins: [
-      { id: "SPA-001", spId: "SP-20260101-0001", name: "Sara Lim", email: "sara@zenithyoga.my", status: "active", invitedAt: "2026-01-05T00:00:00Z" },
+      { id: "SPA-001", spId: "SP-20260101-0001", name: "Sara Lim", email: "sara@zenithyoga.my", status: "active", invitedAt: "2026-01-05T00:00:00Z", branchIds: [] },
     ],
     branches: [
       {
@@ -37,6 +37,7 @@ export const MOCK_SPS: ServiceProvider[] = [
         ],
         address: { line: "Lot 5, Suria KLCC", city: "Kuala Lumpur", state: "Wilayah Persekutuan", country: "Malaysia", postalCode: "50088", lat: 3.1579, lon: 101.7123 },
         contacts: [{ name: "Ahmad Razif", email: "razif@zenithyoga.my", type: "branch_manager", phone: "+60112345678", isPublic: true }],
+        administrators: [],
         isActive: true,
         operatingHours: DEFAULT_OPERATING_HOURS,
         benefits: ["Changing Room", "Shower", "Locker", "Free WiFi", "Towel Service"],
@@ -48,6 +49,7 @@ export const MOCK_SPS: ServiceProvider[] = [
         services: [{ service: "Yoga", subServices: ["Vinyasa Flow"] }],
         address: { line: "G-07, Solaris Dutamas", city: "Kuala Lumpur", state: "Wilayah Persekutuan", country: "Malaysia", postalCode: "50480" },
         contacts: [{ name: "Priya Nair", email: "priya@zenithyoga.my", type: "branch_manager", phone: "+60123456789", isPublic: true }],
+        administrators: [],
         isActive: true,
         operatingHours: DEFAULT_OPERATING_HOURS,
         benefits: ["Changing Room", "Free WiFi"],
@@ -100,7 +102,7 @@ export const MOCK_SPS: ServiceProvider[] = [
       { mainService: "Life & Executive Coaching", tiers: [{ limit: 0, rate: 0.15 }], lastUpdated: "2026-01-20T00:00:00Z" },
     ],
     admins: [
-      { id: "SPA-002", spId: "SP-20260115-0002", name: "Dr. James Wong", email: "james@agilemind.my", status: "active", invitedAt: "2026-01-12T00:00:00Z" },
+      { id: "SPA-002", spId: "SP-20260115-0002", name: "Dr. James Wong", email: "james@agilemind.my", status: "active", invitedAt: "2026-01-12T00:00:00Z", branchIds: [] },
     ],
     branches: [
       {
@@ -110,6 +112,7 @@ export const MOCK_SPS: ServiceProvider[] = [
         services: [{ service: "Therapy & Counselling", subServices: ["Individual Therapy", "Group Counselling"] }],
         address: { line: "Level 10, PJ Trade Centre", city: "Petaling Jaya", state: "Selangor", country: "Malaysia", postalCode: "46200" },
         contacts: [{ name: "Nurul Ain", email: "ain@agilemind.my", type: "reception", phone: "+60198765432", isPublic: true }],
+        administrators: [],
         isActive: true,
         operatingHours: { ...DEFAULT_OPERATING_HOURS, sat: { open: "09:00", close: "13:00", isClosed: false }, sun: { open: "09:00", close: "13:00", isClosed: true } },
         benefits: ["Private Consultation Room", "Waiting Area", "Free WiFi"],
@@ -159,7 +162,7 @@ export const MOCK_SPS: ServiceProvider[] = [
     taxProfile: { isTaxRegistered: true, taxRegNo: "SST-2024-005678", taxRate: 0.08 },
     commissionSchema: [],
     admins: [
-      { id: "SPA-003", spId: "SP-20260201-0003", name: "Chong Wei Lin", email: "wei@corefit.my", status: "pending_activation", invitedAt: "2026-02-03T00:00:00Z" },
+      { id: "SPA-003", spId: "SP-20260201-0003", name: "Chong Wei Lin", email: "wei@corefit.my", status: "pending_activation", invitedAt: "2026-02-03T00:00:00Z", branchIds: [] },
     ],
     branches: [],
     vouchers: [],
@@ -184,7 +187,7 @@ export const MOCK_SPS: ServiceProvider[] = [
       { mainService: "Face & Skin Care", tiers: [{ limit: 0, rate: 0.15 }], lastUpdated: "2026-02-15T00:00:00Z" },
     ],
     admins: [
-      { id: "SPA-004", spId: "SP-20260210-0004", name: "Mei Ling Tan", email: "mei@serenityspa.my", status: "active", invitedAt: "2026-02-12T00:00:00Z" },
+      { id: "SPA-004", spId: "SP-20260210-0004", name: "Mei Ling Tan", email: "mei@serenityspa.my", status: "active", invitedAt: "2026-02-12T00:00:00Z", branchIds: [] },
     ],
     branches: [
       {
@@ -197,6 +200,7 @@ export const MOCK_SPS: ServiceProvider[] = [
         ],
         address: { line: "Level 5, Pavilion Kuala Lumpur", city: "Kuala Lumpur", state: "Wilayah Persekutuan", country: "Malaysia", postalCode: "55100", lat: 3.1488, lon: 101.7131 },
         contacts: [{ name: "Lena Yap", email: "lena@serenityspa.my", type: "branch_manager", phone: "+60161234567", isPublic: true }],
+        administrators: [],
         isActive: false,
         operatingHours: DEFAULT_OPERATING_HOURS,
         benefits: ["Private Rooms", "Steam Room", "Relaxation Lounge", "Free WiFi", "Parking"],

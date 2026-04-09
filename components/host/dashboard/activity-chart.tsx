@@ -111,6 +111,21 @@ function SearchableSelect({
 export function ActivityChart() {
   const [metric, setMetric] = useState<"both" | "issued" | "checkedIn">("both")
   const [entityFilter, setEntityFilter] = useState("all")
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  if (!isMounted) {
+    return (
+      <div className="rounded-lg border border-border bg-card p-5 h-full flex flex-col relative overflow-hidden min-h-[400px]">
+        <div className="flex-1 w-full flex items-center justify-center">
+          <div className="w-8 h-8 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="rounded-lg border border-border bg-card p-5 h-full flex flex-col relative overflow-hidden">

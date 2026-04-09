@@ -23,6 +23,7 @@ import { EntityAvatar } from "@/components/shared/entity-avatar";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { Switch } from "@/components/shared/switch";
+import { useQueryState } from "@/hooks/use-tab-persistence";
 import { cn } from "@/lib/utils";
 import type { Brand } from "@/types/brand";
 import type { ServiceProvider } from "@/types/provider";
@@ -36,8 +37,8 @@ interface BrandDetailViewProps {
 }
 
 export function BrandDetailView({ brand, onBack, onEdit, onRemove }: BrandDetailViewProps) {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [searchQuery, setSearchQuery] = useQueryState("search", "");
+  const [statusFilter, setStatusFilter] = useQueryState("status", "all");
   const [currentStatus, setCurrentStatus] = useState(brand.status);
 
   const brandSps = MOCK_SPS.filter(sp => sp.brandId === brand.id);

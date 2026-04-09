@@ -147,7 +147,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
                     className="w-full px-3 py-2 bg-muted/10 border border-border rounded-lg text-[14px] outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-medium text-foreground hover:border-border/80 cursor-pointer"
                   >
                     <option value="HQ">Headquarters (HQ)</option>
-                    <option value="Branch">Regional Branch</option>
+                    <option value="Branch">Branch</option>
                   </select>
                 </div>
                 <div className="space-y-1.5">
@@ -190,7 +190,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
               />
               <ChoiceCard 
                 title="Existing Wallet"
-                description="Link this branch to an existing wallet (e.g. Shared with HQ or another regional cluster)."
+                description="Link this branch to an existing wallet (e.g. Shared with HQ or another cluster)."
                 selected={walletType === "shared"}
                 onSelect={() => setWalletType("shared")}
                 icon={IdentificationCard}
@@ -214,7 +214,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
                     className="w-full px-3 py-2.5 bg-card border border-border rounded-lg text-[14px] outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-bold text-foreground hover:border-border/80 cursor-pointer"
                   >
                     <option value="hq">Global Tech HQ - RM 250,000.00 MYR</option>
-                    <option value="hub_1">North Regional Hub - RM 45,000.00 MYR</option>
+                    <option value="hub_1">North Hub - RM 45,000.00 MYR</option>
                     <option value="sat_1">Cyberjaya Satellite - RM 12,000.00 MYR</option>
                   </select>
                   <p className="text-[11px] text-muted-foreground/40 mt-1.5 font-medium italic">

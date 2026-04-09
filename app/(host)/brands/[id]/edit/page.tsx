@@ -82,6 +82,7 @@ export default function EditBrandPage() {
         <BrandForm 
           initialData={brand} 
           onSubmit={handleSubmit} 
+          onCancel={() => router.push(`/brands/${brandId}`)}
           isSubmitting={isSubmitting} 
         />
       </div>

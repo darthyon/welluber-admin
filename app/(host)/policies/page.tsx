@@ -114,6 +114,7 @@ function PoliciesContent() {
         <BenefitPolicyWizard 
           mode={wizardMode as any || "create"}
           initialData={selectedPolicy}
+          onEdit={() => setWizardMode("edit")}
           onCancel={() => {
             updateQueryParams({
               wizard: null,
@@ -128,6 +129,8 @@ function PoliciesContent() {
                 id: Math.random().toString(36).substr(2, 9),
               };
               setPolicies([...policies, newPolicy]);
+            } else if (wizardMode === "edit") {
+              setPolicies(prev => prev.map(p => p.id === activePolicyId ? { ...p, ...newData.policy } : p));
             }
             updateQueryParams({
               wizard: null,

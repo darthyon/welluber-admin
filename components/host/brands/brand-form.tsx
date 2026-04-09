@@ -24,10 +24,11 @@ type BrandFormData = z.infer<typeof brandSchema>;
 interface BrandFormProps {
   initialData?: Brand;
   onSubmit: (data: BrandFormData) => void;
+  onCancel?: () => void;
   isSubmitting?: boolean;
 }
 
-export function BrandForm({ initialData, onSubmit, isSubmitting }: BrandFormProps) {
+export function BrandForm({ initialData, onSubmit, onCancel, isSubmitting }: BrandFormProps) {
   const {
     register,
     handleSubmit,
@@ -147,6 +148,17 @@ export function BrandForm({ initialData, onSubmit, isSubmitting }: BrandFormProp
 
       {/* Footer Actions */}
       <div className="flex items-center justify-end gap-3 pt-4 border-t border-border/60">
+        {onCancel && (
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={onCancel}
+            disabled={isSubmitting}
+            className="text-[13px] font-medium text-muted-foreground hover:text-foreground"
+          >
+            Cancel
+          </Button>
+        )}
         <Button
           type="submit"
           disabled={isSubmitting}

@@ -90,7 +90,7 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
       <div className="flex flex-col gap-4">
         <BackButton 
           onClick={onBack}
-          label="Back to Regional Branches"
+          label="Back to Branches"
         />
         
         <EntityHeader

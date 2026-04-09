@@ -56,6 +56,14 @@ export interface SpBranchContact {
   isPublic: boolean;
 }
 
+export interface SpBranchAdmin {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  designateAsPic: boolean;
+}
+
 export interface DayHours {
   open: string;  // "09:00"
   close: string; // "18:00"
@@ -86,7 +94,8 @@ export interface SpBranch {
     lat?: number;
     lon?: number;
   };
-  contacts: SpBranchContact[];
+  contacts: SpBranchContact[]; // Used for PICs (Public Contacts)
+  administrators: SpBranchAdmin[]; // Governance/Access
   isActive: boolean;
   operatingHours: OperatingHours;
   benefits: string[];

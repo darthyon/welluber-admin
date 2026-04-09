@@ -40,7 +40,8 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
       name: branch?.name ?? "",
       services: (branch?.services as any) ?? [],
       address: branch?.address ?? { line: "", city: "", state: "", country: "Malaysia", postalCode: "" },
-      contacts: branch?.contacts ?? [{ name: "", type: "branch_manager", phone: "", isPublic: false }],
+      contacts: branch?.contacts ?? [{ name: "", type: "branch_manager", phone: "", isPublic: true }],
+      administrators: branch?.administrators ?? [{ name: "", email: "", role: "Administrator", designateAsPic: false }],
       isActive: branch?.isActive ?? true,
       operatingHours: branch?.operatingHours ?? DEFAULT_OPERATING_HOURS,
       benefits: (branch as any)?.benefits ?? (branch as any)?.facilities ?? [],
@@ -52,6 +53,11 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
   const { fields: contactFields, append: appendContact, remove: removeContact } = useFieldArray({
     control,
     name: "contacts",
+  });
+
+  const { fields: adminFields, append: appendAdmin, remove: removeAdmin } = useFieldArray({
+    control,
+    name: "administrators",
   });
 
   const [benefitInput, setBenefitInput] = useState("");
@@ -71,6 +77,30 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
     const updated = benefits.filter((_, idx) => idx !== i);
     setBenefits(updated);
     setValue("benefits", updated);
+  };
+
+  // Sync logic: When an administrator is designated as PIC, ensure they exist in the contacts list
+  const watchedAdmins = watch("administrators") || [];
+  const watchedContacts = watch("contacts") || [];
+
+  const handleAdminPicSync = (index: number, isPic: boolean) => {
+    const admin = watchedAdmins[index];
+    if (isPic) {
+      const alreadyExists = watchedContacts.some(c => c.email === admin.email);
+      if (!alreadyExists && admin.email && admin.name) {
+        appendContact({
+          name: admin.name,
+          email: admin.email,
+          type: "branch_manager",
+          phone: "",
+          isPublic: true
+        });
+      }
+    } else {
+      // If unchecked, optionally remove or just let it stay. User didn't specify removal logic, 
+      // but "separate admin and pic" usually implies manual cleanup or one-way sync.
+      // I'll leave it for now to avoid accidental data loss.
+    }
   };
 
   const serviceCatalog = useMemo(() => {
@@ -186,16 +216,16 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
           sidebar={
             <>
               <DetailSection
-                title="Branch Setup Guide"
+                title="Setup Progress"
                 icon={<CheckCircle size={18} weight="fill" />}
-                description="Quick checklist to keep the branch configuration on track."
+                description="Status of essential branch details."
               >
                 <div className="space-y-3">
                   {[
-                    { label: "Basic identity completed", status: !!watch("name") },
-                    { label: "Services selected", status: selectedServices.length > 0 },
-                    { label: "Administrators added", status: contactFields.length > 0 },
-                    { label: "Operating hours configured", status: true },
+                    { label: "Branch identity set", status: !!watch("name") },
+                    { label: "Services configured", status: selectedServices.length > 0 },
+                    { label: "PICs added", status: contactFields.length > 0 },
+                    { label: "Operating hours set", status: true },
                   ].map((step) => (
                     <div key={step.label} className="flex items-center justify-between text-[13px]">
                       <span className="text-muted-foreground">{step.label}</span>
@@ -204,13 +234,6 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                   ))}
                 </div>
               </DetailSection>
-
-              <div className="rounded-xl border border-border bg-card shadow-sm p-4">
-                <h4 className="text-[13px] font-semibold text-muted-foreground tracking-tight mb-3">Branch notes</h4>
-                <p className="text-[13px] text-muted-foreground leading-6">
-                  Branches inherit the service categories from the parent service provider, but each location can still choose which services it offers and how it runs day to day.
-                </p>
-              </div>
             </>
           }
         >
@@ -322,18 +345,88 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
           </DetailSection>
 
           <DetailSection
-            title="Administrators"
+            title="Branch Governance"
             icon={<Users size={16} weight="fill" />}
-            description="Local branch administrators with management access."
+            description="Local administrators with branch management access."
             action={
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
                 className="h-8 text-[12px] gap-1"
-                onClick={() => appendContact({ name: "", email: "", type: "staff", phone: "", isPublic: false })}
+                onClick={() => appendAdmin({ name: "", email: "", role: "Administrator", designateAsPic: false })}
               >
                 <Plus size={13} /> Add Administrator
+              </Button>
+            }
+          >
+            <div className="space-y-4">
+              {adminFields.map((field, i) => (
+                <ItemSection
+                  key={field.id}
+                  index={i + 1}
+                  label="Branch Administrator"
+                  onRemove={() => removeAdmin(i)}
+                >
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-semibold text-muted-foreground tracking-tight">Name</label>
+                      <input {...register(`administrators.${i}.name`)} className={inputCls(!!(errors.administrators as any)?.[i]?.name)} placeholder="Full name" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-semibold text-muted-foreground tracking-tight">Corporate Email</label>
+                      <input type="email" {...register(`administrators.${i}.email`)} className={inputCls(!!(errors.administrators as any)?.[i]?.email)} placeholder="name@company.com" />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-2 border-t border-border/40">
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2">
+                        <Switch 
+                          checked={watch(`administrators.${i}.designateAsPic`)} 
+                          onCheckedChange={(v) => {
+                            setValue(`administrators.${i}.designateAsPic`, v);
+                            handleAdminPicSync(i, v);
+                          }} 
+                        />
+                        <span className="text-[12px] font-medium text-foreground">Designate as PIC</span>
+                      </div>
+                    </div>
+                    
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      size="sm" 
+                      className="h-9 px-4 gap-2 text-[12px] font-bold border-border text-muted-foreground hover:text-primary hover:border-primary/30 transition-all rounded-full"
+                      onClick={() => console.log("Invite sent to", watch(`administrators.${i}.email`))}
+                    >
+                      <PaperPlaneTilt size={14} weight="bold" />
+                      Send Invite
+                    </Button>
+                  </div>
+                </ItemSection>
+              ))}
+              {errors.administrators && (
+                <p className="text-[11px] text-destructive flex items-center gap-1">
+                  <WarningCircle size={12} /> {(errors.administrators as any).message}
+                </p>
+              )}
+            </div>
+          </DetailSection>
+
+          <DetailSection
+            title="Persons In Charge (PIC)"
+            icon={<Users size={16} weight="fill" />}
+            description="Public-facing contact persons for this branch."
+            action={
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-8 text-[12px] gap-1"
+                onClick={() => appendContact({ name: "", email: "", type: "staff", phone: "", isPublic: true })}
+              >
+                <Plus size={13} /> Add PIC
               </Button>
             }
           >
@@ -342,7 +435,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                 <ItemSection
                   key={field.id}
                   index={i + 1}
-                  label="Branch Administrator"
+                  label="Branch PIC"
                   onRemove={() => removeContact(i)}
                 >
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -355,7 +448,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                       <input type="email" {...register(`contacts.${i}.email`)} className={inputCls(!!(errors.contacts as any)?.[i]?.email)} placeholder="name@company.com" />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[11px] font-semibold text-muted-foreground tracking-tight">Role</label>
+                      <label className="text-[11px] font-semibold text-muted-foreground tracking-tight">Job Role</label>
                       <select {...register(`contacts.${i}.type`)} className={cn(inputCls(), "appearance-none cursor-pointer bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236b7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1.25rem_1.25rem] bg-[right_0.5rem_center] bg-no-repeat pr-10")}>
                         {BRANCH_CONTACT_TYPES.map((t) => (
                           <option key={t.value} value={t.value}>{t.label}</option>
@@ -375,17 +468,6 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                         <span className="text-[12px] font-medium text-foreground">Public profile</span>
                       </div>
                     </div>
-                    
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      size="sm" 
-                      className="h-9 px-4 gap-2 text-[12px] font-bold border-border text-muted-foreground hover:text-primary hover:border-primary/30 transition-all rounded-full"
-                      onClick={() => console.log("Invite sent to", watch(`contacts.${i}.email`))}
-                    >
-                      <PaperPlaneTilt size={14} weight="bold" />
-                      Send Invite
-                    </Button>
                   </div>
                 </ItemSection>
               ))}

@@ -2,7 +2,7 @@
 
 import { Plus, DownloadSimple, MagnifyingGlass, FadersHorizontal } from "@phosphor-icons/react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { SpCard } from "@/components/host/service-providers/sp-card";
 import { SpDataTable } from "@/components/host/service-providers/sp-data-table";
@@ -14,16 +14,17 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { AdvancedFilterSheet, AdvancedFilters, DEFAULT_ADVANCED_FILTERS } from "@/components/shared/advanced-filter-sheet";
 import { Badge } from "@/components/ui/badge";
 import { motion, AnimatePresence } from "framer-motion";
+import { useQueryState } from "@/hooks/use-tab-persistence";
 import { cn } from "@/lib/utils";
 import { MOCK_SPS } from "@/features/providers/mock-data";
 import { SP_STATUS_OPTIONS } from "@/features/providers/constants";
 import { SERVICE_TAXONOMY } from "@/features/organizations/constants";
 
-export default function ServiceProvidersPage() {
-  const [viewMode, setViewMode] = useState<ViewMode>("grid");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
+function ServiceProvidersContent() {
+  const [viewMode, setViewMode] = useQueryState("view", "grid");
+  const [searchQuery, setSearchQuery] = useQueryState("search", "");
+  const [statusFilter, setStatusFilter] = useQueryState("status", "all");
+  const [isFilterSheetOpen, setIsFilterSheetOpen] = useQueryState("advancedFilter");
   const [advancedFilters, setAdvancedFilters] = useState<AdvancedFilters>({
     ...DEFAULT_ADVANCED_FILTERS,
   });
@@ -59,7 +60,7 @@ export default function ServiceProvidersPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <ViewToggle mode={viewMode} onChange={setViewMode} />
+          <ViewToggle mode={viewMode as ViewMode} onChange={setViewMode} />
 
           <Button variant="outline" size="sm" className="h-9 text-[13px] font-medium border-border/60 hover:bg-muted/50">
             <DownloadSimple size={16} className="mr-1.5 opacity-60" />
@@ -101,8 +102,8 @@ export default function ServiceProvidersPage() {
           </>
         }
         advancedFilter={{
-          isOpen: isFilterSheetOpen,
-          onToggle: () => setIsFilterSheetOpen(true),
+          isOpen: isFilterSheetOpen === "true",
+          onToggle: () => setIsFilterSheetOpen("true"),
           activeCount: activeAdvancedCount,
         }}
       />
@@ -159,16 +160,24 @@ export default function ServiceProvidersPage() {
       </div>
 
       <AdvancedFilterSheet
-        isOpen={isFilterSheetOpen}
-        onClose={() => setIsFilterSheetOpen(false)}
+        isOpen={isFilterSheetOpen === "true"}
+        onClose={() => setIsFilterSheetOpen(null)}
         filters={advancedFilters}
         setFilters={setAdvancedFilters}
-        onApply={() => setIsFilterSheetOpen(false)}
+        onApply={() => setIsFilterSheetOpen(null)}
         showWorkforce={false}
         showWalletModel={false}
         showIndustry={false}
         description="Filter service providers by service categories and utilization."
       />
     </div>
+  );
+}
+
+export default function ServiceProvidersPage() {
+  return (
+    <Suspense fallback={<div className="h-[400px] flex items-center justify-center text-muted-foreground animate-pulse">Loading service providers...</div>}>
+      <ServiceProvidersContent />
+    </Suspense>
   );
 }

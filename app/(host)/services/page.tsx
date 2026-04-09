@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, Suspense } from "react";
 import { 
   TreeStructure, 
   Plus, 
@@ -47,6 +47,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useQueryState, useUpdateQueryParams } from "@/hooks/use-tab-persistence";
 import {
   Dialog,
   DialogContent,
@@ -90,15 +91,21 @@ const INITIAL_SERVICE_ICONS: Record<string, string> = {
   "Meditation": "Brain",
 };
 
-export default function ServicesPage() {
+function ServicesContent() {
   const [searchQuery, setSearchQuery] = useState("");
   const [taxonomy, setTaxonomy] = useState(SERVICE_TAXONOMY);
   const [specs, setSpecs] = useState(SERVICE_SPEC_TAXONOMY);
   const [serviceIcons, setServiceIcons] = useState<Record<string, string>>(INITIAL_SERVICE_ICONS);
   
-  // Sheet & Category Selection State
-  const [selectedCategory, setSelectedCategory] = useState<{ category: string; services: string[] } | null>(null);
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  // Sheet & Category Selection State (Refactored to Query State)
+  const [selectedCategoryName, setSelectedCategoryName] = useQueryState("category");
+  const [isSheetOpen, setIsSheetOpen] = useQueryState("sheet", "false");
+  const updateQueryParams = useUpdateQueryParams();
+
+  const selectedCategory = useMemo(() => {
+    if (!selectedCategoryName) return null;
+    return taxonomy.find(cat => cat.category === selectedCategoryName) || null;
+  }, [selectedCategoryName, taxonomy]);
 
   // CRUD State
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -127,6 +134,10 @@ export default function ServicesPage() {
         setTaxonomy(prev => [...prev, { category: inputValue, services: [] }]);
       } else {
         setTaxonomy(prev => prev.map(c => c.category === dialogConfig.id ? { ...c, category: inputValue } : c));
+        // Update URL if the selected category was renamed
+        if (selectedCategoryName === dialogConfig.id) {
+          setSelectedCategoryName(inputValue);
+        }
       }
     } else if (dialogConfig.type === "service") {
       if (dialogConfig.mode === "add") {
@@ -169,6 +180,9 @@ export default function ServicesPage() {
 
     if (type === "category") {
       setTaxonomy(prev => prev.filter(c => c.category !== id));
+      if (selectedCategoryName === id) {
+        handleCloseSheet();
+      }
     } else if (type === "service") {
       setTaxonomy(prev => prev.map(c => ({ ...c, services: c.services.filter(s => s !== id) })));
       setServiceIcons(prev => {
@@ -181,9 +195,18 @@ export default function ServicesPage() {
     }
   };
 
-  const handleOpenCategory = (category: typeof selectedCategory) => {
-    setSelectedCategory(category);
-    setIsSheetOpen(true);
+  const handleOpenCategory = (cat: { category: string; services: string[] }) => {
+    updateQueryParams({
+      category: cat.category,
+      sheet: "true"
+    });
+  };
+
+  const handleCloseSheet = () => {
+    updateQueryParams({
+      category: null,
+      sheet: null
+    });
   };
 
   const filteredTaxonomy = taxonomy.filter(cat => {
@@ -296,8 +319,8 @@ export default function ServicesPage() {
 
       {/* Detail Slide-over Sheet */}
       <CategoryDetailSheet
-        isOpen={isSheetOpen}
-        onClose={() => setIsSheetOpen(false)}
+        isOpen={isSheetOpen === "true"}
+        onClose={handleCloseSheet}
         category={selectedCategory}
         specs={specs}
         serviceIcons={serviceIcons}
@@ -378,5 +401,13 @@ export default function ServicesPage() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+export default function ServicesPage() {
+  return (
+    <Suspense fallback={<div className="h-[400px] flex items-center justify-center text-muted-foreground animate-pulse">Loading service taxonomy...</div>}>
+      <ServicesContent />
+    </Suspense>
   );
 }

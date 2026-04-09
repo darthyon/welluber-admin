@@ -64,52 +64,11 @@ export function SpBranchDetailView({ branch, serviceCategories, onBack, onEdit }
       <TwoColumnDetailLayout
         sidebar={
           <>
-            {/* Administrators Section (Aligned with Governance) */}
-            <DetailSection title="Branch Governance" icon={<Users size={18} weight="duotone" />} description="Local administrators with branch management access.">
-              {branch.contacts.length === 0 ? (
-                <p className="text-[13px] text-muted-foreground italic">No administrators added.</p>
-              ) : (
-                <div className="space-y-3">
-                  {branch.contacts.map((c, i) => (
-                    <div key={i} className="flex items-center justify-between p-3 rounded-xl border border-border/60 bg-card hover:border-primary/20 transition-all group relative overflow-hidden">
-                       <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/[0.02] transition-colors pointer-events-none" />
-                       <div className="flex items-center gap-3 relative z-10">
-                          <EntityAvatar name={c.name} size="sm" />
-                          <div>
-                            <p className="text-[13px] font-bold text-foreground leading-tight tracking-tight">{c.name}</p>
-                            <p className="text-[11px] text-muted-foreground font-medium opacity-70 mt-0.5">{CONTACT_TYPE_LABEL[c.type] ?? c.type}</p>
-                         </div>
-                       </div>
-                       <div className="flex items-center gap-2 relative z-10">
-                         {c.isPublic && (
-                           <Badge variant="outline" className="text-[9px] font-bold border-emerald-500/20 text-emerald-600 bg-emerald-500/5">Portal</Badge>
-                         )}
-                         <ActionPopover 
-                           actions={[
-                             { label: "View Details", onClick: () => console.log("View", c.name) },
-                           ]}
-                         />
-                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </DetailSection>
-
-            {/* Branch Quick Stats (Matching Org Detail) */}
-            <div className="bg-primary/95 dark:bg-primary/20 rounded-xl p-6 text-primary-foreground dark:text-primary overflow-hidden relative group border border-primary/20 shadow-lg shadow-primary/5">
-              <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-primary-foreground/10 dark:bg-primary/20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-1000" />
-              <h4 className="text-[15px] font-bold mb-2 tracking-tight">Branch quick stats</h4>
-              <div className="space-y-4 relative z-10">
-                <div>
-                  <p className="text-[11px] font-bold opacity-70 tracking-tight">Services Active</p>
-                  <p className="text-xl font-bold">{serviceCount}</p>
-                </div>
-                <div>
-                  <p className="text-[11px] font-bold opacity-70 tracking-tight">Daily Availability</p>
-                  <p className="text-xl font-bold">100%</p>
-                </div>
-              </div>
+            {/* Sidebar reserved for future activity logs as per user request */}
+            <div className="rounded-xl border border-dashed border-border bg-muted/30 p-8 flex flex-col items-center justify-center text-center opacity-40">
+              <TrendUp size={24} weight="duotone" className="mb-2" />
+              <p className="text-[12px] font-medium">Activity Stream</p>
+              <p className="text-[10px]">Logs appearing soon</p>
             </div>
           </>
         }
@@ -129,6 +88,85 @@ export function SpBranchDetailView({ branch, serviceCategories, onBack, onEdit }
               </div>
             </div>
           </div>
+        </DetailSection>
+
+        {/* Persons In Charge (PIC) */}
+        <DetailSection 
+          title="Persons In Charge (PIC)" 
+          icon={<Users size={18} weight="duotone" />} 
+          description="Public-facing contact persons with portal visibility."
+        >
+          {branch.contacts.length === 0 ? (
+            <p className="text-[13px] text-muted-foreground italic">No PICs designated for this branch.</p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {branch.contacts.map((c, i) => (
+                <div key={i} className="flex items-center justify-between p-3.5 rounded-xl border border-border/80 bg-card hover:border-primary/20 hover:shadow-sm transition-all group relative overflow-hidden">
+                  <div className="flex items-center gap-4 relative z-10">
+                    <EntityAvatar name={c.name} size="md" />
+                    <div>
+                      <p className="text-[14px] font-bold text-foreground leading-tight tracking-tight">{c.name}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-[11px] text-muted-foreground font-medium">{CONTACT_TYPE_LABEL[c.type] ?? c.type}</span>
+                        {c.isPublic && (
+                          <Badge variant="outline" className="text-[9px] h-4 font-bold border-emerald-500/20 text-emerald-600 bg-emerald-500/5">Public Profile</Badge>
+                        )}
+                      </div>
+                      <div className="flex flex-col gap-1 mt-2">
+                        <p className="text-[11px] text-muted-foreground flex items-center gap-1.5">
+                          <Phone size={10} weight="fill" className="opacity-40" /> {c.phone}
+                        </p>
+                        <p className="text-[11px] text-muted-foreground flex items-center gap-1.5">
+                          <Globe size={10} weight="fill" className="opacity-40" /> {c.email}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <ActionPopover 
+                    actions={[
+                      { label: "View Details", onClick: () => console.log("View", c.name) },
+                    ]}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </DetailSection>
+
+        {/* Branch Governance (Administrators) */}
+        <DetailSection 
+          title="Branch Governance" 
+          icon={<Users size={18} weight="fill" />} 
+          description="Local administrators with system management access."
+        >
+          {(branch.administrators?.length ?? 0) === 0 ? (
+            <p className="text-[13px] text-muted-foreground italic">No system administrators added.</p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {branch.administrators?.map((admin, i) => (
+                <div key={i} className="flex items-center justify-between p-3.5 rounded-xl border border-border/80 bg-card hover:border-primary/20 transition-all group">
+                  <div className="flex items-center gap-4 relative z-10">
+                    <EntityAvatar name={admin.name} size="sm" className="bg-indigo-50 text-indigo-600" />
+                    <div>
+                      <p className="text-[13px] font-bold text-foreground leading-tight tracking-tight">{admin.name}</p>
+                      <p className="text-[11px] text-muted-foreground font-medium mt-0.5">{admin.role}</p>
+                      <p className="text-[11px] text-muted-foreground mt-1 opacity-70">{admin.email}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {admin.designateAsPic && (
+                      <Badge variant="outline" className="text-[9px] font-bold border-indigo-500/20 text-indigo-600 bg-indigo-500/5">PIC Linked</Badge>
+                    )}
+                    <ActionPopover 
+                      actions={[
+                        { label: "Manage Access", onClick: () => console.log("Manage", admin.email) },
+                      ]}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </DetailSection>
 
         {/* Location Mapping */}

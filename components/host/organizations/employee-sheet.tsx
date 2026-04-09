@@ -25,7 +25,7 @@ export function EmployeeSheet({
       title={isEditing ? "Edit Employee" : "Add New Employee"}
       description={isEditing
         ? "Update identity, employment details, and benefit policy assignments for this employee."
-        : "Register a new employee. Once added, their profile will be linked to the organization's regional branch and designated benefit policies."
+        : "Register a new employee. Once added, their profile will be linked to the organization's branch and designated benefit policies."
       }
     >
       <EmployeeForm

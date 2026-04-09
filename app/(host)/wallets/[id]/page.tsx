@@ -24,6 +24,7 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { useWallets, useWalletTransactions } from "@/features/wallets/hooks";
 import { TRANSACTION_TYPE_LABELS } from "@/features/wallets/constants";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
+import { useQueryState } from "@/hooks/use-tab-persistence";
 import { DetailSection } from "@/components/shared/detail-section";
 import { DetailField } from "@/components/shared/detail-field";
 import { ActionPopover } from "@/components/shared/action-popover";
@@ -33,18 +34,18 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { ConfirmationModal } from "@/components/shared/confirmation-modal";
 import { SharedDataTable } from "@/components/shared/data-table";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
-export default function WalletDetailPage() {
+function WalletDetailContent() {
   const params = useParams();
   const router = useRouter();
   const walletId = params.id as string;
   const { wallets } = useWallets();
   const { transactions } = useWalletTransactions(walletId);
 
-  const [activeTab, setActiveTab] = useState("transactions");
+  const [activeTab, setActiveTab] = useQueryState("tab", "transactions");
   const [searchQuery, setSearchQuery] = useState("");
   const [period, setPeriod] = useState<"By Month" | "By Quarter" | "By Year">("By Month");
   
@@ -485,5 +486,13 @@ export default function WalletDetailPage() {
         }}
       />
     </div>
+  );
+}
+
+export default function WalletDetailPage() {
+  return (
+    <Suspense fallback={<div className="h-[400px] flex items-center justify-center text-muted-foreground animate-pulse">Loading wallet details...</div>}>
+      <WalletDetailContent />
+    </Suspense>
   );
 }
