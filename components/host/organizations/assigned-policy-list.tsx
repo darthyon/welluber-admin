@@ -46,7 +46,7 @@ export function AssignedPolicyList({ policies, onUnlink, onView, onEdit }: Assig
           </div>
           <div>
             <p className="text-[14px] font-bold text-foreground group-hover:text-primary transition-colors leading-tight">{policy.name}</p>
-            <p className="text-[11px] font-mono text-muted-foreground/40 uppercase tracking-widest leading-none mt-0.5">{policy.code}</p>
+            <p className="text-[11px] font-mono text-muted-foreground/50 tracking-tight leading-none mt-0.5">{policy.code}</p>
           </div>
         </div>
       )

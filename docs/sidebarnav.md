@@ -257,7 +257,7 @@ Sidebar click → Route
 - **Color scheme:** Use sidebar section headers with `--color-background-tertiary` + `--color-text-tertiary` (uppercase, smaller font)
 - **Active item:** `--color-background-info` + `--color-text-info` + left border `--color-border-info`
 - **Hover state:** `--color-background-secondary`
-- **Font:** Sans-serif, 13px body, 11px section headers (uppercase)
+- **Font:** Sans-serif, 13px body, 11px section headers (uppercase is permitted ONLY for these section headers)
 - **Icons (optional):** 16x16, muted gray unless active (then info color)
 - **Transitions:** 0.15s all for hover/active state changes
 

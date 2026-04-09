@@ -47,58 +47,79 @@ export function AdminCard({ admin }: AdminCardProps) {
       transition={{ duration: 0.2 }}
       className="group relative bg-card border border-border rounded-2xl p-5 hover:border-primary/30 hover:shadow-md transition-all duration-300"
     >
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-muted text-muted-foreground/60 flex items-center justify-center border border-border">
-            {admin.role === "HostAdmin" ? <Shield size={20} weight="fill" /> : 
-             admin.role === "OrgAdmin" ? <Buildings size={20} weight="fill" /> : 
-             <Storefront size={20} weight="fill" />}
+      <div className="flex items-start justify-between mb-8 relative z-10">
+        <div className="flex items-center gap-3.5">
+          <div className="w-11 h-11 rounded-2xl bg-muted border border-border/60 text-muted-foreground/60 flex items-center justify-center">
+            {admin.role === "HostAdmin" ? <Shield size={22} weight="fill" /> : 
+             admin.role === "OrgAdmin" ? <Buildings size={22} weight="fill" /> : 
+             <Storefront size={22} weight="fill" />}
           </div>
-          <div className="space-y-0.5">
+          <div className="space-y-1.5">
             <h3 className="font-bold text-[14px] text-foreground tracking-tight leading-tight">
               {admin.name}
             </h3>
-            <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-              <EnvelopeSimple size={12} />
-              {admin.email}
+            <div className="flex items-center gap-2">
+              <StatusBadge 
+                status={admin.status} 
+                variant={admin.status === "Active" ? "emerald" : "rose"} 
+                className="px-1.5 py-0.5 rounded-md text-[10px]"
+              />
+              <span className="text-[10px] text-muted-foreground/60 font-mono bg-background/50 px-1.5 py-0.5 rounded border border-border/40 tracking-tight">Admin</span>
             </div>
           </div>
         </div>
         <ActionPopover actions={actions} />
       </div>
 
-      <div className="space-y-3.5 pt-1">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-muted-foreground/30">
-            <Shield size={14} />
-            <span className="text-[11px] font-semibold text-muted-foreground/60">Role</span>
+      {/* Main Content: Standardized Field Grid */}
+      <div className="relative z-10 space-y-6">
+        
+        {/* Row 1: Email & User Type */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2.5">
+            <div className="flex items-center gap-1.5 text-muted-foreground/30">
+              <EnvelopeSimple size={14} weight="bold" />
+              <span className="text-[11px] font-bold tracking-tight text-muted-foreground/60">Email Address</span>
+            </div>
+            <span className="text-[12px] font-bold text-foreground/80 block truncate font-mono" title={admin.email}>
+              {admin.email}
+            </span>
           </div>
-          <span className={cn(
-            "px-2 py-0.5 rounded-md text-[10px] font-bold border",
-            getRoleStyle(admin.role)
-          )}>
-            {getRoleLabel(admin.role)}
-          </span>
+
+          <div className="space-y-2.5">
+            <div className="flex items-center gap-1.5 text-muted-foreground/30">
+              <Shield size={14} weight="bold" />
+              <span className="text-[11px] font-bold tracking-tight text-muted-foreground/60">User Type</span>
+            </div>
+            <span className={cn(
+              "inline-flex px-2 py-0.5 rounded-md text-[10px] font-bold border mt-0.5",
+              getRoleStyle(admin.role)
+            )}>
+              {getRoleLabel(admin.role)}
+            </span>
+          </div>
         </div>
 
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-muted-foreground/30">
-            <Buildings size={14} />
-            <span className="text-[11px] font-semibold text-muted-foreground/60">Entity</span>
+        {/* Row 2: Entity & Last Active */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2.5">
+            <div className="flex items-center gap-1.5 text-muted-foreground/30">
+              <Buildings size={14} weight="bold" />
+              <span className="text-[11px] font-bold tracking-tight text-muted-foreground/60">Entity</span>
+            </div>
+            <span className="text-[12px] font-bold text-foreground truncate block" title={admin.entity?.name || "Platform Core"}>
+              {admin.entity?.name || "Platform Core"}
+            </span>
           </div>
-          <span className="text-[12px] font-bold text-foreground truncate max-w-[140px]">
-            {admin.entity?.name || "Platform Core"}
-          </span>
-        </div>
 
-        <div className="pt-2 flex items-center justify-between border-t border-border/50 mt-2">
-          <StatusBadge 
-            status={admin.status} 
-            variant={admin.status === "Active" ? "emerald" : "rose"} 
-          />
-          <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground/40 font-medium">
-            <Clock size={12} />
-            {admin.lastLogin}
+          <div className="space-y-2.5">
+            <div className="flex items-center gap-1.5 text-muted-foreground/30">
+              <Clock size={14} weight="bold" />
+              <span className="text-[11px] font-bold tracking-tight text-muted-foreground/60">Last Active</span>
+            </div>
+            <span className="text-[12px] font-bold text-foreground/80 block">
+              {admin.lastActive}
+            </span>
           </div>
         </div>
       </div>

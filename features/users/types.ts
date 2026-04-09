@@ -15,6 +15,7 @@ export interface Member {
   };
   status: "Active" | "Inactive" | "Pending";
   joinedDate: string;
+  lastActive: string;
 }
 
 export interface Administrator {
@@ -28,5 +29,7 @@ export interface Administrator {
     type: "Organization" | "ServiceProvider" | "Platform";
   };
   status: "Active" | "Inactive";
+  joinedDate: string;
   lastLogin: string;
+  lastActive: string;
 }

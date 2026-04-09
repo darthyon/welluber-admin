@@ -85,7 +85,7 @@ export function ActivityTimeline({ items, title, icon, className }: ActivityTime
                   <h4 className="text-[13.5px] font-bold text-foreground group-hover:text-primary transition-colors duration-200 tracking-tight">
                     {item.title}
                   </h4>
-                  <span className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-wider tabular-nums">
+                  <span className="text-[10px] font-bold text-muted-foreground/40 tracking-wider tabular-nums">
                     {item.timestamp.split(',')[1]?.trim() || item.timestamp}
                   </span>
                 </div>

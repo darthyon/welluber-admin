@@ -53,7 +53,7 @@ export default function AdministratorsPage() {
       )
     },
     {
-      header: "Role",
+      header: "User Type",
       accessorKey: "role",
       sortable: true,
       render: (row) => (
@@ -92,13 +92,23 @@ export default function AdministratorsPage() {
       )
     },
     {
-      header: "Last Login",
-      accessorKey: "lastLogin",
+      header: "Joined Date",
+      accessorKey: "joinedDate",
+      sortable: true,
+      render: (row) => (
+        <span className="text-[12px] font-medium text-zinc-500">
+          {row.joinedDate}
+        </span>
+      )
+    },
+    {
+      header: "Last Active",
+      accessorKey: "lastActive",
       sortable: true,
       render: (row) => (
         <div className="flex items-center gap-2 text-[12px] font-medium text-zinc-500">
           <Clock size={14} />
-          {row.lastLogin}
+          {row.lastActive}
         </div>
       )
     },
@@ -164,11 +174,11 @@ export default function AdministratorsPage() {
         filters={
           <>
             <FilterItem 
-              label="Role"
+              label="User Type"
               value={roleFilter}
               onChange={setRoleFilter}
               options={[
-                { label: "All Roles", value: "all" },
+                { label: "All User Types", value: "all" },
                 { label: "Host Admin", value: "HostAdmin" },
                 { label: "Org Admin", value: "OrgAdmin" },
                 { label: "SP Admin", value: "SPAdmin" },

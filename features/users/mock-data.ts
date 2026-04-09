@@ -9,7 +9,8 @@ export const MOCK_MEMBERS: Member[] = [
     organization: { id: "org_1", name: "TechCorp Solutions" },
     branch: { id: "br_1", name: "Main HQ" },
     status: "Active",
-    joinedDate: "2024-01-15",
+    joinedDate: "15 Jan 2024",
+    lastActive: "09 Apr 2024, 17:15",
   },
   {
     id: "mem_2",
@@ -18,7 +19,8 @@ export const MOCK_MEMBERS: Member[] = [
     type: "Dependent",
     organization: { id: "org_1", name: "TechCorp Solutions" },
     status: "Active",
-    joinedDate: "2024-02-10",
+    joinedDate: "10 Feb 2024",
+    lastActive: "07 Apr 2024, 10:20",
   },
   {
     id: "mem_3",
@@ -28,7 +30,8 @@ export const MOCK_MEMBERS: Member[] = [
     organization: { id: "org_2", name: "WellUber Global" },
     branch: { id: "br_2", name: "KL Office" },
     status: "Pending",
-    joinedDate: "2024-03-01",
+    joinedDate: "01 Mar 2024",
+    lastActive: "01 Mar 2024, 09:00",
   },
 ];
 
@@ -39,7 +42,9 @@ export const MOCK_ADMINS: Administrator[] = [
     email: "yon@welluber.com",
     role: "HostAdmin",
     status: "Active",
-    lastLogin: "2024-04-06 14:30",
+    joinedDate: "01 Jan 2024",
+    lastLogin: "06 Apr 2024, 14:30",
+    lastActive: "09 Apr 2024, 16:45",
   },
   {
     id: "adm_2",
@@ -48,7 +53,9 @@ export const MOCK_ADMINS: Administrator[] = [
     role: "OrgAdmin",
     entity: { id: "org_1", name: "TechCorp Solutions", type: "Organization" },
     status: "Active",
-    lastLogin: "2024-04-05 09:15",
+    joinedDate: "15 Jan 2024",
+    lastLogin: "05 Apr 2024, 09:15",
+    lastActive: "08 Apr 2024, 11:30",
   },
   {
     id: "adm_3",
@@ -57,6 +64,8 @@ export const MOCK_ADMINS: Administrator[] = [
     role: "SPAdmin",
     entity: { id: "sp_1", name: "MediCare Clinic Group", type: "ServiceProvider" },
     status: "Inactive",
-    lastLogin: "2024-03-20 16:45",
+    joinedDate: "10 Feb 2024",
+    lastLogin: "20 Mar 2024, 16:45",
+    lastActive: "24 Mar 2024, 13:10",
   },
 ];

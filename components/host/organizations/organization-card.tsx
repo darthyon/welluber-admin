@@ -99,11 +99,11 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
           {/* Row 1: Employees & Utilization (Paired) */}
           <div className="grid grid-cols-2 gap-4">
             {/* Workforce / Employees */}
-            <div className="space-y-2.5">
-              <div className="flex items-center gap-1.5 text-muted-foreground/30">
-                <Users size={14} weight="bold" />
-                <span className="text-[11px] font-bold tracking-tight text-muted-foreground/40 uppercase">Workforce</span>
-              </div>
+          <div className="space-y-2.5">
+            <div className="flex items-center gap-1.5 text-muted-foreground/40">
+              <Users size={14} weight="bold" />
+              <span className="text-[11px] font-bold text-muted-foreground/60 tracking-tight">Workforce</span>
+            </div>
               <div className="space-y-2">
                 <span className="text-[14px] font-bold text-foreground block">
                   {org.employeeCount.toLocaleString()} <span className="text-[11px] font-normal text-muted-foreground/60">pax</span>
@@ -114,9 +114,9 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
 
             {/* Utilization */}
             <div className="space-y-2.5">
-              <div className="flex items-center gap-1.5 text-muted-foreground/30">
+              <div className="flex items-center gap-1.5 text-muted-foreground/40">
                 <ChartPieSlice size={14} weight="bold" />
-                <span className="text-[11px] font-bold tracking-tight text-muted-foreground/40 uppercase leading-none">Utilisation & Claims</span>
+                <span className="text-[11px] font-bold text-muted-foreground/60 tracking-tight leading-none">Utilisation & Claims</span>
               </div>
               <div className="flex items-center gap-3">
                 <UtilizationChart value={org.utilizationRate} mode="ring" size={44} strokeWidth={4} />
@@ -141,9 +141,9 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
 
           {/* Row 2: Active Policies (Full Width) */}
           <div className="pt-2">
-            <div className="flex items-center gap-1.5 text-muted-foreground/30 mb-3">
+            <div className="flex items-center gap-1.5 text-muted-foreground/40 mb-3">
               <Shield size={14} weight="bold" />
-              <span className="text-[11px] font-bold tracking-tight text-muted-foreground/40 uppercase leading-none">Benefit policies</span>
+              <span className="text-[11px] font-bold text-muted-foreground/60 tracking-tight leading-none">Benefit policies</span>
               <span className="h-2 w-2 rounded-full bg-border flex items-center justify-center">
                 <span className="h-1 w-1 rounded-full bg-muted-foreground/40" />
               </span>
@@ -177,7 +177,7 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
                         onClick={(e) => e.stopPropagation()}
                       >
                         <div className="flex flex-col gap-1.5">
-                          <span className="text-[11px] font-semibold tracking-tight text-muted-foreground/60 px-2 py-1 opacity-80">Benefit policies</span>
+                          <label className="text-[11px] font-semibold text-zinc-500/80 tracking-tight pl-1">Benefit ID</label>
                           <div className="max-h-[160px] overflow-y-auto px-1 space-y-1">
                             {org.policies.slice(3).map((policy, i) => (
                               <div key={i} className="text-[12px] px-2 py-1.5 hover:bg-accent rounded-lg text-foreground/80 transition-colors truncate font-medium">

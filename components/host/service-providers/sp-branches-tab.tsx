@@ -14,6 +14,7 @@ import { SpBranchForm } from "./sp-branch-form";
 import type { ServiceProvider, SpBranch } from "@/types/provider";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ActionPopover } from "@/components/shared/action-popover";
+import { SharedDataTable } from "@/components/shared/data-table";
 import { cn } from "@/lib/utils";
 
 interface SpBranchesTabProps {
@@ -161,68 +162,75 @@ export function SpBranchesTab({ sp }: SpBranchesTabProps) {
             ))}
           </div>
         ) : (
-          <div className="border border-border rounded-lg overflow-hidden bg-card">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-border/50 bg-muted/20">
-                  <th className="font-semibold text-muted-foreground/80 text-[13px] tracking-tight p-4">Branch</th>
-                  <th className="font-semibold text-muted-foreground/80 text-[13px] tracking-tight p-4">Location</th>
-                  <th className="font-semibold text-muted-foreground/80 text-[13px] tracking-tight p-4">Services</th>
-                  <th className="font-semibold text-muted-foreground/80 text-[13px] tracking-tight p-4">Status</th>
-                  <th className="font-semibold text-muted-foreground/80 text-[13px] tracking-tight p-4 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/50">
-                {filteredBranches.map((branch) => (
-                  <tr
-                    key={branch.id}
-                    className="hover:bg-muted/30 transition-colors group cursor-pointer"
-                    onClick={() => handleView(branch)}
-                  >
-                    <td className="p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-muted/60 border border-border/60 text-muted-foreground flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary transition-all duration-300">
-                          <GitBranch size={18} weight="fill" />
-                        </div>
-                        <div>
-                          <p className="text-[13px] font-semibold text-foreground group-hover:text-primary transition-colors">{branch.name}</p>
-                          <p className="text-[11px] font-medium text-muted-foreground">{branch.isActive ? "Active branch" : "Inactive branch"}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="p-4 text-[13px] text-muted-foreground">
-                      {branch.address.city}, {branch.address.state}
-                    </td>
-                    <td className="p-4">
-                      <div className="flex flex-wrap gap-1.5">
-                        {branch.services.slice(0, 2).map((service) => (
-                          <span key={service.service} className="inline-flex items-center px-2 py-0.5 rounded-full bg-muted text-[11px] font-medium text-muted-foreground border border-border">
-                            {service.service}
-                          </span>
-                        ))}
-                        {branch.services.length > 2 && (
-                          <span className="text-[11px] font-medium text-muted-foreground/60">
-                            +{branch.services.length - 2} more
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="p-4">
-                      <StatusBadge status={branch.isActive ? "Active" : "Inactive"} variant={branch.isActive ? "emerald" : "zinc"} />
-                    </td>
-                    <td className="p-4 text-right">
-                      <ActionPopover
-                        actions={[
-                          { label: "View Details", onClick: () => handleView(branch) },
-                          { label: "Edit Branch", onClick: () => handleEdit(branch) },
-                        ]}
-                      />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <SharedDataTable
+            data={filteredBranches}
+            onRowClick={handleView}
+            columns={[
+              {
+                header: "Branch",
+                accessorKey: "name",
+                sortable: true,
+                render: (branch) => (
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-muted/60 border border-border/60 text-muted-foreground flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary transition-all duration-300">
+                      <GitBranch size={18} weight="fill" />
+                    </div>
+                    <div>
+                      <p className="text-[13px] font-semibold text-foreground group-hover:text-primary transition-colors">{branch.name}</p>
+                      <p className="text-[11px] font-medium text-muted-foreground">{branch.isActive ? "Active branch" : "Inactive branch"}</p>
+                    </div>
+                  </div>
+                ),
+              },
+              {
+                header: "Location",
+                render: (branch) => (
+                  <span className="text-[13px] text-muted-foreground">
+                    {branch.address.city}, {branch.address.state}
+                  </span>
+                ),
+              },
+              {
+                header: "Services",
+                render: (branch) => (
+                  <div className="flex flex-wrap gap-1.5">
+                    {branch.services.slice(0, 2).map((service) => (
+                      <span key={service.service} className="inline-flex items-center px-2 py-0.5 rounded-full bg-muted text-[11px] font-medium text-muted-foreground border border-border">
+                        {service.service}
+                      </span>
+                    ))}
+                    {branch.services.length > 2 && (
+                      <span className="text-[11px] font-medium text-muted-foreground/60">
+                        +{branch.services.length - 2} more
+                      </span>
+                    )}
+                  </div>
+                ),
+              },
+              {
+                header: "Status",
+                accessorKey: "isActive",
+                sortable: true,
+                render: (branch) => (
+                  <StatusBadge status={branch.isActive ? "Active" : "Inactive"} variant={branch.isActive ? "emerald" : "zinc"} />
+                ),
+              },
+              {
+                header: "",
+                align: "right",
+                render: (branch) => (
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <ActionPopover
+                      actions={[
+                        { label: "View Details", onClick: () => handleView(branch) },
+                        { label: "Edit Branch", onClick: () => handleEdit(branch) },
+                      ]}
+                    />
+                  </div>
+                ),
+              },
+            ]}
+          />
         )}
       </DetailSection>
     </div>

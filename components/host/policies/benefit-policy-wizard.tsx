@@ -594,7 +594,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
           <div className="space-y-8 p-1">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-3">
-                <label className="text-[11px] font-bold text-muted-foreground/60 uppercase tracking-wider">Employee pool type</label>
+                <label className="text-[11px] font-bold text-muted-foreground/60 tracking-wider">Employee pool type</label>
                 <div className="flex gap-2 p-1 bg-muted rounded-xl">
                   {(["Individual", "Shared"] as const).map((type) => (
                     <button
@@ -606,7 +606,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                 </div>
               </div>
               <div className="space-y-3">
-                <label className="text-[11px] font-bold text-muted-foreground/60 uppercase tracking-wider">Dependent Pool Type</label>
+                <label className="text-[11px] font-bold text-muted-foreground/60 tracking-wider">Dependent Pool Type</label>
                 <div className="flex gap-2 p-1 bg-muted rounded-xl">
                   {(["None", "Individual", "Shared"] as const).map((type) => (
                     <button
@@ -873,7 +873,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 p-1">
               <div className="space-y-1.5 flex-1">
-                <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest pl-1">Policy Name</label>
+                <label className="text-[11px] font-semibold text-zinc-500/80 tracking-tight pl-1">Policy Name</label>
                 <div className={cn(
                   "relative group transition-all",
                   !isGenerated && "opacity-50 grayscale pointer-events-none"
@@ -889,7 +889,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
               </div>
 
               <div className="space-y-1.5 flex-1">
-                <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest pl-1">Benefit ID</label>
+                <label className="text-[11px] font-semibold text-zinc-500/80 tracking-tight pl-1">Benefit ID</label>
                 <input
                   placeholder="e.g. BEN-W-01"
                   className="w-full px-4 py-3 bg-white border border-border rounded-xl text-[14px] outline-none transition-all font-bold font-mono text-zinc-800 focus:ring-4 focus:ring-zinc-500/5 focus:border-zinc-400"
@@ -899,7 +899,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
               </div>
 
               <div className="space-y-1.5 md:col-span-2">
-                <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest pl-1">Suggested Description</label>
+                <label className="text-[11px] font-semibold text-zinc-500/80 tracking-tight pl-1">Suggested Description</label>
                 <div className="relative group">
                   <Quotes size={16} className="absolute left-3 top-4 text-zinc-300" />
                   <textarea
@@ -960,7 +960,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                     </div>
                     <div>
                       <p className="text-[13px] font-bold text-zinc-900">{group.name}</p>
-                      <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-tight">{benefits.filter(b => b.groupId === group.id).length} services</p>
+                      <p className="text-[10px] text-zinc-500 font-bold tracking-tight">{benefits.filter(b => b.groupId === group.id).length} services</p>
                     </div>
                   </div>
                   <div className="text-right">
@@ -971,12 +971,12 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
               
               <div className="mt-4 p-4 rounded-2xl border border-zinc-200/60 bg-transparent flex items-center justify-between">
                 <div>
-                  <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest leading-none">Global Refresh</p>
+                  <p className="text-[11px] font-bold text-zinc-500/80 tracking-tight leading-none">Global Refresh</p>
                   <p className="text-[14px] font-bold text-zinc-900 mt-1">{policyData.refreshCycle}</p>
                 </div>
                 <div className="h-8 w-px bg-zinc-200 mx-2" />
                 <div className="flex-1 text-right">
-                  <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest leading-none">Trigger</p>
+                  <p className="text-[11px] font-bold text-zinc-500/80 tracking-tight leading-none">Trigger</p>
                   <p className="text-[14px] font-bold text-zinc-900 mt-1 truncate">{policyData.activationMode === "JoinDate" ? "On Joining" : "Post-probation"}</p>
                 </div>
               </div>

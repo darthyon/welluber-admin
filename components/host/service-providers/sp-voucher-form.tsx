@@ -21,7 +21,8 @@ import {
   CalendarPlus,
   Clock,
   Stack,
-  Image as ImageIcon
+  Image as ImageIcon,
+  PencilSimpleLine
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { inputCls } from "@/components/shared/styles";
@@ -55,6 +56,7 @@ interface SpVoucherFormProps {
   spBranches: { id: string; name: string }[];
   voucher?: SpVoucher;
   isReadOnly?: boolean;
+  onEdit?: () => void;
   onSuccess: () => void;
   onCancel: () => void;
 }
@@ -65,6 +67,7 @@ export function SpVoucherForm({
   spBranches,
   voucher,
   isReadOnly = false,
+  onEdit,
   onSuccess,
   onCancel,
 }: SpVoucherFormProps) {
@@ -152,7 +155,7 @@ export function SpVoucherForm({
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-400">
       {/* Header */}
-      <div className="flex items-center justify-between pb-4 border-b border-border/60">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-border/60">
         <div className="flex items-center gap-4">
           <button 
             onClick={onCancel}
@@ -165,53 +168,67 @@ export function SpVoucherForm({
               {isReadOnly ? "Voucher Details" : (isEditing ? "Edit Voucher" : "Add Voucher")}
             </h2>
             <p className="text-[13px] text-muted-foreground mt-1">
-              {isEditing 
-                ? "Update pricing, service lines, and activation periods for this voucher."
-                : "Create a new voucher entry for services purchasable on the marketplace."}
+              {isReadOnly 
+                ? "Review the pricing and configuration details for this voucher."
+                : (isEditing 
+                  ? "Update pricing, service lines, and activation periods for this voucher."
+                  : "Create a new voucher entry for services purchasable on the marketplace.")}
             </p>
           </div>
         </div>
         
         <div className="flex items-center gap-3">
-          <Button 
-            variant="ghost" 
-            onClick={onCancel} 
-            disabled={isSubmitting || isPublishing}
-            className="text-muted-foreground font-bold hover:text-foreground hover:bg-muted"
-          >
-            Cancel
-          </Button>
-          
-          {isEditing && voucher?.status === "draft" && !isReadOnly && (
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onPublish}
-              disabled={isSubmitting || isPublishing}
-              className="text-emerald-600 border-emerald-200 hover:bg-emerald-50 font-medium px-6 shadow-sm min-w-[120px] gap-2 rounded-full h-10"
-            >
-              {isPublishing ? (
-                <div className="w-4 h-4 border-2 border-emerald-300 border-t-emerald-600 rounded-full animate-spin" />
-              ) : null}
-              <span>Publish</span>
-            </Button>
-          )}
-
-          {!isReadOnly && (
+          {isReadOnly ? (
             <Button 
-              disabled={isSubmitting || isPublishing}
-              onClick={handleSubmit(onSave)}
-              className="bg-primary text-white hover:bg-primary/90 font-semibold px-8 shadow-sm shadow-primary/20 min-w-[160px] rounded-full h-10 gap-2"
+              variant="secondary" 
+              size="lg" 
+              onClick={onEdit}
+              className="text-[13px] font-bold rounded-full gap-2 transition-all px-6 h-10 border border-border/60"
             >
-              {isSubmitting ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  <span>Saving...</span>
-                </>
-              ) : (
-                isEditing ? "Save Changes" : "Add voucher"
-              )}
+              <PencilSimpleLine size={16} weight="bold" />
+              Edit Voucher
             </Button>
+          ) : (
+            <>
+              <Button 
+                variant="ghost" 
+                onClick={onCancel} 
+                disabled={isSubmitting || isPublishing}
+                className="text-muted-foreground font-bold hover:text-foreground hover:bg-muted h-10 px-5"
+              >
+                Cancel
+              </Button>
+              
+              {isEditing && voucher?.status === "draft" && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={onPublish}
+                  disabled={isSubmitting || isPublishing}
+                  className="text-emerald-600 border-emerald-200 hover:bg-emerald-50 font-medium px-6 shadow-sm min-w-[120px] gap-2 rounded-full h-10"
+                >
+                  {isPublishing ? (
+                    <div className="w-4 h-4 border-2 border-emerald-300 border-t-emerald-600 rounded-full animate-spin" />
+                  ) : null}
+                  <span>Publish</span>
+                </Button>
+              )}
+
+              <Button 
+                disabled={isSubmitting || isPublishing}
+                onClick={handleSubmit(onSave)}
+                className="bg-primary text-white hover:bg-primary/90 font-semibold px-8 shadow-sm shadow-primary/20 min-w-[160px] rounded-full h-10 gap-2"
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <span>Saving...</span>
+                  </>
+                ) : (
+                  isEditing ? "Save Changes" : "Add voucher"
+                )}
+              </Button>
+            </>
           )}
         </div>
       </div>
@@ -235,7 +252,7 @@ export function SpVoucherForm({
                 </div>
               )}
               <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-muted-foreground/40 tracking-tight uppercase">
+                <label className="text-[11px] font-bold text-muted-foreground/40 tracking-tight">
                   Voucher name <span className="text-rose-500">*</span>
                 </label>
                 <input 
@@ -288,7 +305,7 @@ export function SpVoucherForm({
                   >
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-tight">Service</label>
+                        <label className="text-[10px] font-bold text-muted-foreground/40 tracking-tight">Service</label>
                         <SectionedSearchSelect
                           taxonomy={SERVICE_TAXONOMY.filter(cat => spServiceCategories.includes(cat.category))}
                           value={watch(`serviceLines.${i}.service`)}
@@ -302,7 +319,7 @@ export function SpVoucherForm({
                         />
                       </div>
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-tight">Sub-services</label>
+                        <label className="text-[10px] font-bold text-muted-foreground/40 tracking-tight">Sub-services</label>
                         <CustomMultiSelect
                           options={SERVICE_SPEC_TAXONOMY[watch(`serviceLines.${i}.service`)] || []}
                           selected={watch(`serviceLines.${i}.subServices`) || []}
@@ -312,7 +329,7 @@ export function SpVoucherForm({
                         />
                       </div>
                       <div className="space-y-1.5 sm:col-span-2">
-                        <label className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-tight">Voucher features</label>
+                        <label className="text-[10px] font-bold text-muted-foreground/40 tracking-tight">Voucher features</label>
                         <textarea 
                           {...register(`serviceLines.${i}.descriptionList`)} 
                           rows={3} 
@@ -353,7 +370,7 @@ export function SpVoucherForm({
               {/* Activation Period */}
               <div className="space-y-4">
                 <div>
-                  <h4 className="text-[14px] font-bold text-foreground uppercase tracking-tight">Activation period</h4>
+                  <h4 className="text-[14px] font-bold text-foreground tracking-tight">Activation period</h4>
                   <p className="text-[12px] text-muted-foreground/60 mt-0.5">When is this voucher available for purchase?</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -379,7 +396,7 @@ export function SpVoucherForm({
               {/* Redemption Period */}
               <div className="space-y-4">
                 <div>
-                  <h4 className="text-[14px] font-bold text-foreground uppercase tracking-tight">Redemption period</h4>
+                  <h4 className="text-[14px] font-bold text-foreground tracking-tight">Redemption period</h4>
                   <p className="text-[12px] text-muted-foreground/60 mt-0.5">When can customers use this voucher?</p>
                 </div>
 
@@ -407,7 +424,7 @@ export function SpVoucherForm({
                 {redemptionMode === "after_purchase" && (
                   <div className="mt-4 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
                     <div className="flex flex-col gap-2">
-                      <label className="text-[11px] font-bold text-muted-foreground/40 uppercase tracking-tight">Valid for</label>
+                      <label className="text-[11px] font-bold text-muted-foreground/40 tracking-tight">Valid for</label>
                       <div className="flex items-center gap-2">
                         <input
                           type="number"
@@ -431,11 +448,10 @@ export function SpVoucherForm({
 
                 {redemptionMode === "exact_date" && (
                   <div className="mt-4 space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                    <label className="text-[11px] font-bold text-muted-foreground/40 uppercase tracking-tight block">Expiry date</label>
+                    <label className="text-[11px] font-bold text-muted-foreground/40 tracking-tight block">Expiry date</label>
                     <DatePickerField
                       value={watch("redemptionPeriod.date") || ""}
                       onChange={(v: string) => setValue("redemptionPeriod.date", v)}
-                      className="bg-white"
                       clearable
                     />
                   </div>
@@ -496,7 +512,7 @@ export function SpVoucherForm({
 
               {branchScope === "specific" && (
                 <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <label className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-tight">Select branches</label>
+                  <label className="text-[10px] font-bold text-muted-foreground/40 tracking-tight">Select branches</label>
                   <CustomMultiSelect
                     options={spBranches.map(b => b.name)}
                     selected={watch("branchIds").map(id => spBranches.find(b => b.id === id)?.name || id)}
@@ -521,7 +537,7 @@ export function SpVoucherForm({
           >
             <div className="p-1 space-y-5">
               <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-muted-foreground/40 uppercase tracking-tight">Currency</label>
+                <label className="text-[11px] font-bold text-muted-foreground/40 tracking-tight">Currency</label>
                 <select {...register("currency")} className={selectCls()} disabled={isReadOnly}>
                   {Object.entries(CURRENCIES).map(([code, name]) => (
                     <option key={code} value={code}>{code} - {name}</option>
@@ -530,11 +546,11 @@ export function SpVoucherForm({
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-muted-foreground/40 uppercase tracking-tight">Initial price</label>
+                  <label className="text-[11px] font-bold text-muted-foreground/40 tracking-tight">Initial price</label>
                   <input type="number" step="0.01" {...register("initialPrice", { valueAsNumber: true })} className={cn(inputCls(), "font-mono")} disabled={isReadOnly} />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-muted-foreground/40 uppercase tracking-tight">Final price</label>
+                  <label className="text-[11px] font-bold text-muted-foreground/40 tracking-tight">Final price</label>
                   <input type="number" step="0.01" {...register("finalPrice", { valueAsNumber: true })} className={cn(inputCls(!!errors.finalPrice), "font-mono font-bold text-primary bg-primary/5 border-primary/20")} disabled={isReadOnly} />
                 </div>
               </div>

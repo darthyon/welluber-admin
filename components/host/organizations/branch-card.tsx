@@ -78,9 +78,9 @@ export function BranchCard({ branch, onView, onEdit }: BranchCardProps) {
       <div className="mt-auto space-y-4 pt-6 relative z-10">
         <div className="flex items-center justify-between border-t border-border/40 pt-4">
           <div className="flex flex-col gap-1">
-            <span className="text-[11px] font-bold tracking-tight text-muted-foreground/40 uppercase">Wallet model</span>
+            <span className="text-[11px] font-bold text-muted-foreground/60">Wallet model</span>
             <div className="flex items-center gap-1.5 text-[12px] font-semibold text-foreground">
-              <Wallet size={14} weight="duotone" className="text-primary" />
+              <Wallet size={14} weight="bold" className="text-primary" />
               <span>{walletLabel}</span>
               {branch.balance && (
                 <span className="text-muted-foreground font-normal ml-1 border-l border-border pl-2">{branch.balance}</span>
@@ -90,9 +90,9 @@ export function BranchCard({ branch, onView, onEdit }: BranchCardProps) {
           
           {branch.employeesCount && (
             <div className="flex flex-col items-end gap-1 text-right">
-              <span className="text-[11px] font-bold tracking-tight text-muted-foreground/40 uppercase">Workforce</span>
+              <span className="text-[11px] font-bold text-muted-foreground/60">Workforce</span>
               <div className="flex items-center gap-1.5 text-[12px] font-semibold text-foreground">
-                <Users size={14} weight="duotone" className="text-primary" />
+                <Users size={14} weight="bold" className="text-primary" />
                 <span>{branch.employeesCount.toLocaleString()}</span>
               </div>
             </div>
@@ -103,7 +103,7 @@ export function BranchCard({ branch, onView, onEdit }: BranchCardProps) {
           <div className="space-y-2.5 pt-4 border-t border-border/40">
             <div className="flex items-center gap-1.5 text-muted-foreground/30">
               <ChartPieSlice size={14} weight="bold" />
-              <span className="text-[11px] font-bold tracking-tight text-muted-foreground/40 uppercase leading-none">Utilisation & Claims</span>
+              <span className="text-[11px] font-bold text-muted-foreground/60 leading-none">Utilisation & Claims</span>
             </div>
             <div className="flex items-center gap-3">
               <UtilizationChart value={branch.utilizationRate} mode="ring" size={40} strokeWidth={4} />

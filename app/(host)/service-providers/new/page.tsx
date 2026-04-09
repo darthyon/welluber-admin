@@ -319,7 +319,7 @@ export default function NewServiceProviderPage() {
             </div>
             {brandCategories.length > 0 && (
                 <div className="flex flex-wrap gap-1 mb-2">
-                    <span className="text-[10px] uppercase font-bold text-muted-foreground/60 w-full mb-1">Brand Categories</span>
+                    <span className="text-[10px] font-bold text-muted-foreground/60 w-full mb-1">Brand Categories</span>
                     {brandCategories.map(cat => (
                         <Badge key={cat} variant="outline" className="text-[10px] font-medium bg-muted/20">{cat}</Badge>
                     ))}

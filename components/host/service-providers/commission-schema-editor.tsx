@@ -25,9 +25,9 @@ export function CommissionSchemaEditor({ spId, serviceCategories, initialRows }:
     <div className="space-y-4">
       <div className="border border-border rounded-xl overflow-hidden bg-background">
         <div className="grid grid-cols-[200px_1fr_120px] gap-4 px-4 py-3 bg-muted/20 border-b border-border">
-          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-left">Main Service</p>
-          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-left">Commission Tiers</p>
-          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-right">Status</p>
+          <p className="text-[11px] font-bold text-muted-foreground/60 tracking-tight text-left">Starts From (Qty)</p>
+          <p className="text-[11px] font-bold text-muted-foreground/60 tracking-tight text-left">Commission Rate (%)</p>
+          <p className="text-[11px] font-bold text-muted-foreground/60 tracking-tight text-right">Delete</p>
         </div>
 
         <div className="divide-y divide-border/50">
@@ -46,7 +46,7 @@ export function CommissionSchemaEditor({ spId, serviceCategories, initialRows }:
                 <div className="flex flex-wrap gap-2">
                   {row.tiers.map((tier: any, idx: number) => (
                     <div key={idx} className="flex flex-col px-3 py-1.5 bg-muted/30 border border-border/50 rounded-lg min-w-[100px]">
-                      <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-tight">
+                      <span className="text-[10px] text-muted-foreground font-medium tracking-tight">
                         {idx === 0 ? "Base" : `Qty: ${tier.limit}+`}
                       </span>
                       <span className="text-[13px] font-bold text-foreground">

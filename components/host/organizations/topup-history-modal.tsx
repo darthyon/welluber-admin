@@ -74,7 +74,7 @@ export function TopUpHistoryModal({ isOpen, onClose, branchId, branchName }: Top
             </div>
             <div>
               <h3 className="font-semibold text-foreground tracking-tight leading-tight">Top-Up History</h3>
-              <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider mt-0.5">
+              <p className="text-[11px] text-muted-foreground font-medium tracking-wider mt-0.5">
                 {branchName} Wallet Transactions
               </p>
             </div>
@@ -120,12 +120,12 @@ export function TopUpHistoryModal({ isOpen, onClose, branchId, branchName }: Top
             <table className="w-full text-left border-collapse">
               <thead className="sticky top-0 bg-muted/50 backdrop-blur-sm z-10 border-b border-border">
                 <tr>
-                  <th className="px-4 py-3 text-[12px] font-semibold text-muted-foreground/80 tracking-tight uppercase">Paid Date</th>
-                  <th className="px-4 py-3 text-[12px] font-semibold text-muted-foreground/80 tracking-tight uppercase">Amount</th>
-                  <th className="px-4 py-3 text-[12px] font-semibold text-muted-foreground/80 tracking-tight uppercase">Method</th>
-                  <th className="px-4 py-3 text-[12px] font-semibold text-muted-foreground/80 tracking-tight uppercase">Reference</th>
-                  <th className="px-4 py-3 text-[12px] font-semibold text-muted-foreground/80 tracking-tight uppercase text-right">Status</th>
-                  <th className="px-4 py-3 text-[12px] font-semibold text-muted-foreground/80 tracking-tight uppercase text-right">Action</th>
+                  <th className="px-4 py-3 text-[12px] font-semibold text-muted-foreground/80 tracking-tight">Paid Date</th>
+                  <th className="px-4 py-3 text-[12px] font-semibold text-muted-foreground/80 tracking-tight">Amount</th>
+                  <th className="px-4 py-3 text-[12px] font-semibold text-muted-foreground/80 tracking-tight">Method</th>
+                  <th className="px-4 py-3 text-[12px] font-semibold text-muted-foreground/80 tracking-tight">Reference</th>
+                  <th className="px-4 py-3 text-[12px] font-semibold text-muted-foreground/80 tracking-tight text-right">Status</th>
+                  <th className="px-4 py-3 text-[12px] font-semibold text-muted-foreground/80 tracking-tight text-right">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">

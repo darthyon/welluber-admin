@@ -4,6 +4,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Tag, WarningCircle, CheckCircle } from "@phosphor-icons/react";
+import { Switch } from "@/components/shared/switch";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Brand, BrandStatus } from "@/types/brand";
@@ -60,9 +61,9 @@ export function BrandForm({ initialData, onSubmit, isSubmitting }: BrandFormProp
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div className="grid grid-cols-1 gap-6">
-        {/* Brand Name */}
+        {/* Brand name */}
         <div className="space-y-1.5">
-          <label className="text-[13px] font-medium text-foreground">Brand Name</label>
+          <label className="text-xs font-medium text-foreground">Brand name</label>
           <input
             {...register("name")}
             className={inputCls(!!errors.name)}
@@ -75,11 +76,10 @@ export function BrandForm({ initialData, onSubmit, isSubmitting }: BrandFormProp
           )}
         </div>
 
-        {/* Service Categories */}
         <div className="p-4 bg-muted/20 border border-border rounded-xl space-y-4">
           <div className="flex items-center gap-2 pb-1 text-primary">
             <Tag size={16} weight="fill" />
-            <h3 className="text-[13px] font-bold">Service Categories</h3>
+            <h3 className="text-[13px] font-semibold">Service categories</h3>
           </div>
           <Controller
             control={control}
@@ -109,27 +109,38 @@ export function BrandForm({ initialData, onSubmit, isSubmitting }: BrandFormProp
               value={field.value}
               onChange={field.onChange}
               error={errors.logo?.message as string}
-              label="Brand Logo"
+              label="Brand logo"
             />
           )}
         />
 
-        {/* Status Toggle - Only show when editing, as requested */}
+        {/* Brand status - Only show when editing */}
         {initialData && (
           <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border/40">
             <div className="space-y-0.5">
-              <h4 className="text-[13px] font-semibold text-foreground">Activate Brand</h4>
+              <h4 className="text-xs font-semibold text-foreground leading-tight">Brand status</h4>
               <p className="text-[11px] text-muted-foreground opacity-70">
                 Only active brands can have new service providers assigned.
               </p>
             </div>
-            <select
-              {...register("status")}
-              className="bg-background border border-border rounded px-2 py-1 text-[12px] font-medium outline-none"
-            >
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
+            <Controller
+              control={control}
+              name="status"
+              render={({ field }) => (
+                <div className="flex items-center gap-2">
+                  <span className={cn(
+                    "text-[10px] font-bold tracking-tight transition-colors",
+                    field.value === "active" ? "text-emerald-600" : "text-muted-foreground/60"
+                  )}>
+                    {field.value === "active" ? "Active" : "Inactive"}
+                  </span>
+                  <Switch 
+                    checked={field.value === "active"} 
+                    onCheckedChange={(checked) => field.onChange(checked ? "active" : "inactive")}
+                  />
+                </div>
+              )}
+            />
           </div>
         )}
       </div>

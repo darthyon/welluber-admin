@@ -108,12 +108,18 @@ export default function MembersPage() {
       header: "Joined Date",
       accessorKey: "joinedDate",
       sortable: true,
-      headerClassName: "text-right",
-      align: "right",
       render: (row) => (
-        <span className="text-[12px] font-bold text-muted-foreground/50 tracking-tight">{row.joinedDate}</span>
+        <span className="text-[12px] font-medium text-muted-foreground/80 tracking-tight">{row.joinedDate}</span>
       )
-    }
+    },
+    {
+      header: "Last Active",
+      accessorKey: "lastActive",
+      sortable: true,
+      render: (row) => (
+        <span className="text-[12px] font-medium text-muted-foreground/80 tracking-tight">{row.lastActive}</span>
+      )
+    },
   ];
 
   return (

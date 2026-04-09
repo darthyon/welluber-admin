@@ -247,9 +247,10 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
       align: "right",
       render: (org) => (
         <span className="text-[12px] text-muted-foreground font-medium">
-          {new Date(org.createdAt).toLocaleDateString("en-MY", { 
+          {new Date(org.createdAt).toLocaleDateString("en-GB", { 
+            day: "2-digit",
+            month: "short",
             year: "numeric", 
-            month: "short"
           })}
         </span>
       )

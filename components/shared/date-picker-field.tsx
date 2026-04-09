@@ -63,15 +63,15 @@ export function DatePickerField({
             type="button"
             disabled={disabled}
             className={cn(
-              "w-full flex items-center gap-2.5 px-3 py-2 bg-white border border-zinc-200 rounded-lg text-[14px] font-medium text-left transition-all pr-10",
-              "hover:border-zinc-300 focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30",
-              "disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-zinc-50",
-              !selected && "text-zinc-400",
-              selected && "text-zinc-700",
+              "w-full flex items-center gap-2.5 px-3 py-2 bg-background border border-border rounded-lg text-[14px] font-medium text-left transition-all pr-10",
+              "hover:border-foreground/20 focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30",
+              "disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-muted/50",
+              !selected && "text-muted-foreground/60",
+              selected && "text-foreground",
               className
             )}
           >
-            <CalendarBlank size={16} className="text-zinc-400 shrink-0" />
+            <CalendarBlank size={16} className="text-muted-foreground/60 shrink-0" />
             {selected ? format(selected, "dd MMM yyyy") : placeholder}
           </button>
           
@@ -79,7 +79,7 @@ export function DatePickerField({
             <button
               type="button"
               onClick={handleClear}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md hover:bg-zinc-100 text-zinc-400 hover:text-zinc-600 transition-colors"
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md hover:bg-muted text-muted-foreground/60 hover:text-foreground transition-colors"
               title="Clear date"
             >
               <X size={14} weight="bold" />

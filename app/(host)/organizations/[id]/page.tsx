@@ -468,6 +468,22 @@ export default function OrganizationDetailPage() {
                     )
                   },
                   {
+                    header: "Joined Date",
+                    accessorKey: "joinDate",
+                    sortable: true,
+                    render: (admin: any) => (
+                      <span className="text-[12px] font-medium text-muted-foreground/80">{admin.joinDate}</span>
+                    )
+                  },
+                  {
+                    header: "Last Active",
+                    accessorKey: "lastActive",
+                    sortable: true,
+                    render: (admin: any) => (
+                      <span className="text-[12px] font-medium text-muted-foreground/80">{admin.lastActive}</span>
+                    )
+                  },
+                  {
                     header: "Branch",
                     accessorKey: "branchName",
                     sortable: true,
@@ -505,7 +521,7 @@ export default function OrganizationDetailPage() {
                   }
                 ]}
                 data={[
-                  { id: "adm_1", name: "John Doe", email: "john.doe@acme.com", role: "Org Admin", branchName: "ACME HQ", branchId: "br_1", status: "Active" }
+                  { id: "adm_1", name: "John Doe", email: "john.doe@acme.com", role: "Org Admin", joinDate: "12 Oct 2023", lastActive: "09 Apr 2024, 16:30", branchName: "ACME HQ", branchId: "br_1", status: "Active" }
                 ]}
               />
             </DetailSection>
@@ -887,6 +903,18 @@ export default function OrganizationDetailPage() {
                             render: (emp) => <span className="text-[12px] font-semibold px-2 py-0.5 rounded-md bg-zinc-100/80 text-zinc-600 border border-zinc-200">{emp.branch}</span>
                           },
                           {
+                            header: "Joined Date",
+                            accessorKey: "joinDate",
+                            sortable: true,
+                            render: (emp) => <span className="text-[12px] font-medium text-muted-foreground/80">{emp.joinDate}</span>
+                          },
+                          {
+                            header: "Last Active",
+                            accessorKey: "lastActive",
+                            sortable: true,
+                            render: (emp) => <span className="text-[12px] font-medium text-muted-foreground/80">{emp.lastActive}</span>
+                          },
+                          {
                             header: "Policies",
                             render: (emp) => (
                               <div className="flex flex-wrap items-center gap-1 overflow-visible max-w-[280px]">
@@ -987,10 +1015,10 @@ export default function OrganizationDetailPage() {
                           }
                         ]}
                         data={[
-                          { id: "emp_1", name: "Robert Fox", email: "robert.f@acme.com", branch: "ACME HQ", status: "Linked", empCode: "ACM-001", benefitPolicies: [{ policyName: "Wellness Allocation", benefitGroups: ["Gym", "Mental Health"], utilisation: 48 }, { policyName: "Corporate Perks" }] },
-                          { id: "emp_2", name: "Jenny Wilson", email: "jenny.w@acme.com", branch: "ACME Subang Jaya", status: "Linked", empCode: "ACM-042", benefitPolicies: [{ policyName: "Lifestyle Pocket", benefitGroups: ["Food", "Travel"], utilisation: 85 }] },
-                          { id: "emp_3", name: "Dianne Russell", email: "dianne.r@acme.com", branch: "ACME HQ", status: "Pending", empCode: "ACM-156", benefitPolicies: [{ policyName: "Rejuvenation Fund", benefitGroups: ["Spa Sessions", "Massages", "Facials", "Manicures", "Pedicures", "Aromatherapy", "Hot Stone"], utilisation: 15 }] },
-                          { id: "emp_4", name: "Marvin McKinney", email: "marvin@acme.com", branch: "ACME Subang Jaya", status: "Linked", empCode: "ACM-089", benefitPolicies: [{ policyName: "Mental Health Support", benefitGroups: ["Counseling", "Meditation Apps"], utilisation: 12 }, { policyName: "Development Fund"}, { policyName: "WFH Allowance"}, { policyName: "Wellness Extras"}] },
+                          { id: "emp_1", name: "Robert Fox", email: "robert.f@acme.com", branch: "ACME HQ", joinDate: "12 Oct 2023", lastActive: "09 Apr 2024, 17:15", status: "Linked", empCode: "ACM-001", benefitPolicies: [{ policyName: "Wellness Allocation", benefitGroups: ["Gym", "Mental Health"], utilisation: 48 }, { policyName: "Corporate Perks" }] },
+                          { id: "emp_2", name: "Jenny Wilson", email: "jenny.w@acme.com", branch: "ACME Subang Jaya", joinDate: "05 Mar 2024", lastActive: "09 Apr 2024, 16:45", status: "Linked", empCode: "ACM-042", benefitPolicies: [{ policyName: "Lifestyle Pocket", benefitGroups: ["Food", "Travel"], utilisation: 85 }] },
+                          { id: "emp_3", name: "Dianne Russell", email: "dianne.r@acme.com", branch: "ACME HQ", joinDate: "20 May 2026", lastActive: "09 Apr 2024, 10:20", status: "Pending", empCode: "ACM-156", benefitPolicies: [{ policyName: "Rejuvenation Fund", benefitGroups: ["Spa Sessions", "Massages", "Facials", "Manicures", "Pedicures", "Aromatherapy", "Hot Stone"], utilisation: 15 }] },
+                          { id: "emp_4", name: "Marvin McKinney", email: "marvin@acme.com", branch: "ACME Subang Jaya", joinDate: "12 Jan 2024", lastActive: "08 Apr 2024, 14:30", status: "Linked", empCode: "ACM-089", benefitPolicies: [{ policyName: "Mental Health Support", benefitGroups: ["Counseling", "Meditation Apps"], utilisation: 12 }, { policyName: "Development Fund"}, { policyName: "WFH Allowance"}, { policyName: "Wellness Extras"}] },
                         ]}
                       />
                     </TooltipProvider>

@@ -34,6 +34,7 @@ export function SectionedSearchSelect({
   const containerRef = React.useRef<HTMLDivElement>(null);
   const dropdownRef = React.useRef<HTMLDivElement>(null);
   const [dropdownStyle, setDropdownStyle] = React.useState<React.CSSProperties>({});
+  const searchRef = React.useRef<HTMLInputElement>(null);
 
   const filteredTaxonomy = taxonomy.map(cat => ({
     ...cat,
@@ -66,6 +67,7 @@ export function SectionedSearchSelect({
 
   React.useEffect(() => {
     if (!isOpen || !containerRef.current) return;
+    
     const updatePosition = () => {
       const rect = containerRef.current?.getBoundingClientRect();
       if (!rect) return;
@@ -77,12 +79,21 @@ export function SectionedSearchSelect({
         minWidth: "240px",
       });
     };
+
     updatePosition();
+    
+    // Focus after positioning to prevent scroll jump
+    const timer = setTimeout(() => {
+      searchRef.current?.focus({ preventScroll: true });
+    }, 10);
+
     window.addEventListener("resize", updatePosition);
     window.addEventListener("scroll", updatePosition, true);
+    
     return () => {
       window.removeEventListener("resize", updatePosition);
       window.removeEventListener("scroll", updatePosition, true);
+      clearTimeout(timer);
     };
   }, [isOpen]);
 
@@ -93,10 +104,10 @@ export function SectionedSearchSelect({
         onClick={() => !disabled && setIsOpen(!isOpen)}
         disabled={disabled}
         className={cn(
-          "w-full flex items-center justify-between px-4 py-2.5 rounded-xl border bg-white text-[13px] transition-all text-left pr-12",
-          isOpen ? "border-primary ring-2 ring-primary/10" : "border-zinc-200 hover:border-zinc-300",
-          !value && "text-zinc-400",
-          disabled && "opacity-60 cursor-not-allowed bg-zinc-50"
+          "w-full flex items-center justify-between px-4 py-2.5 rounded-xl border bg-background text-[13px] transition-all text-left pr-12",
+          isOpen ? "border-primary ring-2 ring-primary/10" : "border-border hover:border-foreground/20",
+          !value && "text-muted-foreground/40",
+          disabled && "opacity-60 cursor-not-allowed bg-muted"
         )}
       >
         <span className="truncate">{value || placeholder}</span>
@@ -107,27 +118,27 @@ export function SectionedSearchSelect({
           <button
             type="button"
             onClick={handleClear}
-            className="p-1 rounded-md hover:bg-zinc-100 text-zinc-400 hover:text-zinc-600 transition-colors pointer-events-auto"
+            className="p-1 rounded-md hover:bg-muted text-muted-foreground/60 hover:text-foreground transition-colors pointer-events-auto"
             title="Clear selection"
           >
             <X size={12} weight="bold" />
           </button>
         )}
-        <CaretDown size={14} className={cn("text-zinc-400 transition-transform shrink-0", isOpen && "rotate-180", disabled && "opacity-40")} />
+        <CaretDown size={14} className={cn("text-muted-foreground/60 transition-transform shrink-0", isOpen && "rotate-180", disabled && "opacity-40")} />
       </div>
 
       {isOpen && typeof document !== "undefined" && createPortal(
         <div
           ref={dropdownRef}
-          className="z-[1000] overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-2xl animate-in fade-in zoom-in-95 duration-100 flex flex-col"
+          className="z-[1000] overflow-hidden rounded-xl border border-border bg-popover shadow-2xl animate-in fade-in zoom-in-95 duration-100 flex flex-col"
           style={dropdownStyle}
         >
-          <div className="p-2 border-b border-zinc-100 flex items-center gap-2 bg-zinc-50/50">
-            <MagnifyingGlass size={16} className="text-zinc-400 shrink-0" />
+          <div className="p-2 border-b border-border flex items-center gap-2 bg-muted/30">
+            <MagnifyingGlass size={16} className="text-muted-foreground/60 shrink-0" />
             <input
-              autoFocus
+              ref={searchRef}
               type="text"
-              className="w-full bg-transparent border-0 outline-none text-[13px] h-8"
+              className="w-full bg-transparent border-0 outline-none text-[13px] h-8 text-foreground"
               placeholder="Search services..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -137,7 +148,7 @@ export function SectionedSearchSelect({
             {filteredTaxonomy.length > 0 ? (
               filteredTaxonomy.map((group) => (
                 <div key={group.category} className="mb-2 last:mb-0">
-                  <div className="px-3 py-2 text-[10px] font-bold text-zinc-500/60 select-none">
+                  <div className="px-3 py-2 text-[10px] font-bold text-muted-foreground/40 select-none uppercase tracking-wider">
                     {group.category}
                   </div>
                   {group.services.map((opt) => (
@@ -147,7 +158,7 @@ export function SectionedSearchSelect({
                       type="button"
                       className={cn(
                         "w-full text-left px-3 py-2 rounded-lg text-[13px] transition-colors flex items-center justify-between group",
-                        value === opt ? "bg-primary/5 text-primary font-semibold" : "hover:bg-zinc-50 text-zinc-600"
+                        value === opt ? "bg-primary/5 text-primary font-semibold" : "hover:bg-muted text-foreground/80"
                       )}
                     >
                       <span>{opt}</span>
@@ -157,7 +168,7 @@ export function SectionedSearchSelect({
                 </div>
               ))
             ) : (
-              <div className="p-4 text-center text-zinc-400 text-[12px]">
+              <div className="p-4 text-center text-muted-foreground/40 text-[12px]">
                 No services found matching &quot;{query}&quot;
               </div>
             )}

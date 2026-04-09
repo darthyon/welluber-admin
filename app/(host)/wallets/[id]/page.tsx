@@ -377,7 +377,7 @@ export default function WalletDetailPage() {
                      render: (trx: any) => (
                        <div className="text-center">
                          <p className="text-[13px] font-bold text-foreground/80 tracking-tight">
-                           {new Date(trx.createdAt).toLocaleDateString('en-MY', { day: '2-digit', month: 'short', year: 'numeric' })}
+                           {new Date(trx.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                          </p>
                          <p className="text-[11px] font-semibold text-muted-foreground/40">
                            {new Date(trx.createdAt).toLocaleTimeString('en-MY', { hour: '2-digit', minute: '2-digit' })}
@@ -416,8 +416,8 @@ export default function WalletDetailPage() {
                       </div>
                     } 
                   />
-                  <DetailField label="Creation date" value={new Date(wallet.createdAt).toLocaleDateString('en-MY', { day: '2-digit', month: 'short', year: 'numeric' })} />
-                  <DetailField label="Last activity" value={new Date(wallet.updatedAt).toLocaleDateString('en-MY', { day: '2-digit', month: 'short', year: 'numeric' })} />
+                  <DetailField label="Creation date" value={new Date(wallet.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} />
+                  <DetailField label="Last activity" value={new Date(wallet.updatedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} />
                 </div>
               </DetailSection>
 

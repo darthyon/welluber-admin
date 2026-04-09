@@ -101,7 +101,7 @@ export function ServiceToggleCard({
                   className={cn(
                     "inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-lg font-medium border transition-all duration-200 group/badge",
                     isMasterlist 
-                      ? "bg-white text-muted-foreground border-border hover:border-muted-foreground/30" 
+                      ? "bg-muted text-muted-foreground border-border hover:border-muted-foreground/30" 
                       : "bg-primary/[0.04] text-primary border-primary/20 hover:bg-primary/10"
                   )}
                 >
@@ -110,7 +110,7 @@ export function ServiceToggleCard({
                     <button 
                       type="button" 
                       onClick={() => onRemoveSubService(sub)}
-                      className="text-zinc-300 hover:text-destructive transition-colors ml-0.5"
+                      className="text-muted-foreground/40 hover:text-destructive transition-colors ml-0.5"
                     >
                       <Trash size={12} weight="bold" />
                     </button>
@@ -131,14 +131,14 @@ export function ServiceToggleCard({
                   handleAdd();
                 }
               }}
-              className="h-8 w-full px-3 py-1 bg-white border border-zinc-200 rounded-lg text-[12px] outline-none transition-all placeholder:text-zinc-400 focus:border-primary/30 focus:shadow-[0_0_10px_-4px_rgba(var(--primary-rgb),0.1)]"
+              className="h-8 w-full px-3 py-1 bg-background border border-border rounded-lg text-[12px] outline-none transition-all placeholder:text-muted-foreground/40 focus:border-primary/30 focus:shadow-[0_0_10px_-4px_rgba(var(--primary-rgb),0.1)]"
               placeholder={placeholder || `Add custom sub-service...`}
             />
             <Button 
               type="button" 
               variant="outline" 
               size="icon" 
-              className="h-8 w-8 px-0 border-zinc-200 text-zinc-400 bg-white hover:text-primary hover:border-primary/30 transition-all shrink-0"
+              className="h-8 w-8 px-0 border-border text-muted-foreground/60 bg-background hover:text-primary hover:border-primary/30 transition-all shrink-0"
               onClick={handleAdd}
             >
               <Plus size={14} weight="bold" />

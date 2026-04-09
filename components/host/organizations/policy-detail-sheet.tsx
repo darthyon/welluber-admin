@@ -41,9 +41,9 @@ export function PolicyDetailSheet({ isOpen, onClose, policy, groups, benefits, o
              <div>
                <h3 className="text-xl font-bold text-foreground tracking-tight">{policy.name}</h3>
                <div className="flex items-center gap-3 mt-1">
-                 <span className="text-[11px] font-mono text-muted-foreground/40 uppercase tracking-widest leading-none">{policy.code}</span>
+                 <span className="text-[11px] font-mono text-muted-foreground/50 tracking-tight leading-none">{policy.code}</span>
                  <div className="w-1.5 h-1.5 rounded-full bg-muted" />
-                 <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 font-bold uppercase text-[10px] tracking-wider h-5">
+                 <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 font-bold text-[10px] tracking-wider h-5">
                    {policy.status}
                  </Badge>
                </div>

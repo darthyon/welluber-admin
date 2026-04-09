@@ -113,7 +113,7 @@ export async function inviteSpAdmin(spId: string, data: InviteSpAdminData) {
   return {
     success: true,
     message: `Invite sent to ${data.email}. They can activate within 60 minutes.`,
-    data: { token: mockToken, expiresIn: "60 minutes" },
+    data: { token: mockToken, expiresIn: "60 minutes", ...data },
   };
 }
 

@@ -98,15 +98,15 @@ export function SpBranchDetailView({ branch, serviceCategories, onBack, onEdit }
 
             {/* Branch Quick Stats (Matching Org Detail) */}
             <div className="bg-primary/95 dark:bg-primary/20 rounded-xl p-6 text-primary-foreground dark:text-primary overflow-hidden relative group border border-primary/20 shadow-lg shadow-primary/5">
-              <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-white/10 dark:bg-primary/20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-1000" />
+              <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-primary-foreground/10 dark:bg-primary/20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-1000" />
               <h4 className="text-[15px] font-bold mb-2 tracking-tight">Branch quick stats</h4>
               <div className="space-y-4 relative z-10">
                 <div>
-                  <p className="text-[11px] font-bold opacity-70 tracking-tight text-white/70 dark:text-primary/70">Services Active</p>
+                  <p className="text-[11px] font-bold opacity-70 tracking-tight">Services Active</p>
                   <p className="text-xl font-bold">{serviceCount}</p>
                 </div>
                 <div>
-                  <p className="text-[11px] font-bold opacity-70 tracking-tight text-white/70 dark:text-primary/70">Daily Availability</p>
+                  <p className="text-[11px] font-bold opacity-70 tracking-tight">Daily Availability</p>
                   <p className="text-xl font-bold">100%</p>
                 </div>
               </div>

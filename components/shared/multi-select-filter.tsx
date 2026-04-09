@@ -57,7 +57,7 @@ export function MultiSelectFilter({
           <div className="flex flex-col max-h-[450px]">
              {/* Integrated Header */}
              <div className="px-4 py-3 border-b border-border/50 bg-muted/10">
-               <h4 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 flex items-center gap-2">
+               <h4 className="text-[11px] font-bold tracking-tight text-muted-foreground/60 flex items-center gap-2">
                  <Heartbeat size={14} weight="bold" className="text-primary" />
                  Select {pluralLabel.charAt(0).toUpperCase() + pluralLabel.slice(1)}
                </h4>

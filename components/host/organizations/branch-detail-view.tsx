@@ -287,7 +287,7 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
                   </div>
                   
                   <div className="text-right">
-                    <p className="text-[11px] font-bold tracking-tight text-muted-foreground/60 mb-1 uppercase">Available balance</p>
+                    <p className="text-[11px] font-bold tracking-tight text-muted-foreground/60 mb-1">Available balance</p>
                     <p className="text-2xl font-bold text-foreground tracking-tight">RM 45,000.00</p>
                     
                     <div className="flex items-center justify-end gap-2 mt-3">

@@ -101,7 +101,7 @@ export function OverflowTags({ items, className }: OverflowTagsProps) {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex flex-col gap-0.5 py-1">
-                <span className="text-[10px] font-semibold text-zinc-400 px-2 py-0.5">
+                <span className="text-[10px] font-semibold text-muted-foreground/60 px-2 py-0.5 uppercase tracking-wider">
                   More items
                 </span>
                 {hiddenItems.map((item, i) => (

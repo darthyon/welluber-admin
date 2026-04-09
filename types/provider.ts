@@ -43,6 +43,7 @@ export interface SpAdmin {
   email: string;
   status: SpAdminStatus;
   invitedAt: ISODate;
+  branchIds: string[];
 }
 
 // ─── SP Branch ────────────────────────────────────────────────────────────────

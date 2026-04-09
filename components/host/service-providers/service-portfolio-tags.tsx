@@ -115,7 +115,7 @@ export function ServicePortfolioTags({ mainServices, className }: ServicePortfol
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="flex flex-col gap-0.5 py-1">
-                  <span className="text-[9px] font-semibold text-zinc-400 px-2 py-1 uppercase tracking-wider">
+                  <span className="ml-2 inline-flex items-center gap-1 text-[10px] font-bold text-primary/70 tracking-tighter bg-primary/5 px-1.5 py-0.5 rounded border border-primary/10">
                     Other Main Services
                   </span>
                   <div className="max-h-[300px] overflow-y-auto">
@@ -135,7 +135,7 @@ export function ServicePortfolioTags({ mainServices, className }: ServicePortfol
                               </span>
                             ))}
                             {item.subServices.length > 4 && (
-                              <span className="text-[9px] text-muted-foreground/40 italic">+{item.subServices.length - 4} more</span>
+                              <span className="text-[10px] font-bold text-muted-foreground/60 w-full mb-1">+{item.subServices.length - 4} more</span>
                             )}
                           </div>
                         )}

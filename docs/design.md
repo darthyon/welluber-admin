@@ -92,6 +92,8 @@ WellUber Admin is a **B2B SaaS admin console** for managing corporate wellness b
 - **Three weights:** 400 (read), 500 (navigate/interact), 600 (announce/title)
 - Never use `font-bold` (700) in the admin UI. 600 is the max.
 - `tracking-tight` on page titles only. Body runs at normal tracking.
+- **Lowercase Priority:** Avoid `uppercase` Tailwind class for all UI labels, metadata, and secondary text. All labels should use standard sentence-case or title-case to maintain a modern, readable aesthetic.
+- **Sidebar Exception:** Typography for sidebar section headers (`SidebarGroupLabel`) is the only permitted use of `uppercase` to maintain structural hierarchy.
 - Geist Mono for any code, technical IDs, or monetary values.
 
 ---
@@ -198,6 +200,7 @@ WellUber Admin is a **B2B SaaS admin console** for managing corporate wellness b
 - Use warm-stone border tokens — the subtle warmth distinguishes WellUber from cold grays
 - Use `tracking-tight` on page headings — creates the Vercel-level compression
 - Keep the primary indigo for CTAs and primary actions only — everything else is neutral
+- Use `uppercase` ONLY for sidebar section labels
 
 ### Don't
 - Don't use `font-bold` (700) — max weight is 600 (semibold)

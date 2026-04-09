@@ -90,7 +90,7 @@ export function SpDataTable({ data }: SpDataTableProps) {
       align: "right",
       render: (sp) => (
         <span className="text-[12px] text-muted-foreground font-medium">
-          {new Date(sp.createdAt).toLocaleDateString("en-MY", { year: "numeric", month: "short" })}
+          {new Date(sp.createdAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
         </span>
       ),
     },

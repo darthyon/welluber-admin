@@ -135,14 +135,6 @@ export function BrandDetailView({ brand, onBack, onEdit, onRemove }: BrandDetail
               <div className="flex items-center gap-3">
                 <h2 className="text-2xl font-bold tracking-tight text-foreground">{brand.name}</h2>
                 <StatusBadge status={currentStatus} variant={currentStatus === "active" ? "emerald" : "zinc"} />
-                
-                <div className="flex items-center gap-2 ml-2 px-2.5 py-1 bg-muted/40 rounded-lg border border-border/40">
-                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">Active Status</span>
-                  <Switch 
-                    checked={currentStatus === "active"} 
-                    onCheckedChange={(checked) => setCurrentStatus(checked ? "active" : "inactive")}
-                  />
-                </div>
               </div>
               <p className="text-[14px] text-muted-foreground mt-1 font-medium">
                 {brand.assignedSpCount} Service Providers Assigned
@@ -164,7 +156,10 @@ export function BrandDetailView({ brand, onBack, onEdit, onRemove }: BrandDetail
             <ActionPopover 
               align="end"
               actions={[
-                { label: "Deactivate Brand", onClick: () => console.log("Deactivate") },
+                { 
+                  label: currentStatus === "active" ? "Mark as inactive" : "Mark as active", 
+                  onClick: () => setCurrentStatus(currentStatus === "active" ? "inactive" : "active") 
+                },
                 { label: "Delete Brand", isDanger: true, onClick: () => onRemove() },
               ]}
             />
@@ -200,7 +195,7 @@ export function BrandDetailView({ brand, onBack, onEdit, onRemove }: BrandDetail
             />
             <DetailField 
               label="Creation Date" 
-              value={new Date(brand.createdAt).toLocaleDateString("en-MY", { day: "numeric", month: "long", year: "numeric" })}
+              value={new Date(brand.createdAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
               icon={<Plus size={16} />}
             />
           </div>

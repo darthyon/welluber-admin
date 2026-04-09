@@ -99,7 +99,7 @@ export function LinkPolicyModal({ isOpen, onClose, onLink }: LinkPolicyModalProp
                         <p className={cn("text-[14px] font-bold transition-colors", isSelected ? "text-primary" : "text-foreground")}>
                           {policy.name}
                         </p>
-                        <p className="text-[11px] font-mono text-muted-foreground/40 uppercase tracking-widest leading-none">
+                        <p className="text-[11px] font-mono text-muted-foreground/50 tracking-tight leading-none">
                           {policy.code}
                         </p>
                       </div>

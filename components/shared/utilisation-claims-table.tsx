@@ -130,7 +130,7 @@ export function UtilisationClaimsTable({ data }: Props) {
                 {/* Claims sub-header */}
                 <div className="grid grid-cols-[140px_1fr_1fr_1fr_110px_90px] gap-3 px-10 py-2.5 border-b border-border/40">
                   {["Voucher", "Service", "Provider", "Location", "Date", "Amount"].map((h) => (
-                    <p key={h} className="text-[11px] font-bold text-muted-foreground/60 uppercase tracking-wider">{h}</p>
+                    <p key={h} className="text-[11px] font-bold text-muted-foreground/60 font-sans">{h}</p>
                   ))}
                 </div>
 

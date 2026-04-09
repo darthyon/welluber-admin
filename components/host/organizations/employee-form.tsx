@@ -445,7 +445,7 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
             <div key={idx} className="p-4 rounded-xl border border-border bg-card shadow-sm flex items-start justify-between gap-4 animate-in fade-in slide-in-from-top-2 hover:border-primary/20 transition-all">
               <div className="flex-1 grid grid-cols-2 gap-4">
                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-muted-foreground/60 tracking-tight uppercase">Select benefit policy</label>
+                    <label className="text-[10px] font-bold text-muted-foreground/60 tracking-tight">Select benefit policy</label>
                     <select 
                       className="w-full px-3 py-2 bg-background border border-border/80 rounded-lg text-[13px] font-bold text-foreground outline-none focus:ring-2 focus:ring-primary/10 transition-all"
                       value={assigned.policyId}
@@ -462,7 +462,7 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
                     </select>
                  </div>
                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-muted-foreground/60 tracking-tight uppercase">Select benefit group</label>
+                    <label className="text-[10px] font-bold text-muted-foreground/60 tracking-tight">Select benefit group</label>
                     <select 
                       className="w-full px-3 py-2 bg-background border border-border/80 rounded-lg text-[13px] font-bold text-foreground outline-none focus:ring-2 focus:ring-primary/10 transition-all"
                       value={assigned.benefitGroupId}
@@ -506,7 +506,7 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
           {dependents.map((dep) => (
              <div key={dep.id} className="p-5 rounded-2xl border border-border/80 bg-muted/5 space-y-5 animate-in fade-in zoom-in-95 hover:border-primary/20 transition-all">
                 <div className="flex items-center justify-between">
-                   <span className="text-[10px] font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-full uppercase tracking-wider">Dependent unit</span>
+                   <span className="text-[10px] font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-full tracking-wider">Dependent unit</span>
                    <button onClick={() => removeDependent(dep.id)} className="text-muted-foreground/30 hover:text-rose-500 transition-colors">
                      <Trash size={16} />
                    </button>
@@ -514,7 +514,7 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
                 
                 <div className="grid grid-cols-2 gap-5">
                   <div className="space-y-1.5 col-span-2 sm:col-span-1">
-                    <label className="text-[11px] font-bold text-muted-foreground/60 tracking-tight uppercase">Relationship</label>
+                    <label className="text-[11px] font-bold text-muted-foreground/60 tracking-tight">Relationship</label>
                     <select 
                       value={dep.relationship}
                       onChange={(e) => updateDependent(dep.id, 'relationship', e.target.value)}
@@ -524,7 +524,7 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
                     </select>
                   </div>
                   <div className="space-y-1.5 col-span-2 sm:col-span-1">
-                    <label className="text-[11px] font-bold text-muted-foreground/60 tracking-tight uppercase">Full name</label>
+                    <label className="text-[11px] font-bold text-muted-foreground/60 tracking-tight">Full name</label>
                     <input 
                       value={dep.name}
                       onChange={(e) => updateDependent(dep.id, 'name', e.target.value)}
@@ -533,7 +533,7 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-muted-foreground/60 tracking-tight uppercase">Email address</label>
+                    <label className="text-[11px] font-bold text-muted-foreground/60 tracking-tight">Email address</label>
                     <input 
                       value={dep.email}
                       onChange={(e) => updateDependent(dep.id, 'email', e.target.value)}
@@ -542,7 +542,7 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-muted-foreground/60 tracking-tight uppercase">Phone number</label>
+                    <label className="text-[11px] font-bold text-muted-foreground/60 tracking-tight">Phone number</label>
                     <input 
                       value={dep.phone}
                       onChange={(e) => updateDependent(dep.id, 'phone', e.target.value)}

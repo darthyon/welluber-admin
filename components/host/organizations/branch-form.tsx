@@ -129,7 +129,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
           >
             <div className="space-y-5 p-1">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-tight">Branch Name</label>
+                <label className="text-[10px] font-bold text-muted-foreground/40 tracking-tight">Branch Name</label>
                 <input 
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -140,7 +140,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-tight">Branch Type</label>
+                  <label className="text-[10px] font-bold text-muted-foreground/40 tracking-tight">Branch Type</label>
                   <select 
                     value={formData.type}
                     onChange={(e) => setFormData({ ...formData, type: e.target.value })}
@@ -151,7 +151,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-tight">Status</label>
+                  <label className="text-[10px] font-bold text-muted-foreground/40 tracking-tight">Status</label>
                   <div className="h-[38px] flex items-center px-3 bg-muted/20 border border-border rounded-lg text-[13px] text-muted-foreground font-medium">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 mr-2 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
                     Pending activation
@@ -263,7 +263,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
           </DetailSection>
           
           <div className="p-4 rounded-xl border border-border bg-card shadow-sm space-y-4">
-            <h4 className="text-[13px] font-bold text-muted-foreground/40 tracking-tight uppercase">Branch setup guide</h4>
+            <h4 className="text-[13px] font-bold text-muted-foreground/40 tracking-tight">Branch setup guide</h4>
             <div className="space-y-3">
               {[
                 { label: "Identity Verified", status: true },

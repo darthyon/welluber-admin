@@ -110,7 +110,7 @@ export function ManualTopUpModal({
             </div>
             <div>
               <h3 className="font-semibold text-foreground tracking-tight leading-tight">Manual Top-Up</h3>
-              <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider mt-0.5">
+              <p className="text-[11px] text-muted-foreground font-medium tracking-wider mt-0.5">
                 {orgName} • {branchName}
               </p>
             </div>
@@ -135,7 +135,7 @@ export function ManualTopUpModal({
             <form id="manualTopupForm" onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5 col-span-2 sm:col-span-1">
-                  <label className="text-[12px] font-semibold text-muted-foreground/80 tracking-tight uppercase">Amount (Credit)</label>
+                  <label className="text-[12px] font-semibold text-muted-foreground/80 tracking-tight">Amount (Credit)</label>
                   <div className="relative">
                     <CurrencyDollar size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                     <input 
@@ -158,7 +158,7 @@ export function ManualTopUpModal({
                 </div>
 
                 <div className="space-y-1.5 col-span-2 sm:col-span-1">
-                  <label className="text-[12px] font-semibold text-muted-foreground/80 tracking-tight uppercase">Payment Method</label>
+                  <label className="text-[12px] font-semibold text-muted-foreground/80 tracking-tight">Payment Method</label>
                   <div className="relative">
                     <Bank size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                     <select 
@@ -174,7 +174,7 @@ export function ManualTopUpModal({
                 </div>
 
                 <div className="space-y-1.5 col-span-2">
-                  <label className="text-[12px] font-semibold text-muted-foreground/80 tracking-tight uppercase">Paid Date</label>
+                  <label className="text-[12px] font-semibold text-muted-foreground/80 tracking-tight">Paid Date</label>
                   <div className="relative">
                     <CalendarBlank size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                     <Controller
@@ -201,7 +201,7 @@ export function ManualTopUpModal({
                 </div>
 
                 <div className="space-y-1.5 col-span-2">
-                  <label className="text-[12px] font-semibold text-muted-foreground/80 tracking-tight uppercase">Remarks</label>
+                  <label className="text-[12px] font-semibold text-muted-foreground/80 tracking-tight">Remarks</label>
                   <textarea 
                     {...register("remarks")}
                     className="w-full px-3 py-2 bg-background border border-border rounded-md text-[13px] outline-none focus:border-foreground/30 focus:bg-muted/30 transition-colors resize-none"
@@ -212,7 +212,7 @@ export function ManualTopUpModal({
 
                 {/* Attachment Upload */}
                 <div className="space-y-1.5 col-span-2">
-                  <label className="text-[12px] font-semibold text-muted-foreground/80 tracking-tight uppercase">
+                  <label className="text-[12px] font-semibold text-muted-foreground/80 tracking-tight">
                     Attachment <span className="text-destructive">*</span>
                   </label>
                   

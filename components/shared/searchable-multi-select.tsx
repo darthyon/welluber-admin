@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { createPortal } from "react-dom";
-import { X, MagnifyingGlass, Check, CaretDown } from "@phosphor-icons/react";
+import { X, Check } from "@phosphor-icons/react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
@@ -17,6 +17,7 @@ interface SearchableMultiSelectProps {
   onChange: (selected: string[]) => void;
   placeholder?: string;
   isInline?: boolean;
+  staticOptions?: string[];
 }
 
 export function SearchableMultiSelect({ 
@@ -24,7 +25,8 @@ export function SearchableMultiSelect({
   selected, 
   onChange,
   placeholder = "Search services...",
-  isInline = false
+  isInline = false,
+  staticOptions = []
 }: SearchableMultiSelectProps) {
   const [query, setQuery] = React.useState("");
   const [isOpen, setIsOpen] = React.useState(false);
@@ -33,6 +35,10 @@ export function SearchableMultiSelect({
   const [dropdownStyle, setDropdownStyle] = React.useState<React.CSSProperties>({});
 
   // Filter logic for sectioned taxonomy
+  const filteredStaticOptions = staticOptions.filter(opt => 
+    opt.toLowerCase().includes(query.toLowerCase()) && !selected.includes(opt)
+  );
+
   const filteredTaxonomy = taxonomy.map(cat => ({
     ...cat,
     services: cat.services.filter(s => 
@@ -92,7 +98,74 @@ export function SearchableMultiSelect({
     };
   }, [isInline, isOpen, query, selected.length]);
 
-  const showList = isInline || (isOpen && (query.length > 0 || filteredTaxonomy.length > 0));
+  const showList = isInline || (isOpen && (query.length > 0 || filteredTaxonomy.length > 0 || filteredStaticOptions.length > 0));
+
+  const renderDropdownContent = () => (
+    <div className="p-1">
+      {/* Header with Clear All only */}
+      {(taxonomy.length > 0 || staticOptions.length > 0) && (
+        <div className="flex items-center justify-between px-2 py-1.5 border-b border-border/50 mb-1">
+          <span className="text-[10px] font-bold text-muted-foreground tracking-tight">
+            {query ? "Filtered Results" : title}
+          </span>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => onChange([])}
+              className="text-[10px] font-bold text-rose-500 hover:text-rose-600 transition-colors"
+            >
+              Clear All
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Static Options Section */}
+      {filteredStaticOptions.length > 0 && (
+        <div className="mb-2 p-1 border-b border-border/40 pb-2">
+          {filteredStaticOptions.map((opt) => (
+            <button
+              key={opt}
+              onClick={() => toggleOption(opt)}
+              type="button"
+              className="w-full text-left px-3 py-1.5 rounded-lg text-[13px] hover:bg-muted/50 transition-colors flex items-center justify-between group font-semibold text-primary"
+            >
+              <span>{opt}</span>
+              <Check size={14} className="opacity-0 group-hover:opacity-40" />
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Filtered Taxonomy Section */}
+      {filteredTaxonomy.length > 0 ? (
+        filteredTaxonomy.map((group) => (
+          <div key={group.category} className="mb-2">
+            {(taxonomy.length > 1 || staticOptions.length > 0) && (
+              <div className="px-3 py-1.5 text-[10px] font-bold tracking-tight text-muted-foreground/50 select-none">
+                {group.category}
+              </div>
+            )}
+            {group.services.map((opt) => (
+              <button
+                key={opt}
+                onClick={() => toggleOption(opt)}
+                type="button"
+                className="w-full text-left px-3 py-1.5 rounded-lg text-[13px] hover:bg-muted/50 transition-colors flex items-center justify-between group font-normal"
+              >
+                <span>{opt}</span>
+                <Check size={14} className="opacity-0 group-hover:opacity-40" />
+              </button>
+            ))}
+          </div>
+        ))
+      ) : filteredStaticOptions.length === 0 && (
+        <div className="p-4 text-center text-muted-foreground text-[12px]">
+          {query ? `No results found matching "${query}"` : "Search to narrow down options"}
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <div className={cn("relative w-full", !isInline && isOpen && "z-50")} ref={containerRef}>
@@ -128,34 +201,7 @@ export function SearchableMultiSelect({
         {showList && (
           isInline ? (
             <div className="max-h-[300px] mt-0 overflow-y-auto">
-              <div className="p-1">
-                {filteredTaxonomy.length > 0 ? (
-                  filteredTaxonomy.map((group) => (
-                    <div key={group.category} className="mb-2">
-                      {taxonomy.length > 1 && (
-                        <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 select-none">
-                          {group.category}
-                        </div>
-                      )}
-                      {group.services.map((opt) => (
-                        <button
-                          key={opt}
-                          onClick={() => toggleOption(opt)}
-                          type="button"
-                          className="w-full text-left px-3 py-1.5 rounded-lg text-[13px] hover:bg-muted/50 transition-colors flex items-center justify-between group font-normal"
-                        >
-                          <span>{opt}</span>
-                          <Check size={14} className="opacity-0 group-hover:opacity-40" />
-                        </button>
-                      ))}
-                    </div>
-                  ))
-                ) : (
-                  <div className="p-4 text-center text-muted-foreground text-[12px]">
-                    {query ? `No services found matching "${query}"` : "Search to narrow down services"}
-                  </div>
-                )}
-              </div>
+              {renderDropdownContent()}
             </div>
           ) : typeof document !== "undefined" ? createPortal(
             <div
@@ -163,34 +209,7 @@ export function SearchableMultiSelect({
               className="z-[1000] max-h-[400px] overflow-y-auto rounded-xl border border-border bg-card shadow-2xl animate-in fade-in zoom-in-95 duration-100"
               style={dropdownStyle}
             >
-              <div className="p-1">
-                {filteredTaxonomy.length > 0 ? (
-                  filteredTaxonomy.map((group) => (
-                    <div key={group.category} className="mb-2">
-                      {taxonomy.length > 1 && (
-                        <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 select-none">
-                          {group.category}
-                        </div>
-                      )}
-                      {group.services.map((opt) => (
-                        <button
-                          key={opt}
-                          onClick={() => toggleOption(opt)}
-                          type="button"
-                          className="w-full text-left px-3 py-1.5 rounded-lg text-[13px] hover:bg-muted/50 transition-colors flex items-center justify-between group font-normal"
-                        >
-                          <span>{opt}</span>
-                          <Check size={14} className="opacity-0 group-hover:opacity-40" />
-                        </button>
-                      ))}
-                    </div>
-                  ))
-                ) : (
-                  <div className="p-4 text-center text-muted-foreground text-[12px]">
-                    {query ? `No services found matching "${query}"` : "Search to narrow down services"}
-                  </div>
-                )}
-              </div>
+              {renderDropdownContent()}
             </div>,
             document.body
           ) : null

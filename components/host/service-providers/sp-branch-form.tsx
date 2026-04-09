@@ -250,7 +250,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                 {(serviceCatalog as any[]).map((group: any) => (
                   <div key={group.category} className="space-y-3">
                     <div className="flex items-center justify-between px-1">
-                      <h4 className="text-[12px] font-bold text-muted-foreground uppercase tracking-wider">{group.category}</h4>
+                      <h4 className="text-[12px] font-bold text-muted-foreground tracking-wider">{group.category}</h4>
                       <span className="text-[10px] font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
                         {group.services.filter((s: any) => selectedServices.some(ls => ls.service === s.name)).length} Main Services
                       </span>
@@ -347,15 +347,15 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                 >
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-tight">Name</label>
+                      <label className="text-[11px] font-semibold text-muted-foreground tracking-tight">Name</label>
                       <input {...register(`contacts.${i}.name`)} className={inputCls(!!(errors.contacts as any)?.[i]?.name)} placeholder="Full name" />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-tight">Corporate Email</label>
+                      <label className="text-[11px] font-semibold text-muted-foreground tracking-tight">Corporate Email</label>
                       <input type="email" {...register(`contacts.${i}.email`)} className={inputCls(!!(errors.contacts as any)?.[i]?.email)} placeholder="name@company.com" />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-tight">Role</label>
+                      <label className="text-[11px] font-semibold text-muted-foreground tracking-tight">Role</label>
                       <select {...register(`contacts.${i}.type`)} className={cn(inputCls(), "appearance-none cursor-pointer bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236b7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1.25rem_1.25rem] bg-[right_0.5rem_center] bg-no-repeat pr-10")}>
                         {BRANCH_CONTACT_TYPES.map((t) => (
                           <option key={t.value} value={t.value}>{t.label}</option>
@@ -363,7 +363,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                       </select>
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-tight">Phone</label>
+                      <label className="text-[11px] font-semibold text-muted-foreground tracking-tight">Phone</label>
                       <input {...register(`contacts.${i}.phone`)} className={inputCls()} placeholder="+601XXXXXXXX" />
                     </div>
                   </div>

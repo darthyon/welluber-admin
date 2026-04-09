@@ -165,7 +165,7 @@ export default function ServiceProviderDetailPage() {
                   />
                 </div>
                 <div className="flex items-center gap-3 text-[13px] text-muted-foreground">
-                  <span className="font-mono text-[11px] text-zinc-400 bg-white px-2 py-0.5 rounded border border-zinc-200 uppercase tracking-widest">
+                  <span className="font-mono text-[11px] text-muted-foreground/60 bg-muted px-2 py-0.5 rounded border border-border tracking-widest">
                     {sp.registrationNo}
                   </span>
                 </div>
@@ -257,7 +257,7 @@ export default function ServiceProviderDetailPage() {
                     />
                   }
                 />
-                <DetailField label="On Platform Since" value={new Date(sp.createdAt).toLocaleDateString("en-MY", { year: "numeric", month: "long", day: "numeric" })} />
+                <DetailField label="On Platform Since" value={new Date(sp.createdAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })} />
               </div>
             </DetailSection>
  
@@ -344,10 +344,10 @@ export default function ServiceProviderDetailPage() {
                 {(sp.documents || []).length > 0 ? (
                   sp.documents?.map((doc, i) => (
                     <div key={i} className="flex items-center gap-3 p-3 bg-muted/20 border border-border rounded-xl">
-                      <div className="w-9 h-9 rounded-lg bg-white border border-zinc-100 flex items-center justify-center text-zinc-400">
+                      <div className="w-9 h-9 rounded-lg bg-muted border border-border flex items-center justify-center text-muted-foreground/60">
                         <Files size={18} weight="duotone" />
                       </div>
-                      <div className="flex-1 overflow-hidden">
+                    <div className="flex-1 overflow-hidden">
                         <p className="text-[12px] font-bold text-foreground truncate">{doc}</p>
                         <p className="text-[10px] text-muted-foreground font-medium">Document attached</p>
                       </div>
@@ -399,12 +399,37 @@ export default function ServiceProviderDetailPage() {
                         ),
                       },
                       {
-                        header: "Role",
+                        header: "User Type",
                         render: () => <span className="text-[13px] text-muted-foreground">SP Admin</span>,
                       },
                       {
-                        header: "Branch",
-                        render: () => <span className="text-[13px] text-muted-foreground">{adminBranchLabel}</span>,
+                        header: "Branches",
+                        render: (admin: any) => {
+                          if (admin.branchIds && admin.branchIds.length > 0) {
+                            if (admin.branchIds.includes("all")) {
+                              return <span className="text-[13px] text-muted-foreground">All Branches</span>;
+                            }
+
+                            const branchNames = admin.branchIds.map((id: string) => {
+                              const branch = sp.branches.find((b) => b.id === id || b.name === id);
+                              return branch?.name ?? id;
+                            });
+                            
+                            if (branchNames.length <= 2) {
+                              return <span className="text-[13px] text-muted-foreground">{branchNames.join(", ")}</span>;
+                            }
+                            return (
+                              <span className="text-[13px] text-muted-foreground">
+                                {branchNames.length} Branches
+                              </span>
+                            );
+                          }
+                          return (
+                            <span className="text-[13px] text-muted-foreground">
+                              {sp.branches.length > 1 ? "All Branches" : sp.branches[0]?.name ?? "All Branches"}
+                            </span>
+                          );
+                        },
                       },
                       {
                         header: "Status",
@@ -576,6 +601,7 @@ export default function ServiceProviderDetailPage() {
         <SpInviteAdminModal
           spId={spId}
           spName={sp.name}
+          branches={sp.branches}
           existingEmails={sp.admins.map((a) => a.email.toLowerCase())}
           onClose={() => setIsInviteModalOpen(false)}
         />

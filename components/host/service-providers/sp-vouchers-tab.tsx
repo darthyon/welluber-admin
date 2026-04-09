@@ -11,6 +11,7 @@ import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { SpVoucherForm } from "./sp-voucher-form";
 import type { ServiceProvider, SpVoucher, SpVoucherStatus } from "@/types/provider";
 import { ActionPopover } from "@/components/shared/action-popover";
+import { SharedDataTable } from "@/components/shared/data-table";
 import { cn } from "@/lib/utils";
 
 interface SpVouchersTabProps {
@@ -86,6 +87,7 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
           spBranches={sp.branches.map((b) => ({ id: b.id, name: b.name }))}
           voucher={selectedVoucher}
           isReadOnly={isReadOnly}
+          onEdit={() => setIsReadOnly(false)}
           onSuccess={handleBack}
           onCancel={handleBack}
         />
@@ -135,71 +137,92 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
               ) : undefined}
             />
           ) : (
-            <div className="border border-border rounded-xl overflow-hidden bg-white shadow-sm">
-              <div className="grid grid-cols-[1.2fr_1.8fr_140px_110px_100px_48px] gap-4 px-5 py-3 bg-muted/40 border-b border-border">
-                {["Voucher", "Description", "Period", "Price (RM)", "Status", ""].map((h) => (
-                  <p key={h} className="text-[13px] font-semibold text-muted-foreground/80 tracking-tight">{h}</p>
-                ))}
-              </div>
-
-              {filteredVouchers.map((voucher) => (
-                <div
-                  key={voucher.id}
-                  className="grid grid-cols-[1.2fr_1.8fr_140px_110px_100px_48px] gap-4 px-5 py-4 border-b border-border/50 last:border-0 hover:bg-muted/10 transition-colors items-center"
-                >
-                  <div className="space-y-1">
-                    <p className="text-[13px] font-semibold text-foreground leading-none">{voucher.name}</p>
-                    <p className="text-[11px] font-mono text-muted-foreground bg-muted w-fit px-1.5 py-0.5 rounded leading-none border border-border/50">
-                      {voucher.code}
+            <SharedDataTable
+              data={filteredVouchers}
+              columns={[
+                {
+                  header: "Voucher",
+                  accessorKey: "name",
+                  sortable: true,
+                  render: (voucher) => (
+                    <div className="space-y-1">
+                      <p className="text-[13px] font-semibold text-foreground leading-none">{voucher.name}</p>
+                      <p className="text-[11px] font-mono text-muted-foreground bg-muted w-fit px-1.5 py-0.5 rounded leading-none border border-border/50">
+                        {voucher.code}
+                      </p>
+                    </div>
+                  ),
+                },
+                {
+                  header: "Description",
+                  accessorKey: "description",
+                  render: (voucher) => (
+                    <p className="text-[12px] text-muted-foreground leading-relaxed line-clamp-2 max-w-[300px]">
+                      {voucher.description || "—"}
+                      {voucher.bookingRequired && (
+                        <span className="ml-2 inline-flex items-center gap-1 text-[10px] font-bold text-primary/70 tracking-tighter bg-primary/5 px-1.5 py-0.5 rounded border border-primary/10">
+                          Booking Required
+                        </span>
+                      )}
                     </p>
-                  </div>
-
-                  <p className="text-[12px] text-muted-foreground leading-relaxed line-clamp-2">
-                    {voucher.description || "—"}
-                    {voucher.bookingRequired && (
-                      <span className="ml-2 inline-flex items-center gap-1 text-[10px] font-bold text-primary/70 uppercase tracking-tighter bg-primary/5 px-1.5 py-0.5 rounded border border-primary/10">
-                        Booking Required
-                      </span>
-                    )}
-                  </p>
-
-                  <div className="text-[11px] text-muted-foreground space-y-0.5">
-                    <p className="font-medium text-foreground/80">{new Date(voucher.activationPeriod.startDate).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" })}</p>
-                    {voucher.activationPeriod.endDate ? (
-                      <p className="opacity-70">→ {new Date(voucher.activationPeriod.endDate).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" })}</p>
-                    ) : (
-                      <p className="text-[10px] text-muted-foreground/60 italic">Open-ended</p>
-                    )}
-                  </div>
-
-                  <div className="space-y-0.5">
-                    {voucher.initialPrice !== voucher.finalPrice && (
-                      <p className="text-[10px] text-muted-foreground/60 line-through">RM {voucher.initialPrice}</p>
-                    )}
-                    <p className="text-[13px] font-semibold text-foreground font-mono">RM {voucher.finalPrice}</p>
-                  </div>
-
-                  <div className="flex">
+                  ),
+                },
+                {
+                  header: "Period",
+                  render: (voucher) => (
+                    <div className="text-[11px] text-muted-foreground space-y-0.5">
+                      <p className="font-medium text-foreground/80">{new Date(voucher.activationPeriod.startDate).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</p>
+                      {voucher.activationPeriod.endDate ? (
+                        <p className="opacity-70">→ {new Date(voucher.activationPeriod.endDate).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</p>
+                      ) : (
+                        <p className="text-[10px] text-muted-foreground/60 italic">Open-ended</p>
+                      )}
+                    </div>
+                  ),
+                },
+                {
+                  header: "Price (RM)",
+                  accessorKey: "finalPrice",
+                  sortable: true,
+                  render: (voucher) => (
+                    <div className="space-y-0.5">
+                      {voucher.initialPrice !== voucher.finalPrice && (
+                        <p className="text-[10px] text-muted-foreground/60 line-through">RM {voucher.initialPrice}</p>
+                      )}
+                      <p className="text-[13px] font-semibold text-foreground font-mono">RM {voucher.finalPrice}</p>
+                    </div>
+                  ),
+                },
+                {
+                  header: "Status",
+                  accessorKey: "status",
+                  sortable: true,
+                  render: (voucher) => (
                     <StatusBadge
                       status={voucher.status}
                       variant={STATUS_VARIANT[voucher.status]}
                       className="w-fit"
                     />
-                  </div>
-
-                  <div className="flex justify-end pr-1">
-                    <ActionPopover
-                      actions={[
-                        { label: "View Voucher", onClick: () => handleView(voucher) },
-                        { label: "Edit Voucher", onClick: () => handleEdit(voucher) },
-                        { label: "Suspend Voucher", onClick: () => console.log("Suspend", voucher.id) },
-                        { label: "Remove Voucher", isDanger: true, onClick: () => console.log("Remove", voucher.id) },
-                      ]}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
+                  ),
+                },
+                {
+                  header: "",
+                  align: "right",
+                  render: (voucher) => (
+                    <div className="flex justify-end pr-1">
+                      <ActionPopover
+                        actions={[
+                          { label: "View Voucher", onClick: () => handleView(voucher) },
+                          { label: "Edit Voucher", onClick: () => handleEdit(voucher) },
+                          { label: "Suspend Voucher", onClick: () => console.log("Suspend", voucher.id) },
+                          { label: "Remove Voucher", isDanger: true, onClick: () => console.log("Remove", voucher.id) },
+                        ]}
+                      />
+                    </div>
+                  ),
+                },
+              ]}
+            />
           )}
         </div>
       </DetailSection>

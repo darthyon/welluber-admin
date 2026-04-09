@@ -54,7 +54,7 @@ export default function DashboardPage() {
             trend={{ value: "+1.2%", label: "growth", isPositive: true }}
           >
             <div className="flex flex-col items-end gap-1.5 ml-auto">
-              <span className="text-[9px] font-bold text-muted-foreground/40 uppercase tracking-[0.08em] group-hover:text-primary/60 transition-colors">64% Employees</span>
+              <span className="text-[9px] font-bold text-muted-foreground/40 tracking-[0.08em] group-hover:text-primary/60 transition-colors">64% Employees</span>
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
@@ -105,7 +105,7 @@ export default function DashboardPage() {
             trend={{ value: "+3.2%", label: "growth", isPositive: true }}
           >
             <div className="flex flex-col items-end gap-1.5 ml-auto">
-              <span className="text-[9px] font-bold text-muted-foreground/40 uppercase tracking-[0.08em] group-hover:text-primary/60 transition-colors">88% Claims</span>
+              <span className="text-[9px] font-bold text-muted-foreground/40 tracking-[0.08em] group-hover:text-primary/60 transition-colors">88% Claims</span>
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>

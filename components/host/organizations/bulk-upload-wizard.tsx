@@ -155,7 +155,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
                   {row.dob}
                 </span>
               </div>
-              <span className="text-[10px] font-bold text-muted-foreground uppercase opacity-60 leading-none">{row.gender}</span>
+              <span className="text-[10px] font-bold text-muted-foreground opacity-60 leading-none"> {row.gender}</span>
             </>
           )}
         </div>
@@ -297,11 +297,11 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
       header: "Status",
       render: (row) => (
         row.status === "Valid" ? (
-          <div className="flex items-center gap-1.5 text-emerald-400 font-bold text-[10px] uppercase bg-emerald-500/10 w-fit px-2 py-0.5 rounded-full border border-emerald-500/20 leading-none">
+          <div className="flex items-center gap-1.5 text-emerald-400 font-bold text-[10px] bg-emerald-500/10 w-fit px-2 py-0.5 rounded-full border border-emerald-500/20 leading-none">
             <CheckCircle size={12} weight="fill" /> Valid
           </div>
         ) : (
-          <div className="flex items-center gap-1.5 text-rose-400 font-bold text-[10px] uppercase bg-rose-500/10 w-fit px-2 py-0.5 rounded-full border border-rose-500/20 leading-none">
+          <div className="flex items-center gap-1.5 text-rose-400 font-bold text-[10px] bg-rose-500/10 w-fit px-2 py-0.5 rounded-full border border-rose-500/20 leading-none">
             <WarningCircle size={12} weight="fill" /> {row.issue || "Issue"}
           </div>
         )
@@ -319,7 +319,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
           </Button>
           <div>
             <h3 className="font-bold text-foreground">Bulk Employee Enrollment</h3>
-            <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider mt-0.5">CSV Import Wizard</p>
+            <p className="text-[11px] text-muted-foreground font-medium tracking-wider mt-0.5">CSV Import Wizard</p>
           </div>
         </div>
         

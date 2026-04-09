@@ -1,6 +1,6 @@
 "use client";
 
-import { Storefront, Ticket } from "@phosphor-icons/react";
+import { Storefront, Ticket, Package, MapPin } from "@phosphor-icons/react";
 import type { ServiceProvider } from "@/types/provider";
 import { PulseStatus } from "@/components/shared/pulse-status";
 import { ActionPopover } from "@/components/shared/action-popover";
@@ -9,7 +9,13 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { 
+  Popover, 
+  PopoverContent, 
+  PopoverTrigger 
+} from "@/components/ui/popover";
 import { ServicePortfolioTags } from "./service-portfolio-tags";
+import { Badge } from "@/components/ui/badge";
 
 interface SpCardProps {
   sp: ServiceProvider;
@@ -62,30 +68,101 @@ export function SpCard({ sp }: SpCardProps) {
           <ActionPopover actions={actions} />
         </div>
 
-        {/* Main Services */}
-        <div className="relative z-10 space-y-4">
-          <div className="space-y-2">
-            <span className="text-[10px] font-semibold tracking-tight text-muted-foreground/60">Main Services</span>
-            {sp.mainServices.length === 0 ? (
-              <span className="text-[11px] text-muted-foreground/40 italic">None assigned</span>
-            ) : (
-              <ServicePortfolioTags mainServices={sp.mainServices} />
-            )}
+
+        {/* Main Content: Standardized Field Grid */}
+        <div className="relative z-10 space-y-6">
+          <div className="grid grid-cols-2 gap-4">
+            
+            {/* Main Services */}
+            <div className="space-y-2.5">
+              <div className="flex items-center gap-1.5 text-muted-foreground/40">
+              <Package size={14} weight="bold" />
+              <span className="text-[11px] font-bold tracking-tight text-muted-foreground/60 leading-none">Main Services</span>
+            </div>
+              {sp.mainServices.length === 0 ? (
+                <span className="text-[11px] text-muted-foreground/40 italic block mt-1">None assigned</span>
+              ) : (
+                <div className="mt-1">
+                  <ServicePortfolioTags mainServices={sp.mainServices} />
+                </div>
+              )}
+            </div>
+
+            {/* Active Vouchers */}
+            <div className="space-y-2.5">
+            <div className="flex items-center gap-1.5 text-muted-foreground/40">
+              <Ticket size={14} weight="bold" />
+              <span className="text-[11px] font-bold tracking-tight text-muted-foreground/60 leading-none">Active Vouchers</span>
+            </div>
+              <div 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  router.push(`/service-providers/${sp.id}?tab=vouchers`);
+                }}
+                className="group/vouchers cursor-pointer hover:text-primary transition-colors flex items-baseline gap-1.5 mt-0.5"
+              >
+                <span className="text-[14px] font-bold text-foreground group-hover/vouchers:text-primary transition-colors">
+                  {sp.activeVoucherCount}
+                </span>
+                <span className="text-[11px] font-normal text-muted-foreground/60">pax active</span>
+              </div>
+            </div>
           </div>
 
-          {/* Active Vouchers */}
-          <div className="flex items-center gap-2 pt-1">
-            <div className={cn(
-              "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[11px] font-semibold",
-              sp.activeVoucherCount > 0
-                ? "bg-primary/10 border-primary/20 text-primary shadow-[0_0_8px_rgba(var(--primary-rgb),0.1)]"
-                : "bg-muted/40 border-border/60 text-muted-foreground/60"
-            )}>
-              <Ticket size={13} weight="fill" />
-              {sp.activeVoucherCount} active voucher{sp.activeVoucherCount !== 1 ? "s" : ""}
+          <div className="pt-4 border-t border-border/40">
+            <div className="flex items-center gap-1.5 text-muted-foreground/40 mb-3">
+              <MapPin size={14} weight="bold" />
+              <span className="text-[11px] font-bold tracking-tight text-muted-foreground/60 leading-none">Branches</span>
+              <span className="h-2 w-2 rounded-full bg-border/60 flex items-center justify-center">
+                <span className="h-1 w-1 rounded-full bg-muted-foreground/30" />
+              </span>
             </div>
-            <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border/60 bg-muted/40 text-[11px] font-medium text-muted-foreground/60">
-              {sp.branches.length} branch{sp.branches.length !== 1 ? "es" : ""}
+            <div className="flex flex-wrap gap-2">
+              {sp.branches.length === 0 ? (
+                <span className="text-[11px] text-muted-foreground/40 font-bold italic">No branches</span>
+              ) : (
+                <>
+                  {sp.branches.slice(0, 3).map((branch, i) => (
+                    <Badge 
+                      key={i} 
+                      variant="secondary" 
+                      className="bg-background/40 hover:bg-background/60 text-[11px] font-medium px-2.5 py-0.5 border-border/60 h-6 transition-colors text-foreground/70"
+                    >
+                      {branch.name}
+                    </Badge>
+                  ))}
+                  {sp.branches.length > 3 && (
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <button
+                          onClick={(e) => e.stopPropagation()}
+                          className="text-[11px] text-muted-foreground/60 hover:text-primary font-bold px-1.5 h-6 rounded-md hover:bg-muted/50 transition-colors"
+                        >
+                          +{sp.branches.length - 3} more
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent 
+                        className="w-52 p-1.5 bg-popover rounded-xl border border-border/60 shadow-2xl z-[200]"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <div className="flex flex-col gap-0.5">
+                          <span className="text-[10px] font-bold text-muted-foreground/40 px-2.5 py-1.5 tracking-tight">
+                            Other locations
+                          </span>
+                          {sp.branches.slice(3).map((branch, i) => (
+                            <div 
+                              key={i}
+                              className="text-[12px] px-2.5 py-1.5 hover:bg-muted/60 rounded-lg text-foreground/80 font-medium transition-colors cursor-default"
+                            >
+                              {branch.name}
+                            </div>
+                          ))}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  )}
+                </>
+              )}
             </div>
           </div>
         </div>
