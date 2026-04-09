@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ServicePortfolioTags } from "./service-portfolio-tags";
 
 interface SpCardProps {
   sp: ServiceProvider;
@@ -61,14 +62,14 @@ export function SpCard({ sp }: SpCardProps) {
           <ActionPopover actions={actions} />
         </div>
 
-        {/* Service Categories */}
+        {/* Main Services */}
         <div className="relative z-10 space-y-4">
           <div className="space-y-2">
-            <span className="text-[10px] font-semibold tracking-tight text-muted-foreground/60">Service categories</span>
-            {sp.serviceCategories.length === 0 ? (
+            <span className="text-[10px] font-semibold tracking-tight text-muted-foreground/60">Main Services</span>
+            {sp.mainServices.length === 0 ? (
               <span className="text-[11px] text-muted-foreground/40 italic">None assigned</span>
             ) : (
-              <OverflowTags items={sp.serviceCategories} />
+              <ServicePortfolioTags mainServices={sp.mainServices} />
             )}
           </div>
 

@@ -40,11 +40,11 @@ export default function ServiceProvidersPage() {
 
     const matchesStatus = statusFilter === "all" || sp.status === statusFilter;
 
-    const matchesCategories =
+    const matchesServices =
       advancedFilters.services.length === 0 ||
-      advancedFilters.services.every((s) => sp.serviceCategories.includes(s));
+      advancedFilters.services.some((s) => sp.mainServices?.includes(s));
 
-    return matchesSearch && matchesStatus && matchesCategories;
+    return matchesSearch && matchesStatus && matchesServices;
   });
 
   return (
@@ -91,10 +91,12 @@ export default function ServiceProvidersPage() {
               options={SP_STATUS_OPTIONS as unknown as { label: string; value: string }[]}
             />
             <MultiSelectFilter
-              label="Service Category"
+              label="Main Services"
               taxonomy={SERVICE_TAXONOMY}
               selected={advancedFilters.services}
               onChange={(services) => setAdvancedFilters({ ...advancedFilters, services })}
+              singularLabel="service"
+              pluralLabel="services"
             />
           </>
         }

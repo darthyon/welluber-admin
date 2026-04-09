@@ -11,8 +11,10 @@ import { createSpSchema, CreateSpData } from "@/features/providers/schemas";
 import { updateSp } from "@/features/providers/actions";
 import { Button } from "@/components/ui/button";
 import { SearchableMultiSelect } from "@/components/shared/searchable-multi-select";
-import { SERVICE_TAXONOMY } from "@/features/organizations/constants";
+import { MASTER_SERVICE_TAXONOMY } from "@/features/providers/service-taxonomy";
 import { MOCK_SPS } from "@/features/providers/mock-data";
+import { MOCK_BRANDS } from "@/features/brands/mock-data";
+import { Badge } from "@/components/ui/badge";
 import { DocumentUploadSection } from "@/components/shared/document-upload-section";
 import { Controller } from "react-hook-form";
 import { Article, Files, Info } from "@phosphor-icons/react";
@@ -30,7 +32,10 @@ export default function EditServiceProviderPage() {
   const sp = MOCK_SPS.find((s) => s.id === spId) ?? MOCK_SPS[0];
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>(sp.serviceCategories);
+  const [selectedMainServices, setSelectedMainServices] = useState<string[]>(sp.mainServices || []);
+  
+  const brand = MOCK_BRANDS.find(b => b.id === sp.brandId);
+  const brandCategories = brand?.serviceCategories || [];
 
   const {
     register,
@@ -45,7 +50,8 @@ export default function EditServiceProviderPage() {
       registrationNo: sp.registrationNo,
       website: sp.website ?? "",
       description: sp.description ?? "",
-      serviceCategories: sp.serviceCategories,
+      mainServices: sp.mainServices || [],
+      serviceCategories: sp.serviceCategories || [],
       isActive: sp.isActive,
       tinNumber: sp.tinNumber ?? "",
       classificationCode: sp.classificationCode ?? "",
@@ -54,10 +60,21 @@ export default function EditServiceProviderPage() {
     },
   });
 
-  const onSubmit = async (data: CreateSpData) => {
+  const onSubmit = async (data: any) => {
     setIsSubmitting(true);
     try {
-      const res = await updateSp(spId, { ...data, serviceCategories: selectedCategories });
+      const derivedCategories = Array.from(new Set(
+        selectedMainServices.map(serviceName => {
+          const group = MASTER_SERVICE_TAXONOMY.find(g => g.services.some(s => s.name === serviceName));
+          return group?.category;
+        }).filter(Boolean) as string[]
+      ));
+
+      const res = await updateSp(spId, { 
+        ...data, 
+        mainServices: selectedMainServices,
+        serviceCategories: derivedCategories 
+      });
       if (res.success) {
         router.push(`/service-providers/${spId}`);
       }
@@ -67,9 +84,9 @@ export default function EditServiceProviderPage() {
     }
   };
 
-  const handleCategoriesChange = (cats: string[]) => {
-    setSelectedCategories(cats);
-    setValue("serviceCategories", cats);
+  const handleServicesChange = (services: string[]) => {
+    setSelectedMainServices(services);
+    setValue("mainServices", services);
   };
 
   const inputCls = (hasError?: boolean) =>
@@ -79,6 +96,14 @@ export default function EditServiceProviderPage() {
         ? "border-destructive focus:border-destructive"
         : "border-border focus:border-foreground/30 focus:bg-muted/30"
     );
+
+  // Filter the taxonomy based on the Brand's allowed service categories
+  const SERVICE_PORTFOLIO_TAXONOMY = MASTER_SERVICE_TAXONOMY
+    .filter(group => brandCategories.length === 0 || brandCategories.includes(group.category))
+    .map(group => ({
+      category: group.category,
+      services: group.services.map(s => s.name),
+    }));
 
   return (
     <div className="max-w-2xl mx-auto space-y-6 pb-12">
@@ -157,27 +182,37 @@ export default function EditServiceProviderPage() {
             </div>
           </div>
 
-          {/* Section: Service Categories */}
+          {/* Section: Service Portfolio */}
           <div className="p-6 border-b border-border space-y-4">
-            <div className="flex items-center gap-2 pb-2">
-              <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500">
-                <Tag size={16} weight="fill" />
+            <div className="flex items-center justify-between pb-2">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                  <Tag size={16} weight="fill" />
+                </div>
+                <h3 className="text-[15px] font-semibold text-foreground">Service Portfolio</h3>
               </div>
-              <h3 className="text-[15px] font-semibold text-foreground">Service Categories</h3>
+              {brandCategories.length > 0 && (
+                <div className="flex flex-wrap gap-1 justify-end max-w-[50%]">
+                    {brandCategories.map(cat => (
+                        <Badge key={cat} variant="outline" className="text-[10px] font-medium bg-muted/20">{cat}</Badge>
+                    ))}
+                </div>
+              )}
             </div>
 
             <p className="text-[12px] text-muted-foreground">
-              Changing service categories will affect commission schema rows and branch service options.
+              Select available services from the masterlist allowed for this brand.
             </p>
 
             <SearchableMultiSelect
-              taxonomy={SERVICE_TAXONOMY}
-              selected={selectedCategories}
-              onChange={handleCategoriesChange}
+              taxonomy={SERVICE_PORTFOLIO_TAXONOMY}
+              selected={selectedMainServices}
+              onChange={handleServicesChange}
+              placeholder="Search main services..."
             />
-            {errors.serviceCategories && (
+            {errors.mainServices && (
               <p className="text-[11px] text-destructive flex items-center gap-1">
-                <WarningCircle size={12} /> {errors.serviceCategories.message}
+                <WarningCircle size={12} /> {errors.mainServices.message}
               </p>
             )}
           </div>

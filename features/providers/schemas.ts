@@ -6,7 +6,8 @@ import { COMMISSION_RATE_MIN, COMMISSION_RATE_MAX } from "./constants";
 export const createSpSchema = z.object({
   name: z.string().min(2, "Company name is required"),
   registrationNo: z.string().min(4, "Registration number is required"),
-  serviceCategories: z.array(z.string()).min(1, "Select at least one service category"),
+  serviceCategories: z.array(z.string()).optional(),
+  mainServices: z.array(z.string()).min(1, "Select at least one main service"),
   description: z.string().optional(),
   website: z.string().url("Enter a valid URL").optional().or(z.literal("")),
   isActive: z.boolean().default(true),

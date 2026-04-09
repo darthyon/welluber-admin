@@ -70,8 +70,8 @@ export function CommissionSchemaSheet({
     <Sheet
       isOpen={isOpen}
       onClose={onClose}
-      title="Service Portfolio & Commissions"
-      description="Define the main services offered by this provider and configure their commission rates."
+      title="Service Portfolio"
+      description="Manage the services offered by this provider and configure their commission rates."
       size="lg"
       footer={
         <>
@@ -79,7 +79,7 @@ export function CommissionSchemaSheet({
             Cancel
           </Button>
           <Button type="button" onClick={handleSubmit(onSubmit)} disabled={isSubmitting}>
-            {isSubmitting ? "Saving..." : "Save Portfolio"}
+            {isSubmitting ? "Saving..." : "Update Portfolio"}
           </Button>
         </>
       }

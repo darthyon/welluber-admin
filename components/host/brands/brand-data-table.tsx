@@ -9,6 +9,9 @@ import { FilterItem } from "@/components/shared/filter-item";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { EntityAvatar } from "@/components/shared/entity-avatar";
+import { OverflowTags } from "@/components/shared/overflow-tags";
+import { MultiSelectFilter } from "@/components/shared/multi-select-filter";
+import { SERVICE_TAXONOMY } from "@/features/organizations/constants";
 import type { Brand } from "@/types/brand";
 import React, { useMemo, useState } from "react";
 
@@ -21,6 +24,7 @@ export function BrandDataTable({ data, onRemove }: BrandDataTableProps) {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   const filteredData = useMemo(() => {
     return data.filter(brand => {
@@ -28,9 +32,12 @@ export function BrandDataTable({ data, onRemove }: BrandDataTableProps) {
         brand.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
         brand.id.toLowerCase().includes(searchQuery.toLowerCase());
       const statusMatch = statusFilter === "all" || brand.status === statusFilter;
-      return searchMatch && statusMatch;
+      const categoryMatch = selectedCategories.length === 0 || 
+        selectedCategories.some(cat => brand.serviceCategories?.includes(cat));
+        
+      return searchMatch && statusMatch && categoryMatch;
     });
-  }, [data, searchQuery, statusFilter]);
+  }, [data, searchQuery, statusFilter, selectedCategories]);
 
   const columns: Column<Brand>[] = [
     {
@@ -53,6 +60,15 @@ export function BrandDataTable({ data, onRemove }: BrandDataTableProps) {
           status={brand.status}
           variant={brand.status === "active" ? "emerald" : "zinc"}
         />
+      ),
+    },
+    {
+      header: "Service Categories",
+      headerClassName: "min-w-[180px]",
+      render: (brand) => (
+        <div className="max-w-[170px]">
+          <OverflowTags items={brand.serviceCategories || []} />
+        </div>
       ),
     },
 
@@ -106,16 +122,24 @@ export function BrandDataTable({ data, onRemove }: BrandDataTableProps) {
           onSearchChange={setSearchQuery}
           searchPlaceholder="Search by brand name or ID..."
           filters={
-            <FilterItem
-              label="Status"
-              options={[
-                { label: "All Status", value: "all" },
-                { label: "Active", value: "active" },
-                { label: "Inactive", value: "inactive" },
-              ]}
-              value={statusFilter}
-              onChange={(v) => setStatusFilter(v)}
-            />
+            <>
+              <FilterItem
+                label="Status"
+                options={[
+                  { label: "All Status", value: "all" },
+                  { label: "Active", value: "active" },
+                  { label: "Inactive", value: "inactive" },
+                ]}
+                value={statusFilter}
+                onChange={(v) => setStatusFilter(v)}
+              />
+              <MultiSelectFilter
+                label="Service Category"
+                taxonomy={SERVICE_TAXONOMY}
+                selected={selectedCategories}
+                onChange={setSelectedCategories}
+              />
+            </>
           }
         />
         <SharedDataTable

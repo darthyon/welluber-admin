@@ -235,12 +235,15 @@ export default function ServiceProviderDetailPage() {
                   <DetailField label="Description" value={sp.description} className="sm:col-span-2" />
                 )}
                 <DetailField
-                  label="Service Categories"
+                  label="Main Services"
                   value={
                     <div className="flex flex-wrap gap-1.5 mt-0.5">
-                      {sp.serviceCategories.map((cat, i) => (
-                        <Badge key={i} variant="secondary" className="text-[11px]">{cat}</Badge>
+                      {sp.mainServices?.map((service, i) => (
+                        <Badge key={i} variant="secondary" className="text-[11px] font-medium">{service}</Badge>
                       ))}
+                      {(!sp.mainServices || sp.mainServices.length === 0) && (
+                        <span className="text-[12px] text-muted-foreground italic">None selected</span>
+                      )}
                     </div>
                   }
                   className="sm:col-span-2"
@@ -257,12 +260,12 @@ export default function ServiceProviderDetailPage() {
                 <DetailField label="On Platform Since" value={new Date(sp.createdAt).toLocaleDateString("en-MY", { year: "numeric", month: "long", day: "numeric" })} />
               </div>
             </DetailSection>
-
-            {/* Section 2: Commission Schema */}
+ 
+            {/* Section 2: Service Portfolio */}
             <DetailSection
-              title="Commission Schema"
+              title="Service Portfolio"
               icon={<IdentificationCard size={16} weight="fill" />}
-              description="Rates applied per service category. Valid range: 10%–30%."
+              description="Manage your service catalog and configure tiered commission rates."
               action={
                 <div className="flex items-center gap-2">
                   <TooltipProvider>

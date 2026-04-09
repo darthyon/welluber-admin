@@ -8,6 +8,7 @@ import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { FilterItem } from "@/components/shared/filter-item";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
+import { ServicePortfolioTags } from "./service-portfolio-tags";
 import type { ServiceProvider } from "@/types/provider";
 import React, { useMemo, useState } from "react";
 
@@ -43,34 +44,14 @@ export function SpDataTable({ data }: SpDataTableProps) {
       ),
     },
     {
-      header: "Service Categories",
+      header: "Main Services",
+      headerClassName: "min-w-[240px]",
       render: (sp) => (
-        <div className="flex items-center gap-1 overflow-hidden max-w-[200px]">
-          {sp.serviceCategories.length === 0 ? (
+        <div className="max-w-[240px]">
+          {sp.mainServices.length === 0 ? (
             <span className="text-[10px] text-muted-foreground/50 font-medium italic px-1">None</span>
           ) : (
-            <>
-              <Badge variant="secondary" className="bg-muted/50 font-medium text-[10px] px-1.5 py-0 h-4 border-border/40 whitespace-nowrap">
-                {sp.serviceCategories[0]}
-              </Badge>
-              {sp.serviceCategories.length > 1 && (
-                <Tooltip delayDuration={0}>
-                  <TooltipTrigger asChild>
-                    <button onClick={(e) => e.stopPropagation()} className="text-[10px] text-muted-foreground hover:text-primary font-bold px-1 transition-colors">
-                      +{sp.serviceCategories.length - 1}
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent className="w-52 bg-card rounded-xl border-border shadow-2xl z-[200]">
-                    <div className="flex flex-col gap-1">
-                      <span className="text-[9px] font-semibold tracking-tight text-muted-foreground opacity-60 mb-1 px-1">Service categories</span>
-                      {sp.serviceCategories.slice(1).map((cat, i) => (
-                        <div key={i} className="text-[11px] px-2 py-1.5 hover:bg-muted rounded text-foreground transition-colors font-medium">{cat}</div>
-                      ))}
-                    </div>
-                  </TooltipContent>
-                </Tooltip>
-              )}
-            </>
+            <ServicePortfolioTags mainServices={sp.mainServices} />
           )}
         </div>
       ),

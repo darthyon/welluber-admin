@@ -16,7 +16,7 @@ export function CommissionSchemaEditor({ spId, serviceCategories, initialRows }:
   if (serviceCategories.length === 0) {
     return (
       <p className="text-[13px] text-muted-foreground italic">
-        No service categories assigned. Add categories to define your service portfolio.
+        No service categories assigned to the brand. Contact support to update the brand's allowed categories.
       </p>
     );
   }

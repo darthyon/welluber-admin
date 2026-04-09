@@ -22,6 +22,7 @@ import { SharedDataTable, Column } from "@/components/shared/data-table";
 import { EntityAvatar } from "@/components/shared/entity-avatar";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
+import { Switch } from "@/components/shared/switch";
 import { cn } from "@/lib/utils";
 import type { Brand } from "@/types/brand";
 import type { ServiceProvider } from "@/types/provider";
@@ -37,6 +38,7 @@ interface BrandDetailViewProps {
 export function BrandDetailView({ brand, onBack, onEdit, onRemove }: BrandDetailViewProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [currentStatus, setCurrentStatus] = useState(brand.status);
 
   const brandSps = MOCK_SPS.filter(sp => sp.brandId === brand.id);
 
@@ -132,7 +134,15 @@ export function BrandDetailView({ brand, onBack, onEdit, onRemove }: BrandDetail
             <div>
               <div className="flex items-center gap-3">
                 <h2 className="text-2xl font-bold tracking-tight text-foreground">{brand.name}</h2>
-                <StatusBadge status={brand.status} variant={brand.status === "active" ? "emerald" : "zinc"} />
+                <StatusBadge status={currentStatus} variant={currentStatus === "active" ? "emerald" : "zinc"} />
+                
+                <div className="flex items-center gap-2 ml-2 px-2.5 py-1 bg-muted/40 rounded-lg border border-border/40">
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">Active Status</span>
+                  <Switch 
+                    checked={currentStatus === "active"} 
+                    onCheckedChange={(checked) => setCurrentStatus(checked ? "active" : "inactive")}
+                  />
+                </div>
               </div>
               <p className="text-[14px] text-muted-foreground mt-1 font-medium">
                 {brand.assignedSpCount} Service Providers Assigned
@@ -173,6 +183,20 @@ export function BrandDetailView({ brand, onBack, onEdit, onRemove }: BrandDetail
               label="Brand Identity" 
               value={brand.name} 
               icon={<Storefront size={16} />}
+            />
+            <DetailField 
+              label="Service Categories" 
+              value={
+                <div className="flex flex-wrap gap-1.5 mt-0.5">
+                  {brand.serviceCategories?.map((cat, i) => (
+                    <Badge key={i} variant="secondary" className="text-[11px] font-medium">{cat}</Badge>
+                  ))}
+                  {(!brand.serviceCategories || brand.serviceCategories.length === 0) && (
+                    <span className="text-[12px] text-muted-foreground italic">None assigned</span>
+                  )}
+                </div>
+              }
+              icon={<Tag size={16} />}
             />
             <DetailField 
               label="Creation Date" 

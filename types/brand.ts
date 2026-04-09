@@ -8,6 +8,7 @@ export interface Brand {
   name: string;
   logo?: string;
   status: BrandStatus;
+  serviceCategories: string[]; // Tier 1 Service Categories
   assignedSpCount: number;
   createdAt: ISODate;
   updatedAt: ISODate;

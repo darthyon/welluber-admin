@@ -16,16 +16,25 @@ interface MultiSelectFilterProps {
   taxonomy: { category: string; services: string[] }[];
   selected: string[];
   onChange: (selected: string[]) => void;
+  singularLabel?: string;
+  pluralLabel?: string;
 }
 
-export function MultiSelectFilter({ label, taxonomy, selected, onChange }: MultiSelectFilterProps) {
+export function MultiSelectFilter({ 
+  label, 
+  taxonomy, 
+  selected, 
+  onChange,
+  singularLabel = "category",
+  pluralLabel = "categories"
+}: MultiSelectFilterProps) {
   const [isOpen, setIsOpen] = React.useState(false);
 
   const labelText = selected.length === 0 
-    ? "All Categories" 
+    ? `All ${pluralLabel.charAt(0).toUpperCase() + pluralLabel.slice(1)}` 
     : selected.length === 1 
       ? selected[0] 
-      : `${selected.length} categories`;
+      : `${selected.length} ${pluralLabel}`;
 
   return (
     <div className="flex items-center gap-2">
@@ -50,7 +59,7 @@ export function MultiSelectFilter({ label, taxonomy, selected, onChange }: Multi
              <div className="px-4 py-3 border-b border-border/50 bg-muted/10">
                <h4 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 flex items-center gap-2">
                  <Heartbeat size={14} weight="bold" className="text-primary" />
-                 Select Service Categories
+                 Select {pluralLabel.charAt(0).toUpperCase() + pluralLabel.slice(1)}
                </h4>
             </div>
 
@@ -60,7 +69,7 @@ export function MultiSelectFilter({ label, taxonomy, selected, onChange }: Multi
                 taxonomy={taxonomy}
                 selected={selected}
                 onChange={onChange}
-                placeholder="Search categories..."
+                placeholder={`Search ${pluralLabel}...`}
                 isInline={true}
               />
             </div>
@@ -69,7 +78,7 @@ export function MultiSelectFilter({ label, taxonomy, selected, onChange }: Multi
             {selected.length > 0 && (
               <div className="p-2 border-t border-border/50 bg-muted/5 flex items-center justify-between">
                 <span className="text-[10px] text-muted-foreground font-medium px-2">
-                  {selected.length} categories selected
+                  {selected.length} {pluralLabel} selected
                 </span>
                 <Button 
                   variant="ghost" 

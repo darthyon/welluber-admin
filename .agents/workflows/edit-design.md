@@ -10,10 +10,13 @@ Use this workflow when the user requests specific visual adjustments, layout fix
 1.  **Analyze Input**: 
     - **Description**: Grep for labels, placeholder text, or component names.
     - **Image**: Identify unique icons (Phosphor), layout structures, or specific data fields.
-2.  **Targeted Search**: 
+2.  **Structural Impact Check**: 
+    - Before proceeding, assess if the edit requires moving data between entities or changing the application's hierarchy (e.g., "Move field X from Organization to Brand").
+    - If structural changes are involved, invoke the `/revise-structure` workflow first to align the data layer before refining the UI.
+3.  **Targeted Search**: 
     - `grep_search` in `app/(host)/` (pages) or `components/` (shared).
     - Use `ls -R` to find file names before reading.
-3.  **Read Smart**: 
+4.  **Read Smart**: 
     - Do NOT read the entire file if you only need a specific section. 
     - Use `view_file` with `StartLine` and `EndLine` once you have the line number from grep.
 

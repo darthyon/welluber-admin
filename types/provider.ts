@@ -154,12 +154,13 @@ export interface ServiceProvider {
   logo?: string;
   name: string;
   registrationNo: string;
-  serviceCategories: string[]; // refs to taxonomy service categories
+  serviceCategories: string[]; // derived from mainServices (Tier 1)
+  mainServices: string[]; // SELECTED Tier 2 Services
   description?: string;
   website?: string;
   isActive: boolean;
   taxProfile: TaxProfile;
-  commissionSchema: CommissionSchemaRow[];
+  commissionSchema: CommissionSchemaRow[]; // Part of the Service Portfolio
   admins: SpAdmin[];
   branches: SpBranch[];
   vouchers: SpVoucher[];

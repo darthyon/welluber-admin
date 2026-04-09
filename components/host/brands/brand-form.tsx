@@ -6,13 +6,16 @@ import * as z from "zod";
 import { Tag, WarningCircle, CheckCircle } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Brand } from "@/types/brand";
+import { Brand, BrandStatus } from "@/types/brand";
 import { LogoUpload } from "@/components/shared/logo-upload";
+import { MASTER_SERVICE_TAXONOMY } from "@/features/providers/service-taxonomy";
+import { SearchableMultiSelect } from "@/components/shared/searchable-multi-select";
 
 const brandSchema = z.object({
   name: z.string().min(2, "Brand name must be at least 2 characters"),
   logo: z.any().optional(),
   status: z.enum(["active", "inactive"]),
+  serviceCategories: z.array(z.string()).min(1, "Select at least one service category"),
 });
 
 type BrandFormData = z.infer<typeof brandSchema>;
@@ -35,8 +38,16 @@ export function BrandForm({ initialData, onSubmit, isSubmitting }: BrandFormProp
       name: initialData?.name || "",
       logo: initialData?.logo || "",
       status: initialData?.status === "removed" ? "inactive" : initialData?.status || "active",
+      serviceCategories: initialData?.serviceCategories || [],
     },
   });
+
+  const CATEGORY_TAXONOMY = [
+    {
+      category: "Service Categories",
+      services: MASTER_SERVICE_TAXONOMY.map((group) => group.category),
+    },
+  ];
 
   const inputCls = (hasError?: boolean) =>
     cn(
@@ -64,6 +75,31 @@ export function BrandForm({ initialData, onSubmit, isSubmitting }: BrandFormProp
           )}
         </div>
 
+        {/* Service Categories */}
+        <div className="p-4 bg-muted/20 border border-border rounded-xl space-y-4">
+          <div className="flex items-center gap-2 pb-1 text-primary">
+            <Tag size={16} weight="fill" />
+            <h3 className="text-[13px] font-bold">Service Categories</h3>
+          </div>
+          <Controller
+            control={control}
+            name="serviceCategories"
+            render={({ field }) => (
+              <SearchableMultiSelect
+                taxonomy={CATEGORY_TAXONOMY}
+                selected={field.value}
+                onChange={field.onChange}
+                placeholder="Select categories..."
+              />
+            )}
+          />
+          {errors.serviceCategories && (
+            <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
+              <WarningCircle size={12} /> {errors.serviceCategories.message}
+            </p>
+          )}
+        </div>
+
         {/* Logo Upload */}
         <Controller
           control={control}
@@ -78,22 +114,24 @@ export function BrandForm({ initialData, onSubmit, isSubmitting }: BrandFormProp
           )}
         />
 
-        {/* Status Toggle */}
-        <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border/40">
-          <div className="space-y-0.5">
-            <h4 className="text-[13px] font-semibold text-foreground">Activate Brand</h4>
-            <p className="text-[11px] text-muted-foreground opacity-70">
-              Only active brands can have new service providers assigned.
-            </p>
+        {/* Status Toggle - Only show when editing, as requested */}
+        {initialData && (
+          <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border/40">
+            <div className="space-y-0.5">
+              <h4 className="text-[13px] font-semibold text-foreground">Activate Brand</h4>
+              <p className="text-[11px] text-muted-foreground opacity-70">
+                Only active brands can have new service providers assigned.
+              </p>
+            </div>
+            <select
+              {...register("status")}
+              className="bg-background border border-border rounded px-2 py-1 text-[12px] font-medium outline-none"
+            >
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
           </div>
-          <select
-            {...register("status")}
-            className="bg-background border border-border rounded px-2 py-1 text-[12px] font-medium outline-none"
-          >
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
-        </div>
+        )}
       </div>
 
       {/* Footer Actions */}

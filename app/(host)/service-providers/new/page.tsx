@@ -26,6 +26,7 @@ import { MOCK_BRANDS } from "@/features/brands/mock-data";
 import { BrandSelectionModal } from "@/components/host/service-providers/brand-selection-modal";
 import { Brand } from "@/types/brand";
 import { LogoUpload } from "@/components/shared/logo-upload";
+import { Badge } from "@/components/ui/badge";
 
 type Step = "selection" | "details";
 type BrandType = "new" | "existing";
@@ -36,8 +37,9 @@ export default function NewServiceProviderPage() {
   const [brandType, setBrandType] = useState<BrandType | null>(null);
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedMainServices, setSelectedMainServices] = useState<string[]>([]);
   const [isBrandModalOpen, setIsBrandModalOpen] = useState(false);
+  const [brandCategories, setBrandCategories] = useState<string[]>([]);
 
   const {
     register,
@@ -48,18 +50,35 @@ export default function NewServiceProviderPage() {
     formState: { errors },
   } = useForm<CreateSpData & { brandName?: string; brandLogo?: any }>({
     resolver: zodResolver(createSpSchema as any),
-    defaultValues: { isActive: true, serviceCategories: [] },
+    defaultValues: { isActive: true, mainServices: [], serviceCategories: [] },
   });
 
   const onSubmit = async (data: any) => {
     setIsSubmitting(true);
     try {
-      // In a real app, logic would differ based on brandType (new vs existing)
+      // Derive service categories from selected main services for storage efficiency
+      const derivedCategories = Array.from(new Set(
+        selectedMainServices.map(serviceName => {
+          const group = MASTER_SERVICE_TAXONOMY.find(g => g.services.some(s => s.name === serviceName));
+          return group?.category;
+        }).filter(Boolean) as string[]
+      ));
+
+      // Generate empty commission schema rows for each selected main service
+      const initialCommissionSchema = selectedMainServices.map(service => ({
+        mainService: service,
+        tiers: [{ limit: 0, rate: 0.10 }], // Default 10% base
+        lastUpdated: new Date().toISOString()
+      }));
+
       const res = await createSp({ 
         ...data, 
         brandId: selectedBrand?.id || "NEW-BRAND-ID",
-        serviceCategories: selectedCategories 
+        mainServices: selectedMainServices,
+        serviceCategories: derivedCategories,
+        commissionSchema: initialCommissionSchema
       });
+
       if (res.success) {
         router.push(`/service-providers/${res.data.id}`);
       }
@@ -69,13 +88,14 @@ export default function NewServiceProviderPage() {
     }
   };
 
-  const handleCategoriesChange = (cats: string[]) => {
-    setSelectedCategories(cats);
-    setValue("serviceCategories", cats);
+  const handleServicesChange = (services: string[]) => {
+    setSelectedMainServices(services);
+    setValue("mainServices", services);
   };
 
   const handleBrandSelect = (brand: Brand) => {
     setSelectedBrand(brand);
+    setBrandCategories(brand.serviceCategories || []);
     setIsBrandModalOpen(false);
     setStep("details");
   };
@@ -88,12 +108,13 @@ export default function NewServiceProviderPage() {
         : "border-border focus:border-foreground/30 focus:bg-muted/30"
     );
 
-  const CATEGORY_TAXONOMY = [
-    {
-      category: "Service Categories",
-      services: MASTER_SERVICE_TAXONOMY.map((group) => group.category),
-    },
-  ];
+  // Filter the taxonomy based on the Brand's allowed service categories
+  const SERVICE_PORTFOLIO_TAXONOMY = MASTER_SERVICE_TAXONOMY
+    .filter(group => brandCategories.length === 0 || brandCategories.includes(group.category))
+    .map(group => ({
+      category: group.category,
+      services: group.services.map(s => s.name),
+    }));
 
   if (step === "selection") {
     return (
@@ -283,29 +304,37 @@ export default function NewServiceProviderPage() {
             </div>
           </div>
 
-          {/* Section: Service Categories */}
+          {/* Section: Service Portfolio */}
           <div className="p-6 border-b border-border space-y-4">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500">
                 <Tag size={16} weight="fill" />
               </div>
               <div className="space-y-0.5">
-                <h3 className="text-[15px] font-bold text-foreground">Service Categories</h3>
+                <h3 className="text-[15px] font-bold text-foreground">Service Portfolio</h3>
                 <p className="text-[12px] text-muted-foreground leading-relaxed">
-                  Select all primary categories this provider belongs to according to the Masterlist.
+                  Select available services from the masterlist allowed for this brand.
                 </p>
               </div>
             </div>
+            {brandCategories.length > 0 && (
+                <div className="flex flex-wrap gap-1 mb-2">
+                    <span className="text-[10px] uppercase font-bold text-muted-foreground/60 w-full mb-1">Brand Categories</span>
+                    {brandCategories.map(cat => (
+                        <Badge key={cat} variant="outline" className="text-[10px] font-medium bg-muted/20">{cat}</Badge>
+                    ))}
+                </div>
+            )}
 
             <SearchableMultiSelect
-              taxonomy={CATEGORY_TAXONOMY}
-              selected={selectedCategories}
-              onChange={handleCategoriesChange}
-              placeholder="Search categories (e.g. Fitness, Medical)..."
+              taxonomy={SERVICE_PORTFOLIO_TAXONOMY}
+              selected={selectedMainServices}
+              onChange={handleServicesChange}
+              placeholder="Search main services..."
             />
-            {errors.serviceCategories && (
+            {errors.mainServices && (
               <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
-                <WarningCircle size={12} /> {errors.serviceCategories.message}
+                <WarningCircle size={12} /> {errors.mainServices.message}
               </p>
             )}
           </div>
