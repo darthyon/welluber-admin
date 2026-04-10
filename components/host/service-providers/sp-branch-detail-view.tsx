@@ -51,7 +51,7 @@ export function SpBranchDetailView({ branch, serviceCategories, onBack, onEdit }
             <Button 
               variant="secondary" 
               size="lg" 
-              className="text-[13px] font-medium rounded-full gap-2 transition-all"
+              className="text-nav font-medium rounded-full gap-2 transition-all"
               onClick={onEdit}
             >
               <PencilSimpleLine size={16} weight="bold" />
@@ -67,8 +67,8 @@ export function SpBranchDetailView({ branch, serviceCategories, onBack, onEdit }
             {/* Sidebar reserved for future activity logs as per user request */}
             <div className="rounded-xl border border-dashed border-border bg-muted/30 p-8 flex flex-col items-center justify-center text-center opacity-40">
               <TrendUp size={24} weight="duotone" className="mb-2" />
-              <p className="text-[12px] font-medium">Activity Stream</p>
-              <p className="text-[10px]">Logs appearing soon</p>
+              <p className="text-label font-medium">Activity Stream</p>
+              <p className="text-micro">Logs appearing soon</p>
             </div>
           </>
         }
@@ -82,7 +82,7 @@ export function SpBranchDetailView({ branch, serviceCategories, onBack, onEdit }
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <DetailField label="Branch Name" value={branch.name} />
             <div className="space-y-1.5">
-            <p className="text-[11px] font-medium text-muted-foreground/80 tracking-tight">Branch status</p>
+            <p className="text-caption font-medium text-muted-foreground/80 tracking-tight">Branch status</p>
               <div className="flex items-center gap-2">
                 <StatusBadge status={branch.isActive ? "Active" : "Suspended"} variant={branch.isActive ? "emerald" : "rose"} />
               </div>
@@ -97,7 +97,7 @@ export function SpBranchDetailView({ branch, serviceCategories, onBack, onEdit }
           description="Public-facing contact persons with portal visibility."
         >
           {branch.contacts.length === 0 ? (
-            <p className="text-[13px] text-muted-foreground italic">No PICs designated for this branch.</p>
+            <p className="text-nav text-muted-foreground italic">No PICs designated for this branch.</p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {branch.contacts.map((c, i) => (
@@ -105,18 +105,18 @@ export function SpBranchDetailView({ branch, serviceCategories, onBack, onEdit }
                   <div className="flex items-center gap-4 relative z-10">
                     <EntityAvatar name={c.name} size="md" />
                     <div>
-                      <p className="text-[14px] font-bold text-foreground leading-tight tracking-tight">{c.name}</p>
+                      <p className="text-body font-semibold text-foreground leading-tight tracking-tight">{c.name}</p>
                       <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[11px] text-muted-foreground font-medium">{CONTACT_TYPE_LABEL[c.type] ?? c.type}</span>
+                        <span className="text-caption text-muted-foreground font-medium">{CONTACT_TYPE_LABEL[c.type] ?? c.type}</span>
                         {c.isPublic && (
-                          <Badge variant="outline" className="text-[9px] h-4 font-bold border-emerald-500/20 text-emerald-600 bg-emerald-500/5">Public Profile</Badge>
+                          <Badge variant="outline" className="text-micro h-4 font-semibold border-emerald-500/20 text-emerald-600 bg-emerald-500/5">Public Profile</Badge>
                         )}
                       </div>
                       <div className="flex flex-col gap-1 mt-2">
-                        <p className="text-[11px] text-muted-foreground flex items-center gap-1.5">
+                        <p className="text-caption text-muted-foreground flex items-center gap-1.5">
                           <Phone size={10} weight="fill" className="opacity-40" /> {c.phone}
                         </p>
-                        <p className="text-[11px] text-muted-foreground flex items-center gap-1.5">
+                        <p className="text-caption text-muted-foreground flex items-center gap-1.5">
                           <Globe size={10} weight="fill" className="opacity-40" /> {c.email}
                         </p>
                       </div>
@@ -140,22 +140,22 @@ export function SpBranchDetailView({ branch, serviceCategories, onBack, onEdit }
           description="Local administrators with system management access."
         >
           {(branch.administrators?.length ?? 0) === 0 ? (
-            <p className="text-[13px] text-muted-foreground italic">No system administrators added.</p>
+            <p className="text-nav text-muted-foreground italic">No system administrators added.</p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {branch.administrators?.map((admin, i) => (
                 <div key={i} className="flex items-center justify-between p-3.5 rounded-xl border border-border/80 bg-card hover:border-primary/20 transition-all group">
                   <div className="flex items-center gap-4 relative z-10">
-                    <EntityAvatar name={admin.name} size="sm" className="bg-indigo-50 text-indigo-600" />
+                    <EntityAvatar name={admin.name} size="sm" className="bg-primary/10 text-primary" />
                     <div>
-                      <p className="text-[13px] font-bold text-foreground leading-tight tracking-tight">{admin.name}</p>
-                      <p className="text-[11px] text-muted-foreground font-medium mt-0.5">{admin.role}</p>
-                      <p className="text-[11px] text-muted-foreground mt-1 opacity-70">{admin.email}</p>
+                      <p className="text-nav font-semibold text-foreground leading-tight tracking-tight">{admin.name}</p>
+                      <p className="text-caption text-muted-foreground font-medium mt-0.5">{admin.role}</p>
+                      <p className="text-caption text-muted-foreground mt-1 opacity-70">{admin.email}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     {admin.designateAsPic && (
-                      <Badge variant="outline" className="text-[9px] font-bold border-indigo-500/20 text-indigo-600 bg-indigo-500/5">PIC Linked</Badge>
+                      <Badge variant="outline" className="text-micro font-semibold border-primary/20 text-primary bg-primary/5">PIC Linked</Badge>
                     )}
                     <ActionPopover 
                       actions={[
@@ -187,7 +187,7 @@ export function SpBranchDetailView({ branch, serviceCategories, onBack, onEdit }
                     </div>
                     <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-background shadow-sm" />
                   </div>
-                  <span className="text-[10px] font-bold text-primary bg-background/90 backdrop-blur-sm px-2 py-0.5 rounded-full border border-primary/20 tracking-tight">
+                  <span className="text-micro font-semibold text-primary bg-background/90 backdrop-blur-sm px-2 py-0.5 rounded-full border border-primary/20 tracking-tight">
                     Pinned
                   </span>
                 </div>
@@ -210,11 +210,11 @@ export function SpBranchDetailView({ branch, serviceCategories, onBack, onEdit }
                 <div className="pt-6 border-t border-border/60 grid grid-cols-2 gap-4">
                   <DetailField 
                     label="Latitude" 
-                    value={<span className="font-mono text-[13px] text-foreground">{branch.address.lat}</span>} 
+                    value={<span className="font-mono text-nav text-foreground">{branch.address.lat}</span>} 
                   />
                   <DetailField 
                     label="Longitude" 
-                    value={<span className="font-mono text-[13px] text-foreground">{branch.address.lon}</span>} 
+                    value={<span className="font-mono text-nav text-foreground">{branch.address.lon}</span>} 
                   />
                 </div>
               )}
@@ -230,15 +230,15 @@ export function SpBranchDetailView({ branch, serviceCategories, onBack, onEdit }
         >
           <div className="space-y-4">
             {groups.length === 0 && customServices.length === 0 ? (
-              <p className="text-[13px] text-muted-foreground italic">No services configured for this branch.</p>
+              <p className="text-nav text-muted-foreground italic">No services configured for this branch.</p>
             ) : (
               <>
                 {groups.map((group) => (
                   <div key={group.category} className="rounded-xl border border-border bg-muted/20 p-4 space-y-3">
                     <div className="flex items-center justify-between gap-3">
                       <div>
-                        <p className="text-[13px] font-semibold text-foreground">{group.category}</p>
-                        <p className="text-[11px] text-muted-foreground">{group.services.length} service{group.services.length !== 1 ? "s" : ""}</p>
+                        <p className="text-nav font-semibold text-foreground">{group.category}</p>
+                        <p className="text-caption text-muted-foreground">{group.services.length} service{group.services.length !== 1 ? "s" : ""}</p>
                       </div>
                     </div>
 
@@ -247,13 +247,13 @@ export function SpBranchDetailView({ branch, serviceCategories, onBack, onEdit }
                         <div key={service.name} className="rounded-lg border border-border bg-card p-3">
                           <div className="flex items-start justify-between gap-3">
                             <div>
-                              <p className="text-[13px] font-medium text-foreground">{service.name}</p>
-                              <p className="text-[11px] text-muted-foreground mt-0.5">Service</p>
+                              <p className="text-nav font-medium text-foreground">{service.name}</p>
+                              <p className="text-caption text-muted-foreground mt-0.5">Service</p>
                             </div>
                           </div>
                           <div className="mt-3 flex flex-wrap gap-1.5">
                             {service.subServices.map((subService) => (
-                              <Badge key={subService} variant="secondary" className="text-[11px]">
+                              <Badge key={subService} variant="secondary" className="text-caption">
                                 {subService}
                               </Badge>
                             ))}
@@ -267,12 +267,12 @@ export function SpBranchDetailView({ branch, serviceCategories, onBack, onEdit }
                 {customServices.length > 0 && (
                   <div className="rounded-xl border border-dashed border-border bg-muted/10 p-4 space-y-3">
                     <div>
-                      <p className="text-[13px] font-semibold text-foreground">Custom Subservices</p>
-                      <p className="text-[11px] text-muted-foreground">Free-text additions entered by the provider.</p>
+                      <p className="text-nav font-semibold text-foreground">Custom Subservices</p>
+                      <p className="text-caption text-muted-foreground">Free-text additions entered by the provider.</p>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {customServices.map((subService) => (
-                        <Badge key={subService} variant="outline" className="text-[11px]">
+                        <Badge key={subService} variant="outline" className="text-caption">
                           {subService}
                         </Badge>
                       ))}
@@ -289,7 +289,7 @@ export function SpBranchDetailView({ branch, serviceCategories, onBack, onEdit }
           <DetailSection title="Benefits" icon={<CheckCircle size={16} weight="fill" />}>
             <div className="flex flex-wrap gap-2">
               {branch.benefits?.map((benefit) => (
-                <Badge key={benefit} variant="secondary" className="text-[12px] px-3 py-1">
+                <Badge key={benefit} variant="secondary" className="text-label px-3 py-1">
                   {benefit}
                 </Badge>
               ))}
@@ -304,11 +304,11 @@ export function SpBranchDetailView({ branch, serviceCategories, onBack, onEdit }
               const day = branch.operatingHours[key];
               return (
                 <div key={key} className="grid grid-cols-[100px_1fr] items-center gap-4 py-1.5">
-                  <span className="text-[12px] font-medium text-foreground">{label}</span>
+                  <span className="text-label font-medium text-foreground">{label}</span>
                   {day.isClosed ? (
-                    <span className="text-[12px] text-muted-foreground/60 italic">Closed</span>
+                    <span className="text-label text-muted-foreground/60 italic">Closed</span>
                   ) : (
-                    <span className="text-[12px] text-muted-foreground font-mono">{day.open} – {day.close}</span>
+                    <span className="text-label text-muted-foreground font-mono">{day.open} – {day.close}</span>
                   )}
                 </div>
               );

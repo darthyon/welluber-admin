@@ -28,8 +28,8 @@ export function Slider({
     <div className={cn("space-y-3", className)}>
       {(label || value !== undefined) && (
         <div className="flex items-center justify-between">
-          {label && <label className="text-[13px] font-medium text-foreground">{label}</label>}
-          <span className="text-[12px] font-mono font-medium text-primary bg-primary/10 px-2 py-0.5 rounded">
+          {label && <label className="text-nav font-medium text-foreground">{label}</label>}
+          <span className="text-label font-mono font-medium text-primary bg-primary/10 px-2 py-0.5 rounded">
             {value}{unit}
           </span>
         </div>
@@ -43,7 +43,7 @@ export function Slider({
         onChange={(e) => onChange(parseInt(e.target.value))}
         className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all hover:bg-muted/80"
       />
-      <div className="flex justify-between text-[10px] text-muted-foreground font-medium px-0.5">
+      <div className="flex justify-between text-micro text-muted-foreground font-medium px-0.5">
         <span>{min}{unit}</span>
         <span>{max}{unit}</span>
       </div>

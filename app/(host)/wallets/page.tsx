@@ -35,20 +35,20 @@ export default function WalletsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold tracking-tight text-foreground text-[20px]">Wallets</h1>
-          <p className="text-muted-foreground text-[13px] mt-1 font-normal opacity-80">
+          <p className="text-muted-foreground text-nav mt-1 font-normal opacity-80">
             Monitor and manage organisation/branch fiscal balances.
           </p>
         </div>
         
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="h-9 text-[13px] font-medium border-border/60 hover:bg-muted/50">
+          <Button variant="outline" size="sm" className="h-9 text-nav font-medium border-border/60 hover:bg-muted/50">
             <ArrowsClockwise size={16} className="mr-1.5 opacity-60" />
             Refresh
           </Button>
 
           <div className="h-4 w-[1px] bg-border mx-1" />
 
-          <Button className="h-9 text-[13px] font-medium shadow-sm">
+          <Button className="h-9 text-nav font-medium shadow-sm">
             <Plus size={16} weight="bold" className="mr-1.5" />
             Create Wallet
           </Button>
@@ -180,7 +180,7 @@ function WalletGridCard({ wallet }: { wallet: Wallet }) {
         exit={{ opacity: 0, scale: 0.95 }}
         whileHover={{ y: -2 }}
         transition={{ duration: 0.2, ease: "easeOut" }}
-        className="group relative bg-zinc-50/50 border border-zinc-200 rounded-xl p-5 hover:border-primary/30 hover:shadow-md transition-all duration-300 cursor-pointer overflow-hidden"
+        className="group relative bg-muted/50 border border-zinc-200 rounded-xl p-5 hover:border-primary/30 hover:shadow-md transition-all duration-300 cursor-pointer overflow-hidden"
         onClick={() => router.push(`/wallets/${wallet.id}`)}
       >
         {/* Decorative accent */}
@@ -189,21 +189,21 @@ function WalletGridCard({ wallet }: { wallet: Wallet }) {
         {/* Header */}
         <div className="flex items-start justify-between mb-8 relative z-10">
           <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-zinc-100/80 border border-zinc-200/60 text-zinc-500 flex items-center justify-center transition-all duration-300 group-hover:bg-primary/5 group-hover:text-primary">
+            <div className="w-12 h-12 rounded-2xl bg-muted/80 border border-zinc-200/60 text-muted-foreground flex items-center justify-center transition-all duration-300 group-hover:bg-primary/5 group-hover:text-primary">
                {wallet.model === "cash_balance" ? <Bank size={24} weight="fill" /> : <CreditCard size={24} weight="fill" />}
             </div>
 
             <div className="space-y-1.5">
-              <h3 className="font-bold text-[14px] text-foreground hover:text-zinc-900 transition-colors block leading-tight tracking-tight">
+              <h3 className="font-semibold text-body text-foreground hover:text-foreground transition-colors block leading-tight tracking-tight">
                 {wallet.orgName}
               </h3>
               <div className="flex items-center gap-2">
                 <StatusBadge 
                   status={wallet.status} 
                   variant={wallet.status === "active" ? "emerald" : "zinc"} 
-                  className="px-1.5 py-0.5 rounded-md text-[10px]"
+                  className="px-1.5 py-0.5 rounded-md text-micro"
                 />
-                <span className="text-[10px] text-zinc-400 font-mono bg-white px-1.5 py-0.5 rounded border border-zinc-200 tracking-tight">{wallet.id}</span>
+                <span className="text-micro text-muted-foreground/60 font-mono bg-white px-1.5 py-0.5 rounded border border-zinc-200 tracking-tight">{wallet.id}</span>
               </div>
             </div>
           </div>
@@ -218,15 +218,15 @@ function WalletGridCard({ wallet }: { wallet: Wallet }) {
           <div className="grid grid-cols-2 gap-4">
             {/* Wallet Model & Branch */}
             <div className="space-y-2.5">
-              <div className="flex items-center gap-1.5 text-zinc-400">
+              <div className="flex items-center gap-1.5 text-muted-foreground/60">
                 <WalletIcon size={14} weight="bold" />
-                <span className="text-[11px] font-semibold tracking-tight text-muted-foreground/80">Wallet model</span>
+                <span className="text-caption font-semibold tracking-tight text-muted-foreground/80">Wallet model</span>
               </div>
               <div className="space-y-1">
-                <span className="text-[14px] font-bold text-zinc-800 block">
+                <span className="text-body font-semibold text-foreground block">
                   {wallet.model === "cash_balance" ? "Cash" : "Credit"}
                 </span>
-                <span className="text-[11px] font-medium text-zinc-400 truncate block max-w-full">
+                <span className="text-caption font-medium text-muted-foreground/60 truncate block max-w-full">
                    {wallet.branchName}
                 </span>
               </div>
@@ -234,17 +234,17 @@ function WalletGridCard({ wallet }: { wallet: Wallet }) {
 
             {/* Utilization Ring */}
             <div className="space-y-2.5">
-              <div className="flex items-center gap-1.5 text-zinc-400">
+              <div className="flex items-center gap-1.5 text-muted-foreground/60">
                 <ChartPieSlice size={14} weight="bold" />
-                <span className="text-[11px] font-semibold tracking-tight text-zinc-500/80">Utilisation</span>
+                <span className="text-caption font-semibold tracking-tight text-muted-foreground">Utilisation</span>
               </div>
               <div className="flex items-center gap-3">
                 <UtilizationChart value={utilizationRate} mode="ring" size={44} strokeWidth={4} />
                 <div className="flex flex-col justify-center">
-                  <span className={cn("text-[14px] font-bold leading-tight", getUtilColor(utilizationRate))}>
+                  <span className={cn("text-body font-semibold leading-tight", getUtilColor(utilizationRate))}>
                     RM {wallet.balance.toLocaleString()}
                   </span>
-                  <span className="text-[10px] text-zinc-400 font-medium tabular-nums mt-0.5">
+                  <span className="text-micro text-muted-foreground/60 font-medium tabular-nums mt-0.5">
                     / RM {limit.toLocaleString()}
                   </span>
                 </div>
@@ -255,16 +255,16 @@ function WalletGridCard({ wallet }: { wallet: Wallet }) {
           {/* Pending claims aligned with SP style */}
           <div className="pt-2 flex items-center gap-2">
             <div className={cn(
-              "inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[11px] font-semibold transition-all",
+              "inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-caption font-semibold transition-all",
               wallet.pendingDeductions > 0
                 ? "bg-amber-50 border-amber-200 text-amber-700"
-                : "bg-zinc-50 border-zinc-200 text-zinc-400"
+                : "bg-muted border-zinc-200 text-muted-foreground/60"
             )}>
               <Ticket size={14} weight="fill" />
               {wallet.pendingDeductions === 0 ? "0" : `RM ${wallet.pendingDeductions.toLocaleString()}`} pending
             </div>
             {wallet.status === "suspended" && (
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-red-100 bg-red-50 text-[11px] font-semibold text-red-600">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-red-100 bg-red-50 text-caption font-semibold text-red-600">
                     Hold active
                 </div>
             )}

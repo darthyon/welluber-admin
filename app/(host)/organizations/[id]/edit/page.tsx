@@ -68,12 +68,12 @@ export default function EditOrganizationPage() {
         <div>
           <Link 
             href={`/organizations/${orgId}`}
-            className="inline-flex items-center gap-1.5 text-[13px] font-medium text-muted-foreground hover:text-foreground transition-colors mb-4"
+            className="inline-flex items-center gap-1.5 text-nav font-medium text-muted-foreground hover:text-foreground transition-colors mb-4"
           >
             <CaretLeft size={16} /> Back to Detail Profile
           </Link>
           <h1 className="text-xl font-semibold tracking-tight text-foreground">Edit Organisation</h1>
-          <p className="text-muted-foreground text-[13px] mt-1">Make changes to the corporate client&apos;s core identity.</p>
+          <p className="text-muted-foreground text-nav mt-1">Make changes to the corporate client&apos;s core identity.</p>
         </div>
 
         {/* Form Card */}
@@ -83,52 +83,52 @@ export default function EditOrganizationPage() {
             {/* Section: Account Details */}
             <div className="p-6 border-b border-border space-y-6">
               <div className="flex items-center gap-2 pb-2">
-                <div className="w-8 h-8 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-500">
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                   <Buildings size={16} weight="fill" />
                 </div>
-                <h3 className="text-[15px] font-semibold text-foreground">Account Details</h3>
+                <h3 className="text-subtitle font-semibold text-foreground">Account Details</h3>
               </div>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div className="space-y-1.5 sm:col-span-2">
-                  <label className="text-[13px] font-medium text-foreground">Company Name</label>
+                  <label className="text-nav font-medium text-foreground">Company Name</label>
                   <input 
                     {...register("name")}
                     className={cn(
-                      "w-full px-3 py-2 bg-background border rounded-md text-[14px] outline-none transition-colors",
+                      "w-full px-3 py-2 bg-background border rounded-md text-body outline-none transition-colors",
                       errors.name ? "border-destructive focus:border-destructive" : "border-border focus:border-foreground/30 focus:bg-muted/30"
                     )}
                     placeholder="e.g. Acme Corporation Sdn Bhd"
                   />
                   {errors.name && (
-                    <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
+                    <p className="text-caption text-destructive flex items-center gap-1 mt-1">
                       <WarningCircle size={12} /> {errors.name.message}
                     </p>
                   )}
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[13px] font-medium text-foreground">Registration Number</label>
+                  <label className="text-nav font-medium text-foreground">Registration Number</label>
                   <input 
                     {...register("registrationNumber")}
                     className={cn(
-                      "w-full px-3 py-2 bg-background border rounded-md text-[14px] outline-none transition-colors",
+                      "w-full px-3 py-2 bg-background border rounded-md text-body outline-none transition-colors",
                       errors.registrationNumber ? "border-destructive focus:border-destructive" : "border-border focus:border-foreground/30 focus:bg-muted/30"
                     )}
                     placeholder="e.g. 1234567-T"
                   />
                   {errors.registrationNumber && (
-                    <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
+                    <p className="text-caption text-destructive flex items-center gap-1 mt-1">
                       <WarningCircle size={12} /> {errors.registrationNumber.message}
                     </p>
                   )}
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[13px] font-medium text-foreground">Organisation Type</label>
+                  <label className="text-nav font-medium text-foreground">Organisation Type</label>
                   <select 
                     {...register("type")}
-                    className="w-full px-3 py-2 bg-background border border-border rounded-md text-[14px] outline-none focus:border-foreground/30 focus:bg-muted/30 transition-colors"
+                    className="w-full px-3 py-2 bg-background border border-border rounded-md text-body outline-none focus:border-foreground/30 focus:bg-muted/30 transition-colors"
                   >
                     <option value="sme">SME</option>
                     <option value="enterprise">Enterprise</option>
@@ -139,11 +139,11 @@ export default function EditOrganizationPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[13px] font-medium text-foreground">Industry</label>
+                  <label className="text-nav font-medium text-foreground">Industry</label>
                   <select 
                     {...register("industry")}
                     className={cn(
-                      "w-full px-3 py-2 bg-background border rounded-md text-[14px] outline-none transition-colors",
+                      "w-full px-3 py-2 bg-background border rounded-md text-body outline-none transition-colors",
                       errors.industry ? "border-destructive focus:border-destructive" : "border-border focus:border-foreground/30 focus:bg-muted/30"
                     )}
                   >
@@ -158,41 +158,41 @@ export default function EditOrganizationPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[13px] font-medium text-foreground">Sub-Industry</label>
+                  <label className="text-nav font-medium text-foreground">Sub-Industry</label>
                   <input 
                     {...register("subIndustry")}
-                    className="w-full px-3 py-2 bg-background border border-border rounded-md text-[14px] outline-none focus:border-foreground/30 focus:bg-muted/30 transition-colors"
+                    className="w-full px-3 py-2 bg-background border border-border rounded-md text-body outline-none focus:border-foreground/30 focus:bg-muted/30 transition-colors"
                     placeholder="e.g. Software Development"
                   />
                 </div>
 
                 <div className="space-y-1.5 sm:col-span-2">
-                  <label className="text-[13px] font-medium text-foreground flex items-center justify-between">
+                  <label className="text-nav font-medium text-foreground flex items-center justify-between">
                     Financial Year Start Date
-                    <span className="text-[11px] font-normal text-muted-foreground bg-muted px-1.5 py-0.5 rounded italic">Used for benefit cycle</span>
+                    <span className="text-caption font-normal text-muted-foreground bg-muted px-1.5 py-0.5 rounded italic">Used for benefit cycle</span>
                   </label>
                   <input 
                     type="date"
                     {...register("financialYearStart", { valueAsDate: true })}
                     className={cn(
-                      "w-full px-3 py-2 bg-background border rounded-md text-[14px] outline-none transition-colors",
+                      "w-full px-3 py-2 bg-background border rounded-md text-body outline-none transition-colors",
                       errors.financialYearStart ? "border-destructive focus:border-destructive" : "border-border focus:border-foreground/30 focus:bg-muted/30"
                     )}
                   />
                 </div>
 
                 <div className="space-y-1.5 sm:col-span-2">
-                  <label className="text-[13px] font-medium text-foreground">TIN No.</label>
+                  <label className="text-nav font-medium text-foreground">TIN No.</label>
                   <input 
                     {...register("tinNumber")}
                     className={cn(
-                      "w-full px-3 py-2 bg-background border rounded-md text-[14px] outline-none transition-colors",
+                      "w-full px-3 py-2 bg-background border rounded-md text-body outline-none transition-colors",
                       errors.tinNumber ? "border-destructive focus:border-destructive" : "border-border focus:border-foreground/30 focus:bg-muted/30"
                     )}
                     placeholder="e.g. TR-882910-01"
                   />
                   {errors.tinNumber && (
-                    <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
+                    <p className="text-caption text-destructive flex items-center gap-1 mt-1">
                       <WarningCircle size={12} /> {errors.tinNumber.message}
                     </p>
                   )}
@@ -206,15 +206,15 @@ export default function EditOrganizationPage() {
                 <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500">
                   <CreditCard size={16} weight="fill" />
                 </div>
-                <h3 className="text-[15px] font-semibold text-foreground">Subscription Details</h3>
+                <h3 className="text-subtitle font-semibold text-foreground">Subscription Details</h3>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div className="space-y-1.5">
-                  <label className="text-[13px] font-medium text-foreground">Subscription Plan</label>
+                  <label className="text-nav font-medium text-foreground">Subscription Plan</label>
                   <select 
                     {...register("subscription.plan")}
-                    className="w-full px-3 py-2 bg-background border border-border rounded-md text-[14px] outline-none focus:border-foreground/30 focus:bg-muted/30 transition-colors"
+                    className="w-full px-3 py-2 bg-background border border-border rounded-md text-body outline-none focus:border-foreground/30 focus:bg-muted/30 transition-colors"
                   >
                     <option value="standard">Standard Plan</option>
                     <option value="premium">Premium Plan</option>
@@ -223,43 +223,43 @@ export default function EditOrganizationPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[13px] font-medium text-foreground">Payment Method</label>
+                  <label className="text-nav font-medium text-foreground">Payment Method</label>
                   <input 
                     {...register("subscription.paymentMethod")}
-                    className="w-full px-3 py-2 bg-background border border-border rounded-md text-[14px] outline-none focus:border-foreground/30 focus:bg-muted/30 transition-colors"
+                    className="w-full px-3 py-2 bg-background border border-border rounded-md text-body outline-none focus:border-foreground/30 focus:bg-muted/30 transition-colors"
                     placeholder="e.g. Visa ending in 4242"
                   />
                 </div>
 
                 <div className="space-y-1.5 sm:col-span-2">
-                  <label className="text-[13px] font-medium text-foreground">Billing Information</label>
+                  <label className="text-nav font-medium text-foreground">Billing Information</label>
                   <textarea 
                     {...register("subscription.billingInformation")}
                     rows={2}
-                    className="w-full px-3 py-2 bg-background border border-border rounded-md text-[14px] outline-none focus:border-foreground/30 focus:bg-muted/30 transition-colors resize-none"
+                    className="w-full px-3 py-2 bg-background border border-border rounded-md text-body outline-none focus:border-foreground/30 focus:bg-muted/30 transition-colors resize-none"
                     placeholder="e.g. Monthly Invoicing"
                   />
                 </div>
 
                 <div className="space-y-1.5 font-medium">
-                  <label className="text-[13px] font-medium text-foreground flex items-center gap-1.5">
+                  <label className="text-nav font-medium text-foreground flex items-center gap-1.5">
                     <CalendarBlank size={14} /> Start Date
                   </label>
                   <input 
                     type="date"
                     {...register("subscription.startDate", { valueAsDate: true })}
-                    className="w-full px-3 py-2 bg-background border border-border rounded-md text-[14px] outline-none focus:border-foreground/30 focus:bg-muted/30 transition-colors"
+                    className="w-full px-3 py-2 bg-background border border-border rounded-md text-body outline-none focus:border-foreground/30 focus:bg-muted/30 transition-colors"
                   />
                 </div>
 
                 <div className="space-y-1.5 font-medium">
-                  <label className="text-[13px] font-medium text-foreground flex items-center gap-1.5">
+                  <label className="text-nav font-medium text-foreground flex items-center gap-1.5">
                     <CalendarBlank size={14} /> End Date
                   </label>
                   <input 
                     type="date"
                     {...register("subscription.endDate", { valueAsDate: true })}
-                    className="w-full px-3 py-2 bg-background border border-border rounded-md text-[14px] outline-none focus:border-foreground/30 focus:bg-muted/30 transition-colors"
+                    className="w-full px-3 py-2 bg-background border border-border rounded-md text-body outline-none focus:border-foreground/30 focus:bg-muted/30 transition-colors"
                   />
                 </div>
               </div>
@@ -271,56 +271,56 @@ export default function EditOrganizationPage() {
                 <div className="w-8 h-8 rounded-full bg-violet-500/10 flex items-center justify-center text-violet-500">
                   <Article size={16} weight="fill" />
                 </div>
-                <h3 className="text-[15px] font-semibold text-foreground">Tax & Banking Details</h3>
+                <h3 className="text-subtitle font-semibold text-foreground">Tax & Banking Details</h3>
               </div>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div className="space-y-1.5 sm:col-span-2">
-                  <label className="text-[13px] font-medium text-foreground">Bank Name</label>
+                  <label className="text-nav font-medium text-foreground">Bank Name</label>
                   <input 
                     {...register("bankAccountDetails.bankName")}
                     className={cn(
-                      "w-full px-3 py-2 bg-background border rounded-md text-[14px] outline-none transition-colors",
+                      "w-full px-3 py-2 bg-background border rounded-md text-body outline-none transition-colors",
                       errors.bankAccountDetails?.bankName ? "border-destructive focus:border-destructive" : "border-border focus:border-foreground/30 focus:bg-muted/30"
                     )}
                     placeholder="e.g. Maybank Berhad"
                   />
                   {errors.bankAccountDetails?.bankName && (
-                    <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
+                    <p className="text-caption text-destructive flex items-center gap-1 mt-1">
                       <WarningCircle size={12} /> {errors.bankAccountDetails.bankName.message}
                     </p>
                   )}
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[13px] font-medium text-foreground">Account Number</label>
+                  <label className="text-nav font-medium text-foreground">Account Number</label>
                   <input 
                     {...register("bankAccountDetails.accountNumber")}
                     className={cn(
-                      "w-full px-3 py-2 bg-background border rounded-md text-[14px] outline-none transition-colors",
+                      "w-full px-3 py-2 bg-background border rounded-md text-body outline-none transition-colors",
                       errors.bankAccountDetails?.accountNumber ? "border-destructive focus:border-destructive" : "border-border focus:border-foreground/30 focus:bg-muted/30"
                     )}
                     placeholder="e.g. 5140 1234 5678"
                   />
                   {errors.bankAccountDetails?.accountNumber && (
-                    <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
+                    <p className="text-caption text-destructive flex items-center gap-1 mt-1">
                       <WarningCircle size={12} /> {errors.bankAccountDetails.accountNumber.message}
                     </p>
                   )}
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[13px] font-medium text-foreground">Account Name</label>
+                  <label className="text-nav font-medium text-foreground">Account Name</label>
                   <input 
                     {...register("bankAccountDetails.accountName")}
                     className={cn(
-                      "w-full px-3 py-2 bg-background border rounded-md text-[14px] outline-none transition-colors",
+                      "w-full px-3 py-2 bg-background border rounded-md text-body outline-none transition-colors",
                       errors.bankAccountDetails?.accountName ? "border-destructive focus:border-destructive" : "border-border focus:border-foreground/30 focus:bg-muted/30"
                     )}
                     placeholder="e.g. Acme Corporation Sdn Bhd"
                   />
                   {errors.bankAccountDetails?.accountName && (
-                    <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
+                    <p className="text-caption text-destructive flex items-center gap-1 mt-1">
                       <WarningCircle size={12} /> {errors.bankAccountDetails.accountName.message}
                     </p>
                   )}
@@ -348,14 +348,14 @@ export default function EditOrganizationPage() {
               <Button 
                 asChild
                 variant="outline"
-                className="text-[13px] font-medium"
+                className="text-nav font-medium"
               >
                 <Link href={`/organizations/${orgId}`}>Cancel</Link>
               </Button>
               <Button 
                 type="submit"
                 disabled={isSubmitting}
-                className="text-[13px] font-medium flex items-center gap-2"
+                className="text-nav font-medium flex items-center gap-2"
               >
                 {isSubmitting ? (
                   <>

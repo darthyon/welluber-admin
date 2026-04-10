@@ -135,27 +135,27 @@ function WalletDetailContent() {
 
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
             <div className="flex items-start gap-5">
-              <div className="w-15 h-15 rounded-2xl bg-zinc-100/80 flex items-center justify-center text-zinc-500 border border-zinc-200/60 transition-all">
+              <div className="w-15 h-15 rounded-2xl bg-muted/80 flex items-center justify-center text-muted-foreground border border-zinc-200/60 transition-all">
                 {wallet.model === "cash_balance" ? <Bank size={32} weight="fill" /> : <CreditCard size={32} weight="fill" />}
               </div>
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
-                  <h1 className="text-2xl font-bold tracking-tight text-foreground">{wallet.orgName}</h1>
+                  <h1 className="text-2xl font-semibold tracking-tight text-foreground">{wallet.orgName}</h1>
                   <StatusBadge status={wallet.status} variant={wallet.status === "active" ? "emerald" : "zinc"} />
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-[11px] text-zinc-400 bg-white px-2 py-0.5 rounded border border-zinc-200 uppercase tracking-widest">{wallet.id}</span>
-                  <span className="px-1.5 py-0.5 rounded-md bg-zinc-100 border border-zinc-200 text-[10px] font-semibold text-zinc-500">
+                  <span className="font-mono text-caption text-muted-foreground/60 bg-white px-2 py-0.5 rounded border border-zinc-200 uppercase tracking-widest">{wallet.id}</span>
+                  <span className="px-1.5 py-0.5 rounded-md bg-muted border border-zinc-200 text-micro font-semibold text-muted-foreground">
                     {wallet.model === "cash_balance" ? "Cash balance" : "Credit limit"}
                   </span>
                   <span className="opacity-20 text-muted-foreground">•</span>
-                  <span className="text-[12px] font-medium text-muted-foreground/60">{wallet.branchName}</span>
+                  <span className="text-label font-medium text-muted-foreground/60">{wallet.branchName}</span>
                 </div>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="lg" className="text-[13px] font-medium rounded-full h-10 px-5 border-border/60 hover:bg-muted/10">
+              <Button variant="outline" size="lg" className="text-nav font-medium rounded-full h-10 px-5 border-border/60 hover:bg-muted/10">
                 <CreditCard size={16} className="mr-2 opacity-60" />
                 Update {wallet.model === "cash_balance" ? "Balance" : "Limit"}
               </Button>
@@ -172,7 +172,7 @@ function WalletDetailContent() {
             <button 
               onClick={() => setActiveTab("transactions")}
               className={cn(
-                "h-10 px-0 border-b-2 text-[14px] font-medium transition-all relative",
+                "h-10 px-0 border-b-2 text-body font-medium transition-all relative",
                 activeTab === "transactions" ? "border-primary text-primary" : "border-transparent text-muted-foreground/60 hover:text-foreground"
               )}
             >
@@ -181,7 +181,7 @@ function WalletDetailContent() {
             <button 
               onClick={() => setActiveTab("settings")}
               className={cn(
-                "h-10 px-0 border-b-2 text-[14px] font-medium transition-all relative",
+                "h-10 px-0 border-b-2 text-body font-medium transition-all relative",
                 activeTab === "settings" ? "border-primary text-primary" : "border-transparent text-muted-foreground/60 hover:text-foreground"
               )}
             >
@@ -195,23 +195,23 @@ function WalletDetailContent() {
         {activeTab === "transactions" ? (
            <>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 bg-indigo-50/20 border border-indigo-100 rounded-2xl overflow-hidden relative p-8">
+              <div className="lg:col-span-2 bg-primary/5 border border-primary/10 rounded-2xl overflow-hidden relative p-8">
                 <div className="absolute top-0 right-0 p-8 opacity-[0.03]">
                   {wallet.model === "cash_balance" ? <Bank size={80} weight="fill" /> : <CreditCard size={80} weight="fill" />}
                 </div>
                 <div className="relative z-10">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
                     <div className="space-y-1">
-                      <p className="text-[12px] font-semibold text-indigo-600/70 tracking-tight">Utilisation</p>
-                      <h2 className="text-4xl font-bold tracking-tight text-indigo-950">
+                      <p className="text-label font-semibold text-primary/70 tracking-tight">Utilisation</p>
+                      <h2 className="text-4xl font-semibold tracking-tight text-foreground">
                         RM {wallet.balance.toLocaleString()}
                       </h2>
                       <div className="flex items-center gap-3 mt-4">
                         <div className={cn(
-                          "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[11px] font-semibold transition-all",
+                          "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-caption font-semibold transition-all",
                           wallet.pendingDeductions > 0
                             ? "bg-amber-50 border-amber-200 text-amber-700"
-                            : "bg-zinc-50 border-zinc-200 text-zinc-400"
+                            : "bg-muted border-zinc-200 text-muted-foreground/60"
                         )}>
                           <Ticket size={14} weight="fill" />
                           {wallet.pendingDeductions === 0 ? "0" : `RM ${wallet.pendingDeductions.toLocaleString()}`} pending claims
@@ -220,20 +220,20 @@ function WalletDetailContent() {
                     </div>
 
                     <div className="space-y-4 min-w-[280px]">
-                      <div className="flex justify-between items-center text-[12px] font-bold">
-                        <span className="text-indigo-600/70 tracking-tight">Utilisation pool</span>
-                        <span className="text-indigo-950 font-mono">{utilisationPercent}%</span>
+                      <div className="flex justify-between items-center text-label font-semibold">
+                        <span className="text-primary/70 tracking-tight">Utilisation pool</span>
+                        <span className="text-foreground font-mono">{utilisationPercent}%</span>
                       </div>
-                      <div className="w-full h-2.5 bg-indigo-200/50 rounded-full overflow-hidden shadow-inner">
+                      <div className="w-full h-2.5 bg-primary/20 rounded-full overflow-hidden shadow-inner">
                         <div 
                           className={cn(
                             "h-full rounded-full transition-all duration-700",
-                            utilisationRatio > 0.9 ? "bg-rose-500" : utilisationRatio > 0.7 ? "bg-amber-500" : "bg-indigo-600"
+                            utilisationRatio > 0.9 ? "bg-rose-500" : utilisationRatio > 0.7 ? "bg-amber-500" : "bg-primary"
                           )}
                           style={{ width: `${Math.min(utilisationPercent, 100)}%` }}
                         />
                       </div>
-                      <div className="flex justify-between text-[11px] font-semibold text-indigo-900/40 tracking-tight">
+                      <div className="flex justify-between text-caption font-semibold text-foreground/40 tracking-tight">
                         <span>Used RM {wallet.balance.toLocaleString()}</span>
                         <span>Total RM {(wallet.creditLimit || wallet.balance).toLocaleString()}</span>
                       </div>
@@ -243,8 +243,8 @@ function WalletDetailContent() {
               </div>
 
               <div className="bg-card border border-border/60 rounded-xl p-5 space-y-5">
-                <h3 className="text-[14px] font-bold tracking-tight text-foreground/80">Quick actions</h3>
-                <div className="space-y-2.5 text-[13px] font-medium">
+                <h3 className="text-body font-semibold tracking-tight text-foreground/80">Quick actions</h3>
+                <div className="space-y-2.5 text-nav font-medium">
                    <Button variant="ghost" className="w-full justify-start h-10 gap-3 px-3 hover:bg-muted/50 rounded-lg group">
                     <div className="h-8 w-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 group-hover:bg-emerald-100 transition-colors">
                       <ArrowUpRight size={14} weight="bold" />
@@ -258,7 +258,7 @@ function WalletDetailContent() {
                     Adjustment ledger
                   </Button>
                   <Button variant="ghost" className="w-full justify-start h-10 gap-3 px-3 hover:bg-muted/50 rounded-lg group">
-                    <div className="h-8 w-8 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-500 group-hover:bg-zinc-200 transition-colors">
+                    <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center text-muted-foreground group-hover:bg-muted/50 transition-colors">
                       <DownloadSimple size={14} weight="bold" />
                     </div>
                     Export statement
@@ -283,7 +283,7 @@ function WalletDetailContent() {
                         <button 
                           key={p}
                           onClick={() => setPeriod(p as any)}
-                          className={`px-3 py-1 text-[11px] font-bold rounded-md transition-all ${
+                          className={`px-3 py-1 text-caption font-semibold rounded-md transition-all ${
                             period === p ? "bg-white shadow-sm text-foreground" : "text-muted-foreground/60 hover:text-foreground"
                           }`}
                         >
@@ -292,7 +292,7 @@ function WalletDetailContent() {
                       ))}
                     </div>
 
-                    <select className="px-3 py-1 h-[32px] bg-white border border-border hover:bg-muted/30 rounded-lg text-[11px] font-bold text-foreground outline-none cursor-pointer transition-colors min-w-[120px]">
+                    <select className="px-3 py-1 h-[32px] bg-white border border-border hover:bg-muted/30 rounded-lg text-caption font-semibold text-foreground outline-none cursor-pointer transition-colors min-w-[120px]">
                       {period === "By Month" && (
                         <>
                           <option>January 2026</option>
@@ -311,7 +311,7 @@ function WalletDetailContent() {
 
                     <Popover>
                       <PopoverTrigger asChild>
-                        <button className="flex items-center gap-2 px-3 py-1 h-[32px] bg-white border border-border hover:bg-muted/30 rounded-lg text-[11px] font-bold text-foreground transition-colors group">
+                        <button className="flex items-center gap-2 px-3 py-1 h-[32px] bg-white border border-border hover:bg-muted/30 rounded-lg text-caption font-semibold text-foreground transition-colors group">
                           <CalendarBlank size={14} className="text-muted-foreground group-hover:text-foreground transition-colors" />
                           <span>Custom Range</span>
                         </button>
@@ -334,13 +334,13 @@ function WalletDetailContent() {
                        <div className="flex items-center gap-4 py-1">
                          <div className={cn(
                            "h-9 w-9 rounded-xl flex items-center justify-center shrink-0 shadow-sm",
-                           trx.type === "topup" ? "bg-emerald-50 text-emerald-600" : "bg-zinc-50 text-zinc-500"
+                           trx.type === "topup" ? "bg-emerald-50 text-emerald-600" : "bg-muted text-muted-foreground"
                          )}>
                            {trx.type === "topup" ? <ArrowUpRight size={15} weight="bold" /> : <ArrowDownRight size={15} weight="bold" />}
                          </div>
                          <div className="space-y-0.5">
-                           <p className="text-[14px] font-bold tracking-tight text-foreground">{trx.description}</p>
-                           <p className="text-[11px] font-semibold text-muted-foreground/50 font-mono">ID: {trx.id}</p>
+                           <p className="text-body font-semibold tracking-tight text-foreground">{trx.description}</p>
+                           <p className="text-caption font-semibold text-muted-foreground/50 font-mono">ID: {trx.id}</p>
                          </div>
                        </div>
                      )
@@ -353,12 +353,12 @@ function WalletDetailContent() {
                      render: (trx: any) => (
                        <div className="text-right">
                          <p className={cn(
-                           "text-[15px] font-bold tracking-tight",
+                           "text-subtitle font-semibold tracking-tight",
                            trx.amount > 0 && trx.type === "topup" ? "text-emerald-600" : "text-foreground"
                          )}>
                            {trx.type === "topup" ? "+" : "-"} RM {Math.abs(trx.amount).toLocaleString()}
                          </p>
-                         <p className="text-[11px] font-medium text-muted-foreground/50 text-nowrap">Balance after: RM {trx.balanceAfter.toLocaleString()}</p>
+                         <p className="text-caption font-medium text-muted-foreground/50 text-nowrap">Balance after: RM {trx.balanceAfter.toLocaleString()}</p>
                        </div>
                      )
                    },
@@ -377,10 +377,10 @@ function WalletDetailContent() {
                      align: "center",
                      render: (trx: any) => (
                        <div className="text-center">
-                         <p className="text-[13px] font-bold text-foreground/80 tracking-tight">
+                         <p className="text-nav font-semibold text-foreground/80 tracking-tight">
                            {new Date(trx.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                          </p>
-                         <p className="text-[11px] font-semibold text-muted-foreground/40">
+                         <p className="text-caption font-semibold text-muted-foreground/40">
                            {new Date(trx.createdAt).toLocaleTimeString('en-MY', { hour: '2-digit', minute: '2-digit' })}
                          </p>
                        </div>
@@ -413,7 +413,7 @@ function WalletDetailContent() {
                     value={
                       <div className="flex items-center gap-3">
                         <StatusBadge status={wallet.status} variant={wallet.status === "active" ? "emerald" : "zinc"} />
-                        <button className="text-[11px] font-bold text-primary hover:opacity-70 transition-opacity">Change status</button>
+                        <button className="text-caption font-semibold text-primary hover:opacity-70 transition-opacity">Change status</button>
                       </div>
                     } 
                   />
@@ -432,12 +432,12 @@ function WalletDetailContent() {
                   <div className="rounded-xl border border-border bg-muted/20 p-4">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div className="space-y-1">
-                        <p className="text-[13px] font-semibold text-foreground">Suspend Wallet</p>
-                        <p className="text-[12px] text-muted-foreground">
+                        <p className="text-nav font-semibold text-foreground">Suspend Wallet</p>
+                        <p className="text-label text-muted-foreground">
                           Pause all deductions and activities temporarily.
                         </p>
                       </div>
-                      <Button variant="outline" className="text-[12px] h-9" onClick={() => openDangerAction("suspend")}>
+                      <Button variant="outline" className="text-label h-9" onClick={() => openDangerAction("suspend")}>
                         Suspend
                       </Button>
                     </div>
@@ -446,12 +446,12 @@ function WalletDetailContent() {
                   <div className="rounded-xl border border-rose-200 bg-rose-50/60 p-4">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div className="space-y-1">
-                        <p className="text-[13px] font-semibold text-foreground">Terminate Wallet Permanently</p>
-                        <p className="text-[12px] text-muted-foreground">
+                        <p className="text-nav font-semibold text-foreground">Terminate Wallet Permanently</p>
+                        <p className="text-label text-muted-foreground">
                           Instantly shutdown fiscal operations for this branch.
                         </p>
                       </div>
-                      <Button variant="destructive" className="text-[12px] h-9" onClick={() => openDangerAction("terminate")}>
+                      <Button variant="destructive" className="text-label h-9" onClick={() => openDangerAction("terminate")}>
                         Terminate
                       </Button>
                     </div>

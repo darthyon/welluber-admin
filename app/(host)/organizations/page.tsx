@@ -219,20 +219,20 @@ export default function OrganizationsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold tracking-tight text-foreground">Organisations</h1>
-          <p className="text-muted-foreground text-[13px] mt-1 font-normal opacity-80">Manage B2B corporate clients on the Welluber platform.</p>
+          <p className="text-muted-foreground text-nav mt-1 font-normal opacity-80">Manage B2B corporate clients on the Welluber platform.</p>
         </div>
         
         <div className="flex items-center gap-2">
           <ViewToggle mode={viewMode} onChange={setViewMode} />
           
-          <Button variant="outline" size="sm" className="h-9 text-[13px] font-medium border-border/60 hover:bg-muted/50">
+          <Button variant="outline" size="sm" className="h-9 text-nav font-medium border-border/60 hover:bg-muted/50">
             <DownloadSimple size={16} className="mr-1.5 opacity-60" />
             Export
           </Button>
 
           <div className="h-4 w-[1px] bg-border mx-1" />
 
-          <Button asChild className="h-9 text-[13px] font-medium shadow-sm">
+          <Button asChild className="h-9 text-nav font-medium shadow-sm">
             <Link href="/organizations/new">
               <Plus size={16} weight="bold" className="mr-1.5" />
               Add Organisation

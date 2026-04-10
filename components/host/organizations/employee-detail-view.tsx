@@ -111,7 +111,7 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
       <div className="flex flex-col gap-4">
         <button 
           onClick={onBack}
-          className="flex items-center gap-1.5 text-[13px] font-medium text-muted-foreground hover:text-primary transition-colors w-fit group"
+          className="flex items-center gap-1.5 text-nav font-medium text-muted-foreground hover:text-primary transition-colors w-fit group"
         >
           <CaretLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
           Back to Employee Directory
@@ -119,15 +119,15 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
         
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-lg shadow-sm">
+            <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-semibold text-lg shadow-sm">
               {employeeData.avatar}
             </div>
             <div>
               <div className="flex items-center gap-3">
-                <h2 className="text-2xl font-bold tracking-tight text-foreground">{employeeData.name}</h2>
+                <h2 className="text-2xl font-semibold tracking-tight text-foreground">{employeeData.name}</h2>
                 <StatusBadge status={employeeData.status} variant="emerald" />
               </div>
-              <p className="text-[14px] text-muted-foreground mt-1 font-medium">
+              <p className="text-body text-muted-foreground mt-1 font-medium">
                 {employeeData.designation} • {employeeData.department}
               </p>
             </div>
@@ -137,7 +137,7 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
             <Button 
                variant="outline" 
                size="sm" 
-               className="h-10 px-4 font-bold border-border/60 hover:bg-muted"
+               className="h-10 px-4 font-semibold border-border/60 hover:bg-muted"
                onClick={() => onEdit(employeeId)}
             >
               <PencilSimpleLine size={18} weight="bold" className="mr-2" />
@@ -251,21 +251,21 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
                           <Shield size={16} weight="fill" />
                         </div>
                         <div>
-                          <h4 className="text-[14px] font-bold text-foreground">{policy.name}</h4>
+                          <h4 className="text-body font-semibold text-foreground">{policy.name}</h4>
                           <div className="flex items-center gap-1 mt-0.5 flex-wrap">
                             {policy.groups.map((g, i) => (
-                              <span key={i} className="text-[10px] bg-muted px-2 py-0.5 rounded-full text-muted-foreground font-bold">{g}</span>
+                              <span key={i} className="text-micro bg-muted px-2 py-0.5 rounded-full text-muted-foreground font-semibold">{g}</span>
                             ))}
                           </div>
                         </div>
                       </div>
                       <div className="flex items-center gap-4 shrink-0">
                         <div className="text-right">
-                          <div className="text-[12px] font-bold text-foreground">{policy.spent} / {policy.limit}</div>
-                          <div className="text-[11px] font-semibold text-muted-foreground/80 mt-0.5">Utilised</div>
+                          <div className="text-label font-semibold text-foreground">{policy.spent} / {policy.limit}</div>
+                          <div className="text-caption font-semibold text-muted-foreground/80 mt-0.5">Utilised</div>
                         </div>
                         <div className="w-24 space-y-1">
-                          <div className="flex justify-between text-[10px] font-bold">
+                          <div className="flex justify-between text-micro font-semibold">
                             <span className={cn(policy.utilisation > 80 ? "text-rose-500" : "text-primary")}>{policy.utilisation}%</span>
                           </div>
                           <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
@@ -276,7 +276,7 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
                           </div>
                         </div>
                         <div className="flex items-center gap-1.5 text-muted-foreground/30">
-                          <span className="text-[11px] font-bold">{policy.claims.length}</span>
+                          <span className="text-caption font-semibold">{policy.claims.length}</span>
                           <CaretDown size={13} weight="bold" className={cn("transition-transform duration-200", isExpanded && "rotate-180")} />
                         </div>
                       </div>
@@ -287,31 +287,31 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
                       <div className="border-t border-border bg-muted/30">
                         <div className="grid grid-cols-[120px_1fr_1fr_1fr_100px_80px] gap-3 px-6 py-2 border-b border-border">
                           {["Voucher", "Service", "Provider", "Location", "Date", "Amount"].map(h => (
-                            <p key={h} className="text-[11px] font-semibold text-muted-foreground/60 tracking-tight">{h}</p>
+                            <p key={h} className="text-caption font-semibold text-muted-foreground/60 tracking-tight">{h}</p>
                           ))}
                         </div>
                         {policy.claims.length === 0 ? (
-                          <p className="text-[12px] text-muted-foreground/40 italic px-6 py-4 font-medium">No claims recorded.</p>
+                          <p className="text-label text-muted-foreground/40 italic px-6 py-4 font-medium">No claims recorded.</p>
                         ) : policy.claims.map(claim => (
                           <div key={claim.id} className="grid grid-cols-[120px_1fr_1fr_1fr_100px_80px] gap-3 px-6 py-3 border-b border-border last:border-0 hover:bg-muted/80 transition-colors items-center">
                             <div className="flex items-center gap-1.5">
-                              <span className={cn("text-[9px] font-bold px-1.5 py-0.5 rounded", CLAIM_STATUS_STYLE[claim.status])}>{claim.status}</span>
-                              <code className="text-[10px] font-mono text-muted-foreground/60 truncate tracking-tighter">{claim.voucherCode}</code>
+                              <span className={cn("text-micro font-semibold px-1.5 py-0.5 rounded", CLAIM_STATUS_STYLE[claim.status])}>{claim.status}</span>
+                              <code className="text-micro font-mono text-muted-foreground/60 truncate tracking-tighter">{claim.voucherCode}</code>
                             </div>
-                            <p className="text-[12px] text-foreground font-medium truncate">{claim.service}</p>
+                            <p className="text-label text-foreground font-medium truncate">{claim.service}</p>
                             <div className="flex items-center gap-1.5 min-w-0">
                                <Storefront size={11} className="text-muted-foreground/30 shrink-0" />
-                               <p className="text-[12px] text-muted-foreground font-medium truncate">{claim.provider}</p>
+                               <p className="text-label text-muted-foreground font-medium truncate">{claim.provider}</p>
                             </div>
                             <div className="flex items-center gap-1.5 min-w-0">
                                <MapPin size={11} className="text-muted-foreground/30 shrink-0" />
-                               <p className="text-[12px] text-muted-foreground font-medium truncate">{claim.location}</p>
+                               <p className="text-label text-muted-foreground font-medium truncate">{claim.location}</p>
                             </div>
                             <div className="flex items-center gap-1.5">
                                <Calendar size={11} className="text-muted-foreground/30 shrink-0" />
-                               <p className="text-[11px] text-muted-foreground/50 font-bold tracking-tight whitespace-nowrap">{claim.date}</p>
+                               <p className="text-caption text-muted-foreground/50 font-semibold tracking-tight whitespace-nowrap">{claim.date}</p>
                             </div>
-                            <p className="text-[12px] font-bold font-mono text-foreground text-right tracking-tighter">RM {claim.amount.toFixed(2)}</p>
+                            <p className="text-label font-semibold font-mono text-foreground text-right tracking-tighter">RM {claim.amount.toFixed(2)}</p>
                           </div>
                         ))}
                       </div>
@@ -333,11 +333,11 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
               <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground/50 mb-4 border border-dashed border-border/40">
                 <Users size={24} />
               </div>
-              <h5 className="text-[14px] font-bold text-foreground tracking-tight">0 Dependents</h5>
-              <p className="text-[12px] text-muted-foreground mt-1 max-w-[180px] font-medium opacity-70">
+              <h5 className="text-body font-semibold text-foreground tracking-tight">0 Dependents</h5>
+              <p className="text-label text-muted-foreground mt-1 max-w-[180px] font-medium opacity-70">
                 No dependents have been added to this employee profile yet.
               </p>
-              <Button variant="link" className="text-primary h-auto p-0 mt-4 font-bold text-[13px] hover:no-underline hover:text-primary/80">
+              <Button variant="link" className="text-primary h-auto p-0 mt-4 font-semibold text-nav hover:no-underline hover:text-primary/80">
                 Add Dependent
               </Button>
             </div>

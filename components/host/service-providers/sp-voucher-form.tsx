@@ -164,10 +164,10 @@ export function SpVoucherForm({
             <CaretLeft size={20} weight="bold" />
           </button>
           <div>
-            <h2 className="text-xl font-bold tracking-tight text-foreground">
+            <h2 className="text-xl font-semibold tracking-tight text-foreground">
               {isReadOnly ? "Voucher Details" : (isEditing ? "Edit Voucher" : "Add Voucher")}
             </h2>
-            <p className="text-[13px] text-muted-foreground mt-1">
+            <p className="text-nav text-muted-foreground mt-1">
               {isReadOnly 
                 ? "Review the pricing and configuration details for this voucher."
                 : (isEditing 
@@ -183,7 +183,7 @@ export function SpVoucherForm({
               variant="secondary" 
               size="lg" 
               onClick={onEdit}
-              className="text-[13px] font-bold rounded-full gap-2 transition-all px-6 h-10 border border-border/60"
+              className="text-nav font-semibold rounded-full gap-2 transition-all px-6 h-10 border border-border/60"
             >
               <PencilSimpleLine size={16} weight="bold" />
               Edit Voucher
@@ -194,7 +194,7 @@ export function SpVoucherForm({
                 variant="ghost" 
                 onClick={onCancel} 
                 disabled={isSubmitting || isPublishing}
-                className="text-muted-foreground font-bold hover:text-foreground hover:bg-muted h-10 px-5"
+                className="text-muted-foreground font-semibold hover:text-foreground hover:bg-muted h-10 px-5"
               >
                 Cancel
               </Button>
@@ -244,16 +244,16 @@ export function SpVoucherForm({
             <div className="space-y-5 p-1">
               {isEditing && (
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-semibold text-muted-foreground/40 tracking-tight">Voucher code</label>
-                  <div className="w-full px-3 py-2 bg-muted/10 border border-border rounded-lg text-[14px] font-mono text-muted-foreground/60 cursor-not-allowed">
+                  <label className="text-caption font-semibold text-muted-foreground/40 tracking-tight">Voucher code</label>
+                  <div className="w-full px-3 py-2 bg-muted/10 border border-border rounded-lg text-body font-mono text-muted-foreground/60 cursor-not-allowed">
                     {voucher?.code}
                   </div>
-                  <p className="text-[10px] text-muted-foreground/20 italic">Auto-generated format. Cannot be changed.</p>
+                  <p className="text-micro text-muted-foreground/20 italic">Auto-generated format. Cannot be changed.</p>
                 </div>
               )}
               <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-muted-foreground/40 tracking-tight">
-                  Voucher name <span className="text-rose-500">*</span>
+                <label className="text-caption font-semibold text-muted-foreground/40 tracking-tight">
+                  Voucher name <span className="text-destructive">*</span>
                 </label>
                 <input 
                   {...register("name")} 
@@ -264,7 +264,7 @@ export function SpVoucherForm({
                 {errors.name && <FieldError msg={errors.name.message} />}
               </div>
               <div className="space-y-1.5">
-                <label className="text-[11px] font-semibold text-muted-foreground/40 tracking-tight">Description</label>
+                <label className="text-caption font-semibold text-muted-foreground/40 tracking-tight">Description</label>
                 <textarea 
                   {...register("description")} 
                   rows={4} 
@@ -275,8 +275,8 @@ export function SpVoucherForm({
               </div>
               <div className="flex items-center justify-between p-4 bg-primary/5 rounded-2xl border border-primary/10">
                 <div className="space-y-0.5">
-                  <p className="text-[14px] font-bold text-foreground">Booking Required</p>
-                  <p className="text-[12px] text-muted-foreground/60">Enable this if members must book a slot before redemption.</p>
+                  <p className="text-body font-semibold text-foreground">Booking Required</p>
+                  <p className="text-label text-muted-foreground/60">Enable this if members must book a slot before redemption.</p>
                 </div>
                 <Switch 
                   checked={watch("bookingRequired")} 
@@ -305,7 +305,7 @@ export function SpVoucherForm({
                   >
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-muted-foreground/40 tracking-tight">Service</label>
+                        <label className="text-micro font-semibold text-muted-foreground/40 tracking-tight">Service</label>
                         <SectionedSearchSelect
                           taxonomy={SERVICE_TAXONOMY.filter(cat => spServiceCategories.includes(cat.category))}
                           value={watch(`serviceLines.${i}.service`)}
@@ -319,7 +319,7 @@ export function SpVoucherForm({
                         />
                       </div>
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-muted-foreground/40 tracking-tight">Sub-services</label>
+                        <label className="text-micro font-semibold text-muted-foreground/40 tracking-tight">Sub-services</label>
                         <CustomMultiSelect
                           options={SERVICE_SPEC_TAXONOMY[watch(`serviceLines.${i}.service`)] || []}
                           selected={watch(`serviceLines.${i}.subServices`) || []}
@@ -329,11 +329,11 @@ export function SpVoucherForm({
                         />
                       </div>
                       <div className="space-y-1.5 sm:col-span-2">
-                        <label className="text-[10px] font-bold text-muted-foreground/40 tracking-tight">Voucher features</label>
+                        <label className="text-micro font-semibold text-muted-foreground/40 tracking-tight">Voucher features</label>
                         <textarea 
                           {...register(`serviceLines.${i}.descriptionList`)} 
                           rows={3} 
-                          className={cn(inputCls(), "resize-none font-mono text-[13px] bg-card")} 
+                          className={cn(inputCls(), "resize-none font-mono text-nav bg-card")} 
                           placeholder="List features separated by lines, e.g.
 • Includes 5 sessions
 • Peak hours access
@@ -349,7 +349,7 @@ export function SpVoucherForm({
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full border-dashed border-border h-14 text-muted-foreground hover:text-primary hover:border-primary/30 transition-all bg-card rounded-2xl font-bold shadow-sm"
+                    className="w-full border-dashed border-border h-14 text-muted-foreground hover:text-primary hover:border-primary/30 transition-all bg-card rounded-2xl font-semibold shadow-sm"
                     onClick={() => appendLine({ service: "", subServices: [], description: "", descriptionList: "" })}
                   >
                     <Plus size={18} weight="bold" className="mr-2" /> 
@@ -370,8 +370,8 @@ export function SpVoucherForm({
               {/* Activation Period */}
               <div className="space-y-4">
                 <div>
-                  <h4 className="text-[14px] font-bold text-foreground tracking-tight">Activation period</h4>
-                  <p className="text-[12px] text-muted-foreground/60 mt-0.5">When is this voucher available for purchase?</p>
+                  <h4 className="text-body font-semibold text-foreground tracking-tight">Activation period</h4>
+                  <p className="text-label text-muted-foreground/60 mt-0.5">When is this voucher available for purchase?</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <DatePickerField
@@ -396,8 +396,8 @@ export function SpVoucherForm({
               {/* Redemption Period */}
               <div className="space-y-4">
                 <div>
-                  <h4 className="text-[14px] font-bold text-foreground tracking-tight">Redemption period</h4>
-                  <p className="text-[12px] text-muted-foreground/60 mt-0.5">When can customers use this voucher?</p>
+                  <h4 className="text-body font-semibold text-foreground tracking-tight">Redemption period</h4>
+                  <p className="text-label text-muted-foreground/60 mt-0.5">When can customers use this voucher?</p>
                 </div>
 
                 <div className="flex flex-col gap-2">
@@ -424,16 +424,16 @@ export function SpVoucherForm({
                 {redemptionMode === "after_purchase" && (
                   <div className="mt-4 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
                     <div className="flex flex-col gap-2">
-                      <label className="text-[11px] font-bold text-muted-foreground/40 tracking-tight">Valid for</label>
+                      <label className="text-caption font-semibold text-muted-foreground/40 tracking-tight">Valid for</label>
                       <div className="flex items-center gap-2">
                         <input
                           type="number"
-                          className="w-16 px-3 py-1.5 bg-card border border-border rounded-lg text-[14px] text-center font-bold outline-none focus:ring-2 focus:ring-primary/10"
+                          className="w-16 px-3 py-1.5 bg-card border border-border rounded-lg text-body text-center font-semibold outline-none focus:ring-2 focus:ring-primary/10"
                           {...register("redemptionPeriod.value", { valueAsNumber: true })}
                           disabled={isReadOnly}
                         />
                         <select
-                          className="flex-1 px-3 py-1.5 bg-card border border-border rounded-lg text-[14px] font-bold text-foreground outline-none focus:ring-2 focus:ring-primary/10"
+                          className="flex-1 px-3 py-1.5 bg-card border border-border rounded-lg text-body font-semibold text-foreground outline-none focus:ring-2 focus:ring-primary/10"
                           {...register("redemptionPeriod.unit")}
                           disabled={isReadOnly}
                         >
@@ -448,7 +448,7 @@ export function SpVoucherForm({
 
                 {redemptionMode === "exact_date" && (
                   <div className="mt-4 space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                    <label className="text-[11px] font-bold text-muted-foreground/40 tracking-tight block">Expiry date</label>
+                    <label className="text-caption font-semibold text-muted-foreground/40 tracking-tight block">Expiry date</label>
                     <DatePickerField
                       value={watch("redemptionPeriod.date") || ""}
                       onChange={(v: string) => setValue("redemptionPeriod.date", v)}
@@ -512,7 +512,7 @@ export function SpVoucherForm({
 
               {branchScope === "specific" && (
                 <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <label className="text-[10px] font-bold text-muted-foreground/40 tracking-tight">Select branches</label>
+                  <label className="text-micro font-semibold text-muted-foreground/40 tracking-tight">Select branches</label>
                   <CustomMultiSelect
                     options={spBranches.map(b => b.name)}
                     selected={watch("branchIds").map(id => spBranches.find(b => b.id === id)?.name || id)}
@@ -537,7 +537,7 @@ export function SpVoucherForm({
           >
             <div className="p-1 space-y-5">
               <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-muted-foreground/40 tracking-tight">Currency</label>
+                <label className="text-caption font-semibold text-muted-foreground/40 tracking-tight">Currency</label>
                 <select {...register("currency")} className={selectCls()} disabled={isReadOnly}>
                   {Object.entries(CURRENCIES).map(([code, name]) => (
                     <option key={code} value={code}>{code} - {name}</option>
@@ -546,12 +546,12 @@ export function SpVoucherForm({
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-muted-foreground/40 tracking-tight">Initial price</label>
+                  <label className="text-caption font-semibold text-muted-foreground/40 tracking-tight">Initial price</label>
                   <input type="number" step="0.01" {...register("initialPrice", { valueAsNumber: true })} className={cn(inputCls(), "font-mono")} disabled={isReadOnly} />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-muted-foreground/40 tracking-tight">Final price</label>
-                  <input type="number" step="0.01" {...register("finalPrice", { valueAsNumber: true })} className={cn(inputCls(!!errors.finalPrice), "font-mono font-bold text-primary bg-primary/5 border-primary/20")} disabled={isReadOnly} />
+                  <label className="text-caption font-semibold text-muted-foreground/40 tracking-tight">Final price</label>
+                  <input type="number" step="0.01" {...register("finalPrice", { valueAsNumber: true })} className={cn(inputCls(!!errors.finalPrice), "font-mono font-semibold text-primary bg-primary/5 border-primary/20")} disabled={isReadOnly} />
                 </div>
               </div>
               {errors.finalPrice && <FieldError msg={errors.finalPrice.message} />}
@@ -566,7 +566,7 @@ export function SpVoucherForm({
 function FieldError({ msg }: { msg?: string }) {
   if (!msg) return null;
   return (
-    <div className="flex items-center gap-1.5 text-rose-500 text-[11px] mt-1 font-medium animate-in fade-in slide-in-from-top-1">
+    <div className="flex items-center gap-1.5 text-rose-500 text-caption mt-1 font-medium animate-in fade-in slide-in-from-top-1">
       <WarningCircle size={14} weight="fill" />
       <span>{msg}</span>
     </div>

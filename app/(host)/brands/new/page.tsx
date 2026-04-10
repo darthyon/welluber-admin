@@ -32,13 +32,13 @@ export default function NewBrandPage() {
           <div className="mt-8 flex flex-col items-center gap-4 w-full">
             <Button 
                onClick={() => router.push("/brands")}
-               className="w-full h-11 font-bold text-[14px]"
+               className="w-full h-11 font-semibold text-body"
             >
               Back to Brand List
             </Button>
             <button 
               onClick={() => setIsSuccess(false)}
-              className="text-[13px] font-medium text-muted-foreground hover:text-foreground transition-colors"
+              className="text-nav font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               Create another brand
             </button>
@@ -54,15 +54,15 @@ export default function NewBrandPage() {
       <div className="mb-8 space-y-4">
         <button
           onClick={() => router.push("/brands")}
-          className="flex items-center gap-1.5 text-[13px] font-medium text-muted-foreground hover:text-primary transition-colors group"
+          className="flex items-center gap-1.5 text-nav font-medium text-muted-foreground hover:text-primary transition-colors group"
         >
           <CaretLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
           Back to Brands
         </button>
 
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">Add New Brand</h1>
-          <p className="text-muted-foreground text-[13px] mt-1 font-normal opacity-80">
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Add New Brand</h1>
+          <p className="text-muted-foreground text-nav mt-1 font-normal opacity-80">
             Create a new brand identity to organize service providers and branches.
           </p>
         </div>

@@ -15,7 +15,7 @@ export default function NotFound() {
           title="Page Not Found"
           description="The page you are looking for might have been moved, deleted, or does not exist. Please check the URL or return to the dashboard."
           action={
-            <Button asChild className="rounded-full px-8 h-12 font-bold shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95">
+            <Button asChild className="rounded-full px-8 h-12 font-semibold shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95">
               <Link href="/dashboard" className="flex items-center gap-2">
                 <House size={20} weight="bold" />
                 Return to Dashboard

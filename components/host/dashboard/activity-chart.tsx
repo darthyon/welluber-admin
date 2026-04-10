@@ -61,7 +61,7 @@ function SearchableSelect({
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center justify-between gap-2 px-3 py-1.5 bg-card border border-border hover:bg-muted/50 rounded-md text-[12px] font-medium text-foreground w-[180px] text-left transition-colors"
+        className="flex items-center justify-between gap-2 px-3 py-1.5 bg-card border border-border hover:bg-muted/50 rounded-md text-label font-medium text-foreground w-[180px] text-left transition-colors"
       >
         <span className="truncate">{selectedName}</span>
         <CaretDown size={14} className="text-muted-foreground shrink-0" />
@@ -73,7 +73,7 @@ function SearchableSelect({
             <MagnifyingGlass size={14} className="text-muted-foreground" />
             <input 
               autoFocus
-              className="bg-transparent text-[12px] outline-none w-full" 
+              className="bg-transparent text-label outline-none w-full" 
               placeholder="Search organisation..." 
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -81,7 +81,7 @@ function SearchableSelect({
           </div>
           <div className="max-h-[180px] overflow-y-auto p-1">
             {filtered.length === 0 ? (
-              <p className="text-[11px] text-muted-foreground text-center py-3">No results found.</p>
+              <p className="text-caption text-muted-foreground text-center py-3">No results found.</p>
             ) : (
               filtered.map(opt => (
                 <button
@@ -92,7 +92,7 @@ function SearchableSelect({
                     setSearch("")
                   }}
                   className={cn(
-                    "w-full text-left px-2 py-1.5 text-[12px] rounded-sm flex items-center justify-between",
+                    "w-full text-left px-2 py-1.5 text-label rounded-sm flex items-center justify-between",
                     value === opt.id ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted/50"
                   )}
                 >
@@ -132,13 +132,13 @@ export function ActivityChart() {
       <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-6 gap-4">
         <div className="flex flex-col">
           <div className="flex items-center gap-1.5 mb-0.5">
-            <h2 className="text-[13px] font-semibold text-foreground tracking-tight">Voucher Lifecycle</h2>
+            <h2 className="text-nav font-semibold text-foreground tracking-tight">Voucher Lifecycle</h2>
             <TooltipProvider>
               <Tooltip delayDuration={0}>
                 <TooltipTrigger asChild>
                   <Info size={14} className="text-muted-foreground/60 cursor-help hover:text-primary transition-colors" />
                 </TooltipTrigger>
-                <TooltipContent side="top" className="text-[12px] font-medium leading-relaxed max-w-[220px]">
+                <TooltipContent side="top" className="text-label font-medium leading-relaxed max-w-[220px]">
                   Volume of newly issued vs redeemed vouchers (Check-ins)
                 </TooltipContent>
               </Tooltip>
@@ -158,7 +158,7 @@ export function ActivityChart() {
           <select 
             value={metric}
             onChange={(e) => setMetric(e.target.value as any)}
-            className="px-3 py-1.5 bg-card border border-border hover:bg-muted/50 rounded-md text-[12px] font-medium text-foreground outline-none cursor-pointer transition-colors"
+            className="px-3 py-1.5 bg-card border border-border hover:bg-muted/50 rounded-md text-label font-medium text-foreground outline-none cursor-pointer transition-colors"
           >
             <option value="both">Compare Both</option>
             <option value="issued">Issued Volume</option>
@@ -226,11 +226,11 @@ export function ActivityChart() {
       <div className="mt-4 flex items-center justify-center gap-6">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-sm bg-primary/30" />
-          <span className="text-[11px] font-medium text-muted-foreground">Vouchers Issued</span>
+          <span className="text-caption font-medium text-muted-foreground">Vouchers Issued</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-sm bg-primary" />
-          <span className="text-[11px] font-medium text-muted-foreground">Verified Check-ins</span>
+          <span className="text-caption font-medium text-muted-foreground">Verified Check-ins</span>
         </div>
       </div>
     </div>

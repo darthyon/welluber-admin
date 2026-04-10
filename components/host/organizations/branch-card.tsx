@@ -49,17 +49,17 @@ export function BranchCard({ branch, onView, onEdit }: BranchCardProps) {
 
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <h4 className="font-semibold text-[14px] text-foreground group-hover:text-primary transition-all tracking-tight leading-none">
+              <h4 className="font-semibold text-body text-foreground group-hover:text-primary transition-all tracking-tight leading-none">
                 {branch.name}
               </h4>
               <StatusBadge status={branch.status || "Active"} variant={branch.status === "Active" ? "emerald" : "zinc"} />
             </div>
-            <div className="flex items-center gap-1.5 text-[12px] text-muted-foreground">
+            <div className="flex items-center gap-1.5 text-label text-muted-foreground">
               <span className="font-medium">{branch.type}</span>
               {branch.address && (
                 <>
                   <span className="w-1 h-1 rounded-full bg-border" />
-                  <span className="text-[11px] font-medium opacity-80">{branch.address.city}, {branch.address.state}</span>
+                  <span className="text-caption font-medium opacity-80">{branch.address.city}, {branch.address.state}</span>
                 </>
               )}
             </div>
@@ -78,8 +78,8 @@ export function BranchCard({ branch, onView, onEdit }: BranchCardProps) {
       <div className="mt-auto space-y-4 pt-6 relative z-10">
         <div className="flex items-center justify-between border-t border-border/40 pt-4">
           <div className="flex flex-col gap-1">
-            <span className="text-[11px] font-bold text-muted-foreground/60">Wallet model</span>
-            <div className="flex items-center gap-1.5 text-[12px] font-semibold text-foreground">
+            <span className="text-caption font-semibold text-muted-foreground/60">Wallet model</span>
+            <div className="flex items-center gap-1.5 text-label font-semibold text-foreground">
               <Wallet size={14} weight="bold" className="text-primary" />
               <span>{walletLabel}</span>
               {branch.balance && (
@@ -90,8 +90,8 @@ export function BranchCard({ branch, onView, onEdit }: BranchCardProps) {
           
           {branch.employeesCount && (
             <div className="flex flex-col items-end gap-1 text-right">
-              <span className="text-[11px] font-bold text-muted-foreground/60">Workforce</span>
-              <div className="flex items-center gap-1.5 text-[12px] font-semibold text-foreground">
+              <span className="text-caption font-semibold text-muted-foreground/60">Workforce</span>
+              <div className="flex items-center gap-1.5 text-label font-semibold text-foreground">
                 <Users size={14} weight="bold" className="text-primary" />
                 <span>{branch.employeesCount.toLocaleString()}</span>
               </div>
@@ -103,26 +103,26 @@ export function BranchCard({ branch, onView, onEdit }: BranchCardProps) {
           <div className="space-y-2.5 pt-4 border-t border-border/40">
             <div className="flex items-center gap-1.5 text-muted-foreground/30">
               <ChartPieSlice size={14} weight="bold" />
-              <span className="text-[11px] font-bold text-muted-foreground/60 leading-none">Utilisation & Claims</span>
+              <span className="text-caption font-semibold text-muted-foreground/60 leading-none">Utilisation & Claims</span>
             </div>
             <div className="flex items-center gap-3">
               <UtilizationChart value={branch.utilizationRate} mode="ring" size={40} strokeWidth={4} />
               <div className="flex flex-col justify-center">
                 <div className="flex items-center gap-1.5 leading-tight">
                   <span className={cn(
-                    "text-[13px] font-bold text-foreground",
+                    "text-nav font-semibold text-foreground",
                     branch.utilizationRate > 80 ? "text-rose-500" : branch.utilizationRate > 50 ? "text-amber-500" : "text-emerald-500"
                   )}>
                     {branch.balance}
                   </span>
                   {branch.claimsCount !== undefined && (
-                    <span className="text-[10px] font-bold px-1.5 rounded-full bg-muted text-muted-foreground/60 border border-border tabular-nums leading-none flex items-center">
+                    <span className="text-micro font-semibold px-1.5 rounded-full bg-muted text-muted-foreground/60 border border-border tabular-nums leading-none flex items-center">
                       {branch.claimsCount}
                     </span>
                   )}
                 </div>
                 {branch.limit && (
-                  <span className="text-[10px] text-muted-foreground/60 font-medium tabular-nums mt-0.5">
+                  <span className="text-micro text-muted-foreground/60 font-medium tabular-nums mt-0.5">
                     / {branch.limit}
                   </span>
                 )}

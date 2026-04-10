@@ -94,7 +94,7 @@ const MOCK_EMPLOYEES = [
 const STATUS_CONFIG: Record<PolicyStatus, { label: string; color: string; bg: string; icon: React.ElementType }> = {
   Draft: { label: "Draft", color: "text-amber-600 dark:text-amber-400", bg: "bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/20", icon: NotePencil },
   Published: { label: "Published", color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20", icon: CheckCircle },
-  Unlisted: { label: "Unlisted", color: "text-zinc-500 dark:text-zinc-400", bg: "bg-zinc-50 dark:bg-zinc-500/10 border-zinc-200 dark:border-zinc-500/20", icon: EyeSlash },
+  Unlisted: { label: "Unlisted", color: "text-muted-foreground dark:text-muted-foreground/60", bg: "bg-muted dark:bg-muted0/10 border-zinc-200 dark:border-zinc-500/20", icon: EyeSlash },
   Deactivated: { label: "Deactivated", color: "text-rose-600 dark:text-rose-400", bg: "bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/20", icon: XCircle },
 };
 
@@ -103,8 +103,8 @@ const STATUS_CONFIG: Record<PolicyStatus, { label: string; color: string; bg: st
 function ReadField({ label, value }: { label: string; value?: string }) {
   return (
     <div className="space-y-1">
-      <p className="text-[11px] font-bold text-muted-foreground/80">{label}</p>
-      <p className="text-[14px] font-medium text-foreground">{value || <span className="text-zinc-300 dark:text-zinc-600 italic">—</span>}</p>
+      <p className="text-caption font-semibold text-muted-foreground/80">{label}</p>
+      <p className="text-body font-medium text-foreground">{value || <span className="text-muted-foreground/40 dark:text-muted-foreground italic">—</span>}</p>
     </div>
   );
 }
@@ -120,7 +120,7 @@ function StatusPicker({ value, onChange, disabled }: { value: PolicyStatus; onCh
         disabled={disabled}
         onClick={() => setOpen(!open)}
         className={cn(
-          "flex items-center gap-2 px-3 py-1.5 rounded-full border text-[12px] font-bold transition-all",
+          "flex items-center gap-2 px-3 py-1.5 rounded-full border text-label font-semibold transition-all",
           cfg.bg, cfg.color,
           !disabled && "hover:opacity-80 cursor-pointer"
         )}
@@ -146,7 +146,7 @@ function StatusPicker({ value, onChange, disabled }: { value: PolicyStatus; onCh
                   key={s}
                   onClick={() => { onChange(s); setOpen(false); }}
                   className={cn(
-                    "flex items-center gap-2.5 w-full px-4 py-2.5 text-[13px] font-semibold hover:bg-muted transition-colors text-left",
+                    "flex items-center gap-2.5 w-full px-4 py-2.5 text-nav font-semibold hover:bg-muted transition-colors text-left",
                     c.color,
                     s === value && "bg-muted"
                   )}
@@ -272,8 +272,8 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
         accessorKey: "name",
         render: (row) => (
           <div className="flex flex-col">
-            <span className="font-bold text-zinc-900">{row.name}</span>
-            <span className="text-[11px] text-zinc-400 font-medium">{row.email}</span>
+            <span className="font-semibold text-foreground">{row.name}</span>
+            <span className="text-caption text-muted-foreground/60 font-medium">{row.email}</span>
           </div>
         )
       },
@@ -463,7 +463,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                 variant="ghost" 
                 size="sm" 
                 onClick={assignVisibleWorkforce}
-                className="h-8 px-3 gap-2 text-[11px] font-bold text-primary hover:bg-primary/5 transition-all"
+                className="h-8 px-3 gap-2 text-caption font-semibold text-primary hover:bg-primary/5 transition-all"
               >
                 <SelectionAll size={14} />
                 Assign Filtered
@@ -472,12 +472,12 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                 variant="ghost" 
                 size="sm" 
                 onClick={clearVisibleWorkforce}
-                className="h-8 px-3 gap-2 text-[11px] font-bold text-rose-500 hover:bg-rose-500/10 transition-all border-l border-border"
+                className="h-8 px-3 gap-2 text-caption font-semibold text-rose-500 hover:bg-rose-500/10 transition-all border-l border-border"
               >
                 <Eraser size={14} />
                 Clear
               </Button>
-              <span className="text-[12px] font-bold text-primary bg-primary/10 px-3 py-1.5 rounded-full ring-1 ring-primary/20">
+              <span className="text-label font-semibold text-primary bg-primary/10 px-3 py-1.5 rounded-full ring-1 ring-primary/20">
                 {selectedEmployeeIds.size} Assigned
               </span>
             </div>
@@ -594,32 +594,32 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
           <div className="space-y-8 p-1">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-3">
-                <label className="text-[11px] font-bold text-muted-foreground/60 tracking-wider">Employee pool type</label>
+                <label className="text-caption font-semibold text-muted-foreground/60 tracking-wider">Employee pool type</label>
                 <div className="flex gap-2 p-1 bg-muted rounded-xl">
                   {(["Individual", "Shared"] as const).map((type) => (
                     <button
                       key={type}
                       onClick={() => setPolicyData({ ...policyData, benefitPoolType: { ...policyData.benefitPoolType!, employee: type } })}
-                      className={cn("flex-1 py-2 text-[13px] font-semibold rounded-lg transition-all", policyData.benefitPoolType?.employee === type ? "bg-background text-primary shadow-sm" : "text-muted-foreground hover:text-foreground")}
+                      className={cn("flex-1 py-2 text-nav font-semibold rounded-lg transition-all", policyData.benefitPoolType?.employee === type ? "bg-background text-primary shadow-sm" : "text-muted-foreground hover:text-foreground")}
                     >{type}</button>
                   ))}
                 </div>
               </div>
               <div className="space-y-3">
-                <label className="text-[11px] font-bold text-muted-foreground/60 tracking-wider">Dependent Pool Type</label>
+                <label className="text-caption font-semibold text-muted-foreground/60 tracking-wider">Dependent Pool Type</label>
                 <div className="flex gap-2 p-1 bg-muted rounded-xl">
                   {(["None", "Individual", "Shared"] as const).map((type) => (
                     <button
                       key={type}
                       onClick={() => setPolicyData({ ...policyData, benefitPoolType: { ...policyData.benefitPoolType!, dependents: type } })}
-                      className={cn("flex-1 py-2 text-[13px] font-semibold rounded-lg transition-all", policyData.benefitPoolType?.dependents === type ? "bg-background text-primary shadow-sm" : "text-muted-foreground hover:text-foreground")}
+                      className={cn("flex-1 py-2 text-nav font-semibold rounded-lg transition-all", policyData.benefitPoolType?.dependents === type ? "bg-background text-primary shadow-sm" : "text-muted-foreground hover:text-foreground")}
                     >{type}</button>
                   ))}
                 </div>
               </div>
             </div>
             <div className="space-y-3">
-              <label className="text-[11px] font-bold text-zinc-500/80">Utilisation Mode</label>
+              <label className="text-caption font-semibold text-muted-foreground">Utilisation Mode</label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <ChoiceCard title="Fixed Allocation" description="Full benefit amounts granted upfront upon assignment." icon={Gear} selected={policyData.utilisationMode === "Fixed"} onSelect={() => setPolicyData({ ...policyData, utilisationMode: "Fixed" })} />
                 <ChoiceCard title="Prorated Allocation" description="Benefit amounts calculated based on join date/time." icon={Gear} selected={policyData.utilisationMode === "Prorated"} onSelect={() => setPolicyData({ ...policyData, utilisationMode: "Prorated" })} />
@@ -631,9 +631,9 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
         <DetailSection title="Cycle & Lifecycle" icon={<Gear size={18} weight="duotone" />} description="Refresh intervals and activation triggers" ghost>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-1">
             <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-zinc-500/80">Refresh Cycle</label>
+              <label className="text-caption font-semibold text-muted-foreground">Refresh Cycle</label>
               <select
-                className="w-full px-4 py-2 bg-muted/20 border border-border rounded-xl text-[14px] font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all"
+                className="w-full px-4 py-2 bg-muted/20 border border-border rounded-xl text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all"
                 value={policyData.refreshCycle}
                 onChange={(e) => setPolicyData({ ...policyData, refreshCycle: e.target.value as any })}
               >
@@ -641,9 +641,9 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
               </select>
             </div>
             <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-zinc-500/80">Refresh Start Reference</label>
+              <label className="text-caption font-semibold text-muted-foreground">Refresh Start Reference</label>
               <select
-                className="w-full px-4 py-2 bg-transparent border border-zinc-200 rounded-xl text-[14px] font-medium outline-none focus:ring-2 focus:ring-primary/10"
+                className="w-full px-4 py-2 bg-transparent border border-zinc-200 rounded-xl text-body font-medium outline-none focus:ring-2 focus:ring-primary/10"
                 value={policyData.refreshStartReference}
                 onChange={(e) => setPolicyData({ ...policyData, refreshStartReference: e.target.value as any })}
               >
@@ -653,13 +653,13 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
               </select>
             </div>
             <div className="space-y-1.5 md:col-span-2">
-              <label className="text-[11px] font-bold text-zinc-500/80">Activation Mode</label>
+              <label className="text-caption font-semibold text-muted-foreground">Activation Mode</label>
               <div className="grid grid-cols-1 gap-2 mt-2">
                 {(["JoinDate", "ProbationEnds", "CustomDate"] as const).map((m) => (
                   <button
                     key={m}
                     onClick={() => setPolicyData({ ...policyData, activationMode: m })}
-                    className={cn("flex items-center gap-3 px-4 py-2.5 rounded-xl border text-[13px] font-medium transition-all text-left", policyData.activationMode === m ? "border-primary bg-primary/5 text-primary" : "border-border bg-card text-muted-foreground hover:border-border/80")}
+                    className={cn("flex items-center gap-3 px-4 py-2.5 rounded-xl border text-nav font-medium transition-all text-left", policyData.activationMode === m ? "border-primary bg-primary/5 text-primary" : "border-border bg-card text-muted-foreground hover:border-border/80")}
                   >
                     <div className={cn("w-4 h-4 rounded-full border flex items-center justify-center shrink-0", policyData.activationMode === m ? "border-primary" : "border-zinc-200")}>
                       {policyData.activationMode === m && <div className="w-2 h-2 rounded-full bg-primary" />}
@@ -683,7 +683,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
       ghost
       action={
         !isViewMode ? (
-          <Button onClick={addGroup} size="sm" className="rounded-full flex items-center gap-2 text-[12px] h-8 px-4">
+          <Button onClick={addGroup} size="sm" className="rounded-full flex items-center gap-2 text-label h-8 px-4">
             <Plus size={14} weight="bold" />
             Add Group
           </Button>
@@ -692,10 +692,10 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
     >
       {groups.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 bg-muted/20 rounded-xl border border-dashed border-border text-center">
-          <TreeStructure size={36} weight="duotone" className="text-zinc-300 mb-3 mx-auto" />
-          <p className="text-zinc-500 font-medium text-[13px]">{isViewMode ? "No benefit groups configured." : "No benefit groups yet."}</p>
+          <TreeStructure size={36} weight="duotone" className="text-muted-foreground/40 mb-3 mx-auto" />
+          <p className="text-muted-foreground font-medium text-nav">{isViewMode ? "No benefit groups configured." : "No benefit groups yet."}</p>
           {!isViewMode && (
-            <Button variant="ghost" onClick={addGroup} className="mt-2 text-primary font-bold text-[13px]">
+            <Button variant="ghost" onClick={addGroup} className="mt-2 text-primary font-semibold text-nav">
               Create your first group
             </Button>
           )}
@@ -712,19 +712,19 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                   </div>
                   {isViewMode ? (
                     <div className="min-w-0">
-                      <p className="text-[14px] font-bold text-foreground truncate">{group.name}</p>
-                      {group.description && <p className="text-[12px] text-zinc-500 truncate">{group.description}</p>}
+                      <p className="text-body font-semibold text-foreground truncate">{group.name}</p>
+                      {group.description && <p className="text-label text-muted-foreground truncate">{group.description}</p>}
                     </div>
                   ) : (
                     <div className="flex-1 min-w-0">
                       <input
-                        className="text-[14px] font-bold text-foreground bg-transparent border-none p-0 outline-none w-full focus:ring-0 truncate"
+                        className="text-body font-semibold text-foreground bg-transparent border-none p-0 outline-none w-full focus:ring-0 truncate"
                         value={group.name}
                         onChange={(e) => updateGroup(group.id, "name", e.target.value)}
                         placeholder="Group Name"
                       />
                       <input
-                        className="text-[12px] text-zinc-500 bg-transparent border-none p-0 outline-none w-full focus:ring-0"
+                        className="text-label text-muted-foreground bg-transparent border-none p-0 outline-none w-full focus:ring-0"
                         value={group.description}
                         onChange={(e) => updateGroup(group.id, "description", e.target.value)}
                         placeholder="Brief description..."
@@ -733,7 +733,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                   )}
                 </div>
                 {!isViewMode && (
-                  <button onClick={() => removeGroup(group.id)} className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-300 hover:text-rose-500 transition-colors shrink-0">
+                  <button onClick={() => removeGroup(group.id)} className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground/40 hover:text-rose-500 transition-colors shrink-0">
                     <Trash size={16} />
                   </button>
                 )}
@@ -744,14 +744,14 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                 {/* Distribution type + max usage */}
                 <div className="flex items-center gap-4 flex-wrap">
                   <div className="space-y-1">
-                    <p className="text-[10px] font-bold text-zinc-500/80">Distribution</p>
+                    <p className="text-micro font-semibold text-muted-foreground">Distribution</p>
                     {isViewMode ? (
-                      <p className="text-[12px] font-semibold text-foreground/80">{group.distributionType === "SharedAmount" ? "Shared Pool" : "Individual Per Service"}</p>
+                      <p className="text-label font-semibold text-foreground/80">{group.distributionType === "SharedAmount" ? "Shared Pool" : "Individual Per Service"}</p>
                     ) : (
                       <div className="flex p-0.5 bg-muted rounded-lg">
                         {(["SharedAmount", "IndividualBenefitAmount"] as const).map((type) => (
                           <button key={type} onClick={() => updateGroup(group.id, "distributionType", type)}
-                            className={cn("px-2.5 py-1 text-[10px] font-bold rounded-md transition-all", group.distributionType === type ? "bg-background text-primary shadow-sm" : "text-muted-foreground")}
+                            className={cn("px-2.5 py-1 text-micro font-semibold rounded-md transition-all", group.distributionType === type ? "bg-background text-primary shadow-sm" : "text-muted-foreground")}
                           >
                             {type === "SharedAmount" ? "Shared Pool" : "Individual"}
                           </button>
@@ -761,11 +761,11 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                   </div>
                   {group.distributionType === "SharedAmount" && (
                     <div className="space-y-1">
-                      <p className="text-[10px] font-bold text-zinc-500/80">Max Usage</p>
+                      <p className="text-micro font-semibold text-muted-foreground">Max Usage</p>
                       {isViewMode ? (
-                        <p className="text-[12px] font-semibold text-zinc-700">{group.maxUsagePerCycle ? `RM ${group.maxUsagePerCycle.toFixed(2)}` : "—"}</p>
+                        <p className="text-label font-semibold text-foreground">{group.maxUsagePerCycle ? `RM ${group.maxUsagePerCycle.toFixed(2)}` : "—"}</p>
                       ) : (
-                        <input type="number" className="w-28 px-2.5 py-1 border border-border bg-background rounded-lg text-[12px] outline-none focus:ring-2 focus:ring-primary/10" value={group.maxUsagePerCycle} onChange={(e) => updateGroup(group.id, "maxUsagePerCycle", parseFloat(e.target.value))} placeholder="0.00" />
+                        <input type="number" className="w-28 px-2.5 py-1 border border-border bg-background rounded-lg text-label outline-none focus:ring-2 focus:ring-primary/10" value={group.maxUsagePerCycle} onChange={(e) => updateGroup(group.id, "maxUsagePerCycle", parseFloat(e.target.value))} placeholder="0.00" />
                       )}
                     </div>
                   )}
@@ -773,36 +773,36 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
 
                 {/* Services */}
                 <div className="space-y-2">
-                  <p className="text-[10px] font-bold text-zinc-500/80">Services</p>
+                  <p className="text-micro font-semibold text-muted-foreground">Services</p>
                   <div className="space-y-1.5">
                     {benefits.filter(b => b.groupId === group.id).map((benefit) => (
                       <div key={benefit.id} className="flex items-center gap-3 px-3 py-2 rounded-xl bg-muted/40 border border-border">
                         <div className="flex-1 min-w-0">
                           {isViewMode ? (
-                            <p className="text-[12px] font-semibold text-zinc-700 truncate">{SERVICES.find(s => s.id === benefit.serviceId)?.name}</p>
+                            <p className="text-label font-semibold text-foreground truncate">{SERVICES.find(s => s.id === benefit.serviceId)?.name}</p>
                           ) : (
-                            <select className="w-full bg-transparent border-none p-0 text-[12px] font-semibold text-foreground/80 outline-none" value={benefit.serviceId} onChange={(e) => updateBenefit(benefit.id, "serviceId", e.target.value)}>
+                            <select className="w-full bg-transparent border-none p-0 text-label font-semibold text-foreground/80 outline-none" value={benefit.serviceId} onChange={(e) => updateBenefit(benefit.id, "serviceId", e.target.value)}>
                               {SERVICES.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                             </select>
                           )}
                         </div>
                         <div className="flex items-center gap-3 shrink-0">
                           {isViewMode ? (
-                            <span className="text-[12px] font-bold text-zinc-800 font-mono">RM {benefit.amount.toFixed(2)}</span>
+                            <span className="text-label font-semibold text-foreground font-mono">RM {benefit.amount.toFixed(2)}</span>
                           ) : (
-                            <input type="number" className="w-20 px-2 py-1 bg-background border border-border rounded-lg text-[11px] font-mono outline-none text-right" value={benefit.amount} onChange={(e) => updateBenefit(benefit.id, "amount", parseFloat(e.target.value))} />
+                            <input type="number" className="w-20 px-2 py-1 bg-background border border-border rounded-lg text-caption font-mono outline-none text-right" value={benefit.amount} onChange={(e) => updateBenefit(benefit.id, "amount", parseFloat(e.target.value))} />
                           )}
                           {isViewMode ? (
-                            <span className={cn("text-[10px] font-bold px-2 py-0.5 rounded-full", benefit.coPayment.required ? "bg-primary/10 text-primary" : "bg-zinc-100 text-zinc-400")}>
+                            <span className={cn("text-micro font-semibold px-2 py-0.5 rounded-full", benefit.coPayment.required ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground/60")}>
                               {benefit.coPayment.required ? "Co-pay" : "No co-pay"}
                             </span>
                           ) : (
-                            <button onClick={() => updateBenefit(benefit.id, "coPayment.required", !benefit.coPayment.required)} className={cn("w-8 h-4 rounded-full transition-colors relative shrink-0", benefit.coPayment.required ? "bg-primary" : "bg-zinc-200")}>
+                            <button onClick={() => updateBenefit(benefit.id, "coPayment.required", !benefit.coPayment.required)} className={cn("w-8 h-4 rounded-full transition-colors relative shrink-0", benefit.coPayment.required ? "bg-primary" : "bg-muted/50")}>
                               <div className={cn("w-3 h-3 rounded-full bg-white absolute top-[2px] transition-all", benefit.coPayment.required ? "right-0.5" : "left-0.5")} />
                             </button>
                           )}
                           {!isViewMode && (
-                            <button onClick={() => removeBenefit(benefit.id)} className="text-zinc-300 hover:text-rose-500 transition-colors">
+                            <button onClick={() => removeBenefit(benefit.id)} className="text-muted-foreground/40 hover:text-rose-500 transition-colors">
                               <Trash size={14} />
                             </button>
                           )}
@@ -811,7 +811,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                     ))}
                   </div>
                   {!isViewMode && (
-                    <button onClick={() => addBenefit(group.id)} className="w-full h-8 border-dashed border-2 border-zinc-200 rounded-xl text-[11px] font-bold text-zinc-400 hover:border-primary/40 hover:text-primary transition-all flex items-center justify-center gap-1.5">
+                    <button onClick={() => addBenefit(group.id)} className="w-full h-8 border-dashed border-2 border-zinc-200 rounded-xl text-caption font-semibold text-muted-foreground/60 hover:border-primary/40 hover:text-primary transition-all flex items-center justify-center gap-1.5">
                       <Plus size={12} />
                       Add Service
                     </button>
@@ -846,20 +846,20 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
             >
               <Sparkle size={40} weight="fill" className="animate-pulse" />
             </motion.div>
-            <h3 className="text-xl font-bold text-zinc-900">Crafting Policy Identity...</h3>
-            <p className="text-zinc-500 mt-2 flex items-center gap-2">
-              Optimizing for <span className="text-primary font-bold">{genContext || "Workforce"}</span>
+            <h3 className="text-xl font-semibold text-foreground">Crafting Policy Identity...</h3>
+            <p className="text-muted-foreground mt-2 flex items-center gap-2">
+              Optimizing for <span className="text-primary font-semibold">{genContext || "Workforce"}</span>
             </p>
           </motion.div>
         )}
       </AnimatePresence>
 
       <div className="text-center mb-8">
-        <div className="w-14 h-14 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 mx-auto mb-4 shadow-sm">
+        <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mx-auto mb-4 shadow-sm">
           <ShieldCheck size={28} weight="duotone" />
         </div>
-        <h3 className="text-2xl font-bold text-zinc-900 tracking-tight">Finalize & Launch Policy</h3>
-        <p className="text-zinc-500 mt-1">Review the AI-suggested identity and verify configured benefits.</p>
+        <h3 className="text-2xl font-semibold text-foreground tracking-tight">Finalize & Launch Policy</h3>
+        <p className="text-muted-foreground mt-1">Review the AI-suggested identity and verify configured benefits.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
@@ -873,14 +873,14 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 p-1">
               <div className="space-y-1.5 flex-1">
-                <label className="text-[11px] font-semibold text-zinc-500/80 tracking-tight pl-1">Policy Name</label>
+                <label className="text-caption font-semibold text-muted-foreground tracking-tight pl-1">Policy Name</label>
                 <div className={cn(
                   "relative group transition-all",
                   !isGenerated && "opacity-50 grayscale pointer-events-none"
                 )}>
                   <input
                     placeholder="e.g. Wellness Premium 2026"
-                    className="w-full px-4 py-3 bg-white border border-border rounded-xl text-[14px] outline-none transition-all font-bold text-zinc-900 focus:ring-4 focus:ring-primary/10 focus:border-primary/40 group-hover:border-primary/30"
+                    className="w-full px-4 py-3 bg-white border border-border rounded-xl text-body outline-none transition-all font-semibold text-foreground focus:ring-4 focus:ring-primary/10 focus:border-primary/40 group-hover:border-primary/30"
                     value={policyData.name}
                     onChange={(e) => setPolicyData({ ...policyData, name: e.target.value })}
                   />
@@ -889,22 +889,22 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
               </div>
 
               <div className="space-y-1.5 flex-1">
-                <label className="text-[11px] font-semibold text-zinc-500/80 tracking-tight pl-1">Benefit ID</label>
+                <label className="text-caption font-semibold text-muted-foreground tracking-tight pl-1">Benefit ID</label>
                 <input
                   placeholder="e.g. BEN-W-01"
-                  className="w-full px-4 py-3 bg-white border border-border rounded-xl text-[14px] outline-none transition-all font-bold font-mono text-zinc-800 focus:ring-4 focus:ring-zinc-500/5 focus:border-zinc-400"
+                  className="w-full px-4 py-3 bg-white border border-border rounded-xl text-body outline-none transition-all font-semibold font-mono text-foreground focus:ring-4 focus:ring-zinc-500/5 focus:border-zinc-400"
                   value={policyData.code}
                   onChange={(e) => setPolicyData({ ...policyData, code: e.target.value })}
                 />
               </div>
 
               <div className="space-y-1.5 md:col-span-2">
-                <label className="text-[11px] font-semibold text-zinc-500/80 tracking-tight pl-1">Suggested Description</label>
+                <label className="text-caption font-semibold text-muted-foreground tracking-tight pl-1">Suggested Description</label>
                 <div className="relative group">
-                  <Quotes size={16} className="absolute left-3 top-4 text-zinc-300" />
+                  <Quotes size={16} className="absolute left-3 top-4 text-muted-foreground/40" />
                   <textarea
                     placeholder="Describe the purpose of this benefit..."
-                    className="w-full pl-10 pr-4 py-3.5 bg-white border border-border rounded-xl text-[13px] leading-relaxed outline-none transition-all font-medium text-zinc-600 min-h-[100px] resize-none focus:ring-4 focus:ring-primary/5 focus:border-primary/20 group-hover:border-primary/10"
+                    className="w-full pl-10 pr-4 py-3.5 bg-white border border-border rounded-xl text-nav leading-relaxed outline-none transition-all font-medium text-muted-foreground min-h-[100px] resize-none focus:ring-4 focus:ring-primary/5 focus:border-primary/20 group-hover:border-primary/10"
                     value={policyData.description}
                     onChange={(e) => setPolicyData({ ...policyData, description: e.target.value })}
                   />
@@ -922,18 +922,18 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
             <div className="p-5 rounded-2xl border border-zinc-200/50 flex items-center justify-between transition-all hover:border-primary/20 bg-transparent">
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center border border-zinc-200/60">
-                  <SelectionAll size={20} className="text-zinc-500" />
+                  <SelectionAll size={20} className="text-muted-foreground" />
                 </div>
                 <div>
-                  <p className="text-[14px] font-bold text-zinc-900">{selectedEmployeeIds.size} Employees Selected</p>
-                  <p className="text-[11px] text-zinc-500 font-medium tracking-tight">Assignment effective immediately upon activation</p>
+                  <p className="text-body font-semibold text-foreground">{selectedEmployeeIds.size} Employees Selected</p>
+                  <p className="text-caption text-muted-foreground font-medium tracking-tight">Assignment effective immediately upon activation</p>
                 </div>
               </div>
               <Button 
                 variant="ghost" 
                 size="sm" 
                 onClick={() => goToStep(1)}
-                className="text-primary font-bold text-[12px] hover:bg-primary/5 transition-colors"
+                className="text-primary font-semibold text-label hover:bg-primary/5 transition-colors"
               >
                 Change Selection
               </Button>
@@ -951,7 +951,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
           >
             <div className="space-y-3">
               {groups.length === 0 ? (
-                <p className="text-center py-8 text-[13px] text-zinc-400 font-medium bg-zinc-50/50 rounded-xl border border-dashed border-zinc-200">No benefit groups configured.</p>
+                <p className="text-center py-8 text-nav text-muted-foreground/60 font-medium bg-muted/50 rounded-xl border border-dashed border-zinc-200">No benefit groups configured.</p>
               ) : groups.map(group => (
                  <div key={group.id} className="p-4 rounded-2xl border border-zinc-200/60 flex items-center justify-between bg-transparent hover:border-primary/20 transition-all cursor-default">
                   <div className="flex items-center gap-3">
@@ -959,25 +959,25 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                       <TreeStructure size={16} />
                     </div>
                     <div>
-                      <p className="text-[13px] font-bold text-zinc-900">{group.name}</p>
-                      <p className="text-[10px] text-zinc-500 font-bold tracking-tight">{benefits.filter(b => b.groupId === group.id).length} services</p>
+                      <p className="text-nav font-semibold text-foreground">{group.name}</p>
+                      <p className="text-micro text-muted-foreground font-semibold tracking-tight">{benefits.filter(b => b.groupId === group.id).length} services</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-[14px] font-bold text-primary">{group.distributionType === "SharedAmount" ? `RM ${group.maxUsagePerCycle?.toFixed(2)}` : "Individual"}</p>
+                    <p className="text-body font-semibold text-primary">{group.distributionType === "SharedAmount" ? `RM ${group.maxUsagePerCycle?.toFixed(2)}` : "Individual"}</p>
                   </div>
                 </div>
               ))}
               
               <div className="mt-4 p-4 rounded-2xl border border-zinc-200/60 bg-transparent flex items-center justify-between">
                 <div>
-                  <p className="text-[11px] font-bold text-zinc-500/80 tracking-tight leading-none">Global Refresh</p>
-                  <p className="text-[14px] font-bold text-zinc-900 mt-1">{policyData.refreshCycle}</p>
+                  <p className="text-caption font-semibold text-muted-foreground tracking-tight leading-none">Global Refresh</p>
+                  <p className="text-body font-semibold text-foreground mt-1">{policyData.refreshCycle}</p>
                 </div>
-                <div className="h-8 w-px bg-zinc-200 mx-2" />
+                <div className="h-8 w-px bg-muted/50 mx-2" />
                 <div className="flex-1 text-right">
-                  <p className="text-[11px] font-bold text-zinc-500/80 tracking-tight leading-none">Trigger</p>
-                  <p className="text-[14px] font-bold text-zinc-900 mt-1 truncate">{policyData.activationMode === "JoinDate" ? "On Joining" : "Post-probation"}</p>
+                  <p className="text-caption font-semibold text-muted-foreground tracking-tight leading-none">Trigger</p>
+                  <p className="text-body font-semibold text-foreground mt-1 truncate">{policyData.activationMode === "JoinDate" ? "On Joining" : "Post-probation"}</p>
                 </div>
               </div>
             </div>
@@ -994,8 +994,8 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
     <div className="mt-12 pt-8 border-t border-zinc-100">
       <div className="flex items-start justify-between">
         <div>
-          <h4 className="text-[13px] font-bold text-zinc-900">Policy Status</h4>
-          <p className="text-[12px] text-zinc-400 mt-0.5">Control the visibility and lifecycle state of this policy.</p>
+          <h4 className="text-nav font-semibold text-foreground">Policy Status</h4>
+          <p className="text-label text-muted-foreground/60 mt-0.5">Control the visibility and lifecycle state of this policy.</p>
         </div>
         <StatusPicker
           value={(policyData.status as PolicyStatus) || "Draft"}
@@ -1015,11 +1015,11 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
           <div className="flex items-center gap-4">
             <button
               onClick={onCancel}
-              className="w-10 h-10 rounded-xl border border-zinc-200/60 flex items-center justify-center hover:bg-zinc-100/50 transition-all shadow-none"
+              className="w-10 h-10 rounded-xl border border-zinc-200/60 flex items-center justify-center hover:bg-muted/50 transition-all shadow-none"
             >
               <CaretLeft size={20} weight="bold" />
             </button>
-            <h2 className="text-xl font-bold tracking-tight text-zinc-900">
+            <h2 className="text-xl font-semibold tracking-tight text-foreground">
               {isViewMode ? "View Benefit Policy" : mode === "edit" ? "Edit Benefit Policy" : "Create Benefit Policy"}
             </h2>
           </div>
@@ -1040,7 +1040,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
               <>
                 <button
                   onClick={() => onSaveDraft?.({ policy: policyData, groups, benefits })}
-                  className="text-zinc-500 font-medium text-[14px] px-4 py-2 rounded-full hover:bg-zinc-100 transition-colors"
+                  className="text-muted-foreground font-medium text-body px-4 py-2 rounded-full hover:bg-muted transition-colors"
                 >
                   Save as Draft
                 </button>
@@ -1079,10 +1079,10 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                 key={tab.id}
                 onClick={() => setCurrentStep(tab.id)}
                 className={cn(
-                  "px-5 py-3 text-[13px] font-semibold transition-all border-b-2 -mb-px",
+                  "px-5 py-3 text-nav font-semibold transition-all border-b-2 -mb-px",
                   currentStep === tab.id
                     ? "border-primary text-primary"
-                    : "border-transparent text-zinc-500 hover:text-zinc-800 hover:border-zinc-200"
+                    : "border-transparent text-muted-foreground hover:text-foreground hover:border-zinc-200"
                 )}
               >
                 {tab.title}
@@ -1104,18 +1104,18 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                 )}
               >
                 <div className={cn(
-                  "w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-bold shadow-sm transition-all group-hover:shadow-md",
-                  currentStep === step.id ? "bg-primary text-white ring-2 ring-primary/20 ring-offset-2" : "bg-zinc-100 text-zinc-500 group-hover:bg-zinc-200"
+                  "w-6 h-6 rounded-lg flex items-center justify-center text-micro font-semibold shadow-sm transition-all group-hover:shadow-md",
+                  currentStep === step.id ? "bg-primary text-white ring-2 ring-primary/20 ring-offset-2" : "bg-muted text-muted-foreground group-hover:bg-muted/50"
                 )}>
                   {currentStep > step.id ? "✓" : step.id}
                 </div>
                 <span className={cn(
-                  "text-[13px] font-bold whitespace-nowrap transition-colors",
-                  currentStep === step.id ? "text-primary" : "text-zinc-500 group-hover:text-zinc-800"
+                  "text-nav font-semibold whitespace-nowrap transition-colors",
+                  currentStep === step.id ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
                 )}>
                   {step.title}
                 </span>
-                {step.id < 4 && <div className="w-6 h-[1.5px] bg-zinc-100 ml-2" />}
+                {step.id < 4 && <div className="w-6 h-[1.5px] bg-muted ml-2" />}
               </button>
             ))}
           </div>

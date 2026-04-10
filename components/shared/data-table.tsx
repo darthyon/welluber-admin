@@ -137,7 +137,7 @@ export function SharedDataTable<T extends { id: string | number }>({
                     key={i} 
                     onClick={() => col.sortable && col.accessorKey && handleSort(col.accessorKey)}
                     className={cn(
-                      "font-semibold text-muted-foreground text-[13px] p-4 whitespace-nowrap z-20 tracking-tight transition-colors",
+                      "font-semibold text-muted-foreground text-nav p-4 whitespace-nowrap z-20 tracking-tight transition-colors",
                       !ghost ? "bg-muted/30" : "bg-transparent",
                       col.sortable && "cursor-pointer hover:bg-primary/5 hover:text-primary",
                       (isFirstCol && !ghost) && "rounded-tl-xl",
@@ -193,7 +193,7 @@ export function SharedDataTable<T extends { id: string | number }>({
                       <td 
                         key={i} 
                         className={cn(
-                          "p-4 text-[13px] transition-colors",
+                          "p-4 text-nav transition-colors",
                           getCellAlignment(col.align),
                           isFirst && "sticky left-0 bg-card z-10 group-hover:bg-accent/40 shadow-[4px_0_12px_-4px_rgba(0,0,0,0.1)]",
                           isLast && "sticky right-0 bg-card z-10 group-hover:bg-accent/40 shadow-[-4px_0_12px_-4px_rgba(0,0,0,0.1)]",
@@ -209,7 +209,7 @@ export function SharedDataTable<T extends { id: string | number }>({
             </AnimatePresence>
             {sortedData.length === 0 && (
               <tr>
-                <td colSpan={columns.length} className="p-12 text-center text-muted-foreground text-[14px] font-medium opacity-60">
+                <td colSpan={columns.length} className="p-12 text-center text-muted-foreground text-body font-medium opacity-60">
                   No records found matching your selection.
                 </td>
               </tr>
@@ -221,16 +221,16 @@ export function SharedDataTable<T extends { id: string | number }>({
       {/* Pagination Footer */}
       {totalPages > 0 && (
         <div className={cn(
-          "p-4 flex items-center justify-between text-[12px] text-muted-foreground font-medium transition-all",
+          "p-4 flex items-center justify-between text-label text-muted-foreground font-medium transition-all",
           !ghost ? "border-t border-border/60 bg-muted/5" : "bg-transparent border-t border-border/40 px-0"
         )}>
           <div className="flex items-center gap-2">
             <span>Showing</span>
-            <span className="text-foreground font-bold">{startIndex + 1}</span>
+            <span className="text-foreground font-semibold">{startIndex + 1}</span>
             <span>to</span>
-            <span className="text-foreground font-bold">{Math.min(startIndex + rowsPerPage, sortedData.length)}</span>
+            <span className="text-foreground font-semibold">{Math.min(startIndex + rowsPerPage, sortedData.length)}</span>
             <span>of</span>
-            <span className="text-foreground font-bold">{sortedData.length}</span>
+            <span className="text-foreground font-semibold">{sortedData.length}</span>
             <span>records</span>
           </div>
           
@@ -246,7 +246,7 @@ export function SharedDataTable<T extends { id: string | number }>({
               Previous
             </button>
             <div className="flex items-center px-1.5">
-              <span className="text-foreground font-bold">{currentPage}</span>
+              <span className="text-foreground font-semibold">{currentPage}</span>
               <span className="mx-1 opacity-40">/</span>
               <span>{totalPages}</span>
             </div>

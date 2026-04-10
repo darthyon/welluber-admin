@@ -31,7 +31,7 @@ export function AssignedPolicyList({ policies, onUnlink, onView, onEdit }: Assig
            <ShieldCheck size={32} weight="duotone" />
          </div>
          <p className="text-muted-foreground font-medium">No benefit policies assigned to this organization.</p>
-         <p className="text-muted-foreground/40 text-[13px] mt-1">Assign a policy to start providing benefits to employees.</p>
+         <p className="text-muted-foreground/40 text-nav mt-1">Assign a policy to start providing benefits to employees.</p>
       </div>
     );
   }
@@ -45,8 +45,8 @@ export function AssignedPolicyList({ policies, onUnlink, onView, onEdit }: Assig
             <IdentificationCard size={20} weight="duotone" />
           </div>
           <div>
-            <p className="text-[14px] font-bold text-foreground group-hover:text-primary transition-colors leading-tight">{policy.name}</p>
-            <p className="text-[11px] font-mono text-muted-foreground/50 tracking-tight leading-none mt-0.5">{policy.code}</p>
+            <p className="text-body font-semibold text-foreground group-hover:text-primary transition-colors leading-tight">{policy.name}</p>
+            <p className="text-caption font-mono text-muted-foreground/50 tracking-tight leading-none mt-0.5">{policy.code}</p>
           </div>
         </div>
       )
@@ -56,7 +56,7 @@ export function AssignedPolicyList({ policies, onUnlink, onView, onEdit }: Assig
       render: (policy) => (
         <div className="flex items-center gap-2">
           <TreeStructure size={14} className="text-muted-foreground/40" />
-          <span className="text-[13px] font-medium text-muted-foreground">{policy.assignedTo}</span>
+          <span className="text-nav font-medium text-muted-foreground">{policy.assignedTo}</span>
         </div>
       )
     },
@@ -64,7 +64,7 @@ export function AssignedPolicyList({ policies, onUnlink, onView, onEdit }: Assig
       header: "Employees",
       headerClassName: "text-center",
       render: (policy) => (
-        <div className="text-center font-bold text-[13px] text-foreground/80 tabular-nums">
+        <div className="text-center font-semibold text-nav text-foreground/80 tabular-nums">
           {policy.employeeCount.toLocaleString()}
         </div>
       )
@@ -80,7 +80,7 @@ export function AssignedPolicyList({ policies, onUnlink, onView, onEdit }: Assig
     },
     {
       header: "Last Updated",
-      render: (policy) => <span className="text-[13px] text-muted-foreground/60 font-medium">{policy.lastUpdated}</span>
+      render: (policy) => <span className="text-nav text-muted-foreground/60 font-medium">{policy.lastUpdated}</span>
     },
     {
       header: "Actions",

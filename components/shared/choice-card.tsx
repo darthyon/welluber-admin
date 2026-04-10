@@ -44,12 +44,12 @@ export function ChoiceCard({
       
       <div className="flex-1 min-w-0">
         <h4 className={cn(
-          "text-[14px] font-semibold mb-0.5 transition-colors",
+          "text-body font-semibold mb-0.5 transition-colors",
           selected ? "text-primary" : "text-foreground"
         )}>
           {title}
         </h4>
-        <p className="text-[12px] text-muted-foreground leading-snug">
+        <p className="text-label text-muted-foreground leading-snug">
           {description}
         </p>
 

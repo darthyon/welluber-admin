@@ -49,14 +49,14 @@ export function DocumentUploadSection({
     <div className={cn("space-y-4", className)}>
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-0.5">
-          <label className="text-[14px] font-semibold text-foreground">{label}</label>
-          <p className="text-[12px] text-muted-foreground">{description}</p>
+          <label className="text-body font-semibold text-foreground">{label}</label>
+          <p className="text-label text-muted-foreground">{description}</p>
         </div>
         <Button 
           type="button"
           variant="outline" 
           size="sm" 
-          className="h-8 gap-1.5 text-[12px] font-medium rounded-full"
+          className="h-8 gap-1.5 text-label font-medium rounded-full"
           onClick={() => fileInputRef.current?.click()}
         >
           <UploadSimple size={14} weight="bold" /> Upload
@@ -79,20 +79,20 @@ export function DocumentUploadSection({
               className="flex items-center justify-between p-3 bg-muted/30 border border-border rounded-xl group hover:border-primary/30 transition-all shadow-sm"
             >
               <div className="flex items-center gap-3 overflow-hidden">
-                <div className="w-8 h-8 rounded-lg bg-white border border-zinc-100 flex items-center justify-center text-zinc-400 group-hover:text-primary transition-colors shrink-0">
+                <div className="w-8 h-8 rounded-lg bg-white border border-zinc-100 flex items-center justify-center text-muted-foreground/60 group-hover:text-primary transition-colors shrink-0">
                   <FileIcon size={16} weight="duotone" />
                 </div>
                 <div className="overflow-hidden">
-                  <p className="text-[12px] font-bold text-foreground truncate max-w-[200px]" title={doc}>
+                  <p className="text-label font-semibold text-foreground truncate max-w-[200px]" title={doc}>
                     {doc}
                   </p>
-                  <p className="text-[10px] text-muted-foreground font-medium">Document attached</p>
+                  <p className="text-micro text-muted-foreground font-medium">Document attached</p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => handleRemove(index)}
-                className="p-1.5 text-zinc-400 hover:text-destructive hover:bg-destructive/5 rounded-full transition-all"
+                className="p-1.5 text-muted-foreground/60 hover:text-destructive hover:bg-destructive/5 rounded-full transition-all"
               >
                 <X size={14} weight="bold" />
               </button>
@@ -107,16 +107,16 @@ export function DocumentUploadSection({
             error && "border-destructive/50 bg-destructive/5"
           )}
         >
-          <div className="w-10 h-10 rounded-full bg-white border border-zinc-100 flex items-center justify-center text-zinc-400 group-hover:text-primary transition-colors mb-3">
+          <div className="w-10 h-10 rounded-full bg-white border border-zinc-100 flex items-center justify-center text-muted-foreground/60 group-hover:text-primary transition-colors mb-3">
             <UploadSimple size={20} weight="bold" />
           </div>
-          <p className="text-[13px] font-bold text-foreground">Click to upload files</p>
-          <p className="text-[11px] text-muted-foreground mt-0.5">PDF, Word, or Image files accepted</p>
+          <p className="text-nav font-semibold text-foreground">Click to upload files</p>
+          <p className="text-caption text-muted-foreground mt-0.5">PDF, Word, or Image files accepted</p>
         </div>
       )}
 
       {error && (
-        <p className="text-[11px] text-destructive flex items-center gap-1.5 mt-2 font-medium">
+        <p className="text-caption text-destructive flex items-center gap-1.5 mt-2 font-medium">
           <WarningCircle size={14} weight="fill" />
           {error}
         </p>

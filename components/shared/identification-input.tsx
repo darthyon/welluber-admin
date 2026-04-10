@@ -32,7 +32,7 @@ export function IdentificationInput({ type, number, onTypeChange, onNumberChange
         <PopoverTrigger asChild>
           <button className="flex items-center gap-1.5 px-3 h-full border-r border-border/50 hover:bg-muted transition-colors shrink-0">
             <selectedType.icon size={16} className="text-muted-foreground/60" />
-            <span className="text-[13px] font-bold text-foreground">{selectedType.label}</span>
+            <span className="text-nav font-semibold text-foreground">{selectedType.label}</span>
             <CaretDown size={12} className={cn("text-muted-foreground/40 transition-transform", isOpen && "rotate-180")} />
           </button>
         </PopoverTrigger>
@@ -57,8 +57,8 @@ export function IdentificationInput({ type, number, onTypeChange, onNumberChange
                   <t.icon size={18} />
                 </div>
                 <div>
-                  <p className={cn("text-[13px] font-bold", type === t.id ? "text-primary" : "text-foreground")}>{t.label}</p>
-                  <p className="text-[10px] text-muted-foreground/40 leading-tight">{t.description}</p>
+                  <p className={cn("text-nav font-semibold", type === t.id ? "text-primary" : "text-foreground")}>{t.label}</p>
+                  <p className="text-micro text-muted-foreground/40 leading-tight">{t.description}</p>
                 </div>
               </button>
             ))}
@@ -71,7 +71,7 @@ export function IdentificationInput({ type, number, onTypeChange, onNumberChange
           value={number}
           onChange={(e) => onNumberChange(e.target.value)}
           placeholder={type === "IC" ? "000000-00-0000" : "Passport Number"}
-          className="w-full h-full pl-3 pr-3 bg-transparent border-none outline-none text-[14px] font-medium text-foreground font-mono tracking-tight"
+          className="w-full h-full pl-3 pr-3 bg-transparent border-none outline-none text-body font-medium text-foreground font-mono tracking-tight"
         />
       </div>
     </div>

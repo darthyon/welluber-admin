@@ -126,8 +126,8 @@ export function NotificationCenter({ notifications = DEFAULT_NOTIFICATIONS }: No
           {/* Header */}
           <div className="p-4 border-b border-border bg-muted/20">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="font-semibold text-[14px]">Notification Center</h3>
-              <button className="text-[11px] text-primary hover:underline font-medium">
+              <h3 className="font-semibold text-body">Notification Center</h3>
+              <button className="text-caption text-primary hover:underline font-medium">
                 Mark all as read
               </button>
             </div>
@@ -137,7 +137,7 @@ export function NotificationCenter({ notifications = DEFAULT_NOTIFICATIONS }: No
               <button
                 onClick={() => setActiveTab("all")}
                 className={cn(
-                  "flex-1 py-1.5 text-[12px] font-medium rounded transition-colors text-center",
+                  "flex-1 py-1.5 text-label font-medium rounded transition-colors text-center",
                   activeTab === "all" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
                 )}
               >
@@ -146,12 +146,12 @@ export function NotificationCenter({ notifications = DEFAULT_NOTIFICATIONS }: No
               <button
                 onClick={() => setActiveTab("action")}
                 className={cn(
-                  "flex-1 py-1.5 text-[12px] font-medium rounded transition-colors text-center flex items-center justify-center gap-1.5",
+                  "flex-1 py-1.5 text-label font-medium rounded transition-colors text-center flex items-center justify-center gap-1.5",
                   activeTab === "action" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
                 )}
               >
                 Action Required
-                <span className="bg-destructive/10 text-destructive px-1.5 rounded-full text-[10px] leading-tight flex items-center justify-center h-4">
+                <span className="bg-destructive/10 text-destructive px-1.5 rounded-full text-micro leading-tight flex items-center justify-center h-4">
                   {notifications.filter(n => n.type === "action" && !n.read).length}
                 </span>
               </button>
@@ -183,20 +183,20 @@ export function NotificationCenter({ notifications = DEFAULT_NOTIFICATIONS }: No
                       <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-start gap-2 mb-1">
                           <p className={cn(
-                            "text-[13px] leading-normal break-words pr-2",
+                            "text-nav leading-normal break-words pr-2",
                             !item.read ? "font-semibold text-foreground" : "font-medium text-foreground/80"
                           )}>
                             {item.title}
                           </p>
-                          <span className="text-[10px] text-muted-foreground shrink-0 mt-0.5 whitespace-nowrap">{item.time}</span>
+                          <span className="text-micro text-muted-foreground shrink-0 mt-0.5 whitespace-nowrap">{item.time}</span>
                         </div>
-                        <p className="text-[12px] text-muted-foreground break-words leading-relaxed">
+                        <p className="text-label text-muted-foreground break-words leading-relaxed">
                           {item.context}
                         </p>
 
                         {item.type === "action" && (
                           <div className="mt-2.5">
-                            <span className="inline-flex text-[11px] font-medium text-primary hover:underline items-center gap-1">
+                            <span className="inline-flex text-caption font-medium text-primary hover:underline items-center gap-1">
                               Review Item <ArrowRight size={10} />
                             </span>
                           </div>
@@ -209,14 +209,14 @@ export function NotificationCenter({ notifications = DEFAULT_NOTIFICATIONS }: No
             ) : (
               <div className="px-4 py-8 text-center flex flex-col items-center justify-center text-muted-foreground">
                 <Lightning size={24} className="mb-2 opacity-50" />
-                <p className="text-[13px] font-medium text-foreground/80">You&apos;re all caught up</p>
-                <p className="text-[12px]">No immediate actions required.</p>
+                <p className="text-nav font-medium text-foreground/80">You&apos;re all caught up</p>
+                <p className="text-label">No immediate actions required.</p>
               </div>
             )}
           </div>
 
           <div className="p-3 border-t border-border bg-muted/10 text-center">
-            <button className="text-[12px] font-medium text-foreground hover:text-primary transition-colors">
+            <button className="text-label font-medium text-foreground hover:text-primary transition-colors">
               View All History
             </button>
           </div>

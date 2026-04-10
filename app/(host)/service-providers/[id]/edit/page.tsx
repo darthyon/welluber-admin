@@ -91,7 +91,7 @@ export default function EditServiceProviderPage() {
 
   const inputCls = (hasError?: boolean) =>
     cn(
-      "w-full px-3 py-2 bg-background border rounded-md text-[14px] outline-none transition-colors",
+      "w-full px-3 py-2 bg-background border rounded-md text-body outline-none transition-colors",
       hasError
         ? "border-destructive focus:border-destructive"
         : "border-border focus:border-foreground/30 focus:bg-muted/30"
@@ -110,12 +110,12 @@ export default function EditServiceProviderPage() {
       <div>
         <Link
           href={`/service-providers/${spId}`}
-          className="inline-flex items-center gap-1.5 text-[13px] font-medium text-muted-foreground hover:text-foreground transition-colors mb-4"
+          className="inline-flex items-center gap-1.5 text-nav font-medium text-muted-foreground hover:text-foreground transition-colors mb-4"
         >
           <CaretLeft size={16} /> Back to {sp.name}
         </Link>
         <h1 className="text-xl font-semibold tracking-tight text-foreground">Edit Service Provider</h1>
-        <p className="text-muted-foreground text-[13px] mt-1">Update the profile and service categories for {sp.name}.</p>
+        <p className="text-muted-foreground text-nav mt-1">Update the profile and service categories for {sp.name}.</p>
       </div>
 
       <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
@@ -124,57 +124,57 @@ export default function EditServiceProviderPage() {
           {/* Section: Basic Info */}
           <div className="p-6 border-b border-border space-y-5">
             <div className="flex items-center gap-2 pb-2">
-              <div className="w-8 h-8 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-500">
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                 <Storefront size={16} weight="fill" />
               </div>
-              <h3 className="text-[15px] font-semibold text-foreground">Provider Profile</h3>
+              <h3 className="text-subtitle font-semibold text-foreground">Provider Profile</h3>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="space-y-1.5 sm:col-span-2">
-                <label className="text-[13px] font-medium text-foreground">Company Name</label>
+                <label className="text-nav font-medium text-foreground">Company Name</label>
                 <input {...register("name")} className={inputCls(!!errors.name)} />
                 {errors.name && (
-                  <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
+                  <p className="text-caption text-destructive flex items-center gap-1 mt-1">
                     <WarningCircle size={12} /> {errors.name.message}
                   </p>
                 )}
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-foreground">Registration Number</label>
+                <label className="text-nav font-medium text-foreground">Registration Number</label>
                 <input {...register("registrationNo")} className={inputCls(!!errors.registrationNo)} />
                 {errors.registrationNo && (
-                  <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
+                  <p className="text-caption text-destructive flex items-center gap-1 mt-1">
                     <WarningCircle size={12} /> {errors.registrationNo.message}
                   </p>
                 )}
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-foreground">
+                <label className="text-nav font-medium text-foreground">
                   Website <span className="text-muted-foreground font-normal">(optional)</span>
                 </label>
                 <input {...register("website")} className={inputCls(!!errors.website)} type="url" />
                 {errors.website && (
-                  <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
+                  <p className="text-caption text-destructive flex items-center gap-1 mt-1">
                     <WarningCircle size={12} /> {errors.website.message}
                   </p>
                 )}
               </div>
 
               <div className="space-y-1.5 sm:col-span-2">
-                <label className="text-[13px] font-medium text-foreground">TIN No.</label>
+                <label className="text-nav font-medium text-foreground">TIN No.</label>
                 <input {...register("tinNumber")} className={inputCls(!!errors.tinNumber)} placeholder="e.g. TR-882910-01" />
                 {errors.tinNumber && (
-                  <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
+                  <p className="text-caption text-destructive flex items-center gap-1 mt-1">
                     <WarningCircle size={12} /> {errors.tinNumber.message}
                   </p>
                 )}
               </div>
 
               <div className="space-y-1.5 sm:col-span-2">
-                <label className="text-[13px] font-medium text-foreground">
+                <label className="text-nav font-medium text-foreground">
                   Description <span className="text-muted-foreground font-normal">(optional)</span>
                 </label>
                 <textarea {...register("description")} rows={3} className={cn(inputCls(), "resize-none")} />
@@ -189,18 +189,18 @@ export default function EditServiceProviderPage() {
                 <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500">
                   <Tag size={16} weight="fill" />
                 </div>
-                <h3 className="text-[15px] font-semibold text-foreground">Service Portfolio</h3>
+                <h3 className="text-subtitle font-semibold text-foreground">Service Portfolio</h3>
               </div>
               {brandCategories.length > 0 && (
                 <div className="flex flex-wrap gap-1 justify-end max-w-[50%]">
                     {brandCategories.map(cat => (
-                        <Badge key={cat} variant="outline" className="text-[10px] font-medium bg-muted/20">{cat}</Badge>
+                        <Badge key={cat} variant="outline" className="text-micro font-medium bg-muted/20">{cat}</Badge>
                     ))}
                 </div>
               )}
             </div>
 
-            <p className="text-[12px] text-muted-foreground">
+            <p className="text-label text-muted-foreground">
               Select available services from the masterlist allowed for this brand.
             </p>
 
@@ -211,7 +211,7 @@ export default function EditServiceProviderPage() {
               placeholder="Search main services..."
             />
             {errors.mainServices && (
-              <p className="text-[11px] text-destructive flex items-center gap-1">
+              <p className="text-caption text-destructive flex items-center gap-1">
                 <WarningCircle size={12} /> {errors.mainServices.message}
               </p>
             )}
@@ -223,16 +223,16 @@ export default function EditServiceProviderPage() {
               <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500">
                 <Article size={16} weight="fill" />
               </div>
-              <h3 className="text-[15px] font-semibold text-foreground">e-Invoice Malaysia</h3>
+              <h3 className="text-subtitle font-semibold text-foreground">e-Invoice Malaysia</h3>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <span className="ml-1 flex items-center gap-1 text-[11px] font-medium text-primary cursor-default">
+                    <span className="ml-1 flex items-center gap-1 text-caption font-medium text-primary cursor-default">
                       <Info size={13} weight="fill" className="text-primary/70" />
                       Submitted by Welluber
                     </span>
                   </TooltipTrigger>
-                  <TooltipContent side="right" className="max-w-[220px] text-center text-[12px]">
+                  <TooltipContent side="right" className="max-w-[220px] text-center text-label">
                     Welluber will submit for SP on behalf to the org.
                   </TooltipContent>
                 </Tooltip>
@@ -241,12 +241,12 @@ export default function EditServiceProviderPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-foreground">Classification Code</label>
+                <label className="text-nav font-medium text-foreground">Classification Code</label>
                 <input {...register("classificationCode")} className={inputCls(!!errors.classificationCode)} placeholder="e.g. 001" />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-foreground">Classification Descriptor</label>
+                <label className="text-nav font-medium text-foreground">Classification Descriptor</label>
                 <input {...register("classificationDescriptor")} className={inputCls(!!errors.classificationDescriptor)} placeholder="e.g. General" />
               </div>
             </div>
@@ -255,10 +255,10 @@ export default function EditServiceProviderPage() {
           {/* Section: Documents */}
           <div className="p-6 space-y-4">
             <div className="flex items-center gap-2 pb-2">
-              <div className="w-8 h-8 rounded-full bg-zinc-500/10 flex items-center justify-center text-zinc-500">
+              <div className="w-8 h-8 rounded-full bg-muted0/10 flex items-center justify-center text-muted-foreground">
                 <Files size={16} weight="fill" />
               </div>
-              <h3 className="text-[15px] font-semibold text-foreground">Documents</h3>
+              <h3 className="text-subtitle font-semibold text-foreground">Documents</h3>
             </div>
 
             <Controller
@@ -276,10 +276,10 @@ export default function EditServiceProviderPage() {
 
           {/* Footer */}
           <div className="p-6 border-t border-border bg-muted/10 flex items-center justify-end gap-3">
-            <Button asChild variant="outline" className="text-[13px] font-medium">
+            <Button asChild variant="outline" className="text-nav font-medium">
               <Link href={`/service-providers/${spId}`}>Cancel</Link>
             </Button>
-            <Button type="submit" disabled={isSubmitting} className="text-[13px] font-medium flex items-center gap-2">
+            <Button type="submit" disabled={isSubmitting} className="text-nav font-medium flex items-center gap-2">
               {isSubmitting ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

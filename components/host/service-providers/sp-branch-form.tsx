@@ -132,7 +132,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
 
   const inputCls = (hasError?: boolean) =>
     cn(
-      "w-full px-3 py-2 bg-background border rounded-md text-[14px] outline-none transition-colors",
+      "w-full px-3 py-2 bg-background border rounded-md text-body outline-none transition-colors",
       hasError ? "border-destructive" : "border-border focus:border-foreground/30 focus:bg-muted/30"
     );
 
@@ -153,7 +153,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
         <button
           type="button"
           onClick={onCancel}
-          className="inline-flex items-center gap-1.5 text-[13px] font-medium text-muted-foreground hover:text-foreground transition-colors w-fit"
+          className="inline-flex items-center gap-1.5 text-nav font-medium text-muted-foreground hover:text-foreground transition-colors w-fit"
         >
           <CaretLeft size={16} />
           Back to Branches
@@ -168,7 +168,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
               <h2 className="text-xl font-semibold tracking-tight text-foreground">
                 {isEditing ? "Edit Branch" : "Add New Branch"}
               </h2>
-              <p className="text-[13px] text-muted-foreground">
+              <p className="text-nav text-muted-foreground">
                 Configure location, access, and operating details for this branch.
               </p>
             </div>
@@ -180,14 +180,14 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
               variant="ghost"
               onClick={onCancel}
               disabled={isSubmitting || isSuccess}
-              className="text-[13px] font-medium"
+              className="text-nav font-medium"
             >
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={isSubmitting || isSuccess}
-              className="text-[13px] font-medium gap-2"
+              className="text-nav font-medium gap-2"
             >
               {isSubmitting ? (
                 <>
@@ -227,7 +227,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                     { label: "PICs added", status: contactFields.length > 0 },
                     { label: "Operating hours set", status: true },
                   ].map((step) => (
-                    <div key={step.label} className="flex items-center justify-between text-[13px]">
+                    <div key={step.label} className="flex items-center justify-between text-nav">
                       <span className="text-muted-foreground">{step.label}</span>
                       <div className={cn("w-2 h-2 rounded-full", step.status ? "bg-emerald-500" : "bg-muted")} title={step.status ? "Completed" : "Pending"} />
                     </div>
@@ -244,10 +244,10 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
           >
             <div className="space-y-5">
               <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-foreground">Branch Name</label>
+                <label className="text-nav font-medium text-foreground">Branch Name</label>
                 <input {...register("name")} className={inputCls(!!errors.name)} placeholder="e.g. Zenith KLCC" />
                 {errors.name && (
-                  <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
+                  <p className="text-caption text-destructive flex items-center gap-1 mt-1">
                     <WarningCircle size={12} /> {errors.name.message}
                   </p>
                 )}
@@ -255,8 +255,8 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
 
               <div className="flex items-center justify-between rounded-xl border border-border bg-muted/20 px-4 py-3">
                 <div>
-                  <p className="text-[13px] font-medium text-foreground">Active</p>
-                  <p className="text-[11px] text-muted-foreground">Inactive branches are hidden from the marketplace.</p>
+                  <p className="text-nav font-medium text-foreground">Active</p>
+                  <p className="text-caption text-muted-foreground">Inactive branches are hidden from the marketplace.</p>
                 </div>
                 <Switch checked={watch("isActive")} onCheckedChange={(v) => setValue("isActive", v)} />
               </div>
@@ -273,8 +273,8 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                 {(serviceCatalog as any[]).map((group: any) => (
                   <div key={group.category} className="space-y-3">
                     <div className="flex items-center justify-between px-1">
-                      <h4 className="text-[12px] font-bold text-muted-foreground tracking-wider">{group.category}</h4>
-                      <span className="text-[10px] font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+                      <h4 className="text-label font-semibold text-muted-foreground tracking-wider">{group.category}</h4>
+                      <span className="text-micro font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
                         {group.services.filter((s: any) => selectedServices.some(ls => ls.service === s.name)).length} Main Services
                       </span>
                     </div>
@@ -323,7 +323,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
               </div>
 
               {errors.services && (
-                <p className="text-[11px] text-destructive flex items-center gap-1">
+                <p className="text-caption text-destructive flex items-center gap-1">
                   <WarningCircle size={12} /> {errors.services.message}
                 </p>
               )}
@@ -353,7 +353,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="h-8 text-[12px] gap-1"
+                className="h-8 text-label gap-1"
                 onClick={() => appendAdmin({ name: "", email: "", role: "Administrator", designateAsPic: false })}
               >
                 <Plus size={13} /> Add Administrator
@@ -370,11 +370,11 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                 >
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-[11px] font-semibold text-muted-foreground tracking-tight">Name</label>
+                      <label className="text-caption font-semibold text-muted-foreground tracking-tight">Name</label>
                       <input {...register(`administrators.${i}.name`)} className={inputCls(!!(errors.administrators as any)?.[i]?.name)} placeholder="Full name" />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[11px] font-semibold text-muted-foreground tracking-tight">Corporate Email</label>
+                      <label className="text-caption font-semibold text-muted-foreground tracking-tight">Corporate Email</label>
                       <input type="email" {...register(`administrators.${i}.email`)} className={inputCls(!!(errors.administrators as any)?.[i]?.email)} placeholder="name@company.com" />
                     </div>
                   </div>
@@ -389,7 +389,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                             handleAdminPicSync(i, v);
                           }} 
                         />
-                        <span className="text-[12px] font-medium text-foreground">Designate as PIC</span>
+                        <span className="text-label font-medium text-foreground">Designate as PIC</span>
                       </div>
                     </div>
                     
@@ -397,7 +397,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                       type="button" 
                       variant="outline" 
                       size="sm" 
-                      className="h-9 px-4 gap-2 text-[12px] font-bold border-border text-muted-foreground hover:text-primary hover:border-primary/30 transition-all rounded-full"
+                      className="h-9 px-4 gap-2 text-label font-semibold border-border text-muted-foreground hover:text-primary hover:border-primary/30 transition-all rounded-full"
                       onClick={() => console.log("Invite sent to", watch(`administrators.${i}.email`))}
                     >
                       <PaperPlaneTilt size={14} weight="bold" />
@@ -407,7 +407,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                 </ItemSection>
               ))}
               {errors.administrators && (
-                <p className="text-[11px] text-destructive flex items-center gap-1">
+                <p className="text-caption text-destructive flex items-center gap-1">
                   <WarningCircle size={12} /> {(errors.administrators as any).message}
                 </p>
               )}
@@ -423,7 +423,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="h-8 text-[12px] gap-1"
+                className="h-8 text-label gap-1"
                 onClick={() => appendContact({ name: "", email: "", type: "staff", phone: "", isPublic: true })}
               >
                 <Plus size={13} /> Add PIC
@@ -440,15 +440,15 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                 >
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-[11px] font-semibold text-muted-foreground tracking-tight">Name</label>
+                      <label className="text-caption font-semibold text-muted-foreground tracking-tight">Name</label>
                       <input {...register(`contacts.${i}.name`)} className={inputCls(!!(errors.contacts as any)?.[i]?.name)} placeholder="Full name" />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[11px] font-semibold text-muted-foreground tracking-tight">Corporate Email</label>
+                      <label className="text-caption font-semibold text-muted-foreground tracking-tight">Corporate Email</label>
                       <input type="email" {...register(`contacts.${i}.email`)} className={inputCls(!!(errors.contacts as any)?.[i]?.email)} placeholder="name@company.com" />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[11px] font-semibold text-muted-foreground tracking-tight">Job Role</label>
+                      <label className="text-caption font-semibold text-muted-foreground tracking-tight">Job Role</label>
                       <select {...register(`contacts.${i}.type`)} className={cn(inputCls(), "appearance-none cursor-pointer bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236b7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1.25rem_1.25rem] bg-[right_0.5rem_center] bg-no-repeat pr-10")}>
                         {BRANCH_CONTACT_TYPES.map((t) => (
                           <option key={t.value} value={t.value}>{t.label}</option>
@@ -456,7 +456,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                       </select>
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[11px] font-semibold text-muted-foreground tracking-tight">Phone</label>
+                      <label className="text-caption font-semibold text-muted-foreground tracking-tight">Phone</label>
                       <input {...register(`contacts.${i}.phone`)} className={inputCls()} placeholder="+601XXXXXXXX" />
                     </div>
                   </div>
@@ -465,14 +465,14 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-2">
                         <Switch checked={watch(`contacts.${i}.isPublic`)} onCheckedChange={(v) => setValue(`contacts.${i}.isPublic`, v)} />
-                        <span className="text-[12px] font-medium text-foreground">Public profile</span>
+                        <span className="text-label font-medium text-foreground">Public profile</span>
                       </div>
                     </div>
                   </div>
                 </ItemSection>
               ))}
               {errors.contacts && typeof errors.contacts === "object" && "message" in errors.contacts && (
-                <p className="text-[11px] text-destructive flex items-center gap-1">
+                <p className="text-caption text-destructive flex items-center gap-1">
                   <WarningCircle size={12} /> {(errors.contacts as any).message}
                 </p>
               )}
@@ -489,15 +489,15 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                 const isClosed = watch(`operatingHours.${key}.isClosed`);
                 return (
                   <div key={key} className="grid grid-cols-[90px_1fr] md:grid-cols-[100px_1fr_120px_120px] gap-3 items-center py-1.5">
-                    <span className="text-[13px] font-medium text-foreground">{label.slice(0, 3)}</span>
+                    <span className="text-nav font-medium text-foreground">{label.slice(0, 3)}</span>
                     <div className="flex items-center gap-2">
                       <Switch checked={!isClosed} onCheckedChange={(v) => setValue(`operatingHours.${key}.isClosed`, !v)} />
-                      <span className="text-[11px] text-muted-foreground ml-1">{isClosed ? "Closed" : "Open"}</span>
+                      <span className="text-caption text-muted-foreground ml-1">{isClosed ? "Closed" : "Open"}</span>
                     </div>
                     {!isClosed && (
                       <>
-                        <input type="time" {...register(`operatingHours.${key}.open`)} disabled={isClosed} className={cn(inputCls(), "text-center text-[12px] font-mono")} />
-                        <input type="time" {...register(`operatingHours.${key}.close`)} disabled={isClosed} className={cn(inputCls(), "text-center text-[12px] font-mono")} />
+                        <input type="time" {...register(`operatingHours.${key}.open`)} disabled={isClosed} className={cn(inputCls(), "text-center text-label font-mono")} />
+                        <input type="time" {...register(`operatingHours.${key}.close`)} disabled={isClosed} className={cn(inputCls(), "text-center text-label font-mono")} />
                       </>
                     )}
                   </div>
@@ -532,7 +532,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
               {benefits.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {benefits.map((f, i) => (
-                    <span key={i} className="inline-flex items-center gap-1.5 text-[12px] px-2.5 py-1 bg-muted border border-border rounded-lg font-medium">
+                    <span key={i} className="inline-flex items-center gap-1.5 text-label px-2.5 py-1 bg-muted border border-border rounded-lg font-medium">
                       {f}
                       <button type="button" onClick={() => removeBenefit(i)} className="text-muted-foreground hover:text-destructive transition-colors">
                         <Trash size={11} />

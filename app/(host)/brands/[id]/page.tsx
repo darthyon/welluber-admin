@@ -18,11 +18,11 @@ export default function BrandDetailPage() {
   if (!brand) {
     return (
       <div className="flex flex-col items-center justify-center py-20 bg-muted/5 rounded-2xl border border-dashed border-border">
-        <h2 className="text-xl font-bold text-foreground">Brand Not Found</h2>
+        <h2 className="text-xl font-semibold text-foreground">Brand Not Found</h2>
         <p className="text-muted-foreground mt-2">The brand you are looking for does not exist or has been removed.</p>
         <button
             onClick={() => router.push("/brands")}
-            className="mt-6 text-primary font-bold hover:underline"
+            className="mt-6 text-primary font-semibold hover:underline"
         >
             Back to Brands
         </button>

@@ -92,10 +92,10 @@ export function AdvancedFilterSheet({
       description={description}
       footer={
         <div className="flex w-full items-center justify-between gap-4">
-          <Button variant="ghost" onClick={handleReset} className="text-[13px] hover:bg-muted font-semibold text-muted-foreground">
+          <Button variant="ghost" onClick={handleReset} className="text-nav hover:bg-muted font-semibold text-muted-foreground">
             Clear All
           </Button>
-          <Button onClick={onApply} className="text-[13px] rounded-xl px-8 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20">
+          <Button onClick={onApply} className="text-nav rounded-xl px-8 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20">
             Apply Filters
           </Button>
         </div>
@@ -108,7 +108,7 @@ export function AdvancedFilterSheet({
           <section className="space-y-6">
             <div className="flex items-center gap-2 text-primary">
                <IdentificationCard size={18} weight="bold" />
-               <h3 className="text-[12px] font-semibold tracking-tight leading-none">Utilization</h3>
+               <h3 className="text-label font-semibold tracking-tight leading-none">Utilization</h3>
             </div>
 
             <div className="space-y-8 pl-1">
@@ -125,7 +125,7 @@ export function AdvancedFilterSheet({
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 text-muted-foreground/60">
                     <Wallet size={14} weight="bold" />
-                    <label className="text-[11px] font-semibold tracking-tight">Wallet model</label>
+                    <label className="text-caption font-semibold tracking-tight">Wallet model</label>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     {["Cash Balance", "Credit Limit"].map((model) => (
@@ -133,7 +133,7 @@ export function AdvancedFilterSheet({
                         key={model}
                         onClick={() => setFilters({ ...filters, walletModel: model === filters.walletModel ? "all" : model })}
                         className={cn(
-                          "px-3 py-2.5 rounded-xl border text-[11px] font-semibold transition-all capitalize",
+                          "px-3 py-2.5 rounded-xl border text-caption font-semibold transition-all capitalize",
                           filters.walletModel === model
                             ? "bg-primary/10 border-primary text-primary"
                             : "bg-card border-border text-muted-foreground hover:bg-muted/30"
@@ -154,7 +154,7 @@ export function AdvancedFilterSheet({
           <section className="space-y-4">
             <div className="flex items-center gap-2 text-primary">
                <Users size={18} weight="bold" />
-               <h3 className="text-[12px] font-semibold tracking-tight leading-none">Workforce size</h3>
+               <h3 className="text-label font-semibold tracking-tight leading-none">Workforce size</h3>
             </div>
 
             <div className="space-y-5 pl-1">
@@ -166,7 +166,7 @@ export function AdvancedFilterSheet({
                       key={range.label}
                       onClick={() => handleRangeSelect(range)}
                       className={cn(
-                        "px-3 py-2.5 rounded-xl border text-[12px] font-semibold transition-all",
+                        "px-3 py-2.5 rounded-xl border text-label font-semibold transition-all",
                         isActive
                           ? "bg-primary text-white border-primary shadow-md shadow-primary/20"
                           : "bg-card border-border hover:border-primary/40 text-muted-foreground hover:bg-muted/30"
@@ -178,11 +178,11 @@ export function AdvancedFilterSheet({
                 })}
               </div>
               <div className="relative">
-                 <label className="text-[11px] font-semibold text-muted-foreground/60 tracking-tight mb-2 block">Custom employee count</label>
+                 <label className="text-caption font-semibold text-muted-foreground/60 tracking-tight mb-2 block">Custom employee count</label>
                 <input
                   type="number"
                   placeholder="Enter specific count..."
-                  className="w-full h-11 px-4 rounded-xl border border-border bg-card text-[13px] focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                  className="w-full h-11 px-4 rounded-xl border border-border bg-card text-nav focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                   value={customPax}
                   onChange={(e) => handleCustomPax(e.target.value)}
                 />
@@ -196,13 +196,13 @@ export function AdvancedFilterSheet({
           <section className="space-y-4">
             <div className="flex items-center gap-2 text-primary">
                <Briefcase size={18} weight="bold" />
-               <h3 className="text-[12px] font-semibold tracking-tight leading-none">Company details</h3>
+               <h3 className="text-label font-semibold tracking-tight leading-none">Company details</h3>
             </div>
             <div className="space-y-4 pl-1">
                <div className="space-y-2">
-                  <label className="text-[11px] font-semibold text-muted-foreground/60 tracking-tight block">Industry vertical</label>
+                  <label className="text-caption font-semibold text-muted-foreground/60 tracking-tight block">Industry vertical</label>
                  <select
-                   className="w-full h-11 px-4 rounded-xl border border-border bg-card text-[13px] focus:ring-2 focus:ring-primary/20 outline-none appearance-none font-medium"
+                   className="w-full h-11 px-4 rounded-xl border border-border bg-card text-nav focus:ring-2 focus:ring-primary/20 outline-none appearance-none font-medium"
                    value={filters.industry}
                    onChange={(e) => setFilters({ ...filters, industry: e.target.value })}
                  >

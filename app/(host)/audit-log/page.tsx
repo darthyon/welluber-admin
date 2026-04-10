@@ -77,8 +77,8 @@ export default function AuditLogPage() {
             <FileText size={20} weight="bold" />
           </div>
           <div>
-            <h1 className="text-xl font-bold tracking-tight text-foreground">Audit Log</h1>
-            <p className="text-muted-foreground text-[13px] mt-0.5 font-medium opacity-80">
+            <h1 className="text-xl font-semibold tracking-tight text-foreground">Audit Log</h1>
+            <p className="text-muted-foreground text-nav mt-0.5 font-medium opacity-80">
               Complete chronological record of all administrative actions and system events.
             </p>
           </div>
@@ -88,7 +88,7 @@ export default function AuditLogPage() {
           variant="outline" 
           size="sm" 
           onClick={exportToCsv}
-          className="h-10 px-4 font-bold border-border/40 hover:bg-muted/50 transition-all flex items-center gap-2"
+          className="h-10 px-4 font-semibold border-border/40 hover:bg-muted/50 transition-all flex items-center gap-2"
         >
           <Download size={18} weight="bold" />
           Export to CSV

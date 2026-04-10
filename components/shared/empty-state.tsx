@@ -54,8 +54,8 @@ export function EmptyState({
       )}
       
       <h3 className={cn(
-        "font-bold text-foreground tracking-tight relative z-10",
-        isPageLevel ? "text-2xl mb-3" : "text-[15px] mb-1.5"
+        "font-semibold text-foreground tracking-tight relative z-10",
+        isPageLevel ? "text-2xl mb-3" : "text-subtitle mb-1.5"
       )}>
         {title}
       </h3>
@@ -63,7 +63,7 @@ export function EmptyState({
       {description && (
         <p className={cn(
           "text-muted-foreground font-medium leading-relaxed opacity-60 relative z-10",
-          isPageLevel ? "text-[16px] max-w-sm mb-10" : "text-[13px] max-w-[260px] mb-8"
+          isPageLevel ? "text-[16px] max-w-sm mb-10" : "text-nav max-w-[260px] mb-8"
         )}>
           {description}
         </p>

@@ -1,7 +1,7 @@
 # DESIGN.md — WellUber Admin
 
 > **Status:** Active
-> **Last Updated:** 2026-04-03
+> **Last Updated:** 2026-04-10
 > **Design Source:** shadcn/ui Luma preset + custom refinements
 > **Inspiration:** Linear, Vercel, Supabase, Midday
 > **Format:** [VoltAgent DESIGN.md](https://github.com/VoltAgent/awesome-design-md)
@@ -81,19 +81,22 @@ WellUber Admin is a **B2B SaaS admin console** for managing corporate wellness b
 | Role | Size | Weight | Tracking | Usage |
 |---|---|---|---|---|
 | **Page Title** | 18px (`text-lg`) | 600 (semibold) | `tracking-tight` | Page headings |
+| **Subtitle** | 15px (`text-[15px]`) | 600 (semibold) | normal | Form section headers, modal titles, sub-page headings |
 | **Section Title** | 13px | 600 (semibold) | normal | Card/panel headings |
 | **Body** | 14px (`text-sm`) | 400 | normal | Standard content |
 | **Nav Item** | 13px | 500 (medium) | normal | Sidebar navigation links |
 | **Label** | 12px (`text-xs`) | 500 (medium) | normal | Stat card labels, metadata |
 | **Section Label** | 10px | 600 (semibold) | `tracking-[0.08em]` | Sidebar section titles, uppercase |
 | **Caption** | 11px | 400 | normal | Timestamps, footnotes |
+| **Micro** | 9px | 500 (medium) | normal | Keyboard shortcut hints only |
 
 ### Principles
-- **Three weights:** 400 (read), 500 (navigate/interact), 600 (announce/title)
-- Never use `font-bold` (700) in the admin UI. 600 is the max.
+- **Three weights only:** 400 (read), 500 (navigate/interact), 600 (announce/title). **Never use `font-bold` (700)**. If you find yourself reaching for 700, use 600 (`font-semibold`) instead — this applies to headings, card titles, table headers, badges, and dialog titles without exception.
 - `tracking-tight` on page titles only. Body runs at normal tracking.
-- **Lowercase Priority:** Avoid `uppercase` Tailwind class for all UI labels, metadata, and secondary text. All labels should use standard sentence-case or title-case to maintain a modern, readable aesthetic.
-- **Sidebar Exception:** Typography for sidebar section headers (`SidebarGroupLabel`) is the only permitted use of `uppercase` to maintain structural hierarchy.
+- **Title Case for headers and labels.** Write "Employee Directory", not "Employee directory". This applies to page titles, section titles, tab labels, and prominent headings. Button text and form field labels may follow platform conventions (Sentence case for brevity in long labels).
+- **`uppercase` is restricted to two contexts only:**
+  1. Sidebar section labels (`SidebarGroupLabel`) — structural hierarchy.
+  2. Technical ID badges — monospaced entity identifiers (e.g., `ORG-20260115-0001`) using `uppercase tracking-widest font-mono`.
 - Geist Mono for any code, technical IDs, or monetary values.
 
 ---
@@ -125,6 +128,9 @@ WellUber Admin is a **B2B SaaS admin console** for managing corporate wellness b
   - Active: `bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400`
   - Pending: `bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400`
   - Suspended: `bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400`
+- **Beneficiary type badge:** `text-[10px] font-semibold px-1.5 py-0.5 rounded-full`
+  - Employee: `bg-blue-50 text-blue-600 border border-blue-100`
+  - Dependent: `bg-purple-50 text-purple-600 border border-purple-100`
 
 ### Navigation
 - Sidebar: 240px fixed, `bg-sidebar`, `border-r border-border`
@@ -152,6 +158,20 @@ WellUber Admin is a **B2B SaaS admin console** for managing corporate wellness b
   - Sectioning: Support for category headers (e.g., Service Category).
   - Interaction: Checkbox-based selection with instant count feedback in the trigger.
   - Inline mode: Supports nested popovers without occlusion.
+
+### Semantic Color Convention
+
+Status and state colors use **Tailwind utility classes** (not CSS custom properties) because they represent universally understood semantic meanings that remain consistent across themes.
+
+| Semantic | Color | Tailwind Pattern | Usage |
+|---|---|---|---|
+| **Success/Active** | Emerald | `bg-emerald-500/10 text-emerald-600` | Active status, approvals, positive metrics |
+| **Warning/Pending** | Amber | `bg-amber-500/10 text-amber-600` | Pending states, attention needed |
+| **Danger/Error** | Rose | `bg-rose-500/10 text-rose-600` | Destructive actions, rejected, errors |
+| **Neutral/Removed** | Zinc | `bg-zinc-500/10 text-zinc-600` | Inactive, archived, disabled |
+| **Brand Accent** | Primary | `bg-primary/10 text-primary` | Active filters, selected states, links |
+
+> **Rule:** Never use hardcoded `indigo-*` for active/selected UI states. Use `primary` tokens instead (`bg-primary/10 text-primary border-primary/20`) so the brand color responds to theme changes. Reserve named colors (emerald, amber, rose) only for semantic states.
 
 ---
 
@@ -194,21 +214,27 @@ WellUber Admin is a **B2B SaaS admin console** for managing corporate wellness b
 
 ### Do
 - Use `text-[13px]` for nav items and section headers — not 14px, not 12px
+- Use `text-[15px]` for form section titles and modal headers — the "Subtitle" role
 - Use `rounded-lg` for cards and `rounded-md` for nav items — consistent mid-radius
 - Use `border border-border` for all surface containers — never box-shadow alone
-- Use `font-semibold` (600) for page titles — never `font-bold` (700)
+- Use `font-semibold` (600) for all emphasized text — page titles, card titles, table headers, badges
 - Use warm-stone border tokens — the subtle warmth distinguishes WellUber from cold grays
 - Use `tracking-tight` on page headings — creates the Vercel-level compression
 - Keep the primary indigo for CTAs and primary actions only — everything else is neutral
-- Use `uppercase` ONLY for sidebar section labels
+- Use `uppercase` ONLY for sidebar section labels and monospace ID badges
+- Use **Title Case** for all headers: "Employee Directory", not "Employee directory"
+- Use `bg-primary/10 text-primary` for active filter states — not hardcoded `indigo-*`
 
 ### Don't
-- Don't use `font-bold` (700) — max weight is 600 (semibold)
+- Don't use `font-bold` (700) anywhere — max weight is 600 (`font-semibold`). This includes dialog titles, card headings, badge text, table headers, and form labels. No exceptions.
 - Don't use heavy box-shadows — depth comes from borders
 - Don't apply primary color to backgrounds or large surfaces — it's for buttons and links
-- Don't use `text-base` (16px) for body text in the admin UI — use `text-sm` (14px) or 13px
+- Don't use `text-base` (16px) for body text in the admin UI — use `text-sm` (14px) or `text-[15px]` for subtitles
 - Don't add decorative gradients — this is infrastructure, not a marketing site
 - Don't use more than 3 font weights on any screen
+- Don't use hardcoded `indigo-*` classes for active UI states — use `primary` tokens instead
+- Don't use `uppercase` or `tracking-wider` outside of the two permitted contexts (sidebar labels, ID badges)
+- Don't use Sentence case for headers — use Title Case ("Account Details", not "Account details")
 
 ---
 
@@ -255,6 +281,7 @@ WellUber Admin is a **B2B SaaS admin console** for managing corporate wellness b
 | 2026-04-03 | Initial scaffold — shadcn Luma preset, Geist font | All |
 | 2026-04-03 | Theme default to light, add toggle, Linear/Vercel polish | Shell, sidebar, top bar, dashboard |
 | 2026-04-03 | Organization Directory UI Refinement — Triage toolbar, Ring charts, Sectioned taxonomy | Organization List |
+| 2026-04-10 | Typography audit — Added "Subtitle" (15px) and "Micro" (9px) roles, standardized Title Case rule, added Technical ID exception for uppercase, documented semantic color convention, reinforced `font-bold` prohibition | All |
 
 ---
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Plus, Users, Buildings, TreeStructure, MagnifyingGlass, Export, Funnel, DownloadSimple } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { SharedDataTable, Column } from "@/components/shared/data-table";
@@ -19,7 +19,12 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { EntityAvatar } from "@/components/shared/entity-avatar";
 
 export default function MembersPage() {
+  const [mounted, setMounted] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -50,8 +55,8 @@ export default function MembersPage() {
         <div className="flex items-center gap-3">
           <EntityAvatar name={row.name} size="sm" />
           <div className="flex flex-col">
-            <span className="font-bold text-foreground text-[14px] tracking-tight hover:text-primary transition-colors cursor-pointer">{row.name}</span>
-            <span className="text-[11px] text-muted-foreground font-medium opacity-70">{row.email}</span>
+            <span className="font-semibold text-foreground text-body tracking-tight hover:text-primary transition-colors cursor-pointer">{row.name}</span>
+            <span className="text-caption text-muted-foreground font-medium opacity-70">{row.email}</span>
           </div>
         </div>
       )
@@ -62,7 +67,7 @@ export default function MembersPage() {
       sortable: true,
       render: (row) => (
         <span className={cn(
-          "px-2 py-0.5 rounded-md text-[10px] font-bold border backdrop-blur-sm",
+          "px-2 py-0.5 rounded-md text-micro font-semibold border backdrop-blur-sm",
           row.type === "Employee" 
             ? "bg-blue-500/10 text-blue-600 border-blue-500/20" 
             : "bg-purple-500/10 text-purple-600 border-purple-500/20"
@@ -78,7 +83,7 @@ export default function MembersPage() {
       render: (row) => (
         <div className="flex items-center gap-2">
           <Buildings size={16} className="text-muted-foreground/40" />
-          <span className="text-[13px] font-semibold text-foreground/80">{row.organization.name}</span>
+          <span className="text-nav font-semibold text-foreground/80">{row.organization.name}</span>
         </div>
       )
     },
@@ -89,7 +94,7 @@ export default function MembersPage() {
       render: (row) => (
         <div className="flex items-center gap-2">
           <TreeStructure size={16} className="text-muted-foreground/40" />
-          <span className="text-[13px] font-medium text-muted-foreground">{row.branch?.name || "-"}</span>
+          <span className="text-nav font-medium text-muted-foreground">{row.branch?.name || "-"}</span>
         </div>
       )
     },
@@ -109,7 +114,7 @@ export default function MembersPage() {
       accessorKey: "joinedDate",
       sortable: true,
       render: (row) => (
-        <span className="text-[12px] font-medium text-muted-foreground/80 tracking-tight">{row.joinedDate}</span>
+        <span className="text-label font-medium text-muted-foreground/80 tracking-tight">{row.joinedDate}</span>
       )
     },
     {
@@ -117,7 +122,7 @@ export default function MembersPage() {
       accessorKey: "lastActive",
       sortable: true,
       render: (row) => (
-        <span className="text-[12px] font-medium text-muted-foreground/80 tracking-tight">{row.lastActive}</span>
+        <span className="text-label font-medium text-muted-foreground/80 tracking-tight">{row.lastActive}</span>
       )
     },
   ];
@@ -128,84 +133,80 @@ export default function MembersPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold tracking-tight text-foreground">Members</h1>
-          <p className="text-muted-foreground text-[13px] mt-1 font-normal opacity-80">
-            Manage your global workforce members, including employees and their dependents. Audit eligibility and track activation status.
+          <p className="text-muted-foreground text-nav mt-1 font-normal opacity-80">
+            Record of global workforce members, including employees and their dependents who have signed up on the app. Track activation status and member activity.
           </p>
         </div>
         <div className="flex items-center gap-2">
           <ViewToggle mode={viewMode} onChange={setViewMode} />
           
-          <Button variant="outline" size="sm" className="h-9 text-[13px] font-medium border-border/60 hover:bg-muted/50">
+          <Button variant="outline" size="sm" className="h-9 text-nav font-medium border-border/60 hover:bg-muted/50">
             <DownloadSimple size={16} className="mr-1.5 opacity-60" />
             Export
           </Button>
 
-          <div className="h-4 w-[1px] bg-border mx-1" />
-
-          <Button asChild className="h-9 text-[13px] font-medium shadow-sm">
-            <Link href="/users/members/new">
-              <Plus size={16} weight="bold" className="mr-1.5" />
-              Add Member
-            </Link>
-          </Button>
         </div>
       </div>
 
       {/* Toolbar */}
-      <DataFilterBar
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        searchPlaceholder="Search members..."
-        filters={
-          <>
-            <FilterItem 
-              label="Type"
-              value={typeFilter}
-              onChange={setTypeFilter}
-              options={[
-                { label: "All Types", value: "all" },
-                { label: "Employee", value: "Employee" },
-                { label: "Dependent", value: "Dependent" },
-              ]}
-            />
-            <FilterItem 
-              label="Status"
-              value={statusFilter}
-              onChange={setStatusFilter}
-              options={[
-                { label: "All Status", value: "all" },
-                { label: "Active", value: "Active" },
-                { label: "Pending", value: "Pending" },
-                { label: "Inactive", value: "Inactive" },
-              ]}
-            />
-            <SearchableFilterItem 
-              label="Organization"
-              value={orgFilter}
-              onChange={setOrgFilter}
-              icon={<Buildings size={14} />}
-              options={[
-                { label: "All Organisations", value: "all" },
-                { label: "TechCorp Solutions", value: "TechCorp Solutions" },
-                { label: "WellUber Global", value: "WellUber Global" },
-                { label: "MediCare Group", value: "MediCare Group" },
-              ]}
-            />
-            <SearchableFilterItem 
-              label="Branch"
-              value={branchFilter}
-              onChange={setBranchFilter}
-              icon={<TreeStructure size={14} />}
-              options={[
-                { label: "All Branches", value: "all" },
-                { label: "Main HQ", value: "Main HQ" },
-                { label: "KL Office", value: "KL Office" },
-                { label: "Penang Branch", value: "Penang Branch" },
-              ]}
-            />
-          </>
-        }
-      />
+      {mounted ? (
+        <DataFilterBar
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          searchPlaceholder="Search members..."
+          filters={
+            <>
+              <FilterItem 
+                label="Type"
+                value={typeFilter}
+                onChange={setTypeFilter}
+                options={[
+                  { label: "All Types", value: "all" },
+                  { label: "Employee", value: "Employee" },
+                  { label: "Dependent", value: "Dependent" },
+                ]}
+              />
+              <FilterItem 
+                label="Status"
+                value={statusFilter}
+                onChange={setStatusFilter}
+                options={[
+                  { label: "All Status", value: "all" },
+                  { label: "Active", value: "Active" },
+                  { label: "Pending", value: "Pending" },
+                  { label: "Inactive", value: "Inactive" },
+                ]}
+              />
+              <SearchableFilterItem 
+                label="Organization"
+                value={orgFilter}
+                onChange={setOrgFilter}
+                icon={<Buildings size={14} />}
+                options={[
+                  { label: "All Organisations", value: "all" },
+                  { label: "TechCorp Solutions", value: "TechCorp Solutions" },
+                  { label: "WellUber Global", value: "WellUber Global" },
+                  { label: "MediCare Group", value: "MediCare Group" },
+                ]}
+              />
+              <SearchableFilterItem 
+                label="Branch"
+                value={branchFilter}
+                onChange={setBranchFilter}
+                icon={<TreeStructure size={14} />}
+                options={[
+                  { label: "All Branches", value: "all" },
+                  { label: "Main HQ", value: "Main HQ" },
+                  { label: "KL Office", value: "KL Office" },
+                  { label: "Penang Branch", value: "Penang Branch" },
+                ]}
+              />
+            </>
+          }
+        />
+      ) : (
+        <div className="h-10 w-full" />
+      )}
 
       {/* Content */}
       <div className="min-h-[400px]">

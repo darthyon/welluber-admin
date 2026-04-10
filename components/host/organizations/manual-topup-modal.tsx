@@ -105,12 +105,12 @@ export function ManualTopUpModal({
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-border">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-500">
+            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
               <Wallet size={18} weight="duotone" />
             </div>
             <div>
-              <h3 className="font-semibold text-foreground tracking-tight leading-tight">Manual Top-Up</h3>
-              <p className="text-[11px] text-muted-foreground font-medium tracking-wider mt-0.5">
+              <h3 className="font-semibold text-foreground text-nav leading-tight">Manual Top-Up</h3>
+              <p className="text-caption text-muted-foreground font-medium mt-0.5">
                 {orgName} • {branchName}
               </p>
             </div>
@@ -135,13 +135,13 @@ export function ManualTopUpModal({
             <form id="manualTopupForm" onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5 col-span-2 sm:col-span-1">
-                  <label className="text-[12px] font-semibold text-muted-foreground/80 tracking-tight">Amount (Credit)</label>
+                  <label className="text-label font-semibold text-muted-foreground/80">Amount (Credit)</label>
                   <div className="relative">
                     <CurrencyDollar size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                     <input 
                       {...register("amount")}
                       className={cn(
-                        "w-full pl-9 pr-3 py-2 bg-background border rounded-md text-[14px] font-medium outline-none transition-colors",
+                        "w-full pl-9 pr-3 py-2 bg-background border rounded-md text-body font-medium outline-none transition-colors",
                         errors.amount ? "border-destructive focus:border-destructive" : "border-border focus:border-foreground/30 focus:bg-muted/30"
                       )}
                       placeholder="0.00"
@@ -151,19 +151,19 @@ export function ManualTopUpModal({
                     />
                   </div>
                   {errors.amount && (
-                    <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
+                    <p className="text-caption text-destructive flex items-center gap-1 mt-1">
                       <WarningCircle size={12} /> {errors.amount.message}
                     </p>
                   )}
                 </div>
 
                 <div className="space-y-1.5 col-span-2 sm:col-span-1">
-                  <label className="text-[12px] font-semibold text-muted-foreground/80 tracking-tight">Payment Method</label>
+                  <label className="text-label font-semibold text-muted-foreground/80 tracking-tight">Payment Method</label>
                   <div className="relative">
                     <Bank size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                     <select 
                       {...register("method")}
-                      className="w-full pl-9 pr-3 py-2 bg-background border border-border rounded-md text-[14px] outline-none focus:border-foreground/30 focus:bg-muted/30 transition-colors appearance-none"
+                      className="w-full pl-9 pr-3 py-2 bg-background border border-border rounded-md text-body outline-none focus:border-foreground/30 focus:bg-muted/30 transition-colors appearance-none"
                     >
                       <option value="bank_transfer">Bank Transfer</option>
                       <option value="cheque">Cheque</option>
@@ -174,7 +174,7 @@ export function ManualTopUpModal({
                 </div>
 
                 <div className="space-y-1.5 col-span-2">
-                  <label className="text-[12px] font-semibold text-muted-foreground/80 tracking-tight">Paid Date</label>
+                  <label className="text-label font-semibold text-muted-foreground/80 tracking-tight">Paid Date</label>
                   <div className="relative">
                     <CalendarBlank size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                     <Controller
@@ -186,7 +186,7 @@ export function ManualTopUpModal({
                           value={field.value instanceof Date ? field.value.toISOString().split('T')[0] : field.value}
                           onChange={(e) => field.onChange(new Date(e.target.value))}
                           className={cn(
-                            "w-full pl-9 pr-3 py-2 bg-background border rounded-md text-[14px] outline-none transition-colors",
+                            "w-full pl-9 pr-3 py-2 bg-background border rounded-md text-body outline-none transition-colors",
                             errors.paidDate ? "border-destructive focus:border-destructive" : "border-border focus:border-foreground/30 focus:bg-muted/30"
                           )}
                         />
@@ -194,17 +194,17 @@ export function ManualTopUpModal({
                     />
                   </div>
                   {errors.paidDate && (
-                    <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
+                    <p className="text-caption text-destructive flex items-center gap-1 mt-1">
                       <WarningCircle size={12} /> {errors.paidDate.message}
                     </p>
                   )}
                 </div>
 
                 <div className="space-y-1.5 col-span-2">
-                  <label className="text-[12px] font-semibold text-muted-foreground/80 tracking-tight">Remarks</label>
+                  <label className="text-label font-semibold text-muted-foreground/80 tracking-tight">Remarks</label>
                   <textarea 
                     {...register("remarks")}
-                    className="w-full px-3 py-2 bg-background border border-border rounded-md text-[13px] outline-none focus:border-foreground/30 focus:bg-muted/30 transition-colors resize-none"
+                    className="w-full px-3 py-2 bg-background border border-border rounded-md text-nav outline-none focus:border-foreground/30 focus:bg-muted/30 transition-colors resize-none"
                     placeholder="Reference numbers, specific instructions, etc."
                     rows={2}
                   />
@@ -212,7 +212,7 @@ export function ManualTopUpModal({
 
                 {/* Attachment Upload */}
                 <div className="space-y-1.5 col-span-2">
-                  <label className="text-[12px] font-semibold text-muted-foreground/80 tracking-tight">
+                  <label className="text-label font-semibold text-muted-foreground/80 tracking-tight">
                     Attachment <span className="text-destructive">*</span>
                   </label>
                   
@@ -220,7 +220,7 @@ export function ManualTopUpModal({
                     onClick={() => fileInputRef.current?.click()}
                     className={cn(
                       "border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all",
-                      attachment ? "border-emerald-500/50 bg-emerald-50/10" : "border-border hover:border-indigo-500/50 hover:bg-indigo-50/10",
+                      attachment ? "border-emerald-500/50 bg-emerald-50/10" : "border-border hover:border-primary/50 hover:bg-primary/5",
                       errors.attachment && "border-destructive bg-destructive/5"
                     )}
                   >
@@ -244,16 +244,16 @@ export function ManualTopUpModal({
                             <FileText size={24} weight="duotone" />
                           </div>
                         )}
-                        <p className="text-[13px] font-medium text-foreground text-center line-clamp-1 px-4">
+                        <p className="text-nav font-medium text-foreground text-center line-clamp-1 px-4">
                           {attachment.name}
                         </p>
-                        <p className="text-[11px] text-muted-foreground mt-0.5">
+                        <p className="text-caption text-muted-foreground mt-0.5">
                           {(attachment.size / 1024 / 1024).toFixed(2)} MB
                         </p>
                         <Button 
                           variant="ghost" 
                           size="sm" 
-                          className="h-7 text-[11px] text-destructive hover:text-destructive hover:bg-destructive/10 mt-2 px-2"
+                          className="h-7 text-caption text-destructive hover:text-destructive hover:bg-destructive/10 mt-2 px-2"
                           onClick={(e) => {
                             e.stopPropagation();
                             setValue("attachment", undefined as any, { shouldValidate: true });
@@ -269,14 +269,14 @@ export function ManualTopUpModal({
                           <UploadSimple size={20} />
                         </div>
                         <div className="text-center">
-                          <p className="text-[13px] font-medium text-foreground">Click to upload payment proof</p>
-                          <p className="text-[11px] text-muted-foreground mt-0.5">PDF, PNG, JPG (max 5MB)</p>
+                          <p className="text-nav font-medium text-foreground">Click to upload payment proof</p>
+                          <p className="text-caption text-muted-foreground mt-0.5">PDF, PNG, JPG (max 5MB)</p>
                         </div>
                       </>
                     )}
                   </div>
                   {errors.attachment && (
-                    <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
+                    <p className="text-caption text-destructive flex items-center gap-1 mt-1">
                       <WarningCircle size={12} /> {errors.attachment.message as string}
                     </p>
                   )}
@@ -294,7 +294,7 @@ export function ManualTopUpModal({
               variant="outline"
               onClick={onClose}
               disabled={isSubmitting}
-              className="text-[13px] font-medium h-9"
+              className="text-nav font-medium h-9"
             >
               Cancel
             </Button>
@@ -302,7 +302,7 @@ export function ManualTopUpModal({
               form="manualTopupForm"
               type="submit"
               disabled={isSubmitting}
-              className="text-[13px] font-medium flex items-center gap-2 h-9 bg-indigo-600 hover:bg-indigo-700"
+              className="text-nav font-medium flex items-center gap-2 h-9 bg-primary hover:bg-primary/90"
             >
               {isSubmitting ? (
                 <>

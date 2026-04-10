@@ -59,8 +59,8 @@ export function BrandDetailView({ brand, onBack, onEdit, onRemove }: BrandDetail
       headerClassName: "min-w-[200px]",
       render: (sp) => (
         <div className="flex flex-col">
-          <span className="font-bold text-[14px] text-foreground tracking-tight">{sp.name}</span>
-          <span className="text-[11px] text-muted-foreground mt-0.5 font-mono tracking-tight">{sp.registrationNo}</span>
+          <span className="font-semibold text-body text-foreground tracking-tight">{sp.name}</span>
+          <span className="text-caption text-muted-foreground mt-0.5 font-mono tracking-tight">{sp.registrationNo}</span>
         </div>
       ),
     },
@@ -79,12 +79,12 @@ export function BrandDetailView({ brand, onBack, onEdit, onRemove }: BrandDetail
       render: (sp) => (
         <div className="flex items-center gap-1 overflow-hidden max-w-[200px]">
           {sp.serviceCategories.slice(0, 1).map((cat, i) => (
-            <Badge key={i} variant="secondary" className="bg-muted/50 font-medium text-[10px] px-1.5 py-0 h-4 border-border/40 whitespace-nowrap">
+            <Badge key={i} variant="secondary" className="bg-muted/50 font-medium text-micro px-1.5 py-0 h-4 border-border/40 whitespace-nowrap">
               {cat}
             </Badge>
           ))}
           {sp.serviceCategories.length > 1 && (
-            <span className="text-[10px] text-muted-foreground font-bold px-1">+{sp.serviceCategories.length - 1}</span>
+            <span className="text-micro text-muted-foreground font-semibold px-1">+{sp.serviceCategories.length - 1}</span>
           )}
         </div>
       ),
@@ -93,14 +93,14 @@ export function BrandDetailView({ brand, onBack, onEdit, onRemove }: BrandDetail
         header: "Vouchers",
         align: "right",
         render: (sp) => (
-          <span className="text-[13px] font-semibold text-foreground/80">{sp.activeVoucherCount}</span>
+          <span className="text-nav font-semibold text-foreground/80">{sp.activeVoucherCount}</span>
         ),
     },
     {
       header: "Branches",
       align: "right",
       render: (sp) => (
-        <span className="text-[13px] font-medium text-muted-foreground">{sp.branches.length}</span>
+        <span className="text-nav font-medium text-muted-foreground">{sp.branches.length}</span>
       ),
     },
     {
@@ -123,7 +123,7 @@ export function BrandDetailView({ brand, onBack, onEdit, onRemove }: BrandDetail
       <div className="flex flex-col gap-4">
         <button 
           onClick={onBack}
-          className="flex items-center gap-1.5 text-[13px] font-medium text-muted-foreground hover:text-primary transition-colors w-fit group"
+          className="flex items-center gap-1.5 text-nav font-medium text-muted-foreground hover:text-primary transition-colors w-fit group"
         >
           <CaretLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
           Back to Brand List
@@ -134,10 +134,10 @@ export function BrandDetailView({ brand, onBack, onEdit, onRemove }: BrandDetail
             <EntityAvatar name={brand.name} size="xl" />
             <div>
               <div className="flex items-center gap-3">
-                <h2 className="text-2xl font-bold tracking-tight text-foreground">{brand.name}</h2>
+                <h2 className="text-2xl font-semibold tracking-tight text-foreground">{brand.name}</h2>
                 <StatusBadge status={currentStatus} variant={currentStatus === "active" ? "emerald" : "zinc"} />
               </div>
-              <p className="text-[14px] text-muted-foreground mt-1 font-medium">
+              <p className="text-body text-muted-foreground mt-1 font-medium">
                 {brand.assignedSpCount} Service Providers Assigned
               </p>
             </div>
@@ -147,7 +147,7 @@ export function BrandDetailView({ brand, onBack, onEdit, onRemove }: BrandDetail
             <Button 
                variant="outline" 
                size="sm" 
-               className="h-10 px-4 font-bold border-border/80 hover:bg-muted"
+               className="h-10 px-4 font-semibold border-border/80 hover:bg-muted"
                onClick={() => onEdit(brand.id)}
             >
               <PencilSimpleLine size={18} weight="bold" className="mr-2" />
@@ -185,10 +185,10 @@ export function BrandDetailView({ brand, onBack, onEdit, onRemove }: BrandDetail
               value={
                 <div className="flex flex-wrap gap-1.5 mt-0.5">
                   {brand.serviceCategories?.map((cat, i) => (
-                    <Badge key={i} variant="secondary" className="text-[11px] font-medium">{cat}</Badge>
+                    <Badge key={i} variant="secondary" className="text-caption font-medium">{cat}</Badge>
                   ))}
                   {(!brand.serviceCategories || brand.serviceCategories.length === 0) && (
-                    <span className="text-[12px] text-muted-foreground italic">None assigned</span>
+                    <span className="text-label text-muted-foreground italic">None assigned</span>
                   )}
                 </div>
               }

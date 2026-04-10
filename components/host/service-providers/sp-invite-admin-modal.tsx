@@ -66,7 +66,7 @@ export function SpInviteAdminModal({
 
   const inputCls = (hasError?: boolean) =>
     cn(
-      "w-full px-3 py-2 bg-background border rounded-md text-[14px] outline-none transition-colors",
+      "w-full px-3 py-2 bg-background border rounded-md text-body outline-none transition-colors",
       hasError ? "border-destructive" : "border-border focus:border-foreground/30 focus:bg-muted/30"
     );
 
@@ -87,7 +87,7 @@ export function SpInviteAdminModal({
               message={`Invite sent to ${invitedEmail}. They can activate their account within 60 minutes.`}
             />
             <div className="mt-6 flex justify-center">
-              <Button onClick={onClose} variant="outline" className="text-[13px]">
+              <Button onClick={onClose} variant="outline" className="text-nav">
                 Close
               </Button>
             </div>
@@ -97,8 +97,8 @@ export function SpInviteAdminModal({
             {/* Header */}
             <div className="flex items-center justify-between p-5 border-b border-border">
               <div>
-                <h2 className="text-[15px] font-semibold text-foreground">Invite SP Admin</h2>
-                <p className="text-[12px] text-muted-foreground mt-0.5">
+                <h2 className="text-subtitle font-semibold text-foreground">Invite SP Admin</h2>
+                <p className="text-label text-muted-foreground mt-0.5">
                   Send a magic link to {spName}
                 </p>
               </div>
@@ -116,28 +116,28 @@ export function SpInviteAdminModal({
               {isDuplicateEmail && watchedEmail && (
                 <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2.5">
                   <Warning size={14} className="text-amber-600 mt-0.5 shrink-0" />
-                  <p className="text-[12px] text-amber-700 leading-relaxed">
+                  <p className="text-label text-amber-700 leading-relaxed">
                     This email is already an SP Admin for another provider. They can manage multiple SPs from one account.
                   </p>
                 </div>
               )}
 
               <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-foreground">Full Name</label>
+                <label className="text-nav font-medium text-foreground">Full Name</label>
                 <input
                   {...register("name")}
                   className={inputCls(!!errors.name)}
                   placeholder="e.g. Sara Lim"
                 />
                 {errors.name && (
-                  <p className="text-[11px] text-destructive flex items-center gap-1">
+                  <p className="text-caption text-destructive flex items-center gap-1">
                     <WarningCircle size={12} /> {errors.name.message}
                   </p>
                 )}
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-foreground">Email Address</label>
+                <label className="text-nav font-medium text-foreground">Email Address</label>
                 <input
                   {...register("email")}
                   className={inputCls(!!errors.email)}
@@ -145,7 +145,7 @@ export function SpInviteAdminModal({
                   type="email"
                 />
                 {errors.email && (
-                  <p className="text-[11px] text-destructive flex items-center gap-1">
+                  <p className="text-caption text-destructive flex items-center gap-1">
                     <WarningCircle size={12} /> {errors.email.message}
                   </p>
                 )}
@@ -153,8 +153,8 @@ export function SpInviteAdminModal({
 
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <label className="text-[13px] font-medium text-foreground">Restricted to Branches (Optional)</label>
-                  <span className="text-[10px] text-muted-foreground">Default: All Branches</span>
+                  <label className="text-nav font-medium text-foreground">Restricted to Branches (Optional)</label>
+                  <span className="text-micro text-muted-foreground">Default: All Branches</span>
                 </div>
                 <Controller
                   control={control}
@@ -203,22 +203,22 @@ export function SpInviteAdminModal({
                   )}
                 />
                 {errors.branchIds && (
-                  <p className="text-[11px] text-destructive flex items-center gap-1">
+                  <p className="text-caption text-destructive flex items-center gap-1">
                     <WarningCircle size={12} /> {errors.branchIds.message}
                   </p>
                 )}
               </div>
 
-              <p className="text-[11px] text-muted-foreground bg-muted/50 border border-border rounded-lg px-3 py-2">
+              <p className="text-caption text-muted-foreground bg-muted/50 border border-border rounded-lg px-3 py-2">
                 A magic link will be sent to this address. The link expires in{" "}
                 <span className="font-semibold text-foreground">60 minutes</span>.
               </p>
 
               <div className="flex items-center justify-end gap-3 pt-1">
-                <Button type="button" variant="outline" onClick={onClose} className="text-[13px]">
+                <Button type="button" variant="outline" onClick={onClose} className="text-nav">
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isSubmitting} className="text-[13px] gap-2">
+                <Button type="submit" disabled={isSubmitting} className="text-nav gap-2">
                   {isSubmitting ? (
                     <>
                       <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

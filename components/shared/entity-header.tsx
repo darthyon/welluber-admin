@@ -35,7 +35,7 @@ export function EntityHeader({
             <h2 className="text-xl font-semibold tracking-tight text-foreground">{title}</h2>
             {status && <StatusBadge status={status} variant={statusVariant} />}
           </div>
-          {subtitle && <p className="text-[13px] text-muted-foreground mt-0.5">{subtitle}</p>}
+          {subtitle && <p className="text-nav text-muted-foreground mt-0.5">{subtitle}</p>}
         </div>
       </div>
       

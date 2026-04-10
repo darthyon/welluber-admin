@@ -1,8 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { IconProps } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 interface DetailSectionProps {
   /**
@@ -37,7 +37,7 @@ interface DetailSectionProps {
 
 /**
  * A reusable section component for detail views, following the Luma/Vercel aesthetic.
- * Features a distinct header with subtle background and indigo icon integration.
+ * Built on top of the Shadcn Card foundations.
  */
 export function DetailSection({
   title,
@@ -48,36 +48,59 @@ export function DetailSection({
   className,
   ghost = false
 }: DetailSectionProps) {
-  return (
-    <div className={cn(
-      "transition-all duration-300",
-      !ghost ? "bg-card border border-border rounded-xl overflow-hidden shadow-sm" : "bg-transparent border-none shadow-none",
-      className
-    )}>
-      <div className={cn(
-        "px-6 py-4 flex items-center justify-between transition-all",
-        !ghost ? "border-b border-border bg-muted/50" : "px-0 border-none bg-transparent pb-3"
-      )}>
-        <div className="flex items-center gap-3">
-          {icon && (
-            <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
-              {icon}
-            </div>
-          )}
-          <div>
-            <h3 className="text-[13px] font-semibold text-foreground leading-none tracking-tight">
-              {title}
-            </h3>
-            {description && (
-              <p className="text-[11px] text-muted-foreground mt-1.5">{description}</p>
+  if (ghost) {
+    return (
+      <div className={cn("space-y-4", className)}>
+        <div className="flex items-center justify-between pb-3">
+          <div className="flex items-center gap-3">
+            {icon && (
+              <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center border border-primary/20">
+                {icon}
+              </div>
             )}
+            <div>
+              <CardTitle className="text-subtitle font-semibold">
+                {title}
+              </CardTitle>
+              {description && (
+                <p className="text-caption text-muted-foreground mt-1">{description}</p>
+              )}
+            </div>
           </div>
+          {action && <div className="flex items-center gap-2">{action}</div>}
         </div>
-        {action && <div className="flex items-center gap-2">{action}</div>}
+        <div>
+          {children}
+        </div>
       </div>
-      <div className={cn("p-6", ghost && "px-0 py-2")}>
+    );
+  }
+
+  return (
+    <Card className={cn("overflow-hidden", className)}>
+      <CardHeader className="bg-muted/50 border-b border-border/60 py-4 px-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {icon && (
+              <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center border border-primary/20">
+                {icon}
+              </div>
+            )}
+            <div>
+              <CardTitle className="text-subtitle font-semibold">
+                {title}
+              </CardTitle>
+              {description && (
+                <p className="text-caption text-muted-foreground mt-1">{description}</p>
+              )}
+            </div>
+          </div>
+          {action && <div className="flex items-center gap-2">{action}</div>}
+        </div>
+      </CardHeader>
+      <CardContent className="p-6">
         {children}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

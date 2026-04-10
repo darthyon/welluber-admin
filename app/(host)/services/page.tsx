@@ -227,12 +227,12 @@ function ServicesContent() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold tracking-tight text-foreground">Services</h1>
-          <p className="text-muted-foreground text-[13px] mt-1 font-normal opacity-80">
+          <p className="text-muted-foreground text-nav mt-1 font-normal opacity-80">
             Define and manage the global service taxonomy. Group services into categories and link them to brands and providers.
           </p>
         </div>
         <Button 
-          className="h-9 text-[13px] font-medium shadow-sm transition-all hover:scale-[1.02]"
+          className="h-9 text-nav font-medium shadow-sm transition-all hover:scale-[1.02]"
           onClick={() => handleOpenDialog({ type: "category", mode: "add" })}
         >
           <Plus size={16} weight="bold" className="mr-1.5" />
@@ -246,12 +246,12 @@ function ServicesContent() {
           <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/60" size={16} />
           <Input 
             placeholder="Search categories, services or specs..." 
-            className="pl-9 h-10 text-[13px] bg-background/50 focus:bg-background transition-colors"
+            className="pl-9 h-10 text-nav bg-background/50 focus:bg-background transition-colors"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <div className="flex items-center gap-2 text-[11px] font-semibold text-muted-foreground ml-auto">
+        <div className="flex items-center gap-2 text-caption font-semibold text-muted-foreground ml-auto">
           <span>{filteredTaxonomy.length} Categories</span>
           <span className="w-1 h-1 rounded-full bg-border" />
           <span>{filteredTaxonomy.reduce((acc, cat) => acc + cat.services.length, 0)} Main Services</span>
@@ -294,8 +294,8 @@ function ServicesContent() {
                       <TreeStructure size={16} weight="duotone" />
                     </div>
                     <div>
-                      <p className="text-[13px] font-semibold text-foreground leading-tight">{category.category}</p>
-                      <p className="text-[11px] text-muted-foreground">{category.services.length} service{category.services.length !== 1 ? "s" : ""}</p>
+                      <p className="text-nav font-semibold text-foreground leading-tight">{category.category}</p>
+                      <p className="text-caption text-muted-foreground">{category.services.length} service{category.services.length !== 1 ? "s" : ""}</p>
                     </div>
                   </div>
                   <div onClick={(e) => e.stopPropagation()} className="relative z-20">
@@ -306,7 +306,7 @@ function ServicesContent() {
                 {/* Services list */}
                 <div className="relative z-10 h-7 flex items-center">
                   {category.services.length === 0 ? (
-                    <span className="text-[11px] text-muted-foreground italic">No services yet</span>
+                    <span className="text-caption text-muted-foreground italic">No services yet</span>
                   ) : (
                     <OverflowTags items={category.services} className="w-full" />
                   )}
@@ -344,13 +344,13 @@ function ServicesContent() {
           <div className="space-y-4">
             <div className="space-y-4">
               <div className="space-y-2">
-                <label htmlFor="name" className="text-[12px] font-bold text-zinc-500 block">Name</label>
+                <label htmlFor="name" className="text-label font-semibold text-muted-foreground block">Name</label>
                 <Input
                   id="name"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder={dialogConfig?.type === "category" ? "e.g. Fitness & Exercise" : "e.g. Yoga"}
-                  className="h-10 text-[13px]"
+                  className="h-10 text-nav"
                   autoFocus
                 />
               </div>
@@ -358,11 +358,11 @@ function ServicesContent() {
               {dialogConfig?.type === "service" && (
                 <div className="space-y-3 pb-2 pt-2">
                   <div className="flex items-center justify-between">
-                    <label className="text-[12px] font-bold text-zinc-500 block">Service Icon</label>
+                    <label className="text-label font-semibold text-muted-foreground block">Service Icon</label>
                     {selectedIcon && (
                       <button 
                         onClick={() => setSelectedIcon(null)}
-                        className="text-[10px] text-primary font-bold hover:underline"
+                        className="text-micro text-primary font-semibold hover:underline"
                       >
                         Clear
                       </button>
@@ -379,7 +379,7 @@ function ServicesContent() {
                           "w-10 h-10 rounded-xl border flex items-center justify-center transition-all group/icon",
                           selectedIcon === name 
                             ? "bg-primary text-white border-primary shadow-lg shadow-primary/20 scale-110 z-10" 
-                            : "bg-zinc-50 border-zinc-200 text-zinc-400 hover:border-primary/30 hover:bg-white hover:text-primary"
+                            : "bg-muted border-zinc-200 text-muted-foreground/60 hover:border-primary/30 hover:bg-white hover:text-primary"
                         )}
                       >
                         <IconComp size={20} weight={selectedIcon === name ? "fill" : "duotone"} />
@@ -391,10 +391,10 @@ function ServicesContent() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setIsDialogOpen(false)} className="h-10 text-[13px] font-medium">
+            <Button variant="ghost" onClick={() => setIsDialogOpen(false)} className="h-10 text-nav font-medium">
               Cancel
             </Button>
-            <Button onClick={handleSave} className="h-10 px-6 text-[13px] font-bold">
+            <Button onClick={handleSave} className="h-10 px-6 text-nav font-semibold">
               {dialogConfig?.mode === "add" ? "Save " + dialogConfig?.type : "Update"}
             </Button>
           </DialogFooter>

@@ -27,7 +27,7 @@ Before editing, verify against `docs/design.md` and `docs/scaffold.md`:
     - Nav/Section Headers: `text-[13px] font-semibold`.
     - Labels: `text-xs` (12px) font-medium.
     - **Prohibited**: NO `font-bold` (max 600 semibold), NO `uppercase` (except nav section titles), NO `tracking-widest`.
--   **Case**: Strictly **Sentence Case** (e.g., "Active policy" instead of "Active Policy").
+-   **Case**: Strictly **Title Case** (e.g., "Active Policy" instead of "Active policy").
 -   **Colors**: Use CSS variables (e.g., `text-muted-foreground`, `border-border`). Accents should be Indigo (`text-primary`).
 -   **Components**: Prefer `DetailSection`, `DetailField`, and `StatusBadge`.
 

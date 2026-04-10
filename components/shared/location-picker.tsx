@@ -65,7 +65,7 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
 
   const inputCls = (hasError?: boolean) =>
     cn(
-      "w-full px-3 py-2 bg-background border rounded-lg text-[14px] outline-none transition-all font-medium",
+      "w-full px-3 py-2 bg-background border rounded-lg text-body outline-none transition-all font-medium",
       hasError 
         ? "border-destructive ring-destructive/10 text-destructive placeholder:text-destructive/40" 
         : "border-border focus:ring-2 focus:ring-primary/10 focus:border-primary/30 hover:border-border-hover text-foreground"
@@ -91,7 +91,7 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
                     </button>
                   </TooltipTrigger>
                   <TooltipContent side="left" className="max-w-[220px]">
-                    <p className="text-[12px] leading-relaxed">
+                    <p className="text-label leading-relaxed">
                       Pinned location will automatically populate the address details on the right.
                     </p>
                   </TooltipContent>
@@ -114,7 +114,7 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
                 )}
               </div>
               <span className={cn(
-                "text-[11px] font-semibold transition-colors tracking-tight",
+                "text-caption font-semibold transition-colors tracking-tight",
                 value.lat && value.lon ? "text-primary/70" : "text-muted-foreground/30"
               )}>
                 {isSearching ? "Locating..." : (value.lat && value.lon ? "Pinned" : "No location set")}
@@ -133,7 +133,7 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleMockSearch())}
-                  className="w-full pl-10 pr-12 py-3.5 bg-background shadow-2xl shadow-black/10 border-border border-2 rounded-xl text-[14px] font-medium outline-none focus:border-primary/40 focus:ring-4 focus:ring-primary/5 transition-all placeholder:text-muted-foreground/60"
+                  className="w-full pl-10 pr-12 py-3.5 bg-background shadow-2xl shadow-black/10 border-border border-2 rounded-xl text-body font-medium outline-none focus:border-primary/40 focus:ring-4 focus:ring-primary/5 transition-all placeholder:text-muted-foreground/60"
                 />
                 <button
                   type="button"
@@ -158,7 +158,7 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
       <div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-500 delay-100">
         <div className="space-y-4">
           <div className="space-y-1.5">
-            <label className="text-[13px] font-medium text-foreground">Street Address</label>
+            <label className="text-nav font-medium text-foreground">Street Address</label>
             <input
               value={value.line}
               onChange={(e) => handleChange("line", e.target.value)}
@@ -166,7 +166,7 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
               className={inputCls(!!errors?.line)}
             />
             {errors?.line && (
-              <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
+              <p className="text-caption text-destructive flex items-center gap-1 mt-1">
                 <XCircle size={12} weight="fill" /> {errors.line.message}
               </p>
             )}
@@ -174,7 +174,7 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-[13px] font-medium text-foreground">City</label>
+              <label className="text-nav font-medium text-foreground">City</label>
               <input
                 value={value.city}
                 onChange={(e) => handleChange("city", e.target.value)}
@@ -183,7 +183,7 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-[13px] font-medium text-foreground">Postal Code</label>
+              <label className="text-nav font-medium text-foreground">Postal Code</label>
               <input
                 value={value.postalCode}
                 onChange={(e) => handleChange("postalCode", e.target.value)}
@@ -194,7 +194,7 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[13px] font-medium text-foreground">State</label>
+            <label className="text-nav font-medium text-foreground">State</label>
             <select
               value={value.state}
               onChange={(e) => handleChange("state", e.target.value)}
@@ -213,19 +213,19 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
 
         <div className="pt-4 border-t border-border/60 grid grid-cols-2 gap-4">
            <div className="space-y-1.5">
-            <label className="text-[13px] font-medium text-foreground">Latitude</label>
+            <label className="text-nav font-medium text-foreground">Latitude</label>
             <input
               value={value.lat ?? ""}
               onChange={(e) => handleChange("lat", e.target.value)}
-              className={cn(inputCls(), "font-mono text-[13px]")}
+              className={cn(inputCls(), "font-mono text-nav")}
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-[13px] font-medium text-foreground">Longitude</label>
+            <label className="text-nav font-medium text-foreground">Longitude</label>
             <input
               value={value.lon ?? ""}
               onChange={(e) => handleChange("lon", e.target.value)}
-              className={cn(inputCls(), "font-mono text-[13px]")}
+              className={cn(inputCls(), "font-mono text-nav")}
             />
           </div>
         </div>

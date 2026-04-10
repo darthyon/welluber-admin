@@ -47,7 +47,7 @@ export function PulseStatus({ status, label, showLabel = true, className }: Puls
   
   return (
     <div className={cn(
-      "inline-flex items-center gap-2 px-2 py-0.5 rounded-full border text-[11px] font-semibold capitalize",
+      "inline-flex items-center gap-2 px-2 py-0.5 rounded-full border text-caption font-semibold capitalize",
       config.bg,
       config.text,
       config.border,

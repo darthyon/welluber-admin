@@ -73,10 +73,10 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
             <CaretLeft size={20} weight="bold" />
           </button>
           <div>
-            <h2 className="text-xl font-bold tracking-tight text-foreground">
+            <h2 className="text-xl font-semibold tracking-tight text-foreground">
               {isEditing ? "Edit Branch" : "Add New Branch"}
             </h2>
-            <p className="text-[13px] text-muted-foreground mt-1">
+            <p className="text-nav text-muted-foreground mt-1">
               Configure location, personnel, and financial mapping for this branch.
             </p>
           </div>
@@ -129,30 +129,30 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
           >
             <div className="space-y-5 p-1">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-muted-foreground/40 tracking-tight">Branch Name</label>
+                <label className="text-micro font-semibold text-muted-foreground/40 tracking-tight">Branch Name</label>
                 <input 
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="e.g. ACME Subang Jaya"
-                  className="w-full px-3 py-2 bg-muted/10 border border-border rounded-lg text-[14px] outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-medium text-foreground hover:border-border/80"
+                  className="w-full px-3 py-2 bg-muted/10 border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-medium text-foreground hover:border-border/80"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground/40 tracking-tight">Branch Type</label>
+                  <label className="text-micro font-semibold text-muted-foreground/40 tracking-tight">Branch Type</label>
                   <select 
                     value={formData.type}
                     onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                    className="w-full px-3 py-2 bg-muted/10 border border-border rounded-lg text-[14px] outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-medium text-foreground hover:border-border/80 cursor-pointer"
+                    className="w-full px-3 py-2 bg-muted/10 border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-medium text-foreground hover:border-border/80 cursor-pointer"
                   >
                     <option value="HQ">Headquarters (HQ)</option>
                     <option value="Branch">Branch</option>
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-muted-foreground/40 tracking-tight">Status</label>
-                  <div className="h-[38px] flex items-center px-3 bg-muted/20 border border-border rounded-lg text-[13px] text-muted-foreground font-medium">
+                  <label className="text-micro font-semibold text-muted-foreground/40 tracking-tight">Status</label>
+                  <div className="h-[38px] flex items-center px-3 bg-muted/20 border border-border rounded-lg text-nav text-muted-foreground font-medium">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 mr-2 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
                     Pending activation
                   </div>
@@ -200,36 +200,36 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
             <div className="mt-6 space-y-6">
               {walletType === "independent" ? (
                 <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <label className="text-[13px] font-bold text-foreground">Default Currency</label>
-                  <div className="flex items-center gap-3 w-full px-3 py-2 bg-muted/20 border border-border rounded-lg text-[14px]">
-                    <span className="w-8 h-5 bg-muted rounded-sm flex items-center justify-center text-[10px] font-bold text-muted-foreground">MYR</span>
-                    <span className="text-foreground font-bold whitespace-nowrap">Malaysian Ringgit (RM)</span>
-                    <span className="ml-auto text-[11px] text-muted-foreground/40 font-bold tracking-tight">Locked</span>
+                  <label className="text-nav font-semibold text-foreground">Default Currency</label>
+                  <div className="flex items-center gap-3 w-full px-3 py-2 bg-muted/20 border border-border rounded-lg text-body">
+                    <span className="w-8 h-5 bg-muted rounded-sm flex items-center justify-center text-micro font-semibold text-muted-foreground">MYR</span>
+                    <span className="text-foreground font-semibold whitespace-nowrap">Malaysian Ringgit (RM)</span>
+                    <span className="ml-auto text-caption text-muted-foreground/40 font-semibold tracking-tight">Locked</span>
                   </div>
                 </div>
               ) : (
                 <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <label className="text-[13px] font-bold text-foreground">Bridge to Existing Wallet</label>
+                  <label className="text-nav font-semibold text-foreground">Bridge to Existing Wallet</label>
                   <select 
-                    className="w-full px-3 py-2.5 bg-card border border-border rounded-lg text-[14px] outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-bold text-foreground hover:border-border/80 cursor-pointer"
+                    className="w-full px-3 py-2.5 bg-card border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-semibold text-foreground hover:border-border/80 cursor-pointer"
                   >
                     <option value="hq">Global Tech HQ - RM 250,000.00 MYR</option>
                     <option value="hub_1">North Hub - RM 45,000.00 MYR</option>
                     <option value="sat_1">Cyberjaya Satellite - RM 12,000.00 MYR</option>
                   </select>
-                  <p className="text-[11px] text-muted-foreground/40 mt-1.5 font-medium italic">
+                  <p className="text-caption text-muted-foreground/40 mt-1.5 font-medium italic">
                     * This branch will consume funds from the selected centralized liquidity pool.
                   </p>
                 </div>
               )}
 
               <div className="p-4 rounded-xl border border-border bg-muted/20 space-y-3">
-                <div className="flex items-start gap-3 text-[13px] text-muted-foreground">
+                <div className="flex items-start gap-3 text-nav text-muted-foreground">
                   <CheckCircle size={18} weight="fill" className="text-primary mt-0.5 shrink-0" />
                   <span>Administrative fees are consolidated at the parent organization level for all linked accounts.</span>
                 </div>
                 {walletType === "independent" && (
-                  <div className="flex items-start gap-3 text-[13px] text-muted-foreground animate-in fade-in duration-300">
+                  <div className="flex items-start gap-3 text-nav text-muted-foreground animate-in fade-in duration-300">
                     <CheckCircle size={18} weight="fill" className="text-primary mt-0.5 shrink-0" />
                     <span>A 1.5% administrative fee applies to all standalone wallets.</span>
                   </div>
@@ -252,10 +252,10 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
                     <PaperPlaneTilt size={20} />
                   </div>
                   <div>
-                    <p className="text-[14px] font-bold text-foreground leading-tight">Invite org admin</p>
-                    <p className="text-[12px] text-muted-foreground mt-1">Send an invitation to manage this branch.</p>
+                    <p className="text-body font-semibold text-foreground leading-tight">Invite org admin</p>
+                    <p className="text-label text-muted-foreground mt-1">Send an invitation to manage this branch.</p>
                   </div>
-                  <Button variant="secondary" size="sm" className="text-[12px] font-bold rounded-full px-6 transition-all hover:bg-muted">
+                  <Button variant="secondary" size="sm" className="text-label font-semibold rounded-full px-6 transition-all hover:bg-muted">
                     Add Invitation
                   </Button>
                </div>
@@ -263,7 +263,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
           </DetailSection>
           
           <div className="p-4 rounded-xl border border-border bg-card shadow-sm space-y-4">
-            <h4 className="text-[13px] font-bold text-muted-foreground/40 tracking-tight">Branch setup guide</h4>
+            <h4 className="text-nav font-semibold text-muted-foreground/40 tracking-tight">Branch setup guide</h4>
             <div className="space-y-3">
               {[
                 { label: "Identity Verified", status: true },
@@ -271,7 +271,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
                 { label: "Financial Pool Linked", status: false },
                 { label: "Admins Invited", status: false }
               ].map((step, i) => (
-                <div key={i} className="flex items-center justify-between text-[13px]">
+                <div key={i} className="flex items-center justify-between text-nav">
                   <span className="text-muted-foreground font-medium">{step.label}</span>
                   <div className={cn(
                     "w-2 h-2 rounded-full",

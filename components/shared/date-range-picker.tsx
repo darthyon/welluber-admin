@@ -38,7 +38,7 @@ export function DateRangePicker({
           <button
             id="date"
             className={cn(
-              "flex items-center gap-2 px-3 py-1.5 h-[34px] bg-card border border-border hover:bg-muted/50 rounded-md text-[12px] font-medium text-foreground transition-colors group relative pr-8",
+              "flex items-center gap-2 px-3 py-1.5 h-[34px] bg-card border border-border hover:bg-muted/50 rounded-md text-label font-medium text-foreground transition-colors group relative pr-8",
               !value && "text-muted-foreground"
             )}
           >

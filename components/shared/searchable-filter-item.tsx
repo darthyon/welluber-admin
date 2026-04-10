@@ -47,15 +47,15 @@ export function SearchableFilterItem({
 
   return (
     <div className={cn("flex items-center gap-2", className)}>
-      <span className="text-[12px] font-medium text-muted-foreground whitespace-nowrap select-none">{label}</span>
+      <span className="text-label font-medium text-muted-foreground whitespace-nowrap select-none">{label}</span>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
             size="sm"
             className={cn(
-              "h-9 px-3 gap-2 text-[13px] font-normal border-border/60 bg-card hover:bg-muted/50 hover:border-border transition-all rounded-lg",
-              value !== "all" && "border-indigo-200 bg-indigo-50/30 text-indigo-600 hover:bg-indigo-50/50 hover:border-indigo-300"
+              "h-9 px-3 gap-2 text-nav font-normal border-border/60 bg-card hover:bg-muted/50 hover:border-border transition-all rounded-lg",
+              value !== "all" && "border-primary/20 bg-primary/5 text-primary hover:bg-primary/10 hover:border-primary/30"
             )}
           >
             {icon}
@@ -73,7 +73,7 @@ export function SearchableFilterItem({
                 placeholder={placeholder}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-transparent border-0 outline-none text-[13px] h-7 focus:ring-0 placeholder:text-muted-foreground/60"
+                className="w-full bg-transparent border-0 outline-none text-nav h-7 focus:ring-0 placeholder:text-muted-foreground/60"
               />
               {searchQuery && (
                 <button 
@@ -96,9 +96,9 @@ export function SearchableFilterItem({
                       setSearchQuery("");
                     }}
                     className={cn(
-                      "flex items-center justify-between w-full px-3 py-2 text-[13px] rounded-lg transition-all text-left font-normal",
+                      "flex items-center justify-between w-full px-3 py-2 text-nav rounded-lg transition-all text-left font-normal",
                       value === option.value
-                        ? "bg-indigo-50 text-indigo-600 font-semibold"
+                        ? "bg-primary/10 text-primary font-semibold"
                         : "text-muted-foreground hover:bg-muted hover:text-foreground"
                     )}
                   >
@@ -107,7 +107,7 @@ export function SearchableFilterItem({
                   </button>
                 ))
               ) : (
-                <div className="py-6 px-4 text-center text-[12px] text-muted-foreground font-medium italic">
+                <div className="py-6 px-4 text-center text-label text-muted-foreground font-medium italic">
                   No results found matching &quot;{searchQuery}&quot;
                 </div>
               )}

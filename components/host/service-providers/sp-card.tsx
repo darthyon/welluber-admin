@@ -57,10 +57,10 @@ export function SpCard({ sp }: SpCardProps) {
               )}
             </div>
             <div className="space-y-1.5">
-              <p className="font-bold text-[14px] text-foreground leading-tight tracking-tight">{sp.name}</p>
+              <p className="font-semibold text-body text-foreground leading-tight tracking-tight">{sp.name}</p>
               <div className="flex items-center gap-2">
                 <PulseStatus status={sp.status as "active" | "pending" | "suspended"} showLabel />
-                <span className="text-[9px] text-muted-foreground/60 font-mono bg-background/50 px-1.5 py-0.5 rounded border border-border/40 tracking-tight">{sp.registrationNo}</span>
+                <span className="text-micro text-muted-foreground/60 font-mono bg-background/50 px-1.5 py-0.5 rounded border border-border/40 tracking-tight">{sp.registrationNo}</span>
               </div>
             </div>
           </div>
@@ -77,10 +77,10 @@ export function SpCard({ sp }: SpCardProps) {
             <div className="space-y-2.5">
               <div className="flex items-center gap-1.5 text-muted-foreground/40">
               <Package size={14} weight="bold" />
-              <span className="text-[11px] font-bold tracking-tight text-muted-foreground/60 leading-none">Main Services</span>
+              <span className="text-caption font-semibold tracking-tight text-muted-foreground/60 leading-none">Main Services</span>
             </div>
               {sp.mainServices.length === 0 ? (
-                <span className="text-[11px] text-muted-foreground/40 italic block mt-1">None assigned</span>
+                <span className="text-caption text-muted-foreground/40 italic block mt-1">None assigned</span>
               ) : (
                 <div className="mt-1">
                   <ServicePortfolioTags mainServices={sp.mainServices} />
@@ -92,7 +92,7 @@ export function SpCard({ sp }: SpCardProps) {
             <div className="space-y-2.5">
             <div className="flex items-center gap-1.5 text-muted-foreground/40">
               <Ticket size={14} weight="bold" />
-              <span className="text-[11px] font-bold tracking-tight text-muted-foreground/60 leading-none">Active Vouchers</span>
+              <span className="text-caption font-semibold tracking-tight text-muted-foreground/60 leading-none">Active Vouchers</span>
             </div>
               <div 
                 onClick={(e) => {
@@ -101,10 +101,10 @@ export function SpCard({ sp }: SpCardProps) {
                 }}
                 className="group/vouchers cursor-pointer hover:text-primary transition-colors flex items-baseline gap-1.5 mt-0.5"
               >
-                <span className="text-[14px] font-bold text-foreground group-hover/vouchers:text-primary transition-colors">
+                <span className="text-body font-semibold text-foreground group-hover/vouchers:text-primary transition-colors">
                   {sp.activeVoucherCount}
                 </span>
-                <span className="text-[11px] font-normal text-muted-foreground/60">pax active</span>
+                <span className="text-caption font-normal text-muted-foreground/60">pax active</span>
               </div>
             </div>
           </div>
@@ -112,21 +112,21 @@ export function SpCard({ sp }: SpCardProps) {
           <div className="pt-4 border-t border-border/40">
             <div className="flex items-center gap-1.5 text-muted-foreground/40 mb-3">
               <MapPin size={14} weight="bold" />
-              <span className="text-[11px] font-bold tracking-tight text-muted-foreground/60 leading-none">Branches</span>
+              <span className="text-caption font-semibold tracking-tight text-muted-foreground/60 leading-none">Branches</span>
               <span className="h-2 w-2 rounded-full bg-border/60 flex items-center justify-center">
                 <span className="h-1 w-1 rounded-full bg-muted-foreground/30" />
               </span>
             </div>
             <div className="flex flex-wrap gap-2">
               {sp.branches.length === 0 ? (
-                <span className="text-[11px] text-muted-foreground/40 font-bold italic">No branches</span>
+                <span className="text-caption text-muted-foreground/40 font-semibold italic">No branches</span>
               ) : (
                 <>
                   {sp.branches.slice(0, 3).map((branch, i) => (
                     <Badge 
                       key={i} 
                       variant="secondary" 
-                      className="bg-background/40 hover:bg-background/60 text-[11px] font-medium px-2.5 py-0.5 border-border/60 h-6 transition-colors text-foreground/70"
+                      className="bg-background/40 hover:bg-background/60 text-caption font-medium px-2.5 py-0.5 border-border/60 h-6 transition-colors text-foreground/70"
                     >
                       {branch.name}
                     </Badge>
@@ -136,7 +136,7 @@ export function SpCard({ sp }: SpCardProps) {
                       <PopoverTrigger asChild>
                         <button
                           onClick={(e) => e.stopPropagation()}
-                          className="text-[11px] text-muted-foreground/60 hover:text-primary font-bold px-1.5 h-6 rounded-md hover:bg-muted/50 transition-colors"
+                          className="text-caption text-muted-foreground/60 hover:text-primary font-semibold px-1.5 h-6 rounded-md hover:bg-muted/50 transition-colors"
                         >
                           +{sp.branches.length - 3} more
                         </button>
@@ -146,13 +146,13 @@ export function SpCard({ sp }: SpCardProps) {
                         onClick={(e) => e.stopPropagation()}
                       >
                         <div className="flex flex-col gap-0.5">
-                          <span className="text-[10px] font-bold text-muted-foreground/40 px-2.5 py-1.5 tracking-tight">
+                          <span className="text-micro font-semibold text-muted-foreground/40 px-2.5 py-1.5 tracking-tight">
                             Other locations
                           </span>
                           {sp.branches.slice(3).map((branch, i) => (
                             <div 
                               key={i}
-                              className="text-[12px] px-2.5 py-1.5 hover:bg-muted/60 rounded-lg text-foreground/80 font-medium transition-colors cursor-default"
+                              className="text-label px-2.5 py-1.5 hover:bg-muted/60 rounded-lg text-foreground/80 font-medium transition-colors cursor-default"
                             >
                               {branch.name}
                             </div>

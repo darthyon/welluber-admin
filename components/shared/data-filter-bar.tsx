@@ -74,7 +74,7 @@ export function DataFilterBar({
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             className={cn(
-              "w-full pl-11 pr-10 py-2.5 bg-background/5 border border-border/60 rounded-xl text-[14px] font-medium outline-none transition-all placeholder:text-muted-foreground/40",
+              "w-full pl-11 pr-10 py-2.5 bg-background/5 border border-border/60 rounded-xl text-body font-medium outline-none transition-all placeholder:text-muted-foreground/40",
               "focus:border-primary/40 focus:bg-background/20 focus:shadow-[0_0_12px_rgba(var(--primary-rgb),0.1)]"
             )}
           />
@@ -105,7 +105,7 @@ export function DataFilterBar({
             size="sm"
             onClick={advancedFilter.onToggle}
             className={cn(
-              "h-10 px-4 gap-2 text-[13px] font-semibold rounded-xl border border-border/60 transition-all",
+              "h-10 px-4 gap-2 text-nav font-semibold rounded-xl border border-border/60 transition-all",
               advancedFilter.isOpen || (advancedFilter.activeCount ?? 0) > 0 
                 ? "bg-primary/10 border-primary/30 text-primary hover:bg-primary/20" 
                 : "bg-background/40 text-muted-foreground hover:bg-accent border-border/40"
@@ -114,7 +114,7 @@ export function DataFilterBar({
             <FadersHorizontal size={18} weight={(advancedFilter.activeCount ?? 0) > 0 ? "fill" : "bold"} />
             Advanced Filters
             {(advancedFilter.activeCount ?? 0) > 0 && (
-              <Badge className="ml-1 h-5 min-w-[20px] px-1.5 bg-primary text-white border-0 text-[10px] font-bold">
+              <Badge className="ml-1 h-5 min-w-[20px] px-1.5 bg-primary text-white border-0 text-micro font-semibold">
                 {advancedFilter.activeCount}
               </Badge>
             )}

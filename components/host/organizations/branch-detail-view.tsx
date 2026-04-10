@@ -67,7 +67,7 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
   const handleResetPassword = (email: string) => {
     // Simulated toast
     const toast = document.createElement("div");
-    toast.className = "fixed bottom-4 left-1/2 -translate-x-1/2 bg-popover text-popover-foreground text-[13px] px-4 py-2 rounded-lg shadow-2xl z-[300] border border-border/60 animate-in slide-in-from-bottom-2 duration-300";
+    toast.className = "fixed bottom-4 left-1/2 -translate-x-1/2 bg-popover text-popover-foreground text-nav px-4 py-2 rounded-lg shadow-2xl z-[300] border border-border/60 animate-in slide-in-from-bottom-2 duration-300";
     toast.innerText = `Reset password email sent to ${email}`;
     document.body.appendChild(toast);
     setTimeout(() => {
@@ -103,7 +103,7 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
             <Button 
               variant="secondary" 
               size="lg" 
-              className="text-[13px] font-medium rounded-full gap-2 transition-all"
+              className="text-nav font-medium rounded-full gap-2 transition-all"
               onClick={onEdit}
             >
               <PencilSimpleLine size={16} weight="bold" />
@@ -132,12 +132,12 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
                      <div className="flex items-center gap-3 relative z-10">
                         <EntityAvatar name={admin.name} size="sm" />
                         <div>
-                          <p className="text-[13px] font-bold text-foreground leading-tight tracking-tight">{admin.name}</p>
-                          <p className="text-[11px] text-muted-foreground font-medium opacity-70 mt-0.5">{admin.role}</p>
+                          <p className="text-nav font-semibold text-foreground leading-tight tracking-tight">{admin.name}</p>
+                          <p className="text-caption text-muted-foreground font-medium opacity-70 mt-0.5">{admin.role}</p>
                         </div>
                      </div>
                      <div className="flex items-center gap-2 relative z-10">
-                       <Badge variant="outline" className="text-[9px] font-bold border-emerald-500/20 text-emerald-600 bg-emerald-500/5">Admin</Badge>
+                       <Badge variant="outline" className="text-micro font-semibold border-emerald-500/20 text-emerald-600 bg-emerald-500/5">Admin</Badge>
                        <ActionPopover 
                          actions={[
                            { label: "View Details", onClick: () => console.log("View", admin.name) },
@@ -151,7 +151,7 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
                   variant="secondary" 
                   size="sm"
                   onClick={() => setIsInviteModalOpen(true)}
-                  className="w-full text-[12px] font-medium rounded-full flex items-center gap-2 mt-2 transition-all"
+                  className="w-full text-label font-medium rounded-full flex items-center gap-2 mt-2 transition-all"
                 >
                   <Plus size={14} weight="bold" />
                   Send Invite
@@ -161,15 +161,15 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
             
             <div className="bg-primary/95 dark:bg-primary/20 rounded-xl p-6 text-primary-foreground dark:text-primary overflow-hidden relative group border border-primary/20 shadow-lg shadow-primary/5">
               <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-white/10 dark:bg-primary/20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-1000" />
-              <h4 className="text-[15px] font-bold mb-2 tracking-tight">Branch quick stats</h4>
+              <h4 className="text-subtitle font-semibold mb-2 tracking-tight">Branch quick stats</h4>
               <div className="space-y-4 relative z-10">
                 <div>
-                  <p className="text-[11px] font-bold opacity-70 tracking-tight">Total employees</p>
-                  <p className="text-xl font-bold">1,240</p>
+                  <p className="text-caption font-semibold opacity-70 tracking-tight">Total employees</p>
+                  <p className="text-xl font-semibold">1,240</p>
                 </div>
                 <div>
-                  <p className="text-[11px] font-bold opacity-70 tracking-tight">Redemption rate</p>
-                  <p className="text-xl font-bold">92%</p>
+                  <p className="text-caption font-semibold opacity-70 tracking-tight">Redemption rate</p>
+                  <p className="text-xl font-semibold">92%</p>
                 </div>
               </div>
             </div>
@@ -186,7 +186,7 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
               <DetailField label="Official Name" value={branchData.name} />
               <DetailField label="Branch Type" value={branchData.type} />
               <div className="space-y-1.5">
-                <p className="text-[11px] font-medium text-muted-foreground/80 tracking-tight">Operational status</p>
+                <p className="text-caption font-medium text-muted-foreground/80 tracking-tight">Operational status</p>
                 <div className="flex items-center gap-2">
                   <StatusBadge status={branchData.status} variant="emerald" />
                 </div>
@@ -215,7 +215,7 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
                       </div>
                       <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-background shadow-sm" />
                     </div>
-                    <span className="text-[10px] font-semibold text-primary bg-background/90 backdrop-blur-sm px-2 py-0.5 rounded-full border border-primary/20 tracking-tight">
+                    <span className="text-micro font-semibold text-primary bg-background/90 backdrop-blur-sm px-2 py-0.5 rounded-full border border-primary/20 tracking-tight">
                       Pinned
                     </span>
                   </div>
@@ -236,7 +236,7 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
 
                   <div className="relative group/tz">
                     <DetailField label="Country" value={branchData.address.country} />
-                    <div className="absolute top-0 right-0 flex items-center gap-1.5 text-[10px] font-semibold text-primary/60 bg-primary/5 px-2 py-0.5 rounded-full border border-primary/10 select-none opacity-0 group-hover/tz:opacity-100 transition-all duration-300">
+                    <div className="absolute top-0 right-0 flex items-center gap-1.5 text-micro font-semibold text-primary/60 bg-primary/5 px-2 py-0.5 rounded-full border border-primary/10 select-none opacity-0 group-hover/tz:opacity-100 transition-all duration-300">
                       <Clock size={10} weight="bold" />
                       <span>{branchData.address.timezone}</span>
                     </div>
@@ -246,11 +246,11 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
                 <div className="pt-6 border-t border-border/60 grid grid-cols-2 gap-6">
                   <DetailField 
                     label="Latitude" 
-                    value={<span className="font-mono text-[13px] text-foreground">{branchData.address.coordinates.lat}</span>} 
+                    value={<span className="font-mono text-nav text-foreground">{branchData.address.coordinates.lat}</span>} 
                   />
                   <DetailField 
                     label="Longitude" 
-                    value={<span className="font-mono text-[13px] text-foreground">{branchData.address.coordinates.lng}</span>} 
+                    value={<span className="font-mono text-nav text-foreground">{branchData.address.coordinates.lng}</span>} 
                   />
                 </div>
               </div>
@@ -279,23 +279,23 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
                       )}
                     </div>
                     <div>
-                      <h4 className="font-semibold text-[15px] text-foreground tracking-tight">
+                      <h4 className="font-semibold text-subtitle text-foreground tracking-tight">
                         {walletType === "independent" ? "New Single Wallet" : "Existing Wallet"}
                       </h4>
-                      <p className="text-[12px] text-muted-foreground">Active Configuration</p>
+                      <p className="text-label text-muted-foreground">Active Configuration</p>
                     </div>
                   </div>
                   
                   <div className="text-right">
-                    <p className="text-[11px] font-bold tracking-tight text-muted-foreground/60 mb-1">Available balance</p>
-                    <p className="text-2xl font-bold text-foreground tracking-tight">RM 45,000.00</p>
+                    <p className="text-caption font-semibold tracking-tight text-muted-foreground/60 mb-1">Available balance</p>
+                    <p className="text-2xl font-semibold text-foreground tracking-tight">RM 45,000.00</p>
                     
                     <div className="flex items-center justify-end gap-2 mt-3">
                       <Button 
                         variant="secondary" 
                         size="sm" 
                         onClick={() => setIsHistoryModalOpen(true)}
-                        className="h-8 text-[11px] font-bold rounded-full gap-1.5 px-3 border-border/60 hover:bg-muted transition-all shadow-sm"
+                        className="h-8 text-caption font-semibold rounded-full gap-1.5 px-3 border-border/60 hover:bg-muted transition-all shadow-sm"
                       >
                         <ClockCounterClockwise size={14} weight="bold" />
                         History
@@ -304,7 +304,7 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
                         variant="default" 
                         size="sm" 
                         onClick={() => setIsTopUpModalOpen(true)}
-                        className="h-8 text-[11px] font-bold rounded-full gap-1.5 px-3 bg-primary hover:bg-primary/90 transition-all shadow-lg shadow-primary/10"
+                        className="h-8 text-caption font-semibold rounded-full gap-1.5 px-3 bg-primary hover:bg-primary/90 transition-all shadow-lg shadow-primary/10"
                       >
                         <Plus size={14} weight="bold" />
                         Top-Up
@@ -316,16 +316,16 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
                   <div className="pt-6 border-t border-border/40 grid grid-cols-2 lg:grid-cols-3 gap-6">
                     <DetailField 
                       label="Wallet ID" 
-                      value={<span className="font-mono text-[11px] bg-background px-1.5 py-0.5 rounded border border-border/60 tracking-tight text-foreground/70">WAL-BR01-2026</span>} 
+                      value={<span className="font-mono text-caption bg-background px-1.5 py-0.5 rounded border border-border/60 tracking-tight text-foreground/70">WAL-BR01-2026</span>} 
                     />
                     <DetailField 
                       label="Utilization" 
-                      value={<span className="text-[14px] font-bold text-foreground/80 tracking-tight">68% <span className="text-[11px] font-normal text-muted-foreground ml-1">(RM 30,600 spent)</span></span>} 
+                      value={<span className="text-body font-semibold text-foreground/80 tracking-tight">68% <span className="text-caption font-normal text-muted-foreground ml-1">(RM 30,600 spent)</span></span>} 
                     />
                   {walletType === "shared" && (
                     <DetailField 
                       label="Source Pool" 
-                      value={<span className="text-[13px] font-medium text-primary tracking-tight">Corporate Master HQ Wallet</span>} 
+                      value={<span className="text-nav font-medium text-primary tracking-tight">Corporate Master HQ Wallet</span>} 
                       className="md:col-span-1"
                     />
                   )}

@@ -47,8 +47,8 @@ export function BrandDataTable({ data, onRemove }: BrandDataTableProps) {
         <div className="flex items-center gap-3">
           <EntityAvatar name={brand.name} size="sm" />
           <div className="flex flex-col">
-            <span className="font-bold text-[14px] text-foreground tracking-tight leading-tight">{brand.name}</span>
-            <span className="text-[11px] text-muted-foreground mt-0.5 tracking-tight opacity-70">ID: {brand.id}</span>
+            <span className="font-semibold text-body text-foreground tracking-tight leading-tight">{brand.name}</span>
+            <span className="text-caption text-muted-foreground mt-0.5 tracking-tight opacity-70">ID: {brand.id}</span>
           </div>
         </div>
       ),
@@ -76,7 +76,7 @@ export function BrandDataTable({ data, onRemove }: BrandDataTableProps) {
       header: "Assigned SPs",
       align: "right",
       render: (brand) => (
-        <span className="text-[13px] font-semibold text-foreground/80">{brand.assignedSpCount}</span>
+        <span className="text-nav font-semibold text-foreground/80">{brand.assignedSpCount}</span>
       ),
     },
     {
@@ -84,7 +84,7 @@ export function BrandDataTable({ data, onRemove }: BrandDataTableProps) {
       headerClassName: "text-right",
       align: "right",
       render: (brand) => (
-        <span className="text-[12px] text-muted-foreground font-medium">
+        <span className="text-label text-muted-foreground font-medium">
           {new Date(brand.createdAt).toLocaleDateString("en-MY", { year: "numeric", month: "short" })}
         </span>
       ),

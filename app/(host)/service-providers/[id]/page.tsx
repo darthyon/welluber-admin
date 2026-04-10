@@ -145,12 +145,12 @@ export default function ServiceProviderDetailPage() {
 
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
             <div className="flex items-start gap-5">
-              <div className="w-15 h-15 rounded-2xl bg-zinc-100/80 flex items-center justify-center text-zinc-500 border border-zinc-200/60 transition-all">
+              <div className="w-15 h-15 rounded-2xl bg-muted/80 flex items-center justify-center text-muted-foreground border border-zinc-200/60 transition-all">
                 <Storefront size={32} weight="fill" />
               </div>
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
-                  <h1 className="text-2xl font-bold tracking-tight text-foreground">{sp.name}</h1>
+                  <h1 className="text-2xl font-semibold tracking-tight text-foreground">{sp.name}</h1>
                   <StatusBadge
                     status={currentStatus}
                     variant={
@@ -164,8 +164,8 @@ export default function ServiceProviderDetailPage() {
                     }
                   />
                 </div>
-                <div className="flex items-center gap-3 text-[13px] text-muted-foreground">
-                  <span className="font-mono text-[11px] text-muted-foreground/60 bg-muted px-2 py-0.5 rounded border border-border tracking-widest">
+                <div className="flex items-center gap-3 text-nav text-muted-foreground">
+                  <span className="font-mono text-caption text-muted-foreground/60 bg-muted px-2 py-0.5 rounded border border-border tracking-widest">
                     {sp.registrationNo}
                   </span>
                 </div>
@@ -173,7 +173,7 @@ export default function ServiceProviderDetailPage() {
             </div>
 
             <div className="flex items-center gap-2">
-              <Button asChild variant="secondary" size="lg" className="text-[13px] font-medium rounded-full transition-all">
+              <Button asChild variant="secondary" size="lg" className="text-nav font-medium rounded-full transition-all">
                 <Link href={`/service-providers/${spId}/edit`}>
                   <PencilSimpleLine size={16} weight="bold" className="mr-1.5" />
                   Edit Service Provider
@@ -192,7 +192,7 @@ export default function ServiceProviderDetailPage() {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={cn(
-                    "flex items-center gap-2 py-3 border-b-2 text-[14px] font-medium transition-all duration-300",
+                    "flex items-center gap-2 py-3 border-b-2 text-body font-medium transition-all duration-300",
                     isActive
                       ? "border-primary text-primary"
                       : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
@@ -239,10 +239,10 @@ export default function ServiceProviderDetailPage() {
                   value={
                     <div className="flex flex-wrap gap-1.5 mt-0.5">
                       {sp.mainServices?.map((service, i) => (
-                        <Badge key={i} variant="secondary" className="text-[11px] font-medium">{service}</Badge>
+                        <Badge key={i} variant="secondary" className="text-caption font-medium">{service}</Badge>
                       ))}
                       {(!sp.mainServices || sp.mainServices.length === 0) && (
-                        <span className="text-[12px] text-muted-foreground italic">None selected</span>
+                        <span className="text-label text-muted-foreground italic">None selected</span>
                       )}
                     </div>
                   }
@@ -271,11 +271,11 @@ export default function ServiceProviderDetailPage() {
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <span className="flex items-center cursor-default text-indigo-500">
+                        <span className="flex items-center cursor-default text-primary">
                           <Info size={16} weight="fill" />
                         </span>
                       </TooltipTrigger>
-                      <TooltipContent side="left" className="max-w-[240px] text-[12px]">
+                      <TooltipContent side="left" className="max-w-[240px] text-label">
                         Define your service portfolio and configure tiered commission rates.
                       </TooltipContent>
                     </Tooltip>
@@ -283,7 +283,7 @@ export default function ServiceProviderDetailPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="h-7 px-3 text-[12px] font-medium gap-1.5"
+                    className="h-7 px-3 text-label font-medium gap-1.5"
                     onClick={() => setIsCommissionSheetOpen(true)}
                   >
                     <PencilSimpleLine size={13} />
@@ -317,11 +317,11 @@ export default function ServiceProviderDetailPage() {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <span className="flex items-center cursor-default text-indigo-500">
+                      <span className="flex items-center cursor-default text-primary">
                         <Info size={16} weight="fill" />
                       </span>
                     </TooltipTrigger>
-                    <TooltipContent side="left" className="max-w-[220px] text-center text-[12px]">
+                    <TooltipContent side="left" className="max-w-[220px] text-center text-label">
                       Welluber will submit for SP on behalf to the org.
                     </TooltipContent>
                   </Tooltip>
@@ -348,13 +348,13 @@ export default function ServiceProviderDetailPage() {
                         <Files size={18} weight="duotone" />
                       </div>
                     <div className="flex-1 overflow-hidden">
-                        <p className="text-[12px] font-bold text-foreground truncate">{doc}</p>
-                        <p className="text-[10px] text-muted-foreground font-medium">Document attached</p>
+                        <p className="text-label font-semibold text-foreground truncate">{doc}</p>
+                        <p className="text-micro text-muted-foreground font-medium">Document attached</p>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <p className="text-[12px] text-muted-foreground italic">No documents uploaded.</p>
+                  <p className="text-label text-muted-foreground italic">No documents uploaded.</p>
                 )}
               </div>
             </DetailSection>
@@ -368,7 +368,7 @@ export default function ServiceProviderDetailPage() {
                   <Button
                     variant="secondary"
                     size="sm"
-                    className="text-[12px] font-medium h-8 gap-1.5"
+                    className="text-label font-medium h-8 gap-1.5"
                     onClick={() => setIsInviteModalOpen(true)}
                   >
                     <EnvelopeSimple size={13} /> Send Invite
@@ -376,7 +376,7 @@ export default function ServiceProviderDetailPage() {
                 }
               >
                 {sp.admins.length === 0 ? (
-                  <p className="text-[13px] text-muted-foreground italic">
+                  <p className="text-nav text-muted-foreground italic">
                     No administrators yet. Send an invite to give portal access.
                   </p>
                 ) : (
@@ -387,7 +387,7 @@ export default function ServiceProviderDetailPage() {
                         accessorKey: "name",
                         sortable: true,
                         render: (admin: any) => (
-                          <span className="text-[13px] font-medium text-foreground">{admin.name}</span>
+                          <span className="text-nav font-medium text-foreground">{admin.name}</span>
                         ),
                       },
                       {
@@ -395,19 +395,19 @@ export default function ServiceProviderDetailPage() {
                         accessorKey: "email",
                         sortable: true,
                         render: (admin: any) => (
-                          <span className="text-[13px] text-muted-foreground">{admin.email}</span>
+                          <span className="text-nav text-muted-foreground">{admin.email}</span>
                         ),
                       },
                       {
                         header: "User Type",
-                        render: () => <span className="text-[13px] text-muted-foreground">SP Admin</span>,
+                        render: () => <span className="text-nav text-muted-foreground">SP Admin</span>,
                       },
                       {
                         header: "Branches",
                         render: (admin: any) => {
                           if (admin.branchIds && admin.branchIds.length > 0) {
                             if (admin.branchIds.includes("all")) {
-                              return <span className="text-[13px] text-muted-foreground">All Branches</span>;
+                              return <span className="text-nav text-muted-foreground">All Branches</span>;
                             }
 
                             const branchNames = admin.branchIds.map((id: string) => {
@@ -416,16 +416,16 @@ export default function ServiceProviderDetailPage() {
                             });
                             
                             if (branchNames.length <= 2) {
-                              return <span className="text-[13px] text-muted-foreground">{branchNames.join(", ")}</span>;
+                              return <span className="text-nav text-muted-foreground">{branchNames.join(", ")}</span>;
                             }
                             return (
-                              <span className="text-[13px] text-muted-foreground">
+                              <span className="text-nav text-muted-foreground">
                                 {branchNames.length} Branches
                               </span>
                             );
                           }
                           return (
-                            <span className="text-[13px] text-muted-foreground">
+                            <span className="text-nav text-muted-foreground">
                               {sp.branches.length > 1 ? "All Branches" : sp.branches[0]?.name ?? "All Branches"}
                             </span>
                           );
@@ -451,7 +451,7 @@ export default function ServiceProviderDetailPage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-8 text-[12px] font-medium"
+                                className="h-8 text-label font-medium"
                                 onClick={() => resendSpAdminInvite(spId, admin.id, admin.email)}
                               >
                                 Resend Invite
@@ -492,10 +492,10 @@ export default function ServiceProviderDetailPage() {
                   <div className="rounded-xl border border-border bg-muted/20 p-4">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div className="space-y-1">
-                        <p className="text-[13px] font-semibold text-foreground">
+                        <p className="text-nav font-semibold text-foreground">
                           {currentStatus === "suspended" ? "Reactivate Service Provider" : "Suspend Service Provider"}
                         </p>
-                        <p className="text-[12px] text-muted-foreground">
+                        <p className="text-label text-muted-foreground">
                           {currentStatus === "suspended"
                             ? "Restore access and allow new transactions."
                             : "Pause access and stop new transactions temporarily."}
@@ -505,7 +505,7 @@ export default function ServiceProviderDetailPage() {
                         variant="outline"
                         size="lg"
                         className={cn(
-                          "w-full sm:w-auto text-[13px] font-medium rounded-full transition-all",
+                          "w-full sm:w-auto text-nav font-medium rounded-full transition-all",
                           currentStatus === "suspended"
                             ? "text-emerald-600 border-emerald-200 hover:bg-emerald-50"
                             : "text-destructive border-destructive/30 hover:bg-destructive/5"
@@ -531,15 +531,15 @@ export default function ServiceProviderDetailPage() {
                   <div className="rounded-xl border border-rose-200 bg-rose-50/60 p-4">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div className="space-y-1">
-                        <p className="text-[13px] font-semibold text-foreground">Remove Service Provider</p>
-                        <p className="text-[12px] text-muted-foreground">
+                        <p className="text-nav font-semibold text-foreground">Remove Service Provider</p>
+                        <p className="text-label text-muted-foreground">
                           Permanently remove the provider, branches, vouchers, and admin access.
                         </p>
                       </div>
                       <Button
                         variant="destructive"
                         size="lg"
-                        className="w-full sm:w-auto text-[13px] font-medium rounded-full transition-all"
+                        className="w-full sm:w-auto text-nav font-medium rounded-full transition-all"
                         onClick={() => openDangerAction("remove")}
                       >
                         Remove Service Provider

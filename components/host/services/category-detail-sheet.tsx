@@ -63,10 +63,10 @@ export function CategoryDetailSheet({
               <TreeStructure size={24} weight="fill" />
             </div>
             <div>
-              <h2 className="text-xl font-bold tracking-tight text-foreground">
+              <h2 className="text-xl font-semibold tracking-tight text-foreground">
                 {category.category}
               </h2>
-              <p className="text-[13px] text-muted-foreground mt-0.5">
+              <p className="text-nav text-muted-foreground mt-0.5">
                 Manage services and sub-services for this category.
               </p>
             </div>
@@ -75,7 +75,7 @@ export function CategoryDetailSheet({
             <Button 
               variant="outline" 
               size="sm" 
-              className="h-9 px-4 text-[13px] font-medium gap-2 border-primary/20 hover:bg-primary/5 text-primary"
+              className="h-9 px-4 text-nav font-medium gap-2 border-primary/20 hover:bg-primary/5 text-primary"
               onClick={() => onOpenDialog({ type: "service", mode: "add", parentId: category.category })}
             >
               <Plus size={16} weight="bold" />
@@ -110,8 +110,8 @@ export function CategoryDetailSheet({
                         <IconComp size={24} weight="duotone" />
                       </div>
                       <div>
-                        <h4 className="text-[15px] font-bold text-foreground group-hover/service:text-primary transition-colors leading-tight">{service}</h4>
-                        <p className="text-[12px] font-medium text-muted-foreground/60 mt-1">Main service</p>
+                        <h4 className="text-subtitle font-semibold text-foreground group-hover/service:text-primary transition-colors leading-tight">{service}</h4>
+                        <p className="text-label font-medium text-muted-foreground/60 mt-1">Main service</p>
                       </div>
                     </div>
 
@@ -123,13 +123,13 @@ export function CategoryDetailSheet({
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-48">
                         <DropdownMenuItem 
-                          className="gap-2 text-[13px] font-medium py-2"
+                          className="gap-2 text-nav font-medium py-2"
                           onClick={() => onOpenDialog({ type: "service", mode: "edit", id: service, initialValue: service })}
                         >
                           <PencilSimple size={16} /> Rename Service
                         </DropdownMenuItem>
                         <DropdownMenuItem 
-                          className="gap-2 text-[13px] font-medium py-2 text-destructive focus:text-destructive"
+                          className="gap-2 text-nav font-medium py-2 text-destructive focus:text-destructive"
                           onClick={() => onDelete("service", service)}
                         >
                           <Trash size={16} /> Delete Service
@@ -141,7 +141,7 @@ export function CategoryDetailSheet({
                   {/* Tier 3: Sub-services */}
                   <div className="space-y-3 mt-auto">
                     <div className="flex items-center justify-between">
-                      <span className="text-[12px] font-bold text-muted-foreground/40">Sub-services</span>
+                      <span className="text-label font-semibold text-muted-foreground/40">Sub-services</span>
                     </div>
                     
                     <div className="flex flex-wrap gap-2 min-h-[32px]">
@@ -152,7 +152,7 @@ export function CategoryDetailSheet({
                           title={spec}
                         >
                           <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/30 group-hover/spec:bg-primary/40 transition-colors" />
-                          <span className="text-[11px] font-bold text-muted-foreground group-hover/spec:text-foreground transition-colors truncate max-w-[140px]">{spec}</span>
+                          <span className="text-caption font-semibold text-muted-foreground group-hover/spec:text-foreground transition-colors truncate max-w-[140px]">{spec}</span>
                           
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -162,13 +162,13 @@ export function CategoryDetailSheet({
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-32">
                               <DropdownMenuItem 
-                                className="text-[11px] py-1 font-medium"
+                                className="text-caption py-1 font-medium"
                                 onClick={() => onOpenDialog({ type: "spec", mode: "edit", id: spec, parentId: service, initialValue: spec })}
                               >
                                 Rename
                               </DropdownMenuItem>
                               <DropdownMenuItem 
-                                className="text-[11px] py-1 font-medium text-destructive focus:text-destructive"
+                                className="text-caption py-1 font-medium text-destructive focus:text-destructive"
                                 onClick={() => onDelete("spec", spec, service)}
                               >
                                 Remove
@@ -182,7 +182,7 @@ export function CategoryDetailSheet({
                         onClick={() => onOpenDialog({ type: "spec", mode: "add", parentId: service })}
                       >
                         <Plus size={12} weight="bold" />
-                        <span className="text-[11px] font-bold">Add sub-service</span>
+                        <span className="text-caption font-semibold">Add sub-service</span>
                       </button>
                     </div>
                   </div>
@@ -197,7 +197,7 @@ export function CategoryDetailSheet({
           <Button 
             variant="ghost"
             onClick={onClose}
-            className="text-[13px] font-medium h-10 px-6"
+            className="text-nav font-medium h-10 px-6"
           >
             Close Drawer
           </Button>

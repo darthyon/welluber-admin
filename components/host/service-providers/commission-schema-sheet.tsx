@@ -89,13 +89,13 @@ export function CommissionSchemaSheet({
         <div className="bg-muted/30 border border-dashed border-border rounded-xl p-4 space-y-3">
           <div className="flex items-center gap-2 text-muted-foreground mb-1">
             <Plus size={16} weight="bold" />
-            <span className="text-[13px] font-semibold">Add Service to Portfolio</span>
+            <span className="text-nav font-semibold">Add Service to Portfolio</span>
           </div>
           <div className="flex gap-2">
             <select
               value={selectedMainService}
               onChange={(e) => setSelectedMainService(e.target.value)}
-              className={inputCls(false, "h-10 text-[13px]")}
+              className={inputCls(false, "h-10 text-nav")}
             >
               <option value="">Select a main service...</option>
               {availableMainServices
@@ -118,7 +118,7 @@ export function CommissionSchemaSheet({
               Add to Portfolio
             </Button>
           </div>
-          <p className="text-[11px] text-muted-foreground">
+          <p className="text-caption text-muted-foreground">
             Only services from the provider's assigned categories ({serviceCategories.join(", ")}) are available.
           </p>
         </div>
@@ -128,8 +128,8 @@ export function CommissionSchemaSheet({
             <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-4 border border-border">
               <Plus size={24} className="text-muted-foreground/60" />
             </div>
-            <p className="text-[13px] font-medium text-foreground">No services in portfolio</p>
-            <p className="text-[12px] text-muted-foreground mt-1 max-w-[240px] mx-auto">
+            <p className="text-nav font-medium text-foreground">No services in portfolio</p>
+            <p className="text-label text-muted-foreground mt-1 max-w-[240px] mx-auto">
               Add the services this provider offers to start configuring commissions.
             </p>
           </div>
@@ -179,9 +179,9 @@ function ServiceSchemaRow({
   return (
     <div className="space-y-3 p-4 border border-border rounded-xl bg-muted/5">
       <div className="flex items-center justify-between">
-        <h4 className="text-[14px] font-semibold text-foreground flex items-center gap-2">
+        <h4 className="text-body font-semibold text-foreground flex items-center gap-2">
           {mainService}
-          <span className="text-[10px] font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+          <span className="text-micro font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
             Main Service
           </span>
         </h4>
@@ -190,7 +190,7 @@ function ServiceSchemaRow({
             type="button"
             size="sm"
             variant="outline"
-            className="h-8 text-[11px] gap-1.5"
+            className="h-8 text-caption gap-1.5"
             onClick={() => append({ limit: (watchedTiers[watchedTiers.length - 1]?.limit ?? 0) + 100, rate: 0.1 })}
           >
             <Plus size={12} /> Add Tier
@@ -209,9 +209,9 @@ function ServiceSchemaRow({
 
       <div className="border border-border/50 rounded-lg overflow-hidden bg-background">
         <div className="grid grid-cols-[140px_1fr_60px] gap-4 px-3 py-2 bg-muted/30 border-b border-border/50">
-          <p className="text-[11px] font-bold text-muted-foreground/60 tracking-tight text-left">Starts From (Qty)</p>
-          <p className="text-[11px] font-bold text-muted-foreground/60 tracking-tight text-left">Commission Rate (%)</p>
-          <p className="text-[11px] font-bold text-muted-foreground/60 tracking-tight text-right">Delete</p>
+          <p className="text-caption font-semibold text-muted-foreground/60 tracking-tight text-left">Starts From (Qty)</p>
+          <p className="text-caption font-semibold text-muted-foreground/60 tracking-tight text-left">Commission Rate (%)</p>
+          <p className="text-caption font-semibold text-muted-foreground/60 tracking-tight text-right">Delete</p>
         </div>
 
         <div className="divide-y divide-border/30">
@@ -228,7 +228,7 @@ function ServiceSchemaRow({
                       type="number"
                       {...register(`rows.${rowIndex}.tiers.${tierIndex}.limit`, { valueAsNumber: true })}
                       disabled={isBase}
-                      className={inputCls(!!tierError?.limit, "h-9 text-[13px] font-mono")}
+                      className={inputCls(!!tierError?.limit, "h-9 text-nav font-mono")}
                     />
                     {isBase && (
                       <span className="absolute right-2 top-1/2 -translate-y-1/2">
@@ -237,11 +237,11 @@ function ServiceSchemaRow({
                     )}
                   </div>
                   {tierError?.limit && (
-                    <p className="text-[10px] text-destructive flex items-center gap-0.5">
+                    <p className="text-micro text-destructive flex items-center gap-0.5">
                       <WarningCircle size={10} /> {tierError.limit.message}
                     </p>
                   )}
-                  {isBase && <p className="text-[10px] text-muted-foreground font-medium tracking-tight">Base tier starts at 0</p>}
+                  {isBase && <p className="text-micro text-muted-foreground font-medium tracking-tight">Base tier starts at 0</p>}
                 </div>
 
                 {/* Rate */}
@@ -251,14 +251,14 @@ function ServiceSchemaRow({
                       type="number"
                       step="0.01"
                       {...register(`rows.${rowIndex}.tiers.${tierIndex}.rate`, { valueAsNumber: true })}
-                      className={inputCls(!!tierError?.rate, "h-9 text-[13px] font-mono pl-3 pr-8")}
+                      className={inputCls(!!tierError?.rate, "h-9 text-nav font-mono pl-3 pr-8")}
                     />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-muted-foreground font-mono">
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-label text-muted-foreground font-mono">
                       × 100
                     </span>
                   </div>
                   {tierError?.rate && (
-                    <p className="text-[10px] text-destructive flex items-center gap-0.5">
+                    <p className="text-micro text-destructive flex items-center gap-0.5">
                       <WarningCircle size={10} /> {tierError.rate.message}
                     </p>
                   )}
@@ -285,7 +285,7 @@ function ServiceSchemaRow({
       </div>
       {/* Array-level validation error (e.g. non-sequential limits) */}
       {errors.rows?.[rowIndex]?.tiers && "message" in (errors.rows[rowIndex].tiers as any) && (
-        <p className="text-[11px] text-destructive flex items-center gap-1.5 mt-2 bg-destructive/5 px-2 py-1.5 rounded-lg border border-destructive/10">
+        <p className="text-caption text-destructive flex items-center gap-1.5 mt-2 bg-destructive/5 px-2 py-1.5 rounded-lg border border-destructive/10">
           <WarningCircle size={14} /> {(errors.rows[rowIndex].tiers as any).message}
         </p>
       )}

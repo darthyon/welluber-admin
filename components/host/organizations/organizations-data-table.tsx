@@ -42,8 +42,8 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
         <div className="flex items-center gap-3">
           <EntityAvatar name={org.name} size="sm" />
           <div className="flex flex-col">
-            <span className="font-bold text-[14px] text-foreground tracking-tight leading-tight">{org.name}</span>
-            <span className="text-[11px] text-muted-foreground mt-0.5 font-mono tracking-tight">{org.id}</span>
+            <span className="font-semibold text-body text-foreground tracking-tight leading-tight">{org.name}</span>
+            <span className="text-caption text-muted-foreground mt-0.5 font-mono tracking-tight">{org.id}</span>
           </div>
         </div>
       )
@@ -67,7 +67,7 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
       render: (org) => {
         if (org.needsAction.length === 0) {
           return (
-            <Badge variant="outline" className="text-[10px] px-2 h-5 bg-emerald-500/10 text-emerald-400 border-emerald-500/20 font-bold gap-1 animate-in fade-in duration-500">
+            <Badge variant="outline" className="text-micro px-2 h-5 bg-emerald-500/10 text-emerald-400 border-emerald-500/20 font-semibold gap-1 animate-in fade-in duration-500">
               <CheckCircle size={12} weight="fill" />
               All good
             </Badge>
@@ -92,16 +92,16 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
           <UtilizationChart value={org.utilizationRate} mode="ring" size={32} strokeWidth={3} />
           <div className="flex flex-col justify-center">
             <div className="flex items-center gap-1.5 leading-tight">
-              <span className="text-[12px] font-bold text-foreground">
+              <span className="text-label font-semibold text-foreground">
                 {formatCurrency(org.totalWalletBalance)}
               </span>
               {org.claimsCount !== undefined && (
-                <span className="text-[10px] font-bold px-1.5 rounded-full bg-muted text-muted-foreground/60 border border-border tabular-nums leading-none flex items-center">
+                <span className="text-micro font-semibold px-1.5 rounded-full bg-muted text-muted-foreground/60 border border-border tabular-nums leading-none flex items-center">
                   {org.claimsCount}
                 </span>
               )}
             </div>
-            <span className="text-[10px] text-muted-foreground/60 font-medium tabular-nums mt-0.5">
+            <span className="text-micro text-muted-foreground/60 font-medium tabular-nums mt-0.5">
               / {formatCurrency(org.walletLimit)}
             </span>
           </div>
@@ -113,11 +113,11 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
       render: (org) => (
         <div className="flex items-center gap-1 overflow-hidden max-w-[200px]">
           {org.services.length === 0 ? (
-            <span className="text-[10px] text-muted-foreground/50 font-medium italic px-1">Unassigned</span>
+            <span className="text-micro text-muted-foreground/50 font-medium italic px-1">Unassigned</span>
           ) : (
             <>
               {org.services.slice(0, 1).map((service, i) => (
-                <Badge key={i} variant="secondary" className="bg-muted/50 font-medium text-[10px] px-1.5 py-0 h-4 border-border/40 whitespace-nowrap">
+                <Badge key={i} variant="secondary" className="bg-muted/50 font-medium text-micro px-1.5 py-0 h-4 border-border/40 whitespace-nowrap">
                   {service}
                 </Badge>
               ))}
@@ -126,16 +126,16 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
                   <TooltipTrigger asChild>
                     <button 
                       onClick={(e) => e.stopPropagation()}
-                      className="text-[10px] text-muted-foreground hover:text-primary font-bold px-1 transition-colors"
+                      className="text-micro text-muted-foreground hover:text-primary font-semibold px-1 transition-colors"
                     >
                       +{org.services.length - 1}
                     </button>
                   </TooltipTrigger>
                   <TooltipContent className="w-52 bg-card rounded-xl border-border shadow-2xl z-[200]">
                     <div className="flex flex-col gap-1">
-                      <span className="text-[10px] font-semibold text-muted-foreground/70 mb-1 px-1">Service category</span>
+                      <span className="text-micro font-semibold text-muted-foreground/70 mb-1 px-1">Service category</span>
                       {org.services.slice(1).map((service, i) => (
-                        <div key={i} className="text-[11px] px-2 py-1.5 hover:bg-muted rounded text-foreground transition-colors font-medium">
+                        <div key={i} className="text-caption px-2 py-1.5 hover:bg-muted rounded text-foreground transition-colors font-medium">
                           {service}
                         </div>
                       ))}
@@ -154,11 +154,11 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
       render: (org) => (
         <div className="flex items-center gap-1 overflow-hidden">
           {org.policies.length === 0 ? (
-            <span className="text-[10px] text-muted-foreground/50 font-medium italic px-1">Unassigned</span>
+            <span className="text-micro text-muted-foreground/50 font-medium italic px-1">Unassigned</span>
           ) : (
             <>
               {org.policies.slice(0, 1).map((policy, i) => (
-                <Badge key={i} variant="secondary" className="bg-indigo-500/10 text-indigo-400 font-bold text-[10px] px-1.5 py-0 h-4 border-indigo-500/20 whitespace-nowrap">
+                <Badge key={i} variant="secondary" className="bg-primary/10 text-primary font-semibold text-micro px-1.5 py-0 h-4 border-primary/20 whitespace-nowrap">
                   {policy}
                 </Badge>
               ))}
@@ -167,16 +167,16 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
                   <TooltipTrigger asChild>
                     <button 
                       onClick={(e) => e.stopPropagation()}
-                      className="text-[10px] text-muted-foreground hover:text-indigo-600 font-bold px-1 transition-colors"
+                      className="text-micro text-muted-foreground hover:text-primary font-semibold px-1 transition-colors"
                     >
                       +{org.policies.length - 1}
                     </button>
                   </TooltipTrigger>
                   <TooltipContent className="w-52 bg-card rounded-xl border-border shadow-2xl z-[200]">
                     <div className="flex flex-col gap-1">
-                      <span className="text-[10px] font-semibold text-muted-foreground/70 mb-1 px-1">Benefit policies</span>
+                      <span className="text-micro font-semibold text-muted-foreground/70 mb-1 px-1">Benefit policies</span>
                       {org.policies.slice(1).map((policy, i) => (
-                        <div key={i} className="text-[11px] px-2 py-1.5 hover:bg-muted rounded text-foreground transition-colors font-medium">
+                        <div key={i} className="text-caption px-2 py-1.5 hover:bg-muted rounded text-foreground transition-colors font-medium">
                           {policy}
                         </div>
                       ))}
@@ -197,11 +197,11 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
       render: (org) => (
         <div className="flex items-center gap-1 overflow-hidden">
           {org.branches.length === 0 ? (
-            <span className="text-[10px] text-muted-foreground/50 font-medium italic px-1">Unassigned</span>
+            <span className="text-micro text-muted-foreground/50 font-medium italic px-1">Unassigned</span>
           ) : (
             <>
               {org.branches.slice(0, 1).map((branch, i) => (
-                <Badge key={i} variant="secondary" className="bg-sky-500/10 text-sky-400 font-bold text-[10px] px-1.5 py-0 h-4 border-sky-500/20 whitespace-nowrap">
+                <Badge key={i} variant="secondary" className="bg-sky-500/10 text-sky-400 font-semibold text-micro px-1.5 py-0 h-4 border-sky-500/20 whitespace-nowrap">
                   {branch}
                 </Badge>
               ))}
@@ -210,16 +210,16 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
                   <TooltipTrigger asChild>
                     <button 
                       onClick={(e) => e.stopPropagation()}
-                      className="text-[10px] text-muted-foreground hover:text-sky-600 font-bold px-1 transition-colors"
+                      className="text-micro text-muted-foreground hover:text-sky-600 font-semibold px-1 transition-colors"
                     >
                       +{org.branches.length - 1}
                     </button>
                   </TooltipTrigger>
                   <TooltipContent className="w-52 bg-card rounded-xl border-border shadow-2xl z-[200]">
                     <div className="flex flex-col gap-1">
-                      <span className="text-[10px] font-semibold text-muted-foreground/70 mb-1 px-1">Branches</span>
+                      <span className="text-micro font-semibold text-muted-foreground/70 mb-1 px-1">Branches</span>
                       {org.branches.slice(1).map((branch, i) => (
-                        <div key={i} className="text-[11px] px-2 py-1.5 hover:bg-muted rounded text-foreground transition-colors font-medium">
+                        <div key={i} className="text-caption px-2 py-1.5 hover:bg-muted rounded text-foreground transition-colors font-medium">
                           {branch}
                         </div>
                       ))}
@@ -237,7 +237,7 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
       accessorKey: "employeeCount",
       sortable: true,
       align: "right",
-      render: (org) => <span className="text-[13px] font-bold text-foreground/80">{org.employeeCount.toLocaleString()}</span>
+      render: (org) => <span className="text-nav font-semibold text-foreground/80">{org.employeeCount.toLocaleString()}</span>
     },
     {
       header: "Joined",
@@ -246,7 +246,7 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
       headerClassName: "text-right",
       align: "right",
       render: (org) => (
-        <span className="text-[12px] text-muted-foreground font-medium">
+        <span className="text-label text-muted-foreground font-medium">
           {new Date(org.createdAt).toLocaleDateString("en-GB", { 
             day: "2-digit",
             month: "short",
@@ -264,7 +264,7 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
             { label: "Edit Organisation", href: `/organizations/${org.id}/edit` },
             { label: "Quick Invite Admin", onClick: () => console.log("Invite clicked") },
             { label: "Settings", isSectionTitle: true },
-            { label: "Benefit Policies", href: `/organizations/${org.id}?tab=policies`, className: "text-indigo-600 font-semibold" }
+            { label: "Benefit Policies", href: `/organizations/${org.id}?tab=policies`, className: "text-primary font-semibold" }
           ]} 
         />
       )

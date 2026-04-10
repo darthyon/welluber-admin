@@ -2,14 +2,14 @@ import { ShieldCheck, ArrowRight } from "@phosphor-icons/react"
 
 export function SettlementStatus() {
   return (
-    <div className="rounded-lg border border-border bg-card p-5 h-full flex flex-col relative overflow-hidden shadow-sm">
+    <div className="rounded-lg border border-border bg-card p-4 h-full flex flex-col relative overflow-hidden shadow-sm">
       {/* Decorative gradient background similar to Stitch Profitability card */}
       <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -z-0 pointer-events-none" />
       
       <div className="relative z-10 flex flex-col h-full">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
-            <h2 className="text-[13px] font-semibold text-foreground tracking-tight leading-none">Settlement status</h2>
+            <h2 className="text-[13px] font-semibold text-foreground leading-none tracking-tight">Settlement Status</h2>
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="System operational" />
           </div>
           <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
@@ -18,25 +18,25 @@ export function SettlementStatus() {
         </div>
 
         <div className="mb-4">
-          <p className="text-[13px] text-muted-foreground font-semibold mb-2">Pending payouts</p>
+          <p className="text-[12px] font-medium text-muted-foreground mb-2">Pending Payouts</p>
           <div className="flex items-baseline gap-1">
-            <span className="text-xl font-medium text-muted-foreground">RM</span>
-            <span className="text-3xl font-bold tracking-tight text-foreground">18.2M</span>
+            <span className="text-[20px] font-medium text-muted-foreground">RM</span>
+            <span className="text-[24px] font-semibold tracking-tight text-foreground leading-tight">18.2M</span>
           </div>
         </div>
 
         <div className="space-y-3 mt-auto">
           <div className="flex justify-between items-center text-[12px]">
-            <span className="text-muted-foreground font-medium">Next cycle date</span>
+            <span className="text-muted-foreground font-medium">Next Cycle Date</span>
             <span className="font-semibold text-foreground">May 01, 2026</span>
           </div>
           
           <div className="w-full bg-muted/60 rounded-full h-1.5 mb-1 overflow-hidden">
             <div className="bg-primary h-1.5 rounded-full" style={{ width: '85%' }}></div>
           </div>
-          <div className="flex justify-between text-[10px] text-muted-foreground font-medium">
-            <span>Cycle progress</span>
-            <span>26 Days elapsed</span>
+          <div className="flex justify-between text-[11px] text-muted-foreground font-medium">
+            <span>Cycle Progress</span>
+            <span>26 Days Elapsed</span>
           </div>
         </div>
 

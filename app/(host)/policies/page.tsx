@@ -149,19 +149,19 @@ function PoliciesContent() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold tracking-tight text-foreground">Benefit Policies</h1>
-          <p className="text-muted-foreground text-[13px] mt-1 font-normal opacity-80">
+          <p className="text-muted-foreground text-nav mt-1 font-normal opacity-80">
             Design and oversee flexible benefit structures for your workforce. Define eligibility, pool strategies, and individual service rules.
           </p>
         </div>
         <div className="flex items-center gap-2">
-           <Button variant="outline" size="sm" className="h-9 text-[13px] font-medium border-border/60 hover:bg-muted/50">
+           <Button variant="outline" size="sm" className="h-9 text-nav font-medium border-border/60 hover:bg-muted/50">
             <DownloadSimple size={16} className="mr-1.5 opacity-60" />
             Export
           </Button>
           <div className="h-4 w-[1px] bg-border mx-1" />
           <Button 
             onClick={handleCreateNew}
-            className="h-9 text-[13px] font-medium shadow-sm"
+            className="h-9 text-nav font-medium shadow-sm"
           >
             <Plus size={16} weight="bold" className="mr-1.5" />
             Create New Policy

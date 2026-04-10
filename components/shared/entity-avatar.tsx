@@ -24,10 +24,10 @@ export function EntityAvatar({
     .toUpperCase();
 
   const sizeClasses = {
-    sm: "h-8 w-8 text-[9px]",
-    md: "h-10 w-10 text-[11px]",
-    lg: "h-12 w-12 text-[13px]",
-    xl: "h-14 w-14 text-[15px]",
+    sm: "h-8 w-8 text-micro",
+    md: "h-10 w-10 text-caption",
+    lg: "h-12 w-12 text-nav",
+    xl: "h-14 w-14 text-subtitle",
   };
 
   return (
@@ -37,7 +37,7 @@ export function EntityAvatar({
       className
     )}>
       {imageUrl && <AvatarImage src={imageUrl} alt={name} className="rounded-full object-cover" />}
-      <AvatarFallback className="bg-transparent text-primary/80 font-bold rounded-full border-none shadow-none tracking-tighter">
+      <AvatarFallback className="bg-transparent text-primary/80 font-semibold rounded-full border-none shadow-none tracking-tighter">
         {initials}
       </AvatarFallback>
     </Avatar>

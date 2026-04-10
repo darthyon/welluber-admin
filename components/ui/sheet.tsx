@@ -59,7 +59,7 @@ export function Sheet({
               <div>
                 <h2 className="text-lg font-semibold tracking-tight text-foreground">{title}</h2>
                 {description && (
-                  <p className="text-[13px] text-muted-foreground mt-0.5">{description}</p>
+                  <p className="text-nav text-muted-foreground mt-0.5">{description}</p>
                 )}
               </div>
               <button

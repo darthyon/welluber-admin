@@ -38,15 +38,15 @@ export function MultiSelectFilter({
 
   return (
     <div className="flex items-center gap-2">
-      <span className="text-[12px] font-medium text-muted-foreground whitespace-nowrap select-none">{label}</span>
+      <span className="text-label font-medium text-muted-foreground whitespace-nowrap select-none">{label}</span>
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
             size="sm"
             className={cn(
-              "h-9 px-3 gap-2 text-[13px] font-normal border-border/60 bg-card hover:bg-muted/50 hover:border-border transition-all rounded-lg",
-              selected.length > 0 && "border-indigo-200 bg-indigo-50/30 text-indigo-600 hover:bg-indigo-50/50 hover:border-indigo-300"
+              "h-9 px-3 gap-2 text-nav font-normal border-border/60 bg-card hover:bg-muted/50 hover:border-border transition-all rounded-lg",
+              selected.length > 0 && "border-primary/20 bg-primary/5 text-primary hover:bg-primary/10 hover:border-primary/30"
             )}
           >
             <span className="truncate max-w-[120px]">{labelText}</span>
@@ -57,7 +57,7 @@ export function MultiSelectFilter({
           <div className="flex flex-col max-h-[450px]">
              {/* Integrated Header */}
              <div className="px-4 py-3 border-b border-border/50 bg-muted/10">
-               <h4 className="text-[11px] font-bold tracking-tight text-muted-foreground/60 flex items-center gap-2">
+               <h4 className="text-caption font-semibold tracking-tight text-muted-foreground/60 flex items-center gap-2">
                  <Heartbeat size={14} weight="bold" className="text-primary" />
                  Select {pluralLabel.charAt(0).toUpperCase() + pluralLabel.slice(1)}
                </h4>
@@ -77,13 +77,13 @@ export function MultiSelectFilter({
             {/* Integrated Footer */}
             {selected.length > 0 && (
               <div className="p-2 border-t border-border/50 bg-muted/5 flex items-center justify-between">
-                <span className="text-[10px] text-muted-foreground font-medium px-2">
+                <span className="text-micro text-muted-foreground font-medium px-2">
                   {selected.length} {pluralLabel} selected
                 </span>
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  className="h-7 text-[11px] font-bold text-rose-500 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                  className="h-7 text-caption font-semibold text-rose-500 hover:text-rose-600 hover:bg-rose-50 transition-colors"
                   onClick={() => onChange([])}
                 >
                   Clear Selection

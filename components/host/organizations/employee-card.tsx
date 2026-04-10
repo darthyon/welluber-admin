@@ -81,7 +81,7 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
       <div className="flex items-start justify-between mb-4 relative z-10">
         <div className="flex items-center gap-3">
           <div className="relative">
-            <div className="w-10 h-10 rounded-lg border border-border/40 flex items-center justify-center bg-muted/30 text-primary font-bold text-[12px] group-hover:scale-105 transition-all duration-500 shadow-sm overflow-hidden">
+            <div className="w-10 h-10 rounded-lg border border-border/40 flex items-center justify-center bg-muted/30 text-primary font-semibold text-label group-hover:scale-105 transition-all duration-500 shadow-sm overflow-hidden">
                <div className="bg-primary/10 w-full h-full flex items-center justify-center font-mono tracking-tighter">
                   {initials}
                </div>
@@ -93,7 +93,7 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
 
           <div className="space-y-1.5">
             <div className="flex items-center gap-2">
-              <h4 className="font-bold text-[14px] text-foreground group-hover:text-primary transition-colors truncate tracking-tight max-w-[140px]">
+              <h4 className="font-semibold text-body text-foreground group-hover:text-primary transition-colors truncate tracking-tight max-w-[140px]">
                 {employee.name}
               </h4>
             </div>
@@ -101,9 +101,9 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
               <StatusBadge 
                 status={employee.status} 
                 variant={employee.status === "Linked" ? "emerald" : "amber"} 
-                className="px-1.5 py-0.5 rounded-md text-[10px]"
+                className="px-1.5 py-0.5 rounded-md text-micro"
               />
-              <span className="text-[10px] text-muted-foreground/60 font-mono bg-background/50 px-1.5 py-0.5 rounded border border-border/40 tracking-tight">{employee.empCode}</span>
+              <span className="text-micro text-muted-foreground/60 font-mono bg-background/50 px-1.5 py-0.5 rounded border border-border/40 tracking-tight">{employee.empCode}</span>
             </div>
           </div>
         </div>
@@ -127,18 +127,18 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
           <div className="space-y-2.5">
             <div className="flex items-center gap-1.5 text-muted-foreground/30">
               <Buildings size={14} weight="bold" />
-              <span className="text-[11px] font-bold tracking-tight text-muted-foreground/60">Branch</span>
+              <span className="text-caption font-semibold tracking-tight text-muted-foreground/60">Branch</span>
             </div>
-            <span className="text-[13px] font-bold text-foreground block truncate" title={employee.branch}>
+            <span className="text-nav font-semibold text-foreground block truncate" title={employee.branch}>
               {employee.branch}
             </span>
           </div>
           <div className="space-y-2.5 font-mono">
             <div className="flex items-center gap-1.5 text-muted-foreground/30">
               <UserCircle size={14} weight="bold" />
-              <span className="text-[11px] font-bold tracking-tight text-muted-foreground/60">Email</span>
+              <span className="text-caption font-semibold tracking-tight text-muted-foreground/60">Email</span>
             </div>
-            <span className="text-[11px] font-bold text-muted-foreground/80 block truncate" title={employee.email}>
+            <span className="text-caption font-semibold text-muted-foreground/80 block truncate" title={employee.email}>
               {employee.email}
             </span>
           </div>
@@ -148,7 +148,7 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
         <div className="bg-muted/30 rounded-xl px-4 py-4 border border-border/60 relative overflow-hidden group/policy min-h-[140px]">
           <div className="flex items-center gap-1.5 text-muted-foreground/30 mb-3">
             <Shield size={14} weight="bold" />
-            <span className="text-[11px] font-bold tracking-tight text-muted-foreground/60">Benefit Policy</span>
+            <span className="text-caption font-semibold tracking-tight text-muted-foreground/60">Benefit Policy</span>
           </div>
           <AnimatePresence mode="wait">
             <motion.div
@@ -160,7 +160,7 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
               className="space-y-3.5"
             >
               <div className="flex flex-col gap-2.5 overflow-hidden flex-1">
-                <span className="text-[13px] font-bold text-foreground truncate" title={currentItem.policyName}>
+                <span className="text-nav font-semibold text-foreground truncate" title={currentItem.policyName}>
                   {currentItem.policyName}
                 </span>
                 
@@ -177,7 +177,7 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
                     {currentItem.benefitGroups.map((group: string, idx: number) => (
                       <div 
                         key={idx}
-                        className="bg-background/40 border border-border/60 text-muted-foreground/80 px-2.5 py-1 rounded-full text-[10px] font-bold shadow-sm whitespace-nowrap shrink-0 hover:border-primary/40 hover:text-primary transition-all duration-300 pointer-events-none"
+                        className="bg-background/40 border border-border/60 text-muted-foreground/80 px-2.5 py-1 rounded-full text-micro font-semibold shadow-sm whitespace-nowrap shrink-0 hover:border-primary/40 hover:text-primary transition-all duration-300 pointer-events-none"
                       >
                         {group}
                       </div>
@@ -187,10 +187,10 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
               </div>
 
               <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-[11px] font-semibold tracking-tight">
-                  <span className="text-muted-foreground/60 font-bold">Utilisation</span>
+                <div className="flex items-center justify-between text-caption font-semibold tracking-tight">
+                  <span className="text-muted-foreground/60 font-semibold">Utilisation</span>
                   <span className={cn(
-                    "px-1.5 py-0.5 rounded shrink-0 font-bold",
+                    "px-1.5 py-0.5 rounded shrink-0 font-semibold",
                     currentItem.utilisation > 80 ? "bg-rose-500/10 text-rose-500" : "bg-emerald-500/10 text-emerald-500"
                   )}>
                     {currentItem.utilisation}%
@@ -220,9 +220,9 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
         <div className="space-y-1.5">
           <div className="flex items-center gap-1.5 text-muted-foreground/30">
             <Users size={14} weight="bold" />
-            <span className="text-[11px] font-bold tracking-tight text-muted-foreground/60">Workforce</span>
+            <span className="text-caption font-semibold tracking-tight text-muted-foreground/60">Workforce</span>
           </div>
-          <span className="text-[12px] font-bold text-foreground/80 block">
+          <span className="text-label font-semibold text-foreground/80 block">
             {employee.dependentsCount} (Dependents)
           </span>
         </div>
@@ -230,9 +230,9 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
         <div className="space-y-1.5">
           <div className="flex items-center gap-1.5 text-muted-foreground/30">
             <Clock size={14} weight="bold" />
-            <span className="text-[11px] font-bold tracking-tight text-muted-foreground/60">Last Active</span>
+            <span className="text-caption font-semibold tracking-tight text-muted-foreground/60">Last Active</span>
           </div>
-          <span className="text-[12px] font-bold text-foreground/80 block">
+          <span className="text-label font-semibold text-foreground/80 block">
             {employee.joinDate}
           </span>
         </div>

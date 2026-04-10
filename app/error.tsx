@@ -34,12 +34,12 @@ export default function Error({
               <Button 
                 variant="outline" 
                 onClick={() => reset()}
-                className="rounded-full px-8 h-12 font-bold bg-white text-zinc-900 border-zinc-200 hover:bg-zinc-50 transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
+                className="rounded-full px-8 h-12 font-semibold bg-white text-foreground border-zinc-200 hover:bg-muted transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
               >
                 <ArrowCounterClockwise size={20} weight="bold" />
                 Try again
               </Button>
-              <Button asChild className="rounded-full px-8 h-12 font-bold shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
+              <Button asChild className="rounded-full px-8 h-12 font-semibold shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
                 <Link href="/dashboard">
                   <House size={20} weight="bold" />
                   Return to Dashboard

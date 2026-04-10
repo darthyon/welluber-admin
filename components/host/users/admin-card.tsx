@@ -22,7 +22,7 @@ export function AdminCard({ admin }: AdminCardProps) {
   const getRoleStyle = (role: string) => {
     switch (role) {
       case "HostAdmin":
-        return "bg-indigo-500/10 text-indigo-500 border-indigo-500/20";
+        return "bg-primary/10 text-primary border-primary/20";
       case "OrgAdmin":
         return "bg-emerald-500/10 text-emerald-500 border-emerald-500/20";
       case "SPAdmin":
@@ -55,16 +55,16 @@ export function AdminCard({ admin }: AdminCardProps) {
              <Storefront size={22} weight="fill" />}
           </div>
           <div className="space-y-1.5">
-            <h3 className="font-bold text-[14px] text-foreground tracking-tight leading-tight">
+            <h3 className="font-semibold text-body text-foreground tracking-tight leading-tight">
               {admin.name}
             </h3>
             <div className="flex items-center gap-2">
               <StatusBadge 
                 status={admin.status} 
                 variant={admin.status === "Active" ? "emerald" : "rose"} 
-                className="px-1.5 py-0.5 rounded-md text-[10px]"
+                className="px-1.5 py-0.5 rounded-md text-micro"
               />
-              <span className="text-[10px] text-muted-foreground/60 font-mono bg-background/50 px-1.5 py-0.5 rounded border border-border/40 tracking-tight">Admin</span>
+              <span className="text-micro text-muted-foreground/60 font-mono bg-background/50 px-1.5 py-0.5 rounded border border-border/40 tracking-tight">Admin</span>
             </div>
           </div>
         </div>
@@ -79,9 +79,9 @@ export function AdminCard({ admin }: AdminCardProps) {
           <div className="space-y-2.5">
             <div className="flex items-center gap-1.5 text-muted-foreground/30">
               <EnvelopeSimple size={14} weight="bold" />
-              <span className="text-[11px] font-bold tracking-tight text-muted-foreground/60">Email Address</span>
+              <span className="text-caption font-semibold tracking-tight text-muted-foreground/60">Email Address</span>
             </div>
-            <span className="text-[12px] font-bold text-foreground/80 block truncate font-mono" title={admin.email}>
+            <span className="text-label font-semibold text-foreground/80 block truncate font-mono" title={admin.email}>
               {admin.email}
             </span>
           </div>
@@ -89,10 +89,10 @@ export function AdminCard({ admin }: AdminCardProps) {
           <div className="space-y-2.5">
             <div className="flex items-center gap-1.5 text-muted-foreground/30">
               <Shield size={14} weight="bold" />
-              <span className="text-[11px] font-bold tracking-tight text-muted-foreground/60">User Type</span>
+              <span className="text-caption font-semibold tracking-tight text-muted-foreground/60">User Type</span>
             </div>
             <span className={cn(
-              "inline-flex px-2 py-0.5 rounded-md text-[10px] font-bold border mt-0.5",
+              "inline-flex px-2 py-0.5 rounded-md text-micro font-semibold border mt-0.5",
               getRoleStyle(admin.role)
             )}>
               {getRoleLabel(admin.role)}
@@ -105,9 +105,9 @@ export function AdminCard({ admin }: AdminCardProps) {
           <div className="space-y-2.5">
             <div className="flex items-center gap-1.5 text-muted-foreground/30">
               <Buildings size={14} weight="bold" />
-              <span className="text-[11px] font-bold tracking-tight text-muted-foreground/60">Entity</span>
+              <span className="text-caption font-semibold tracking-tight text-muted-foreground/60">Entity</span>
             </div>
-            <span className="text-[12px] font-bold text-foreground truncate block" title={admin.entity?.name || "Platform Core"}>
+            <span className="text-label font-semibold text-foreground truncate block" title={admin.entity?.name || "Platform Core"}>
               {admin.entity?.name || "Platform Core"}
             </span>
           </div>
@@ -115,9 +115,9 @@ export function AdminCard({ admin }: AdminCardProps) {
           <div className="space-y-2.5">
             <div className="flex items-center gap-1.5 text-muted-foreground/30">
               <Clock size={14} weight="bold" />
-              <span className="text-[11px] font-bold tracking-tight text-muted-foreground/60">Last Active</span>
+              <span className="text-caption font-semibold tracking-tight text-muted-foreground/60">Last Active</span>
             </div>
-            <span className="text-[12px] font-bold text-foreground/80 block">
+            <span className="text-label font-semibold text-foreground/80 block">
               {admin.lastActive}
             </span>
           </div>

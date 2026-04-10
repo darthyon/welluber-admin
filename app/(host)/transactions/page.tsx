@@ -2,7 +2,7 @@ export default function TransactionsPage() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold tracking-tight">Transactions</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Transactions</h1>
         <p className="text-muted-foreground text-sm mt-1">
           View and audit benefit transactions across the platform
         </p>

@@ -55,12 +55,12 @@ export function SpBranchCard({ branch, onView, onEdit }: SpBranchCardProps) {
 
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <h4 className="font-semibold text-[14px] text-foreground group-hover:text-primary transition-all tracking-tight leading-none">
+              <h4 className="font-semibold text-body text-foreground group-hover:text-primary transition-all tracking-tight leading-none">
                 {branch.name}
               </h4>
               <StatusBadge status={branch.isActive ? "Active" : "Suspended"} variant={branch.isActive ? "emerald" : "zinc"} />
             </div>
-            <div className="flex items-center gap-1.5 text-[12px] text-muted-foreground">
+            <div className="flex items-center gap-1.5 text-label text-muted-foreground">
               <MapPin size={12} className="opacity-70" />
               <span className="font-medium">{branch.address.city}, {branch.address.state}</span>
             </div>
@@ -73,7 +73,7 @@ export function SpBranchCard({ branch, onView, onEdit }: SpBranchCardProps) {
       {/* Services (Pills) - Standardized row height */}
       <div className="relative z-10 h-7 flex items-center mb-6">
         {branch.services.length === 0 ? (
-          <span className="text-[11px] text-muted-foreground italic">No services yet</span>
+          <span className="text-caption text-muted-foreground italic">No services yet</span>
         ) : (
           <OverflowTags 
             items={branch.services.map(s => s.service)} 
@@ -85,8 +85,8 @@ export function SpBranchCard({ branch, onView, onEdit }: SpBranchCardProps) {
       {/* Footer Footer Footer (Operating Hours Matching Org staff/wallet styling) */}
       <div className="mt-auto pt-4 border-t border-border/40 relative z-10">
         <div className="flex flex-col gap-1">
-          <span className="text-[10px] font-semibold tracking-tight text-muted-foreground/60">Operating hours</span>
-          <div className="flex items-center gap-1.5 text-[12px] font-semibold text-foreground">
+          <span className="text-micro font-semibold tracking-tight text-muted-foreground/60">Operating hours</span>
+          <div className="flex items-center gap-1.5 text-label font-semibold text-foreground">
             <Clock size={14} weight="duotone" className="text-primary" />
             <span>{getHoursSummary(branch)}</span>
           </div>

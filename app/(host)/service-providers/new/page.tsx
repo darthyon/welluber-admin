@@ -102,7 +102,7 @@ export default function NewServiceProviderPage() {
 
   const inputCls = (hasError?: boolean) =>
     cn(
-      "w-full px-3 py-2 bg-background border rounded-md text-[14px] outline-none transition-colors",
+      "w-full px-3 py-2 bg-background border rounded-md text-body outline-none transition-colors",
       hasError
         ? "border-destructive focus:border-destructive"
         : "border-border focus:border-foreground/30 focus:bg-muted/30"
@@ -122,12 +122,12 @@ export default function NewServiceProviderPage() {
         <div>
           <Link
             href="/service-providers"
-            className="inline-flex items-center gap-1.5 text-[13px] font-medium text-muted-foreground hover:text-foreground transition-colors mb-4"
+            className="inline-flex items-center gap-1.5 text-nav font-medium text-muted-foreground hover:text-foreground transition-colors mb-4"
           >
             <CaretLeft size={16} /> Back to Service Providers
           </Link>
           <h1 className="text-xl font-semibold tracking-tight text-foreground">Add Service Provider</h1>
-          <p className="text-muted-foreground text-[13px] mt-1 font-normal">Select how you want to categorize this service provider account.</p>
+          <p className="text-muted-foreground text-nav mt-1 font-normal">Select how you want to categorize this service provider account.</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
@@ -139,8 +139,8 @@ export default function NewServiceProviderPage() {
               <Plus size={20} weight="bold" />
             </div>
             <div>
-              <h3 className="text-[15px] font-bold text-foreground">New Brand</h3>
-              <p className="text-[12px] text-muted-foreground mt-1 leading-relaxed">Create a fresh brand record and link this service provider account to it.</p>
+              <h3 className="text-subtitle font-semibold text-foreground">New Brand</h3>
+              <p className="text-label text-muted-foreground mt-1 leading-relaxed">Create a fresh brand record and link this service provider account to it.</p>
             </div>
           </button>
 
@@ -148,12 +148,12 @@ export default function NewServiceProviderPage() {
             onClick={() => { setBrandType("existing"); setIsBrandModalOpen(true); }}
             className="group flex flex-col p-6 bg-card border border-border/60 rounded-xl hover:border-primary/50 hover:bg-primary/[0.02] transition-all text-left space-y-3 shadow-sm hover:shadow-md"
           >
-            <div className="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-500 group-hover:scale-110 transition-transform">
+            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
               <Tag size={20} weight="fill" />
             </div>
             <div>
-              <h3 className="text-[15px] font-bold text-foreground">Existing Brand</h3>
-              <p className="text-[12px] text-muted-foreground mt-1 leading-relaxed">Select from your existing portfolio of brands to link this service provider.</p>
+              <h3 className="text-subtitle font-semibold text-foreground">Existing Brand</h3>
+              <p className="text-label text-muted-foreground mt-1 leading-relaxed">Select from your existing portfolio of brands to link this service provider.</p>
             </div>
           </button>
         </div>
@@ -174,14 +174,14 @@ export default function NewServiceProviderPage() {
       <div className="flex flex-col gap-4">
         <button
           onClick={() => setStep("selection")}
-          className="inline-flex items-center gap-1.5 text-[13px] font-medium text-muted-foreground hover:text-foreground transition-colors w-fit"
+          className="inline-flex items-center gap-1.5 text-nav font-medium text-muted-foreground hover:text-foreground transition-colors w-fit"
         >
           <CaretLeft size={16} /> Change Brand Selection
         </button>
         <div className="flex items-center justify-between">
             <div>
                 <h1 className="text-xl font-semibold tracking-tight text-foreground">Account Details</h1>
-                <p className="text-muted-foreground text-[13px] mt-1">
+                <p className="text-muted-foreground text-nav mt-1">
                     {brandType === "new" ? "Registering a new brand and its first service provider." : `Adding a new provider under the ${selectedBrand?.name} brand.`}
                 </p>
             </div>
@@ -189,9 +189,9 @@ export default function NewServiceProviderPage() {
                 <div className="flex items-center gap-2 bg-muted/40 px-3 py-1.5 rounded-lg border border-border/40">
                     <Avatar className="h-6 w-6 rounded">
                         <AvatarImage src={selectedBrand.logo} />
-                        <AvatarFallback className="text-[9px] font-bold">{selectedBrand.name.substring(0,2)}</AvatarFallback>
+                        <AvatarFallback className="text-micro font-semibold">{selectedBrand.name.substring(0,2)}</AvatarFallback>
                     </Avatar>
-                    <span className="text-[12px] font-bold text-foreground/80">{selectedBrand.name}</span>
+                    <span className="text-label font-semibold text-foreground/80">{selectedBrand.name}</span>
                 </div>
             )}
         </div>
@@ -206,11 +206,11 @@ export default function NewServiceProviderPage() {
                     <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                         <Tag size={16} weight="fill" />
                     </div>
-                    <h3 className="text-[15px] font-bold text-foreground">Brand Identity</h3>
+                    <h3 className="text-subtitle font-semibold text-foreground">Brand Identity</h3>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <div className="space-y-1.5 sm:col-span-1">
-                        <label className="text-[13px] font-medium text-foreground">Brand Name</label>
+                        <label className="text-nav font-medium text-foreground">Brand Name</label>
                         <input
                             {...register("brandName")}
                             className={inputCls()}
@@ -238,43 +238,43 @@ export default function NewServiceProviderPage() {
           {/* Section: Basic Info */}
           <div className="p-6 border-b border-border space-y-5">
             <div className="flex items-center gap-2 pb-2">
-              <div className="w-8 h-8 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-500">
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                 <Storefront size={16} weight="fill" />
               </div>
-              <h3 className="text-[15px] font-bold text-foreground">Provider Profile</h3>
+              <h3 className="text-subtitle font-semibold text-foreground">Provider Profile</h3>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="space-y-1.5 sm:col-span-2">
-                <label className="text-[13px] font-medium text-foreground">Service Provider Name</label>
+                <label className="text-nav font-medium text-foreground">Service Provider Name</label>
                 <input
                   {...register("name")}
                   className={inputCls(!!errors.name)}
                   placeholder="e.g. Zenith Yoga Studio Sdn Bhd"
                 />
                 {errors.name && (
-                  <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
+                  <p className="text-caption text-destructive flex items-center gap-1 mt-1">
                     <WarningCircle size={12} /> {errors.name.message}
                   </p>
                 )}
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-foreground">Registration Number</label>
+                <label className="text-nav font-medium text-foreground">Registration Number</label>
                 <input
                   {...register("registrationNo")}
                   className={inputCls(!!errors.registrationNo)}
                   placeholder="e.g. 1122334-A"
                 />
                 {errors.registrationNo && (
-                  <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
+                  <p className="text-caption text-destructive flex items-center gap-1 mt-1">
                     <WarningCircle size={12} /> {errors.registrationNo.message}
                   </p>
                 )}
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-foreground">
+                <label className="text-nav font-medium text-foreground">
                   Website <span className="text-muted-foreground font-normal">(optional)</span>
                 </label>
                 <input
@@ -284,14 +284,14 @@ export default function NewServiceProviderPage() {
                   type="url"
                 />
                 {errors.website && (
-                  <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
+                  <p className="text-caption text-destructive flex items-center gap-1 mt-1">
                     <WarningCircle size={12} /> {errors.website.message}
                   </p>
                 )}
               </div>
 
               <div className="space-y-1.5 sm:col-span-2">
-                <label className="text-[13px] font-medium text-foreground">
+                <label className="text-nav font-medium text-foreground">
                   Description <span className="text-muted-foreground font-normal">(optional)</span>
                 </label>
                 <textarea
@@ -311,17 +311,17 @@ export default function NewServiceProviderPage() {
                 <Tag size={16} weight="fill" />
               </div>
               <div className="space-y-0.5">
-                <h3 className="text-[15px] font-bold text-foreground">Service Portfolio</h3>
-                <p className="text-[12px] text-muted-foreground leading-relaxed">
+                <h3 className="text-subtitle font-semibold text-foreground">Service Portfolio</h3>
+                <p className="text-label text-muted-foreground leading-relaxed">
                   Select available services from the masterlist allowed for this brand.
                 </p>
               </div>
             </div>
             {brandCategories.length > 0 && (
                 <div className="flex flex-wrap gap-1 mb-2">
-                    <span className="text-[10px] font-bold text-muted-foreground/60 w-full mb-1">Brand Categories</span>
+                    <span className="text-micro font-semibold text-muted-foreground/60 w-full mb-1">Brand Categories</span>
                     {brandCategories.map(cat => (
-                        <Badge key={cat} variant="outline" className="text-[10px] font-medium bg-muted/20">{cat}</Badge>
+                        <Badge key={cat} variant="outline" className="text-micro font-medium bg-muted/20">{cat}</Badge>
                     ))}
                 </div>
             )}
@@ -333,7 +333,7 @@ export default function NewServiceProviderPage() {
               placeholder="Search main services..."
             />
             {errors.mainServices && (
-              <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
+              <p className="text-caption text-destructive flex items-center gap-1 mt-1">
                 <WarningCircle size={12} /> {errors.mainServices.message}
               </p>
             )}
@@ -341,13 +341,13 @@ export default function NewServiceProviderPage() {
 
           {/* Form Footer */}
           <div className="p-6 border-t border-border bg-muted/10 flex items-center justify-end gap-3">
-            <Button asChild variant="outline" className="text-[13px] font-medium">
+            <Button asChild variant="outline" className="text-nav font-medium">
               <Link href="/service-providers">Cancel</Link>
             </Button>
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="text-[13px] font-medium flex items-center gap-2"
+              className="text-nav font-medium flex items-center gap-2"
             >
               {isSubmitting ? (
                 <>

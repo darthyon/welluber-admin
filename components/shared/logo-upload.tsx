@@ -55,7 +55,7 @@ export function LogoUpload({
 
   return (
     <div className={cn("space-y-2", className)}>
-      {label && <label className="text-[13px] font-medium text-foreground">{label}</label>}
+      {label && <label className="text-nav font-medium text-foreground">{label}</label>}
       
       <div 
         onClick={() => !disabled && fileInputRef.current?.click()}
@@ -93,15 +93,15 @@ export function LogoUpload({
               <UploadSimple size={18} weight="bold" />
             </div>
             <div className="space-y-0.5">
-              <p className="text-[12px] font-bold text-foreground">Click to upload</p>
-              <p className="text-[10px] text-muted-foreground/60 font-medium tracking-tight">SVG, PNG or JPG (max. 800x800px)</p>
+              <p className="text-label font-semibold text-foreground">Click to upload</p>
+              <p className="text-micro text-muted-foreground/60 font-medium tracking-tight">SVG, PNG or JPG (max. 800x800px)</p>
             </div>
           </div>
         )}
       </div>
 
       {error && (
-        <p className="text-[11px] text-destructive flex items-center gap-1 mt-1 font-medium">
+        <p className="text-caption text-destructive flex items-center gap-1 mt-1 font-medium">
           <WarningCircle size={12} weight="bold" />
           {error}
         </p>

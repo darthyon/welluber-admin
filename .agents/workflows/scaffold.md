@@ -30,11 +30,11 @@ description: How to scaffold a new feature module
    ```
 
 4. **Design & Typography Standards**
-   - **Case**: Always use **Sentence Case** for all UI labels, headers, and metadata (e.g., "Active policy" instead of "ACTIVE POLICY").
+   - **Case**: Always use **Title Case** for all UI labels, headers, and metadata (e.g., "Active Policy" instead of "Active policy").
    - **Typography Matrix**:
      - **Dashboard Titles (KPIs & Cards)**: `text-[13px] font-semibold tracking-tight`
      - **Card Descriptions**: Use `Tooltip` with an `Info` icon (`size={14}`) next to the title instead of inline text.
-     - **Entity Card Names**: `text-[14px] font-bold tracking-tight` (Org name, SP name, Branch name)
+     - **Entity Card Names**: `text-[14px] font-semibold tracking-tight` (Org name, SP name, Branch name)
      - **Section Headers**: `text-[15px] font-semibold tracking-tight` (Internal page sections)
      - **Table Headers**: `text-[13px] font-semibold text-muted-foreground/70 tracking-tight`
      - **Secondary Labels/Metadata**: `text-[11px] font-semibold text-muted-foreground/80 tracking-tight`

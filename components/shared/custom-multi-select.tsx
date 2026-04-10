@@ -100,7 +100,7 @@ export function CustomMultiSelect({
             <Badge 
               key={s} 
               variant="secondary" 
-              className="bg-primary/15 text-primary border-primary/20 px-2.5 py-1 text-[12px] font-bold gap-1.5 group whitespace-nowrap h-7 items-center"
+              className="bg-primary/15 text-primary border-primary/20 px-2.5 py-1 text-label font-semibold gap-1.5 group whitespace-nowrap h-7 items-center"
             >
               {s}
               {!disabled && (
@@ -119,7 +119,7 @@ export function CustomMultiSelect({
         ))}
           <input 
             type="text"
-            className="flex-1 bg-transparent border-0 outline-none text-[13px] placeholder:text-muted-foreground/40 min-w-[80px] h-7 px-1"
+            className="flex-1 bg-transparent border-0 outline-none text-nav placeholder:text-muted-foreground/40 min-w-[80px] h-7 px-1"
             placeholder={selected.length === 0 ? placeholder : ""}
           value={query}
           disabled={disabled}
@@ -164,7 +164,7 @@ export function CustomMultiSelect({
           {showAddCustom && (
             <button
               onClick={addCustom}
-              className="w-full text-left px-3 py-2 rounded-lg text-[13px] bg-primary/10 text-primary font-bold flex items-center gap-2 mb-1 border-b border-border/20"
+              className="w-full text-left px-3 py-2 rounded-lg text-nav bg-primary/10 text-primary font-semibold flex items-center gap-2 mb-1 border-b border-border/20"
             >
               <Plus size={14} weight="bold" />
               <span>Add custom: &quot;{query}&quot;</span>
@@ -176,7 +176,7 @@ export function CustomMultiSelect({
               key={opt}
               onClick={() => toggleOption(opt)}
               type="button"
-                className="w-full text-left px-3 py-2 rounded-lg text-[13px] hover:bg-accent/40 text-muted-foreground/80 hover:text-foreground transition-colors flex items-center justify-between group font-semibold"
+                className="w-full text-left px-3 py-2 rounded-lg text-nav hover:bg-accent/40 text-muted-foreground/80 hover:text-foreground transition-colors flex items-center justify-between group font-semibold"
             >
               <span className="truncate">{opt}</span>
               <Check size={14} className="opacity-0 group-hover:opacity-40" />

@@ -54,7 +54,7 @@ export function PhoneInput({ value, onChange, placeholder = "12-345 6789", class
         <PopoverTrigger asChild>
           <button className="flex items-center gap-1.5 px-3 h-full border-r border-border/50 hover:bg-muted transition-colors shrink-0">
             <span className="text-[16px]">{selectedCountry.flag}</span>
-            <span className="text-[13px] font-bold text-foreground font-mono">{selectedCountry.code}</span>
+            <span className="text-nav font-semibold text-foreground font-mono">{selectedCountry.code}</span>
             <CaretDown size={12} className={cn("text-muted-foreground/60 transition-transform", isOpen && "rotate-180")} />
           </button>
         </PopoverTrigger>
@@ -71,11 +71,11 @@ export function PhoneInput({ value, onChange, placeholder = "12-345 6789", class
               >
                 <div className="flex items-center gap-2.5">
                   <span className="text-[16px]">{c.flag}</span>
-                  <span className={cn("text-[13px] font-medium", selectedCountry.code === c.code ? "text-primary" : "text-foreground/80")}>
+                  <span className={cn("text-nav font-medium", selectedCountry.code === c.code ? "text-primary" : "text-foreground/80")}>
                     {c.name}
                   </span>
                 </div>
-                <span className="text-[11px] font-bold text-muted-foreground/40 font-mono group-hover:text-primary/70">{c.code}</span>
+                <span className="text-caption font-semibold text-muted-foreground/40 font-mono group-hover:text-primary/70">{c.code}</span>
               </button>
             ))}
           </div>
@@ -89,7 +89,7 @@ export function PhoneInput({ value, onChange, placeholder = "12-345 6789", class
           value={numberPart}
           onChange={(e) => handleNumberChange(e.target.value)}
           placeholder={placeholder}
-          className="w-full h-full pl-10 pr-3 bg-transparent border-none outline-none text-[14px] font-medium text-foreground/80 font-mono tracking-tight"
+          className="w-full h-full pl-10 pr-3 bg-transparent border-none outline-none text-body font-medium text-foreground/80 font-mono tracking-tight"
         />
       </div>
     </div>

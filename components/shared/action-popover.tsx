@@ -53,7 +53,7 @@ export function ActionPopover({
           {actions.map((action, i) => {
             if (action.isSectionTitle) {
               return (
-                <div key={i} className="px-3 py-1.5 text-[10px] font-bold text-muted-foreground opacity-50 select-none">
+                <div key={i} className="px-3 py-1.5 text-micro font-semibold text-muted-foreground opacity-50 select-none">
                   {action.label}
                 </div>
               );
@@ -73,7 +73,7 @@ export function ActionPopover({
                     }
                   }}
                   className={cn(
-                    "flex items-center w-full px-3 py-2 rounded-lg text-[13px] font-medium transition-colors text-left",
+                    "flex items-center w-full px-3 py-2 rounded-lg text-nav font-medium transition-colors text-left",
                     action.isDanger 
                       ? "text-rose-500 hover:bg-rose-50" 
                       : "text-foreground/80 hover:bg-muted hover:text-foreground",

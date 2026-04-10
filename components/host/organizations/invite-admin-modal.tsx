@@ -74,58 +74,58 @@ export function InviteAdminModal({ targetId, isOpen, onClose, title = "Invite Ad
           ) : (
 
             <form id="inviteAdminForm" onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-              <p className="text-[13px] text-muted-foreground mb-4">
+              <p className="text-nav text-muted-foreground mb-4">
                 Enter the details below to invite an administrator. They will receive an email with a secure link to join.
               </p>
               
               <div className="space-y-1.5">
-                <label className="text-[12px] font-medium text-foreground">Full Name</label>
+                <label className="text-label font-medium text-foreground">Full Name</label>
                 <input 
                   {...register("name")}
                   className={cn(
-                    "w-full px-3 py-2 bg-background border rounded-md text-[13px] outline-none transition-colors",
+                    "w-full px-3 py-2 bg-background border rounded-md text-nav outline-none transition-colors",
                     errors.name ? "border-destructive focus:border-destructive" : "border-border focus:border-foreground/30 focus:bg-muted/30"
                   )}
                   placeholder="e.g. John Doe"
                   autoFocus
                 />
                 {errors.name && (
-                  <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
+                  <p className="text-caption text-destructive flex items-center gap-1 mt-1">
                     <WarningCircle size={12} /> {errors.name.message}
                   </p>
                 )}
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[12px] font-medium text-foreground">Position / Role</label>
+                <label className="text-label font-medium text-foreground">Position / Role</label>
                 <input 
                   {...register("position")}
                   className={cn(
-                    "w-full px-3 py-2 bg-background border rounded-md text-[13px] outline-none transition-colors",
+                    "w-full px-3 py-2 bg-background border rounded-md text-nav outline-none transition-colors",
                     errors.position ? "border-destructive focus:border-destructive" : "border-border focus:border-foreground/30 focus:bg-muted/30"
                   )}
                   placeholder="e.g. Branch Manager, Finance Admin"
                 />
                 {errors.position && (
-                  <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
+                  <p className="text-caption text-destructive flex items-center gap-1 mt-1">
                     <WarningCircle size={12} /> {errors.position.message}
                   </p>
                 )}
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[12px] font-medium text-foreground">Corporate Email</label>
+                <label className="text-label font-medium text-foreground">Corporate Email</label>
                 <input 
                   type="email"
                   {...register("email")}
                   className={cn(
-                    "w-full px-3 py-2 bg-background border rounded-md text-[13px] outline-none transition-colors",
+                    "w-full px-3 py-2 bg-background border rounded-md text-nav outline-none transition-colors",
                     errors.email ? "border-destructive focus:border-destructive" : "border-border focus:border-foreground/30 focus:bg-muted/30"
                   )}
                   placeholder="name@company.com"
                 />
                 {errors.email && (
-                  <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
+                  <p className="text-caption text-destructive flex items-center gap-1 mt-1">
                     <WarningCircle size={12} /> {errors.email.message}
                   </p>
                 )}
@@ -142,7 +142,7 @@ export function InviteAdminModal({ targetId, isOpen, onClose, title = "Invite Ad
               variant="secondary"
               onClick={onClose}
               disabled={isSubmitting}
-              className="text-[13px] font-medium"
+              className="text-nav font-medium"
             >
               Cancel
             </Button>
@@ -150,7 +150,7 @@ export function InviteAdminModal({ targetId, isOpen, onClose, title = "Invite Ad
               form="inviteAdminForm"
               type="submit"
               disabled={isSubmitting}
-              className="text-[13px] font-medium flex items-center gap-2"
+              className="text-nav font-medium flex items-center gap-2"
             >
               {isSubmitting ? (
                 <>

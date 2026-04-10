@@ -29,7 +29,7 @@ export function TopBar() {
             className="pl-9 h-8 w-[240px] bg-muted/40 border-border/50 focus:bg-muted/60 focus:ring-1 focus:ring-primary/10 transition-all placeholder:text-muted-foreground/60 rounded-xl text-xs shadow-none"
           />
           <div className="absolute right-2 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-0.5 px-1.5 py-0.5 bg-muted/50 border border-border rounded-md pointer-events-none opacity-50">
-            <span className="text-[9px] font-medium text-muted-foreground">⌘K</span>
+            <span className="text-micro font-medium text-muted-foreground">⌘K</span>
           </div>
         </div>
 

@@ -43,8 +43,8 @@ export function ConfirmationModal({
       <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-border bg-card shadow-2xl animate-in zoom-in-95 duration-200">
         <div className="flex items-start justify-between gap-4 border-b border-border px-5 py-4">
           <div className="space-y-1">
-            <h2 className="text-[15px] font-semibold tracking-tight text-foreground">{title}</h2>
-            <p className="text-[13px] text-muted-foreground">{description}</p>
+            <h2 className="text-subtitle font-semibold tracking-tight text-foreground">{title}</h2>
+            <p className="text-nav text-muted-foreground">{description}</p>
           </div>
           <button
             onClick={onClose}
@@ -59,8 +59,8 @@ export function ConfirmationModal({
             <div className="flex items-start gap-2">
               <WarningCircle size={16} weight="fill" className="mt-0.5 shrink-0" />
               <div className="space-y-2">
-                <p className="text-[12px] font-semibold">{impactLabel}</p>
-                <ul className="space-y-1 text-[12px] leading-relaxed text-foreground/80">
+                <p className="text-label font-semibold">{impactLabel}</p>
+                <ul className="space-y-1 text-label leading-relaxed text-foreground/80">
                   {impactPoints.map((point, index) => (
                     <li key={index} className="flex gap-2">
                       <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-current" />
@@ -73,14 +73,14 @@ export function ConfirmationModal({
           </div>
 
           <div className="flex items-center justify-end gap-2 pt-1">
-            <Button variant="outline" onClick={onClose} disabled={isSubmitting} className="text-[13px]">
+            <Button variant="outline" onClick={onClose} disabled={isSubmitting} className="text-nav">
               {cancelLabel}
             </Button>
             <Button
               variant="destructive"
               onClick={onConfirm}
               disabled={isSubmitting}
-              className="text-[13px] gap-2"
+              className="text-nav gap-2"
             >
               {isSubmitting ? (
                 <>

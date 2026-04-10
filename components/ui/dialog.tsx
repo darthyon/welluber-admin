@@ -65,9 +65,9 @@ export function DialogFooter({ children, className }: { children: React.ReactNod
 }
 
 export function DialogTitle({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <h2 className={cn("text-[16px] font-bold tracking-tight text-foreground", className)}>{children}</h2>;
+  return <h2 className={cn("text-subtitle font-semibold tracking-tight text-foreground", className)}>{children}</h2>;
 }
 
 export function DialogDescription({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <p className={cn("text-[13px] text-muted-foreground", className)}>{children}</p>;
+  return <p className={cn("text-nav text-muted-foreground", className)}>{children}</p>;
 }

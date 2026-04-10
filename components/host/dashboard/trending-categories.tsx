@@ -17,13 +17,13 @@ export function TrendingCategories() {
     <div className="rounded-lg border border-border bg-card p-5 h-full flex flex-col">
       <div className="mb-4">
         <div className="flex items-center gap-1.5 mb-0.5">
-          <h2 className="text-[13px] font-semibold text-foreground tracking-tight">Top service categories</h2>
+          <h2 className="text-nav font-semibold text-foreground tracking-tight">Top service categories</h2>
           <TooltipProvider>
             <Tooltip delayDuration={0}>
               <TooltipTrigger asChild>
                 <Info size={14} className="text-muted-foreground/60 cursor-help hover:text-primary transition-colors" />
               </TooltipTrigger>
-              <TooltipContent side="top" className="text-[12px] font-medium leading-relaxed max-w-[220px]">
+              <TooltipContent side="top" className="text-label font-medium leading-relaxed max-w-[220px]">
                 Most utilized across all SPs
               </TooltipContent>
             </Tooltip>
@@ -40,14 +40,14 @@ export function TrendingCategories() {
                 <div className="flex items-center justify-between mb-1.5 relative z-10">
                   <div className="flex items-center gap-1.5 min-w-0">
                     <Icon size={14} className="text-muted-foreground shrink-0" />
-                    <span className="text-[12px] font-medium text-foreground truncate">{category.name}</span>
+                    <span className="text-label font-medium text-foreground truncate">{category.name}</span>
                   </div>
                   <div className="flex items-center gap-3 shrink-0">
-                    <span className="text-[12px] text-muted-foreground">
+                    <span className="text-label text-muted-foreground">
                       {category.value.toLocaleString()}
                     </span>
                     <span className={cn(
-                      "text-[11px] font-medium flex items-center gap-0.5 w-[42px] justify-end",
+                      "text-caption font-medium flex items-center gap-0.5 w-[42px] justify-end",
                       category.trend > 0 ? "text-emerald-500" : "text-destructive"
                     )}>
                       {category.trend > 0 ? <TrendUp weight="bold" /> : <TrendDown weight="bold" />}

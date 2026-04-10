@@ -53,7 +53,7 @@ export function BrandForm({ initialData, onSubmit, onCancel, isSubmitting }: Bra
 
   const inputCls = (hasError?: boolean) =>
     cn(
-      "w-full px-3 py-2 bg-background border rounded-md text-[14px] outline-none transition-colors",
+      "w-full px-3 py-2 bg-background border rounded-md text-body outline-none transition-colors",
       hasError
         ? "border-destructive focus:border-destructive"
         : "border-border focus:border-foreground/30 focus:bg-muted/30"
@@ -71,7 +71,7 @@ export function BrandForm({ initialData, onSubmit, onCancel, isSubmitting }: Bra
             placeholder="e.g. Zenith Wellness Group"
           />
           {errors.name && (
-            <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
+            <p className="text-caption text-destructive flex items-center gap-1 mt-1">
               <WarningCircle size={12} /> {errors.name.message}
             </p>
           )}
@@ -80,7 +80,7 @@ export function BrandForm({ initialData, onSubmit, onCancel, isSubmitting }: Bra
         <div className="p-4 bg-muted/20 border border-border rounded-xl space-y-4">
           <div className="flex items-center gap-2 pb-1 text-primary">
             <Tag size={16} weight="fill" />
-            <h3 className="text-[13px] font-semibold">Service categories</h3>
+            <h3 className="text-nav font-semibold">Service categories</h3>
           </div>
           <Controller
             control={control}
@@ -95,7 +95,7 @@ export function BrandForm({ initialData, onSubmit, onCancel, isSubmitting }: Bra
             )}
           />
           {errors.serviceCategories && (
-            <p className="text-[11px] text-destructive flex items-center gap-1 mt-1">
+            <p className="text-caption text-destructive flex items-center gap-1 mt-1">
               <WarningCircle size={12} /> {errors.serviceCategories.message}
             </p>
           )}
@@ -120,7 +120,7 @@ export function BrandForm({ initialData, onSubmit, onCancel, isSubmitting }: Bra
           <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border/40">
             <div className="space-y-0.5">
               <h4 className="text-xs font-semibold text-foreground leading-tight">Brand status</h4>
-              <p className="text-[11px] text-muted-foreground opacity-70">
+              <p className="text-caption text-muted-foreground opacity-70">
                 Only active brands can have new service providers assigned.
               </p>
             </div>
@@ -130,7 +130,7 @@ export function BrandForm({ initialData, onSubmit, onCancel, isSubmitting }: Bra
               render={({ field }) => (
                 <div className="flex items-center gap-2">
                   <span className={cn(
-                    "text-[10px] font-bold tracking-tight transition-colors",
+                    "text-micro font-semibold tracking-tight transition-colors",
                     field.value === "active" ? "text-emerald-600" : "text-muted-foreground/60"
                   )}>
                     {field.value === "active" ? "Active" : "Inactive"}
@@ -154,7 +154,7 @@ export function BrandForm({ initialData, onSubmit, onCancel, isSubmitting }: Bra
             variant="ghost"
             onClick={onCancel}
             disabled={isSubmitting}
-            className="text-[13px] font-medium text-muted-foreground hover:text-foreground"
+            className="text-nav font-medium text-muted-foreground hover:text-foreground"
           >
             Cancel
           </Button>
@@ -162,7 +162,7 @@ export function BrandForm({ initialData, onSubmit, onCancel, isSubmitting }: Bra
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="text-[13px] font-bold px-6"
+          className="text-nav font-semibold px-6"
         >
           {isSubmitting ? (
             <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

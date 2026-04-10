@@ -28,15 +28,15 @@ export function FilterItem({ label, options, value, onChange, icon }: FilterItem
 
   return (
     <div className="flex items-center gap-2">
-      <span className="text-[12px] font-medium text-muted-foreground whitespace-nowrap select-none">{label}</span>
+      <span className="text-label font-medium text-muted-foreground whitespace-nowrap select-none">{label}</span>
       <Popover>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
             size="sm"
             className={cn(
-              "h-9 px-3 gap-2 text-[13px] font-normal border-border/60 bg-transparent hover:bg-muted/50 hover:border-border transition-all rounded-lg",
-              value !== "all" && "border-indigo-200 bg-indigo-50/30 text-indigo-600 hover:bg-indigo-50/50 hover:border-indigo-300"
+              "h-9 px-3 gap-2 text-nav font-normal border-border/60 bg-transparent hover:bg-muted/50 hover:border-border transition-all rounded-lg",
+              value !== "all" && "border-primary/20 bg-primary/5 text-primary hover:bg-primary/10 hover:border-primary/30"
             )}
           >
             {icon}
@@ -51,9 +51,9 @@ export function FilterItem({ label, options, value, onChange, icon }: FilterItem
                 key={option.value}
                 onClick={() => onChange(option.value)}
                 className={cn(
-                  "flex items-center justify-between w-full px-3 py-2 text-[13px] rounded-lg transition-all text-left font-normal",
+                  "flex items-center justify-between w-full px-3 py-2 text-nav rounded-lg transition-all text-left font-normal",
                   value === option.value
-                    ? "bg-indigo-50 text-indigo-600"
+                    ? "bg-primary/10 text-primary"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground"
                 )}
               >

@@ -38,8 +38,8 @@ export default function DashboardPage() {
       <section>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4">
           <div>
-            <h1 className="text-xl font-semibold tracking-tight text-foreground">System Overview</h1>
-            <p className="text-muted-foreground text-[13px] mt-1">
+            <h1 className="text-lg font-semibold tracking-tight text-foreground">System Overview</h1>
+            <p className="text-muted-foreground text-nav mt-1">
               Real-time flexi-benefit insights and all-time platform health
             </p>
           </div>
@@ -54,7 +54,7 @@ export default function DashboardPage() {
             trend={{ value: "+1.2%", label: "growth", isPositive: true }}
           >
             <div className="flex flex-col items-end gap-1.5 ml-auto">
-              <span className="text-[9px] font-bold text-muted-foreground/40 tracking-[0.08em] group-hover:text-primary/60 transition-colors">64% Employees</span>
+              <span className="text-micro font-medium text-muted-foreground/50 tracking-[0.05em] group-hover:text-primary/60 transition-colors">64% Employees</span>
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
@@ -66,8 +66,8 @@ export default function DashboardPage() {
                     </div>
                   </TooltipTrigger>
 
-                  <TooltipContent side="top" className="text-[12px] font-medium leading-relaxed">
-                    <p className="flex items-center gap-2 text-primary font-bold">
+                  <TooltipContent side="top" className="text-label font-medium leading-relaxed">
+                    <p className="flex items-center gap-2 text-primary font-semibold">
                        <span className="w-2 h-2 rounded-full bg-primary" />
                        82,402 Employees (64%)
                     </p>
@@ -105,7 +105,7 @@ export default function DashboardPage() {
             trend={{ value: "+3.2%", label: "growth", isPositive: true }}
           >
             <div className="flex flex-col items-end gap-1.5 ml-auto">
-              <span className="text-[9px] font-bold text-muted-foreground/40 tracking-[0.08em] group-hover:text-primary/60 transition-colors">88% Claims</span>
+              <span className="text-micro font-medium text-muted-foreground/50 tracking-[0.05em] group-hover:text-primary/60 transition-colors">88% Claims</span>
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
@@ -117,8 +117,8 @@ export default function DashboardPage() {
                     </div>
                   </TooltipTrigger>
 
-                  <TooltipContent side="top" className="text-[12px] font-medium leading-relaxed">
-                    <p className="flex items-center gap-2 text-primary font-bold">
+                  <TooltipContent side="top" className="text-label font-medium leading-relaxed">
+                    <p className="flex items-center gap-2 text-primary font-semibold">
                        <span className="w-2 h-2 rounded-full bg-primary" />
                        RM 18.2M Claims (88%)
                     </p>
@@ -138,8 +138,8 @@ export default function DashboardPage() {
       <section className="space-y-4">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
-            <h2 className="text-lg font-semibold tracking-tight text-foreground">Performance</h2>
-            <p className="text-muted-foreground text-[13px] mt-1">
+            <h2 className="text-subtitle font-semibold text-foreground">Performance</h2>
+            <p className="text-muted-foreground text-nav mt-1">
               Ecosystem activity and settlement volume over time
             </p>
           </div>
@@ -151,7 +151,7 @@ export default function DashboardPage() {
                 <button 
                   key={p}
                   onClick={() => setPeriod(p as any)}
-                  className={`px-3 py-1.5 text-[12px] font-medium rounded transition-colors ${
+                  className={`px-3 py-1.5 text-label font-medium rounded transition-colors ${
                     period === p ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
@@ -161,7 +161,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Secondary Option based on primary period */}
-            <select className="px-3 py-1.5 h-[34px] bg-card border border-border hover:bg-muted/50 rounded-md text-[12px] font-medium text-foreground outline-none cursor-pointer transition-colors max-w-[140px]">
+            <select className="px-3 py-1.5 h-[34px] bg-card border border-border hover:bg-muted/50 rounded-md text-label font-medium text-foreground outline-none cursor-pointer transition-colors max-w-[140px]">
               {period === "By Month" && (
                 <>
                   <option>January 2026</option>

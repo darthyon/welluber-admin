@@ -33,8 +33,8 @@ export function BrandSelectionModal({ isOpen, onClose, onSelect, brands }: Brand
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="p-6 pb-2">
-          <DialogTitle className="text-lg font-bold tracking-tight">Select Existing Brand</DialogTitle>
-          <DialogDescription className="text-[13px] text-muted-foreground">
+          <DialogTitle className="text-lg font-semibold tracking-tight">Select Existing Brand</DialogTitle>
+          <DialogDescription className="text-nav text-muted-foreground">
             Search and choose a brand to link this service provider account.
           </DialogDescription>
         </DialogHeader>
@@ -58,15 +58,15 @@ export function BrandSelectionModal({ isOpen, onClose, onSelect, brands }: Brand
                 <div className="flex items-center gap-3">
                   <Avatar className="h-9 w-9 rounded-lg border border-border/40 shadow-sm">
                     <AvatarImage src={brand.logo} />
-                    <AvatarFallback className="text-[10px] font-bold bg-muted-foreground/10 text-muted-foreground">
+                    <AvatarFallback className="text-micro font-semibold bg-muted-foreground/10 text-muted-foreground">
                         {brand.name.substring(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col">
-                    <span className="text-[14px] font-bold text-foreground group-hover:text-primary transition-colors leading-tight">
+                    <span className="text-body font-semibold text-foreground group-hover:text-primary transition-colors leading-tight">
                         {brand.name}
                     </span>
-                    <span className="text-[11px] text-muted-foreground opacity-70">
+                    <span className="text-caption text-muted-foreground opacity-70">
                         {brand.assignedSpCount} SPs • ID: {brand.id}
                     </span>
                   </div>
@@ -81,8 +81,8 @@ export function BrandSelectionModal({ isOpen, onClose, onSelect, brands }: Brand
                 <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto text-muted-foreground mb-3 opacity-40">
                     <MagnifyingGlass size={24} weight="light" />
                 </div>
-                <p className="text-[13px] font-medium text-muted-foreground">No brands found</p>
-                <p className="text-[11px] text-muted-foreground/60 mt-1">Try a different search term.</p>
+                <p className="text-nav font-medium text-muted-foreground">No brands found</p>
+                <p className="text-caption text-muted-foreground/60 mt-1">Try a different search term.</p>
             </div>
           )}
         </div>

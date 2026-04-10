@@ -81,7 +81,7 @@ export function ServiceToggleCard({
             onCheckedChange={onToggle} 
           />
           <span className={cn(
-            "text-[14px] font-semibold tracking-tight transition-colors duration-300",
+            "text-body font-semibold tracking-tight transition-colors duration-300",
             isSelected ? "text-foreground" : "text-muted-foreground"
           )}>
             {name}
@@ -99,7 +99,7 @@ export function ServiceToggleCard({
                 <span 
                   key={sub} 
                   className={cn(
-                    "inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-lg font-medium border transition-all duration-200 group/badge",
+                    "inline-flex items-center gap-1.5 text-caption px-2.5 py-1 rounded-lg font-medium border transition-all duration-200 group/badge",
                     isMasterlist 
                       ? "bg-muted text-muted-foreground border-border hover:border-muted-foreground/30" 
                       : "bg-primary/[0.04] text-primary border-primary/20 hover:bg-primary/10"
@@ -131,7 +131,7 @@ export function ServiceToggleCard({
                   handleAdd();
                 }
               }}
-              className="h-8 w-full px-3 py-1 bg-background border border-border rounded-lg text-[12px] outline-none transition-all placeholder:text-muted-foreground/40 focus:border-primary/30 focus:shadow-[0_0_10px_-4px_rgba(var(--primary-rgb),0.1)]"
+              className="h-8 w-full px-3 py-1 bg-background border border-border rounded-lg text-label outline-none transition-all placeholder:text-muted-foreground/40 focus:border-primary/30 focus:shadow-[0_0_10px_-4px_rgba(var(--primary-rgb),0.1)]"
               placeholder={placeholder || `Add custom sub-service...`}
             />
             <Button 

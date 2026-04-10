@@ -74,7 +74,7 @@ export function TopUpHistoryModal({ isOpen, onClose, branchId, branchName }: Top
             </div>
             <div>
               <h3 className="font-semibold text-foreground tracking-tight leading-tight">Top-Up History</h3>
-              <p className="text-[11px] text-muted-foreground font-medium tracking-wider mt-0.5">
+              <p className="text-caption text-muted-foreground font-medium tracking-wider mt-0.5">
                 {branchName} Wallet Transactions
               </p>
             </div>
@@ -92,11 +92,11 @@ export function TopUpHistoryModal({ isOpen, onClose, branchId, branchName }: Top
           <div className="relative w-64">
             <MagnifyingGlass size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input 
-              className="w-full pl-8 pr-3 py-1.5 bg-background border border-border rounded-md text-[13px] outline-none transition-colors focus:border-border focus:ring-1 focus:ring-ring"
+              className="w-full pl-8 pr-3 py-1.5 bg-background border border-border rounded-md text-nav outline-none transition-colors focus:border-border focus:ring-1 focus:ring-ring"
               placeholder="Search by ref number..."
             />
           </div>
-          <Button variant="ghost" size="sm" className="h-8 text-[12px] flex items-center gap-1.5">
+          <Button variant="ghost" size="sm" className="h-8 text-label flex items-center gap-1.5">
             <Funnel size={14} /> Filter
           </Button>
         </div>
@@ -106,41 +106,41 @@ export function TopUpHistoryModal({ isOpen, onClose, branchId, branchName }: Top
           {isLoading ? (
             <div className="h-full flex flex-col items-center justify-center text-muted-foreground gap-3">
               <div className="w-6 h-6 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
-              <p className="text-[13px] font-medium">Fetching history...</p>
+              <p className="text-nav font-medium">Fetching history...</p>
             </div>
           ) : history.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-muted-foreground gap-2">
               <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
                 <Clock size={24} weight="duotone" />
               </div>
-              <p className="text-[13px] font-medium">No top-up history found</p>
-              <p className="text-[11px]">Completed transactions will appear here.</p>
+              <p className="text-nav font-medium">No top-up history found</p>
+              <p className="text-caption">Completed transactions will appear here.</p>
             </div>
           ) : (
             <table className="w-full text-left border-collapse">
               <thead className="sticky top-0 bg-muted/50 backdrop-blur-sm z-10 border-b border-border">
                 <tr>
-                  <th className="px-4 py-3 text-[12px] font-semibold text-muted-foreground/80 tracking-tight">Paid Date</th>
-                  <th className="px-4 py-3 text-[12px] font-semibold text-muted-foreground/80 tracking-tight">Amount</th>
-                  <th className="px-4 py-3 text-[12px] font-semibold text-muted-foreground/80 tracking-tight">Method</th>
-                  <th className="px-4 py-3 text-[12px] font-semibold text-muted-foreground/80 tracking-tight">Reference</th>
-                  <th className="px-4 py-3 text-[12px] font-semibold text-muted-foreground/80 tracking-tight text-right">Status</th>
-                  <th className="px-4 py-3 text-[12px] font-semibold text-muted-foreground/80 tracking-tight text-right">Action</th>
+                  <th className="px-4 py-3 text-label font-semibold text-muted-foreground/80 tracking-tight">Paid Date</th>
+                  <th className="px-4 py-3 text-label font-semibold text-muted-foreground/80 tracking-tight">Amount</th>
+                  <th className="px-4 py-3 text-label font-semibold text-muted-foreground/80 tracking-tight">Method</th>
+                  <th className="px-4 py-3 text-label font-semibold text-muted-foreground/80 tracking-tight">Reference</th>
+                  <th className="px-4 py-3 text-label font-semibold text-muted-foreground/80 tracking-tight text-right">Status</th>
+                  <th className="px-4 py-3 text-label font-semibold text-muted-foreground/80 tracking-tight text-right">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
                 {history.map((txn) => (
                   <tr key={txn.id} className="hover:bg-muted/10 transition-colors group">
-                    <td className="px-4 py-3 text-[13px] font-medium text-foreground">
+                    <td className="px-4 py-3 text-nav font-medium text-foreground">
                       {format(new Date(txn.paidDate), "dd MMM yyyy")}
                     </td>
-                    <td className="px-4 py-3 text-[13px] font-bold text-foreground">
+                    <td className="px-4 py-3 text-nav font-semibold text-foreground">
                       RM {txn.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                     </td>
-                    <td className="px-4 py-3 text-[12px] text-muted-foreground">
+                    <td className="px-4 py-3 text-label text-muted-foreground">
                       {getMethodLabel(txn.method)}
                     </td>
-                    <td className="px-4 py-3 text-[12px] text-muted-foreground font-mono">
+                    <td className="px-4 py-3 text-label text-muted-foreground font-mono">
                       {txn.referenceNo || "-"}
                     </td>
                     <td className="px-4 py-3 text-right">
@@ -159,7 +159,7 @@ export function TopUpHistoryModal({ isOpen, onClose, branchId, branchName }: Top
         </div>
 
         {/* Footer */}
-        <div className="p-3 border-t border-border flex items-center justify-between text-[11px] text-muted-foreground bg-muted/10">
+        <div className="p-3 border-t border-border flex items-center justify-between text-caption text-muted-foreground bg-muted/10">
           <div>Showing {history.length} records</div>
           <div className="flex items-center gap-1">
             Page 1 of 1

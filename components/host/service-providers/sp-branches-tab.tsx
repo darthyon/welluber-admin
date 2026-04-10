@@ -115,7 +115,7 @@ export function SpBranchesTab({ sp }: SpBranchesTabProps) {
               onClick={handleAdd}
               variant="secondary"
               size="sm"
-              className="flex items-center gap-2 text-[12px] font-medium rounded-full h-8"
+              className="flex items-center gap-2 text-label font-medium rounded-full h-8"
             >
               <Plus size={14} weight="bold" /> Add Branch
             </Button>
@@ -186,8 +186,8 @@ export function SpBranchesTab({ sp }: SpBranchesTabProps) {
                       <GitBranch size={18} weight="fill" />
                     </div>
                     <div>
-                      <p className="text-[13px] font-semibold text-foreground group-hover:text-primary transition-colors">{branch.name}</p>
-                      <p className="text-[11px] font-medium text-muted-foreground">{branch.isActive ? "Active branch" : "Inactive branch"}</p>
+                      <p className="text-nav font-semibold text-foreground group-hover:text-primary transition-colors">{branch.name}</p>
+                      <p className="text-caption font-medium text-muted-foreground">{branch.isActive ? "Active branch" : "Inactive branch"}</p>
                     </div>
                   </div>
                 ),
@@ -195,7 +195,7 @@ export function SpBranchesTab({ sp }: SpBranchesTabProps) {
               {
                 header: "Location",
                 render: (branch) => (
-                  <span className="text-[13px] text-muted-foreground">
+                  <span className="text-nav text-muted-foreground">
                     {branch.address.city}, {branch.address.state}
                   </span>
                 ),
@@ -205,12 +205,12 @@ export function SpBranchesTab({ sp }: SpBranchesTabProps) {
                 render: (branch) => (
                   <div className="flex flex-wrap gap-1.5">
                     {branch.services.slice(0, 2).map((service) => (
-                      <span key={service.service} className="inline-flex items-center px-2 py-0.5 rounded-full bg-muted text-[11px] font-medium text-muted-foreground border border-border">
+                      <span key={service.service} className="inline-flex items-center px-2 py-0.5 rounded-full bg-muted text-caption font-medium text-muted-foreground border border-border">
                         {service.service}
                       </span>
                     ))}
                     {branch.services.length > 2 && (
-                      <span className="text-[11px] font-medium text-muted-foreground/60">
+                      <span className="text-caption font-medium text-muted-foreground/60">
                         +{branch.services.length - 2} more
                       </span>
                     )}

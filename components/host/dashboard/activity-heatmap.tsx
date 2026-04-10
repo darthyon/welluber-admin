@@ -39,21 +39,21 @@ export function ActivityHeatmap() {
     <div className="rounded-lg border border-border bg-card p-5 h-full flex flex-col">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-1.5 min-w-0">
-          <h2 className="text-[13px] font-semibold text-foreground tracking-tight">Voucher redemption intensity</h2>
+          <h2 className="text-nav font-semibold text-foreground tracking-tight">Voucher redemption intensity</h2>
           <TooltipProvider>
             <Tooltip delayDuration={0}>
               <TooltipTrigger asChild>
                 <Info size={14} className="text-muted-foreground/60 cursor-help hover:text-primary transition-colors shrink-0" />
               </TooltipTrigger>
-              <TooltipContent side="top" className="text-[12px] font-medium leading-relaxed max-w-[220px]">
+              <TooltipContent side="top" className="text-label font-medium leading-relaxed max-w-[220px]">
                 Activity density over last 84 days.
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>
         <div className="text-right">
-          <p className="text-[11px] font-semibold text-muted-foreground tracking-tight opacity-60">Total redemptions</p>
-          <p className="text-xl font-bold text-foreground tracking-tight">482.4k</p>
+          <p className="text-caption font-semibold text-muted-foreground tracking-tight opacity-60">Total redemptions</p>
+          <p className="text-xl font-semibold text-foreground tracking-tight">482.4k</p>
         </div>
       </div>
 
@@ -72,7 +72,7 @@ export function ActivityHeatmap() {
           ))}
         </div>
         
-        <div className="flex items-center justify-between text-[11px] text-muted-foreground mt-2">
+        <div className="flex items-center justify-between text-caption text-muted-foreground mt-2">
           <span>April 15, 2026</span>
           <div className="flex items-center gap-1.5">
             <span>Less</span>

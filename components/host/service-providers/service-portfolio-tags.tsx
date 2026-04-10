@@ -94,7 +94,7 @@ export function ServicePortfolioTags({ mainServices, className }: ServicePortfol
             <Badge
               key={i}
               variant="secondary"
-              className="text-[10px] font-bold bg-muted/50 border-border/40 text-muted-foreground/80 px-1.5 py-0 h-4 shrink-0 whitespace-nowrap"
+              className="text-micro font-semibold bg-muted/50 border-border/40 text-muted-foreground/80 px-1.5 py-0 h-4 shrink-0 whitespace-nowrap"
             >
               {item}
             </Badge>
@@ -105,7 +105,7 @@ export function ServicePortfolioTags({ mainServices, className }: ServicePortfol
               <TooltipTrigger asChild>
                 <button
                   onClick={(e) => e.stopPropagation()}
-                  className="text-[10px] text-muted-foreground/60 hover:text-primary font-bold px-1 shrink-0 whitespace-nowrap transition-colors"
+                  className="text-micro text-muted-foreground/60 hover:text-primary font-semibold px-1 shrink-0 whitespace-nowrap transition-colors"
                 >
                   +{hiddenItems.length}
                 </button>
@@ -115,7 +115,7 @@ export function ServicePortfolioTags({ mainServices, className }: ServicePortfol
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="flex flex-col gap-0.5 py-1">
-                  <span className="ml-2 inline-flex items-center gap-1 text-[10px] font-bold text-primary/70 tracking-tighter bg-primary/5 px-1.5 py-0.5 rounded border border-primary/10">
+                  <span className="ml-2 inline-flex items-center gap-1 text-micro font-semibold text-primary/70 tracking-tighter bg-primary/5 px-1.5 py-0.5 rounded border border-primary/10">
                     Other Main Services
                   </span>
                   <div className="max-h-[300px] overflow-y-auto">
@@ -124,18 +124,18 @@ export function ServicePortfolioTags({ mainServices, className }: ServicePortfol
                         key={i}
                         className="px-2 py-2 hover:bg-accent/40 rounded-lg transition-colors"
                       >
-                        <div className="text-[12px] text-foreground/90 font-bold leading-none mb-1">
+                        <div className="text-label text-foreground/90 font-semibold leading-none mb-1">
                           {item.name}
                         </div>
                         {item.subServices.length > 0 && (
                           <div className="flex flex-wrap gap-1 mt-1.5">
                             {item.subServices.slice(0, 4).map((sub, j) => (
-                              <span key={j} className="text-[9px] text-muted-foreground/60 border border-border/30 px-1 rounded-sm">
+                              <span key={j} className="text-micro text-muted-foreground/60 border border-border/30 px-1 rounded-sm">
                                 {sub}
                               </span>
                             ))}
                             {item.subServices.length > 4 && (
-                              <span className="text-[10px] font-bold text-muted-foreground/60 w-full mb-1">+{item.subServices.length - 4} more</span>
+                              <span className="text-micro font-semibold text-muted-foreground/60 w-full mb-1">+{item.subServices.length - 4} more</span>
                             )}
                           </div>
                         )}
@@ -159,7 +159,7 @@ export function ServicePortfolioTags({ mainServices, className }: ServicePortfol
               key={i}
               data-tag={String(i)}
               variant="secondary"
-              className="text-[10px] font-bold px-1.5 py-0 h-4 shrink-0 whitespace-nowrap"
+              className="text-micro font-semibold px-1.5 py-0 h-4 shrink-0 whitespace-nowrap"
             >
               {item}
             </Badge>

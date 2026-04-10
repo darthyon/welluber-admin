@@ -104,7 +104,7 @@ export function SectionedSearchSelect({
         onClick={() => !disabled && setIsOpen(!isOpen)}
         disabled={disabled}
         className={cn(
-          "w-full flex items-center justify-between px-4 py-2.5 rounded-xl border bg-background text-[13px] transition-all text-left pr-12",
+          "w-full flex items-center justify-between px-4 py-2.5 rounded-xl border bg-background text-nav transition-all text-left pr-12",
           isOpen ? "border-primary ring-2 ring-primary/10" : "border-border hover:border-foreground/20",
           !value && "text-muted-foreground/40",
           disabled && "opacity-60 cursor-not-allowed bg-muted"
@@ -138,7 +138,7 @@ export function SectionedSearchSelect({
             <input
               ref={searchRef}
               type="text"
-              className="w-full bg-transparent border-0 outline-none text-[13px] h-8 text-foreground"
+              className="w-full bg-transparent border-0 outline-none text-nav h-8 text-foreground"
               placeholder="Search services..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -148,7 +148,7 @@ export function SectionedSearchSelect({
             {filteredTaxonomy.length > 0 ? (
               filteredTaxonomy.map((group) => (
                 <div key={group.category} className="mb-2 last:mb-0">
-                  <div className="px-3 py-2 text-[10px] font-bold text-muted-foreground/40 select-none uppercase tracking-wider">
+                  <div className="px-3 py-2 text-micro font-semibold text-muted-foreground/40 select-none uppercase tracking-wider">
                     {group.category}
                   </div>
                   {group.services.map((opt) => (
@@ -157,7 +157,7 @@ export function SectionedSearchSelect({
                       onClick={() => handleSelect(opt)}
                       type="button"
                       className={cn(
-                        "w-full text-left px-3 py-2 rounded-lg text-[13px] transition-colors flex items-center justify-between group",
+                        "w-full text-left px-3 py-2 rounded-lg text-nav transition-colors flex items-center justify-between group",
                         value === opt ? "bg-primary/5 text-primary font-semibold" : "hover:bg-muted text-foreground/80"
                       )}
                     >
@@ -168,7 +168,7 @@ export function SectionedSearchSelect({
                 </div>
               ))
             ) : (
-              <div className="p-4 text-center text-muted-foreground/40 text-[12px]">
+              <div className="p-4 text-center text-muted-foreground/40 text-label">
                 No services found matching &quot;{query}&quot;
               </div>
             )}

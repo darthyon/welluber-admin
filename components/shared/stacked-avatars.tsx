@@ -30,9 +30,9 @@ export function StackedAvatars({
   const remainingCount = Math.max(0, count - displayCount);
   
   const sizeClasses = {
-    sm: "w-6 h-6 text-[10px]",
-    md: "w-8 h-8 text-[12px]",
-    lg: "w-10 h-10 text-[14px]"
+    sm: "w-6 h-6 text-micro",
+    md: "w-8 h-8 text-label",
+    lg: "w-10 h-10 text-body"
   };
 
   return (
@@ -47,7 +47,7 @@ export function StackedAvatars({
         <div
           key={i}
           className={cn(
-            "rounded-full border-2 border-background flex items-center justify-center font-bold ring-1 ring-border/50 shadow-sm overflow-hidden bg-muted",
+            "rounded-full border-2 border-background flex items-center justify-center font-semibold ring-1 ring-border/50 shadow-sm overflow-hidden bg-muted",
             sizeClasses[size]
           )}
         >
@@ -60,7 +60,7 @@ export function StackedAvatars({
       ))}
       {remainingCount > 0 && (
         <div className={cn(
-          "rounded-full border-2 border-background flex items-center justify-center text-[10px] font-bold ring-1 ring-border/50 shadow-sm bg-muted text-muted-foreground",
+          "rounded-full border-2 border-background flex items-center justify-center text-micro font-semibold ring-1 ring-border/50 shadow-sm bg-muted text-muted-foreground",
           sizeClasses[size]
         )}>
           +{remainingCount}

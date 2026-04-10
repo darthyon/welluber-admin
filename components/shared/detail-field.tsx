@@ -44,11 +44,11 @@ export function DetailField({
     )}>
       <div className="flex items-center gap-1.5">
         {icon && <span className="text-muted-foreground/60">{icon}</span>}
-        <p className="text-[11px] font-medium text-muted-foreground/80 tracking-wide">
+        <p className="text-caption font-medium text-muted-foreground/80 tracking-wide">
           {label}
         </p>
       </div>
-      <div className="text-[14px] font-semibold text-foreground leading-tight">
+      <div className="text-body font-semibold text-foreground leading-tight">
         {value || "—"}
       </div>
     </div>

@@ -107,14 +107,14 @@ export function SearchableMultiSelect({
       {/* Header with Clear All only */}
       {(taxonomy.length > 0 || staticOptions.length > 0) && (
         <div className="flex items-center justify-between px-2 py-1.5 border-b border-border/50 mb-1">
-          <span className="text-[10px] font-bold text-muted-foreground tracking-tight">
+          <span className="text-micro font-semibold text-muted-foreground tracking-tight">
             {query ? "Filtered Results" : title}
           </span>
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={() => onChange([])}
-              className="text-[10px] font-bold text-rose-500 hover:text-rose-600 transition-colors"
+              className="text-micro font-semibold text-rose-500 hover:text-rose-600 transition-colors"
             >
               Clear All
             </button>
@@ -130,7 +130,7 @@ export function SearchableMultiSelect({
               key={opt}
               onClick={() => toggleOption(opt)}
               type="button"
-              className="w-full text-left px-3 py-1.5 rounded-lg text-[13px] hover:bg-muted/50 transition-colors flex items-center justify-between group font-semibold text-primary"
+              className="w-full text-left px-3 py-1.5 rounded-lg text-nav hover:bg-muted/50 transition-colors flex items-center justify-between group font-semibold text-primary"
             >
               <span>{opt}</span>
               <Check size={14} className="opacity-0 group-hover:opacity-40" />
@@ -144,7 +144,7 @@ export function SearchableMultiSelect({
         filteredTaxonomy.map((group) => (
           <div key={group.category} className="mb-2">
             {(taxonomy.length > 1 || staticOptions.length > 0) && (
-              <div className="px-3 py-1.5 text-[10px] font-bold tracking-tight text-muted-foreground/50 select-none">
+              <div className="px-3 py-1.5 text-micro font-semibold tracking-tight text-muted-foreground/50 select-none">
                 {group.category}
               </div>
             )}
@@ -153,7 +153,7 @@ export function SearchableMultiSelect({
                 key={opt}
                 onClick={() => toggleOption(opt)}
                 type="button"
-                className="w-full text-left px-3 py-1.5 rounded-lg text-[13px] hover:bg-muted/50 transition-colors flex items-center justify-between group font-normal"
+                className="w-full text-left px-3 py-1.5 rounded-lg text-nav hover:bg-muted/50 transition-colors flex items-center justify-between group font-normal"
               >
                 <span>{opt}</span>
                 <Check size={14} className="opacity-0 group-hover:opacity-40" />
@@ -162,7 +162,7 @@ export function SearchableMultiSelect({
           </div>
         ))
       ) : filteredStaticOptions.length === 0 && (
-        <div className="p-4 text-center text-muted-foreground text-[12px]">
+        <div className="p-4 text-center text-muted-foreground text-label">
           {query ? `No results found matching "${query}"` : "Search to narrow down options"}
         </div>
       )}
@@ -175,7 +175,7 @@ export function SearchableMultiSelect({
         {/* Selected Tags */}
         <div className="flex flex-wrap gap-1.5 min-h-[36px] p-1.5 rounded-xl border border-border bg-card focus-within:ring-2 focus-within:ring-primary/20 transition-all shadow-sm">
           {selected.map((s) => (
-            <Badge key={s} variant="secondary" className="bg-indigo-50 text-indigo-600 border-indigo-100 px-2 py-0.5 text-[11px] font-medium gap-1 group whitespace-nowrap">
+            <Badge key={s} variant="secondary" className="bg-primary/10 text-primary border-primary/20 px-2 py-0.5 text-caption font-medium gap-1 group whitespace-nowrap">
               {s}
               <button 
                 onClick={() => removeOption(s)}
@@ -188,7 +188,7 @@ export function SearchableMultiSelect({
           ))}
           <input 
             type="text"
-            className="flex-1 bg-transparent border-0 outline-none text-[13px] placeholder:text-muted-foreground/60 min-w-[120px] h-6 px-1"
+            className="flex-1 bg-transparent border-0 outline-none text-nav placeholder:text-muted-foreground/60 min-w-[120px] h-6 px-1"
             placeholder={selected.length === 0 ? placeholder : ""}
             value={query}
             onFocus={() => setIsOpen(true)}
