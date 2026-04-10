@@ -45,7 +45,7 @@ export default function EditBrandPage() {
   if (!brand) {
     return (
       <div className="flex flex-col items-center justify-center py-20 bg-muted/5 rounded-2xl border border-dashed border-border">
-        <h2 className="text-xl font-semibold text-foreground">Brand Not Found</h2>
+        <h2 className="text-heading font-semibold text-foreground">Brand Not Found</h2>
         <p className="text-muted-foreground mt-2">The brand you are looking for does not exist.</p>
         <button
           onClick={() => router.push("/brands")}
@@ -70,7 +70,7 @@ export default function EditBrandPage() {
         </button>
 
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Edit Brand</h1>
+          <h1 className="text-display font-semibold tracking-tight text-foreground">Edit Brand</h1>
           <p className="text-muted-foreground text-nav mt-1 font-normal opacity-80">
             Update the brand identity for {brand.name}.
           </p>

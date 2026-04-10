@@ -148,7 +148,7 @@ function PoliciesContent() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">Benefit Policies</h1>
+          <h1 className="text-heading font-semibold tracking-tight text-foreground">Benefit Policies</h1>
           <p className="text-muted-foreground text-nav mt-1 font-normal opacity-80">
             Design and oversee flexible benefit structures for your workforce. Define eligibility, pool strategies, and individual service rules.
           </p>

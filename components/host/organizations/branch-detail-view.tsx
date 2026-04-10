@@ -165,11 +165,11 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
               <div className="space-y-4 relative z-10">
                 <div>
                   <p className="text-caption font-semibold opacity-70 tracking-tight">Total employees</p>
-                  <p className="text-xl font-semibold">1,240</p>
+                  <p className="text-title font-semibold">1,240</p>
                 </div>
                 <div>
                   <p className="text-caption font-semibold opacity-70 tracking-tight">Redemption rate</p>
-                  <p className="text-xl font-semibold">92%</p>
+                  <p className="text-title font-semibold">92%</p>
                 </div>
               </div>
             </div>
@@ -288,7 +288,7 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
                   
                   <div className="text-right">
                     <p className="text-caption font-semibold tracking-tight text-muted-foreground/60 mb-1">Available balance</p>
-                    <p className="text-2xl font-semibold text-foreground tracking-tight">RM 45,000.00</p>
+                    <p className="text-display font-semibold text-foreground tracking-tight">RM 45,000.00</p>
                     
                     <div className="flex items-center justify-end gap-2 mt-3">
                       <Button 

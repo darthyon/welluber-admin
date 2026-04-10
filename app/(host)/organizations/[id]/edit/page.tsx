@@ -72,7 +72,7 @@ export default function EditOrganizationPage() {
           >
             <CaretLeft size={16} /> Back to Detail Profile
           </Link>
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">Edit Organisation</h1>
+          <h1 className="text-heading font-semibold tracking-tight text-foreground">Edit Organisation</h1>
           <p className="text-muted-foreground text-nav mt-1">Make changes to the corporate client&apos;s core identity.</p>
         </div>
 

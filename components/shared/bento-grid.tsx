@@ -106,17 +106,19 @@ export function BentoCard({
     <Card
       onClick={onClick}
       className={cn(
-        "p-4 group relative flex flex-col justify-between overflow-hidden",
+        "group relative flex flex-col justify-between overflow-hidden p-4",
         spanClasses[span],
         onClick && "cursor-pointer",
         className
       )}
     >
-      <div className="relative z-10 flex items-start justify-between mb-6">
+      <div className="relative z-10 mb-6 flex items-start justify-between">
         <CardTitle
           className={cn(
-            "text-[13px] font-semibold tracking-tight transition-colors",
-            className?.includes("bg-primary") ? "text-primary-foreground/80" : "text-muted-foreground"
+            "text-nav font-semibold tracking-tight transition-colors",
+            className?.includes("bg-primary")
+              ? "text-primary-foreground/80"
+              : "text-muted-foreground"
           )}
         >
           {title}
@@ -141,12 +143,12 @@ export function BentoCard({
             <TooltipProvider>
               <Tooltip delayDuration={300}>
                 <TooltipTrigger asChild>
-                  <h4 className="cursor-help text-[24px] font-semibold tracking-tight text-foreground leading-tight">
+                  <h4 className="cursor-help text-display leading-tight font-semibold tracking-tight text-foreground">
                     {value}
                   </h4>
                 </TooltipTrigger>
                 <TooltipContent side="top">
-                  <p className="text-label text-[12px] leading-none font-medium">
+                  <p className="text-label leading-none font-medium">
                     Actual:{" "}
                     {typeof value === "string" && value.includes("M")
                       ? `RM ${value.replace("RM ", "").replace("M", ",000,000")}`
@@ -163,7 +165,7 @@ export function BentoCard({
             <div className="flex h-6 items-center gap-2">
               <span
                 className={cn(
-                  "inline-flex h-5 items-center gap-1.5 rounded px-2 py-1 text-[11px] font-semibold tracking-tight transition-all",
+                  "inline-flex h-5 items-center gap-1.5 rounded px-2 py-1 text-caption font-semibold tracking-tight transition-all",
                   trend.isPositive !== false
                     ? "bg-emerald-500/10 text-emerald-600"
                     : "bg-destructive/10 text-destructive",
@@ -180,7 +182,7 @@ export function BentoCard({
               {trend.label && (
                 <span
                   className={cn(
-                    "text-[11px] leading-none font-medium whitespace-nowrap",
+                    "text-caption leading-none font-medium whitespace-nowrap",
                     className?.includes("bg-primary")
                       ? "text-primary-foreground/80"
                       : "text-muted-foreground/80"
@@ -194,7 +196,7 @@ export function BentoCard({
           {!trend && description && !children && (
             <p
               className={cn(
-                "flex items-center gap-1.5 text-[11px] font-medium",
+                "flex items-center gap-1.5 text-caption font-medium",
                 className?.includes("bg-primary")
                   ? "text-primary-foreground/80"
                   : "text-muted-foreground"

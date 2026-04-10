@@ -119,12 +119,12 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
         
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-semibold text-lg shadow-sm">
+            <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-semibold text-heading shadow-sm">
               {employeeData.avatar}
             </div>
             <div>
               <div className="flex items-center gap-3">
-                <h2 className="text-2xl font-semibold tracking-tight text-foreground">{employeeData.name}</h2>
+                <h2 className="text-display font-semibold tracking-tight text-foreground">{employeeData.name}</h2>
                 <StatusBadge status={employeeData.status} variant="emerald" />
               </div>
               <p className="text-body text-muted-foreground mt-1 font-medium">

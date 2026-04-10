@@ -53,7 +53,7 @@ export function ActivityHeatmap() {
         </div>
         <div className="text-right">
           <p className="text-caption font-semibold text-muted-foreground tracking-tight opacity-60">Total redemptions</p>
-          <p className="text-xl font-semibold text-foreground tracking-tight">482.4k</p>
+          <p className="text-heading font-semibold text-foreground tracking-tight">482.4k</p>
         </div>
       </div>
 

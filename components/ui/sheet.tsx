@@ -57,7 +57,7 @@ export function Sheet({
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-5 border-b border-border shrink-0">
               <div>
-                <h2 className="text-lg font-semibold tracking-tight text-foreground">{title}</h2>
+                <h2 className="text-heading font-semibold tracking-tight text-foreground">{title}</h2>
                 {description && (
                   <p className="text-nav text-muted-foreground mt-0.5">{description}</p>
                 )}

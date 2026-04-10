@@ -50,7 +50,7 @@ export default function NewOrganizationPage() {
           >
             <CaretLeft size={16} /> Back to Organisations
           </Link>
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">Add New Organisation</h1>
+          <h1 className="text-heading font-semibold tracking-tight text-foreground">Add New Organisation</h1>
           <p className="text-muted-foreground text-nav mt-1">Register a new corporate client on the platform.</p>
         </div>
 

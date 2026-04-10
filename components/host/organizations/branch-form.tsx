@@ -73,7 +73,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
             <CaretLeft size={20} weight="bold" />
           </button>
           <div>
-            <h2 className="text-xl font-semibold tracking-tight text-foreground">
+            <h2 className="text-heading font-semibold tracking-tight text-foreground">
               {isEditing ? "Edit Branch" : "Add New Branch"}
             </h2>
             <p className="text-nav text-muted-foreground mt-1">

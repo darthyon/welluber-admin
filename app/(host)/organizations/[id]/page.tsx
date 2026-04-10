@@ -463,7 +463,7 @@ function OrganizationDetailContent() {
               <EntityAvatar name={orgName} size="xl" />
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
-                  <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+                  <h1 className="text-display font-semibold tracking-tight text-foreground">
                     {orgName}
                   </h1>
                   <StatusBadge
@@ -1098,7 +1098,7 @@ function OrganizationDetailContent() {
                       {/* Header Row */}
                       <div className="flex items-center justify-between">
                         <div>
-                          <h2 className="text-lg font-semibold text-foreground">
+                          <h2 className="text-heading font-semibold text-foreground">
                             Employee Directory
                           </h2>
                           <p className="text-nav text-muted-foreground">
@@ -1574,7 +1574,7 @@ function OrganizationDetailContent() {
                       {/* Header Row */}
                       <div className="flex items-center justify-between">
                         <div>
-                          <h2 className="text-lg font-semibold text-foreground">
+                          <h2 className="text-heading font-semibold text-foreground">
                             Dependent Directory
                           </h2>
                           <p className="text-nav text-muted-foreground">
@@ -1693,7 +1693,7 @@ function OrganizationDetailContent() {
                       {/* Header Row */}
                       <div className="flex items-center justify-between">
                         <div>
-                          <h2 className="text-lg font-semibold text-foreground">
+                          <h2 className="text-heading font-semibold text-foreground">
                             Entitlements
                           </h2>
                           <p className="text-nav text-muted-foreground">
@@ -1813,7 +1813,7 @@ function OrganizationDetailContent() {
                       {/* Header Row */}
                       <div className="flex items-center justify-between">
                         <div>
-                          <h2 className="text-lg font-semibold text-foreground">
+                          <h2 className="text-heading font-semibold text-foreground">
                             Claims
                           </h2>
                           <p className="text-nav text-muted-foreground">

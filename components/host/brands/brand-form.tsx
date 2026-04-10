@@ -64,7 +64,7 @@ export function BrandForm({ initialData, onSubmit, onCancel, isSubmitting }: Bra
       <div className="grid grid-cols-1 gap-6">
         {/* Brand name */}
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-foreground">Brand name</label>
+          <label className="text-caption font-medium text-foreground">Brand name</label>
           <input
             {...register("name")}
             className={inputCls(!!errors.name)}
@@ -119,7 +119,7 @@ export function BrandForm({ initialData, onSubmit, onCancel, isSubmitting }: Bra
         {initialData && (
           <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border/40">
             <div className="space-y-0.5">
-              <h4 className="text-xs font-semibold text-foreground leading-tight">Brand status</h4>
+              <h4 className="text-caption font-semibold text-foreground leading-tight">Brand status</h4>
               <p className="text-caption text-muted-foreground opacity-70">
                 Only active brands can have new service providers assigned.
               </p>

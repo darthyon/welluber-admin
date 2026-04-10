@@ -33,7 +33,7 @@ export function BrandSelectionModal({ isOpen, onClose, onSelect, brands }: Brand
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="p-6 pb-2">
-          <DialogTitle className="text-lg font-semibold tracking-tight">Select Existing Brand</DialogTitle>
+          <DialogTitle className="text-heading font-semibold tracking-tight">Select Existing Brand</DialogTitle>
           <DialogDescription className="text-nav text-muted-foreground">
             Search and choose a brand to link this service provider account.
           </DialogDescription>

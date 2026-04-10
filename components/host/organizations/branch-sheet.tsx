@@ -29,7 +29,7 @@ export function BranchSheet({ isOpen, onClose, branchName }: BranchSheetProps) {
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <div>
-            <h2 className="text-lg font-semibold tracking-tight text-foreground">
+            <h2 className="text-heading font-semibold tracking-tight text-foreground">
               {branchName || "Add New Branch"}
             </h2>
             <p className="text-nav text-muted-foreground mt-0.5">
@@ -106,7 +106,7 @@ export function BranchSheet({ isOpen, onClose, branchName }: BranchSheetProps) {
                    <div className="flex items-center justify-between">
                      <div>
                        <p className="text-nav text-muted-foreground font-medium mb-1">Available Balance</p>
-                       <p className="text-3xl font-semibold tracking-tight text-foreground">RM 50,000.00</p>
+                       <p className="text-display-lg font-semibold tracking-tight text-foreground">RM 50,000.00</p>
                      </div>
                      <Button size="sm" className="text-nav h-9">
                        Top Up Fund

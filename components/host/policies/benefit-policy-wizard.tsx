@@ -846,7 +846,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
             >
               <Sparkle size={40} weight="fill" className="animate-pulse" />
             </motion.div>
-            <h3 className="text-xl font-semibold text-foreground">Crafting Policy Identity...</h3>
+            <h3 className="text-heading font-semibold text-foreground">Crafting Policy Identity...</h3>
             <p className="text-muted-foreground mt-2 flex items-center gap-2">
               Optimizing for <span className="text-primary font-semibold">{genContext || "Workforce"}</span>
             </p>
@@ -858,7 +858,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
         <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mx-auto mb-4 shadow-sm">
           <ShieldCheck size={28} weight="duotone" />
         </div>
-        <h3 className="text-2xl font-semibold text-foreground tracking-tight">Finalize & Launch Policy</h3>
+        <h3 className="text-display font-semibold text-foreground tracking-tight">Finalize & Launch Policy</h3>
         <p className="text-muted-foreground mt-1">Review the AI-suggested identity and verify configured benefits.</p>
       </div>
 
@@ -1019,7 +1019,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
             >
               <CaretLeft size={20} weight="bold" />
             </button>
-            <h2 className="text-xl font-semibold tracking-tight text-foreground">
+            <h2 className="text-heading font-semibold tracking-tight text-foreground">
               {isViewMode ? "View Benefit Policy" : mode === "edit" ? "Edit Benefit Policy" : "Create Benefit Policy"}
             </h2>
           </div>

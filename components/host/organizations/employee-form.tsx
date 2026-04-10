@@ -165,7 +165,7 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
             <CaretLeft size={20} weight="bold" />
           </button>
           <div>
-            <h2 className="text-xl font-semibold tracking-tight text-foreground">
+            <h2 className="text-heading font-semibold tracking-tight text-foreground">
               {isEditing ? "Edit Employee" : "Add New Employee"}
             </h2>
             <p className="text-nav text-muted-foreground mt-0.5 font-medium opacity-80">

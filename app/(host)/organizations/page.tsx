@@ -218,7 +218,7 @@ export default function OrganizationsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">Organisations</h1>
+          <h1 className="text-heading font-semibold tracking-tight text-foreground">Organisations</h1>
           <p className="text-muted-foreground text-nav mt-1 font-normal opacity-80">Manage B2B corporate clients on the Welluber platform.</p>
         </div>
         

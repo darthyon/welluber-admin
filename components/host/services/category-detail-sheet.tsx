@@ -63,7 +63,7 @@ export function CategoryDetailSheet({
               <TreeStructure size={24} weight="fill" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold tracking-tight text-foreground">
+              <h2 className="text-heading font-semibold tracking-tight text-foreground">
                 {category.category}
               </h2>
               <p className="text-nav text-muted-foreground mt-0.5">

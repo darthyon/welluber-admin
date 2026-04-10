@@ -77,7 +77,7 @@ export default function AuditLogPage() {
             <FileText size={20} weight="bold" />
           </div>
           <div>
-            <h1 className="text-xl font-semibold tracking-tight text-foreground">Audit Log</h1>
+            <h1 className="text-heading font-semibold tracking-tight text-foreground">Audit Log</h1>
             <p className="text-muted-foreground text-nav mt-0.5 font-medium opacity-80">
               Complete chronological record of all administrative actions and system events.
             </p>

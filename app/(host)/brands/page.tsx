@@ -23,7 +23,7 @@ export default function BrandsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">Brands</h1>
+          <h1 className="text-heading font-semibold tracking-tight text-foreground">Brands</h1>
           <p className="text-muted-foreground text-nav mt-1 font-normal opacity-80">
             Create brands and manage the hierarchy of service providers under each brand.
           </p>

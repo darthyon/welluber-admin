@@ -38,7 +38,7 @@ export default function DashboardPage() {
       <section>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4">
           <div>
-            <h1 className="text-lg font-semibold tracking-tight text-foreground">System Overview</h1>
+            <h1 className="text-heading font-semibold tracking-tight text-foreground">System Overview</h1>
             <p className="text-muted-foreground text-nav mt-1">
               Real-time flexi-benefit insights and all-time platform health
             </p>
@@ -161,7 +161,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Secondary Option based on primary period */}
-            <select className="px-3 py-1.5 h-[34px] bg-card border border-border hover:bg-muted/50 rounded-md text-label font-medium text-foreground outline-none cursor-pointer transition-colors max-w-[140px]">
+            <select className="px-3 py-1.5 h-[34px] bg-card border border-border hover:bg-muted/50 rounded-md text-label font-medium text-foreground outline-none cursor-pointer transition-colors max-w-[140px] appearance-none">
               {period === "By Month" && (
                 <>
                   <option>January 2026</option>

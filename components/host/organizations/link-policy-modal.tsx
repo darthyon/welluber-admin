@@ -1,143 +1,197 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { 
-  ShieldCheck, 
-  MagnifyingGlass, 
+import { useState } from "react"
+import {
+  ShieldCheck,
+  MagnifyingGlass,
   IdentificationCard,
   X,
   Buildings,
   CheckCircle,
-  Plus
-} from "@phosphor-icons/react";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+  Plus,
+} from "@phosphor-icons/react"
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
 
 interface PolicyOption {
-  id: string;
-  name: string;
-  code: string;
-  description: string;
+  id: string
+  name: string
+  code: string
+  description: string
 }
 
 const GLOBAL_POLICIES: PolicyOption[] = [
-  { id: "pol_1", name: "Executive Health Plus", code: "WP-EXE-2026", description: "Comprehensive wellness policy with full health screening and premium gym access." },
-  { id: "pol_2", name: "Standard Workforce Pool", code: "WP-STD-2026", description: "Standard benefits for full-time employees including basic outpatient and dental." },
-  { id: "pol_3", name: "Remote Flex Benefits", code: "WP-RMT-2026", description: "Tailored for remote workers with lifestyle co-working and equipment allowances." },
-];
+  {
+    id: "pol_1",
+    name: "Executive Health Plus",
+    code: "WP-EXE-2026",
+    description:
+      "Comprehensive wellness policy with full health screening and premium gym access.",
+  },
+  {
+    id: "pol_2",
+    name: "Standard Workforce Pool",
+    code: "WP-STD-2026",
+    description:
+      "Standard benefits for full-time employees including basic outpatient and dental.",
+  },
+  {
+    id: "pol_3",
+    name: "Remote Flex Benefits",
+    code: "WP-RMT-2026",
+    description:
+      "Tailored for remote workers with lifestyle co-working and equipment allowances.",
+  },
+]
 
 interface LinkPolicyModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onLink: (policyId: string) => void;
+  isOpen: boolean
+  onClose: () => void
+  onLink: (policyId: string) => void
 }
 
-export function LinkPolicyModal({ isOpen, onClose, onLink }: LinkPolicyModalProps) {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+export function LinkPolicyModal({
+  isOpen,
+  onClose,
+  onLink,
+}: LinkPolicyModalProps) {
+  const [searchTerm, setSearchTerm] = useState("")
+  const [selectedId, setSelectedId] = useState<string | null>(null)
 
-  if (!isOpen) return null;
+  if (!isOpen) return null
 
-  const filteredPolicies = GLOBAL_POLICIES.filter(p => 
-    p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    p.code.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredPolicies = GLOBAL_POLICIES.filter(
+    (p) =>
+      p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.code.toLowerCase().includes(searchTerm.toLowerCase())
+  )
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-[2px] animate-in fade-in duration-300">
-      <div className="bg-card rounded-[24px] w-full max-w-lg shadow-2xl overflow-hidden border border-border animate-in zoom-in-95 duration-300">
-        <div className="p-8 pb-4 flex items-center justify-between border-b border-border">
+    <div className="fixed inset-0 z-[100] flex animate-in items-center justify-center bg-black/60 p-4 backdrop-blur-[2px] duration-300 fade-in">
+      <div className="w-full max-w-lg animate-in overflow-hidden rounded-[24px] border border-border bg-card shadow-2xl duration-300 zoom-in-95">
+        <div className="flex items-center justify-between border-b border-border p-8 pb-4">
           <div className="flex items-center gap-4">
-             <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center text-muted-foreground/40 border border-border">
-               <ShieldCheck size={24} weight="duotone" />
-             </div>
-             <div>
-               <h3 className="text-[18px] font-semibold text-foreground tracking-tight">Link benefit policy</h3>
-               <p className="text-nav text-muted-foreground font-medium">Assign a policy to this organisation</p>
-             </div>
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-border bg-muted text-muted-foreground/40">
+              <ShieldCheck size={24} weight="duotone" />
+            </div>
+            <div>
+              <h3 className="text-heading font-semibold tracking-tight text-foreground">
+                Link benefit policy
+              </h3>
+              <p className="text-nav font-medium text-muted-foreground">
+                Assign a policy to this organisation
+              </p>
+            </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-muted rounded-full transition-colors group">
-            <X size={20} className="text-muted-foreground/50 group-hover:text-foreground" />
+          <button
+            onClick={onClose}
+            className="group rounded-full p-2 transition-colors hover:bg-muted"
+          >
+            <X
+              size={20}
+              className="text-muted-foreground/50 group-hover:text-foreground"
+            />
           </button>
         </div>
 
-        <div className="p-8 pt-6 space-y-6">
-          <div className="relative group">
-            <MagnifyingGlass size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/40 group-focus-within:text-primary transition-colors" />
-            <input 
+        <div className="space-y-6 p-8 pt-6">
+          <div className="group relative">
+            <MagnifyingGlass
+              size={18}
+              className="absolute top-1/2 left-4 -translate-y-1/2 text-muted-foreground/40 transition-colors group-focus-within:text-primary"
+            />
+            <input
               type="text"
               placeholder="Search by policy name or code..."
-              className="w-full h-12 pl-11 pr-4 bg-muted/10 border border-border rounded-xl text-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+              className="h-12 w-full rounded-xl border border-border bg-muted/10 pr-4 pl-11 text-body text-foreground transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
 
-          <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+          <div className="custom-scrollbar max-h-[300px] space-y-3 overflow-y-auto pr-2">
             {filteredPolicies.map((policy) => {
-              const isSelected = selectedId === policy.id;
+              const isSelected = selectedId === policy.id
               return (
-                <div 
+                <div
                   key={policy.id}
                   onClick={() => setSelectedId(policy.id)}
                   className={cn(
-                    "p-4 rounded-2xl border transition-all cursor-pointer group",
-                    isSelected 
-                      ? "bg-primary/10 border-primary shadow-sm" 
-                      : "bg-card border-border hover:border-primary/30 hover:bg-muted/50"
+                    "group cursor-pointer rounded-2xl border p-4 transition-all",
+                    isSelected
+                      ? "border-primary bg-primary/10 shadow-sm"
+                      : "border-border bg-card hover:border-primary/30 hover:bg-muted/50"
                   )}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex gap-3">
-                      <div className={cn(
-                        "w-10 h-10 rounded-xl flex items-center justify-center border transition-colors",
-                        isSelected ? "bg-primary text-white border-primary" : "bg-muted text-muted-foreground/30 border-border group-hover:bg-muted/80"
-                      )}>
-                        <IdentificationCard size={20} weight={isSelected ? "fill" : "duotone"} />
+                      <div
+                        className={cn(
+                          "flex h-10 w-10 items-center justify-center rounded-xl border transition-colors",
+                          isSelected
+                            ? "border-primary bg-primary text-white"
+                            : "border-border bg-muted text-muted-foreground/30 group-hover:bg-muted/80"
+                        )}
+                      >
+                        <IdentificationCard
+                          size={20}
+                          weight={isSelected ? "fill" : "duotone"}
+                        />
                       </div>
                       <div className="space-y-1">
-                        <p className={cn("text-body font-semibold transition-colors", isSelected ? "text-primary" : "text-foreground")}>
+                        <p
+                          className={cn(
+                            "text-body font-semibold transition-colors",
+                            isSelected ? "text-primary" : "text-foreground"
+                          )}
+                        >
                           {policy.name}
                         </p>
-                        <p className="text-caption font-mono text-muted-foreground/50 tracking-tight leading-none">
+                        <p className="font-mono text-caption leading-none tracking-tight text-muted-foreground/50">
                           {policy.code}
                         </p>
                       </div>
                     </div>
                     {isSelected && (
-                      <CheckCircle size={20} weight="fill" className="text-primary animate-in zoom-in-50" />
+                      <CheckCircle
+                        size={20}
+                        weight="fill"
+                        className="animate-in text-primary zoom-in-50"
+                      />
                     )}
                   </div>
-                  <p className="text-label text-muted-foreground mt-3 leading-relaxed">
+                  <p className="mt-3 text-label leading-relaxed text-muted-foreground">
                     {policy.description}
                   </p>
                 </div>
-              );
+              )
             })}
             {filteredPolicies.length === 0 && (
-              <div className="text-center py-10 text-muted-foreground/40 space-y-2">
+              <div className="space-y-2 py-10 text-center text-muted-foreground/40">
                 <MagnifyingGlass size={32} className="mx-auto opacity-20" />
-                <p className="text-nav font-medium">No matching policies found.</p>
+                <p className="text-nav font-medium">
+                  No matching policies found.
+                </p>
               </div>
             )}
           </div>
         </div>
 
-        <div className="p-8 pt-4 bg-muted/30 border-t border-border flex items-center gap-3">
-          <Button 
-            variant="outline" 
-            className="flex-1 rounded-xl h-12 border-border font-semibold hover:bg-muted"
+        <div className="flex items-center gap-3 border-t border-border bg-muted/30 p-8 pt-4">
+          <Button
+            variant="outline"
+            className="h-12 flex-1 rounded-xl border-border font-semibold hover:bg-muted"
             onClick={onClose}
           >
             Cancel
           </Button>
-          <Button 
-            className="flex-1 rounded-xl h-12 font-semibold shadow-lg shadow-primary/20"
+          <Button
+            className="h-12 flex-1 rounded-xl font-semibold shadow-lg shadow-primary/20"
             disabled={!selectedId}
             onClick={() => {
               if (selectedId) {
-                onLink(selectedId);
-                onClose();
+                onLink(selectedId)
+                onClose()
               }
             }}
           >
@@ -146,5 +200,5 @@ export function LinkPolicyModal({ isOpen, onClose, onLink }: LinkPolicyModalProp
         </div>
       </div>
     </div>
-  );
+  )
 }

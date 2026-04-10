@@ -132,7 +132,7 @@ export default function MembersPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">Members</h1>
+          <h1 className="text-heading font-semibold tracking-tight text-foreground">Members</h1>
           <p className="text-muted-foreground text-nav mt-1 font-normal opacity-80">
             Record of global workforce members, including employees and their dependents who have signed up on the app. Track activation status and member activity.
           </p>

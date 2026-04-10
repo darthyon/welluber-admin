@@ -165,7 +165,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
               <Building size={24} weight="fill" />
             </div>
             <div className="space-y-1">
-              <h2 className="text-xl font-semibold tracking-tight text-foreground">
+              <h2 className="text-heading font-semibold tracking-tight text-foreground">
                 {isEditing ? "Edit Branch" : "Add New Branch"}
               </h2>
               <p className="text-nav text-muted-foreground">

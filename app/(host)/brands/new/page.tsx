@@ -61,7 +61,7 @@ export default function NewBrandPage() {
         </button>
 
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Add New Brand</h1>
+          <h1 className="text-display font-semibold tracking-tight text-foreground">Add New Brand</h1>
           <p className="text-muted-foreground text-nav mt-1 font-normal opacity-80">
             Create a new brand identity to organize service providers and branches.
           </p>

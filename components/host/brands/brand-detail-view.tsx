@@ -134,7 +134,7 @@ export function BrandDetailView({ brand, onBack, onEdit, onRemove }: BrandDetail
             <EntityAvatar name={brand.name} size="xl" />
             <div>
               <div className="flex items-center gap-3">
-                <h2 className="text-2xl font-semibold tracking-tight text-foreground">{brand.name}</h2>
+                <h2 className="text-display font-semibold tracking-tight text-foreground">{brand.name}</h2>
                 <StatusBadge status={currentStatus} variant={currentStatus === "active" ? "emerald" : "zinc"} />
               </div>
               <p className="text-body text-muted-foreground mt-1 font-medium">

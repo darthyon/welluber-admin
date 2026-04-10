@@ -164,7 +164,7 @@ export function SpVoucherForm({
             <CaretLeft size={20} weight="bold" />
           </button>
           <div>
-            <h2 className="text-xl font-semibold tracking-tight text-foreground">
+            <h2 className="text-heading font-semibold tracking-tight text-foreground">
               {isReadOnly ? "Voucher Details" : (isEditing ? "Edit Voucher" : "Add Voucher")}
             </h2>
             <p className="text-nav text-muted-foreground mt-1">

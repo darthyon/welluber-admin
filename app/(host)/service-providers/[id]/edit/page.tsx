@@ -114,7 +114,7 @@ export default function EditServiceProviderPage() {
         >
           <CaretLeft size={16} /> Back to {sp.name}
         </Link>
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">Edit Service Provider</h1>
+        <h1 className="text-heading font-semibold tracking-tight text-foreground">Edit Service Provider</h1>
         <p className="text-muted-foreground text-nav mt-1">Update the profile and service categories for {sp.name}.</p>
       </div>
 

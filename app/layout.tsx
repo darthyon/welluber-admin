@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils"
 
 const geist = localFont({
   src: "../docs/Geist-VariableFont_wght.ttf",
-  variable: "--font-sans",
+  variable: "--font-geist",
   display: "swap",
 })
 

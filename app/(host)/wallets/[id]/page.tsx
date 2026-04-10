@@ -59,7 +59,7 @@ function WalletDetailContent() {
   if (!wallet) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
-        <h2 className="text-xl font-semibold tracking-tight">Wallet Not Found</h2>
+        <h2 className="text-heading font-semibold tracking-tight">Wallet Not Found</h2>
         <Button variant="outline" onClick={() => router.push("/wallets")} className="rounded-xl px-6">
           Back to Wallets
         </Button>
@@ -140,7 +140,7 @@ function WalletDetailContent() {
               </div>
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
-                  <h1 className="text-2xl font-semibold tracking-tight text-foreground">{wallet.orgName}</h1>
+                  <h1 className="text-display font-semibold tracking-tight text-foreground">{wallet.orgName}</h1>
                   <StatusBadge status={wallet.status} variant={wallet.status === "active" ? "emerald" : "zinc"} />
                 </div>
                 <div className="flex items-center gap-2">

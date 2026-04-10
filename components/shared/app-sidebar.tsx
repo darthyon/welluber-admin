@@ -178,7 +178,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     <div className="flex aspect-square size-8.5 items-center justify-center rounded-xl bg-sidebar-foreground/5 ring-1 ring-sidebar-foreground/10 shadow-sm text-primary shrink-0 group-data-[collapsible=icon]:size-7">
                       <activePersona.icon size={19} weight="fill" />
                     </div>
-                    <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden ml-3">
+                    <div className="grid flex-1 text-left text-body leading-tight group-data-[collapsible=icon]:hidden ml-3">
                       <span className="truncate font-semibold tracking-tight text-nav text-sidebar-foreground/90">
                         {activePersona.name}
                       </span>
@@ -194,7 +194,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   sideOffset={8}
                 >
                   <DropdownMenuLabel className="p-0 font-normal">
-                    <div className="flex items-center gap-2 px-3 py-2.5 text-left text-sm">
+                    <div className="flex items-center gap-2 px-3 py-2.5 text-left text-body">
                       <Avatar className="h-9 w-9 rounded-xl shadow-lg ring-2 ring-primary/10 transition-transform hover:scale-105 active:scale-95 duration-200">
                         <AvatarImage src={user?.image || ""} alt={user?.name || ""} />
                         <AvatarFallback className="bg-primary/10 text-primary font-semibold text-nav tracking-tight">YY</AvatarFallback>
@@ -290,7 +290,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                               )}
                             />
                             <span className={cn(
-                              "text-sm font-semibold tracking-tight truncate group-data-[collapsible=icon]:hidden",
+                              "text-body font-semibold tracking-tight truncate group-data-[collapsible=icon]:hidden",
                               isActive ? "text-sidebar-foreground" : "text-sidebar-foreground/70"
                             )}>
                               {item.label}

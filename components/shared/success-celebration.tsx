@@ -73,7 +73,7 @@ export function SuccessCelebration({ title, message, className }: SuccessCelebra
         transition={{ delay: 0.3 }}
         className="relative z-10 space-y-2"
       >
-        <h3 className="text-2xl font-semibold text-foreground tracking-tight">{title}</h3>
+        <h3 className="text-display font-semibold text-foreground tracking-tight">{title}</h3>
         <p className="text-body text-muted-foreground mx-auto max-w-[280px]">
           {message}
         </p>

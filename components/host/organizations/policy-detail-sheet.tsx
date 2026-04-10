@@ -39,7 +39,7 @@ export function PolicyDetailSheet({ isOpen, onClose, policy, groups, benefits, o
                <ShieldCheck size={28} weight="duotone" />
              </div>
              <div>
-               <h3 className="text-xl font-semibold text-foreground tracking-tight">{policy.name}</h3>
+               <h3 className="text-heading font-semibold text-foreground tracking-tight">{policy.name}</h3>
                <div className="flex items-center gap-3 mt-1">
                  <span className="text-caption font-mono text-muted-foreground/50 tracking-tight leading-none">{policy.code}</span>
                  <div className="w-1.5 h-1.5 rounded-full bg-muted" />

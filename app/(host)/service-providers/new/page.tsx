@@ -126,7 +126,7 @@ export default function NewServiceProviderPage() {
           >
             <CaretLeft size={16} /> Back to Service Providers
           </Link>
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">Add Service Provider</h1>
+          <h1 className="text-heading font-semibold tracking-tight text-foreground">Add Service Provider</h1>
           <p className="text-muted-foreground text-nav mt-1 font-normal">Select how you want to categorize this service provider account.</p>
         </div>
 
@@ -180,7 +180,7 @@ export default function NewServiceProviderPage() {
         </button>
         <div className="flex items-center justify-between">
             <div>
-                <h1 className="text-xl font-semibold tracking-tight text-foreground">Account Details</h1>
+                <h1 className="text-heading font-semibold tracking-tight text-foreground">Account Details</h1>
                 <p className="text-muted-foreground text-nav mt-1">
                     {brandType === "new" ? "Registering a new brand and its first service provider." : `Adding a new provider under the ${selectedBrand?.name} brand.`}
                 </p>
