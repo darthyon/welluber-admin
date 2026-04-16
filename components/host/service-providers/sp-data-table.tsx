@@ -27,7 +27,7 @@ export function SpDataTable({ data }: SpDataTableProps) {
       headerClassName: "min-w-[220px]",
       render: (sp) => (
         <div className="flex flex-col">
-          <span className="font-semibold text-body text-foreground tracking-tight">{sp.name}</span>
+          <span className="font-semibold text-nav text-foreground tracking-tight">{sp.name}</span>
           <span className="text-caption text-muted-foreground mt-0.5 font-mono tracking-tight">{sp.registrationNo}</span>
         </div>
       ),

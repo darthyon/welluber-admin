@@ -49,6 +49,7 @@ import {
   UtilisationClaimsTable,
   type EmployeeUtilisationRow,
 } from "@/components/shared/utilisation-claims-table"
+import { OrganizationClaimsTable } from "@/components/shared/organization-claims-table"
 import { EmployeeDetailView } from "@/components/host/organizations/employee-detail-view"
 import { EmployeeForm } from "@/components/host/organizations/employee-form"
 import { BulkUploadWizard } from "@/components/host/organizations/bulk-upload-wizard"
@@ -1063,6 +1064,8 @@ function OrganizationDetailContent() {
                 onCancel={() => {
                   setIsAddingEmployee(null)
                   setEditingEmployeeId(null)
+                  // Also use router.back() as fallback
+                  router.back()
                 }}
                 onSuccess={() => {
                   setIsAddingEmployee(null)
@@ -1072,14 +1075,6 @@ function OrganizationDetailContent() {
                       ? "Employee updated successfully"
                       : "Employee registered successfully"
                   )
-                }}
-              />
-            ) : viewEmployeeId ? (
-              <EmployeeDetailView
-                employeeId={viewEmployeeId}
-                onBack={() => setViewEmployeeId(null)}
-                onEdit={(id) => {
-                  setEditingEmployeeId(id)
                 }}
               />
             ) : (
@@ -1246,7 +1241,7 @@ function OrganizationDetailContent() {
                             <EmployeeCard
                               key={emp.id}
                               employee={emp as any}
-                              onView={(id) => setViewEmployeeId(id)}
+                              onView={(id) => router.push(`/employees/${id}`)}
                               onEdit={(id) => setEditingEmployeeId(id)}
                             />
                           ))}
@@ -1254,7 +1249,7 @@ function OrganizationDetailContent() {
                       ) : (
                         <TooltipProvider>
                           <SharedDataTable
-                            onRowClick={(emp) => setViewEmployeeId(emp.id)}
+                            onRowClick={(emp) => router.push(`/employees/${emp.id}`)}
                             columns={[
                               {
                                 header: "Employee",
@@ -1461,7 +1456,7 @@ function OrganizationDetailContent() {
                                       {
                                         label: "View Employee",
                                         onClick: () =>
-                                          setViewEmployeeId(emp.id),
+                                          router.push(`/employees/${emp.id}`),
                                       },
                                       {
                                         label: "Edit Employee",
@@ -1601,7 +1596,7 @@ function OrganizationDetailContent() {
                               dependent={dep}
                               onViewEmployee={(employeeId) => {
                                 setActiveEmployeeSubTab("directory")
-                                setViewEmployeeId(employeeId)
+                                router.push(`/employees/${employeeId}`)
                               }}
                               onEdit={(id) => console.log("Edit dependent", id)}
                             />
@@ -1626,7 +1621,7 @@ function OrganizationDetailContent() {
                                 <button
                                   onClick={() => {
                                     setActiveEmployeeSubTab("directory")
-                                    setViewEmployeeId(dep.employeeId)
+                                    router.push(`/employees/${dep.employeeId}`)
                                   }}
                                   className="text-nav font-medium text-primary hover:underline"
                                 >
@@ -2015,7 +2010,7 @@ function OrganizationDetailContent() {
               icon={<ChartLineUp size={18} weight="duotone" />}
               description="Benefit usage and claim history across all employees in this organisation"
             >
-              <UtilisationClaimsTable data={ORG_MOCK_UTILISATION} />
+              <OrganizationClaimsTable data={ORG_MOCK_UTILISATION} />
             </DetailSection>
           </div>
         )}

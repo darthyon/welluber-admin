@@ -143,8 +143,8 @@ export function SharedDataTable<T extends { id: string | number }>({
                       (isFirstCol && !ghost) && "rounded-tl-xl",
                       (isLastCol && !ghost) && "rounded-tr-xl",
                       getCellAlignment(col.align),
-                      isFirst && "sticky left-0 z-30 shadow-[4px_0_12px_-4px_rgba(0,0,0,0.05)]",
-                      isLast && "sticky right-0 z-30 shadow-[-4px_0_12px_-4px_rgba(0,0,0,0.05)]",
+                      isFirst && "sticky left-0 z-30 bg-muted shadow-[0_1px_2px_-1px_rgba(0,0,0,0.05)] border-r border-border/40",
+                      isLast && "sticky right-0 z-30 bg-muted shadow-[0_1px_2px_-1px_rgba(0,0,0,0.05)] border-l border-border/40",
                       isSorted && "text-foreground",
                       col.headerClassName
                     )}
@@ -195,8 +195,8 @@ export function SharedDataTable<T extends { id: string | number }>({
                         className={cn(
                           "p-4 text-nav transition-colors",
                           getCellAlignment(col.align),
-                          isFirst && "sticky left-0 bg-card z-10 group-hover:bg-accent/40 shadow-[4px_0_12px_-4px_rgba(0,0,0,0.1)]",
-                          isLast && "sticky right-0 bg-card z-10 group-hover:bg-accent/40 shadow-[-4px_0_12px_-4px_rgba(0,0,0,0.1)]",
+                          isFirst && "sticky left-0 bg-card z-10 group-hover:bg-muted shadow-[0_1px_3px_-1px_rgba(0,0,0,0.08)] border-r border-border/40",
+                          isLast && "sticky right-0 bg-card z-10 group-hover:bg-muted shadow-[0_1px_3px_-1px_rgba(0,0,0,0.08)] border-l border-border/40",
                           col.cellClassName
                         )}
                       >

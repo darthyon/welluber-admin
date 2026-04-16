@@ -42,7 +42,7 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
         <div className="flex items-center gap-3">
           <EntityAvatar name={org.name} size="sm" />
           <div className="flex flex-col">
-            <span className="font-semibold text-body text-foreground tracking-tight leading-tight">{org.name}</span>
+            <span className="font-semibold text-nav text-foreground tracking-tight leading-tight">{org.name}</span>
             <span className="text-caption text-muted-foreground mt-0.5 font-mono tracking-tight">{org.id}</span>
           </div>
         </div>

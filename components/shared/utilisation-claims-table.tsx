@@ -3,29 +3,9 @@
 import { useState } from "react";
 import { CaretDown, MapPin, Calendar, Storefront, Receipt } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
+import type { Claim, EmployeeUtilisationRow } from "@/types/claims";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-export interface Claim {
-  id: string;
-  voucherCode: string;
-  service: string;
-  provider: string;
-  location: string;
-  date: string;
-  amount: number;
-  status: "Approved" | "Pending" | "Rejected";
-}
-
-export interface EmployeeUtilisationRow {
-  id: string;
-  name: string;
-  empCode: string;
-  branch: string;
-  allocated: number;
-  used: number;
-  claims: Claim[];
-}
+export type { Claim, EmployeeUtilisationRow };
 
 // ─── Status badge ─────────────────────────────────────────────────────────────
 
@@ -63,7 +43,7 @@ export function UtilisationClaimsTable({ data }: Props) {
   return (
     <div className="border border-border rounded-xl bg-card shadow-sm overflow-hidden flex flex-col">
       {/* Table header */}
-      <div className="grid grid-cols-[2.5fr_1.5fr_140px_260px_80px] p-4 bg-muted dark:bg-muted/30 border-b border-border/60">
+      <div className="grid grid-cols-[2.5fr_1.5fr_140px_260px_80px] p-4 bg-muted/30 border-b border-border/60">
         <p className="text-nav font-semibold text-muted-foreground tracking-tight whitespace-nowrap">Employee</p>
         <p className="text-nav font-semibold text-muted-foreground tracking-tight whitespace-nowrap">Branch</p>
         <p className="text-nav font-semibold text-muted-foreground tracking-tight whitespace-nowrap text-right pr-4">Allocated</p>
@@ -77,7 +57,7 @@ export function UtilisationClaimsTable({ data }: Props) {
         const isHigh = pct > 80;
 
         return (
-          <div key={emp.id} className={cn("border-b border-zinc-100 last:border-0")}>
+          <div key={emp.id} className={cn("border-b border-border/40 last:border-0")}>
             {/* Employee row */}
             <button
               className="w-full grid grid-cols-[2.5fr_1.5fr_140px_260px_80px] p-4 text-left hover:bg-muted/30 transition-all items-center"
