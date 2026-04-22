@@ -2,15 +2,43 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CaretLeft, Buildings, Article, NavigationArrow, WarningCircle } from "@phosphor-icons/react";
+import { 
+  CaretLeft, 
+  Buildings, 
+  Article, 
+  NavigationArrow, 
+  WarningCircle,
+  IdentificationCard,
+  MapPin,
+  CreditCard,
+  Bank,
+  Globe
+} from "@phosphor-icons/react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { createOrganizationSchema, CreateOrganizationData } from "@/features/organizations/schemas";
 import { createOrganization } from "@/features/organizations/actions";
 import { Button } from "@/components/ui/button";
 import { SuccessModal } from "@/components/shared/success-modal";
+import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav";
+import { LocationPicker } from "@/components/shared/location-picker";
+import { DocumentUploadSection } from "@/components/shared/document-upload-section";
+import { toast } from "sonner";
+
+const ANCHOR_ITEMS = [
+  { id: "org-profile", label: "Organisation Profile" },
+  { id: "registration-compliance", label: "Registration & Compliance" },
+  { id: "registered-address", label: "Registered Address" },
+  { id: "settlement-platform", label: "Settlement & Platform" },
+];
+
+const ORG_TYPES = [
+  { id: "sme", label: "SME", docs: "Form D / SSM Cert" },
+  { id: "enterprise", label: "Enterprise", docs: "SSM Cert & Form Section 14" },
+  { id: "ngo", label: "NGO", docs: "Registration Papers" },
+];
 
 export default function NewOrganizationPage() {
   const router = useRouter();
@@ -18,7 +46,7 @@ export default function NewOrganizationPage() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [orgId, setOrgId] = useState<string | null>(null);
 
-  const { register, handleSubmit, formState: { errors } } = useForm<CreateOrganizationData>({
+  const { register, handleSubmit, control, watch, setValue, formState: { errors } } = useForm<CreateOrganizationData>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(createOrganizationSchema as any),
     defaultValues: {
@@ -26,9 +54,15 @@ export default function NewOrganizationPage() {
       subscription: {
         plan: "standard",
         status: "pending",
-      }
+      },
+      address: {
+        country: "Malaysia"
+      },
+      creditLimit: 0
     }
   });
+
+  const orgType = watch("type");
 
   const onSubmit = async (data: CreateOrganizationData) => {
     setIsSubmitting(true);
@@ -36,199 +70,320 @@ export default function NewOrganizationPage() {
       const res = await createOrganization(data);
       if (res.success) {
         setOrgId(res.data.id);
+        toast.success("Organisation registered successfully");
         setShowSuccess(true);
       }
     } catch (e) {
       console.error(e);
+      toast.error("Failed to register organisation");
       setIsSubmitting(false);
     }
   };
 
+  const inputCls = (hasError?: boolean) =>
+    cn(
+      "w-full px-3 py-2.5 bg-background border rounded-lg text-nav outline-none transition-all duration-200",
+      hasError
+        ? "border-destructive focus:ring-2 focus:ring-destructive/10"
+        : "border-border focus:border-primary/40 focus:ring-2 focus:ring-primary/10 focus:bg-muted/10"
+    );
+
+  const labelCls = "text-nav font-semibold text-foreground/80 mb-1.5 block";
+
+  const getDocRequirements = (type: string) => {
+    switch (type) {
+      case "enterprise": return "SSM Certificate and Form Section 14 required";
+      case "sme": return "Form D and SSM Certificate required";
+      case "ngo": return "Registration documents required";
+      default: return "Supporting documents required";
+    }
+  };
+
   return (
-    <div className="max-w-2xl mx-auto space-y-6 pb-12">
-        {/* Breadcrumb / Back */}
-        <div>
-          <Link 
-            href="/organizations"
-            className="inline-flex items-center gap-1.5 text-nav font-medium text-muted-foreground hover:text-foreground transition-colors mb-4"
-          >
-            <CaretLeft size={16} /> Back to Organisations
-          </Link>
-          <h1 className="text-heading font-semibold tracking-tight text-foreground">Add New Organisation</h1>
-          <p className="text-muted-foreground text-nav mt-1">Register a new corporate client on the platform.</p>
-        </div>
+    <div className="max-w-[1100px] mx-auto pb-24 px-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="flex flex-col lg:flex-row gap-12 lg:gap-16">
+        
+        {/* Left Column: Navigation */}
+        <aside className="hidden xl:block w-52 shrink-0">
+          <div className="sticky top-32">
+            <FloatingAnchorNav items={ANCHOR_ITEMS} />
+          </div>
+        </aside>
 
-        {/* Form Card */}
-        <div className="bg-card border border-border rounded-lg shadow-sm overflow-hidden">
-          <form id="newOrgForm" onSubmit={handleSubmit(onSubmit)}>
+        {/* Right Column: Form Content */}
+        <div className="flex-1 max-w-2xl">
+          <div className="flex flex-col gap-6">
             
-            {/* Section: Profile */}
-            <div className="p-6 border-b border-border space-y-6">
-              <div className="flex items-center gap-2 pb-2">
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                  <Buildings size={16} weight="fill" />
-                </div>
-                <h3 className="text-subtitle font-semibold text-foreground">Company Profile</h3>
+            {/* Header */}
+            <div className="flex flex-col gap-4">
+              <Link 
+                href="/organizations"
+                className="inline-flex items-center gap-1.5 text-nav font-medium text-muted-foreground hover:text-foreground transition-colors w-fit"
+              >
+                <CaretLeft size={16} /> Back to Organisations
+              </Link>
+              <div>
+                <h1 className="text-heading font-semibold tracking-tight text-foreground">Add New Organisation</h1>
+                <p className="text-muted-foreground text-nav mt-1">Register a new corporate client on the platform.</p>
               </div>
+            </div>
+
+            <form id="newOrgForm" onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <div className="space-y-1.5 sm:col-span-2">
-                  <label className="text-nav font-medium text-foreground">Company Name</label>
-                  <input 
-                    {...register("name")}
-                    className={cn(
-                      "w-full px-3 py-2 bg-background border rounded-md text-body outline-none transition-colors",
-                      errors.name ? "border-destructive focus:border-destructive" : "border-border focus:border-foreground/30 focus:bg-muted/30"
-                    )}
-                    placeholder="e.g. Acme Corporation Sdn Bhd"
-                  />
-                  {errors.name && (
-                    <p className="text-caption text-destructive flex items-center gap-1 mt-1">
-                      <WarningCircle size={12} /> {errors.name.message}
-                    </p>
-                  )}
-                </div>
+              {/* Section: Organisation Profile */}
+              <div id="org-profile" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-24">
+                <div className="p-6 space-y-6">
+                  <div className="flex items-center gap-2 pb-2">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                      <Buildings size={16} weight="fill" />
+                    </div>
+                    <h3 className="text-subtitle font-semibold text-foreground">Organisation Profile</h3>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div className="space-y-1.5 sm:col-span-2">
+                      <label className={labelCls}>Company Name</label>
+                      <input 
+                        {...register("name")}
+                        className={inputCls(!!errors.name)}
+                        placeholder="e.g. Acme Corporation Sdn Bhd"
+                      />
+                      {errors.name && (
+                        <p className="text-caption text-destructive flex items-center gap-1 mt-1">
+                          <WarningCircle size={12} /> {errors.name.message}
+                        </p>
+                      )}
+                    </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-nav font-medium text-foreground">Registration Number</label>
-                  <input 
-                    {...register("registrationNumber")}
-                    className={cn(
-                      "w-full px-3 py-2 bg-background border rounded-md text-body outline-none transition-colors",
-                      errors.registrationNumber ? "border-destructive focus:border-destructive" : "border-border focus:border-foreground/30 focus:bg-muted/30"
-                    )}
-                    placeholder="e.g. 1234567-T"
-                  />
-                  {errors.registrationNumber && (
-                    <p className="text-caption text-destructive flex items-center gap-1 mt-1">
-                      <WarningCircle size={12} /> {errors.registrationNumber.message}
-                    </p>
-                  )}
-                </div>
+                    <div className="space-y-1.5">
+                      <label className={labelCls}>Industry</label>
+                      <select 
+                        {...register("industry")}
+                        className={inputCls(!!errors.industry)}
+                      >
+                        <option value="">Select industry</option>
+                        <option value="Technology">Technology</option>
+                        <option value="Healthcare">Healthcare</option>
+                        <option value="Finance">Finance</option>
+                        <option value="Logistics">Logistics</option>
+                        <option value="Retail">Retail</option>
+                        <option value="Manufacturing">Manufacturing</option>
+                      </select>
+                    </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-nav font-medium text-foreground">Industry</label>
-                  <select 
-                    {...register("industry")}
-                    className={cn(
-                      "w-full px-3 py-2 bg-background border rounded-md text-body outline-none transition-colors",
-                      errors.industry ? "border-destructive focus:border-destructive" : "border-border focus:border-foreground/30 focus:bg-muted/30"
-                    )}
-                  >
-                    <option value="">Select industry</option>
-                    <option value="Technology">Technology</option>
-                    <option value="Healthcare">Healthcare</option>
-                    <option value="Finance">Finance</option>
-                    <option value="Logistics">Logistics</option>
-                    <option value="Retail">Retail</option>
-                    <option value="Manufacturing">Manufacturing</option>
-                  </select>
-                  {errors.industry && (
-                    <p className="text-caption text-destructive flex items-center gap-1 mt-1">
-                      <WarningCircle size={12} /> {errors.industry.message}
-                    </p>
-                  )}
+                    <div className="space-y-1.5">
+                      <label className={labelCls}>Financial Year Start</label>
+                      <input 
+                        type="date"
+                        {...register("financialYearStart", { valueAsDate: true })}
+                        className={inputCls(!!errors.financialYearStart)}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Section: Configuration */}
-            <div className="p-6 space-y-6">
-              <div className="flex items-center gap-2 pb-2">
-                <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500">
-                  <Article size={16} weight="fill" />
+              {/* Section: Registration & Compliance */}
+              <div id="registration-compliance" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
+                <div className="p-6 space-y-6">
+                  <div className="flex items-center gap-2 pb-2">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                      <IdentificationCard size={16} weight="fill" />
+                    </div>
+                    <h3 className="text-subtitle font-semibold text-foreground">Registration & Compliance</h3>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div className="space-y-1.5">
+                      <label className={labelCls}>Registration Number</label>
+                      <input 
+                        {...register("registrationNumber")}
+                        className={inputCls(!!errors.registrationNumber)}
+                        placeholder="e.g. 1234567-T"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className={labelCls}>TIN Number</label>
+                      <input 
+                        {...register("tinNumber")}
+                        className={inputCls(!!errors.tinNumber)}
+                        placeholder="e.g. TR-882910-01"
+                      />
+                    </div>
+
+                    <div className="space-y-3 sm:col-span-2 pt-4 border-t border-border/40">
+                      <label className={labelCls}>Organisation Type</label>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        {ORG_TYPES.map(type => (
+                          <button
+                            key={type.id}
+                            type="button"
+                            onClick={() => setValue("type", type.id as any)}
+                            className={cn(
+                              "flex flex-col p-3 border rounded-lg text-left transition-all duration-200",
+                              orgType === type.id 
+                                ? "border-primary bg-primary/[0.03] ring-1 ring-primary/20" 
+                                : "border-border hover:border-border-hover bg-muted/5"
+                            )}
+                          >
+                            <span className={cn("text-nav font-semibold", orgType === type.id ? "text-primary" : "text-foreground")}>{type.label}</span>
+                            <span className="text-micro text-muted-foreground mt-0.5 leading-tight">{type.docs}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="sm:col-span-2 pt-4 border-t border-border/40">
+                      <Controller
+                        control={control}
+                        name="documents"
+                        render={({ field }) => (
+                          <DocumentUploadSection 
+                            documents={field.value || []}
+                            onChange={field.onChange}
+                            error={errors.documents?.message}
+                            label="Compliance Documents"
+                            description={getDocRequirements(orgType)}
+                          />
+                        )}
+                      />
+                    </div>
+                  </div>
                 </div>
-                <h3 className="text-subtitle font-semibold text-foreground">Platform Configuration</h3>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <div className="space-y-1.5">
-                  <label className="text-nav font-medium text-foreground">Organisation Type</label>
-                  <select 
-                    {...register("type")}
-                    className="w-full px-3 py-2 bg-background border border-border rounded-md text-body outline-none focus:border-foreground/30 focus:bg-muted/30 transition-colors"
-                  >
-                    <option value="sme">SME</option>
-                    <option value="enterprise">Enterprise</option>
-                    <option value="ngo">NGO</option>
-                  </select>
-                </div>
-                
-                <div className="space-y-1.5">
-                  <label className="text-nav font-medium text-foreground">Subscription Plan</label>
-                  <select 
-                    {...register("subscription.plan")}
-                    className="w-full px-3 py-2 bg-background border border-border rounded-md text-body outline-none focus:border-foreground/30 focus:bg-muted/30 transition-colors"
-                  >
-                    <option value="standard">Standard</option>
-                    <option value="premium">Premium</option>
-                    <option value="enterprise">Enterprise</option>
-                  </select>
-                </div>
+              {/* Section: Registered Address */}
+              <div id="registered-address" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
+                <div className="p-6 space-y-6">
+                  <div className="flex items-center gap-2 pb-2">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                      <MapPin size={16} weight="fill" />
+                    </div>
+                    <div className="space-y-0.5">
+                      <h3 className="text-subtitle font-semibold text-foreground">Registered Business Address</h3>
+                      <p className="text-label text-muted-foreground">Official business address as per SSM registration.</p>
+                    </div>
+                  </div>
 
-                <div className="space-y-1.5 sm:col-span-2">
-                  <label className="text-nav font-medium text-foreground text-muted-foreground/80">Sub-Industry (Optional)</label>
-                  <input 
-                    {...register("subIndustry")}
-                    className={cn(
-                      "w-full px-3 py-2 bg-background border rounded-md text-body outline-none transition-colors",
-                      "border-border focus:border-foreground/30 focus:bg-muted/30"
-                    )}
-                    placeholder="e.g. Healthcare Analytics"
-                  />
+                  <div className="p-1">
+                    <Controller
+                      control={control}
+                      name="address"
+                      render={({ field }) => (
+                        <LocationPicker 
+                          value={field.value as any}
+                          onChange={field.onChange}
+                          errors={errors.address}
+                        />
+                      )}
+                    />
+                  </div>
                 </div>
+              </div>
 
-                <div className="space-y-1.5 sm:col-span-2">
-                  <label className="text-nav font-medium text-foreground flex items-center justify-between">
-                    Financial Year Start
-                    <span className="text-caption font-normal text-muted-foreground bg-muted px-1.5 py-0.5 rounded">Used for benefit cycle</span>
-                  </label>
-                  <input 
-                    type="date"
-                    {...register("financialYearStart", { valueAsDate: true })}
-                    className={cn(
-                      "w-full px-3 py-2 bg-background border rounded-md text-body outline-none transition-colors",
-                      errors.financialYearStart ? "border-destructive focus:border-destructive" : "border-border focus:border-foreground/30 focus:bg-muted/30"
-                    )}
-                  />
-                  {errors.financialYearStart && (
-                    <p className="text-caption text-destructive flex items-center gap-1 mt-1">
-                      <WarningCircle size={12} /> {errors.financialYearStart.message}
-                    </p>
+              {/* Section: Settlement & Platform */}
+              <div id="settlement-platform" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
+                <div className="p-6 space-y-8">
+                  <div className="flex items-center gap-2 pb-2 border-b border-border/40">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                      <Bank size={16} weight="fill" />
+                    </div>
+                    <h3 className="text-subtitle font-semibold text-foreground">Settlement & Platform</h3>
+                  </div>
+
+                  {/* Bank Information */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div className="space-y-1.5 sm:col-span-2">
+                      <label className={labelCls}>Bank Name</label>
+                      <input 
+                        {...register("bankAccountDetails.bankName")}
+                        className={inputCls(!!errors.bankAccountDetails?.bankName)}
+                        placeholder="e.g. Maybank Berhad"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className={labelCls}>Account Number</label>
+                      <input 
+                        {...register("bankAccountDetails.accountNumber")}
+                        className={cn(inputCls(!!errors.bankAccountDetails?.accountNumber), "font-mono")}
+                        placeholder="e.g. 5140 1234 5678"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className={labelCls}>Account Name</label>
+                      <input 
+                        {...register("bankAccountDetails.accountName")}
+                        className={inputCls(!!errors.bankAccountDetails?.accountName)}
+                        placeholder="e.g. Acme Corporation Sdn Bhd"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Platform Settings */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-6 border-t border-border/40">
+                    <div className="space-y-1.5">
+                      <label className={labelCls}>Subscription Plan</label>
+                      <select 
+                        {...register("subscription.plan")}
+                        className={inputCls()}
+                      >
+                        <option value="standard">Standard</option>
+                        <option value="premium">Premium</option>
+                        <option value="enterprise">Enterprise</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className={labelCls}>Credit Limit</label>
+                      <div className="relative">
+                        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/50 font-semibold text-nav">RM</div>
+                        <input 
+                          type="number"
+                          {...register("creditLimit", { valueAsNumber: true })}
+                          className={cn(inputCls(), "pl-11 font-mono text-right")}
+                          placeholder="0.00"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Floating Action Bar */}
+              <div className="fixed bottom-8 left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[calc(50%+104px)] z-50 flex items-center gap-4 p-2 px-6 bg-background/80 backdrop-blur-2xl border border-border shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-full animate-in slide-in-from-bottom-10 duration-700 ease-out">
+                <Button asChild variant="ghost" size="lg" className="text-nav font-semibold px-6 transition-colors">
+                  <Link href="/organizations">Cancel</Link>
+                </Button>
+                <div className="w-px h-6 bg-border/40" />
+                <Button 
+                  type="submit"
+                  disabled={isSubmitting}
+                  size="lg"
+                  className="text-nav font-semibold px-8 flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Creating...
+                    </>
+                  ) : (
+                    <>
+                      Create Organisation
+                      <NavigationArrow size={14} weight="bold" className="rotate-90" />
+                    </>
                   )}
-                </div>
+                </Button>
               </div>
-            </div>
 
-            {/* Form Footer */}
-            <div className="p-6 border-t border-border bg-muted/10 flex items-center justify-end gap-3">
-              <Button 
-                asChild
-                variant="outline"
-                className="text-nav font-medium"
-              >
-                <Link href="/organizations">Cancel</Link>
-              </Button>
-              <Button 
-                type="submit"
-                disabled={isSubmitting}
-                className="text-nav font-medium flex items-center gap-2"
-              >
-                {isSubmitting ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Creating...
-                  </>
-                ) : (
-                  <>
-                    Create Organisation
-                    <NavigationArrow size={14} weight="bold" className="rotate-90" />
-                  </>
-                )}
-              </Button>
-            </div>
-          </form>
+              {/* Spacer */}
+              <div className="h-[60vh]" />
+            </form>
+          </div>
         </div>
+      </div>
 
       <SuccessModal
         isOpen={showSuccess}

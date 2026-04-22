@@ -158,6 +158,27 @@ WellUber Admin is a **B2B SaaS admin console** for managing corporate wellness b
   - Interaction: Checkbox-based selection with instant count feedback in the trigger.
   - Inline mode: Supports nested popovers without occlusion.
 
+### Feedback & Modals
+- **Quiet Success Pattern:**
+  - Used for non-disruptive confirmation of administrative actions (e.g., inviting users, creating entities).
+  - Surface: `bg-card border border-border shadow-[0_20px_50px_rgba(0,0,0,0.15)] rounded-2xl`.
+  - Icon: Animated checkmark with a `primary/10` pulse ring.
+  - Typography: `text-title font-semibold` for heading, `text-nav text-muted-foreground` for body.
+  - Actions: Primary CTA with `ArrowRight` icon, secondary Ghost CTA for navigation.
+
+### Complex Forms
+- **Floating Anchor Navigation:**
+  - Sidebar-based jump-links for long, multi-section forms.
+  - Active state: `text-primary border-l-2 border-primary pl-3`.
+  - Inactive state: `text-muted-foreground border-l-2 border-transparent pl-3 hover:text-foreground`.
+- **Floating Action Bar:**
+  - Fixed-bottom controls for primary form actions.
+  - Surface: `bg-white/80 backdrop-blur-2xl border border-white/50 shadow-lg rounded-full`.
+  - Layout: Cancel (Ghost) | Divider | Submit (Primary Pill).
+- **International Phone Input:**
+  - Split control: Country Popover (flag + dial code) + Numeric Input.
+  - Standardized validation: `border-destructive` for errors, `WarningCircle` icon feedback.
+
 ### Semantic Color Convention
 
 Status and state colors use **Tailwind utility classes** (not CSS custom properties) because they represent universally understood semantic meanings that remain consistent across themes.
@@ -188,6 +209,11 @@ Status and state colors use **Tailwind utility classes** (not CSS custom propert
 - Content: fills remaining space, no max-width constraint
 - Stats: `grid-cols-4` on desktop, `grid-cols-2` on tablet, `grid-cols-1` on mobile
 - Detail pages: `grid-cols-3` (2/3 main + 1/3 sidebar)
+- **Multi-Section Forms:**
+  - Sidebar: 208px (`w-52`) for Anchor Navigation.
+  - Main Content: 672px (`max-w-2xl`) for form sections.
+  - Gap: `gap-8` between sidebar and content.
+  - Section Spacing: `space-y-6` between section cards.
 
 ### Whitespace Philosophy
 - **Tight within, generous between.** Components are compact internally but breathe externally.
@@ -300,6 +326,7 @@ Use this 5-point check before submitting any UI change:
 | 2026-04-03 | Theme default to light, add toggle, Linear/Vercel polish | Shell, sidebar, top bar, dashboard |
 | 2026-04-03 | Organization Directory UI Refinement — Triage toolbar, Ring charts, Sectioned taxonomy | Organization List |
 | 2026-04-10 | Typography audit — Added "Subtitle" (15px) and "Micro" (9px) roles, standardized Title Case rule, added Technical ID exception for uppercase, documented semantic color convention, reinforced `font-bold` prohibition | All |
+| 2026-04-22 | Service Provider Unification — Documented "Quiet Success" pattern, International Phone Input, Floating Anchor Nav, and Floating Action Bar | Service Provider, Forms |
 
 ---
 

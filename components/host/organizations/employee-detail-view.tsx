@@ -57,6 +57,10 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
     designation: "Senior Software Engineer",
     mobile: "+60 12-345 6789",
     nationality: "Malaysian",
+    residencyStatus: "Local",
+    isTaxable: true,
+    tier: "Tier 3 - Executive",
+    employmentStatus: "Active",
     benefitPolicies: [
       {
         name: "Wellness Allocation",
@@ -128,8 +132,25 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
                 <StatusBadge status={employeeData.status} variant="emerald" />
               </div>
               <p className="text-body text-muted-foreground mt-1 font-medium">
-                {employeeData.designation} • {employeeData.department}
+                {employeeData.designation} • {employeeData.department} • {employeeData.tier}
               </p>
+              <div className="flex items-center gap-2 mt-2">
+                <span className={cn(
+                  "text-micro font-semibold px-2 py-0.5 rounded-4xl border",
+                  employeeData.employmentStatus === "Active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-amber-500/10 text-amber-600 border-amber-500/20"
+                )}>
+                  {employeeData.employmentStatus}
+                </span>
+                <span className="text-micro font-semibold px-2 py-0.5 rounded-4xl bg-muted text-muted-foreground border border-border">
+                  {employeeData.residencyStatus}
+                </span>
+                <span className={cn(
+                  "text-micro font-semibold px-2 py-0.5 rounded-4xl border",
+                  employeeData.isTaxable ? "bg-primary/10 text-primary border-primary/20" : "bg-rose-500/10 text-rose-600 border-rose-500/20"
+                )}>
+                  {employeeData.isTaxable ? "Taxable" : "Non-taxable"}
+                </span>
+              </div>
             </div>
           </div>
           
@@ -224,9 +245,19 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
                 icon={<ClockCounterClockwise size={16} />}
               />
               <DetailField 
-                label="Nationality" 
-                value={employeeData.nationality} 
+                label="Nationality / Residency" 
+                value={`${employeeData.nationality} (${employeeData.residencyStatus})`} 
                 icon={<Globe size={16} />}
+              />
+              <DetailField 
+                label="Taxable Status" 
+                value={employeeData.isTaxable ? "Taxable (Income Tax Deduction)" : "Non-taxable"} 
+                icon={<CreditCard size={16} />}
+              />
+              <DetailField 
+                label="Position Tier" 
+                value={employeeData.tier} 
+                icon={<IdentificationBadge size={16} />}
               />
             </div>
           </DetailSection>

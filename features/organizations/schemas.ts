@@ -6,7 +6,7 @@ export const createOrganizationSchema = z.object({
   registrationNumber: z.string().min(4, "Registration number is required"),
   industry: z.string().min(1, "Please select an industry"),
   subIndustry: z.string().optional(),
-  type: z.enum(["sme", "enterprise", "ngo", "mnc", "others"] as const, {
+  type: z.enum(["sme", "enterprise", "ngo"] as const, {
     message: "Please select an organization type",
   }),
   financialYearStart: z.date({
@@ -23,6 +23,14 @@ export const createOrganizationSchema = z.object({
     status: z.enum(["active", "pending", "suspended", "on_hold"]).default("pending"),
   }),
   tinNumber: z.string().min(4, "TIN Number is required"),
+  creditLimit: z.number().min(0).default(0),
+  address: z.object({
+    line: z.string().min(5, "Address line is required"),
+    city: z.string().min(2, "City is required"),
+    state: z.string().min(2, "State is required"),
+    country: z.string().min(2, "Country is required"),
+    postalCode: z.string().min(5, "Postal code is required"),
+  }),
   bankAccountDetails: z.object({
     bankName: z.string().min(2, "Bank name is required"),
     accountNumber: z.string().min(8, "Account number is required"),

@@ -11,7 +11,7 @@ interface RegistrationComplianceSectionProps {
   control: any;
   errors: any;
   setValue: any;
-  businessType: string;
+  businessType?: string;
   labelCls: string;
   inputCls: (hasError?: boolean) => string;
 }

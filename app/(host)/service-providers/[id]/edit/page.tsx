@@ -486,15 +486,16 @@ export default function EditServiceProviderPage() {
 
 
           {/* Floating Action Bar */}
-          <div className="fixed bottom-8 left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[calc(50%+104px)] z-50 flex items-center gap-4 p-2.5 px-6 bg-background/80 backdrop-blur-2xl border border-border/50 shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-full animate-in slide-in-from-bottom-10 duration-700 ease-out">
-            <Button asChild variant="ghost" className="text-nav font-semibold rounded-full h-10 px-6 hover:bg-black/5 transition-colors">
+          <div className="fixed bottom-8 left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[calc(50%+104px)] z-50 flex items-center gap-4 p-2 px-6 bg-background/80 backdrop-blur-2xl border border-border shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-full animate-in slide-in-from-bottom-10 duration-700 ease-out">
+            <Button asChild variant="ghost" size="lg" className="text-nav font-semibold px-6 transition-colors">
               <Link href={`/service-providers/${spId}`}>Cancel</Link>
             </Button>
             <div className="w-px h-6 bg-border/40" />
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="text-nav font-semibold rounded-full h-10 px-8 flex items-center gap-2 bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              size="lg"
+              className="text-nav font-semibold px-8 flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
             >
               {isSubmitting ? (
                 <>

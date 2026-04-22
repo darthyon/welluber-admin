@@ -29,6 +29,7 @@ import {
   Suitcase,
   Scroll,
   SealCheck,
+  MapPin,
 } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { Breadcrumbs } from "@/components/shared/breadcrumbs"
@@ -583,10 +584,31 @@ function OrganizationDetailContent() {
                   value="Software Development"
                 />
                 <DetailField
-                  label="Financial Year Start Date"
+                  label="Financial Year Start"
                   value="01 January"
                 />
                 <DetailField label="Organisation Type" value="SME" />
+                <DetailField 
+                  label="Credit Limit" 
+                  value={<span className="font-mono font-semibold text-primary">RM 50,000.00</span>} 
+                />
+              </div>
+            </DetailSection>
+
+            {/* Business Address */}
+            <DetailSection
+              title="Business Address"
+              icon={<MapPin size={18} weight="duotone" />}
+              description="Official registered office address"
+            >
+              <div className="grid grid-cols-1 gap-x-6 gap-y-8 md:grid-cols-2">
+                <DetailField label="Address Line" value="Level 15, Menara Southpoint, Mid Valley City" />
+                <div className="grid grid-cols-2 gap-4">
+                  <DetailField label="City" value="Kuala Lumpur" />
+                  <DetailField label="State" value="W.P. Kuala Lumpur" />
+                  <DetailField label="Postal Code" value="59200" />
+                  <DetailField label="Country" value="Malaysia" />
+                </div>
               </div>
             </DetailSection>
 
@@ -745,22 +767,22 @@ function OrganizationDetailContent() {
             >
               <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 {[
-                  { name: "SSM_Registration_2024.pdf", size: "1.2 MB" },
-                  { name: "Form_49_Directors.pdf", size: "850 KB" },
+                  { name: "SSM_Registration_2024.pdf", size: "1.2 MB", type: "SSM Certificate" },
+                  { name: "Form_49_Directors.pdf", size: "850 KB", type: "Form Section 14" },
                 ].map((doc, i) => (
                   <div
                     key={i}
-                    className="flex items-center gap-3 rounded-lg border border-border bg-muted/20 p-3"
+                    className="flex items-center gap-3 rounded-xl border border-border bg-muted/20 p-3 group hover:border-primary/30 transition-all"
                   >
-                    <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-100 bg-white text-muted-foreground/60">
-                      <Article size={18} weight="duotone" />
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-100 bg-white text-muted-foreground/60 group-hover:text-primary transition-colors">
+                      <Article size={20} weight="duotone" />
                     </div>
                     <div className="flex-1 overflow-hidden">
-                      <p className="truncate text-label font-semibold text-foreground">
+                      <p className="truncate text-nav font-semibold text-foreground">
                         {doc.name}
                       </p>
                       <p className="text-micro font-medium text-muted-foreground">
-                        {doc.size}
+                        {doc.type} • {doc.size}
                       </p>
                     </div>
                   </div>

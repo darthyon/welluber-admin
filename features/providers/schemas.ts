@@ -15,7 +15,7 @@ export const createSpSchema = z.object({
   classificationCode: z.string().optional(),
   classificationDescriptor: z.string().optional(),
   documents: z.array(z.string()).default([]),
-  businessType: z.enum(["sdn_bhd", "sole_prop", "partnership_llp"], { required_error: "Business type is required" }).optional(),
+  businessType: z.enum(["sdn_bhd", "sole_prop", "partnership_llp"]).optional(),
   bankInfo: z.object({
     bankName: z.string().min(1, "Bank name is required"),
     accountNumber: z.string().min(1, "Account number is required"),

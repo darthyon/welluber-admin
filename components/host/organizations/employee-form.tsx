@@ -14,7 +14,11 @@ import {
   Trash,
   CheckCircle,
   CaretLeft,
-  Users
+  Users,
+  Globe,
+  CreditCard,
+  Hourglass,
+  Clock
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { ChoiceCard } from "@/components/shared/choice-card";
@@ -89,6 +93,10 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
     department: "",
     role: "",
     gender: "male" as "male" | "female" | "other",
+    tier: "",
+    residencyStatus: "local" as "local" | "foreigner",
+    isTaxable: true,
+    employmentStatus: "active" as "active" | "probation",
   });
 
   const [dependents, setDependents] = useState<Dependent[]>([]);
@@ -178,6 +186,10 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
               department: "",
               role: "",
               gender: "male" as "male" | "female" | "other",
+              tier: "",
+              residencyStatus: "local" as "local" | "foreigner",
+              isTaxable: true,
+              employmentStatus: "active" as "active" | "probation",
             });
             setDependents([]);
             setAssignedPolicies([]);
@@ -218,18 +230,18 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
           <button
             onClick={onCancel}
             disabled={isSubmitting || isSuccess}
-            className="text-muted-foreground font-semibold text-body px-5 py-2.5 rounded-full hover:bg-muted transition-all disabled:opacity-40"
+            className="text-muted-foreground font-semibold text-sm px-5 py-2.5 rounded-4xl hover:bg-muted transition-all disabled:opacity-40"
           >
             Cancel
           </button>
           <button
             disabled={isSubmitting || isSuccess || !formData.name || !formData.joinDate || !formData.dateOfBirth || !formData.idNumber}
             onClick={handleSubmit}
-            className="bg-primary text-white hover:bg-primary/90 font-semibold text-body px-6 py-2 rounded-full shadow-sm shadow-primary/20 transition-all disabled:opacity-40 disabled:cursor-not-allowed min-w-[160px] flex items-center justify-center gap-2"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-sm px-6 py-2 rounded-4xl shadow-sm shadow-primary/20 transition-all disabled:opacity-40 disabled:cursor-not-allowed min-w-[160px] flex items-center justify-center gap-2"
           >
             {isSubmitting ? (
               <>
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
                 <span>{isEditing ? "Saving..." : "Registering..."}</span>
               </>
             ) : (
@@ -301,6 +313,47 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
               <option value="female">Female</option>
               <option value="other">Other</option>
             </select>
+          </div>
+
+          <div className="space-y-1.5 col-span-2">
+            <label className="text-caption font-semibold text-muted-foreground/70">Residency & Taxable Status</label>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex items-center gap-3 p-3 rounded-lg border border-border bg-card">
+                <Globe size={18} className="text-muted-foreground/40" />
+                <div className="flex-1">
+                  <p className="text-nav font-semibold text-foreground">Residency</p>
+                  <p className="text-micro text-muted-foreground font-medium">Local vs Foreigner</p>
+                </div>
+                <select 
+                  className="bg-muted px-2 py-1 rounded text-xs font-semibold outline-none"
+                  value={formData.residencyStatus}
+                  onChange={(e) => setFormData({ ...formData, residencyStatus: e.target.value as any })}
+                >
+                  <option value="local">Local</option>
+                  <option value="foreigner">Foreigner</option>
+                </select>
+              </div>
+
+              <div className="flex items-center gap-3 p-3 rounded-lg border border-border bg-card">
+                <CreditCard size={18} className="text-muted-foreground/40" />
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-foreground">Taxable</p>
+                  <p className="text-xs text-muted-foreground font-medium">Income tax deduction</p>
+                </div>
+                <div 
+                  onClick={() => setFormData({ ...formData, isTaxable: !formData.isTaxable })}
+                  className={cn(
+                    "relative h-5 w-10 cursor-pointer rounded-4xl transition-all duration-300",
+                    formData.isTaxable ? "bg-primary" : "bg-muted"
+                  )}
+                >
+                  <div className={cn(
+                    "absolute top-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-all duration-300",
+                    formData.isTaxable ? "left-[22px]" : "left-0.5"
+                  )} />
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="space-y-1.5">
@@ -391,6 +444,33 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
                 onChange={(e) => setFormData({ ...formData, role: e.target.value })}
               />
             </div>
+
+            <div className="space-y-1.5">
+              <label className="text-caption font-semibold text-muted-foreground/70">Position Level (Tier)</label>
+              <select 
+                className="w-full px-3 py-2 bg-card border border-border/80 rounded-lg text-body font-semibold text-foreground outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all"
+                value={formData.tier}
+                onChange={(e) => setFormData({ ...formData, tier: e.target.value })}
+              >
+                <option value="">Select Tier</option>
+                <option value="T1">Tier 1 - Director / C-Level</option>
+                <option value="T2">Tier 2 - Management</option>
+                <option value="T3">Tier 3 - Executive</option>
+                <option value="T4">Tier 4 - Support / Staff</option>
+              </select>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-caption font-semibold text-muted-foreground/70">Employment Status</label>
+              <select 
+                className="w-full px-3 py-2 bg-card border border-border/80 rounded-lg text-body font-semibold text-foreground outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all"
+                value={formData.employmentStatus}
+                onChange={(e) => setFormData({ ...formData, employmentStatus: e.target.value as any })}
+              >
+                <option value="active">Active</option>
+                <option value="probation">Probation</option>
+              </select>
+            </div>
           </div>
 
           <div className="space-y-1.5">
@@ -418,30 +498,33 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
              </div>
 
              {/* 3-choice segmented control */}
-             <div className="grid grid-cols-3 gap-2">
-               {([
-                 { id: "3m", label: "3 Months", desc: "Standard probation" },
-                 { id: "6m", label: "6 Months", desc: "Extended probation" },
-                 { id: "date", label: "Specific Date", desc: "Pick exact end date" },
-               ] as const).map((opt) => (
-                 <button
-                   key={opt.id}
-                   onClick={() => setFormData({ ...formData, probationMode: opt.id })}
-                   className={cn(
-                     "flex flex-col items-start px-3 py-2.5 rounded-lg border text-left transition-all",
-                     formData.probationMode === opt.id
-                       ? "border-primary/40 bg-primary/5 ring-1 ring-primary/20"
-                       : "border-border bg-card hover:border-primary/20 transition-colors"
-                   )}
-                 >
-                   <span className={cn(
-                     "text-nav font-semibold",
-                     formData.probationMode === opt.id ? "text-primary" : "text-foreground"
-                   )}>{opt.label}</span>
-                   <span className="text-micro text-muted-foreground/40 mt-0.5 font-medium">{opt.desc}</span>
-                 </button>
-               ))}
-             </div>
+             <div className="grid grid-cols-3 gap-2 mt-2">
+                {([
+                  { id: "3m", label: "3 Months", desc: "Standard probation", icon: <Hourglass size={14}/> },
+                  { id: "6m", label: "6 Months", desc: "Extended probation", icon: <Clock size={14}/> },
+                  { id: "date", label: "Specific Date", desc: "Pick exact end date", icon: <CalendarBlank size={14}/> },
+                ] as const).map((opt) => (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() => setFormData({ ...formData, probationMode: opt.id })}
+                    className={cn(
+                      "flex flex-col items-start px-3 py-2.5 rounded-lg border text-left transition-all",
+                      formData.probationMode === opt.id
+                        ? "border-primary/40 bg-primary/5 ring-1 ring-primary/20"
+                        : "border-border bg-card hover:border-primary/20 transition-colors"
+                    )}
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <span className={cn(
+                        "text-sm font-semibold",
+                        formData.probationMode === opt.id ? "text-primary" : "text-foreground"
+                      )}>{opt.icon} {opt.label}</span>
+                    </div>
+                    <span className="text-xs text-muted-foreground/40 mt-0.5">{opt.desc}</span>
+                  </button>
+                ))}
+              </div>
 
              {/* Specific date picker — only shown when mode = date */}
              {formData.probationMode === "date" && (
@@ -544,7 +627,7 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
           {dependents.map((dep) => (
              <div key={dep.id} className="p-5 rounded-lg border border-border/80 bg-muted/5 space-y-5 animate-in fade-in zoom-in-95 hover:border-primary/20 transition-all">
                 <div className="flex items-center justify-between">
-                   <span className="text-micro font-semibold text-primary bg-primary/10 px-2.5 py-1 rounded-full tracking-wider">Dependent unit</span>
+                   <span className="text-micro font-semibold text-primary bg-primary/10 px-2.5 py-1 rounded-4xl tracking-wider uppercase">Dependent unit</span>
                    <button onClick={() => removeDependent(dep.id)} className="text-muted-foreground/30 hover:text-rose-500 transition-colors">
                      <Trash size={16} />
                    </button>

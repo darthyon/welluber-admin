@@ -12,6 +12,7 @@ import {
   ArrowLeft,
   Calendar,
   Funnel,
+  Globe
 } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -43,6 +44,10 @@ const MOCK_RECORDS = [
     policies: "Wellness Allocation",
     status: "Valid",
     branch: "ACME HQ",
+    tier: "T3",
+    residency: "Local",
+    taxable: true,
+    employmentStatus: "Active",
   },
   {
     code: "E002",
@@ -57,6 +62,10 @@ const MOCK_RECORDS = [
     policies: "Lifestyle Pocket",
     status: "Valid",
     branch: "ACME Subang Jaya",
+    tier: "T2",
+    residency: "Local",
+    taxable: true,
+    employmentStatus: "Active",
   },
   {
     code: "E003",
@@ -65,12 +74,17 @@ const MOCK_RECORDS = [
     dob: "1995-02-14",
     gender: "female",
     mobile: "017-1112223",
-    department: "Design",
+    department: "Growth",
     role: "Staff",
     date: "2026-04-01",
     policies: "Wellness Allocation",
     status: "Valid",
     branch: "ACME HQ",
+    tier: "T4",
+    residency: "Foreigner",
+    taxable: false,
+    employmentStatus: "Probation",
+    isNewDept: true,
   },
   {
     code: "",
@@ -86,6 +100,10 @@ const MOCK_RECORDS = [
     status: "Issue",
     issue: "Missing code & email",
     branch: "ACME HQ",
+    tier: "T4",
+    residency: "Local",
+    taxable: true,
+    employmentStatus: "Active",
   },
   {
     code: "E005",
@@ -101,6 +119,10 @@ const MOCK_RECORDS = [
     status: "Issue",
     issue: "Invalid DOB, Join Date & ID",
     branch: "ACME HQ",
+    tier: "T3",
+    residency: "Local",
+    taxable: true,
+    employmentStatus: "Active",
   },
 ]
 
@@ -154,6 +176,10 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
       policies: "Standard Health",
       status: "Valid",
       branch: "ACME HQ",
+      tier: "T3",
+      residency: "Local",
+      taxable: true,
+      employmentStatus: "Active",
     },
     {
       id: "rec_1",
@@ -169,6 +195,10 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
       policies: "Executive Wellness",
       status: "Valid",
       branch: "ACME Subang Jaya",
+      tier: "T2",
+      residency: "Local",
+      taxable: true,
+      employmentStatus: "Active",
     },
     {
       id: "rec_2",
@@ -178,12 +208,17 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
       dob: "1995-02-14",
       gender: "female",
       mobile: "017-1112223",
-      department: "Design",
+      department: "Growth",
       role: "Staff",
       date: "2026-04-01",
       policies: "Standard Health",
       status: "Valid",
       branch: "ACME HQ",
+      tier: "T4",
+      residency: "Foreigner",
+      taxable: false,
+      employmentStatus: "Probation",
+      isNewDept: true,
     },
     {
       id: "rec_3",
@@ -200,6 +235,10 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
       status: "Issue",
       issue: "Missing Code & Email",
       branch: "ACME HQ",
+      tier: "T4",
+      residency: "Local",
+      taxable: true,
+      employmentStatus: "Active",
     },
     {
       id: "rec_4",
@@ -216,6 +255,10 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
       status: "Issue",
       issue: "Invalid DOB, Join Date & ID",
       branch: "ACME HQ",
+      tier: "T3",
+      residency: "Local",
+      taxable: true,
+      employmentStatus: "Active",
     },
   ]
 
@@ -355,9 +398,16 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
             </div>
           ) : (
             <>
-              <span className="text-label leading-none font-semibold text-foreground">
-                {row.department}
-              </span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-label leading-none font-semibold text-foreground">
+                  {row.department}
+                </span>
+                {row.isNewDept && (
+                  <Badge variant="outline" className="text-[10px] h-4 px-1.5 bg-amber-500/10 text-amber-600 border-amber-500/20 font-semibold uppercase tracking-tighter rounded-full">
+                    Auto-create
+                  </Badge>
+                )}
+              </div>
               <span className="text-caption font-medium text-muted-foreground italic opacity-70">
                 {row.role}
               </span>
@@ -365,6 +415,26 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
           )}
         </div>
       ),
+    },
+    {
+      header: "Tier & Status",
+      render: (row) => (
+        <div className="flex flex-col gap-1">
+           <div className="flex items-center gap-1.5">
+             <span className="text-label font-semibold text-primary bg-primary/5 px-1.5 py-0.5 rounded border border-primary/10">{row.tier}</span>
+             <span className={cn(
+               "text-micro font-semibold px-2 py-0.5 rounded-4xl border",
+               row.employmentStatus === "Active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-amber-500/10 text-amber-600 border-amber-500/20"
+             )}>{row.employmentStatus}</span>
+           </div>
+           <div className="flex items-center gap-1.5 text-micro font-medium text-muted-foreground">
+             <Globe size={10} />
+             <span>{row.residency}</span>
+             <span>•</span>
+             <span className={row.taxable ? "text-emerald-600 font-semibold" : "text-rose-500 font-semibold"}>{row.taxable ? "Taxable" : "Non-taxable"}</span>
+           </div>
+        </div>
+      )
     },
     {
       header: "Contact",
@@ -592,7 +662,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
               </div>
               <Button
                 variant="secondary"
-                className="mt-2 h-10 rounded-full px-8 font-semibold"
+                className="mt-2 h-10 rounded-4xl px-8 font-semibold shadow-sm"
               >
                 Select File
               </Button>
@@ -687,7 +757,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
                   <Button
                     onClick={handleConfirmImport}
                     disabled={showIssuesOnly && issueCount === 0}
-                    className="h-10 animate-in bg-primary px-10 font-semibold text-white shadow-lg shadow-primary/20 transition-all fade-in"
+                    className="h-10 animate-in bg-primary px-10 font-semibold text-white shadow-lg shadow-primary/20 transition-all fade-in rounded-4xl hover:bg-primary/90"
                   >
                     Confirm Import{" "}
                     <ArrowRight size={18} className="ml-2" weight="bold" />
@@ -755,7 +825,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
             <div className="mt-12 flex justify-center">
               <Button
                 onClick={onBack}
-                className="h-12 rounded-full bg-foreground px-12 font-semibold text-background shadow-xl transition-transform hover:scale-[1.02]"
+                className="h-12 rounded-4xl bg-foreground px-12 font-semibold text-background shadow-xl transition-transform hover:scale-[1.02]"
               >
                 Return to Directory
               </Button>

@@ -30,7 +30,7 @@ const STATUS_FILTER_TABS: { label: string; value: SpVoucherStatus | "all" }[] = 
   { label: "Ended", value: "ended" },
 ];
 
-const STATUS_VARIANT: Record<SpVoucherStatus, "emerald" | "amber" | "indigo" | "zinc" | "rose"> = {
+const STATUS_VARIANT: Record<SpVoucherStatus, "emerald" | "amber" | "zinc" | "rose" | "primary"> = {
   draft: "zinc",
   published: "amber",
   activated: "emerald",

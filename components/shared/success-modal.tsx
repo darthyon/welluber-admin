@@ -52,15 +52,17 @@ export function SuccessModal({
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.98, opacity: 0, y: 10 }}
               transition={{ ease: [0.16, 1, 0.3, 1], duration: 0.6 }}
-              className="bg-card border border-border/50 shadow-[0_20px_50px_rgba(0,0,0,0.15)] rounded-2xl w-full max-w-md overflow-hidden pointer-events-auto"
+              className="bg-card border border-border shadow-[0_20px_50px_rgba(0,0,0,0.15)] rounded-3xl w-full max-w-md overflow-hidden pointer-events-auto"
             >
               {/* Close Button */}
-              <button 
+              <Button 
+                variant="ghost"
+                size="icon-sm"
                 onClick={onClose}
-                className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-muted transition-colors text-muted-foreground"
+                className="absolute top-4 right-4 text-muted-foreground/40 hover:text-foreground"
               >
-                <X size={16} weight="bold" />
-              </button>
+                <X size={16} />
+              </Button>
 
               <div className="p-8 flex flex-col items-center text-center">
                 {/* Animated Icon with Quiet Pulse */}
@@ -98,7 +100,7 @@ export function SuccessModal({
                   transition={{ delay: 0.4 }}
                   className="space-y-2"
                 >
-                  <h2 className="text-title font-semibold tracking-tight text-foreground">{title}</h2>
+                  <h2 className="text-subtitle font-semibold tracking-tight text-foreground">{title}</h2>
                   <p className="text-nav text-muted-foreground leading-relaxed px-4">
                     {message}
                   </p>
@@ -113,7 +115,8 @@ export function SuccessModal({
                   <Button
                     asChild={!!primaryAction.href}
                     onClick={primaryAction.onClick}
-                    className="h-11 rounded-xl text-nav font-semibold bg-primary text-primary-foreground shadow-sm hover:shadow-md transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                    size="lg"
+                    className="w-full text-nav font-semibold flex items-center justify-center gap-2"
                   >
                     {primaryAction.href ? (
                       <Link href={primaryAction.href}>
@@ -133,7 +136,8 @@ export function SuccessModal({
                       asChild={!!secondaryAction.href}
                       variant="ghost"
                       onClick={secondaryAction.onClick}
-                      className="h-11 rounded-xl text-nav font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                      size="lg"
+                      className="w-full text-nav font-semibold text-muted-foreground hover:text-foreground"
                     >
                       {secondaryAction.href ? (
                         <Link href={secondaryAction.href}>

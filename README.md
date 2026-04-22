@@ -1,21 +1,28 @@
-# Next.js template
+# WellUber Admin Console
 
-This is a Next.js template with shadcn/ui.
+Precision infrastructure for corporate wellness management. Built with Next.js, shadcn/ui, and Framer Motion.
 
-## Adding components
+## 🎨 Design System
 
-To add components to your app, run the following command:
+This project follows a **"Precision Infrastructure"** aesthetic — inspired by Linear and Vercel. 
 
+- **Primary Source of Truth**: [DESIGN.md](docs/design.md)
+- **Typography**: Geist Variable (Strict no-bold policy, use Semibold 600)
+- **Color**: OKLCH-based theme with deep indigo brand accent
+- **Radius**: Pill-shaped triggers (`rounded-4xl`), card-shaped surfaces (`rounded-lg`)
+
+## 🛠 Adding Components
+
+To add shadcn components:
 ```bash
-npx shadcn@latest add button
+npx shadcn@latest add [component]
 ```
 
-This will place the ui components in the `components` directory.
+## 🧩 Shared Patterns
 
-## Using components
+We use several custom shared patterns for consistency:
+- **Quiet Success**: `SuccessModal` for administrative feedback.
+- **Form Layouts**: `TwoColumnDetailLayout` + `FloatingAnchorNav` for multi-section forms.
+- **Controls**: `PhoneInput` (International), `LocationPicker`, `ServiceToggleCard`.
 
-To use the components in your app, import them as follows:
-
-```tsx
-import { Button } from "@/components/ui/button";
-```
+Refer to [docs/design.md](docs/design.md) for detailed usage guidelines and semantic conventions.

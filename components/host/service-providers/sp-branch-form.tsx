@@ -45,6 +45,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
   const [benefits, setBenefits] = useState<string[]>(branch?.benefits ?? (branch as any)?.facilities ?? []);
   const [benefitInput, setBenefitInput] = useState("");
   const [hasAdminChanges, setHasAdminChanges] = useState(false);
+  const [customServiceInputs, setCustomServiceInputs] = useState<Record<string, string>>({});
 
   const { register, handleSubmit, control, setValue, watch, reset, formState: { errors, dirtyFields, isSubmitting } } = useForm<CreateBranchData>({
     resolver: zodResolver(createBranchSchema as any),
@@ -367,7 +368,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                       type="button"
                       variant="outline"
                       size="sm"
-                      className="h-8 text-label gap-1.5 rounded-full"
+                      className="text-label gap-1.5"
                       onClick={() => appendAdmin({ name: "", email: "", role: "Administrator", designateAsPic: false })}
                     >
                       <Plus size={14} weight="bold" /> Add Admin
@@ -376,7 +377,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                       type="button"
                       variant="outline"
                       size="sm"
-                      className="h-8 text-label gap-1.5 rounded-full"
+                      className="text-label gap-1.5"
                       onClick={() => appendContact({ name: "", email: "", type: "staff", phone: "", isPublic: true })}
                     >
                       <Plus size={14} weight="bold" /> Add PIC
@@ -570,12 +571,13 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
       </div>
 
       {/* Floating Action Bar */}
-      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[calc(50%+104px)] z-50 flex items-center gap-4 p-2.5 px-6 bg-white/80 backdrop-blur-2xl border border-white/50 shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-full animate-in slide-in-from-bottom-10 duration-700 ease-out">
+      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[calc(50%+104px)] z-50 flex items-center gap-4 p-2 px-6 bg-white/80 backdrop-blur-2xl border border-border shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-full animate-in slide-in-from-bottom-10 duration-700 ease-out">
         <Button 
           type="button" 
           variant="ghost" 
+          size="lg"
           onClick={onCancel}
-          className="text-nav font-semibold rounded-full h-10 px-6 hover:bg-black/5 transition-colors"
+          className="text-nav font-semibold px-6"
         >
           Cancel
         </Button>
@@ -583,7 +585,8 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="text-nav font-semibold rounded-full h-10 px-8 flex items-center gap-2 bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all hover:scale-[1.02] active:scale-[0.98]"
+          size="lg"
+          className="text-nav font-semibold px-8 flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
         >
           {isSubmitting ? (
             <>
