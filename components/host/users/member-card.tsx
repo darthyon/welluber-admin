@@ -29,12 +29,12 @@ export function MemberCard({ member }: MemberCardProps) {
     <motion.div
       whileHover={{ y: -2 }}
       transition={{ duration: 0.2 }}
-      className="group relative bg-card border border-border/60 rounded-2xl p-5 hover:border-primary/30 hover:shadow-xl hover:shadow-black/5 transition-all duration-500 overflow-hidden"
+      className="group relative bg-card border border-border/60 rounded-lg p-5 hover:border-primary/30 hover:shadow-xl hover:shadow-black/5 transition-all duration-500 overflow-hidden"
     >
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(var(--primary-rgb),0.03),transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
       <div className="flex items-start justify-between mb-8 relative z-10">
         <div className="flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-2xl bg-muted border border-border/60 text-muted-foreground/60 flex items-center justify-center">
+          <div className="w-11 h-11 rounded-lg bg-muted border border-border/60 text-muted-foreground/60 flex items-center justify-center">
             <Users size={22} weight="fill" />
           </div>
           <div className="space-y-1.5">
@@ -45,10 +45,10 @@ export function MemberCard({ member }: MemberCardProps) {
               <StatusBadge 
                 status={member.status} 
                 variant={member.status === "Active" ? "emerald" : member.status === "Pending" ? "amber" : "rose"} 
-                className="px-1.5 py-0.5 rounded-md text-micro"
+                className="px-1.5 py-0.5 text-micro"
               />
               <span className={cn(
-                "px-2 py-0.5 rounded-md text-micro font-semibold border",
+                "px-2 py-0.5 rounded-full text-micro font-semibold border",
                 member.type === "Employee" 
                   ? "bg-blue-500/10 text-blue-600 border-blue-500/20" 
                   : "bg-purple-500/10 text-purple-600 border-purple-500/20"

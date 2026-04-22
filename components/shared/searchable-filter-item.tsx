@@ -63,7 +63,7 @@ export function SearchableFilterItem({
             <CaretDown size={14} weight="bold" className="opacity-40" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[240px] p-0 shadow-2xl border-border/50 rounded-xl overflow-hidden" align="start">
+        <PopoverContent className="w-[240px] p-0 shadow-2xl border-border/50 rounded-lg overflow-hidden" align="start">
           <div className="flex flex-col h-full max-h-[300px]">
             <div className="p-2 border-b border-border/40 bg-muted/20 flex items-center gap-2">
               <MagnifyingGlass size={16} className="text-muted-foreground shrink-0" />

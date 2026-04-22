@@ -1,10 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CaretLeft, Storefront, Tag, WarningCircle, NavigationArrow } from "@phosphor-icons/react";
+import {
+  CaretLeft,
+  Storefront,
+  Tag,
+  WarningCircle,
+  NavigationArrow,
+  IdentificationCard,
+  MapPin,
+  Bank,
+  Files,
+  ShieldCheck,
+  Globe,
+  Article,
+  CreditCard,
+  Clock,
+} from "@phosphor-icons/react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { createSpSchema, CreateSpData } from "@/features/providers/schemas";
@@ -16,14 +31,17 @@ import { MOCK_SPS } from "@/features/providers/mock-data";
 import { MOCK_BRANDS } from "@/features/brands/mock-data";
 import { Badge } from "@/components/ui/badge";
 import { DocumentUploadSection } from "@/components/shared/document-upload-section";
-import { Controller } from "react-hook-form";
-import { Article, Files, Info } from "@phosphor-icons/react";
+import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav";
+import { Switch } from "@/components/shared/switch";
+import { LocationPicker, LocationData } from "@/components/shared/location-picker";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+  BUSINESS_TYPES,
+  PAYMENT_CYCLES,
+  CREDIT_TERMS,
+} from "@/features/providers/constants";
+
+
+import { toast } from "sonner";
 
 export default function EditServiceProviderPage() {
   const router = useRouter();
@@ -41,6 +59,7 @@ export default function EditServiceProviderPage() {
     register,
     handleSubmit,
     setValue,
+    watch,
     control,
     formState: { errors },
   } = useForm<CreateSpData>({
@@ -57,8 +76,26 @@ export default function EditServiceProviderPage() {
       classificationCode: sp.classificationCode ?? "",
       classificationDescriptor: sp.classificationDescriptor ?? "",
       documents: sp.documents ?? [],
+      businessType: sp.businessType ?? "sdn_bhd",
+      bankInfo: sp.bankInfo ?? { bankName: "", accountNumber: "", accountName: "" },
+      address: sp.address ?? { line: "", city: "", state: "", country: "Malaysia", postalCode: "" },
+      needsEInvoiceSubmission: sp.needsEInvoiceSubmission ?? false,
+      appointedForEInvoice: sp.appointedForEInvoice ?? false,
+      expiredCommissionFee: sp.expiredCommissionFee ?? 0,
+      paymentCycle: sp.paymentCycle ?? "",
+      creditTerms: sp.creditTerms ?? "",
     },
   });
+
+  const businessType = watch("businessType");
+
+  const ANCHOR_ITEMS = [
+    { id: "provider-profile", label: "Provider Profile" },
+    { id: "registration-compliance", label: "Registration & Compliance" },
+    { id: "registered-address", label: "Registered Address" },
+    { id: "settlement-tax", label: "Settlement & Tax" },
+    { id: "service-portfolio", label: "Service Portfolio" },
+  ];
 
   const onSubmit = async (data: any) => {
     setIsSubmitting(true);
@@ -76,6 +113,7 @@ export default function EditServiceProviderPage() {
         serviceCategories: derivedCategories 
       });
       if (res.success) {
+        toast.success("Provider profile updated successfully");
         router.push(`/service-providers/${spId}`);
       }
     } catch (e) {
@@ -91,13 +129,14 @@ export default function EditServiceProviderPage() {
 
   const inputCls = (hasError?: boolean) =>
     cn(
-      "w-full px-3 py-2 bg-background border rounded-md text-body outline-none transition-colors",
+      "w-full px-3 py-2.5 bg-background border rounded-lg text-nav outline-none transition-all duration-200",
       hasError
-        ? "border-destructive focus:border-destructive"
-        : "border-border focus:border-foreground/30 focus:bg-muted/30"
+        ? "border-destructive focus:ring-2 focus:ring-destructive/10"
+        : "border-border focus:border-primary/40 focus:ring-2 focus:ring-primary/10 focus:bg-muted/10"
     );
 
-  // Filter the taxonomy based on the Brand's allowed service categories
+  const labelCls = "text-nav font-semibold text-foreground/80 mb-1.5 block";
+
   const SERVICE_PORTFOLIO_TAXONOMY = MASTER_SERVICE_TAXONOMY
     .filter(group => brandCategories.length === 0 || brandCategories.includes(group.category))
     .map(group => ({
@@ -106,180 +145,357 @@ export default function EditServiceProviderPage() {
     }));
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6 pb-12">
-      <div>
-        <Link
-          href={`/service-providers/${spId}`}
-          className="inline-flex items-center gap-1.5 text-nav font-medium text-muted-foreground hover:text-foreground transition-colors mb-4"
-        >
-          <CaretLeft size={16} /> Back to {sp.name}
-        </Link>
-        <h1 className="text-heading font-semibold tracking-tight text-foreground">Edit Service Provider</h1>
-        <p className="text-muted-foreground text-nav mt-1">Update the profile and service categories for {sp.name}.</p>
-      </div>
+    <div className="max-w-[1100px] mx-auto pb-24 px-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="flex flex-col lg:flex-row gap-12 lg:gap-16">
+        {/* Left Column: Navigation */}
+        <aside className="hidden xl:block w-52 shrink-0">
+          <div className="sticky top-32">
+            <FloatingAnchorNav items={ANCHOR_ITEMS} />
+          </div>
+        </aside>
 
-      <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
-        <form id="editSpForm" onSubmit={handleSubmit(onSubmit)}>
-
-          {/* Section: Basic Info */}
-          <div className="p-6 border-b border-border space-y-5">
-            <div className="flex items-center gap-2 pb-2">
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                <Storefront size={16} weight="fill" />
+        {/* Right Column: Form Content */}
+        <div className="flex-1 max-w-2xl">
+          <div className="flex flex-col gap-6">
+            {/* Header */}
+            <div className="flex flex-col gap-4">
+              <Link
+                href={`/service-providers/${spId}`}
+                className="inline-flex items-center gap-1.5 text-nav font-medium text-muted-foreground hover:text-foreground transition-colors w-fit"
+              >
+                <CaretLeft size={16} /> Back to {sp.name}
+              </Link>
+              <div>
+                <h1 className="text-heading font-semibold tracking-tight text-foreground">Edit Service Provider</h1>
+                <p className="text-muted-foreground text-nav mt-1">Update profile, compliance details, and backend settings.</p>
               </div>
-              <h3 className="text-subtitle font-semibold text-foreground">Provider Profile</h3>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div className="space-y-1.5 sm:col-span-2">
-                <label className="text-nav font-medium text-foreground">Company Name</label>
-                <input {...register("name")} className={inputCls(!!errors.name)} />
-                {errors.name && (
-                  <p className="text-caption text-destructive flex items-center gap-1 mt-1">
-                    <WarningCircle size={12} /> {errors.name.message}
-                  </p>
-                )}
-              </div>
+            <form id="editSpForm" onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          
+          {/* Section: Provider Profile */}
+          <div id="provider-profile" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-24">
+            <div className="p-6 space-y-6">
+                <div className="flex items-center gap-2 pb-2">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                        <Storefront size={16} weight="fill" />
+                    </div>
+                    <h3 className="text-subtitle font-semibold text-foreground">Provider Profile</h3>
+                </div>
 
-              <div className="space-y-1.5">
-                <label className="text-nav font-medium text-foreground">Registration Number</label>
-                <input {...register("registrationNo")} className={inputCls(!!errors.registrationNo)} />
-                {errors.registrationNo && (
-                  <p className="text-caption text-destructive flex items-center gap-1 mt-1">
-                    <WarningCircle size={12} /> {errors.registrationNo.message}
-                  </p>
-                )}
-              </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div className="space-y-1.5 sm:col-span-2">
+                        <label className={labelCls}>Service Provider Name</label>
+                        <input
+                            {...register("name")}
+                            className={inputCls(!!errors.name)}
+                        />
+                    </div>
 
-              <div className="space-y-1.5">
-                <label className="text-nav font-medium text-foreground">
-                  Website <span className="text-muted-foreground font-normal">(optional)</span>
-                </label>
-                <input {...register("website")} className={inputCls(!!errors.website)} type="url" />
-                {errors.website && (
-                  <p className="text-caption text-destructive flex items-center gap-1 mt-1">
-                    <WarningCircle size={12} /> {errors.website.message}
-                  </p>
-                )}
-              </div>
+                    <div className="space-y-1.5 sm:col-span-2">
+                        <label className={labelCls}>Website Link</label>
+                        <div className="relative">
+                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/40">
+                                <Globe size={16} />
+                            </div>
+                            <input
+                                {...register("website")}
+                                className={cn(inputCls(!!errors.website), "pl-9")}
+                                type="url"
+                            />
+                        </div>
+                    </div>
 
-              <div className="space-y-1.5 sm:col-span-2">
-                <label className="text-nav font-medium text-foreground">TIN No.</label>
-                <input {...register("tinNumber")} className={inputCls(!!errors.tinNumber)} placeholder="e.g. TR-882910-01" />
-                {errors.tinNumber && (
-                  <p className="text-caption text-destructive flex items-center gap-1 mt-1">
-                    <WarningCircle size={12} /> {errors.tinNumber.message}
-                  </p>
-                )}
-              </div>
+                    <div className="space-y-1.5 sm:col-span-2">
+                        <label className={labelCls}>Description</label>
+                        <textarea
+                            {...register("description")}
+                            rows={3}
+                            className={cn(inputCls(), "resize-none")}
+                        />
+                    </div>
+                </div>
+            </div>
+          </div>
 
-              <div className="space-y-1.5 sm:col-span-2">
-                <label className="text-nav font-medium text-foreground">
-                  Description <span className="text-muted-foreground font-normal">(optional)</span>
-                </label>
-                <textarea {...register("description")} rows={3} className={cn(inputCls(), "resize-none")} />
-              </div>
+          {/* Section: Registration & Compliance */}
+          <div id="registration-compliance" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
+            <div className="p-6 space-y-6">
+                <div className="flex items-center gap-2 pb-2">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                        <IdentificationCard size={16} weight="fill" />
+                    </div>
+                    <h3 className="text-subtitle font-semibold text-foreground">Registration & Compliance</h3>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div className="space-y-1.5">
+                        <label className={labelCls}>Registration Number (BRN)</label>
+                        <input
+                            {...register("registrationNo")}
+                            className={inputCls(!!errors.registrationNo)}
+                        />
+                    </div>
+
+                    <div className="space-y-1.5">
+                        <label className={labelCls}>TIN Number</label>
+                        <input
+                            {...register("tinNumber")}
+                            className={inputCls()}
+                        />
+                    </div>
+
+                    <div className="space-y-1.5 sm:col-span-2">
+                        <label className={labelCls}>SST Registration No. <span className="text-muted-foreground font-normal">(if applicable)</span></label>
+                        <input
+                            {...register("taxProfile.taxRegNo" as any)}
+                            className={inputCls()}
+                        />
+                    </div>
+
+                    <div className="sm:col-span-2 pt-4 space-y-6 border-t border-border/40">
+                        <div className="space-y-3">
+                            <label className={labelCls}>Business Type</label>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                {BUSINESS_TYPES.map(type => (
+                                    <button
+                                        key={type.id}
+                                        type="button"
+                                        onClick={() => setValue("businessType", type.id as any)}
+                                        className={cn(
+                                            "flex flex-col p-3 border rounded-lg text-left transition-all duration-200",
+                                            businessType === type.id 
+                                                ? "border-primary bg-primary/[0.03] ring-1 ring-primary/20" 
+                                                : "border-border hover:border-border-hover bg-muted/5"
+                                        )}
+                                    >
+                                        <span className={cn("text-nav font-semibold", businessType === type.id ? "text-primary" : "text-foreground")}>{type.label}</span>
+                                        <span className="text-micro text-muted-foreground mt-0.5 leading-tight">{type.docs}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="pt-2">
+                            <Controller
+                                control={control}
+                                name="documents"
+                                render={({ field }) => {
+                                    const typeLabel = BUSINESS_TYPES.find(t => t.id === businessType)?.label || "Provider";
+                                    return (
+                                        <DocumentUploadSection
+                                            documents={field.value || []}
+                                            onChange={field.onChange}
+                                            error={errors.documents?.message as string}
+                                            label={`${typeLabel} Documents`}
+                                        />
+                                    );
+                                }}
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+
+          {/* Section: Registered Address */}
+          <div id="registered-address" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
+            <div className="p-6 space-y-6">
+                <div className="flex items-center gap-2 pb-2">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                        <MapPin size={16} weight="fill" />
+                    </div>
+                    <div className="space-y-0.5">
+                      <h3 className="text-subtitle font-semibold text-foreground">Registered Business Address</h3>
+                      <p className="text-label text-muted-foreground">Official business address as per SSM registration.</p>
+                    </div>
+                </div>
+
+                <div className="p-1">
+                  <Controller
+                    control={control}
+                    name="address"
+                    render={({ field }) => (
+                      <LocationPicker
+                        value={field.value as any}
+                        onChange={(val) => field.onChange(val)}
+                        errors={errors.address}
+                      />
+                    )}
+                  />
+                </div>
+            </div>
+          </div>
+
+          {/* Section: Settlement & Tax Compliance */}
+          <div id="settlement-tax" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
+            <div className="p-6 space-y-6">
+                <div className="flex items-center gap-2 pb-2">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                        <Bank size={16} weight="fill" />
+                    </div>
+                    <h3 className="text-subtitle font-semibold text-foreground">Settlement & Tax Compliance</h3>
+                </div>
+
+                <div className="space-y-8">
+                    {/* Bank Information */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <div className="space-y-1.5 sm:col-span-2">
+                            <label className={labelCls}>Bank Name</label>
+                            <input
+                                {...register("bankInfo.bankName")}
+                                className={inputCls(!!errors.bankInfo?.bankName)}
+                            />
+                        </div>
+                        <div className="space-y-1.5 sm:col-span-2">
+                            <label className={labelCls}>Account Name</label>
+                            <input
+                                {...register("bankInfo.accountName")}
+                                className={inputCls(!!errors.bankInfo?.accountName)}
+                            />
+                        </div>
+                        <div className="space-y-1.5 sm:col-span-2">
+                            <label className={labelCls}>Account Number</label>
+                            <input
+                                {...register("bankInfo.accountNumber")}
+                                className={cn(inputCls(!!errors.bankInfo?.accountNumber), "font-mono")}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Billing Settings */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 pt-6 border-t border-border/40">
+                        <div className="space-y-1.5">
+                            <label className={labelCls}>Payment Cycle</label>
+                            <select {...register("paymentCycle")} className={inputCls()}>
+                                <option value="">Select Cycle</option>
+                                {PAYMENT_CYCLES.map(cycle => (
+                                    <option key={cycle} value={cycle}>{cycle}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className={labelCls}>Credit Terms</label>
+                            <select {...register("creditTerms")} className={inputCls()}>
+                                <option value="">Select Terms</option>
+                                {CREDIT_TERMS.map(term => (
+                                    <option key={term} value={term}>{term}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className={labelCls}>Expired Commission Fee</label>
+                            <div className="relative">
+                                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/40 font-semibold text-nav">%</div>
+                                <input
+                                    {...register("expiredCommissionFee", { valueAsNumber: true })}
+                                    className={cn(inputCls(), "pl-9")}
+                                    type="number"
+                                    step="0.01"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* e-Invoice Settings */}
+                    <div className="pt-6 border-t border-border/40 space-y-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="flex items-center justify-between p-4 bg-muted/20 border border-border rounded-lg group hover:border-primary/20 transition-all duration-300">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-9 h-9 rounded-lg bg-white border border-zinc-100 flex items-center justify-center text-muted-foreground/60 group-hover:text-primary transition-colors">
+                                        <Article size={18} weight="duotone" />
+                                    </div>
+                                    <div className="space-y-0.5">
+                                        <p className="text-nav font-semibold text-foreground">Needs e-Invoice?</p>
+                                        <p className="text-micro text-muted-foreground font-medium">Submission required</p>
+                                    </div>
+                                </div>
+                                <Controller
+                                    control={control}
+                                    name="needsEInvoiceSubmission"
+                                    render={({ field }) => <Switch checked={field.value} onCheckedChange={field.onChange} />}
+                                />
+                            </div>
+
+                            <div className="flex items-center justify-between p-4 bg-muted/20 border border-border rounded-lg group hover:border-primary/20 transition-all duration-300">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-9 h-9 rounded-lg bg-white border border-zinc-100 flex items-center justify-center text-muted-foreground/60 group-hover:text-primary transition-colors">
+                                        <ShieldCheck size={18} weight="duotone" />
+                                    </div>
+                                    <div className="space-y-0.5">
+                                        <p className="text-nav font-semibold text-foreground">Appointed Welluber?</p>
+                                        <p className="text-micro text-muted-foreground font-medium">For submission</p>
+                                    </div>
+                                </div>
+                                <Controller
+                                    control={control}
+                                    name="appointedForEInvoice"
+                                    render={({ field }) => <Switch checked={field.value} onCheckedChange={field.onChange} />}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-muted/5 border border-dashed border-border rounded-lg">
+                            <div className="space-y-1.5">
+                                <label className={labelCls}>Classification Code</label>
+                                <input
+                                    {...register("classificationCode")}
+                                    className={inputCls()}
+                                    placeholder="e.g. 001"
+                                />
+                            </div>
+                            <div className="space-y-1.5">
+                                <label className={labelCls}>Classification Descriptor</label>
+                                <input
+                                    {...register("classificationDescriptor")}
+                                    className={inputCls()}
+                                    placeholder="e.g. General"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
           </div>
 
           {/* Section: Service Portfolio */}
-          <div className="p-6 border-b border-border space-y-4">
-            <div className="flex items-center justify-between pb-2">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500">
-                  <Tag size={16} weight="fill" />
+          <div id="service-portfolio" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-24">
+            <div className="p-6 space-y-6">
+                <div className="flex items-center gap-2 pb-2">
+                    <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500">
+                        <Tag size={16} weight="fill" />
+                    </div>
+                    <h3 className="text-subtitle font-semibold text-foreground">Service Portfolio</h3>
                 </div>
-                <h3 className="text-subtitle font-semibold text-foreground">Service Portfolio</h3>
-              </div>
-              {brandCategories.length > 0 && (
-                <div className="flex flex-wrap gap-1 justify-end max-w-[50%]">
-                    {brandCategories.map(cat => (
-                        <Badge key={cat} variant="outline" className="text-micro font-medium bg-muted/20">{cat}</Badge>
-                    ))}
+
+                <div className="space-y-4">
+                    <SearchableMultiSelect
+                        taxonomy={SERVICE_PORTFOLIO_TAXONOMY}
+                        selected={selectedMainServices}
+                        onChange={handleServicesChange}
+                        placeholder="Search services..."
+                    />
+                    {errors.mainServices && (
+                        <p className="text-caption text-destructive flex items-center gap-1 font-medium">
+                            <WarningCircle size={12} weight="fill" /> {errors.mainServices.message}
+                        </p>
+                    )}
                 </div>
-              )}
-            </div>
-
-            <p className="text-label text-muted-foreground">
-              Select available services from the masterlist allowed for this brand.
-            </p>
-
-            <SearchableMultiSelect
-              taxonomy={SERVICE_PORTFOLIO_TAXONOMY}
-              selected={selectedMainServices}
-              onChange={handleServicesChange}
-              placeholder="Search main services..."
-            />
-            {errors.mainServices && (
-              <p className="text-caption text-destructive flex items-center gap-1">
-                <WarningCircle size={12} /> {errors.mainServices.message}
-              </p>
-            )}
-          </div>
-
-          {/* Section: e-Invoice Malaysia */}
-          <div className="p-6 border-b border-border space-y-5">
-            <div className="flex items-center gap-2 pb-2">
-              <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500">
-                <Article size={16} weight="fill" />
-              </div>
-              <h3 className="text-subtitle font-semibold text-foreground">e-Invoice Malaysia</h3>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <span className="ml-1 flex items-center gap-1 text-caption font-medium text-primary cursor-default">
-                      <Info size={13} weight="fill" className="text-primary/70" />
-                      Submitted by Welluber
-                    </span>
-                  </TooltipTrigger>
-                  <TooltipContent side="right" className="max-w-[220px] text-center text-label">
-                    Welluber will submit for SP on behalf to the org.
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div className="space-y-1.5">
-                <label className="text-nav font-medium text-foreground">Classification Code</label>
-                <input {...register("classificationCode")} className={inputCls(!!errors.classificationCode)} placeholder="e.g. 001" />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-nav font-medium text-foreground">Classification Descriptor</label>
-                <input {...register("classificationDescriptor")} className={inputCls(!!errors.classificationDescriptor)} placeholder="e.g. General" />
-              </div>
             </div>
           </div>
 
-          {/* Section: Documents */}
-          <div className="p-6 space-y-4">
-            <div className="flex items-center gap-2 pb-2">
-              <div className="w-8 h-8 rounded-full bg-muted0/10 flex items-center justify-center text-muted-foreground">
-                <Files size={16} weight="fill" />
-              </div>
-              <h3 className="text-subtitle font-semibold text-foreground">Documents</h3>
-            </div>
 
-            <Controller
-              name="documents"
-              control={control}
-              render={({ field }) => (
-                <DocumentUploadSection 
-                  documents={field.value || []}
-                  onChange={field.onChange}
-                  error={errors.documents?.message}
-                />
-              )}
-            />
-          </div>
-
-          {/* Footer */}
-          <div className="p-6 border-t border-border bg-muted/10 flex items-center justify-end gap-3">
-            <Button asChild variant="outline" className="text-nav font-medium">
+          {/* Floating Action Bar */}
+          <div className="fixed bottom-8 left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[calc(50%+104px)] z-50 flex items-center gap-4 p-2.5 px-6 bg-background/80 backdrop-blur-2xl border border-border/50 shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-full animate-in slide-in-from-bottom-10 duration-700 ease-out">
+            <Button asChild variant="ghost" className="text-nav font-semibold rounded-full h-10 px-6 hover:bg-black/5 transition-colors">
               <Link href={`/service-providers/${spId}`}>Cancel</Link>
             </Button>
-            <Button type="submit" disabled={isSubmitting} className="text-nav font-medium flex items-center gap-2">
+            <div className="w-px h-6 bg-border/40" />
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="text-nav font-semibold rounded-full h-10 px-8 flex items-center gap-2 bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all hover:scale-[1.02] active:scale-[0.98]"
+            >
               {isSubmitting ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -294,6 +510,11 @@ export default function EditServiceProviderPage() {
             </Button>
           </div>
         </form>
+        
+        {/* Spacer to allow last sections to scroll to top */}
+        <div className="h-64" />
+          </div>
+        </div>
       </div>
     </div>
   );

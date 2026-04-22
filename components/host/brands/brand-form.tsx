@@ -77,7 +77,7 @@ export function BrandForm({ initialData, onSubmit, onCancel, isSubmitting }: Bra
           )}
         </div>
 
-        <div className="p-4 bg-muted/20 border border-border rounded-xl space-y-4">
+        <div className="p-4 bg-muted/20 border border-border rounded-lg space-y-4">
           <div className="flex items-center gap-2 pb-1 text-primary">
             <Tag size={16} weight="fill" />
             <h3 className="text-nav font-semibold">Service categories</h3>

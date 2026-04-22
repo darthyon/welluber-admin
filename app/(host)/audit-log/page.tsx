@@ -73,7 +73,7 @@ export default function AuditLogPage() {
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shadow-sm border border-primary/5">
+          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary shadow-sm border border-primary/5">
             <FileText size={20} weight="bold" />
           </div>
           <div>
@@ -123,7 +123,7 @@ export default function AuditLogPage() {
         }
       />
 
-      <div className="bg-card rounded-2xl border border-border p-8 shadow-sm relative overflow-hidden">
+      <div className="bg-card rounded-lg border border-border p-8 shadow-sm relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(var(--primary-rgb),0.02),transparent_70%)] pointer-events-none" />
         <ActivityTimeline 
           className="relative z-10"

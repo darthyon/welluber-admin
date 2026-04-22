@@ -35,7 +35,7 @@ export function DependentCard({
     .join("")
 
   return (
-    <div className="group glass-card relative flex h-full flex-col overflow-hidden rounded-xl p-5">
+    <div className="group glass-card relative flex h-full flex-col overflow-hidden rounded-lg p-5">
       <div className="pointer-events-none absolute -right-8 -bottom-8 h-24 w-24 rounded-full bg-primary/5 blur-2xl transition-all duration-500 group-hover:bg-primary/10" />
 
       <div className="relative z-10 mb-4 flex items-start justify-between">

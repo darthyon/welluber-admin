@@ -60,7 +60,7 @@ export function LogoUpload({
       <div 
         onClick={() => !disabled && fileInputRef.current?.click()}
         className={cn(
-          "relative group flex flex-col items-center justify-center border-2 border-dashed rounded-xl transition-all overflow-hidden",
+          "relative group flex flex-col items-center justify-center border-2 border-dashed rounded-lg transition-all overflow-hidden",
           disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer",
           preview ? "aspect-square w-32 border-primary/20 bg-primary/[0.03]" : "h-32 w-full border-border/60 bg-muted/20 hover:bg-muted/40 hover:border-primary/40",
           error && "border-destructive/40 bg-destructive/5"

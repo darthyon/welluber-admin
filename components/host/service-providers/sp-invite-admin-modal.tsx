@@ -79,7 +79,7 @@ export function SpInviteAdminModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="relative bg-card border border-border rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
+      <div className="relative bg-card border border-border rounded-lg shadow-2xl w-full max-w-md mx-4 overflow-hidden">
         {isSuccess ? (
           <div className="p-8">
             <SuccessCelebration

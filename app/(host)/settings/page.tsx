@@ -7,7 +7,7 @@ export default function SettingsPage() {
           Platform-wide configuration and system settings
         </p>
       </div>
-      <div className="flex flex-col items-center justify-center min-h-[400px] text-center rounded-xl border border-dashed border-border bg-muted/30">
+      <div className="flex flex-col items-center justify-center min-h-[400px] text-center rounded-lg border border-dashed border-border bg-muted/30">
         <p className="text-muted-foreground text-body">System settings — coming soon</p>
       </div>
     </div>

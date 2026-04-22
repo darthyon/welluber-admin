@@ -143,7 +143,7 @@ export function SpVoucherForm({
 
   if (isSuccess) {
     return (
-      <div className="bg-card rounded-2xl border border-border py-20 animate-in zoom-in-95 duration-300">
+      <div className="bg-card rounded-lg border border-border py-20 animate-in zoom-in-95 duration-300">
         <SuccessCelebration 
           title={isEditing ? "Changes Saved!" : "Voucher Added!"} 
           message={successMessage} 
@@ -159,7 +159,7 @@ export function SpVoucherForm({
         <div className="flex items-center gap-4">
           <button 
             onClick={onCancel}
-            className="w-10 h-10 rounded-xl border border-border flex items-center justify-center hover:bg-muted transition-colors bg-card shadow-sm"
+            className="w-10 h-10 rounded-lg border border-border flex items-center justify-center hover:bg-muted transition-colors bg-card shadow-sm"
           >
             <CaretLeft size={20} weight="bold" />
           </button>
@@ -273,7 +273,7 @@ export function SpVoucherForm({
                   disabled={isReadOnly}
                 />
               </div>
-              <div className="flex items-center justify-between p-4 bg-primary/5 rounded-2xl border border-primary/10">
+              <div className="flex items-center justify-between p-4 bg-primary/5 rounded-lg border border-primary/10">
                 <div className="space-y-0.5">
                   <p className="text-body font-semibold text-foreground">Booking Required</p>
                   <p className="text-label text-muted-foreground/60">Enable this if members must book a slot before redemption.</p>
@@ -349,7 +349,7 @@ export function SpVoucherForm({
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full border-dashed border-border h-14 text-muted-foreground hover:text-primary hover:border-primary/30 transition-all bg-card rounded-2xl font-semibold shadow-sm"
+                    className="w-full border-dashed border-border h-14 text-muted-foreground hover:text-primary hover:border-primary/30 transition-all bg-card rounded-lg font-semibold shadow-sm"
                     onClick={() => appendLine({ service: "", subServices: [], description: "", descriptionList: "" })}
                   >
                     <Plus size={18} weight="bold" className="mr-2" /> 

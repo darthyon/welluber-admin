@@ -90,7 +90,7 @@ export function CustomMultiSelect({
     <div className={cn("relative w-full", className)} ref={containerRef}>
       <div 
         className={cn(
-          "relative min-h-[42px] flex flex-wrap items-center gap-1.5 px-3 py-1.5 rounded-xl border bg-background/5 transition-all cursor-text pr-12",
+          "relative min-h-[42px] flex flex-wrap items-center gap-1.5 px-3 py-1.5 rounded-lg border bg-background/5 transition-all cursor-text pr-12",
           isOpen ? "border-primary ring-2 ring-primary/10" : "border-border/60 hover:border-primary/30",
           disabled && "opacity-60 cursor-not-allowed bg-muted/40"
         )}
@@ -158,7 +158,7 @@ export function CustomMultiSelect({
       {isOpen && (filteredOptions.length > 0 || showAddCustom) && typeof document !== "undefined" && createPortal(
         <div
           ref={dropdownRef}
-          className="z-[1000] overflow-y-auto max-h-[300px] rounded-xl border border-border/60 bg-popover shadow-2xl animate-in fade-in zoom-in-95 duration-100 p-1"
+          className="z-[1000] overflow-y-auto max-h-[300px] rounded-lg border border-border/60 bg-popover shadow-2xl animate-in fade-in zoom-in-95 duration-100 p-1"
           style={dropdownStyle}
         >
           {showAddCustom && (

@@ -76,7 +76,7 @@ export function EmployeePolicyTab({ employeeId }: EmployeePolicyTabProps) {
               <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
                 <div className="space-y-4 flex-1">
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
+                    <div className="w-12 h-12 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
                       <Shield size={24} weight="fill" />
                     </div>
                     <div>

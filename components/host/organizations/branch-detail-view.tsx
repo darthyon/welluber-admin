@@ -127,7 +127,7 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
                   { name: "John Doe", email: "john.d@acme.com", role: "Branch Admin" },
                   { name: "Ahmad Faizal", email: "ahmad.f@acme.com", role: "Operations" },
                 ].map((admin, i) => (
-                  <div key={i} className="flex items-center justify-between p-3 rounded-xl border border-border/60 bg-card hover:border-primary/20 transition-all group relative overflow-hidden">
+                  <div key={i} className="flex items-center justify-between p-3 rounded-lg border border-border/60 bg-card hover:border-primary/20 transition-all group relative overflow-hidden">
                      <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/[0.02] transition-colors pointer-events-none" />
                      <div className="flex items-center gap-3 relative z-10">
                         <EntityAvatar name={admin.name} size="sm" />
@@ -159,7 +159,7 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
               </div>
             </DetailSection>
             
-            <div className="bg-primary/95 dark:bg-primary/20 rounded-xl p-6 text-primary-foreground dark:text-primary overflow-hidden relative group border border-primary/20 shadow-lg shadow-primary/5">
+            <div className="bg-primary/95 dark:bg-primary/20 rounded-lg p-6 text-primary-foreground dark:text-primary overflow-hidden relative group border border-primary/20 shadow-lg shadow-primary/5">
               <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-white/10 dark:bg-primary/20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-1000" />
               <h4 className="text-subtitle font-semibold mb-2 tracking-tight">Branch quick stats</h4>
               <div className="space-y-4 relative z-10">
@@ -202,7 +202,7 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Left Column: Map Preview */}
               <div className="space-y-4">
-                <div className="relative aspect-[16/10] lg:aspect-auto lg:h-full min-h-[300px] rounded-2xl border border-border bg-muted/30 overflow-hidden group/map shadow-sm">
+                <div className="relative aspect-[16/10] lg:aspect-auto lg:h-full min-h-[300px] rounded-lg border border-border bg-muted/30 overflow-hidden group/map shadow-sm">
                   <div className="absolute inset-0 bg-[url('https://api.mapbox.com/styles/v1/mapbox/light-v10/static/101.7036,3.1390,12/800x400?access_token=pk.eyJ1IjoibW9ja2Rlc2lnbiIsImEiOiJjbGZnbXhsenQwMG1xM3lvM2wwNmwwNmwwNmwwIn0')] bg-cover bg-center grayscale group-hover/map:grayscale-0 transition-all duration-1000" />
                   <div className="absolute inset-0 bg-primary/5 group-hover/map:bg-transparent transition-colors duration-700" />
                   
@@ -264,14 +264,14 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
             description="Active configuration of the branch's financial resource pool"
           >
             {/* View Mode: Active Configuration Card */}
-            <div className="relative group/wallet bg-muted/20 border border-border/60 rounded-xl p-6 overflow-hidden transition-all hover:border-primary/30">
+            <div className="relative group/wallet bg-muted/20 border border-border/60 rounded-lg p-6 overflow-hidden transition-all hover:border-primary/30">
               {/* Decorative Accent */}
               <div className="absolute -right-8 -top-8 w-32 h-32 bg-primary/5 rounded-full blur-3xl group-hover/wallet:scale-110 transition-transform duration-700" />
               
               <div className="relative z-10 space-y-6">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-background border border-border text-muted-foreground flex items-center justify-center shadow-md shadow-black/5">
+                    <div className="w-12 h-12 rounded-lg bg-background border border-border text-muted-foreground flex items-center justify-center shadow-md shadow-black/5">
                       {walletType === "independent" ? (
                         <CurrencyCircleDollar size={24} weight="fill" />
                       ) : (

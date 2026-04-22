@@ -59,7 +59,7 @@ export function CategoryDetailSheet({
         {/* Header */}
         <div className="flex items-center justify-between px-8 py-6 border-b border-border bg-muted/30">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/20">
+            <div className="w-12 h-12 rounded-lg bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/20">
               <TreeStructure size={24} weight="fill" />
             </div>
             <div>
@@ -83,7 +83,7 @@ export function CategoryDetailSheet({
             </Button>
             <button 
               onClick={onClose}
-              className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-muted text-muted-foreground/60 hover:text-foreground transition-all border border-transparent hover:border-border"
+              className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-muted text-muted-foreground/60 hover:text-foreground transition-all border border-transparent hover:border-border"
             >
               <X size={20} weight="bold" />
             </button>
@@ -101,12 +101,12 @@ export function CategoryDetailSheet({
               return (
                 <div 
                   key={service} 
-                  className="flex flex-col bg-card border border-border/80 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 group/service"
+                  className="flex flex-col bg-card border border-border/80 rounded-lg p-6 shadow-sm hover:shadow-md transition-all duration-300 group/service"
                 >
                   {/* Service Card Header */}
                   <div className="flex items-start justify-between mb-6">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center text-muted-foreground/30 group-hover/service:bg-primary/10 group-hover/service:text-primary transition-all duration-300">
+                      <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center text-muted-foreground/30 group-hover/service:bg-primary/10 group-hover/service:text-primary transition-all duration-300">
                         <IconComp size={24} weight="duotone" />
                       </div>
                       <div>
@@ -148,7 +148,7 @@ export function CategoryDetailSheet({
                       {serviceSpecs.map((spec) => (
                         <div 
                           key={spec} 
-                          className="group/spec flex items-center gap-2 px-3 py-1.5 bg-muted/40 border border-border/50 rounded-xl transition-all hover:bg-card hover:border-primary/30 hover:shadow-sm"
+                          className="group/spec flex items-center gap-2 px-3 py-1.5 bg-muted/40 border border-border/50 rounded-lg transition-all hover:bg-card hover:border-primary/30 hover:shadow-sm"
                           title={spec}
                         >
                           <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/30 group-hover/spec:bg-primary/40 transition-colors" />
@@ -178,7 +178,7 @@ export function CategoryDetailSheet({
                         </div>
                       ))}
                       <button 
-                        className="flex items-center gap-2 px-3 py-1.5 bg-muted/10 border border-dashed border-border rounded-xl text-muted-foreground/60 hover:text-primary hover:border-primary/40 hover:bg-primary/[0.04] transition-all"
+                        className="flex items-center gap-2 px-3 py-1.5 bg-muted/10 border border-dashed border-border rounded-lg text-muted-foreground/60 hover:text-primary hover:border-primary/40 hover:bg-primary/[0.04] transition-all"
                         onClick={() => onOpenDialog({ type: "spec", mode: "add", parentId: service })}
                       >
                         <Plus size={12} weight="bold" />

@@ -20,11 +20,12 @@ import { Button } from "@/components/ui/button";
 import { ChoiceCard } from "@/components/shared/choice-card";
 import { DetailSection } from "@/components/shared/detail-section";
 import { DetailField } from "@/components/shared/detail-field";
-import { SuccessCelebration } from "@/components/shared/success-celebration";
+import { SuccessModal } from "@/components/shared/success-modal";
 import { DatePickerField } from "@/components/shared/date-picker-field";
 import { PhoneInput } from "@/components/shared/phone-input";
 import { IdentificationInput } from "@/components/shared/identification-input";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface Dependent {
   id: string;
@@ -68,6 +69,7 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
   const isEditing = !!employeeId;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [newEmployeeData, setNewEmployeeData] = useState<any>(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -135,21 +137,57 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
     setIsSubmitting(true);
     await new Promise(resolve => setTimeout(resolve, 1500));
     setIsSubmitting(false);
-    setIsSuccess(true);
-    setTimeout(() => onSuccess({ ...formData, dependents, assignedPolicies }), 1500);
+    
+    const payload = { ...formData, dependents, assignedPolicies };
+    
+    if (isEditing) {
+      toast.success("Employee profile updated successfully");
+      onSuccess(payload);
+    } else {
+      setNewEmployeeData(payload);
+      setIsSuccess(true);
+    }
   };
 
-  if (isSuccess) {
+  if (isSuccess && !isEditing) {
     return (
-      <div className="py-12">
-        <SuccessCelebration 
-          title={isEditing ? "Profile Updated!" : "Employee Registered!"}
-          message={isEditing 
-            ? "Member records have been synchronized with the master database." 
-            : "Welcome on board! The new profile is now active and benefits pinned."
+      <SuccessModal
+        isOpen={isSuccess}
+        onClose={onCancel}
+        title="Employee Registered"
+        message="Precision onboarding complete. The employee profile has been established and benefit policies pinned."
+        primaryAction={{
+          label: "Add Another Employee",
+          onClick: () => {
+            setIsSuccess(false);
+            setFormData({
+              name: "",
+              dateOfBirth: "",
+              idType: "IC",
+              idNumber: "",
+              email: "",
+              phone: "+60 ",
+              joinDate: "",
+              empCode: "",
+              probationMonths: "3",
+              probationEndDate: "",
+              employmentType: "full-time",
+              startTerminationDate: "",
+              hasDependents: false,
+              probationMode: "3m" as "3m" | "6m" | "date",
+              department: "",
+              role: "",
+              gender: "male" as "male" | "female" | "other",
+            });
+            setDependents([]);
+            setAssignedPolicies([]);
           }
-        />
-      </div>
+        }}
+        secondaryAction={{
+          label: "View Directory",
+          onClick: () => onSuccess(newEmployeeData)
+        }}
+      />
     );
   }
 
@@ -160,7 +198,7 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
         <div className="flex items-center gap-4">
           <button
             onClick={onCancel}
-            className="w-10 h-10 rounded-xl border border-border flex items-center justify-center hover:bg-muted/50 transition-all bg-card shadow-sm"
+            className="w-10 h-10 rounded-lg border border-border flex items-center justify-center hover:bg-muted/50 transition-all bg-card shadow-sm"
           >
             <CaretLeft size={20} weight="bold" />
           </button>
@@ -371,7 +409,7 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
             </div>
           </div>
 
-          <div className="p-5 rounded-2xl border border-border/80 bg-muted/10 space-y-4">
+          <div className="p-5 rounded-lg border border-border/80 bg-muted/10 space-y-4">
              <div className="flex items-center justify-between">
                 <div>
                   <h5 className="text-body font-semibold text-foreground tracking-tight">Probation Details</h5>
@@ -419,7 +457,7 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
 
              {/* Computed preview for period modes */}
              {(formData.probationMode === "3m" || formData.probationMode === "6m") && formData.joinDate && (
-               <div className="flex items-center gap-2 text-label text-muted-foreground bg-card border border-border rounded-xl px-4 py-3 animate-in fade-in duration-500 shadow-sm transition-all hover:border-primary/20">
+               <div className="flex items-center gap-2 text-label text-muted-foreground bg-card border border-border rounded-lg px-4 py-3 animate-in fade-in duration-500 shadow-sm transition-all hover:border-primary/20">
                  <CalendarBlank size={16} weight="bold" className="text-primary shrink-0" />
                  <span className="font-medium">Probation ends on <strong className="text-foreground font-semibold underline underline-offset-4 decoration-primary/30">
                    {(() => {
@@ -442,7 +480,7 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
       >
         <div className="space-y-4 p-1">
           {assignedPolicies.map((assigned, idx) => (
-            <div key={idx} className="p-4 rounded-xl border border-border bg-card shadow-sm flex items-start justify-between gap-4 animate-in fade-in slide-in-from-top-2 hover:border-primary/20 transition-all">
+            <div key={idx} className="p-4 rounded-lg border border-border bg-card shadow-sm flex items-start justify-between gap-4 animate-in fade-in slide-in-from-top-2 hover:border-primary/20 transition-all">
               <div className="flex-1 grid grid-cols-2 gap-4">
                  <div className="space-y-1.5">
                     <label className="text-micro font-semibold text-muted-foreground/60 tracking-tight">Select benefit policy</label>
@@ -504,7 +542,7 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
       >
         <div className="space-y-5 p-1">
           {dependents.map((dep) => (
-             <div key={dep.id} className="p-5 rounded-2xl border border-border/80 bg-muted/5 space-y-5 animate-in fade-in zoom-in-95 hover:border-primary/20 transition-all">
+             <div key={dep.id} className="p-5 rounded-lg border border-border/80 bg-muted/5 space-y-5 animate-in fade-in zoom-in-95 hover:border-primary/20 transition-all">
                 <div className="flex items-center justify-between">
                    <span className="text-micro font-semibold text-primary bg-primary/10 px-2.5 py-1 rounded-full tracking-wider">Dependent unit</span>
                    <button onClick={() => removeDependent(dep.id)} className="text-muted-foreground/30 hover:text-rose-500 transition-colors">
@@ -543,11 +581,9 @@ export function EmployeeForm({ employeeId, onCancel, onSuccess }: EmployeeFormPr
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-caption font-semibold text-muted-foreground/60 tracking-tight">Phone number</label>
-                    <input 
+                    <PhoneInput 
                       value={dep.phone}
-                      onChange={(e) => updateDependent(dep.id, 'phone', e.target.value)}
-                      className="w-full px-3 py-2 bg-background border border-border/80 rounded-lg text-nav font-semibold text-foreground outline-none focus:ring-2 focus:ring-primary/10 transition-all font-mono placeholder:text-muted-foreground/30"
-                      placeholder="Phone"
+                      onChange={(v) => updateDependent(dep.id, 'phone', v)}
                     />
                   </div>
                 </div>

@@ -44,7 +44,7 @@ export function ActionPopover({
       <PopoverContent 
         align={align}
         className={cn(
-          "w-52 p-1.5 bg-card border border-border shadow-2xl rounded-xl z-50 animate-in fade-in zoom-in-95 duration-100", 
+          "w-52 p-1.5 bg-card border border-border shadow-2xl rounded-lg z-50 animate-in fade-in zoom-in-95 duration-100", 
           contentClassName
         )}
         onClick={(e) => e.stopPropagation()}

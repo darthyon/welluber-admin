@@ -16,7 +16,12 @@ import {
   EnvelopeSimple,
   Article,
   Files,
-  Info
+  Info,
+  Bank,
+  MapPin,
+  CreditCard,
+  Clock,
+  ShieldCheck
 } from "@phosphor-icons/react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -57,6 +62,12 @@ const OTHER_SPS = MOCK_SPS.slice(0, 5).map((s) => ({
   label: s.name,
   href: `/service-providers/${s.id}`,
 }));
+
+import { BUSINESS_TYPES } from "@/features/providers/constants";
+
+const BUSINESS_TYPE_LABELS: Record<string, string> = Object.fromEntries(
+  BUSINESS_TYPES.map(t => [t.id, t.label])
+);
 
 export default function ServiceProviderDetailPage() {
   const params = useParams();
@@ -145,7 +156,7 @@ export default function ServiceProviderDetailPage() {
 
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
             <div className="flex items-start gap-5">
-              <div className="w-15 h-15 rounded-2xl bg-muted/80 flex items-center justify-center text-muted-foreground border border-zinc-200/60 transition-all">
+              <div className="w-15 h-15 rounded-lg bg-muted/80 flex items-center justify-center text-muted-foreground border border-zinc-200/60 transition-all">
                 <Storefront size={32} weight="fill" />
               </div>
               <div className="space-y-2">
@@ -214,19 +225,17 @@ export default function ServiceProviderDetailPage() {
           {activeTab === "details" && (
             <>
             <DetailSection
-              title="Provider Info"
+              title="Provider Profile"
               icon={<Storefront size={16} weight="fill" />}
             >
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-8">
                 <DetailField label="Company Name" value={sp.name} />
-                <DetailField label="Registration No." value={<span className="font-mono">{sp.registrationNo}</span>} />
-                <DetailField label="TIN No." value={sp.tinNumber || "N/A"} />
                 {sp.website && (
                   <DetailField
                     label="Website"
                     value={
-                      <a href={sp.website} target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2 flex items-center gap-1">
-                        <Globe size={12} /> {sp.website}
+                      <a href={sp.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline underline-offset-4 flex items-center gap-1.5 font-medium transition-all">
+                        <Globe size={14} /> {sp.website}
                       </a>
                     }
                   />
@@ -239,7 +248,7 @@ export default function ServiceProviderDetailPage() {
                   value={
                     <div className="flex flex-wrap gap-1.5 mt-0.5">
                       {sp.mainServices?.map((service, i) => (
-                        <Badge key={i} variant="secondary" className="text-caption font-medium">{service}</Badge>
+                        <Badge key={i} variant="secondary" className="text-micro font-semibold bg-muted/40">{service}</Badge>
                       ))}
                       {(!sp.mainServices || sp.mainServices.length === 0) && (
                         <span className="text-label text-muted-foreground italic">None selected</span>
@@ -248,18 +257,143 @@ export default function ServiceProviderDetailPage() {
                   }
                   className="sm:col-span-2"
                 />
-                <DetailField
-                  label="Status"
-                  value={
-                    <StatusBadge
-                      status={currentStatus}
-                      variant={currentStatus === "active" ? "emerald" : currentStatus === "pending" ? "amber" : "zinc"}
+                <div className="pt-2 border-t border-border/50 sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <DetailField
+                        label="Status"
+                        value={
+                            <StatusBadge
+                            status={currentStatus}
+                            variant={currentStatus === "active" ? "emerald" : currentStatus === "pending" ? "amber" : "zinc"}
+                            />
+                        }
                     />
-                  }
-                />
-                <DetailField label="On Platform Since" value={new Date(sp.createdAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })} />
+                    <DetailField label="On Platform Since" value={new Date(sp.createdAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })} />
+                </div>
               </div>
             </DetailSection>
+
+            {/* Registration & Compliance */}
+            <DetailSection
+              title="Registration & Compliance"
+              icon={<IdentificationCard size={16} weight="fill" />}
+            >
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <DetailField label="Registration No. (BRN)" value={<span className="font-mono font-semibold">{sp.registrationNo}</span>} />
+                <DetailField label="TIN Number" value={sp.tinNumber || "N/A"} />
+                <DetailField label="SST Registration No." value={sp.taxProfile?.taxRegNo || "N/A"} />
+                
+                <div className="sm:col-span-3 pt-4">
+                  <p className="text-micro font-semibold text-muted-foreground/50 uppercase tracking-widest mb-3">Compliance Documents</p>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {(sp.documents || []).length > 0 ? (
+                      sp.documents?.map((doc, i) => (
+                        <div key={i} className="flex items-center gap-3 p-3 bg-muted/20 border border-border rounded-lg">
+                          <div className="w-9 h-9 rounded-lg bg-muted border border-border flex items-center justify-center text-muted-foreground/60">
+                            <Files size={18} weight="duotone" />
+                          </div>
+                          <div className="flex-1 overflow-hidden">
+                            <p className="text-label font-semibold text-foreground truncate">{doc}</p>
+                            <p className="text-micro text-muted-foreground font-medium">Document attached</p>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-label text-muted-foreground italic">No documents uploaded.</p>
+                    )}
+                  </div>
+                  {sp.businessType && (
+                    <p className="text-caption text-muted-foreground mt-3">
+                      Categorized as: <span className="font-semibold text-foreground">{BUSINESS_TYPE_LABELS[sp.businessType] || sp.businessType}</span>
+                    </p>
+                  )}
+                </div>
+              </div>
+            </DetailSection>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Section: Business Address */}
+                <DetailSection
+                    title="Registered Business Address"
+                    icon={<MapPin size={16} weight="fill" />}
+                >
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <DetailField label="Address" value={sp.address?.line || "N/A"} className="sm:col-span-2" />
+                        <DetailField label="Post Code" value={sp.address?.postalCode || "N/A"} />
+                        <DetailField label="City" value={sp.address?.city || "N/A"} />
+                        <DetailField label="State" value={sp.address?.state || "N/A"} />
+                        <DetailField label="Country" value={sp.address?.country || "Malaysia"} />
+                    </div>
+                </DetailSection>
+
+                {/* Section: Settlement & Tax Compliance */}
+                <DetailSection
+                    title="Settlement & Tax Compliance"
+                    icon={<Bank size={16} weight="fill" />}
+                    className="bg-muted/5 border-primary/10"
+                >
+                    <div className="space-y-8">
+                        {/* Bank Details */}
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                            <DetailField label="Bank Name" value={sp.bankInfo?.bankName || "N/A"} />
+                            <DetailField label="Account Name" value={sp.bankInfo?.accountName || "N/A"} />
+                            <DetailField label="Account Number" value={<span className="font-mono font-semibold tracking-wider">{sp.bankInfo?.accountNumber || "N/A"}</span>} />
+                        </div>
+
+                        {/* Billing & Tax Settings */}
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-6 border-t border-border/40">
+                            <div className="space-y-1">
+                                <div className="flex items-center gap-2 text-muted-foreground/60 mb-1">
+                                    <Clock size={14} />
+                                    <span className="text-micro font-semibold uppercase tracking-wider">Payment Cycle</span>
+                                </div>
+                                <p className="text-nav font-semibold text-foreground">{sp.paymentCycle || "Not Set"}</p>
+                            </div>
+
+                            <div className="space-y-1">
+                                <div className="flex items-center gap-2 text-muted-foreground/60 mb-1">
+                                    <CreditCard size={14} />
+                                    <span className="text-micro font-semibold uppercase tracking-wider">Credit Terms</span>
+                                </div>
+                                <p className="text-nav font-semibold text-foreground">{sp.creditTerms || "Not Set"}</p>
+                            </div>
+
+                            <div className="space-y-1">
+                                <div className="flex items-center gap-2 text-muted-foreground/60 mb-1">
+                                    <Article size={14} />
+                                    <span className="text-micro font-semibold uppercase tracking-wider">Expired Commission Fee</span>
+                                </div>
+                                <p className="text-nav font-semibold text-foreground">{(sp.expiredCommissionFee ?? 0) * 100}%</p>
+                            </div>
+                        </div>
+
+                        {/* e-Invoice Settings */}
+                        <div className="pt-6 border-t border-border/40 space-y-4">
+                            <div className="flex flex-wrap gap-4">
+                                <div className={cn(
+                                    "flex items-center gap-2 px-3 py-1.5 rounded-full border text-nav font-medium",
+                                    sp.needsEInvoiceSubmission ? "bg-primary/5 border-primary/20 text-primary" : "bg-muted/50 border-border text-muted-foreground"
+                                )}>
+                                    <ShieldCheck size={14} weight={sp.needsEInvoiceSubmission ? "fill" : "regular"} />
+                                    Needs e-Invoice Submission
+                                </div>
+                                <div className={cn(
+                                    "flex items-center gap-2 px-3 py-1.5 rounded-full border text-nav font-medium",
+                                    sp.appointedForEInvoice ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-600" : "bg-muted/50 border-border text-muted-foreground"
+                                )}>
+                                    <ShieldCheck size={14} weight={sp.appointedForEInvoice ? "fill" : "regular"} />
+                                    Appointed Welluber for e-Invoice
+                                </div>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-white/50 border border-border rounded-lg">
+                                <DetailField label="Classification Code" value={sp.classificationCode || "N/A"} />
+                                <DetailField label="Classification Descriptor" value={sp.classificationDescriptor || "N/A"} />
+                            </div>
+                        </div>
+                    </div>
+                </DetailSection>
+            </div>
+
  
             {/* Section 2: Service Portfolio */}
             <DetailSection
@@ -299,65 +433,7 @@ export default function ServiceProviderDetailPage() {
               />
             </DetailSection>
 
-            {/* Section 3: Tax Profile */}
-            <DetailSection
-              title="Tax Profile"
-              icon={<IdentificationCard size={16} weight="fill" />}
-              description="SST registration status and rate applied to this provider's transactions."
-            >
-              <TaxProfileForm spId={spId} initial={sp.taxProfile} />
-            </DetailSection>
 
-            {/* Section: e-Invoice Malaysia */}
-            <DetailSection
-              title="e-Invoice Malaysia"
-              icon={<Article size={16} weight="fill" />}
-              description="Classification codes for e-invoice submission."
-              action={
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <span className="flex items-center cursor-default text-primary">
-                        <Info size={16} weight="fill" />
-                      </span>
-                    </TooltipTrigger>
-                    <TooltipContent side="left" className="max-w-[220px] text-center text-label">
-                      Welluber will submit for SP on behalf to the org.
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              }
-            >
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <DetailField label="Classification Code" value={sp.classificationCode || "N/A"} />
-                <DetailField label="Classification Descriptor" value={sp.classificationDescriptor || "N/A"} />
-              </div>
-            </DetailSection>
-
-            {/* Section: Documents */}
-            <DetailSection
-              title="Documents"
-              icon={<Files size={16} weight="fill" />}
-              description="General file attachments and registration documents."
-            >
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {(sp.documents || []).length > 0 ? (
-                  sp.documents?.map((doc, i) => (
-                    <div key={i} className="flex items-center gap-3 p-3 bg-muted/20 border border-border rounded-xl">
-                      <div className="w-9 h-9 rounded-lg bg-muted border border-border flex items-center justify-center text-muted-foreground/60">
-                        <Files size={18} weight="duotone" />
-                      </div>
-                    <div className="flex-1 overflow-hidden">
-                        <p className="text-label font-semibold text-foreground truncate">{doc}</p>
-                        <p className="text-micro text-muted-foreground font-medium">Document attached</p>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-label text-muted-foreground italic">No documents uploaded.</p>
-                )}
-              </div>
-            </DetailSection>
 
             {/* Section 4: Administrators */}
               <DetailSection
@@ -489,7 +565,7 @@ export default function ServiceProviderDetailPage() {
                 description="Confirm how you want to change the provider lifecycle."
               >
                 <div className="space-y-4">
-                  <div className="rounded-xl border border-border bg-muted/20 p-4">
+                  <div className="rounded-lg border border-border bg-muted/20 p-4">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div className="space-y-1">
                         <p className="text-nav font-semibold text-foreground">
@@ -528,7 +604,7 @@ export default function ServiceProviderDetailPage() {
                     </div>
                   </div>
 
-                  <div className="rounded-xl border border-rose-200 bg-rose-50/60 p-4">
+                  <div className="rounded-lg border border-rose-200 bg-rose-50/60 p-4">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div className="space-y-1">
                         <p className="text-nav font-semibold text-foreground">Remove Service Provider</p>

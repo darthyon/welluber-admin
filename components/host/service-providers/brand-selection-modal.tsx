@@ -53,12 +53,14 @@ export function BrandSelectionModal({ isOpen, onClose, onSelect, brands }: Brand
               <button
                 key={brand.id}
                 onClick={() => onSelect(brand)}
-                className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-muted/60 transition-all group text-left"
+                className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-muted/60 transition-all group text-left"
               >
                 <div className="flex items-center gap-3">
-                  <Avatar className="h-9 w-9 rounded-lg border border-border/40 shadow-sm">
-                    <AvatarImage src={brand.logo} />
-                    <AvatarFallback className="text-micro font-semibold bg-muted-foreground/10 text-muted-foreground">
+                  <Avatar className="h-10 w-10 rounded-lg border border-border/60 shadow-sm bg-white shrink-0">
+                    {brand.logo && !brand.logo.includes("dicebear.com") && (
+                      <AvatarImage src={brand.logo} className="object-contain p-1" />
+                    )}
+                    <AvatarFallback className="text-nav font-semibold bg-primary/[0.03] text-primary/70">
                         {brand.name.substring(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>

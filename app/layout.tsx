@@ -5,16 +5,19 @@ import "./globals.css"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { ThemeProvider } from "@/components/theme-provider"
 import { cn } from "@/lib/utils"
+import { Toaster } from "sonner"
 
 const geist = localFont({
   src: "../docs/Geist-VariableFont_wght.ttf",
   variable: "--font-geist",
+  weight: "100 900",
   display: "swap",
 })
 
 const geistMono = localFont({
   src: "../docs/GeistMono-VariableFont_wght.ttf",
   variable: "--font-mono",
+  weight: "100 900",
   display: "swap",
 })
 
@@ -41,6 +44,7 @@ export default function RootLayout({
         <ThemeProvider>
           <TooltipProvider>
             {children}
+            <Toaster position="top-right" expand={false} richColors />
           </TooltipProvider>
         </ThemeProvider>
       </body>

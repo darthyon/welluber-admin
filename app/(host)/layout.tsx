@@ -11,7 +11,7 @@ export default function HostLayout({
     <SidebarProvider>
       <AppSidebar />
       <TopBar />
-      <SidebarInset className="bg-background min-w-0 overflow-hidden">
+      <SidebarInset className="bg-background min-w-0">
         <main className="flex-1 w-full mt-14 p-8 px-6">
           {children}
         </main>

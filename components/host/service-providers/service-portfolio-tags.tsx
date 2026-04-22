@@ -111,7 +111,7 @@ export function ServicePortfolioTags({ mainServices, className }: ServicePortfol
                 </button>
               </TooltipTrigger>
               <TooltipContent
-                className="w-64 bg-popover rounded-xl border border-border/60 shadow-2xl z-[200] p-1"
+                className="w-64 bg-popover rounded-lg border border-border/60 shadow-2xl z-[200] p-1"
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="flex flex-col gap-0.5 py-1">

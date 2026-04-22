@@ -42,7 +42,7 @@ export function SpBranchCard({ branch, onView, onEdit }: SpBranchCardProps) {
       whileHover={{ y: -4 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
       onClick={onView}
-      className="group bg-card border border-border rounded-xl p-5 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-500 cursor-pointer overflow-hidden relative flex flex-col h-full"
+      className="group bg-card border border-border rounded-lg p-5 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-500 cursor-pointer overflow-hidden relative flex flex-col h-full"
     >
       {/* Decorative Accent (Aligned with Org Card) */}
       <div className="absolute -right-8 -bottom-8 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:w-32 group-hover:h-32 group-hover:bg-primary/10 transition-all duration-500 pointer-events-none" />

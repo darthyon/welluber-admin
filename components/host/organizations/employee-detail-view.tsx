@@ -119,7 +119,7 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
         
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-semibold text-heading shadow-sm">
+            <div className="w-14 h-14 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-semibold text-heading shadow-sm">
               {employeeData.avatar}
             </div>
             <div>
@@ -240,7 +240,7 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
               {employeeData.benefitPolicies.map((policy, idx) => {
                 const isExpanded = expandedPolicies.has(idx);
                 return (
-                  <div key={idx} className="rounded-xl border border-border bg-card overflow-hidden">
+                  <div key={idx} className="rounded-lg border border-border bg-card overflow-hidden">
                     {/* Policy header row */}
                     <button
                       onClick={() => togglePolicy(idx)}
@@ -295,7 +295,7 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
                         ) : policy.claims.map(claim => (
                           <div key={claim.id} className="grid grid-cols-[120px_1fr_1fr_1fr_100px_80px] gap-3 px-6 py-3 border-b border-border last:border-0 hover:bg-muted/80 transition-colors items-center">
                             <div className="flex items-center gap-1.5">
-                              <span className={cn("text-micro font-semibold px-1.5 py-0.5 rounded", CLAIM_STATUS_STYLE[claim.status])}>{claim.status}</span>
+                              <span className={cn("text-micro font-semibold px-1.5 py-0.5 rounded-full", CLAIM_STATUS_STYLE[claim.status])}>{claim.status}</span>
                               <code className="text-micro font-mono text-muted-foreground/60 truncate tracking-tighter">{claim.voucherCode}</code>
                             </div>
                             <p className="text-label text-foreground font-medium truncate">{claim.service}</p>
@@ -329,7 +329,7 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
             title="Household" 
             icon={<Users size={18} weight="bold" className="text-primary" />}
           >
-            <div className="bg-muted/20 border border-dashed border-border rounded-xl p-8 flex flex-col items-center text-center">
+            <div className="bg-muted/20 border border-dashed border-border rounded-lg p-8 flex flex-col items-center text-center">
               <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground/50 mb-4 border border-dashed border-border/40">
                 <Users size={24} />
               </div>
@@ -343,7 +343,7 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
             </div>
           </DetailSection>
 
-          <div className="bg-card rounded-2xl border border-border p-6">
+          <div className="bg-card rounded-lg border border-border p-6">
             <ActivityTimeline 
               items={employeeData.auditTrail.map((trail, i) => ({
                 id: i,

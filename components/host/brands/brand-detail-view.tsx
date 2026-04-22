@@ -226,7 +226,7 @@ export function BrandDetailView({ brand, onBack, onEdit, onRemove }: BrandDetail
               }
             />
             
-            <div className="border border-border/40 rounded-xl overflow-hidden mt-2 bg-card">
+            <div className="border border-border/40 rounded-lg overflow-hidden mt-2 bg-card">
                 <TooltipProvider>
                     <SharedDataTable
                         data={filteredSps}

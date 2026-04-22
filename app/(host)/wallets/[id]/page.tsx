@@ -60,7 +60,7 @@ function WalletDetailContent() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
         <h2 className="text-heading font-semibold tracking-tight">Wallet Not Found</h2>
-        <Button variant="outline" onClick={() => router.push("/wallets")} className="rounded-xl px-6">
+        <Button variant="outline" onClick={() => router.push("/wallets")} className="rounded-lg px-6">
           Back to Wallets
         </Button>
       </div>
@@ -135,7 +135,7 @@ function WalletDetailContent() {
 
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
             <div className="flex items-start gap-5">
-              <div className="w-15 h-15 rounded-2xl bg-muted/80 flex items-center justify-center text-muted-foreground border border-zinc-200/60 transition-all">
+              <div className="w-15 h-15 rounded-lg bg-muted/80 flex items-center justify-center text-muted-foreground border border-zinc-200/60 transition-all">
                 {wallet.model === "cash_balance" ? <Bank size={32} weight="fill" /> : <CreditCard size={32} weight="fill" />}
               </div>
               <div className="space-y-2">
@@ -195,7 +195,7 @@ function WalletDetailContent() {
         {activeTab === "transactions" ? (
            <>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 bg-primary/5 border border-primary/10 rounded-2xl overflow-hidden relative p-8">
+              <div className="lg:col-span-2 bg-primary/5 border border-primary/10 rounded-lg overflow-hidden relative p-8">
                 <div className="absolute top-0 right-0 p-8 opacity-[0.03]">
                   {wallet.model === "cash_balance" ? <Bank size={80} weight="fill" /> : <CreditCard size={80} weight="fill" />}
                 </div>
@@ -242,7 +242,7 @@ function WalletDetailContent() {
                 </div>
               </div>
 
-              <div className="bg-card border border-border/60 rounded-xl p-5 space-y-5">
+              <div className="bg-card border border-border/60 rounded-lg p-5 space-y-5">
                 <h3 className="text-body font-semibold tracking-tight text-foreground/80">Quick actions</h3>
                 <div className="space-y-2.5 text-nav font-medium">
                    <Button variant="ghost" className="w-full justify-start h-10 gap-3 px-3 hover:bg-muted/50 rounded-lg group">
@@ -333,7 +333,7 @@ function WalletDetailContent() {
                      render: (trx: any) => (
                        <div className="flex items-center gap-4 py-1">
                          <div className={cn(
-                           "h-9 w-9 rounded-xl flex items-center justify-center shrink-0 shadow-sm",
+                           "h-9 w-9 rounded-lg flex items-center justify-center shrink-0 shadow-sm",
                            trx.type === "topup" ? "bg-emerald-50 text-emerald-600" : "bg-muted text-muted-foreground"
                          )}>
                            {trx.type === "topup" ? <ArrowUpRight size={15} weight="bold" /> : <ArrowDownRight size={15} weight="bold" />}
@@ -429,7 +429,7 @@ function WalletDetailContent() {
                 description="Confirm how you want to change the wallet lifecycle."
               >
                 <div className="space-y-4">
-                  <div className="rounded-xl border border-border bg-muted/20 p-4">
+                  <div className="rounded-lg border border-border bg-muted/20 p-4">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div className="space-y-1">
                         <p className="text-nav font-semibold text-foreground">Suspend Wallet</p>
@@ -443,7 +443,7 @@ function WalletDetailContent() {
                     </div>
                   </div>
 
-                  <div className="rounded-xl border border-rose-200 bg-rose-50/60 p-4">
+                  <div className="rounded-lg border border-rose-200 bg-rose-50/60 p-4">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div className="space-y-1">
                         <p className="text-nav font-semibold text-foreground">Terminate Wallet Permanently</p>

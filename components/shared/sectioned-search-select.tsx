@@ -104,7 +104,7 @@ export function SectionedSearchSelect({
         onClick={() => !disabled && setIsOpen(!isOpen)}
         disabled={disabled}
         className={cn(
-          "w-full flex items-center justify-between px-4 py-2.5 rounded-xl border bg-background text-nav transition-all text-left pr-12",
+          "w-full flex items-center justify-between px-4 py-2.5 rounded-lg border bg-background text-nav transition-all text-left pr-12",
           isOpen ? "border-primary ring-2 ring-primary/10" : "border-border hover:border-foreground/20",
           !value && "text-muted-foreground/40",
           disabled && "opacity-60 cursor-not-allowed bg-muted"
@@ -130,7 +130,7 @@ export function SectionedSearchSelect({
       {isOpen && typeof document !== "undefined" && createPortal(
         <div
           ref={dropdownRef}
-          className="z-[1000] overflow-hidden rounded-xl border border-border bg-popover shadow-2xl animate-in fade-in zoom-in-95 duration-100 flex flex-col"
+          className="z-[1000] overflow-hidden rounded-lg border border-border bg-popover shadow-2xl animate-in fade-in zoom-in-95 duration-100 flex flex-col"
           style={dropdownStyle}
         >
           <div className="p-2 border-b border-border flex items-center gap-2 bg-muted/30">

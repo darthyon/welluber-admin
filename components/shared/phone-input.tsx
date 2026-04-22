@@ -1,131 +1,124 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { CaretDown, Phone } from "@phosphor-icons/react"
+import * as React from "react";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-import { cn } from "@/lib/utils"
+} from "@/components/ui/popover";
 
 const COUNTRIES = [
-  { name: "Malaysia", code: "+60", flag: "🇲🇾" },
-  { name: "Singapore", code: "+65", flag: "🇸🇬" },
-  { name: "Indonesia", code: "+62", flag: "🇮🇩" },
-  { name: "Thailand", code: "+66", flag: "🇹🇭" },
-  { name: "Vietnam", code: "+84", flag: "🇻🇳" },
-  { name: "Philippines", code: "+63", flag: "🇵🇭" },
-]
+  { name: "Malaysia", code: "MY", dialCode: "+60", flag: "🇲🇾" },
+  { name: "Singapore", code: "SG", dialCode: "+65", flag: "🇸🇬" },
+  { name: "Indonesia", code: "ID", dialCode: "+62", flag: "🇮🇩" },
+  { name: "Thailand", code: "TH", dialCode: "+66", flag: "🇹🇭" },
+  { name: "Vietnam", code: "VN", dialCode: "+84", flag: "🇻🇳" },
+  { name: "Philippines", code: "PH", dialCode: "+63", flag: "🇵🇭" },
+  { name: "United Kingdom", code: "GB", dialCode: "+44", flag: "🇬🇧" },
+  { name: "United States", code: "US", dialCode: "+1", flag: "🇺🇸" },
+];
 
 interface PhoneInputProps {
-  value: string // The full number with prefix
-  onChange: (value: string) => void
-  placeholder?: string
-  className?: string
+  value?: string;
+  onChange?: (value: string) => void;
+  placeholder?: string;
+  className?: string;
+  error?: boolean;
 }
 
 export function PhoneInput({
-  value,
+  value = "",
   onChange,
-  placeholder = "12-345 6789",
+  placeholder = "Phone number",
   className,
+  error,
 }: PhoneInputProps) {
-  // Parse initial value to find matching country
-  const initialCountry =
-    COUNTRIES.find((c) => value.startsWith(c.code)) || COUNTRIES[0]
-  const [selectedCountry, setSelectedCountry] = useState(initialCountry)
-  const [isOpen, setIsOpen] = useState(false)
+  const [open, setOpen] = React.useState(false);
+  
+  // Try to parse dial code from value
+  const selectedCountry = React.useMemo(() => {
+    if (!value) return COUNTRIES[0]; // Default to Malaysia
+    const match = COUNTRIES.find(c => value.startsWith(c.dialCode));
+    return match || COUNTRIES[0];
+  }, [value]);
 
-  // Extract the number part without prefix
-  const numberPart = value.startsWith(selectedCountry.code)
-    ? value.slice(selectedCountry.code.length).trim()
-    : value
+  const phoneNumber = React.useMemo(() => {
+    if (!value) return "";
+    return value.replace(selectedCountry.dialCode, "").trim();
+  }, [value, selectedCountry]);
 
-  const handleNumberChange = (newNumber: string) => {
-    // Only allow digits, spaces, and hyphens
-    const cleanNumber = newNumber.replace(/[^\d\s-]/g, "")
-    onChange(`${selectedCountry.code} ${cleanNumber}`)
-  }
+  const handleCountrySelect = (country: typeof COUNTRIES[0]) => {
+    const newValue = `${country.dialCode} ${phoneNumber}`;
+    onChange?.(newValue);
+    setOpen(false);
+  };
 
-  const handleCountrySelect = (country: (typeof COUNTRIES)[0]) => {
-    setSelectedCountry(country)
-    onChange(`${country.code} ${numberPart}`)
-    setIsOpen(false)
-  }
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value.replace(/\D/g, "");
+    const newValue = `${selectedCountry.dialCode} ${rawValue}`;
+    onChange?.(newValue);
+  };
 
   return (
-    <div
-      className={cn(
-        "group relative flex h-[38px] items-center overflow-hidden rounded-lg border border-border bg-background transition-all focus-within:border-primary/30 focus-within:ring-2 focus-within:ring-primary/10",
-        className
-      )}
-    >
-      <Popover open={isOpen} onOpenChange={setIsOpen}>
+    <div className={cn("flex gap-2", className)}>
+      <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <button className="flex h-full shrink-0 items-center gap-1.5 border-r border-border/50 px-3 transition-colors hover:bg-muted">
-            <span className="text-section">{selectedCountry.flag}</span>
-            <span className="font-mono text-nav font-semibold text-foreground">
-              {selectedCountry.code}
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className={cn(
+              "w-[95px] px-3 shrink-0 justify-between font-medium border-border hover:bg-muted/50",
+              error && "border-destructive ring-destructive/20"
+            )}
+          >
+            <span className="flex items-center gap-2">
+              <span className="text-lg leading-none">{selectedCountry.flag}</span>
+              <span className="text-nav">{selectedCountry.dialCode}</span>
             </span>
-            <CaretDown
-              size={12}
-              className={cn(
-                "text-muted-foreground/60 transition-transform",
-                isOpen && "rotate-180"
-              )}
-            />
-          </button>
+            <ChevronsUpDown className="ml-1 h-3 w-3 shrink-0 opacity-50" />
+          </Button>
         </PopoverTrigger>
-        <PopoverContent
-          align="start"
-          className="z-[200] w-[180px] border-border p-1 shadow-2xl"
-        >
-          <div className="grid gap-0.5">
-            {COUNTRIES.map((c) => (
+        <PopoverContent className="w-[200px] p-0" align="start">
+          <div className="p-1 max-h-[300px] overflow-y-auto">
+             <p className="text-micro font-semibold text-muted-foreground/50 uppercase tracking-widest px-3 py-2">Select Country</p>
+            {COUNTRIES.map((country) => (
               <button
-                key={c.code}
-                onClick={() => handleCountrySelect(c)}
+                key={country.code}
+                type="button"
                 className={cn(
-                  "group flex items-center justify-between rounded-md px-3 py-2 text-left transition-all hover:bg-muted",
-                  selectedCountry.code === c.code && "bg-primary/5"
+                  "flex w-full items-center gap-3 px-3 py-2 text-nav rounded-md hover:bg-muted transition-colors",
+                  selectedCountry.code === country.code && "bg-muted/50"
                 )}
+                onClick={() => handleCountrySelect(country)}
               >
-                <div className="flex items-center gap-2.5">
-                  <span className="text-section">{c.flag}</span>
-                  <span
-                    className={cn(
-                      "text-nav font-medium",
-                      selectedCountry.code === c.code
-                        ? "text-primary"
-                        : "text-foreground/80"
-                    )}
-                  >
-                    {c.name}
-                  </span>
-                </div>
-                <span className="font-mono text-caption font-semibold text-muted-foreground/40 group-hover:text-primary/70">
-                  {c.code}
-                </span>
+                <span className="text-xl leading-none">{country.flag}</span>
+                <span className="flex-1 text-left font-medium">{country.name}</span>
+                <span className="text-muted-foreground text-caption">{country.dialCode}</span>
+                {selectedCountry.code === country.code && (
+                  <Check className="h-4 w-4 text-primary" />
+                )}
               </button>
             ))}
           </div>
         </PopoverContent>
       </Popover>
 
-      <div className="relative flex h-full flex-1 items-center">
-        <Phone
-          size={16}
-          className="absolute left-3 text-muted-foreground/40 transition-colors group-focus-within:text-primary"
-        />
-        <input
-          type="tel"
-          value={numberPart}
-          onChange={(e) => handleNumberChange(e.target.value)}
-          placeholder={placeholder}
-          className="h-full w-full border-none bg-transparent pr-3 pl-10 font-mono text-body font-medium tracking-tight text-foreground/80 outline-none"
-        />
-      </div>
+      <input
+        type="tel"
+        value={phoneNumber}
+        onChange={handlePhoneChange}
+        placeholder={placeholder}
+        className={cn(
+          "w-full px-3 py-2 bg-background border rounded-md text-body outline-none transition-colors",
+          error 
+            ? "border-destructive ring-1 ring-destructive/20" 
+            : "border-border focus:border-foreground/30 focus:bg-muted/30"
+        )}
+      />
     </div>
-  )
+  );
 }

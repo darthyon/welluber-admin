@@ -531,7 +531,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
   ]
 
   return (
-    <div className="animate-in overflow-hidden rounded-xl border border-border bg-card duration-500 fade-in slide-in-from-bottom-4">
+    <div className="animate-in overflow-hidden rounded-lg border border-border bg-card duration-500 fade-in slide-in-from-bottom-4">
       {/* Wizard Header */}
       <div className="flex items-center justify-between border-b border-border bg-muted/20 px-6 py-4">
         <div className="flex items-center gap-3">
@@ -576,10 +576,10 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
         {step === "upload" && (
           <div className="mx-auto max-w-xl space-y-8 py-4">
             <div
-              className="group flex cursor-pointer flex-col items-center space-y-4 rounded-2xl border-2 border-dashed border-border p-16 text-center transition-all hover:border-primary/30 hover:bg-primary/5"
+              className="group flex cursor-pointer flex-col items-center space-y-4 rounded-lg border-2 border-dashed border-border p-16 text-center transition-all hover:border-primary/30 hover:bg-primary/5"
               onClick={() => handleFileSelect("employee_list_2026.csv")}
             >
-              <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-muted/50 text-muted-foreground shadow-sm transition-all duration-300 group-hover:bg-background group-hover:text-primary">
+              <div className="flex h-20 w-20 items-center justify-center rounded-lg bg-muted/50 text-muted-foreground shadow-sm transition-all duration-300 group-hover:bg-background group-hover:text-primary">
                 <CloudArrowUp size={40} />
               </div>
               <div className="space-y-2">
@@ -599,7 +599,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
             </div>
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div className="flex gap-3 rounded-xl border border-primary/10 bg-primary/5 p-4">
+              <div className="flex gap-3 rounded-lg border border-primary/10 bg-primary/5 p-4">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
                   <Info size={24} weight="bold" />
                 </div>
@@ -613,7 +613,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
                   </p>
                 </div>
               </div>
-              <div className="flex flex-col justify-center gap-2 rounded-xl border border-border bg-muted/10 p-4">
+              <div className="flex flex-col justify-center gap-2 rounded-lg border border-border bg-muted/10 p-4">
                 <p className="text-label font-semibold text-foreground">
                   Need help formatting?
                 </p>
@@ -663,7 +663,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
             <div className="flex flex-col gap-4 border-b border-border/50 py-3">
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-emerald-100 bg-emerald-50 text-emerald-600 shadow-sm shadow-emerald-500/5">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-emerald-100 bg-emerald-50 text-emerald-600 shadow-sm shadow-emerald-500/5">
                     <FileCsv size={28} weight="fill" />
                   </div>
                   <div>

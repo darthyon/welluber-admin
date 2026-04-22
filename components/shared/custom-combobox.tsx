@@ -82,7 +82,7 @@ export function CustomComboBox({
           }}
           onFocus={() => setIsOpen(true)}
           className={cn(
-            "w-full px-4 py-2.5 rounded-xl border bg-background/5 text-nav transition-all outline-none pr-10",
+            "w-full px-4 py-2.5 rounded-lg border bg-background/5 text-nav transition-all outline-none pr-10",
             isOpen ? "border-primary ring-2 ring-primary/10" : "border-border/60 hover:border-primary/30 transition-all",
             !value && "placeholder:text-muted-foreground/40"
           )}
@@ -99,7 +99,7 @@ export function CustomComboBox({
       {isOpen && (filteredOptions.length > 0 || showAddCustom) && typeof document !== "undefined" && createPortal(
         <div
           ref={dropdownRef}
-          className="z-[1000] overflow-y-auto max-h-[300px] rounded-xl border border-border/60 bg-popover shadow-2xl animate-in fade-in zoom-in-95 duration-100 p-1"
+          className="z-[1000] overflow-y-auto max-h-[300px] rounded-lg border border-border/60 bg-popover shadow-2xl animate-in fade-in zoom-in-95 duration-100 p-1"
           style={dropdownStyle}
         >
           {showAddCustom && (

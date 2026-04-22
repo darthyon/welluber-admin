@@ -65,7 +65,7 @@ export default function EmployeePage() {
       {/* Page Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center border border-primary/20">
+          <div className="w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center border border-primary/20">
             <span className="font-semibold text-heading">{employee.avatar}</span>
           </div>
           <div>

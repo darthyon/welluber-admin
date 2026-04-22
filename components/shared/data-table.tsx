@@ -117,7 +117,7 @@ export function SharedDataTable<T extends { id: string | number }>({
   return (
     <div className={cn(
       "transition-all duration-300 flex flex-col",
-      !ghost ? "rounded-xl border border-border bg-card overflow-hidden shadow-sm" : "bg-transparent border-none shadow-none",
+      !ghost ? "rounded-lg border border-border bg-card overflow-hidden shadow-sm" : "bg-transparent border-none shadow-none",
       className
     )}>
       {/* Scrollable Container */}

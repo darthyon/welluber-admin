@@ -275,6 +275,15 @@
   }
   html {
     @apply font-sans;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "kern" 1;
+  }
+
+  /* Safari font-family inheritance fix */
+  button, input, select, textarea {
+    font-family: inherit;
   }
 
   /* Forced Dark Charcoal Glass Sidebar (Stability Fix) */
@@ -282,6 +291,7 @@
     --sidebar: oklch(0.12 0.01 260 / 92%) !important;
     --sidebar-foreground: oklch(0.985 0.001 106.423) !important;
     background-color: transparent !important; /* Managed by app-sidebar.tsx for layering */
+    -webkit-backdrop-filter: blur(60px) saturate(300%) !important;
     backdrop-filter: blur(60px) saturate(300%) !important;
     border-right: 0.5px solid oklch(1 0 0 / 15%) !important;
   }

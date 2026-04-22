@@ -229,7 +229,7 @@ function WalletGridCard({ wallet }: { wallet: Wallet }) {
         exit={{ opacity: 0, scale: 0.95 }}
         whileHover={{ y: -2 }}
         transition={{ duration: 0.2, ease: "easeOut" }}
-        className="group relative cursor-pointer overflow-hidden rounded-xl border border-zinc-200 bg-muted/50 p-5 transition-all duration-300 hover:border-primary/30 hover:shadow-md"
+        className="group relative cursor-pointer overflow-hidden rounded-lg border border-zinc-200 bg-muted/50 p-5 transition-all duration-300 hover:border-primary/30 hover:shadow-md"
         onClick={() => router.push(`/wallets/${wallet.id}`)}
       >
         {/* Decorative accent */}
@@ -238,7 +238,7 @@ function WalletGridCard({ wallet }: { wallet: Wallet }) {
         {/* Header */}
         <div className="relative z-10 mb-8 flex items-start justify-between">
           <div className="flex items-center gap-3.5">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-zinc-200/60 bg-muted/80 text-muted-foreground transition-all duration-300 group-hover:bg-primary/5 group-hover:text-primary">
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-zinc-200/60 bg-muted/80 text-muted-foreground transition-all duration-300 group-hover:bg-primary/5 group-hover:text-primary">
               {wallet.model === "cash_balance" ? (
                 <Bank size={24} weight="fill" />
               ) : (

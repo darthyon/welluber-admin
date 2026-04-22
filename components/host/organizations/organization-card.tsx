@@ -65,7 +65,7 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
       <motion.div 
         onClick={() => router.push(`/organizations/${org.id}`)}
         transition={{ duration: 0.2, ease: "easeOut" }}
-        className="group relative glass-card rounded-xl p-5 cursor-pointer overflow-hidden"
+        className="group relative glass-card rounded-lg p-5 cursor-pointer overflow-hidden"
       >
         {/* Bento-style Decorative Accent */}
         <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-primary/5 rounded-full blur-3xl group-hover:w-40 group-hover:h-40 group-hover:bg-primary/10 transition-all duration-500 pointer-events-none" />
@@ -173,7 +173,7 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
                         </button>
                       </TooltipTrigger>
                       <TooltipContent 
-                        className="w-56 bg-popover rounded-2xl border border-border shadow-2xl z-[200] p-1" 
+                        className="w-56 bg-popover rounded-lg border border-border shadow-2xl z-[200] p-1" 
                         onClick={(e) => e.stopPropagation()}
                       >
                         <div className="flex flex-col gap-1.5">

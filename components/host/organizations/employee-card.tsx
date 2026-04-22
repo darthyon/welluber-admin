@@ -73,7 +73,7 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
   };
 
   return (
-    <div className="group glass-card rounded-xl p-5 relative flex flex-col h-full overflow-hidden">
+    <div className="group glass-card rounded-lg p-5 relative flex flex-col h-full overflow-hidden">
       {/* Decorative Accent */}
       <div className="absolute -right-8 -bottom-8 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all duration-500 pointer-events-none" />
 
@@ -145,7 +145,7 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
         </div>
           
         {/* Policy Carousel Section */}
-        <div className="bg-muted/30 rounded-xl px-4 py-4 border border-border/60 relative overflow-hidden group/policy min-h-[140px]">
+        <div className="bg-muted/30 rounded-lg px-4 py-4 border border-border/60 relative overflow-hidden group/policy min-h-[140px]">
           <div className="flex items-center gap-1.5 text-muted-foreground/30 mb-3">
             <Shield size={14} weight="bold" />
             <span className="text-caption font-semibold tracking-tight text-muted-foreground/60">Benefit Policy</span>

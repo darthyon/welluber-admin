@@ -69,3 +69,13 @@ export const DEFAULT_OPERATING_HOURS = {
   sat: { open: "09:00", close: "13:00", isClosed: false },
   sun: { open: "09:00", close: "13:00", isClosed: true },
 };
+
+export const BUSINESS_TYPES = [
+  { id: "sdn_bhd", label: "Sdn Bhd", docs: "SSM Certificate, Form Section 14" },
+  { id: "sole_prop", label: "Sole Proprietorship", docs: "Form D" },
+  { id: "partnership_llp", label: "Partnership / LLP", docs: "Form B" },
+] as const;
+
+export const PAYMENT_CYCLES = ["1 Month", "2 Months", "Quarterly", "Bi-Annual"] as const;
+
+export const CREDIT_TERMS = ["Immediate", "7 Days", "15 Days", "30 Days", "45 Days", "60 Days"] as const;

@@ -136,7 +136,7 @@ function StatusPicker({ value, onChange, disabled }: { value: PolicyStatus; onCh
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -4, scale: 0.97 }}
             transition={{ duration: 0.15 }}
-            className="absolute top-full mt-2 right-0 z-50 bg-popover border border-border rounded-xl shadow-lg shadow-black/20 overflow-hidden min-w-[160px]"
+            className="absolute top-full mt-2 right-0 z-50 bg-popover border border-border rounded-lg shadow-lg shadow-black/20 overflow-hidden min-w-[160px]"
           >
             {(Object.keys(STATUS_CONFIG) as PolicyStatus[]).map((s) => {
               const c = STATUS_CONFIG[s];
@@ -595,7 +595,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-3">
                 <label className="text-caption font-semibold text-muted-foreground/60 tracking-wider">Employee pool type</label>
-                <div className="flex gap-2 p-1 bg-muted rounded-xl">
+                <div className="flex gap-2 p-1 bg-muted rounded-lg">
                   {(["Individual", "Shared"] as const).map((type) => (
                     <button
                       key={type}
@@ -607,7 +607,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
               </div>
               <div className="space-y-3">
                 <label className="text-caption font-semibold text-muted-foreground/60 tracking-wider">Dependent Pool Type</label>
-                <div className="flex gap-2 p-1 bg-muted rounded-xl">
+                <div className="flex gap-2 p-1 bg-muted rounded-lg">
                   {(["None", "Individual", "Shared"] as const).map((type) => (
                     <button
                       key={type}
@@ -633,7 +633,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
             <div className="space-y-1.5">
               <label className="text-caption font-semibold text-muted-foreground">Refresh Cycle</label>
               <select
-                className="w-full px-4 py-2 bg-muted/20 border border-border rounded-xl text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all"
+                className="w-full px-4 py-2 bg-muted/20 border border-border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all"
                 value={policyData.refreshCycle}
                 onChange={(e) => setPolicyData({ ...policyData, refreshCycle: e.target.value as any })}
               >
@@ -643,7 +643,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
             <div className="space-y-1.5">
               <label className="text-caption font-semibold text-muted-foreground">Refresh Start Reference</label>
               <select
-                className="w-full px-4 py-2 bg-transparent border border-zinc-200 rounded-xl text-body font-medium outline-none focus:ring-2 focus:ring-primary/10"
+                className="w-full px-4 py-2 bg-transparent border border-zinc-200 rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10"
                 value={policyData.refreshStartReference}
                 onChange={(e) => setPolicyData({ ...policyData, refreshStartReference: e.target.value as any })}
               >
@@ -659,7 +659,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                   <button
                     key={m}
                     onClick={() => setPolicyData({ ...policyData, activationMode: m })}
-                    className={cn("flex items-center gap-3 px-4 py-2.5 rounded-xl border text-nav font-medium transition-all text-left", policyData.activationMode === m ? "border-primary bg-primary/5 text-primary" : "border-border bg-card text-muted-foreground hover:border-border/80")}
+                    className={cn("flex items-center gap-3 px-4 py-2.5 rounded-lg border text-nav font-medium transition-all text-left", policyData.activationMode === m ? "border-primary bg-primary/5 text-primary" : "border-border bg-card text-muted-foreground hover:border-border/80")}
                   >
                     <div className={cn("w-4 h-4 rounded-full border flex items-center justify-center shrink-0", policyData.activationMode === m ? "border-primary" : "border-zinc-200")}>
                       {policyData.activationMode === m && <div className="w-2 h-2 rounded-full bg-primary" />}
@@ -691,7 +691,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
       }
     >
       {groups.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 bg-muted/20 rounded-xl border border-dashed border-border text-center">
+        <div className="flex flex-col items-center justify-center py-16 bg-muted/20 rounded-lg border border-dashed border-border text-center">
           <TreeStructure size={36} weight="duotone" className="text-muted-foreground/40 mb-3 mx-auto" />
           <p className="text-muted-foreground font-medium text-nav">{isViewMode ? "No benefit groups configured." : "No benefit groups yet."}</p>
           {!isViewMode && (
@@ -703,11 +703,11 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {groups.map((group) => (
-            <div key={group.id} className="rounded-2xl border border-border bg-card/40 overflow-hidden animate-in fade-in zoom-in-95 duration-300 h-full flex flex-col hover:border-primary/20 transition-all">
+            <div key={group.id} className="rounded-lg border border-border bg-card/40 overflow-hidden animate-in fade-in zoom-in-95 duration-300 h-full flex flex-col hover:border-primary/20 transition-all">
               {/* Card header */}
               <div className="flex items-start justify-between gap-3 p-4 border-b border-border">
                 <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                  <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
                     <TreeStructure size={18} weight="duotone" />
                   </div>
                   {isViewMode ? (
@@ -776,7 +776,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                   <p className="text-micro font-semibold text-muted-foreground">Services</p>
                   <div className="space-y-1.5">
                     {benefits.filter(b => b.groupId === group.id).map((benefit) => (
-                      <div key={benefit.id} className="flex items-center gap-3 px-3 py-2 rounded-xl bg-muted/40 border border-border">
+                      <div key={benefit.id} className="flex items-center gap-3 px-3 py-2 rounded-lg bg-muted/40 border border-border">
                         <div className="flex-1 min-w-0">
                           {isViewMode ? (
                             <p className="text-label font-semibold text-foreground truncate">{SERVICES.find(s => s.id === benefit.serviceId)?.name}</p>
@@ -811,7 +811,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                     ))}
                   </div>
                   {!isViewMode && (
-                    <button onClick={() => addBenefit(group.id)} className="w-full h-8 border-dashed border-2 border-zinc-200 rounded-xl text-caption font-semibold text-muted-foreground/60 hover:border-primary/40 hover:text-primary transition-all flex items-center justify-center gap-1.5">
+                    <button onClick={() => addBenefit(group.id)} className="w-full h-8 border-dashed border-2 border-zinc-200 rounded-lg text-caption font-semibold text-muted-foreground/60 hover:border-primary/40 hover:text-primary transition-all flex items-center justify-center gap-1.5">
                       <Plus size={12} />
                       Add Service
                     </button>
@@ -855,7 +855,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
       </AnimatePresence>
 
       <div className="text-center mb-8">
-        <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mx-auto mb-4 shadow-sm">
+        <div className="w-14 h-14 rounded-lg bg-primary/10 flex items-center justify-center text-primary mx-auto mb-4 shadow-sm">
           <ShieldCheck size={28} weight="duotone" />
         </div>
         <h3 className="text-display font-semibold text-foreground tracking-tight">Finalize & Launch Policy</h3>
@@ -880,7 +880,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                 )}>
                   <input
                     placeholder="e.g. Wellness Premium 2026"
-                    className="w-full px-4 py-3 bg-white border border-border rounded-xl text-body outline-none transition-all font-semibold text-foreground focus:ring-4 focus:ring-primary/10 focus:border-primary/40 group-hover:border-primary/30"
+                    className="w-full px-4 py-3 bg-white border border-border rounded-lg text-body outline-none transition-all font-semibold text-foreground focus:ring-4 focus:ring-primary/10 focus:border-primary/40 group-hover:border-primary/30"
                     value={policyData.name}
                     onChange={(e) => setPolicyData({ ...policyData, name: e.target.value })}
                   />
@@ -892,7 +892,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                 <label className="text-caption font-semibold text-muted-foreground tracking-tight pl-1">Benefit ID</label>
                 <input
                   placeholder="e.g. BEN-W-01"
-                  className="w-full px-4 py-3 bg-white border border-border rounded-xl text-body outline-none transition-all font-semibold font-mono text-foreground focus:ring-4 focus:ring-zinc-500/5 focus:border-zinc-400"
+                  className="w-full px-4 py-3 bg-white border border-border rounded-lg text-body outline-none transition-all font-semibold font-mono text-foreground focus:ring-4 focus:ring-zinc-500/5 focus:border-zinc-400"
                   value={policyData.code}
                   onChange={(e) => setPolicyData({ ...policyData, code: e.target.value })}
                 />
@@ -904,7 +904,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                   <Quotes size={16} className="absolute left-3 top-4 text-muted-foreground/40" />
                   <textarea
                     placeholder="Describe the purpose of this benefit..."
-                    className="w-full pl-10 pr-4 py-3.5 bg-white border border-border rounded-xl text-nav leading-relaxed outline-none transition-all font-medium text-muted-foreground min-h-[100px] resize-none focus:ring-4 focus:ring-primary/5 focus:border-primary/20 group-hover:border-primary/10"
+                    className="w-full pl-10 pr-4 py-3.5 bg-white border border-border rounded-lg text-nav leading-relaxed outline-none transition-all font-medium text-muted-foreground min-h-[100px] resize-none focus:ring-4 focus:ring-primary/5 focus:border-primary/20 group-hover:border-primary/10"
                     value={policyData.description}
                     onChange={(e) => setPolicyData({ ...policyData, description: e.target.value })}
                   />
@@ -919,7 +919,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
             description="Individuals assigned to this policy"
             ghost
           >
-            <div className="p-5 rounded-2xl border border-zinc-200/50 flex items-center justify-between transition-all hover:border-primary/20 bg-transparent">
+            <div className="p-5 rounded-lg border border-zinc-200/50 flex items-center justify-between transition-all hover:border-primary/20 bg-transparent">
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center border border-zinc-200/60">
                   <SelectionAll size={20} className="text-muted-foreground" />
@@ -951,9 +951,9 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
           >
             <div className="space-y-3">
               {groups.length === 0 ? (
-                <p className="text-center py-8 text-nav text-muted-foreground/60 font-medium bg-muted/50 rounded-xl border border-dashed border-zinc-200">No benefit groups configured.</p>
+                <p className="text-center py-8 text-nav text-muted-foreground/60 font-medium bg-muted/50 rounded-lg border border-dashed border-zinc-200">No benefit groups configured.</p>
               ) : groups.map(group => (
-                 <div key={group.id} className="p-4 rounded-2xl border border-zinc-200/60 flex items-center justify-between bg-transparent hover:border-primary/20 transition-all cursor-default">
+                 <div key={group.id} className="p-4 rounded-lg border border-zinc-200/60 flex items-center justify-between bg-transparent hover:border-primary/20 transition-all cursor-default">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-primary shadow-sm border border-zinc-200/60">
                       <TreeStructure size={16} />
@@ -969,7 +969,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                 </div>
               ))}
               
-              <div className="mt-4 p-4 rounded-2xl border border-zinc-200/60 bg-transparent flex items-center justify-between">
+              <div className="mt-4 p-4 rounded-lg border border-zinc-200/60 bg-transparent flex items-center justify-between">
                 <div>
                   <p className="text-caption font-semibold text-muted-foreground tracking-tight leading-none">Global Refresh</p>
                   <p className="text-body font-semibold text-foreground mt-1">{policyData.refreshCycle}</p>
@@ -1015,7 +1015,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
           <div className="flex items-center gap-4">
             <button
               onClick={onCancel}
-              className="w-10 h-10 rounded-xl border border-zinc-200/60 flex items-center justify-center hover:bg-muted/50 transition-all shadow-none"
+              className="w-10 h-10 rounded-lg border border-zinc-200/60 flex items-center justify-center hover:bg-muted/50 transition-all shadow-none"
             >
               <CaretLeft size={20} weight="bold" />
             </button>

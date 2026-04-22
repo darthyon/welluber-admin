@@ -121,7 +121,7 @@ export function OrganizationClaimsTable({ data }: Props) {
 
   if (flatData.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-center rounded-2xl border border-dashed border-border">
+      <div className="flex flex-col items-center justify-center py-16 text-center rounded-lg border border-dashed border-border">
         <Receipt size={36} weight="duotone" className="text-muted-foreground/40 mb-3" />
         <p className="text-muted-foreground font-medium text-nav">No claims recorded yet.</p>
       </div>

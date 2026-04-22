@@ -53,7 +53,7 @@ export function BenefitPolicyCard({ policy, onView, onClone }: BenefitPolicyCard
     <motion.div
       transition={{ duration: 0.2, ease: "easeOut" }}
       onClick={() => onView(policy.id)}
-      className="group relative glass-card p-5 rounded-xl cursor-pointer overflow-hidden"
+      className="group relative glass-card p-5 rounded-lg cursor-pointer overflow-hidden"
     >
       {/* Bento-style Decorative Accent */}
       <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-primary/5 rounded-full blur-3xl group-hover:w-40 group-hover:h-40 group-hover:bg-primary/10 transition-all duration-500 pointer-events-none" />
@@ -61,7 +61,7 @@ export function BenefitPolicyCard({ policy, onView, onClone }: BenefitPolicyCard
       {/* Top Section: Header & Actions */}
       <div className="flex items-start justify-between mb-8 relative z-10">
         <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-2xl bg-muted border border-border/60 text-muted-foreground flex items-center justify-center transition-all duration-300 group-hover:bg-primary group-hover:text-white group-hover:border-primary/20">
+          <div className="w-12 h-12 rounded-lg bg-muted border border-border/60 text-muted-foreground flex items-center justify-center transition-all duration-300 group-hover:bg-primary group-hover:text-white group-hover:border-primary/20">
             <IdentificationCard size={24} weight="fill" />
           </div>
 

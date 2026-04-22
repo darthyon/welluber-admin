@@ -44,7 +44,7 @@ export default function EditBrandPage() {
 
   if (!brand) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 bg-muted/5 rounded-2xl border border-dashed border-border">
+      <div className="flex flex-col items-center justify-center py-20 bg-muted/5 rounded-lg border border-dashed border-border">
         <h2 className="text-heading font-semibold text-foreground">Brand Not Found</h2>
         <p className="text-muted-foreground mt-2">The brand you are looking for does not exist.</p>
         <button
@@ -78,7 +78,7 @@ export default function EditBrandPage() {
       </div>
 
       {/* Form Container */}
-      <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm">
+      <div className="bg-card border border-border/60 rounded-lg p-6 shadow-sm">
         <BrandForm 
           initialData={brand} 
           onSubmit={handleSubmit} 

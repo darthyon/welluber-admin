@@ -71,7 +71,7 @@ export function LinkPolicyModal({
       <div className="w-full max-w-lg animate-in overflow-hidden rounded-[24px] border border-border bg-card shadow-2xl duration-300 zoom-in-95">
         <div className="flex items-center justify-between border-b border-border p-8 pb-4">
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-border bg-muted text-muted-foreground/40">
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-border bg-muted text-muted-foreground/40">
               <ShieldCheck size={24} weight="duotone" />
             </div>
             <div>
@@ -103,7 +103,7 @@ export function LinkPolicyModal({
             <input
               type="text"
               placeholder="Search by policy name or code..."
-              className="h-12 w-full rounded-xl border border-border bg-muted/10 pr-4 pl-11 text-body text-foreground transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
+              className="h-12 w-full rounded-lg border border-border bg-muted/10 pr-4 pl-11 text-body text-foreground transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -117,7 +117,7 @@ export function LinkPolicyModal({
                   key={policy.id}
                   onClick={() => setSelectedId(policy.id)}
                   className={cn(
-                    "group cursor-pointer rounded-2xl border p-4 transition-all",
+                    "group cursor-pointer rounded-lg border p-4 transition-all",
                     isSelected
                       ? "border-primary bg-primary/10 shadow-sm"
                       : "border-border bg-card hover:border-primary/30 hover:bg-muted/50"
@@ -127,7 +127,7 @@ export function LinkPolicyModal({
                     <div className="flex gap-3">
                       <div
                         className={cn(
-                          "flex h-10 w-10 items-center justify-center rounded-xl border transition-colors",
+                          "flex h-10 w-10 items-center justify-center rounded-lg border transition-colors",
                           isSelected
                             ? "border-primary bg-primary text-white"
                             : "border-border bg-muted text-muted-foreground/30 group-hover:bg-muted/80"
@@ -180,13 +180,13 @@ export function LinkPolicyModal({
         <div className="flex items-center gap-3 border-t border-border bg-muted/30 p-8 pt-4">
           <Button
             variant="outline"
-            className="h-12 flex-1 rounded-xl border-border font-semibold hover:bg-muted"
+            className="h-12 flex-1 rounded-lg border-border font-semibold hover:bg-muted"
             onClick={onClose}
           >
             Cancel
           </Button>
           <Button
-            className="h-12 flex-1 rounded-xl font-semibold shadow-lg shadow-primary/20"
+            className="h-12 flex-1 rounded-lg font-semibold shadow-lg shadow-primary/20"
             disabled={!selectedId}
             onClick={() => {
               if (selectedId) {

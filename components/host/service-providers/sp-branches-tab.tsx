@@ -182,7 +182,7 @@ export function SpBranchesTab({ sp }: SpBranchesTabProps) {
                 sortable: true,
                 render: (branch) => (
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-muted/60 border border-border/60 text-muted-foreground flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary transition-all duration-300">
+                    <div className="w-10 h-10 rounded-lg bg-muted/60 border border-border/60 text-muted-foreground flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary transition-all duration-300">
                       <GitBranch size={18} weight="fill" />
                     </div>
                     <div>

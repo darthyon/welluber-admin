@@ -68,7 +68,7 @@ export function ServiceToggleCard({
   return (
     <div 
       className={cn(
-        "group p-4 rounded-2xl border transition-all duration-300",
+        "group p-4 rounded-lg border transition-all duration-300",
         isSelected 
           ? "bg-primary/[0.02] border-primary/20" 
           : "bg-transparent border-border/50 hover:bg-muted/30 hover:border-primary/30"

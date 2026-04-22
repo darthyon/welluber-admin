@@ -35,7 +35,7 @@ export function BranchCard({ branch, onView, onEdit }: BranchCardProps) {
 
   return (
     <div 
-      className="group bg-card border border-border rounded-xl p-5 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-500 cursor-pointer overflow-hidden relative flex flex-col h-full"
+      className="group bg-card border border-border rounded-lg p-5 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-500 cursor-pointer overflow-hidden relative flex flex-col h-full"
       onClick={() => onView?.(branch.id)}
     >
       {/* Decorative Accent */}

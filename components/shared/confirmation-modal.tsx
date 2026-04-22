@@ -40,7 +40,7 @@ export function ConfirmationModal({
 
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-      <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-border bg-card shadow-2xl animate-in zoom-in-95 duration-200">
+      <div className="w-full max-w-lg overflow-hidden rounded-lg border border-border bg-card shadow-2xl animate-in zoom-in-95 duration-200">
         <div className="flex items-start justify-between gap-4 border-b border-border px-5 py-4">
           <div className="space-y-1">
             <h2 className="text-subtitle font-semibold tracking-tight text-foreground">{title}</h2>
@@ -55,7 +55,7 @@ export function ConfirmationModal({
         </div>
 
         <div className="space-y-4 px-5 py-5">
-          <div className={cn("rounded-xl border px-4 py-3", toneClasses)}>
+          <div className={cn("rounded-lg border px-4 py-3", toneClasses)}>
             <div className="flex items-start gap-2">
               <WarningCircle size={16} weight="fill" className="mt-0.5 shrink-0" />
               <div className="space-y-2">

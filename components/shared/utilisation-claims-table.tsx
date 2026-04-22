@@ -33,7 +33,7 @@ export function UtilisationClaimsTable({ data }: Props) {
 
   if (data.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-center rounded-2xl border border-dashed border-border">
+      <div className="flex flex-col items-center justify-center py-16 text-center rounded-lg border border-dashed border-border">
         <Receipt size={36} weight="duotone" className="text-muted-foreground/40 mb-3" />
         <p className="text-muted-foreground font-medium text-nav">No utilisation data yet.</p>
       </div>
@@ -41,7 +41,7 @@ export function UtilisationClaimsTable({ data }: Props) {
   }
 
   return (
-    <div className="border border-border rounded-xl bg-card shadow-sm overflow-hidden flex flex-col">
+    <div className="border border-border rounded-lg bg-card shadow-sm overflow-hidden flex flex-col">
       {/* Table header */}
       <div className="grid grid-cols-[2.5fr_1.5fr_140px_260px_80px] p-4 bg-muted/30 border-b border-border/60">
         <p className="text-nav font-semibold text-muted-foreground tracking-tight whitespace-nowrap">Employee</p>

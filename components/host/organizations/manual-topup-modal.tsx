@@ -100,7 +100,7 @@ export function ManualTopUpModal({
 
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-      <div className="bg-card w-full max-w-lg rounded-xl shadow-lg border border-border flex flex-col animate-in zoom-in-95 duration-200 overflow-hidden">
+      <div className="bg-card w-full max-w-lg rounded-lg shadow-lg border border-border flex flex-col animate-in zoom-in-95 duration-200 overflow-hidden">
         
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-border">

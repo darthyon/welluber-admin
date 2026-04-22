@@ -15,6 +15,24 @@ export const createSpSchema = z.object({
   classificationCode: z.string().optional(),
   classificationDescriptor: z.string().optional(),
   documents: z.array(z.string()).default([]),
+  businessType: z.enum(["sdn_bhd", "sole_prop", "partnership_llp"], { required_error: "Business type is required" }).optional(),
+  bankInfo: z.object({
+    bankName: z.string().min(1, "Bank name is required"),
+    accountNumber: z.string().min(1, "Account number is required"),
+    accountName: z.string().min(1, "Account name is required"),
+  }).optional(),
+  address: z.object({
+    line: z.string().min(1, "Address is required"),
+    city: z.string().min(1, "City is required"),
+    state: z.string().min(1, "State is required"),
+    country: z.string().min(1, "Country is required"),
+    postalCode: z.string().min(1, "Postal code is required"),
+  }).optional(),
+  needsEInvoiceSubmission: z.boolean().default(false),
+  appointedForEInvoice: z.boolean().default(false),
+  expiredCommissionFee: z.number().min(0).default(0),
+  paymentCycle: z.string().optional(),
+  creditTerms: z.string().optional(),
 });
 
 export type CreateSpData = z.infer<typeof createSpSchema>;
@@ -70,8 +88,8 @@ export const createBranchSchema = z.object({
     state: z.string().min(1, "State is required"),
     country: z.string().min(1, "Country is required"),
     postalCode: z.string().min(1, "Postal code is required"),
-    lat: z.number().optional(),
-    lon: z.number().optional(),
+    lat: z.coerce.number().optional(),
+    lon: z.coerce.number().optional(),
   }),
   contacts: z.array(branchContactSchema).min(1, "Add at least one PIC"),
   administrators: z.array(branchAdminSchema).default([]),

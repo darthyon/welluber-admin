@@ -131,7 +131,7 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
                       +{org.services.length - 1}
                     </button>
                   </TooltipTrigger>
-                  <TooltipContent className="w-52 bg-card rounded-xl border-border shadow-2xl z-[200]">
+                  <TooltipContent className="w-52 bg-card rounded-lg border-border shadow-2xl z-[200]">
                     <div className="flex flex-col gap-1">
                       <span className="text-micro font-semibold text-muted-foreground/70 mb-1 px-1">Service category</span>
                       {org.services.slice(1).map((service, i) => (
@@ -172,7 +172,7 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
                       +{org.policies.length - 1}
                     </button>
                   </TooltipTrigger>
-                  <TooltipContent className="w-52 bg-card rounded-xl border-border shadow-2xl z-[200]">
+                  <TooltipContent className="w-52 bg-card rounded-lg border-border shadow-2xl z-[200]">
                     <div className="flex flex-col gap-1">
                       <span className="text-micro font-semibold text-muted-foreground/70 mb-1 px-1">Benefit policies</span>
                       {org.policies.slice(1).map((policy, i) => (
@@ -215,7 +215,7 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
                       +{org.branches.length - 1}
                     </button>
                   </TooltipTrigger>
-                  <TooltipContent className="w-52 bg-card rounded-xl border-border shadow-2xl z-[200]">
+                  <TooltipContent className="w-52 bg-card rounded-lg border-border shadow-2xl z-[200]">
                     <div className="flex flex-col gap-1">
                       <span className="text-micro font-semibold text-muted-foreground/70 mb-1 px-1">Branches</span>
                       {org.branches.slice(1).map((branch, i) => (

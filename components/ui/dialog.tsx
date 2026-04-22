@@ -32,7 +32,7 @@ export function Dialog({ open, onOpenChange, children }: DialogProps) {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="bg-card w-full max-w-lg rounded-2xl shadow-2xl border border-border overflow-hidden relative"
+              className="bg-card w-full max-w-lg rounded-lg shadow-2xl border border-border overflow-hidden relative"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close Button */}

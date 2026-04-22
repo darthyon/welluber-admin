@@ -77,7 +77,7 @@ export default function EditOrganizationPage() {
         </div>
 
         {/* Form Card */}
-        <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
+        <div className="bg-card border border-border rounded-lg shadow-sm overflow-hidden">
           <form id="newOrgForm" onSubmit={handleSubmit(onSubmit)}>
             
             {/* Section: Account Details */}

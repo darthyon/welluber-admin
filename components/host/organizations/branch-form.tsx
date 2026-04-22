@@ -68,7 +68,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
         <div className="flex items-center gap-4">
           <button 
             onClick={onCancel}
-            className="w-10 h-10 rounded-xl border border-border flex items-center justify-center hover:bg-muted transition-colors bg-card shadow-sm"
+            className="w-10 h-10 rounded-lg border border-border flex items-center justify-center hover:bg-muted transition-colors bg-card shadow-sm"
           >
             <CaretLeft size={20} weight="bold" />
           </button>
@@ -109,7 +109,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
       </div>
 
       {isSuccess ? (
-        <div className="bg-card rounded-2xl border border-border py-20 animate-in zoom-in-95 duration-300">
+        <div className="bg-card rounded-lg border border-border py-20 animate-in zoom-in-95 duration-300">
           <SuccessCelebration 
             title={isEditing ? "Changes Saved!" : "Branch Created!"}
             message={isEditing 
@@ -223,7 +223,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
                 </div>
               )}
 
-              <div className="p-4 rounded-xl border border-border bg-muted/20 space-y-3">
+              <div className="p-4 rounded-lg border border-border bg-muted/20 space-y-3">
                 <div className="flex items-start gap-3 text-nav text-muted-foreground">
                   <CheckCircle size={18} weight="fill" className="text-primary mt-0.5 shrink-0" />
                   <span>Administrative fees are consolidated at the parent organization level for all linked accounts.</span>
@@ -247,7 +247,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
             description="Manage branch access roles"
           >
              <div className="p-1">
-               <div className="border-2 border-dashed border-border/60 rounded-xl p-8 flex flex-col items-center text-center space-y-3 hover:border-primary/20 hover:bg-muted/30 transition-all cursor-pointer group">
+               <div className="border-2 border-dashed border-border/60 rounded-lg p-8 flex flex-col items-center text-center space-y-3 hover:border-primary/20 hover:bg-muted/30 transition-all cursor-pointer group">
                   <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground/30 group-hover:bg-primary/10 group-hover:text-primary transition-all duration-300">
                     <PaperPlaneTilt size={20} />
                   </div>
@@ -262,7 +262,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
              </div>
           </DetailSection>
           
-          <div className="p-4 rounded-xl border border-border bg-card shadow-sm space-y-4">
+          <div className="p-4 rounded-lg border border-border bg-card shadow-sm space-y-4">
             <h4 className="text-nav font-semibold text-muted-foreground/40 tracking-tight">Branch setup guide</h4>
             <div className="space-y-3">
               {[

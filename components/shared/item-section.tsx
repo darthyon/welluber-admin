@@ -43,7 +43,7 @@ export function ItemSection({
   return (
     <div 
       className={cn(
-        "p-5 bg-muted/40 rounded-2xl border border-border/60 space-y-5 animate-in fade-in slide-in-from-top-1 duration-300", 
+        "p-5 bg-muted/40 rounded-lg border border-border/60 space-y-5 animate-in fade-in slide-in-from-top-1 duration-300", 
         className
       )}
     >

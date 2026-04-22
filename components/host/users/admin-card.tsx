@@ -45,11 +45,11 @@ export function AdminCard({ admin }: AdminCardProps) {
     <motion.div
       whileHover={{ y: -2 }}
       transition={{ duration: 0.2 }}
-      className="group relative bg-card border border-border rounded-2xl p-5 hover:border-primary/30 hover:shadow-md transition-all duration-300"
+      className="group relative bg-card border border-border rounded-lg p-5 hover:border-primary/30 hover:shadow-md transition-all duration-300"
     >
       <div className="flex items-start justify-between mb-8 relative z-10">
         <div className="flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-2xl bg-muted border border-border/60 text-muted-foreground/60 flex items-center justify-center">
+          <div className="w-11 h-11 rounded-lg bg-muted border border-border/60 text-muted-foreground/60 flex items-center justify-center">
             {admin.role === "HostAdmin" ? <Shield size={22} weight="fill" /> : 
              admin.role === "OrgAdmin" ? <Buildings size={22} weight="fill" /> : 
              <Storefront size={22} weight="fill" />}

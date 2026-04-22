@@ -35,7 +35,7 @@ export function PolicyDetailSheet({ isOpen, onClose, policy, groups, benefits, o
         {/* Header */}
         <div className="p-8 pb-6 border-b border-border flex items-center justify-between sticky top-0 bg-card z-10">
           <div className="flex items-center gap-5">
-             <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
+             <div className="w-14 h-14 rounded-lg bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
                <ShieldCheck size={28} weight="duotone" />
              </div>
              <div>
@@ -73,10 +73,10 @@ export function PolicyDetailSheet({ isOpen, onClose, policy, groups, benefits, o
             <h4 className="text-caption font-semibold text-muted-foreground">Nested benefit structure</h4>
             <div className="space-y-6">
               {groups.map((group) => (
-                <div key={group.id} className="rounded-2xl border border-zinc-100 bg-muted/50 p-6 space-y-5">
+                <div key={group.id} className="rounded-lg border border-zinc-100 bg-muted/50 p-6 space-y-5">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-white border border-zinc-100 flex items-center justify-center text-primary shadow-sm">
+                      <div className="w-9 h-9 rounded-lg bg-white border border-zinc-100 flex items-center justify-center text-primary shadow-sm">
                         <TreeStructure size={20} weight="duotone" />
                       </div>
                       <div>
@@ -95,7 +95,7 @@ export function PolicyDetailSheet({ isOpen, onClose, policy, groups, benefits, o
                   {/* Benefits in Group */}
                   <div className="space-y-2 pt-4 border-t border-zinc-200/50">
                     {benefits.filter(b => b.groupId === group.id).map((benefit) => (
-                      <div key={benefit.id} className="flex items-center justify-between p-3 rounded-xl bg-white border border-zinc-100 transition-all hover:border-primary/20">
+                      <div key={benefit.id} className="flex items-center justify-between p-3 rounded-lg bg-white border border-zinc-100 transition-all hover:border-primary/20">
                         <div className="flex items-center gap-3">
                            <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center text-muted-foreground/60 border border-zinc-100">
                              <IdentificationCard size={16} weight="duotone" />
@@ -137,13 +137,13 @@ export function PolicyDetailSheet({ isOpen, onClose, policy, groups, benefits, o
         <div className="p-8 border-t border-border flex items-center gap-4 bg-muted/30 sticky bottom-0 z-10">
           <Button 
             variant="outline" 
-            className="flex-1 rounded-2xl h-12 border-border font-semibold hover:bg-muted"
+            className="flex-1 rounded-lg h-12 border-border font-semibold hover:bg-muted"
             onClick={onClose}
           >
             Close View
           </Button>
           <Button 
-            className="flex-1 rounded-2xl h-12 font-semibold shadow-lg shadow-primary/20"
+            className="flex-1 rounded-lg h-12 font-semibold shadow-lg shadow-primary/20"
             onClick={() => {
               if (onEdit) {
                 onEdit();
@@ -161,7 +161,7 @@ export function PolicyDetailSheet({ isOpen, onClose, policy, groups, benefits, o
 
 function RuleItem({ icon: Icon, label, value }: { icon: any, label: string, value: string }) {
   return (
-    <div className="space-y-1.5 p-3 rounded-xl border border-border bg-card shadow-sm">
+    <div className="space-y-1.5 p-3 rounded-lg border border-border bg-card shadow-sm">
       <div className="flex items-center gap-2 text-muted-foreground/30">
         <Icon size={14} weight="bold" />
         <span className="text-micro font-semibold text-muted-foreground/40 leading-none">{label}</span>

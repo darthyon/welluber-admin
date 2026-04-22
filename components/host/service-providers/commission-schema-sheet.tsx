@@ -86,7 +86,7 @@ export function CommissionSchemaSheet({
     >
       <div className="space-y-8 pb-8">
         {/* Add Main Service to Portfolio Section */}
-        <div className="bg-muted/30 border border-dashed border-border rounded-xl p-4 space-y-3">
+        <div className="bg-muted/30 border border-dashed border-border rounded-lg p-4 space-y-3">
           <div className="flex items-center gap-2 text-muted-foreground mb-1">
             <Plus size={16} weight="bold" />
             <span className="text-nav font-semibold">Add Service to Portfolio</span>
@@ -124,7 +124,7 @@ export function CommissionSchemaSheet({
         </div>
 
         {rows.length === 0 ? (
-          <div className="py-20 text-center border border-dashed border-border rounded-2xl bg-muted/5">
+          <div className="py-20 text-center border border-dashed border-border rounded-lg bg-muted/5">
             <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-4 border border-border">
               <Plus size={24} className="text-muted-foreground/60" />
             </div>
@@ -177,7 +177,7 @@ function ServiceSchemaRow({
   const watchedTiers = watch(`rows.${rowIndex}.tiers`);
 
   return (
-    <div className="space-y-3 p-4 border border-border rounded-xl bg-muted/5">
+    <div className="space-y-3 p-4 border border-border rounded-lg bg-muted/5">
       <div className="flex items-center justify-between">
         <h4 className="text-body font-semibold text-foreground flex items-center gap-2">
           {mainService}

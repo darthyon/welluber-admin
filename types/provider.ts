@@ -180,6 +180,24 @@ export interface ServiceProvider {
   classificationCode?: string;
   classificationDescriptor?: string;
   documents?: string[];
+  businessType?: "sdn_bhd" | "sole_prop" | "partnership_llp";
+  bankInfo?: {
+    bankName: string;
+    accountNumber: string;
+    accountName: string;
+  };
+  address?: {
+    line: string;
+    city: string;
+    state: string;
+    country: string;
+    postalCode: string;
+  };
+  needsEInvoiceSubmission?: boolean;
+  appointedForEInvoice?: boolean;
+  expiredCommissionFee?: number;
+  paymentCycle?: string;
+  creditTerms?: string;
   createdAt: ISODate;
   updatedAt: ISODate;
 }

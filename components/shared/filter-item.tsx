@@ -44,7 +44,7 @@ export function FilterItem({ label, options, value, onChange, icon }: FilterItem
             <CaretDown size={14} weight="bold" className="opacity-40" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[200px] p-1 shadow-2xl border-border/50 rounded-xl" align="start">
+        <PopoverContent className="w-[200px] p-1 shadow-2xl border-border/50 rounded-lg" align="start">
           <div className="flex flex-col gap-0.5">
             {options.map((option) => (
               <button

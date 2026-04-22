@@ -175,7 +175,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     size="lg"
                     className="data-[state=open]:bg-sidebar-foreground/5 data-[state=open]:text-sidebar-foreground hover:bg-sidebar-foreground/5 transition-all duration-300 group-data-[collapsible=icon]:!p-0 group-data-[collapsible=icon]:!justify-center group-data-[collapsible=icon]:!h-10 group-data-[collapsible=icon]:!w-10"
                   >
-                    <div className="flex aspect-square size-8.5 items-center justify-center rounded-xl bg-sidebar-foreground/5 ring-1 ring-sidebar-foreground/10 shadow-sm text-primary shrink-0 group-data-[collapsible=icon]:size-7">
+                    <div className="flex aspect-square size-8.5 items-center justify-center rounded-lg bg-sidebar-foreground/5 ring-1 ring-sidebar-foreground/10 shadow-sm text-primary shrink-0 group-data-[collapsible=icon]:size-7">
                       <activePersona.icon size={19} weight="fill" />
                     </div>
                     <div className="grid flex-1 text-left text-body leading-tight group-data-[collapsible=icon]:hidden ml-3">
@@ -195,7 +195,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 >
                   <DropdownMenuLabel className="p-0 font-normal">
                     <div className="flex items-center gap-2 px-3 py-2.5 text-left text-body">
-                      <Avatar className="h-9 w-9 rounded-xl shadow-lg ring-2 ring-primary/10 transition-transform hover:scale-105 active:scale-95 duration-200">
+                      <Avatar className="h-9 w-9 rounded-lg shadow-lg ring-2 ring-primary/10 transition-transform hover:scale-105 active:scale-95 duration-200">
                         <AvatarImage src={user?.image || ""} alt={user?.name || ""} />
                         <AvatarFallback className="bg-primary/10 text-primary font-semibold text-nav tracking-tight">YY</AvatarFallback>
                       </Avatar>
@@ -243,7 +243,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       <span className="text-nav font-medium text-foreground/70 group-hover/settings:text-primary transition-colors">Account Settings</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem className="flex items-center gap-3 px-3 py-2 cursor-pointer focus:bg-red-500/5 group/logout">
-                      <div className="flex aspect-square size-7 items-center justify-center rounded-xl bg-red-500/5 text-red-500/60 group-hover/logout:bg-red-500 group-hover/logout:text-white transition-all shadow-sm">
+                      <div className="flex aspect-square size-7 items-center justify-center rounded-lg bg-red-500/5 text-red-500/60 group-hover/logout:bg-red-500 group-hover/logout:text-white transition-all shadow-sm">
                         <SignOut size={15} weight="fill" />
                       </div>
                       <span className="text-nav font-medium text-red-500/70 group-hover/logout:text-red-500 transition-colors">Log out</span>

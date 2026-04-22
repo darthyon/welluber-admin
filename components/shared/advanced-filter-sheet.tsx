@@ -95,7 +95,7 @@ export function AdvancedFilterSheet({
           <Button variant="ghost" onClick={handleReset} className="text-nav hover:bg-muted font-semibold text-muted-foreground">
             Clear All
           </Button>
-          <Button onClick={onApply} className="text-nav rounded-xl px-8 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20">
+          <Button onClick={onApply} className="text-nav rounded-lg px-8 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20">
             Apply Filters
           </Button>
         </div>
@@ -133,7 +133,7 @@ export function AdvancedFilterSheet({
                         key={model}
                         onClick={() => setFilters({ ...filters, walletModel: model === filters.walletModel ? "all" : model })}
                         className={cn(
-                          "px-3 py-2.5 rounded-xl border text-caption font-semibold transition-all capitalize",
+                          "px-3 py-2.5 rounded-lg border text-caption font-semibold transition-all capitalize",
                           filters.walletModel === model
                             ? "bg-primary/10 border-primary text-primary"
                             : "bg-card border-border text-muted-foreground hover:bg-muted/30"
@@ -166,7 +166,7 @@ export function AdvancedFilterSheet({
                       key={range.label}
                       onClick={() => handleRangeSelect(range)}
                       className={cn(
-                        "px-3 py-2.5 rounded-xl border text-label font-semibold transition-all",
+                        "px-3 py-2.5 rounded-lg border text-label font-semibold transition-all",
                         isActive
                           ? "bg-primary text-white border-primary shadow-md shadow-primary/20"
                           : "bg-card border-border hover:border-primary/40 text-muted-foreground hover:bg-muted/30"
@@ -182,7 +182,7 @@ export function AdvancedFilterSheet({
                 <input
                   type="number"
                   placeholder="Enter specific count..."
-                  className="w-full h-11 px-4 rounded-xl border border-border bg-card text-nav focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                  className="w-full h-11 px-4 rounded-lg border border-border bg-card text-nav focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                   value={customPax}
                   onChange={(e) => handleCustomPax(e.target.value)}
                 />
@@ -202,7 +202,7 @@ export function AdvancedFilterSheet({
                <div className="space-y-2">
                   <label className="text-caption font-semibold text-muted-foreground/60 tracking-tight block">Industry vertical</label>
                  <select
-                   className="w-full h-11 px-4 rounded-xl border border-border bg-card text-nav focus:ring-2 focus:ring-primary/20 outline-none appearance-none font-medium"
+                   className="w-full h-11 px-4 rounded-lg border border-border bg-card text-nav focus:ring-2 focus:ring-primary/20 outline-none appearance-none font-medium"
                    value={filters.industry}
                    onChange={(e) => setFilters({ ...filters, industry: e.target.value })}
                  >

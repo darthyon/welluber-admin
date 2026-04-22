@@ -45,12 +45,12 @@ export function EmptyState({
       {icon && (
         <div
           className={cn(
-            "relative z-10 mb-8 flex items-center justify-center rounded-2xl border border-border/40 bg-background text-primary/80 shadow-xl shadow-black/5",
+            "relative z-10 mb-8 flex items-center justify-center rounded-lg border border-border/40 bg-background text-primary/80 shadow-xl shadow-black/5",
             "bg-background/50 backdrop-blur-sm",
             isPageLevel ? "size-24 p-6" : "size-16 p-4"
           )}
         >
-          <div className="absolute inset-0 animate-pulse rounded-2xl bg-primary/5" />
+          <div className="absolute inset-0 animate-pulse rounded-lg bg-primary/5" />
           <div className="relative z-10">{icon}</div>
         </div>
       )}

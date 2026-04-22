@@ -27,7 +27,7 @@ export function EntityHeader({
   return (
     <div className={cn("flex items-center justify-between", className)}>
       <div className="flex items-center gap-4">
-        <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center border border-primary/20">
+        <div className="w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center border border-primary/20">
           {icon}
         </div>
         <div>

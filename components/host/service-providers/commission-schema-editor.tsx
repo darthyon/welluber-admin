@@ -23,7 +23,7 @@ export function CommissionSchemaEditor({ spId, serviceCategories, initialRows }:
 
   return (
     <div className="space-y-4">
-      <div className="border border-border rounded-xl overflow-hidden bg-background">
+      <div className="border border-border rounded-lg overflow-hidden bg-background">
         <div className="grid grid-cols-[200px_1fr_120px] gap-4 px-4 py-3 bg-muted/20 border-b border-border">
           <p className="text-caption font-semibold text-muted-foreground/60 tracking-tight text-left">Starts From (Qty)</p>
           <p className="text-caption font-semibold text-muted-foreground/60 tracking-tight text-left">Commission Rate (%)</p>

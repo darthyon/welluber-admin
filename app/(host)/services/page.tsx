@@ -282,7 +282,7 @@ function ServicesContent() {
               <div
                 key={category.category}
                 onClick={() => handleOpenCategory(category)}
-                className="group relative bg-card border border-border rounded-xl p-5 cursor-pointer hover:border-primary/30 hover:shadow-md transition-all duration-200 overflow-hidden"
+                className="group relative bg-card border border-border rounded-lg p-5 cursor-pointer hover:border-primary/30 hover:shadow-md transition-all duration-200 overflow-hidden"
               >
                 {/* Decorative accent */}
                 <div className="absolute -right-6 -bottom-6 w-24 h-24 bg-primary/5 rounded-full blur-3xl group-hover:w-32 group-hover:h-32 group-hover:bg-primary/10 transition-all duration-500 pointer-events-none" />
@@ -376,7 +376,7 @@ function ServicesContent() {
                         onClick={() => setSelectedIcon(name)}
                         title={name}
                         className={cn(
-                          "w-10 h-10 rounded-xl border flex items-center justify-center transition-all group/icon",
+                          "w-10 h-10 rounded-lg border flex items-center justify-center transition-all group/icon",
                           selectedIcon === name 
                             ? "bg-primary text-white border-primary shadow-lg shadow-primary/20 scale-110 z-10" 
                             : "bg-muted border-zinc-200 text-muted-foreground/60 hover:border-primary/30 hover:bg-white hover:text-primary"

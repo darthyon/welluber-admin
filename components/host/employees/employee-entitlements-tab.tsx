@@ -204,7 +204,7 @@ export function EmployeeEntitlementsTab({ employeeId }: EmployeeEntitlementsTabP
 
       {/* Empty State (commented out for reference)
       {entitlements.length === 0 && (
-        <div className="text-center py-12 border-2 border-dashed border-border rounded-2xl">
+        <div className="text-center py-12 border-2 border-dashed border-border rounded-lg">
           <Gift size={48} className="mx-auto text-muted-foreground/40" />
           <h3 className="text-heading font-semibold text-foreground mt-4">No entitlements assigned</h3>
           <p className="text-body text-muted-foreground mt-2 max-w-md mx-auto">

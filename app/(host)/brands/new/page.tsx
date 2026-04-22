@@ -24,7 +24,7 @@ export default function NewBrandPage() {
   if (isSuccess) {
     return (
       <div className="max-w-xl mx-auto py-12 px-4 animate-in fade-in zoom-in duration-500">
-        <div className="bg-card border border-border shadow-sm rounded-2xl p-8 flex flex-col items-center">
+        <div className="bg-card border border-border shadow-sm rounded-lg p-8 flex flex-col items-center">
           <SuccessCelebration 
             title="Brand Created Successfully" 
             message="Your new brand identity has been established and is ready for service provider assignment." 
@@ -69,7 +69,7 @@ export default function NewBrandPage() {
       </div>
 
       {/* Form Container */}
-      <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm">
+      <div className="bg-card border border-border/60 rounded-lg p-6 shadow-sm">
         <BrandForm 
           onSubmit={handleSubmit} 
           onCancel={() => router.push("/brands")}

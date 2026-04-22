@@ -40,7 +40,7 @@ export function SpCard({ sp }: SpCardProps) {
       <motion.div
         onClick={() => router.push(`/service-providers/${sp.id}`)}
         transition={{ duration: 0.2, ease: "easeOut" }}
-        className="group relative glass-card rounded-xl p-5 cursor-pointer overflow-hidden"
+        className="group relative glass-card rounded-lg p-5 cursor-pointer overflow-hidden"
       >
         {/* Decorative accent */}
         <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-primary/5 rounded-full blur-3xl group-hover:w-40 group-hover:h-40 group-hover:bg-primary/10 transition-all duration-500 pointer-events-none" />
@@ -48,10 +48,10 @@ export function SpCard({ sp }: SpCardProps) {
         {/* Header */}
         <div className="flex items-start justify-between mb-6 relative z-10">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-muted border border-border/60 text-muted-foreground flex items-center justify-center">
+            <div className="w-11 h-11 rounded-lg bg-muted border border-border/60 text-muted-foreground flex items-center justify-center">
               {sp.logo ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={sp.logo} alt={sp.name} className="w-full h-full object-cover rounded-2xl" />
+                <img src={sp.logo} alt={sp.name} className="w-full h-full object-cover rounded-lg" />
               ) : (
                 <Storefront size={22} weight="fill" />
               )}
@@ -142,7 +142,7 @@ export function SpCard({ sp }: SpCardProps) {
                         </button>
                       </PopoverTrigger>
                       <PopoverContent 
-                        className="w-52 p-1.5 bg-popover rounded-xl border border-border/60 shadow-2xl z-[200]"
+                        className="w-52 p-1.5 bg-popover rounded-lg border border-border/60 shadow-2xl z-[200]"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <div className="flex flex-col gap-0.5">

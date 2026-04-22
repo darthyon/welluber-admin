@@ -53,7 +53,7 @@ export function MultiSelectFilter({
             <CaretDown size={14} weight="bold" className="opacity-40" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[320px] p-0 shadow-2xl border-border overflow-hidden rounded-2xl" align="start">
+        <PopoverContent className="w-[320px] p-0 shadow-2xl border-border overflow-hidden rounded-lg" align="start">
           <div className="flex flex-col max-h-[450px]">
              {/* Integrated Header */}
              <div className="px-4 py-3 border-b border-border/50 bg-muted/10">

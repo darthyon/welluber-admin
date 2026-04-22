@@ -26,8 +26,8 @@ interface AssignedPolicyListProps {
 export function AssignedPolicyList({ policies, onUnlink, onView, onEdit }: AssignedPolicyListProps) {
   if (policies.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 bg-muted/10 rounded-2xl border border-dashed border-border/60">
-         <div className="w-16 h-16 rounded-2xl bg-card border border-border flex items-center justify-center text-muted/30 mb-4 shadow-sm">
+      <div className="flex flex-col items-center justify-center py-20 bg-muted/10 rounded-lg border border-dashed border-border/60">
+         <div className="w-16 h-16 rounded-lg bg-card border border-border flex items-center justify-center text-muted/30 mb-4 shadow-sm">
            <ShieldCheck size={32} weight="duotone" />
          </div>
          <p className="text-muted-foreground font-medium">No benefit policies assigned to this organization.</p>
@@ -41,7 +41,7 @@ export function AssignedPolicyList({ policies, onUnlink, onView, onEdit }: Assig
       header: "Policy Name",
       render: (policy) => (
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary border border-primary/10">
+          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary border border-primary/10">
             <IdentificationCard size={20} weight="duotone" />
           </div>
           <div>

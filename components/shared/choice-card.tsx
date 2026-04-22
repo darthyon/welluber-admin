@@ -27,7 +27,7 @@ export function ChoiceCard({
     <div
       onClick={() => !disabled && onSelect()}
       className={cn(
-        "relative flex items-center gap-4 p-4 rounded-xl border-2 transition-all group",
+        "relative flex items-center gap-4 p-4 rounded-lg border-2 transition-all group",
         selected
           ? "border-primary bg-primary/5"
           : "border-border/50 bg-card hover:border-primary/30 hover:bg-muted/30",

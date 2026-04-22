@@ -7,7 +7,7 @@ export default function UsersPage() {
           Manage all users across the platform
         </p>
       </div>
-      <div className="flex flex-col items-center justify-center min-h-[400px] text-center rounded-xl border border-dashed border-border bg-muted/30">
+      <div className="flex flex-col items-center justify-center min-h-[400px] text-center rounded-lg border border-dashed border-border bg-muted/30">
         <p className="text-muted-foreground text-body">User management — coming soon</p>
       </div>
     </div>

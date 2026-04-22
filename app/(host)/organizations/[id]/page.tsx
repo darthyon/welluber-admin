@@ -750,7 +750,7 @@ function OrganizationDetailContent() {
                 ].map((doc, i) => (
                   <div
                     key={i}
-                    className="flex items-center gap-3 rounded-xl border border-border bg-muted/20 p-3"
+                    className="flex items-center gap-3 rounded-lg border border-border bg-muted/20 p-3"
                   >
                     <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-100 bg-white text-muted-foreground/60">
                       <Article size={18} weight="duotone" />
@@ -2023,7 +2023,7 @@ function OrganizationDetailContent() {
               description="Confirm how you want to change the organisation lifecycle."
             >
               <div className="space-y-4">
-                <div className="rounded-xl border border-border bg-muted/20 p-4">
+                <div className="rounded-lg border border-border bg-muted/20 p-4">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="space-y-1">
                       <p className="text-nav font-semibold text-foreground">
@@ -2043,7 +2043,7 @@ function OrganizationDetailContent() {
                   </div>
                 </div>
 
-                <div className="rounded-xl border border-border bg-muted/20 p-4">
+                <div className="rounded-lg border border-border bg-muted/20 p-4">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="space-y-1">
                       <p className="text-nav font-semibold text-foreground">
@@ -2064,7 +2064,7 @@ function OrganizationDetailContent() {
                   </div>
                 </div>
 
-                <div className="rounded-xl border border-rose-200 bg-rose-50/60 p-4">
+                <div className="rounded-lg border border-rose-200 bg-rose-50/60 p-4">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="space-y-1">
                       <p className="text-nav font-semibold text-foreground">
@@ -2139,7 +2139,7 @@ function OrganizationDetailContent() {
       />
 
       {toastMessage && (
-        <div className="fixed bottom-6 left-1/2 z-[100] flex -translate-x-1/2 animate-in items-center gap-3 rounded-2xl bg-zinc-900 px-6 py-3 text-white shadow-2xl duration-300 slide-in-from-bottom-4">
+        <div className="fixed bottom-6 left-1/2 z-[100] flex -translate-x-1/2 animate-in items-center gap-3 rounded-lg bg-zinc-900 px-6 py-3 text-white shadow-2xl duration-300 slide-in-from-bottom-4">
           <div className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
           <span className="text-body font-medium">{toastMessage}</span>
           <button

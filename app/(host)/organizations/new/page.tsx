@@ -10,10 +10,13 @@ import { cn } from "@/lib/utils";
 import { createOrganizationSchema, CreateOrganizationData } from "@/features/organizations/schemas";
 import { createOrganization } from "@/features/organizations/actions";
 import { Button } from "@/components/ui/button";
+import { SuccessModal } from "@/components/shared/success-modal";
 
 export default function NewOrganizationPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [orgId, setOrgId] = useState<string | null>(null);
 
   const { register, handleSubmit, formState: { errors } } = useForm<CreateOrganizationData>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -32,7 +35,8 @@ export default function NewOrganizationPage() {
     try {
       const res = await createOrganization(data);
       if (res.success) {
-        router.push(`/organizations/${res.data.id}`);
+        setOrgId(res.data.id);
+        setShowSuccess(true);
       }
     } catch (e) {
       console.error(e);
@@ -55,7 +59,7 @@ export default function NewOrganizationPage() {
         </div>
 
         {/* Form Card */}
-        <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
+        <div className="bg-card border border-border rounded-lg shadow-sm overflow-hidden">
           <form id="newOrgForm" onSubmit={handleSubmit(onSubmit)}>
             
             {/* Section: Profile */}
@@ -226,6 +230,20 @@ export default function NewOrganizationPage() {
           </form>
         </div>
 
+      <SuccessModal
+        isOpen={showSuccess}
+        onClose={() => setShowSuccess(false)}
+        title="Organisation Registered"
+        message="The corporate profile has been successfully established. You can now proceed to assign benefit policies or onboard employees."
+        primaryAction={{
+          label: "Assign Benefit Policy",
+          href: `/organizations/${orgId}?tab=policies&addPolicy=true`
+        }}
+        secondaryAction={{
+          label: "Onboard Employees",
+          href: `/organizations/${orgId}?tab=employees&addEmployee=true`
+        }}
+      />
     </div>
   );
 }

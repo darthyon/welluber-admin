@@ -19,8 +19,8 @@ WellUber Admin is a **B2B SaaS admin console** for managing corporate wellness b
 - Neutral, warm-stone border system (`oklch(0.923 0.003 48.717)`) that adds warmth without color
 - Shadow-as-border philosophy: card depth via `border border-border`, no heavy box-shadows
 - Compact density: `13px` body text in nav, `text-sm` (14px) in content, `text-xs` (12px) for labels
-- 240px sidebar with bottom-anchored user card — Linear-style layout
-- 56px (h-14) top bar with frosted glass (`bg-background/80 backdrop-blur-sm`)
+- **Pill-shaped Triggers**: Buttons, badges, and toggles use `rounded-4xl` for a modern, distinct feel
+- 240px sidebar with frosted glass stability fix (`oklch(0.12 0.01 260 / 92%)`)
 
 **Design Philosophy:**
 - Every pixel should feel intentional. No decoration that doesn't serve information.
@@ -104,40 +104,39 @@ WellUber Admin is a **B2B SaaS admin console** for managing corporate wellness b
 ## 4. Component Stylings
 
 ### Buttons
-- **Primary:** `bg-primary text-primary-foreground rounded-4xl px-4 py-2 text-sm font-medium`
+- **Primary:** `bg-primary text-primary-foreground rounded-4xl px-4 py-2 text-sm font-medium transition-all`
 - **Secondary/Ghost:** `border border-border bg-background hover:bg-accent rounded-4xl px-4 py-2 text-sm font-medium`
-- **Destructive:** `bg-destructive text-white rounded-4xl` — confirmations only
-- **Icon button:** `w-9 h-9 rounded-4xl border border-border hover:bg-accent` — top bar actions
+- **Destructive:** `bg-destructive/10 text-destructive border border-destructive/20 rounded-4xl`
+- **Icon button:** `w-9 h-9 rounded-4xl border border-border hover:bg-accent`
 
 ### Cards & Containers
-- Background: `bg-card`
-- Border: `border border-border rounded-lg`
-- No box-shadows. Depth comes from border contrast.
+- **Standard Card:** `bg-card border border-border rounded-lg shadow-sm`
+- **Glass Card:** `.glass-card` (`border border-border/50 bg-card/60 backdrop-blur-md`) — use for floating panels or overlays
+- **Premium Surface:** Add `.premium-glow` for subtle radial depth on dark surfaces
 - Padding: `p-4` (compact) or `p-5` (standard)
-- Hover: `hover:border-border/80 transition-colors` (subtle)
+- Hover: `hover:border-border/80 transition-colors`
 
 ### Inputs & Forms
 - Background: `bg-muted/50`
 - Border: `border border-border rounded-lg`
-- Focus: `focus:ring-1 focus:ring-ring focus:bg-background`
+- Focus: `focus:ring-1 focus:ring-ring focus:bg-background transition-all`
 - Placeholder: `text-muted-foreground/60`
-- Padding: `px-3 py-1.5` (compact) or `px-4 py-2` (standard)
 
 ### Badges & Pills
-- **Status badge:** `text-xs font-medium px-2 py-0.5 rounded-full`
-  - Active: `bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400`
-  - Pending: `bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400`
-  - Suspended: `bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400`
-- **Beneficiary type badge:** `text-[10px] font-semibold px-1.5 py-0.5 rounded-full`
-  - Employee: `bg-blue-50 text-blue-600 border border-blue-100`
-  - Dependent: `bg-purple-50 text-purple-600 border border-purple-100`
+- **Role:** `text-xs font-medium px-2 py-0.5 rounded-full` (Pill shape required)
+- **Semantic States:**
+  - Active: `bg-emerald-500/10 text-emerald-600`
+  - Pending: `bg-amber-500/10 text-amber-600`
+  - Danger: `bg-rose-500/10 text-rose-600`
+  - Neutral: `bg-zinc-500/10 text-zinc-600`
+- **Informational (Blue):** `bg-blue-500/10 text-blue-600` — used for taxonomy labels
 
 ### Navigation
-- Sidebar: 240px fixed, `bg-sidebar`, `border-r border-border`
+- Sidebar: 240px, `bg-sidebar/92 backdrop-blur-3xl`, `border-r border-border/10`
 - Nav items: 13px, `rounded-md`, `px-3 py-1.5`
-- Active: `bg-accent text-foreground font-medium`
+- Active: `bg-primary/10 text-primary font-medium`
 - Inactive: `text-muted-foreground hover:text-foreground hover:bg-accent/50`
-- Icons: 16px, Phosphor `regular` weight (inactive) → `fill` weight (active)
+- Icons: 16px, Phosphor `regular` (inactive) → `fill` (active)
 
 ### Top Bar
 - Height: `h-14` (56px)
@@ -226,15 +225,34 @@ Status and state colors use **Tailwind utility classes** (not CSS custom propert
 - Use `bg-primary/10 text-primary` for active filter states — not hardcoded `indigo-*`
 
 ### Don't
-- Don't use `font-bold` (700) anywhere — max weight is 600 (`font-semibold`). This includes dialog titles, card headings, badge text, table headers, and form labels. No exceptions.
-- Don't use heavy box-shadows — depth comes from borders
-- Don't apply primary color to backgrounds or large surfaces — it's for buttons and links
-- Don't use `text-base` (16px) for body text in the admin UI — use `text-sm` (14px) or `text-[15px]` for subtitles
-- Don't add decorative gradients — this is infrastructure, not a marketing site
-- Don't use more than 3 font weights on any screen
-- Don't use hardcoded `indigo-*` classes for active UI states — use `primary` tokens instead
-- Don't use `uppercase` or `tracking-wider` outside of the two permitted contexts (sidebar labels, ID badges)
-- Don't use Sentence case for headers — use Title Case ("Account Details", not "Account details")
+- **CRITICAL: Don't use `font-bold` (700) anywhere.** Max weight is 600 (`font-semibold`). This is a hard rule to maintain the SaaS premium aesthetic.
+- Don't use heavy box-shadows — depth comes from borders and subtle glass effects.
+- Don't apply primary color to large surfaces — it is a laser-focused brand accent.
+- Don't use `text-base` (16px) for body text — use `text-sm` (14px) for readability.
+- Don't use hardcoded Tailwind colors (`indigo-500`, `blue-600`) for structural UI. Use `primary` or `muted` tokens.
+- Don't use Sentence case for headers — use Title Case ("Account Details").
+
+---
+
+## 13. Developer Actionability Checklist
+
+Use this 5-point check before submitting any UI change:
+1.  **Typography**: Is there any `font-bold`? (Change to `font-semibold`).
+2.  **Tokens**: Are there any hardcoded hex/Tailwind colors? (Use `primary`, `border`, `muted`).
+3.  **Radius**: Do interactive triggers (Buttons/Badges) use `rounded-4xl`?
+4.  **Casing**: Are all headers and labels in **Title Case**?
+5.  **Density**: Is the body text exactly `14px` (`text-sm`)?
+
+---
+
+## 14. Agent System Instructions
+
+> [!IMPORTANT]
+> When generating code for this project, you MUST adhere to the following constraints:
+> - **STRICT NO BOLD POLICY**: Never use `font-bold` or `700`. Use `font-semibold` or `600` for all emphasis.
+> - **TOKEN FIRST**: Use OKLCH tokens (`primary`, `border`, `muted`) exclusively.
+> - **PILL SHAPE**: Use `rounded-4xl` for all buttons, badges, and switches.
+> - **MODERN SaaS**: Favor `glass-card` and `premium-glow` for high-fidelity surfaces.
 
 ---
 

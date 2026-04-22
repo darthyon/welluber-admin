@@ -10,6 +10,7 @@ import { saveTaxProfile } from "@/features/providers/actions";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/shared/switch";
 import type { TaxProfile } from "@/types/provider";
+import { toast } from "sonner";
 
 interface TaxProfileFormProps {
   spId: string;
@@ -18,7 +19,6 @@ interface TaxProfileFormProps {
 
 export function TaxProfileForm({ spId, initial }: TaxProfileFormProps) {
   const [isSaving, setIsSaving] = useState(false);
-  const [savedMessage, setSavedMessage] = useState<string | null>(null);
   const [savedProfile, setSavedProfile] = useState({
     isTaxRegistered: initial.isTaxRegistered,
     taxRegNo: initial.taxRegNo ?? "",
@@ -54,11 +54,10 @@ export function TaxProfileForm({ spId, initial }: TaxProfileFormProps) {
 
   const onSubmit = async (data: TaxProfileData) => {
     setIsSaving(true);
-    setSavedMessage(null);
     try {
       const res = await saveTaxProfile(spId, data);
       if (res.success) {
-        setSavedMessage(res.message ?? "Saved.");
+        toast.success("Tax profile updated successfully");
         setSavedProfile({
           isTaxRegistered: data.isTaxRegistered,
           taxRegNo: data.taxRegNo ?? "",

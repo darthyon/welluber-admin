@@ -122,7 +122,7 @@ export function NotificationCenter({ notifications = DEFAULT_NOTIFICATIONS }: No
 
       {/* Popover */}
       {isOpen && (
-        <div className="absolute right-0 top-11 w-[400px] bg-card border border-border shadow-xl rounded-xl z-[100] overflow-hidden flex flex-col max-w-[calc(100vw-32px)]">
+        <div className="absolute right-0 top-11 w-[400px] bg-card border border-border shadow-xl rounded-lg z-[100] overflow-hidden flex flex-col max-w-[calc(100vw-32px)]">
           {/* Header */}
           <div className="p-4 border-b border-border bg-muted/20">
             <div className="flex items-center justify-between mb-3">

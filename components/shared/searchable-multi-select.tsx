@@ -32,21 +32,32 @@ export function SearchableMultiSelect({
 }: SearchableMultiSelectProps) {
   const [query, setQuery] = React.useState("");
   const [isOpen, setIsOpen] = React.useState(false);
+  const [activeIndex, setActiveIndex] = React.useState(-1);
   const containerRef = React.useRef<HTMLDivElement>(null);
   const dropdownRef = React.useRef<HTMLDivElement>(null);
+  const inputRef = React.useRef<HTMLInputElement>(null);
   const [dropdownStyle, setDropdownStyle] = React.useState<React.CSSProperties>({});
+  const id = React.useId();
 
   // Filter logic for sectioned taxonomy
-  const filteredStaticOptions = staticOptions.filter(opt => 
-    opt.toLowerCase().includes(query.toLowerCase()) && !selected.includes(opt)
-  );
+  const filteredStaticOptions = React.useMemo(() => 
+    staticOptions.filter(opt => 
+      opt.toLowerCase().includes(query.toLowerCase()) && !selected.includes(opt)
+    ), [staticOptions, query, selected]);
 
-  const filteredTaxonomy = taxonomy.map(cat => ({
-    ...cat,
-    services: cat.services.filter(s => 
-      s.toLowerCase().includes(query.toLowerCase()) && !selected.includes(s)
-    )
-  })).filter(cat => cat.services.length > 0);
+  const filteredTaxonomy = React.useMemo(() => 
+    taxonomy.map(cat => ({
+      ...cat,
+      services: cat.services.filter(s => 
+        s.toLowerCase().includes(query.toLowerCase()) && !selected.includes(s)
+      )
+    })).filter(cat => cat.services.length > 0), [taxonomy, query, selected]);
+
+  const allOptions = React.useMemo(() => {
+    const opts: string[] = [...filteredStaticOptions];
+    filteredTaxonomy.forEach(cat => opts.push(...cat.services));
+    return opts;
+  }, [filteredStaticOptions, filteredTaxonomy]);
 
   const toggleOption = (opt: string) => {
     if (selected.includes(opt)) {
@@ -55,10 +66,41 @@ export function SearchableMultiSelect({
       onChange([...selected, opt]);
     }
     setQuery("");
+    setActiveIndex(-1);
+    if (!isInline) setIsOpen(false);
   };
 
   const removeOption = (opt: string) => {
     onChange(selected.filter(s => s !== opt));
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        setIsOpen(true);
+        setActiveIndex(prev => (prev < allOptions.length - 1 ? prev + 1 : prev));
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        setActiveIndex(prev => (prev > 0 ? prev - 1 : prev));
+        break;
+      case "Enter":
+        e.preventDefault();
+        if (activeIndex >= 0 && activeIndex < allOptions.length) {
+          toggleOption(allOptions[activeIndex]);
+        }
+        break;
+      case "Escape":
+        setIsOpen(false);
+        setActiveIndex(-1);
+        break;
+      case "Backspace":
+        if (query === "" && selected.length > 0) {
+          removeOption(selected[selected.length - 1]);
+        }
+        break;
+    }
   };
 
   // Close when clicking outside (only if not inline)
@@ -71,6 +113,7 @@ export function SearchableMultiSelect({
 
       if (!clickedInsideContainer && !clickedInsideDropdown) {
         setIsOpen(false);
+        setActiveIndex(-1);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -100,10 +143,10 @@ export function SearchableMultiSelect({
     };
   }, [isInline, isOpen, query, selected.length]);
 
-  const showList = isInline || (isOpen && (query.length > 0 || filteredTaxonomy.length > 0 || filteredStaticOptions.length > 0));
+  const showList = isInline || (isOpen && (query.length > 0 || allOptions.length > 0));
 
   const renderDropdownContent = () => (
-    <div className="p-1">
+    <div className="p-1" role="listbox" id={`${id}-listbox`}>
       {/* Header with Clear All only */}
       {(taxonomy.length > 0 || staticOptions.length > 0) && (
         <div className="flex items-center justify-between px-2 py-1.5 border-b border-border/50 mb-1">
@@ -122,46 +165,65 @@ export function SearchableMultiSelect({
         </div>
       )}
 
-      {/* Static Options Section */}
-      {filteredStaticOptions.length > 0 && (
-        <div className="mb-2 p-1 border-b border-border/40 pb-2">
-          {filteredStaticOptions.map((opt) => (
-            <button
-              key={opt}
-              onClick={() => toggleOption(opt)}
-              type="button"
-              className="w-full text-left px-3 py-1.5 rounded-lg text-nav hover:bg-muted/50 transition-colors flex items-center justify-between group font-semibold text-primary"
-            >
-              <span>{opt}</span>
-              <Check size={14} className="opacity-0 group-hover:opacity-40" />
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Filtered Taxonomy Section */}
-      {filteredTaxonomy.length > 0 ? (
-        filteredTaxonomy.map((group) => (
-          <div key={group.category} className="mb-2">
-            {(taxonomy.length > 1 || staticOptions.length > 0) && (
-              <div className="px-3 py-1.5 text-micro font-semibold tracking-tight text-muted-foreground/50 select-none">
-                {group.category}
-              </div>
-            )}
-            {group.services.map((opt) => (
+      {/* Options */}
+      {allOptions.length > 0 ? (
+        <div className="space-y-1">
+          {filteredStaticOptions.map((opt, idx) => {
+            const isHighlighted = activeIndex === idx;
+            return (
               <button
                 key={opt}
+                role="option"
+                aria-selected={selected.includes(opt)}
                 onClick={() => toggleOption(opt)}
+                onMouseEnter={() => setActiveIndex(idx)}
                 type="button"
-                className="w-full text-left px-3 py-1.5 rounded-lg text-nav hover:bg-muted/50 transition-colors flex items-center justify-between group font-normal"
+                className={cn(
+                  "w-full text-left px-3 py-1.5 rounded-lg text-nav transition-colors flex items-center justify-between group font-semibold text-primary",
+                  isHighlighted ? "bg-muted/50" : "hover:bg-muted/50"
+                )}
               >
                 <span>{opt}</span>
-                <Check size={14} className="opacity-0 group-hover:opacity-40" />
+                <Check size={14} className={cn("transition-opacity", selected.includes(opt) ? "opacity-100" : "opacity-0 group-hover:opacity-40")} />
               </button>
-            ))}
-          </div>
-        ))
-      ) : filteredStaticOptions.length === 0 && (
+            );
+          })}
+          
+          {filteredTaxonomy.map((group) => (
+            <div key={group.category} className="mb-2">
+              {(taxonomy.length > 1 || staticOptions.length > 0) && (
+                <div className="px-3 py-1.5 text-micro font-semibold tracking-tight text-muted-foreground/50 select-none">
+                  {group.category}
+                </div>
+              )}
+              {group.services.map((opt) => {
+                const globalIdx = filteredStaticOptions.length + 
+                  filteredTaxonomy.slice(0, filteredTaxonomy.indexOf(group)).reduce((acc, curr) => acc + curr.services.length, 0) + 
+                  group.services.indexOf(opt);
+                const isHighlighted = activeIndex === globalIdx;
+                
+                return (
+                  <button
+                    key={opt}
+                    role="option"
+                    aria-selected={selected.includes(opt)}
+                    onClick={() => toggleOption(opt)}
+                    onMouseEnter={() => setActiveIndex(globalIdx)}
+                    type="button"
+                    className={cn(
+                      "w-full text-left px-3 py-1.5 rounded-lg text-nav transition-colors flex items-center justify-between group font-normal",
+                      isHighlighted ? "bg-muted/50" : "hover:bg-muted/50"
+                    )}
+                  >
+                    <span>{opt}</span>
+                    <Check size={14} className={cn("transition-opacity", selected.includes(opt) ? "opacity-100" : "opacity-0 group-hover:opacity-40")} />
+                  </button>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      ) : (
         <div className="p-4 text-center text-muted-foreground text-label">
           {query ? `No results found matching "${query}"` : "Search to narrow down options"}
         </div>
@@ -173,7 +235,13 @@ export function SearchableMultiSelect({
     <div className={cn("relative w-full", !isInline && isOpen && "z-50")} ref={containerRef}>
       <div className="space-y-2">
         {/* Selected Tags */}
-        <div className="flex flex-wrap gap-1.5 min-h-[36px] p-1.5 rounded-xl border border-border bg-card focus-within:ring-2 focus-within:ring-primary/20 transition-all shadow-sm">
+        <div 
+          className="flex flex-wrap gap-1.5 min-h-[36px] p-1.5 rounded-lg border border-border bg-card focus-within:ring-2 focus-within:ring-primary/20 transition-all shadow-sm"
+          role="combobox"
+          aria-expanded={isOpen}
+          aria-haspopup="listbox"
+          aria-controls={`${id}-listbox`}
+        >
           {selected.map((s) => (
             <Badge key={s} variant="secondary" className="bg-primary/10 text-primary border-primary/20 px-2 py-0.5 text-caption font-medium gap-1 group whitespace-nowrap">
               {s}
@@ -181,12 +249,14 @@ export function SearchableMultiSelect({
                 onClick={() => removeOption(s)}
                 className="hover:text-rose-500 transition-colors"
                 type="button"
+                aria-label={`Remove ${s}`}
               >
                 <X size={10} weight="bold" />
               </button>
             </Badge>
           ))}
           <input 
+            ref={inputRef}
             type="text"
             className="flex-1 bg-transparent border-0 outline-none text-nav placeholder:text-muted-foreground/60 min-w-[120px] h-6 px-1"
             placeholder={selected.length === 0 ? placeholder : ""}
@@ -195,7 +265,12 @@ export function SearchableMultiSelect({
             onChange={(e) => {
               setQuery(e.target.value);
               setIsOpen(true);
+              setActiveIndex(0);
             }}
+            onKeyDown={handleKeyDown}
+            aria-autocomplete="list"
+            aria-controls={`${id}-listbox`}
+            aria-activedescendant={activeIndex >= 0 ? `option-${activeIndex}` : undefined}
           />
         </div>
 
@@ -208,7 +283,7 @@ export function SearchableMultiSelect({
           ) : typeof document !== "undefined" ? createPortal(
             <div
               ref={dropdownRef}
-              className="z-[1000] max-h-[400px] overflow-y-auto rounded-xl border border-border bg-card shadow-2xl animate-in fade-in zoom-in-95 duration-100"
+              className="z-[1000] max-h-[400px] overflow-y-auto rounded-lg border border-border bg-card shadow-2xl animate-in fade-in zoom-in-95 duration-100"
               style={dropdownStyle}
             >
               {renderDropdownContent()}

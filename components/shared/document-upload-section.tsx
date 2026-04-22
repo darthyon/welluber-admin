@@ -52,15 +52,6 @@ export function DocumentUploadSection({
           <label className="text-body font-semibold text-foreground">{label}</label>
           <p className="text-label text-muted-foreground">{description}</p>
         </div>
-        <Button 
-          type="button"
-          variant="outline" 
-          size="sm" 
-          className="h-8 gap-1.5 text-label font-medium rounded-full"
-          onClick={() => fileInputRef.current?.click()}
-        >
-          <UploadSimple size={14} weight="bold" /> Upload
-        </Button>
       </div>
 
       <input 
@@ -76,7 +67,7 @@ export function DocumentUploadSection({
           {documents.map((doc, index) => (
             <div 
               key={`${doc}-${index}`}
-              className="flex items-center justify-between p-3 bg-muted/30 border border-border rounded-xl group hover:border-primary/30 transition-all shadow-sm"
+              className="flex items-center justify-between p-3 bg-muted/30 border border-border rounded-lg group hover:border-primary/30 transition-all shadow-sm"
             >
               <div className="flex items-center gap-3 overflow-hidden">
                 <div className="w-8 h-8 rounded-lg bg-white border border-zinc-100 flex items-center justify-center text-muted-foreground/60 group-hover:text-primary transition-colors shrink-0">
@@ -103,7 +94,7 @@ export function DocumentUploadSection({
         <div 
           onClick={() => fileInputRef.current?.click()}
           className={cn(
-            "flex flex-col items-center justify-center py-8 border-2 border-dashed border-muted/50 rounded-2xl bg-muted/5 hover:bg-muted/10 hover:border-muted-foreground/30 transition-all cursor-pointer group",
+            "flex flex-col items-center justify-center py-8 border-2 border-dashed border-muted/50 rounded-lg bg-muted/5 hover:bg-muted/10 hover:border-muted-foreground/30 transition-all cursor-pointer group",
             error && "border-destructive/50 bg-destructive/5"
           )}
         >
