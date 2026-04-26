@@ -148,7 +148,7 @@ export default function AdministratorsPage() {
         <div className="flex items-center gap-2">
           <ViewToggle mode={viewMode} onChange={setViewMode} />
           
-          <Button asChild variant="outline" size="sm" className="h-9 text-nav font-medium border-border/60 hover:bg-muted/50">
+          <Button asChild variant="ghost" size="sm" className="h-9 text-nav font-medium hover:bg-muted/50">
             <Link href="/audit-log">
               <DownloadSimple size={16} className="mr-1.5 opacity-60" />
               Audit Logs
@@ -223,7 +223,7 @@ export default function AdministratorsPage() {
                     title="No administrators match your filters"
                     description="Try adjusting your search or filters to find what you're looking for."
                     action={
-                      <Button variant="outline" onClick={() => {
+                      <Button variant="ghost" onClick={() => {
                         setSearchQuery("");
                         setStatusFilter("all");
                         setRoleFilter("all");

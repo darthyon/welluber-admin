@@ -1045,7 +1045,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                   Save as Draft
                 </button>
                 {mode === "create" && currentStep > 1 && (
-                  <Button variant="outline" onClick={prevStep} className="rounded-full px-6">Back</Button>
+                  <Button variant="ghost" onClick={prevStep} className="rounded-full px-6">Back</Button>
                 )}
                 {mode === "create" && currentStep < 4 ? (
                   <Button

@@ -155,10 +155,10 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
           </div>
           
           <div className="flex items-center gap-3">
-            <Button 
-               variant="outline" 
-               size="sm" 
-               className="h-10 px-4 font-semibold border-border/60 hover:bg-muted"
+            <Button
+               variant="ghost"
+               size="sm"
+               className="h-10 px-4 font-semibold hover:bg-muted"
                onClick={() => onEdit(employeeId)}
             >
               <PencilSimpleLine size={18} weight="bold" className="mr-2" />

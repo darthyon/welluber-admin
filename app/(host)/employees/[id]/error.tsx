@@ -31,7 +31,7 @@ export default function EmployeeError({
       
       <div className="flex flex-col sm:flex-row gap-4 justify-center">
         <Button
-          variant="outline"
+          variant="ghost"
           className="gap-2"
           onClick={() => window.history.back()}
         >

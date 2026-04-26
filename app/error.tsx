@@ -32,9 +32,9 @@ export default function Error({
           action={
             <div className="flex items-center gap-4">
               <Button 
-                variant="outline" 
+                variant="ghost"
                 onClick={() => reset()}
-                className="rounded-full px-8 h-12 font-semibold bg-white text-foreground border-zinc-200 hover:bg-muted transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
+                className="rounded-full px-8 h-12 font-semibold hover:bg-muted transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
               >
                 <ArrowCounterClockwise size={20} weight="bold" />
                 Try again

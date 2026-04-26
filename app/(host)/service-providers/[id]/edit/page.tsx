@@ -145,17 +145,15 @@ export default function EditServiceProviderPage() {
     }));
 
   return (
-    <div className="max-w-[1100px] mx-auto pb-24 px-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex flex-col lg:flex-row gap-12 lg:gap-16">
+    <div className="pb-24 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start">
         {/* Left Column: Navigation */}
-        <aside className="hidden xl:block w-52 shrink-0">
-          <div className="sticky top-32">
-            <FloatingAnchorNav items={ANCHOR_ITEMS} />
-          </div>
+        <aside className="hidden xl:block w-52 shrink-0 sticky top-20 self-start">
+          <FloatingAnchorNav items={ANCHOR_ITEMS} />
         </aside>
 
         {/* Right Column: Form Content */}
-        <div className="flex-1 max-w-2xl">
+        <div className="flex-1">
           <div className="flex flex-col gap-6">
             {/* Header */}
             <div className="flex flex-col gap-4">

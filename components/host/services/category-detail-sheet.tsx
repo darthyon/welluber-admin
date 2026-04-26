@@ -72,10 +72,10 @@ export function CategoryDetailSheet({
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="h-9 px-4 text-nav font-medium gap-2 border-primary/20 hover:bg-primary/5 text-primary"
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-9 px-4 text-nav font-medium gap-2 hover:bg-primary/5 text-primary"
               onClick={() => onOpenDialog({ type: "service", mode: "add", parentId: category.category })}
             >
               <Plus size={16} weight="bold" />

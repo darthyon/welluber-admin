@@ -115,7 +115,7 @@ export function UnassignPolicyModal({
 
         <DialogFooter className="gap-3">
           <Button
-            variant="outline"
+            variant="ghost"
             onClick={() => onOpenChange(false)}
           >
             Cancel

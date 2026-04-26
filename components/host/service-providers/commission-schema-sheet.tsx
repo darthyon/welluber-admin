@@ -189,7 +189,7 @@ function ServiceSchemaRow({
           <Button
             type="button"
             size="sm"
-            variant="outline"
+            variant="ghost"
             className="h-8 text-caption gap-1.5"
             onClick={() => append({ limit: (watchedTiers[watchedTiers.length - 1]?.limit ?? 0) + 100, rate: 0.1 })}
           >

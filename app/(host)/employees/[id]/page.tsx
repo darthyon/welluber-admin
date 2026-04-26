@@ -81,9 +81,9 @@ export default function EmployeePage() {
         
         <div className="flex items-center gap-3">
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
-            className="h-10 px-4 font-semibold border-border/60 hover:bg-muted"
+            className="h-10 px-4 font-semibold hover:bg-muted"
             onClick={() => console.log("Edit employee", employeeId)}
           >
             <PencilSimpleLine size={18} weight="bold" className="mr-2" />
@@ -93,14 +93,13 @@ export default function EmployeePage() {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex flex-col lg:flex-row gap-8">
+      <div className="flex flex-col lg:flex-row gap-8 items-start">
         {/* Vertical Tabs Sidebar */}
-        <div className="lg:w-64 flex-shrink-0">
+        <div className="lg:w-64 flex-shrink-0 sticky top-20 self-start">
           <VerticalTabs
             tabs={TABS}
             activeTab={activeTab}
             onChange={setActiveTab}
-            className="sticky top-8"
           />
         </div>
 

@@ -11,7 +11,6 @@ import {
   Shield,
   Gear,
   House,
-  Layout,
   Lifebuoy,
   List,
   Receipt,
@@ -35,6 +34,7 @@ import {
 } from "@phosphor-icons/react"
 
 import { cn } from "@/lib/utils"
+import { WelluberLogo } from "@/components/shared/welluber-logo"
 import { useSession } from "@/lib/session"
 import {
   Avatar,
@@ -149,13 +149,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarHeader className="group-data-[collapsible=icon]:p-2 pt-7 pb-2">
 
           <div className="flex items-center justify-between px-2 mb-4">
-            <div className="flex items-center gap-2.5 group-data-[collapsible=icon]:hidden">
-              <div className="flex aspect-square size-7 items-center justify-center rounded-lg bg-primary shadow-lg shadow-primary/20 text-primary-foreground">
-                <Layout size={16} weight="fill" />
-              </div>
-              <span className="font-semibold text-sidebar-foreground tracking-tight text-label opacity-70">
-                WellUber™
-              </span>
+            <div className="flex items-center group-data-[collapsible=icon]:hidden">
+              <WelluberLogo width={120} height={31} className="opacity-90" />
             </div>
             <SidebarTrigger className="h-8 w-8 hover:bg-sidebar-foreground/10 transition-colors text-sidebar-foreground/40 hover:text-sidebar-foreground group-data-[collapsible=icon]:mx-auto">
               {state === "expanded" ? (

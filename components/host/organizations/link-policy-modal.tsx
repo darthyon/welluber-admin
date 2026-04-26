@@ -179,8 +179,8 @@ export function LinkPolicyModal({
 
         <div className="flex items-center gap-3 border-t border-border bg-muted/30 p-8 pt-4">
           <Button
-            variant="outline"
-            className="h-12 flex-1 rounded-lg border-border font-semibold hover:bg-muted"
+            variant="ghost"
+            className="h-12 flex-1 rounded-lg font-semibold hover:bg-muted"
             onClick={onClose}
           >
             Cancel

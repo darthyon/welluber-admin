@@ -118,7 +118,7 @@ export function EmployeeEntitlementsTab({ employeeId }: EmployeeEntitlementsTabP
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h3 className="text-heading font-semibold text-foreground">Benefit Pools</h3>
-          <Button variant="outline" size="sm" className="gap-2">
+          <Button variant="ghost" size="sm" className="gap-2">
             <ArrowClockwise size={16} />
             Refresh All
           </Button>
@@ -163,7 +163,7 @@ export function EmployeeEntitlementsTab({ employeeId }: EmployeeEntitlementsTabP
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <Button variant="outline" size="sm" className="gap-2">
+                  <Button variant="ghost" size="sm" className="gap-2">
                     <ArrowClockwise size={16} />
                     Refresh Pool
                   </Button>

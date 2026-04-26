@@ -134,11 +134,11 @@ export function ServiceToggleCard({
               className="h-8 w-full px-3 py-1 bg-background border border-border rounded-lg text-label outline-none transition-all placeholder:text-muted-foreground/40 focus:border-primary/30 focus:shadow-[0_0_10px_-4px_rgba(var(--primary-rgb),0.1)]"
               placeholder={placeholder || `Add custom sub-service...`}
             />
-            <Button 
-              type="button" 
-              variant="outline" 
-              size="icon" 
-              className="h-8 w-8 px-0 border-border text-muted-foreground/60 bg-background hover:text-primary hover:border-primary/30 transition-all shrink-0"
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 px-0 text-muted-foreground/60 hover:text-primary transition-all shrink-0"
               onClick={handleAdd}
             >
               <Plus size={14} weight="bold" />

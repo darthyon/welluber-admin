@@ -58,9 +58,9 @@ export function SpBranchDetailView({ branch, serviceCategories, onBack, onEdit }
           statusVariant={branch.isActive ? "emerald" : "rose"}
           icon={<Buildings size={24} weight="fill" />}
           actions={
-            <Button 
-              variant="secondary" 
-              size="lg" 
+            <Button
+              variant="secondary"
+              size="lg"
               className="text-nav font-medium rounded-full gap-2 transition-all shadow-sm"
               onClick={onEdit}
             >
@@ -73,14 +73,12 @@ export function SpBranchDetailView({ branch, serviceCategories, onBack, onEdit }
 
       <div className="flex flex-col xl:flex-row gap-8 items-start relative">
         {/* Left Column: Jump-to-section Navigation */}
-        <aside className="hidden xl:block w-52 shrink-0">
-          <div className="sticky top-32">
-            <FloatingAnchorNav items={ANCHOR_ITEMS} />
-          </div>
+        <aside className="hidden xl:block w-52 shrink-0 sticky top-20 self-start">
+          <FloatingAnchorNav items={ANCHOR_ITEMS} />
         </aside>
 
         {/* Right Column: View Sections */}
-        <div className="flex-1 max-w-2xl">
+        <div className="flex-1">
           <div className="flex flex-col gap-6">
             {/* Branch Identity */}
             <div id="branch-identity" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">

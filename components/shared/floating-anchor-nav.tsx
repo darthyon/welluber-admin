@@ -18,13 +18,14 @@ export function FloatingAnchorNav({ items }: FloatingAnchorNavProps) {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveId(entry.target.id);
-          }
-        });
+        const intersecting = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (intersecting.length > 0) {
+          setActiveId(intersecting[0].target.id);
+        }
       },
-      { rootMargin: "-10% 0px -80% 0px" }
+      { rootMargin: "-15% 0px -60% 0px", threshold: 0 }
     );
 
     items.forEach((item) => {
@@ -32,7 +33,22 @@ export function FloatingAnchorNav({ items }: FloatingAnchorNavProps) {
       if (el) observer.observe(el);
     });
 
-    return () => observer.disconnect();
+    const handleScroll = () => {
+      const distanceFromBottom =
+        document.documentElement.scrollHeight -
+        window.scrollY -
+        window.innerHeight;
+      if (distanceFromBottom < 80 && items.length > 0) {
+        setActiveId(items[items.length - 1].id);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, [items]);
 
   const handleClick = (id: string) => {

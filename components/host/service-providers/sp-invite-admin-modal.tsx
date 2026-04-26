@@ -87,7 +87,7 @@ export function SpInviteAdminModal({
               message={`Invite sent to ${invitedEmail}. They can activate their account within 60 minutes.`}
             />
             <div className="mt-6 flex justify-center">
-              <Button onClick={onClose} variant="outline" className="text-nav">
+              <Button onClick={onClose} variant="ghost" className="text-nav">
                 Close
               </Button>
             </div>
@@ -215,7 +215,7 @@ export function SpInviteAdminModal({
               </p>
 
               <div className="flex items-center justify-end gap-3 pt-1">
-                <Button type="button" variant="outline" onClick={onClose} className="text-nav">
+                <Button type="button" variant="ghost" onClick={onClose} className="text-nav">
                   Cancel
                 </Button>
                 <Button type="submit" disabled={isSubmitting} className="text-nav gap-2">

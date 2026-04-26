@@ -61,9 +61,9 @@ export default function WalletsPage() {
 
         <div className="flex items-center gap-2">
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
-            className="h-9 border-border/60 text-nav font-medium hover:bg-muted/50"
+            className="h-9 text-nav font-medium hover:bg-muted/50"
           >
             <ArrowsClockwise size={16} className="mr-1.5 opacity-60" />
             Refresh
@@ -155,7 +155,7 @@ export default function WalletsPage() {
             description="Adjust your search or filters to find what you're looking for."
             action={
               <Button
-                variant="outline"
+                variant="ghost"
                 onClick={() =>
                   setFilters({
                     ...filters,

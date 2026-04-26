@@ -211,14 +211,12 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
 
       <div className="flex flex-col xl:flex-row gap-8 items-start relative">
         {/* Left Column: Jump-to-section Navigation */}
-        <aside className="hidden xl:block w-52 shrink-0">
-          <div className="sticky top-32">
-            <FloatingAnchorNav items={ANCHOR_ITEMS} />
-          </div>
+        <aside className="hidden xl:block w-52 shrink-0 sticky top-20 self-start">
+          <FloatingAnchorNav items={ANCHOR_ITEMS} />
         </aside>
 
         {/* Right Column: Form Sections */}
-        <div className="flex-1 max-w-2xl">
+        <div className="flex-1">
           <div className="flex flex-col gap-6">
             {/* Branch Identity */}
             <div id="branch-identity" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
@@ -366,7 +364,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                   <div className="flex gap-2">
                     <Button
                       type="button"
-                      variant="outline"
+                      variant="ghost"
                       size="sm"
                       className="text-label gap-1.5"
                       onClick={() => appendAdmin({ name: "", email: "", role: "Administrator", designateAsPic: false })}
@@ -375,7 +373,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                     </Button>
                     <Button
                       type="button"
-                      variant="outline"
+                      variant="ghost"
                       size="sm"
                       className="text-label gap-1.5"
                       onClick={() => appendContact({ name: "", email: "", type: "staff", phone: "", isPublic: true })}
@@ -547,7 +545,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                       className={inputCls()}
                       placeholder="e.g. Free WiFi"
                     />
-                    <Button type="button" variant="outline" size="sm" className="shrink-0 h-10" onClick={addBenefit}>
+                    <Button type="button" variant="ghost" size="sm" className="shrink-0 h-10" onClick={addBenefit}>
                       <Plus size={14} />
                     </Button>
                   </div>

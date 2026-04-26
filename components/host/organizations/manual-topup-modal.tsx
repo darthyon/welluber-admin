@@ -289,9 +289,9 @@ export function ManualTopUpModal({
         {/* Footer */}
         {!success && (
           <div className="p-4 border-t border-border flex items-center justify-end gap-2 bg-muted/10">
-            <Button 
+            <Button
               type="button"
-              variant="outline"
+              variant="ghost"
               onClick={onClose}
               disabled={isSubmitting}
               className="text-nav font-medium h-9"

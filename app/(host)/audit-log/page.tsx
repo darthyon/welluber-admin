@@ -84,11 +84,11 @@ export default function AuditLogPage() {
           </div>
         </div>
 
-        <Button 
-          variant="outline" 
-          size="sm" 
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={exportToCsv}
-          className="h-10 px-4 font-semibold border-border/40 hover:bg-muted/50 transition-all flex items-center gap-2"
+          className="h-10 px-4 font-semibold hover:bg-muted/50 transition-all flex items-center gap-2"
         >
           <Download size={18} weight="bold" />
           Export to CSV

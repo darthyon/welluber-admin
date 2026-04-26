@@ -135,9 +135,9 @@ export function PolicyDetailSheet({ isOpen, onClose, policy, groups, benefits, o
 
         {/* Footer Actions */}
         <div className="p-8 border-t border-border flex items-center gap-4 bg-muted/30 sticky bottom-0 z-10">
-          <Button 
-            variant="outline" 
-            className="flex-1 rounded-lg h-12 border-border font-semibold hover:bg-muted"
+          <Button
+            variant="ghost"
+            className="flex-1 rounded-lg h-12 font-semibold hover:bg-muted"
             onClick={onClose}
           >
             Close View

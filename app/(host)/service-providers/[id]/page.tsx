@@ -151,7 +151,7 @@ export default function ServiceProviderDetailPage() {
   return (
     <div className="pb-12">
       <div className="bg-card border-b border-border -mx-6 -mt-6 px-6 pt-6 relative z-30">
-        <div className="max-w-[1200px] mx-auto py-6 lg:px-2">
+        <div className="py-6 lg:px-2">
           <Breadcrumbs items={breadcrumbs} className="mb-4" />
 
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
@@ -218,7 +218,7 @@ export default function ServiceProviderDetailPage() {
         </div>
       </div>
 
-      <div className="max-w-[1200px] mx-auto p-6 lg:p-8">
+      <div className="p-6 lg:p-8">
         <div className="space-y-8">
 
           {/* ── SP Details Tab ──────────────────────────────────────────── */}
@@ -415,7 +415,7 @@ export default function ServiceProviderDetailPage() {
                     </Tooltip>
                   </TooltipProvider>
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     size="sm"
                     className="h-7 px-3 text-label font-medium gap-1.5"
                     onClick={() => setIsCommissionSheetOpen(true)}

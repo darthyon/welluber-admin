@@ -144,10 +144,10 @@ export function BrandDetailView({ brand, onBack, onEdit, onRemove }: BrandDetail
           </div>
           
           <div className="flex items-center gap-3">
-            <Button 
-               variant="outline" 
-               size="sm" 
-               className="h-10 px-4 font-semibold border-border/80 hover:bg-muted"
+            <Button
+               variant="ghost"
+               size="sm"
+               className="h-10 px-4 font-semibold hover:bg-muted"
                onClick={() => onEdit(brand.id)}
             >
               <PencilSimpleLine size={18} weight="bold" className="mr-2" />

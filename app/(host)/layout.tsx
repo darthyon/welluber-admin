@@ -12,6 +12,7 @@ export default function HostLayout({
       <AppSidebar />
       <TopBar />
       <SidebarInset className="bg-background min-w-0">
+        {/* Full-width shell — pages and subpages render edge-to-edge. Never add max-w constraints here or in page wrappers. Use column grids or form layouts to manage internal line length where needed. */}
         <main className="flex-1 w-full mt-14 p-8 px-6">
           {children}
         </main>

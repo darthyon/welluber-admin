@@ -448,7 +448,7 @@ function OrganizationDetailContent() {
 
       {/* Header Banner */}
       <div className="relative z-30 -mx-6 -mt-6 border-b border-border bg-card px-6 pt-6">
-        <div className="mx-auto max-w-[1200px] py-6 lg:px-2">
+        <div className="py-6 lg:px-2">
           <Breadcrumbs
             items={[
               { label: "Organisations", href: "/organizations" },
@@ -566,7 +566,7 @@ function OrganizationDetailContent() {
       </div>
 
       {/* Tab Content */}
-      <div className="mx-auto max-w-[1200px] p-6 lg:p-8">
+      <div className="p-6 lg:p-8">
         {activeTab === "profile" && (
           <div className="animate-in space-y-6 fade-in">
             {/* Account Details */}
@@ -839,9 +839,9 @@ function OrganizationDetailContent() {
                       <div className="h-4 w-[1px] bg-border" />
                       <Button
                         onClick={() => setIsBranchSheetOpen("true")}
-                        variant="outline"
+                        variant="ghost"
                         size="sm"
-                        className="flex h-8 items-center gap-2 rounded-full border-primary/20 px-4 text-label font-medium text-primary hover:bg-primary/5"
+                        className="flex h-8 items-center gap-2 rounded-full px-4 text-label font-medium text-primary hover:bg-primary/5"
                       >
                         <Plus size={14} weight="bold" /> Quick Launch Hub
                       </Button>

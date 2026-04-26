@@ -30,7 +30,7 @@ export default function BrandsPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="h-9 text-nav font-medium border-border/60 hover:bg-muted/50">
+          <Button variant="ghost" size="sm" className="h-9 text-nav font-medium hover:bg-muted/50">
             <DownloadSimple size={16} className="mr-1.5 opacity-60" />
             Export
           </Button>

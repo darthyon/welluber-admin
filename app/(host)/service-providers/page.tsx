@@ -62,7 +62,7 @@ function ServiceProvidersContent() {
         <div className="flex items-center gap-2">
           <ViewToggle mode={viewMode as ViewMode} onChange={setViewMode} />
 
-          <Button variant="outline" size="sm" className="h-9 text-nav font-medium border-border/60 hover:bg-muted/50">
+          <Button variant="ghost" size="sm" className="h-9 text-nav font-medium hover:bg-muted/50">
             <DownloadSimple size={16} className="mr-1.5 opacity-60" />
             Export
           </Button>
@@ -131,7 +131,7 @@ function ServiceProvidersContent() {
                     description="Try adjusting your search or filters."
                     action={
                       <Button
-                        variant="outline"
+                        variant="ghost"
                         onClick={() => {
                           setSearchQuery("");
                           setStatusFilter("all");

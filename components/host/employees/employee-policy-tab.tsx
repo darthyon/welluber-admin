@@ -144,8 +144,8 @@ export function EmployeePolicyTab({ employeeId }: EmployeePolicyTabProps) {
                 </div>
 
                 <div className="flex flex-col gap-3 shrink-0">
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="ghost"
                     className="gap-2"
                     onClick={handleAssignPolicy}
                   >

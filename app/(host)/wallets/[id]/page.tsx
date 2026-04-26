@@ -60,7 +60,7 @@ function WalletDetailContent() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
         <h2 className="text-heading font-semibold tracking-tight">Wallet Not Found</h2>
-        <Button variant="outline" onClick={() => router.push("/wallets")} className="rounded-lg px-6">
+        <Button variant="ghost" onClick={() => router.push("/wallets")} className="rounded-lg px-6">
           Back to Wallets
         </Button>
       </div>
@@ -121,7 +121,7 @@ function WalletDetailContent() {
   return (
     <div className="pb-12">
       <div className="bg-card border-border border-b -mx-6 -mt-6 px-6 pt-6 relative z-30">
-        <div className="max-w-[1200px] mx-auto py-6 lg:px-2">
+        <div className="py-6 lg:px-2">
           <Breadcrumbs 
             items={[
               { label: "Wallets", href: "/wallets" },
@@ -155,7 +155,7 @@ function WalletDetailContent() {
             </div>
 
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="lg" className="text-nav font-medium rounded-full h-10 px-5 border-border/60 hover:bg-muted/10">
+              <Button variant="ghost" size="lg" className="text-nav font-medium rounded-full h-10 px-5 hover:bg-muted/10">
                 <CreditCard size={16} className="mr-2 opacity-60" />
                 Update {wallet.model === "cash_balance" ? "Balance" : "Limit"}
               </Button>
@@ -191,7 +191,7 @@ function WalletDetailContent() {
         </div>
       </div>
 
-      <div className="max-w-[1200px] mx-auto p-6 lg:p-8 space-y-8">
+      <div className="p-6 lg:p-8 space-y-8">
         {activeTab === "transactions" ? (
            <>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

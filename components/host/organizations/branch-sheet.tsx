@@ -88,7 +88,7 @@ export function BranchSheet({ isOpen, onClose, branchName }: BranchSheetProps) {
               </div>
               <div className="border border-border/50 rounded-lg p-4 bg-muted/20 text-center">
                 <p className="text-nav text-muted-foreground mb-3">No contacts mapped to this branch yet.</p>
-                <Button variant="outline" size="sm" className="text-label h-8">
+                <Button variant="ghost" size="sm" className="text-label h-8">
                   + Add Contact
                 </Button>
               </div>

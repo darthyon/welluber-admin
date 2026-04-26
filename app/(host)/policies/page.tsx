@@ -154,7 +154,7 @@ function PoliciesContent() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-           <Button variant="outline" size="sm" className="h-9 text-nav font-medium border-border/60 hover:bg-muted/50">
+           <Button variant="ghost" size="sm" className="h-9 text-nav font-medium hover:bg-muted/50">
             <DownloadSimple size={16} className="mr-1.5 opacity-60" />
             Export
           </Button>
@@ -227,9 +227,9 @@ function PoliciesContent() {
           description="Design and oversee flexible benefit structures for your workforce. Adjust your filters or create a new policy to get started."
           action={
             <Button 
-              variant="outline" 
+              variant="default"
               onClick={handleCreateNew}
-              className="mt-8 px-6 h-10 border-border text-foreground hover:bg-white hover:text-primary hover:border-primary/30 transition-all font-medium shadow-sm"
+              className="mt-8 px-6 h-10 font-medium shadow-sm"
             >
               Launch Wizard
             </Button>

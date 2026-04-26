@@ -214,7 +214,7 @@ export function AssignPolicyModal({
 
         <DialogFooter className="gap-3">
           <Button
-            variant="outline"
+            variant="ghost"
             onClick={() => {
               onOpenChange(false);
               setSelectedPolicyId(null);
