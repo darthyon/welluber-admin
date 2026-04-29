@@ -105,8 +105,9 @@ export function BranchSheet({ isOpen, onClose, branchName }: BranchSheetProps) {
                 {branchName ? (
                    <div className="flex items-center justify-between">
                      <div>
-                       <p className="text-nav text-muted-foreground font-medium mb-1">Available Balance</p>
+                       <p className="text-nav text-muted-foreground font-medium mb-1">Wallet Balance</p>
                        <p className="text-display-lg font-semibold tracking-tight text-foreground">RM 50,000.00</p>
+                       <p className="text-caption text-muted-foreground/60 mt-1">KL HQ Wallet · New</p>
                      </div>
                      <Button size="sm" className="text-nav h-9">
                        Top Up Fund
@@ -114,10 +115,10 @@ export function BranchSheet({ isOpen, onClose, branchName }: BranchSheetProps) {
                    </div>
                 ) : (
                   <div className="space-y-3">
-                    <p className="text-nav text-muted-foreground">Select a wallet model to activate funding for this branch.</p>
+                    <p className="text-nav text-muted-foreground">Select a wallet setup to activate funding for this branch.</p>
                     <select className="w-full px-3 py-2 bg-background border border-border rounded-md text-nav outline-none">
-                      <option>Cash Balance (Pre-funded)</option>
-                      <option>Credit Limit (Post-paid)</option>
+                      <option>New Wallet</option>
+                      <option>Existing Wallet</option>
                     </select>
                   </div>
                 )}

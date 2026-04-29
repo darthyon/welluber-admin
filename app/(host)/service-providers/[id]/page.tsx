@@ -399,7 +399,7 @@ export default function ServiceProviderDetailPage() {
             <DetailSection
               title="Service Portfolio"
               icon={<IdentificationCard size={16} weight="fill" />}
-              description="Manage your service catalog and configure tiered commission rates."
+              description="Manage your service catalogue and configure tiered commission rates."
               action={
                 <div className="flex items-center gap-2">
                   <TooltipProvider>

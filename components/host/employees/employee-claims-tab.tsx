@@ -9,17 +9,17 @@ import { cn } from "@/lib/utils";
 import { SharedDataTable, type Column } from "@/components/shared/data-table";
 import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { FilterItem } from "@/components/shared/filter-item";
-import type { EmployeeClaim } from "@/types/claims";
+import type { ClaimStatus, EmployeeClaim } from "@/types/claims";
 
 // ─── Status badge ─────────────────────────────────────────────────────────────
 
-const STATUS_STYLE: Record<EmployeeClaim["status"], string> = {
-  Approved: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20",
-  Pending:  "bg-amber-500/10  text-amber-600  dark:text-amber-400 border border-amber-500/20",
-  Rejected: "bg-rose-500/10   text-rose-600   dark:text-rose-400 border border-rose-500/20",
+const STATUS_STYLE: Record<ClaimStatus, string> = {
+  "pre-auth":   "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20",
+  confirmed:    "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20",
+  cancelled:    "bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20",
 };
 
-function StatusBadge({ status }: { status: EmployeeClaim["status"] }) {
+function StatusBadge({ status }: { status: ClaimStatus }) {
   return (
     <span className={cn("text-micro font-semibold px-1.5 py-0.5 rounded", STATUS_STYLE[status])}>
       {status}
@@ -30,13 +30,13 @@ function StatusBadge({ status }: { status: EmployeeClaim["status"] }) {
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
 const MOCK_CLAIMS: EmployeeClaim[] = [
-  { id: "c1", voucherCode: "VCH-2024-0081", service: "Gymnasium Facilities", provider: "Celebrity Fitness KLCC", location: "Kuala Lumpur", date: "12 Mar 2024", amount: 180, status: "Approved", benefitGroup: "Gym Membership" },
-  { id: "c2", voucherCode: "VCH-2024-0114", service: "Clinical Therapy", provider: "Mind & Soul Clinic", location: "Mont Kiara", date: "20 Mar 2024", amount: 320, status: "Approved", benefitGroup: "Mental Health" },
-  { id: "c3", voucherCode: "VCH-2024-0198", service: "Group Fitness", provider: "Ritual Yoga Studio", location: "Bangsar", date: "01 Apr 2024", amount: 95, status: "Pending", benefitGroup: "Gym Membership" },
-  { id: "c4", voucherCode: "VCH-2024-0211", service: "Dietary Counseling", provider: "NutriCare Clinic", location: "Damansara", date: "05 Apr 2024", amount: 605, status: "Approved", benefitGroup: "Mental Health" },
-  { id: "c5", voucherCode: "VCH-2024-0033", service: "Grab Food Voucher", provider: "Grab Malaysia", location: "Online", date: "03 Jan 2024", amount: 200, status: "Approved", benefitGroup: "Food & Beverage" },
-  { id: "c6", voucherCode: "VCH-2024-0102", service: "Flight Subsidy", provider: "AirAsia", location: "KLIA2", date: "15 Feb 2024", amount: 450, status: "Approved", benefitGroup: "Travel" },
-  { id: "c7", voucherCode: "VCH-2024-0189", service: "Hotel Stay", provider: "Marriott Putrajaya", location: "Putrajaya", date: "20 Mar 2024", amount: 200, status: "Pending", benefitGroup: "Travel" },
+  { id: "c1", voucherCode: "VCH-2024-0081", voucherName: "Wellness Allocation Voucher", transactionType: "redemption", service: "Gymnasium Facilities", provider: "Celebrity Fitness KLCC", location: "Kuala Lumpur", date: "12 Mar 2024", amount: 180, status: "confirmed", benefitGroup: "Gym Membership" },
+  { id: "c2", voucherCode: "VCH-2024-0114", voucherName: "Wellness Allocation Voucher", transactionType: "redemption", service: "Clinical Therapy", provider: "Mind & Soul Clinic", location: "Mont Kiara", date: "20 Mar 2024", amount: 320, status: "confirmed", benefitGroup: "Mental Health" },
+  { id: "c3", voucherCode: "VCH-2024-0198", voucherName: "Wellness Allocation Voucher", transactionType: "redemption", service: "Group Fitness", provider: "Ritual Yoga Studio", location: "Bangsar", date: "01 Apr 2024", amount: 95, status: "pre-auth", benefitGroup: "Gym Membership" },
+  { id: "c4", voucherCode: "VCH-2024-0211", voucherName: "Wellness Allocation Voucher", transactionType: "reimbursement", service: "Dietary Counseling", provider: "NutriCare Clinic", location: "Damansara", date: "05 Apr 2024", amount: 605, status: "confirmed", benefitGroup: "Mental Health" },
+  { id: "c5", voucherCode: "VCH-2024-0033", voucherName: "Lifestyle Pocket Voucher", transactionType: "redemption", service: "Grab Food Voucher", provider: "Grab Malaysia", location: "Online", date: "03 Jan 2024", amount: 200, status: "confirmed", benefitGroup: "Food & Beverage" },
+  { id: "c6", voucherCode: "VCH-2024-0102", voucherName: "Lifestyle Pocket Voucher", transactionType: "redemption", service: "Flight Subsidy", provider: "AirAsia", location: "KLIA2", date: "15 Feb 2024", amount: 450, status: "confirmed", benefitGroup: "Travel" },
+  { id: "c7", voucherCode: "VCH-2024-0189", voucherName: "Lifestyle Pocket Voucher", transactionType: "redemption", service: "Hotel Stay", provider: "Marriott Putrajaya", location: "Putrajaya", date: "20 Mar 2024", amount: 200, status: "pre-auth", benefitGroup: "Travel" },
 ];
 
 // ─── Column definitions ───────────────────────────────────────────────────────
@@ -119,7 +119,7 @@ interface EmployeeClaimsTabProps {
 
 export function EmployeeClaimsTab({ employeeId: _employeeId }: EmployeeClaimsTabProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState<ClaimStatus | "all">("all");
 
   const filteredClaims = useMemo(() => {
     return MOCK_CLAIMS.filter((claim) => {
@@ -134,8 +134,8 @@ export function EmployeeClaimsTab({ employeeId: _employeeId }: EmployeeClaimsTab
   }, [searchQuery, statusFilter]);
 
   const totalAmount = filteredClaims.reduce((sum, c) => sum + c.amount, 0);
-  const approvedCount = filteredClaims.filter((c) => c.status === "Approved").length;
-  const pendingCount = filteredClaims.filter((c) => c.status === "Pending").length;
+  const confirmedCount = filteredClaims.filter((c) => c.status === "confirmed").length;
+  const preAuthCount = filteredClaims.filter((c) => c.status === "pre-auth").length;
 
   return (
     <div className="space-y-8">
@@ -161,18 +161,18 @@ export function EmployeeClaimsTab({ employeeId: _employeeId }: EmployeeClaimsTab
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-2">
               <Receipt size={16} className="text-emerald-500" />
-              <p className="text-caption font-semibold text-muted-foreground">Approved</p>
+              <p className="text-caption font-semibold text-muted-foreground">Confirmed</p>
             </div>
-            <p className="text-display font-semibold text-foreground">{approvedCount}</p>
+            <p className="text-display font-semibold text-foreground">{confirmedCount}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-2">
               <Receipt size={16} className="text-amber-500" />
-              <p className="text-caption font-semibold text-muted-foreground">Pending</p>
+              <p className="text-caption font-semibold text-muted-foreground">Pre-auth</p>
             </div>
-            <p className="text-display font-semibold text-foreground">{pendingCount}</p>
+            <p className="text-display font-semibold text-foreground">{preAuthCount}</p>
           </CardContent>
         </Card>
         <Card>
@@ -196,12 +196,12 @@ export function EmployeeClaimsTab({ employeeId: _employeeId }: EmployeeClaimsTab
             label="Status"
             options={[
               { label: "All Status", value: "all" },
-              { label: "Approved", value: "Approved" },
-              { label: "Pending", value: "Pending" },
-              { label: "Rejected", value: "Rejected" },
+              { label: "Pre-auth", value: "pre-auth" },
+              { label: "Confirmed", value: "confirmed" },
+              { label: "Cancelled", value: "cancelled" },
             ]}
             value={statusFilter}
-            onChange={setStatusFilter}
+            onChange={(v) => setStatusFilter(v as ClaimStatus | "all")}
           />
         }
         actions={

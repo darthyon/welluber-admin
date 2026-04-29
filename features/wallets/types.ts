@@ -1,28 +1,29 @@
 import { ISODate } from "../organizations/types";
 
 export type WalletStatus = "active" | "suspended" | "closed";
-export type WalletModel = "cash_balance" | "credit_limit";
+export type WalletType = "new" | "existing";
 
 export interface Wallet {
   id: string;
+  name: string;
   orgId: string;
   orgName: string;
   branchId: string;
   branchName: string;
-  model: WalletModel;
+  type: WalletType;
   balance: number;
-  creditLimit?: number;
   pendingDeductions: number;
   status: WalletStatus;
+  attachmentUrl?: string;
   createdAt: ISODate;
   updatedAt: ISODate;
 }
 
-export type TransactionType = 
-  | "topup" 
-  | "deduction" 
-  | "adjustment" 
-  | "reversal" 
+export type TransactionType =
+  | "topup"
+  | "deduction"
+  | "adjustment"
+  | "reversal"
   | "settlement";
 
 export interface WalletTransaction {
@@ -33,17 +34,18 @@ export interface WalletTransaction {
   balanceBefore: number;
   balanceAfter: number;
   referenceId?: string;
+  voucherName?: string;
+  claimId?: string;
   description: string;
   performedBy: string; // Host Admin name/ID
   createdAt: ISODate;
 }
 
 export interface WalletSummary {
-  totalCashBalance: number;
-  totalCreditLimit: number;
-  totalCreditUtilized: number;
+  totalBalance: number;
   activeCount: number;
   suspendedCount: number;
+  totalWallets: number;
 }
 
 import { AdvancedFilters } from "@/components/shared/advanced-filter-sheet";
@@ -53,5 +55,4 @@ export interface WalletFilters extends AdvancedFilters {
   orgIds: string[];
   branchIds: string[];
   status: WalletStatus | "all";
-  model: WalletModel | "all";
 }

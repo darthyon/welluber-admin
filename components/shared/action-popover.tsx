@@ -12,6 +12,7 @@ export interface ActionItem {
   className?: string;
   isDanger?: boolean;
   isSectionTitle?: boolean;
+  icon?: React.ReactNode;
 }
 
 interface ActionPopoverProps {
@@ -73,13 +74,14 @@ export function ActionPopover({
                     }
                   }}
                   className={cn(
-                    "flex items-center w-full px-3 py-2 rounded-lg text-nav font-medium transition-colors text-left",
+                    "flex items-center gap-2 w-full px-3 py-2 rounded-lg text-nav font-medium transition-colors text-left",
                     action.isDanger 
                       ? "text-rose-500 hover:bg-rose-50" 
                       : "text-foreground/80 hover:bg-muted hover:text-foreground",
                     action.className
                   )}
                 >
+                  {action.icon && <span className="text-muted-foreground/60">{action.icon}</span>}
                   {action.label}
                 </Component>
                 {/* Visual separator before section titles (except first) */}

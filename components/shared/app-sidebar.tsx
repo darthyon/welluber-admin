@@ -75,7 +75,7 @@ const personas = [
   },
   {
     id: "org",
-    name: "Organization Admin",
+    name: "Organisation Admin",
     description: "Corporate Management",
     icon: Buildings,
   },
@@ -93,7 +93,7 @@ const hostNavigation = [
     title: "Operations",
     items: [
       { id: "dashboard", label: "Dashboard", href: "/dashboard", icon: SquaresFour },
-      { id: "organizations", label: "Organizations", href: "/organizations", icon: Buildings },
+      { id: "organizations", label: "Organisations", href: "/organizations", icon: Buildings },
       { id: "providers", label: "Service Providers", href: "/service-providers", icon: Storefront },
       { id: "settlements", label: "Settlement & Payouts", href: "/settlements", icon: CurrencyCircleDollar },
       { id: "wallets", label: "Wallets", href: "/wallets", icon: Wallet },
@@ -190,9 +190,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 >
                   <DropdownMenuLabel className="p-0 font-normal">
                     <div className="flex items-center gap-2 px-3 py-2.5 text-left text-body">
-                      <Avatar className="h-9 w-9 rounded-lg shadow-lg ring-2 ring-primary/10 transition-transform hover:scale-105 active:scale-95 duration-200">
+                      <Avatar className="h-9 w-9 rounded-full shadow-lg ring-2 ring-primary/10 transition-transform hover:scale-105 active:scale-95 duration-200">
                         <AvatarImage src={user?.image || ""} alt={user?.name || ""} />
-                        <AvatarFallback className="bg-primary/10 text-primary font-semibold text-nav tracking-tight">YY</AvatarFallback>
+                        <AvatarFallback className="bg-primary/10 text-primary font-semibold text-nav tracking-tight">
+                          {(() => {
+                            const n = user?.name || ""
+                            const parts = n.trim().split(/\s+/).filter(Boolean)
+                            return parts.length >= 2
+                              ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+                              : parts[0]?.substring(0, 2).toUpperCase() || "?"
+                          })()}
+                        </AvatarFallback>
                       </Avatar>
                       <div className="grid flex-1 text-left leading-tight">
                         <span className="truncate font-semibold tracking-tight text-foreground">{user?.name || "Yon Yusuf"}</span>

@@ -179,7 +179,9 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
       tier: "T3",
       residency: "Local",
       taxable: true,
-      employmentStatus: "Active",
+      employmentType: "full-time",
+      employeeStatus: "active",
+      isProbation: false,
     },
     {
       id: "rec_1",
@@ -198,7 +200,9 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
       tier: "T2",
       residency: "Local",
       taxable: true,
-      employmentStatus: "Active",
+      employmentType: "full-time",
+      employeeStatus: "active",
+      isProbation: false,
     },
     {
       id: "rec_2",
@@ -217,7 +221,9 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
       tier: "T4",
       residency: "Foreigner",
       taxable: false,
-      employmentStatus: "Probation",
+      employmentType: "internship",
+      employeeStatus: "active",
+      isProbation: true,
       isNewDept: true,
     },
     {
@@ -238,7 +244,9 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
       tier: "T4",
       residency: "Local",
       taxable: true,
-      employmentStatus: "Active",
+      employmentType: "part-time",
+      employeeStatus: "inactive",
+      isProbation: false,
     },
     {
       id: "rec_4",
@@ -258,7 +266,9 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
       tier: "T3",
       residency: "Local",
       taxable: true,
-      employmentStatus: "Active",
+      employmentType: "contract",
+      employeeStatus: "active",
+      isProbation: true,
     },
   ]
 
@@ -271,8 +281,8 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
     const matchesIssues = !showIssuesOnly || r.status === "Issue"
     const matchesSearch =
       !searchQuery ||
-      [r.name, r.email, r.code, r.department, r.role].some((field) =>
-        field.toLowerCase().includes(searchQuery.toLowerCase())
+      [r.name, r.email, r.code, r.department, r.role, r.tier, r.employmentType, r.employeeStatus].some((field) =>
+        String(field).toLowerCase().includes(searchQuery.toLowerCase())
       )
     return matchesIssues && matchesSearch
   })
@@ -395,6 +405,18 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
                 className="w-full rounded border border-border bg-background px-1.5 py-0.5 text-caption font-semibold outline-none focus:border-primary/50"
                 placeholder="Role"
               />
+              <select
+                value={row.employmentType}
+                onChange={(e) =>
+                  handleRecordChange(row.id, "employmentType", e.target.value)
+                }
+                className="w-full rounded border border-border bg-background px-1.5 py-0.5 text-caption font-semibold outline-none focus:border-primary/50"
+              >
+                <option value="full-time">Full-time</option>
+                <option value="part-time">Part-time</option>
+                <option value="contract">Contract</option>
+                <option value="internship">Internship</option>
+              </select>
             </div>
           ) : (
             <>
@@ -411,6 +433,9 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
               <span className="text-caption font-medium text-muted-foreground italic opacity-70">
                 {row.role}
               </span>
+              <span className="text-micro font-semibold text-muted-foreground/60 capitalize">
+                {row.employmentType?.replace("-", " ")}
+              </span>
             </>
           )}
         </div>
@@ -420,14 +445,21 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
       header: "Tier & Status",
       render: (row) => (
         <div className="flex flex-col gap-1">
-           <div className="flex items-center gap-1.5">
+           <div className="flex items-center gap-1.5 flex-wrap">
              <span className="text-label font-semibold text-primary bg-primary/5 px-1.5 py-0.5 rounded border border-primary/10">{row.tier}</span>
              <span className={cn(
                "text-micro font-semibold px-2 py-0.5 rounded-4xl border",
-               row.employmentStatus === "Active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-amber-500/10 text-amber-600 border-amber-500/20"
-             )}>{row.employmentStatus}</span>
+               row.employeeStatus === "active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-rose-500/10 text-rose-600 border-rose-500/20"
+             )}>{row.employeeStatus}</span>
+             {row.isProbation && (
+               <span className="text-micro font-semibold px-2 py-0.5 rounded-4xl border bg-amber-500/10 text-amber-600 border-amber-500/20">
+                 Probation
+               </span>
+             )}
            </div>
-           <div className="flex items-center gap-1.5 text-micro font-medium text-muted-foreground">
+           <div className="flex items-center gap-1.5 text-micro font-medium text-muted-foreground flex-wrap">
+             <span className="font-semibold text-foreground/70 capitalize">{row.employmentType?.replace("-", " ")}</span>
+             <span>•</span>
              <Globe size={10} />
              <span>{row.residency}</span>
              <span>•</span>
@@ -678,8 +710,8 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
                     Required Columns
                   </p>
                   <p className="text-caption leading-relaxed text-primary/80">
-                    Code, Email, First Name, Last Name, DOB, ID Type, ID Number,
-                    Join Date, Branch ID.
+                    Code, Email, Name, DOB, Gender, Mobile, Department, Role,
+                    Join Date, Branch, Tier, Employment Type, Status, Is Probation.
                   </p>
                 </div>
               </div>

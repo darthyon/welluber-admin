@@ -1,14 +1,12 @@
 "use client";
 
-import { 
-  ArrowLeft, 
-  ArrowUpRight, 
-  ArrowDownRight, 
-  CreditCard, 
-  Bank, 
-  Info, 
-  Clock, 
-  User, 
+import {
+  ArrowLeft,
+  ArrowUpRight,
+  ArrowDownRight,
+  Info,
+  Clock,
+  User,
   DotsThreeVertical,
   DotsThreeCircle,
   Funnel,
@@ -16,7 +14,8 @@ import {
   Ticket,
   CalendarBlank,
   Buildings,
-  Gear
+  Gear,
+  Wallet,
 } from "@phosphor-icons/react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -48,7 +47,7 @@ function WalletDetailContent() {
   const [activeTab, setActiveTab] = useQueryState("tab", "transactions");
   const [searchQuery, setSearchQuery] = useState("");
   const [period, setPeriod] = useState<"By Month" | "By Quarter" | "By Year">("By Month");
-  
+
   // Danger States
   const [isDangerModalOpen, setIsDangerModalOpen] = useState(false);
   const [dangerAction, setDangerAction] = useState<"suspend" | "terminate" | null>(null);
@@ -67,18 +66,19 @@ function WalletDetailContent() {
     );
   }
 
-  const filteredTransactions = transactions.filter(t => 
+  const filteredTransactions = transactions.filter(t =>
     t.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
     t.id.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const limit = wallet.creditLimit || wallet.balance;
-  const utilisationRatio = limit > 0 ? (wallet.balance / limit) : 0;
-  const utilisationPercent = Math.round(utilisationRatio * 100);
+  // Mock org credit data (in real app, fetch from org)
+  const orgCreditLimit = 10000;
+  const orgCreditUsed = Math.abs(Math.min(0, wallet.balance));
+  const orgCreditRemaining = orgCreditLimit - orgCreditUsed;
 
   const OTHER_WALLETS = wallets
     .filter(w => w.id !== walletId)
-    .map(w => ({ label: `${w.orgName} (${w.branchName})`, href: `/wallets/${w.id}` }));
+    .map(w => ({ label: `${w.name} (${w.orgName})`, href: `/wallets/${w.id}` }));
 
   const openDangerAction = (action: "suspend" | "terminate") => {
     setDangerAction(action);
@@ -122,11 +122,11 @@ function WalletDetailContent() {
     <div className="pb-12">
       <div className="bg-card border-border border-b -mx-6 -mt-6 px-6 pt-6 relative z-30">
         <div className="py-6 lg:px-2">
-          <Breadcrumbs 
+          <Breadcrumbs
             items={[
               { label: "Wallets", href: "/wallets" },
-              { 
-                label: `${wallet.orgName} (${wallet.branchName})`,
+              {
+                label: `${wallet.name}`,
                 options: OTHER_WALLETS
               }
             ]}
@@ -136,18 +136,17 @@ function WalletDetailContent() {
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
             <div className="flex items-start gap-5">
               <div className="w-15 h-15 rounded-lg bg-muted/80 flex items-center justify-center text-muted-foreground border border-zinc-200/60 transition-all">
-                {wallet.model === "cash_balance" ? <Bank size={32} weight="fill" /> : <CreditCard size={32} weight="fill" />}
+                <Wallet size={32} weight="fill" />
               </div>
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
-                  <h1 className="text-display font-semibold tracking-tight text-foreground">{wallet.orgName}</h1>
+                  <h1 className="text-display font-semibold tracking-tight text-foreground">{wallet.name}</h1>
                   <StatusBadge status={wallet.status} variant={wallet.status === "active" ? "emerald" : "zinc"} />
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="font-mono text-caption text-muted-foreground/60 bg-white px-2 py-0.5 rounded border border-zinc-200 uppercase tracking-widest">{wallet.id}</span>
-                  <span className="px-1.5 py-0.5 rounded-md bg-muted border border-zinc-200 text-micro font-semibold text-muted-foreground">
-                    {wallet.model === "cash_balance" ? "Cash balance" : "Credit limit"}
-                  </span>
+                  <span className="opacity-20 text-muted-foreground">•</span>
+                  <span className="text-label font-medium text-muted-foreground/60">{wallet.orgName}</span>
                   <span className="opacity-20 text-muted-foreground">•</span>
                   <span className="text-label font-medium text-muted-foreground/60">{wallet.branchName}</span>
                 </div>
@@ -156,10 +155,10 @@ function WalletDetailContent() {
 
             <div className="flex items-center gap-2">
               <Button variant="ghost" size="lg" className="text-nav font-medium rounded-full h-10 px-5 hover:bg-muted/10">
-                <CreditCard size={16} className="mr-2 opacity-60" />
-                Update {wallet.model === "cash_balance" ? "Balance" : "Limit"}
+                <Wallet size={16} className="mr-2 opacity-60" />
+                Update Balance
               </Button>
-              <ActionPopover 
+              <ActionPopover
                 actions={[
                   { label: "View Statement", onClick: () => {} },
                   { label: "Suspend Wallet", isDanger: true, onClick: () => openDangerAction("suspend") },
@@ -169,7 +168,7 @@ function WalletDetailContent() {
           </div>
 
           <div className="flex items-center gap-8 mt-8 border-b border-border">
-            <button 
+            <button
               onClick={() => setActiveTab("transactions")}
               className={cn(
                 "h-10 px-0 border-b-2 text-body font-medium transition-all relative",
@@ -178,7 +177,7 @@ function WalletDetailContent() {
             >
               Transaction records
             </button>
-            <button 
+            <button
               onClick={() => setActiveTab("settings")}
               className={cn(
                 "h-10 px-0 border-b-2 text-body font-medium transition-all relative",
@@ -197,14 +196,17 @@ function WalletDetailContent() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 bg-primary/5 border border-primary/10 rounded-lg overflow-hidden relative p-8">
                 <div className="absolute top-0 right-0 p-8 opacity-[0.03]">
-                  {wallet.model === "cash_balance" ? <Bank size={80} weight="fill" /> : <CreditCard size={80} weight="fill" />}
+                  <Wallet size={80} weight="fill" />
                 </div>
                 <div className="relative z-10">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
                     <div className="space-y-1">
-                      <p className="text-label font-semibold text-primary/70 tracking-tight">Utilisation</p>
-                      <h2 className="text-4xl font-semibold tracking-tight text-foreground">
-                        RM {wallet.balance.toLocaleString()}
+                      <p className="text-label font-semibold text-primary/70 tracking-tight">Wallet Balance</p>
+                      <h2 className={cn(
+                        "text-4xl font-semibold tracking-tight",
+                        wallet.balance < 0 ? "text-rose-500" : "text-foreground"
+                      )}>
+                        {wallet.balance < 0 ? "-" : ""}RM {Math.abs(wallet.balance).toLocaleString()}
                       </h2>
                       <div className="flex items-center gap-3 mt-4">
                         <div className={cn(
@@ -216,26 +218,33 @@ function WalletDetailContent() {
                           <Ticket size={14} weight="fill" />
                           {wallet.pendingDeductions === 0 ? "0" : `RM ${wallet.pendingDeductions.toLocaleString()}`} pending claims
                         </div>
+                        {wallet.balance < 0 && (
+                          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-rose-200 bg-rose-50 text-caption font-semibold text-rose-700">
+                            Overdrawn
+                          </div>
+                        )}
                       </div>
                     </div>
 
-                    <div className="space-y-4 min-w-[280px]">
-                      <div className="flex justify-between items-center text-label font-semibold">
-                        <span className="text-primary/70 tracking-tight">Utilisation pool</span>
-                        <span className="text-foreground font-mono">{utilisationPercent}%</span>
+                    <div className="space-y-3 min-w-[240px]">
+                      <div className="flex items-center gap-2 text-label font-semibold text-primary/70 tracking-tight">
+                        Credit Remaining
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Info size={14} className="text-muted-foreground/40 cursor-help" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p className="text-nav max-w-[200px]">Org-level overdraft remaining before hard block</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       </div>
-                      <div className="w-full h-2.5 bg-primary/20 rounded-full overflow-hidden shadow-inner">
-                        <div 
-                          className={cn(
-                            "h-full rounded-full transition-all duration-700",
-                            utilisationRatio > 0.9 ? "bg-rose-500" : utilisationRatio > 0.7 ? "bg-amber-500" : "bg-primary"
-                          )}
-                          style={{ width: `${Math.min(utilisationPercent, 100)}%` }}
-                        />
+                      <div className="text-2xl font-semibold text-foreground">
+                        RM {orgCreditRemaining.toLocaleString()}
                       </div>
-                      <div className="flex justify-between text-caption font-semibold text-foreground/40 tracking-tight">
-                        <span>Used RM {wallet.balance.toLocaleString()}</span>
-                        <span>Total RM {(wallet.creditLimit || wallet.balance).toLocaleString()}</span>
+                      <div className="text-caption text-muted-foreground/60">
+                        Total Credit Limit: RM {orgCreditLimit.toLocaleString()}
                       </div>
                     </div>
                   </div>
@@ -276,11 +285,11 @@ function WalletDetailContent() {
                     searchPlaceholder="Search transactions..."
                   />
                 </div>
-                 
+
                  <div className="flex flex-wrap items-center gap-2 shrink-0">
                     <div className="flex bg-muted/50 p-0.5 rounded-lg border border-border">
                       {["By Month", "By Quarter", "By Year"].map((p) => (
-                        <button 
+                        <button
                           key={p}
                           onClick={() => setPeriod(p as any)}
                           className={`px-3 py-1 text-caption font-semibold rounded-md transition-all ${
@@ -323,7 +332,7 @@ function WalletDetailContent() {
                   </div>
                </div>
 
-               <SharedDataTable 
+               <SharedDataTable
                  defaultSort={{ key: "createdAt", direction: "desc" }}
                  columns={[
                    {
@@ -345,52 +354,69 @@ function WalletDetailContent() {
                        </div>
                      )
                    },
-                   {
-                     header: "Amount",
-                     accessorKey: "amount",
-                     sortable: true,
-                     align: "right",
-                     render: (trx: any) => (
-                       <div className="text-right">
-                         <p className={cn(
-                           "text-subtitle font-semibold tracking-tight",
-                           trx.amount > 0 && trx.type === "topup" ? "text-emerald-600" : "text-foreground"
-                         )}>
-                           {trx.type === "topup" ? "+" : "-"} RM {Math.abs(trx.amount).toLocaleString()}
-                         </p>
-                         <p className="text-caption font-medium text-muted-foreground/50 text-nowrap">Balance after: RM {trx.balanceAfter.toLocaleString()}</p>
-                       </div>
-                     )
-                   },
-                   {
-                     header: "Type",
-                     accessorKey: "type",
-                     sortable: true,
-                     render: (trx: any) => (
-                       <StatusBadge status={TRANSACTION_TYPE_LABELS[trx.type as keyof typeof TRANSACTION_TYPE_LABELS] || trx.type} variant="zinc" />
-                     )
-                   },
-                   {
-                     header: "Date",
-                     accessorKey: "createdAt",
-                     sortable: true,
-                     align: "center",
-                     render: (trx: any) => (
-                       <div className="text-center">
-                         <p className="text-nav font-semibold text-foreground/80 tracking-tight">
-                           {new Date(trx.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-                         </p>
-                         <p className="text-caption font-semibold text-muted-foreground/40">
-                           {new Date(trx.createdAt).toLocaleTimeString('en-MY', { hour: '2-digit', minute: '2-digit' })}
-                         </p>
-                       </div>
-                     )
-                   },
+                    {
+                      header: "Amount",
+                      accessorKey: "amount",
+                      sortable: true,
+                      align: "right",
+                      render: (trx: any) => (
+                        <div className="text-right">
+                          <p className={cn(
+                            "text-subtitle font-semibold tracking-tight",
+                            trx.amount > 0 && trx.type === "topup" ? "text-emerald-600" : "text-foreground"
+                          )}>
+                            {trx.type === "topup" ? "+" : "-"} RM {Math.abs(trx.amount).toLocaleString()}
+                          </p>
+                          <p className="text-caption font-medium text-muted-foreground/50 text-nowrap">Balance after: RM {trx.balanceAfter.toLocaleString()}</p>
+                        </div>
+                      )
+                    },
+                    {
+                      header: "Type",
+                      accessorKey: "type",
+                      sortable: true,
+                      render: (trx: any) => (
+                        <StatusBadge status={TRANSACTION_TYPE_LABELS[trx.type as keyof typeof TRANSACTION_TYPE_LABELS] || trx.type} variant="zinc" />
+                      )
+                    },
+                    {
+                      header: "Reference",
+                      accessorKey: "voucherName",
+                      sortable: true,
+                      render: (trx: any) => (
+                        <div className="space-y-0.5">
+                          {trx.voucherName ? (
+                            <>
+                              <p className="text-body font-semibold text-foreground">{trx.voucherName}</p>
+                              <p className="text-caption font-semibold text-muted-foreground/50 font-mono">{trx.claimId}</p>
+                            </>
+                          ) : (
+                            <span className="text-caption text-muted-foreground/60">—</span>
+                          )}
+                        </div>
+                      )
+                    },
+                    {
+                      header: "Date",
+                      accessorKey: "createdAt",
+                      sortable: true,
+                      align: "center",
+                      render: (trx: any) => (
+                        <div className="text-center">
+                          <p className="text-nav font-semibold text-foreground/80 tracking-tight">
+                            {new Date(trx.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                          </p>
+                          <p className="text-caption font-semibold text-muted-foreground/40">
+                            {new Date(trx.createdAt).toLocaleTimeString('en-MY', { hour: '2-digit', minute: '2-digit' })}
+                          </p>
+                        </div>
+                      )
+                    },
                    {
                      header: "Actions",
                      align: "right",
                      render: (trx: any) => (
-                       <ActionPopover 
+                       <ActionPopover
                          actions={[
                            { label: "View detail record", onClick: () => {} },
                            { label: "Download voucher", onClick: () => {} },
@@ -405,18 +431,20 @@ function WalletDetailContent() {
            </>
           ) : (
             <div className="space-y-8 animate-in fade-in transition-all duration-300">
-              <DetailSection title="Wallet configuration" icon={<Bank size={18} />}>
+              <DetailSection title="Wallet configuration" icon={<Wallet size={18} />}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-7">
-                  <DetailField label="Wallet model" value={wallet.model === "cash_balance" ? "Cash balance (Pre-paid)" : "Credit limit (Post-paid)"} />
-                  <DetailField 
-                    label="Status" 
+                  <DetailField label="Wallet name" value={wallet.name} />
+                  <DetailField
+                    label="Status"
                     value={
                       <div className="flex items-center gap-3">
                         <StatusBadge status={wallet.status} variant={wallet.status === "active" ? "emerald" : "zinc"} />
                         <button className="text-caption font-semibold text-primary hover:opacity-70 transition-opacity">Change status</button>
                       </div>
-                    } 
+                    }
                   />
+                  <DetailField label="Organization" value={wallet.orgName} />
+                  <DetailField label="Branch" value={wallet.branchName} />
                   <DetailField label="Creation date" value={new Date(wallet.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} />
                   <DetailField label="Last activity" value={new Date(wallet.updatedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} />
                 </div>
@@ -462,7 +490,7 @@ function WalletDetailContent() {
           )}
         </div>
 
-      <ConfirmationModal 
+      <ConfirmationModal
         isOpen={isDangerModalOpen}
         title={dangerAction ? dangerActionConfig[dangerAction].title : "Confirm Action"}
         description={dangerAction ? dangerActionConfig[dangerAction].description : ""}

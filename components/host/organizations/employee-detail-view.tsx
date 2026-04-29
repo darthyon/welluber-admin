@@ -44,7 +44,6 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
     id: employeeId,
     name: "Robert Fox",
     email: "robert.fox@acme.com",
-    avatar: "RF",
     status: "Linked",
     empCode: "ACM-1002",
     dateOfBirth: "12 May 1990",
@@ -52,7 +51,7 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
     idNumber: "900512-14-5231",
     joinDate: "12 Oct 2023",
     branch: "ACME HQ (Kuala Lumpur)",
-    workType: "Full-time",
+    employmentType: "full_time",
     department: "Engineering",
     designation: "Senior Software Engineer",
     mobile: "+60 12-345 6789",
@@ -60,7 +59,8 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
     residencyStatus: "Local",
     isTaxable: true,
     tier: "Tier 3 - Executive",
-    employmentStatus: "Active",
+    employeeStatus: "active",
+    isProbation: false,
     benefitPolicies: [
       {
         name: "Wellness Allocation",
@@ -69,10 +69,10 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
         spent: "RM 1,200.00",
         utilisation: 48,
         claims: [
-          { id: "c1", voucherCode: "VCH-2024-0081", service: "Gymnasium Facilities", provider: "Celebrity Fitness KLCC", location: "Kuala Lumpur",  date: "12 Mar 2024", amount: 180, status: "Approved" },
-          { id: "c2", voucherCode: "VCH-2024-0114", service: "Clinical Therapy",     provider: "Mind & Soul Clinic",   location: "Mont Kiara",    date: "20 Mar 2024", amount: 320, status: "Approved" },
-          { id: "c3", voucherCode: "VCH-2024-0198", service: "Group Fitness",        provider: "Ritual Yoga Studio",   location: "Bangsar",       date: "01 Apr 2024", amount: 95,  status: "Pending"  },
-          { id: "c4", voucherCode: "VCH-2024-0211", service: "Dietary Counseling",   provider: "NutriCare Clinic",     location: "Damansara",     date: "05 Apr 2024", amount: 605, status: "Approved" },
+          { id: "c1", voucherCode: "VCH-2024-0081", voucherName: "Wellness Allocation Voucher", transactionType: "redemption", service: "Gymnasium Facilities", provider: "Celebrity Fitness KLCC", location: "Kuala Lumpur",  date: "12 Mar 2024", amount: 180, status: "confirmed" },
+          { id: "c2", voucherCode: "VCH-2024-0114", voucherName: "Wellness Allocation Voucher", transactionType: "redemption", service: "Clinical Therapy",     provider: "Mind & Soul Clinic",   location: "Mont Kiara",    date: "20 Mar 2024", amount: 320, status: "confirmed" },
+          { id: "c3", voucherCode: "VCH-2024-0198", voucherName: "Wellness Allocation Voucher", transactionType: "redemption", service: "Group Fitness",        provider: "Ritual Yoga Studio",   location: "Bangsar",       date: "01 Apr 2024", amount: 95,  status: "pre-auth"  },
+          { id: "c4", voucherCode: "VCH-2024-0211", voucherName: "Wellness Allocation Voucher", transactionType: "reimbursement", service: "Dietary Counseling",   provider: "NutriCare Clinic",     location: "Damansara",     date: "05 Apr 2024", amount: 605, status: "confirmed" },
         ] as Claim[]
       },
       {
@@ -82,9 +82,9 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
         spent: "RM 850.00",
         utilisation: 85,
         claims: [
-          { id: "c5", voucherCode: "VCH-2024-0033", service: "Grab Food Voucher",   provider: "Grab Malaysia",      location: "Online",      date: "03 Jan 2024", amount: 200, status: "Approved" },
-          { id: "c6", voucherCode: "VCH-2024-0102", service: "Flight Subsidy",      provider: "AirAsia",           location: "KLIA2",       date: "15 Feb 2024", amount: 450, status: "Approved" },
-          { id: "c7", voucherCode: "VCH-2024-0189", service: "Hotel Stay",          provider: "Marriott Putrajaya",location: "Putrajaya",   date: "20 Mar 2024", amount: 200, status: "Pending"  },
+          { id: "c5", voucherCode: "VCH-2024-0033", voucherName: "Lifestyle Pocket Voucher", transactionType: "redemption", service: "Grab Food Voucher",   provider: "Grab Malaysia",      location: "Online",      date: "03 Jan 2024", amount: 200, status: "confirmed" },
+          { id: "c6", voucherCode: "VCH-2024-0102", voucherName: "Lifestyle Pocket Voucher", transactionType: "redemption", service: "Flight Subsidy",      provider: "AirAsia",           location: "KLIA2",       date: "15 Feb 2024", amount: 450, status: "confirmed" },
+          { id: "c7", voucherCode: "VCH-2024-0189", voucherName: "Lifestyle Pocket Voucher", transactionType: "redemption", service: "Hotel Stay",          provider: "Marriott Putrajaya",location: "Putrajaya",   date: "20 Mar 2024", amount: 200, status: "pre-auth"  },
         ] as Claim[]
       }
     ],
@@ -104,9 +104,9 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
     });
 
   const CLAIM_STATUS_STYLE: Record<Claim["status"], string> = {
-    Approved: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20",
-    Pending:  "bg-amber-500/10  text-amber-600  dark:text-amber-400 border border-amber-500/20",
-    Rejected: "bg-rose-500/10   text-rose-600   dark:text-rose-400 border border-rose-500/20",
+    "pre-auth":   "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20",
+    confirmed:    "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20",
+    cancelled:    "bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20",
   };
 
   return (
@@ -124,7 +124,12 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-semibold text-heading shadow-sm">
-              {employeeData.avatar}
+              {(() => {
+                const parts = employeeData.name.trim().split(/\s+/).filter(Boolean)
+                return parts.length >= 2
+                  ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+                  : parts[0]?.substring(0, 2).toUpperCase() || "?"
+              })()}
             </div>
             <div>
               <div className="flex items-center gap-3">
@@ -134,13 +139,18 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
               <p className="text-body text-muted-foreground mt-1 font-medium">
                 {employeeData.designation} • {employeeData.department} • {employeeData.tier}
               </p>
-              <div className="flex items-center gap-2 mt-2">
+              <div className="flex items-center gap-2 mt-2 flex-wrap">
                 <span className={cn(
                   "text-micro font-semibold px-2 py-0.5 rounded-4xl border",
-                  employeeData.employmentStatus === "Active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-amber-500/10 text-amber-600 border-amber-500/20"
+                  employeeData.employeeStatus === "active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-rose-500/10 text-rose-600 border-rose-500/20"
                 )}>
-                  {employeeData.employmentStatus}
+                  {employeeData.employeeStatus}
                 </span>
+                {employeeData.isProbation && (
+                  <span className="text-micro font-semibold px-2 py-0.5 rounded-4xl border bg-amber-500/10 text-amber-600 border-amber-500/20">
+                    Probation
+                  </span>
+                )}
                 <span className="text-micro font-semibold px-2 py-0.5 rounded-4xl bg-muted text-muted-foreground border border-border">
                   {employeeData.residencyStatus}
                 </span>
@@ -240,8 +250,18 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
                 icon={<CalendarBlank size={16} />}
               />
               <DetailField 
-                label="Work Type" 
-                value={employeeData.workType} 
+                label="Employment Type" 
+                value={employeeData.employmentType.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase())} 
+                icon={<ClockCounterClockwise size={16} />}
+              />
+              <DetailField 
+                label="Status" 
+                value={employeeData.employeeStatus} 
+                icon={<Shield size={16} />}
+              />
+              <DetailField 
+                label="Is Probation" 
+                value={employeeData.isProbation ? "Yes" : "No"} 
                 icon={<ClockCounterClockwise size={16} />}
               />
               <DetailField 

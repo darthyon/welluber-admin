@@ -48,6 +48,7 @@ const MOCK_ORGS: Organization[] = [
     claimsCount: 24,
     totalWalletBalance: 45200,
     walletLimit: 60000,
+    creditLimit: 10000,
     needsAction: [],
     services: ["Health Screenings", "Clinical Therapy"],
     policies: ["Comprehensive Health", "Mental Health Support"],
@@ -84,6 +85,7 @@ const MOCK_ORGS: Organization[] = [
     claimsCount: 8,
     totalWalletBalance: 12500,
     walletLimit: 85000,
+    creditLimit: 15000,
     needsAction: ["Missing PIC"],
     services: ["General Practice", "Health Screenings"],
     policies: ["Basic GP", "Group Term Life"],
@@ -120,6 +122,7 @@ const MOCK_ORGS: Organization[] = [
     claimsCount: 156,
     totalWalletBalance: 4800,
     walletLimit: 5000,
+    creditLimit: 2000,
     needsAction: ["Wallet low", "No policies"],
     services: ["Clinical Therapy", "Specialist Care"],
     policies: [],
@@ -156,6 +159,7 @@ const MOCK_ORGS: Organization[] = [
     claimsCount: 12 + i,
     totalWalletBalance: 35000 + (i * 1000),
     walletLimit: 80000,
+    creditLimit: 20000 + (i * 5000),
     needsAction: i % 4 === 0 ? ["No branches"] : [],
     services: ["Occupational Health", "Gymnasium Facilities"],
     policies: ["Standard Medical"],
@@ -167,7 +171,7 @@ const MOCK_ORGS: Organization[] = [
 ];
 
 export default function OrganizationsPage() {
-  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [triageFilter, setTriageFilter] = useState<string>("all");
@@ -245,7 +249,7 @@ export default function OrganizationsPage() {
       <DataFilterBar
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        searchPlaceholder="Search organizations..."
+        searchPlaceholder="Search organisations..."
         filters={
           <>
             <FilterItem 
@@ -306,7 +310,7 @@ export default function OrganizationsPage() {
                 <div className="col-span-full py-12">
                   <EmptyState 
                     icon={<MagnifyingGlass size={32} weight="light" />}
-                    title="No organizations match your filters"
+                    title="No organisations match your filters"
                     description="Try adjusting your search or filters to find what you're looking for."
                     action={
                       <Button variant="ghost" onClick={() => {

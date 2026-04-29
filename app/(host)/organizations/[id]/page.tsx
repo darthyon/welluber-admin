@@ -30,6 +30,7 @@ import {
   Scroll,
   SealCheck,
   MapPin,
+  Ticket,
 } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { Breadcrumbs } from "@/components/shared/breadcrumbs"
@@ -43,7 +44,7 @@ import {
 } from "@/components/shared/vertical-tabs"
 import { BranchCard } from "@/components/host/organizations/branch-card"
 import { BranchDetailView } from "@/components/host/organizations/branch-detail-view"
-import { BranchForm } from "@/components/host/organizations/branch-form"
+
 import { EmployeeCard } from "@/components/host/organizations/employee-card"
 import { DependentCard } from "@/components/host/organizations/dependent-card"
 import {
@@ -51,13 +52,16 @@ import {
   type EmployeeUtilisationRow,
 } from "@/components/shared/utilisation-claims-table"
 import { OrganizationClaimsTable } from "@/components/shared/organization-claims-table"
+import { VouchersTable } from "@/components/shared/vouchers-table"
+import { VoucherDetailSheet } from "@/components/shared/voucher-detail-sheet"
 import { EmployeeDetailView } from "@/components/host/organizations/employee-detail-view"
-import { EmployeeForm } from "@/components/host/organizations/employee-form"
+
 import { BulkUploadWizard } from "@/components/host/organizations/bulk-upload-wizard"
 import { AssignedPolicyList } from "@/components/host/organizations/assigned-policy-list"
 import { LinkPolicyModal } from "@/components/host/organizations/link-policy-modal"
 import { BenefitPolicyWizard } from "@/components/host/policies/benefit-policy-wizard"
 import { BenefitPolicy } from "@/types/policy"
+import type { FlatClaimRow } from "@/types/claims"
 import { DetailSection } from "@/components/shared/detail-section"
 import { DetailField } from "@/components/shared/detail-field"
 import { BentoGrid, BentoCard } from "@/components/shared/bento-grid"
@@ -87,7 +91,8 @@ const TABS = [
   { id: "branches", label: "Branches", icon: Buildings },
   { id: "employees", label: "Employees", icon: Users },
   { id: "policies", label: "Benefit Policy", icon: Shield },
-  { id: "usage", label: "Utilization & Claims", icon: ChartLineUp },
+  { id: "claims", label: "Claims", icon: SealCheck },
+  { id: "vouchers", label: "Vouchers", icon: Ticket },
   { id: "settings", label: "Settings", icon: Gear },
 ] as const
 
@@ -118,10 +123,13 @@ function OrganizationDetailContent() {
     "deactivate" | "suspend" | "remove" | null
   >(null)
 
+  // Voucher detail sheet state
+  const [selectedVoucherClaim, setSelectedVoucherClaim] = useState<FlatClaimRow | null>(null)
+
   // View modes
-  const [branchesView, setBranchesView] = useState<ViewMode>("grid")
-  const [employeesView, setEmployeesView] = useState<ViewMode>("grid")
-  const [dependentsView, setDependentsView] = useState<ViewMode>("grid")
+  const [branchesView, setBranchesView] = useState<ViewMode>("list")
+  const [employeesView, setEmployeesView] = useState<ViewMode>("list")
+  const [dependentsView, setDependentsView] = useState<ViewMode>("list")
   const [adminsView, setAdminsView] = useState<ViewMode>("list")
   const [policiesView, setPoliciesView] = useState<ViewMode>("list")
 
@@ -139,14 +147,9 @@ function OrganizationDetailContent() {
 
   // Sub-navigation state (Branches)
   const [viewBranchId, setViewBranchId] = useQueryState("branchId")
-  const [isAddingBranch, setIsAddingBranch] = useQueryState("addBranch")
-  const [editingBranchId, setEditingBranchId] = useQueryState("editBranch")
 
   // Sub-navigation state (Employees)
   const [viewEmployeeId, setViewEmployeeId] = useQueryState("employeeId")
-  const [isAddingEmployee, setIsAddingEmployee] = useQueryState("addEmployee")
-  const [editingEmployeeId, setEditingEmployeeId] =
-    useQueryState("editEmployee")
   const [isBulkUploading, setIsBulkUploading] = useQueryState("bulkUpload")
   const [activeEmployeeSubTab, setActiveEmployeeSubTab] = useQueryState(
     "subTab",
@@ -370,7 +373,7 @@ function OrganizationDetailContent() {
 
   const handleUnlinkPolicy = (id: string) => {
     setAssignedPolicies(assignedPolicies.filter((p) => p.id !== id))
-    setToastMessage("Policy unlinked from organization")
+    setToastMessage("Policy unlinked from organisation")
   }
 
   const openDangerAction = (action: "deactivate" | "suspend" | "remove") => {
@@ -380,22 +383,22 @@ function OrganizationDetailContent() {
 
   const dangerActionConfig = {
     deactivate: {
-      title: "Deactivate Organization",
-      confirmLabel: "Deactivate Organization",
+      title: "Deactivate Organisation",
+      confirmLabel: "Deactivate Organisation",
       description:
-        "Temporarily disable this organization without removing its records.",
+        "Temporarily disable this organisation without removing its records.",
       impactPoints: [
-        "Organization admins will lose access until the account is reactivated.",
+        "Organisation admins will lose access until the account is reactivated.",
         "Employees and branches remain stored, but the workspace becomes read-only.",
-        "New actions across the organization will be paused.",
+        "New actions across the organisation will be paused.",
       ],
       run: () => deactivateOrganization(orgId),
     },
     suspend: {
-      title: "Suspend Organization",
-      confirmLabel: "Suspend Organization",
+      title: "Suspend Organisation",
+      confirmLabel: "Suspend Organisation",
       description:
-        "Suspend operations while keeping the organization data available for recovery.",
+        "Suspend operations while keeping the organisation data available for recovery.",
       impactPoints: [
         "Admins can no longer manage employees, policies, or wallet activity.",
         "Active operations are paused until the suspension is lifted.",
@@ -404,10 +407,10 @@ function OrganizationDetailContent() {
       run: () => suspendOrganization(orgId),
     },
     remove: {
-      title: "Remove Organization",
-      confirmLabel: "Remove Organization",
+      title: "Remove Organisation",
+      confirmLabel: "Remove Organisation",
       description:
-        "Permanently remove this organization and all associated records.",
+        "Permanently remove this organisation and all associated records.",
       impactPoints: [
         "Branches, employees, policies, and admins will be removed from the workspace.",
         "This action cannot be undone.",
@@ -522,12 +525,8 @@ function OrganizationDetailContent() {
                       tab: tab.id === "profile" ? null : tab.id,
                       // Reset all sub-navigation and detail view parameters
                       branchId: null,
-                      addBranch: null,
-                      editBranch: null,
                       branchName: null,
                       employeeId: null,
-                      addEmployee: null,
-                      editEmployee: null,
                       bulkUpload: null,
                       linkPolicy: null,
                       addPolicy: null,
@@ -573,7 +572,7 @@ function OrganizationDetailContent() {
             <DetailSection
               title="Account Details"
               icon={<Buildings size={18} weight="duotone" />}
-              description="Basic information about the organization"
+              description="Basic information about the organisation"
             >
               <div className="grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-4">
                 <DetailField label="Registration No." value="1234567-T" />
@@ -763,7 +762,7 @@ function OrganizationDetailContent() {
             <DetailSection
               title="Documents"
               icon={<Article size={18} weight="duotone" />}
-              description="Legal and registration documents for this organization"
+              description="Legal and registration documents for this organisation"
             >
               <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 {[
@@ -795,29 +794,12 @@ function OrganizationDetailContent() {
         {/* Branches Tab */}
         {activeTab === "branches" && (
           <div className="animate-in transition-all duration-300 fade-in">
-            {isAddingBranch === "true" || editingBranchId ? (
-              <BranchForm
-                branchId={editingBranchId}
-                onCancel={() => {
-                  setIsAddingBranch(null)
-                  setEditingBranchId(null)
-                }}
-                onSubmit={() => {
-                  setIsAddingBranch(null)
-                  setEditingBranchId(null)
-                  setToastMessage(
-                    editingBranchId
-                      ? "Branch updated successfully"
-                      : "Branch created successfully"
-                  )
-                }}
-              />
-            ) : viewBranchId ? (
+            {viewBranchId ? (
               <BranchDetailView
                 branchId={viewBranchId}
                 onBack={() => setViewBranchId(null)}
                 onEdit={() => {
-                  setEditingBranchId(viewBranchId)
+                  router.push(`/organizations/${orgId}/branches/${viewBranchId}/edit`)
                 }}
               />
             ) : (
@@ -838,12 +820,14 @@ function OrganizationDetailContent() {
                       </Button>
                       <div className="h-4 w-[1px] bg-border" />
                       <Button
-                        onClick={() => setIsBranchSheetOpen("true")}
+                        asChild
                         variant="ghost"
                         size="sm"
                         className="flex h-8 items-center gap-2 rounded-full px-4 text-label font-medium text-primary hover:bg-primary/5"
                       >
-                        <Plus size={14} weight="bold" /> Quick Launch Hub
+                        <Link href={`/organizations/${orgId}/branches/new`}>
+                          <Plus size={14} weight="bold" /> Add Branch
+                        </Link>
                       </Button>
                       <div className="mx-1 h-4 w-[1px] bg-border" />
                       <ViewToggle
@@ -890,7 +874,8 @@ function OrganizationDetailContent() {
                           id: "br_1",
                           name: "ACME HQ (Kuala Lumpur)",
                           type: "HQ",
-                          walletModel: "Cash Balance",
+                          walletModel: "New",
+                          walletName: "KL HQ Wallet",
                           address: {
                             city: "Kuala Lumpur",
                             state: "Wilayah Persekutuan",
@@ -903,14 +888,15 @@ function OrganizationDetailContent() {
                           claimsCount: 12,
                         }}
                         onView={() => setViewBranchId("br_1")}
-                        onEdit={() => setEditingBranchId("br_1")}
+                        onEdit={() => router.push(`/organizations/${orgId}/branches/br_1/edit`)}
                       />
                       <BranchCard
                         branch={{
                           id: "br_2",
                           name: "ACME Subang Jaya",
                           type: "Branch Office",
-                          walletModel: "Shared HQ Wallet",
+                          walletModel: "Existing",
+                          walletName: "Acme Shared Wallet",
                           address: { city: "Subang Jaya", state: "Selangor" },
                           employeesCount: 450,
                           status: "Active",
@@ -920,7 +906,7 @@ function OrganizationDetailContent() {
                           claimsCount: 5,
                         }}
                         onView={() => setViewBranchId("br_2")}
-                        onEdit={() => setEditingBranchId("br_2")}
+                        onEdit={() => router.push(`/organizations/${orgId}/branches/br_2/edit`)}
                       />
                     </div>
                   ) : (
@@ -1029,7 +1015,7 @@ function OrganizationDetailContent() {
                                   {
                                     label: "Edit Branch",
                                     onClick: () =>
-                                      setEditingBranchId(branch.id),
+                                      router.push(`/organizations/${orgId}/branches/${branch.id}/edit`),
                                   },
                                   { label: "Deactivate", isDanger: true },
                                 ]}
@@ -1045,7 +1031,7 @@ function OrganizationDetailContent() {
                           type: "HQ",
                           status: "Active",
                           employees: 1240,
-                          walletModel: "Single Wallet",
+                          walletModel: "New",
                           balance: "RM 45,000",
                           limit: "RM 60,000",
                           utilizationRate: 68,
@@ -1057,7 +1043,7 @@ function OrganizationDetailContent() {
                           type: "Branch office",
                           status: "Active",
                           employees: 450,
-                          walletModel: "Existing Wallet",
+                          walletModel: "Existing",
                           balance: "RM 12,500",
                           limit: "RM 30,000",
                           utilizationRate: 42,
@@ -1079,25 +1065,6 @@ function OrganizationDetailContent() {
               <BulkUploadWizard
                 onBack={() => setIsBulkUploading(null)}
                 onSuccess={() => setIsBulkUploading(null)}
-              />
-            ) : isAddingEmployee === "true" || editingEmployeeId ? (
-              <EmployeeForm
-                employeeId={editingEmployeeId}
-                onCancel={() => {
-                  setIsAddingEmployee(null)
-                  setEditingEmployeeId(null)
-                  // Also use router.back() as fallback
-                  router.back()
-                }}
-                onSuccess={() => {
-                  setIsAddingEmployee(null)
-                  setEditingEmployeeId(null)
-                  setToastMessage(
-                    editingEmployeeId
-                      ? "Employee updated successfully"
-                      : "Employee registered successfully"
-                  )
-                }}
               />
             ) : (
               <div className="flex flex-col gap-8 lg:flex-row">
@@ -1132,12 +1099,14 @@ function OrganizationDetailContent() {
                             <Upload size={14} weight="bold" /> Bulk Upload
                           </Button>
                           <Button
+                            asChild
                             variant="secondary"
                             size="sm"
                             className="h-8 gap-1.5 text-label font-medium"
-                            onClick={() => setIsAddingEmployee("true")}
                           >
-                            <Plus size={14} weight="bold" /> Add Employee
+                            <Link href={`/employees/new?org=${orgId}`}>
+                              <Plus size={14} weight="bold" /> Add Employee
+                            </Link>
                           </Button>
                           <div className="mx-1 h-4 w-[1px] bg-border" />
                           <ViewToggle
@@ -1197,6 +1166,9 @@ function OrganizationDetailContent() {
                               status: "Linked",
                               empCode: "ACM-001",
                               joinDate: "12 Oct 2023",
+                              department: "Engineering",
+                              tier: "T3",
+                              employmentType: "full-time",
                               dependentsCount: 2,
                               benefitPolicies: [
                                 {
@@ -1225,6 +1197,9 @@ function OrganizationDetailContent() {
                               status: "Linked",
                               empCode: "ACM-042",
                               joinDate: "05 Mar 2024",
+                              department: "Product",
+                              tier: "T2",
+                              employmentType: "full-time",
                               dependentsCount: 0,
                               benefitPolicies: [
                                 {
@@ -1242,6 +1217,9 @@ function OrganizationDetailContent() {
                               status: "Pending Invite",
                               empCode: "ACM-156",
                               joinDate: "20 May 2026",
+                              department: "Growth",
+                              tier: "T4",
+                              employmentType: "internship",
                               dependentsCount: 1,
                               benefitPolicies: [
                                 {
@@ -1264,7 +1242,7 @@ function OrganizationDetailContent() {
                               key={emp.id}
                               employee={emp as any}
                               onView={(id) => router.push(`/employees/${id}`)}
-                              onEdit={(id) => setEditingEmployeeId(id)}
+                              onEdit={(id) => router.push(`/employees/${id}/edit`)}
                             />
                           ))}
                         </div>
@@ -1305,6 +1283,36 @@ function OrganizationDetailContent() {
                                 render: (emp) => (
                                   <span className="rounded-md border border-zinc-200 bg-muted/80 px-2 py-0.5 text-label font-semibold text-muted-foreground">
                                     {emp.branch}
+                                  </span>
+                                ),
+                              },
+                              {
+                                header: "Department",
+                                accessorKey: "department",
+                                sortable: true,
+                                render: (emp) => (
+                                  <span className="text-label font-medium text-foreground">
+                                    {emp.department || "—"}
+                                  </span>
+                                ),
+                              },
+                              {
+                                header: "Tier",
+                                accessorKey: "tier",
+                                sortable: true,
+                                render: (emp) => (
+                                  <span className="text-label font-semibold text-primary bg-primary/5 px-1.5 py-0.5 rounded border border-primary/10">
+                                    {emp.tier || "—"}
+                                  </span>
+                                ),
+                              },
+                              {
+                                header: "Employment Type",
+                                accessorKey: "employmentType",
+                                sortable: true,
+                                render: (emp) => (
+                                  <span className="text-label font-medium text-muted-foreground capitalize">
+                                    {emp.employmentType?.replace("-", " ") || "—"}
                                   </span>
                                 ),
                               },
@@ -1483,7 +1491,7 @@ function OrganizationDetailContent() {
                                       {
                                         label: "Edit Employee",
                                         onClick: () => {
-                                          setEditingEmployeeId(emp.id)
+                                          router.push(`/employees/${emp.id}/edit`)
                                         },
                                       },
                                       {
@@ -1505,6 +1513,9 @@ function OrganizationDetailContent() {
                                 lastActive: "09 Apr 2024, 17:15",
                                 status: "Linked",
                                 empCode: "ACM-001",
+                                department: "Engineering",
+                                tier: "T3",
+                                employmentType: "full-time",
                                 benefitPolicies: [
                                   {
                                     policyName: "Wellness Allocation",
@@ -1523,6 +1534,9 @@ function OrganizationDetailContent() {
                                 lastActive: "09 Apr 2024, 16:45",
                                 status: "Linked",
                                 empCode: "ACM-042",
+                                department: "Product",
+                                tier: "T2",
+                                employmentType: "full-time",
                                 benefitPolicies: [
                                   {
                                     policyName: "Lifestyle Pocket",
@@ -1540,6 +1554,9 @@ function OrganizationDetailContent() {
                                 lastActive: "09 Apr 2024, 10:20",
                                 status: "Pending",
                                 empCode: "ACM-156",
+                                department: "Growth",
+                                tier: "T4",
+                                employmentType: "internship",
                                 benefitPolicies: [
                                   {
                                     policyName: "Rejuvenation Fund",
@@ -1565,6 +1582,9 @@ function OrganizationDetailContent() {
                                 lastActive: "08 Apr 2024, 14:30",
                                 status: "Linked",
                                 empCode: "ACM-089",
+                                department: "Sales",
+                                tier: "T3",
+                                employmentType: "contract",
                                 benefitPolicies: [
                                   {
                                     policyName: "Mental Health Support",
@@ -1918,7 +1938,7 @@ function OrganizationDetailContent() {
               <DetailSection
                 title="Benefit Policies"
                 icon={<Shield size={18} weight="duotone" />}
-                description="Manage which benefit structures are assigned to this organization's workforce"
+                description="Manage which benefit structures are assigned to this organisation's workforce"
                 action={
                   <div className="flex items-center gap-2">
                     <Button
@@ -2025,14 +2045,33 @@ function OrganizationDetailContent() {
             )}
           </div>
         )}
-        {activeTab === "usage" && (
+        {activeTab === "claims" && (
           <div className="animate-in fade-in">
             <DetailSection
-              title="Utilisation & Claims"
-              icon={<ChartLineUp size={18} weight="duotone" />}
-              description="Benefit usage and claim history across all employees in this organisation"
+              title="Claims"
+              icon={<SealCheck size={18} weight="duotone" />}
+              description="Claim history across all employees in this organisation"
             >
-              <OrganizationClaimsTable data={ORG_MOCK_UTILISATION} />
+              <OrganizationClaimsTable
+                data={ORG_MOCK_UTILISATION}
+                onViewVoucher={(claim) => setSelectedVoucherClaim(claim)}
+                onViewDetails={(claim) => setSelectedVoucherClaim(claim)}
+              />
+            </DetailSection>
+          </div>
+        )}
+
+        {activeTab === "vouchers" && (
+          <div className="animate-in fade-in">
+            <DetailSection
+              title="Vouchers"
+              icon={<Ticket size={18} weight="duotone" />}
+              description="Voucher redemption records across all employees in this organisation"
+            >
+              <VouchersTable
+                data={ORG_MOCK_UTILISATION}
+                onViewVoucher={(voucher) => console.log("View voucher", voucher)}
+              />
             </DetailSection>
           </div>
         )}
@@ -2161,9 +2200,8 @@ function OrganizationDetailContent() {
       />
 
       {toastMessage && (
-        <div className="fixed bottom-6 left-1/2 z-[100] flex -translate-x-1/2 animate-in items-center gap-3 rounded-lg bg-zinc-900 px-6 py-3 text-white shadow-2xl duration-300 slide-in-from-bottom-4">
-          <div className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
-          <span className="text-body font-medium">{toastMessage}</span>
+        <div className="fixed bottom-6 right-6 z-50 flex items-center rounded-lg bg-foreground px-5 py-3 text-white shadow-lg animate-in slide-in-from-bottom-4 fade-in">
+          <p className="text-nav font-semibold">{toastMessage}</p>
           <button
             onClick={() => setToastMessage(null)}
             className="ml-4 text-muted-foreground/60 transition-colors hover:text-white"
@@ -2172,6 +2210,11 @@ function OrganizationDetailContent() {
           </button>
         </div>
       )}
+
+      <VoucherDetailSheet
+        claim={selectedVoucherClaim}
+        onClose={() => setSelectedVoucherClaim(null)}
+      />
     </div>
   )
 }
@@ -2204,42 +2247,50 @@ const ORG_MOCK_UTILISATION: EmployeeUtilisationRow[] = [
       {
         id: "c1",
         voucherCode: "VCH-2024-0081",
+        voucherName: "Wellness Allocation Voucher",
+        transactionType: "redemption",
         service: "Gymnasium Facilities",
         provider: "Celebrity Fitness KLCC",
         location: "Kuala Lumpur",
         date: "12 Mar 2024",
         amount: 180,
-        status: "Approved",
+        status: "confirmed",
       },
       {
         id: "c2",
         voucherCode: "VCH-2024-0114",
+        voucherName: "Wellness Allocation Voucher",
+        transactionType: "redemption",
         service: "Clinical Therapy",
         provider: "Mind & Soul Clinic",
         location: "Mont Kiara",
         date: "20 Mar 2024",
         amount: 320,
-        status: "Approved",
+        status: "confirmed",
       },
       {
         id: "c3",
         voucherCode: "VCH-2024-0198",
+        voucherName: "Wellness Allocation Voucher",
+        transactionType: "redemption",
         service: "Group Fitness",
         provider: "Ritual Yoga Studio",
         location: "Bangsar",
         date: "01 Apr 2024",
         amount: 95,
-        status: "Pending",
+        status: "pre-auth",
       },
       {
         id: "c4",
         voucherCode: "VCH-2024-0211",
+        voucherName: "Wellness Allocation Voucher",
+        transactionType: "reimbursement",
         service: "Dietary Counseling",
         provider: "NutriCare Clinic",
         location: "Damansara",
         date: "05 Apr 2024",
         amount: 605,
-        status: "Approved",
+        status: "confirmed",
       },
     ],
   },
@@ -2254,62 +2305,74 @@ const ORG_MOCK_UTILISATION: EmployeeUtilisationRow[] = [
       {
         id: "c5",
         voucherCode: "VCH-2024-0033",
+        voucherName: "Lifestyle Pocket Voucher",
+        transactionType: "redemption",
         service: "Gymnasium Facilities",
         provider: "Fitness First Subang",
         location: "Subang Jaya",
         date: "03 Jan 2024",
         amount: 200,
-        status: "Approved",
+        status: "confirmed",
       },
       {
         id: "c6",
         voucherCode: "VCH-2024-0057",
+        voucherName: "Lifestyle Pocket Voucher",
+        transactionType: "redemption",
         service: "Therapeutic Spa",
         provider: "Hammam Spa & Wellness",
         location: "Shah Alam",
         date: "18 Feb 2024",
         amount: 380,
-        status: "Approved",
+        status: "confirmed",
       },
       {
         id: "c7",
         voucherCode: "VCH-2024-0089",
+        voucherName: "Lifestyle Pocket Voucher",
+        transactionType: "redemption",
         service: "Mental Fitness",
         provider: "Calm Studio KL",
         location: "Subang Jaya",
         date: "10 Mar 2024",
         amount: 145,
-        status: "Approved",
+        status: "confirmed",
       },
       {
         id: "c8",
         voucherCode: "VCH-2024-0132",
+        voucherName: "Lifestyle Pocket Voucher",
+        transactionType: "redemption",
         service: "Group Fitness",
         provider: "Barry's Bootcamp",
         location: "TTDI",
         date: "22 Mar 2024",
         amount: 200,
-        status: "Rejected",
+        status: "cancelled",
       },
       {
         id: "c9",
         voucherCode: "VCH-2024-0201",
+        voucherName: "Lifestyle Pocket Voucher",
+        transactionType: "reimbursement",
         service: "Clinical Therapy",
         provider: "Therapy Works PJ",
         location: "Petaling Jaya",
         date: "08 Apr 2024",
         amount: 400,
-        status: "Approved",
+        status: "confirmed",
       },
       {
         id: "c10",
         voucherCode: "VCH-2024-0215",
+        voucherName: "Lifestyle Pocket Voucher",
+        transactionType: "redemption",
         service: "Dietary Counseling",
         provider: "NutriCare Clinic",
         location: "Subang Jaya",
         date: "10 Apr 2024",
         amount: 800,
-        status: "Pending",
+        status: "pre-auth",
       },
     ],
   },
@@ -2324,22 +2387,26 @@ const ORG_MOCK_UTILISATION: EmployeeUtilisationRow[] = [
       {
         id: "c11",
         voucherCode: "VCH-2024-0177",
+        voucherName: "Rejuvenation Fund Voucher",
+        transactionType: "redemption",
         service: "Therapeutic Spa",
         provider: "Relaxe Spa KL",
         location: "KLCC",
         date: "15 Mar 2024",
         amount: 250,
-        status: "Approved",
+        status: "confirmed",
       },
       {
         id: "c12",
         voucherCode: "VCH-2024-0190",
+        voucherName: "Rejuvenation Fund Voucher",
+        transactionType: "redemption",
         service: "Group Fitness",
         provider: "TRX Studio KL",
         location: "Bukit Bintang",
         date: "28 Mar 2024",
         amount: 125,
-        status: "Pending",
+        status: "pre-auth",
       },
     ],
   },
@@ -2354,22 +2421,26 @@ const ORG_MOCK_UTILISATION: EmployeeUtilisationRow[] = [
       {
         id: "c13",
         voucherCode: "VCH-2024-0144",
+        voucherName: "Mental Health Support Voucher",
+        transactionType: "redemption",
         service: "Mental Fitness",
         provider: "Headspace Partner KL",
         location: "Online",
         date: "01 Apr 2024",
         amount: 120,
-        status: "Approved",
+        status: "confirmed",
       },
       {
         id: "c14",
         voucherCode: "VCH-2024-0188",
+        voucherName: "Mental Health Support Voucher",
+        transactionType: "refund",
         service: "Clinical Therapy",
         provider: "Mind & Soul Clinic",
         location: "Mont Kiara",
         date: "09 Apr 2024",
         amount: 180,
-        status: "Pending",
+        status: "confirmed",
       },
     ],
   },

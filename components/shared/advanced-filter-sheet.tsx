@@ -113,7 +113,7 @@ export function AdvancedFilterSheet({
 
             <div className="space-y-8 pl-1">
               <Slider
-                label="Max Budget Utilization"
+                label="Max Budget Utilisation"
                 min={0}
                 max={100}
                 unit="%"

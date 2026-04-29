@@ -21,7 +21,7 @@ const topOrgs = [
 ]
 
 const topSPs = [
-  { id: "s1", rank: 1, name: "Urban Wellness Center", metric1: "12k", metric2: "4.9" },
+  { id: "s1", rank: 1, name: "Urban Wellness Centre", metric1: "12k", metric2: "4.9" },
   { id: "s2", rank: 2, name: "Zenith Yoga Studio", metric1: "8.4k", metric2: "4.8" },
   { id: "s3", rank: 3, name: "Apex Performance Lab", metric1: "7.1k", metric2: "5.0" },
   { id: "s4", rank: 4, name: "Serenity Day Spa", metric1: "6.8k", metric2: "4.7" },

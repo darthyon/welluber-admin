@@ -21,7 +21,7 @@ import { SP_STATUS_OPTIONS } from "@/features/providers/constants";
 import { SERVICE_TAXONOMY } from "@/features/organizations/constants";
 
 function ServiceProvidersContent() {
-  const [viewMode, setViewMode] = useQueryState("view", "grid");
+  const [viewMode, setViewMode] = useQueryState("view", "list");
   const [searchQuery, setSearchQuery] = useQueryState("search", "");
   const [statusFilter, setStatusFilter] = useQueryState("status", "all");
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useQueryState("advancedFilter");
@@ -168,7 +168,7 @@ function ServiceProvidersContent() {
         showWorkforce={false}
         showWalletModel={false}
         showIndustry={false}
-        description="Filter service providers by service categories and utilization."
+        description="Filter service providers by service categories and utilisation."
       />
     </div>
   );

@@ -58,15 +58,15 @@ export default function EditBrandPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto py-8 px-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Header */}
       <div className="mb-8 space-y-4">
         <button
-          onClick={() => router.push(`/brands/${brandId}`)}
+          onClick={() => router.back()}
           className="flex items-center gap-1.5 text-nav font-medium text-muted-foreground hover:text-primary transition-colors group"
         >
           <CaretLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
-          Back to Brand Details
+          Back
         </button>
 
         <div>

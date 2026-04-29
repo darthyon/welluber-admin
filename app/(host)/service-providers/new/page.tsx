@@ -150,14 +150,14 @@ export default function NewServiceProviderPage() {
 
   if (step === "selection") {
     return (
-      <div className="max-w-2xl mx-auto space-y-6 pb-12">
+      <div className="space-y-6 pb-12">
         <div>
-          <Link
-            href="/service-providers"
+          <button
+            onClick={() => router.back()}
             className="inline-flex items-center gap-1.5 text-nav font-medium text-muted-foreground hover:text-foreground transition-colors mb-4"
           >
-            <CaretLeft size={16} /> Back to Service Providers
-          </Link>
+            <CaretLeft size={16} /> Back
+          </button>
           <h1 className="text-heading font-semibold tracking-tight text-foreground">Add Service Provider</h1>
           <p className="text-muted-foreground text-nav mt-1">Select how you want to categorize this service provider account.</p>
         </div>
@@ -228,7 +228,7 @@ export default function NewServiceProviderPage() {
                 </div>
                 {selectedBrand && (
                   <div className="flex items-center gap-2 bg-muted/40 px-3 py-1.5 rounded-lg border border-border/40">
-                    <Avatar className="h-6 w-6 rounded">
+                    <Avatar className="h-6 w-6 rounded-full">
                       <AvatarImage src={selectedBrand.logo} />
                       <AvatarFallback className="text-micro font-semibold">{selectedBrand.name.substring(0,2)}</AvatarFallback>
                     </Avatar>
@@ -289,8 +289,8 @@ export default function NewServiceProviderPage() {
 
               {/* Floating Action Bar */}
               <div className="fixed bottom-8 left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[calc(50%+104px)] z-50 flex items-center gap-4 p-2.5 px-6 bg-background/80 backdrop-blur-2xl border border-border/50 shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-full animate-in slide-in-from-bottom-10 duration-700 ease-out">
-                <Button asChild variant="ghost" className="text-nav font-semibold rounded-full h-10 px-6 hover:bg-black/5 transition-colors">
-                  <Link href="/service-providers">Cancel</Link>
+                <Button variant="ghost" className="text-nav font-semibold rounded-full h-10 px-6 hover:bg-black/5 transition-colors" onClick={() => router.back()}>
+                  Cancel
                 </Button>
                 <div className="w-px h-6 bg-border/40" />
                 <Button

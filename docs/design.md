@@ -1,7 +1,7 @@
 # DESIGN.md — WellUber Admin
 
 > **Status:** Active
-> **Last Updated:** 2026-04-10
+> **Last Updated:** 2026-04-27
 > **Design Source:** shadcn/ui Luma preset + custom refinements
 > **Inspiration:** Linear, Vercel, Supabase, Midday
 > **Format:** [VoltAgent DESIGN.md](https://github.com/VoltAgent/awesome-design-md)
@@ -56,16 +56,16 @@ WellUber Admin is a **B2B SaaS admin console** for managing corporate wellness b
 | Foreground | `--foreground` | `oklch(0.985 0.001 106.423)` |
 | Card | `--card` | `oklch(0.216 0.006 56.043)` |
 | Muted | `--muted` | `oklch(0.268 0.007 34.298)` |
-| Primary | `--primary` | `oklch(0.398 0.195 277.366)` |
+| Primary | `--primary` | `oklch(0.585 0.233 277.117)` |
 | Border | `--border` | `oklch(1 0 0 / 10%)` |
 
 ### Sidebar
 
 | Token | Light | Dark |
 |---|---|---|
-| `--sidebar` | `oklch(0.985 0.001 106.423)` | `oklch(0.216 0.006 56.043)` |
-| `--sidebar-foreground` | `oklch(0.147 0.004 49.25)` | `oklch(0.985 0.001 106.423)` |
-| `--sidebar-border` | `oklch(0.923 0.003 48.717)` | `oklch(1 0 0 / 10%)` |
+| `--sidebar` | `oklch(0.12 0.01 260 / 80%)` | `oklch(0.12 0.01 260 / 92%)` |
+| `--sidebar-foreground` | `oklch(0.985 0.001 106.423)` | `oklch(0.985 0.001 106.423)` |
+| `--sidebar-border` | `oklch(0 0 0 / 8%)` | `oklch(1 0 0 / 10%)` |
 
 ---
 
@@ -80,15 +80,15 @@ WellUber Admin is a **B2B SaaS admin console** for managing corporate wellness b
 
 | Role | Size | Weight | Tracking | Usage |
 |---|---|---|---|---|
-| **Page Title** | 18px (`text-lg`) | 600 (semibold) | `tracking-tight` | Page headings |
-| **Subtitle** | 15px (`text-[15px]`) | 600 (semibold) | normal | Form section headers, modal titles, sub-page headings |
-| **Section Title** | 13px | 600 (semibold) | normal | Card/panel headings |
-| **Body** | 14px (`text-sm`) | 400 | normal | Standard content |
-| **Nav Item** | 13px | 500 (medium) | normal | Sidebar navigation links |
-| **Label** | 12px (`text-xs`) | 500 (medium) | normal | Stat card labels, metadata |
-| **Section Label** | 10px | 600 (semibold) | `tracking-[0.08em]` | Sidebar section titles, uppercase |
-| **Caption** | 11px | 400 | normal | Timestamps, footnotes |
-| **Micro** | 9px | 500 (medium) | normal | Keyboard shortcut hints only |
+| **Page Title** | `1.125rem` (18px) | 600 (semibold) | `tracking-tight` | Page headings |
+| **Subtitle** | `0.9375rem` (15px) | 600 (semibold) | normal | Form section headers, modal titles, sub-page headings |
+| **Section Title** | `0.8125rem` (13px) | 600 (semibold) | normal | Card/panel headings |
+| **Body** | `0.875rem` (14px) | 400 | normal | Standard content |
+| **Nav Item** | `0.8125rem` (13px) | 500 (medium) | normal | Sidebar navigation links |
+| **Label** | `0.75rem` (12px) | 500 (medium) | normal | Stat card labels, metadata |
+| **Section Label** | `0.625rem` (10px) | 600 (semibold) | `tracking-[0.08em]` | Sidebar section titles, uppercase |
+| **Caption** | `0.6875rem` (11px) | 400 | normal | Timestamps, footnotes |
+| **Micro** | `0.5625rem` (9px) | 500 (medium) | normal | Keyboard shortcut hints only |
 
 ### Principles
 - **Three weights only:** 400 (read), 500 (navigate/interact), 600 (announce/title). **Never use `font-bold` (700)**. If you find yourself reaching for 700, use 600 (`font-semibold`) instead — this applies to headings, card titles, table headers, badges, and dialog titles without exception.
@@ -104,10 +104,15 @@ WellUber Admin is a **B2B SaaS admin console** for managing corporate wellness b
 ## 4. Component Stylings
 
 ### Buttons
-- **Primary:** `bg-primary text-primary-foreground rounded-4xl px-4 py-2 text-sm font-medium transition-all`
-- **Secondary/Ghost:** `border border-border bg-background hover:bg-accent rounded-4xl px-4 py-2 text-sm font-medium`
+
+**Variants and when to use each:**
+- `default` (primary fill) — empty-state CTAs, primary form submit. `bg-primary text-primary-foreground rounded-4xl px-4 py-2 text-sm font-medium`
+- `ghost` — toolbar actions, cancel, nav-adjacent, inline icon actions. `hover:bg-accent rounded-4xl px-4 py-2 text-sm font-medium`
+- `outline` — filter controls, danger zone triggers, dashed add-item patterns. `border border-border bg-background hover:bg-accent rounded-4xl px-4 py-2 text-sm font-medium`
 - **Destructive:** `bg-destructive/10 text-destructive border border-destructive/20 rounded-4xl`
 - **Icon button:** `w-9 h-9 rounded-4xl border border-border hover:bg-accent`
+
+**Rule:** `variant="outline"` is NOT the default secondary — use `ghost` for most secondary actions.
 
 ### Cards & Containers
 - **Standard Card:** `bg-card border border-border rounded-lg shadow-sm`
@@ -327,6 +332,7 @@ Use this 5-point check before submitting any UI change:
 | 2026-04-03 | Organization Directory UI Refinement — Triage toolbar, Ring charts, Sectioned taxonomy | Organization List |
 | 2026-04-10 | Typography audit — Added "Subtitle" (15px) and "Micro" (9px) roles, standardized Title Case rule, added Technical ID exception for uppercase, documented semantic color convention, reinforced `font-bold` prohibition | All |
 | 2026-04-22 | Service Provider Unification — Documented "Quiet Success" pattern, International Phone Input, Floating Anchor Nav, and Floating Action Bar | Service Provider, Forms |
+| 2026-04-27 | Token overhaul — primary to `oklch(0.457 0.24 277.023)` / dark `oklch(0.585 0.233 277.117)`, sidebar to dark frosted blue both modes, typography to rem, button variant clarification (ghost vs outline vs default) | All |
 
 ---
 

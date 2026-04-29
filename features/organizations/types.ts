@@ -30,14 +30,14 @@ export interface OrganizationBranch {
   utilizationRate?: number;
   balance?: string;
   limit?: string;
-  walletModel?: string;
+  walletModel?: "New" | "Existing";
 }
 
 export interface OrganizationWallet {
   id: string;
+  name: string;
   orgId: string;
   branchId: string;
-  model: "cash_balance" | "credit_limit";
   balance: number;
   pendingDeductions: number;
   status: "active" | "suspended";
@@ -71,8 +71,9 @@ export interface Organization {
   picId: string | null;
   utilizationRate: number; // 0 to 100
   claimsCount?: number;
-  totalWalletBalance: number; // This represents the 'spent' or 'used' amount in this context
-  walletLimit: number;
+  totalWalletBalance: number; // Sum of all wallet balances (can be negative)
+  walletLimit: number; // Max prepaid funds across all wallets
+  creditLimit: number; // Max overdraft amount before hard block
   needsAction: string[]; // Triage status pills (e.g. "Missing PIC")
   services: string[]; // Tier 2 Service Names
   policies: string[];
@@ -103,13 +104,15 @@ export interface Employee {
   empCode: string;
   department?: string;
   role?: string;
+  tier?: string;
   dateOfBirth?: ISODate;
   gender?: "male" | "female" | "other";
   mobileNumber?: string;
   joinDate: ISODate;
   probationEndDate?: ISODate;
   employmentType: EmploymentType;
-  status: "active" | "terminated";
+  status: "active" | "inactive";
+  isProbation: boolean;
 }
 
 export type DependentRelationship = "spouse" | "child" | "mother" | "father" | "brother" | "sister" | "mother_in_law" | "father_in_law";

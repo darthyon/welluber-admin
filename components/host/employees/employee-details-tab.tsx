@@ -29,10 +29,13 @@ interface EmployeeDetailsTabProps {
     mobile: string;
     branch: string;
     joinDate: string;
-    workType: string;
+    employmentType: string;
     nationality: string;
     department: string;
     designation: string;
+    tier?: string;
+    status?: string;
+    isProbation?: boolean;
   };
 }
 
@@ -107,14 +110,9 @@ export function EmployeeDetailsTab({ employee }: EmployeeDetailsTabProps) {
             icon={<CalendarBlank size={16} />}
           />
           <DetailField 
-            label="Work Type" 
-            value={employee.workType} 
+            label="Employment Type" 
+            value={employee.employmentType} 
             icon={<ClockCounterClockwise size={16} />}
-          />
-          <DetailField 
-            label="Nationality" 
-            value={employee.nationality} 
-            icon={<Globe size={16} />}
           />
           <DetailField 
             label="Department" 
@@ -125,6 +123,16 @@ export function EmployeeDetailsTab({ employee }: EmployeeDetailsTabProps) {
             label="Designation" 
             value={employee.designation} 
             icon={<User size={16} />}
+          />
+          <DetailField 
+            label="Tier / Level" 
+            value={employee.tier || "—"} 
+            icon={<Buildings size={16} />}
+          />
+          <DetailField 
+            label="Nationality" 
+            value={employee.nationality} 
+            icon={<Globe size={16} />}
           />
         </div>
       </DetailSection>
@@ -137,13 +145,13 @@ export function EmployeeDetailsTab({ employee }: EmployeeDetailsTabProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-y-8 gap-x-12">
           <DetailField 
             label="Status" 
-            value="Active" 
+            value={employee.status || "Active"} 
             icon={<Shield size={16} />}
           />
           <DetailField 
-            label="Last Updated" 
-            value="Today, 10:45 AM" 
-            icon={<CalendarBlank size={16} />}
+            label="Is Probation" 
+            value={employee.isProbation ? "Yes" : "No"} 
+            icon={<ClockCounterClockwise size={16} />}
           />
         </div>
       </DetailSection>

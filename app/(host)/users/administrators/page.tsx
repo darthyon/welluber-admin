@@ -18,7 +18,7 @@ import Link from "next/link";
 import { EmptyState } from "@/components/shared/empty-state";
 
 export default function AdministratorsPage() {
-  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");

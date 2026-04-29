@@ -131,12 +131,12 @@ export default function EditOrganizationPage() {
             
             {/* Header */}
             <div className="flex flex-col gap-4">
-              <Link 
-                href={`/organizations/${orgId}`}
+              <button
+                onClick={() => router.back()}
                 className="inline-flex items-center gap-1.5 text-nav font-medium text-muted-foreground hover:text-foreground transition-colors w-fit"
               >
-                <CaretLeft size={16} /> Back to Detail Profile
-              </Link>
+                <CaretLeft size={16} /> Back
+              </button>
               <div>
                 <h1 className="text-heading font-semibold tracking-tight text-foreground">Edit Organisation</h1>
                 <p className="text-muted-foreground text-nav mt-1">Make changes to the corporate client&apos;s core identity.</p>
@@ -369,8 +369,8 @@ export default function EditOrganizationPage() {
 
               {/* Floating Action Bar */}
               <div className="fixed bottom-8 left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[calc(50%+104px)] z-50 flex items-center gap-4 p-2 px-6 bg-background/80 backdrop-blur-2xl border border-border shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-full animate-in slide-in-from-bottom-10 duration-700 ease-out">
-                <Button asChild variant="ghost" size="lg" className="text-nav font-semibold px-6 transition-colors">
-                  <Link href={`/organizations/${orgId}`}>Cancel</Link>
+                <Button variant="ghost" size="lg" className="text-nav font-semibold px-6 transition-colors" onClick={() => router.back()}>
+                  Cancel
                 </Button>
                 <div className="w-px h-6 bg-border/40" />
                 <Button 

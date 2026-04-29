@@ -1,37 +1,78 @@
 "use client";
 
-import { MapPin, Calendar, Storefront, Receipt } from "@phosphor-icons/react";
+import { useState } from "react";
+import {
+  MapPin,
+  Calendar,
+  Storefront,
+  Receipt,
+  DotsThreeVertical,
+  FileText,
+  Eye,
+  Download,
+  Ticket,
+} from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { SharedDataTable, type Column } from "@/components/shared/data-table";
-import type { Claim, EmployeeUtilisationRow, FlatClaimRow } from "@/types/claims";
-
-export type { Claim, EmployeeUtilisationRow, FlatClaimRow };
+import { DataFilterBar } from "@/components/shared/data-filter-bar";
+import { FilterItem } from "@/components/shared/filter-item";
+import { ActionPopover } from "@/components/shared/action-popover";
+import type {
+  ClaimStatus,
+  TransactionType,
+  EmployeeUtilisationRow,
+  FlatClaimRow,
+} from "@/types/claims";
 
 // ─── Status badge ─────────────────────────────────────────────────────────────
 
-const STATUS_STYLE: Record<Claim["status"], string> = {
-  Approved: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20",
-  Pending:  "bg-amber-500/10  text-amber-600  dark:text-amber-400 border border-amber-500/20",
-  Rejected: "bg-rose-500/10   text-rose-600   dark:text-rose-400 border border-rose-500/20",
+const STATUS_STYLE: Record<ClaimStatus, string> = {
+  "pre-auth":
+    "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20",
+  confirmed:
+    "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20",
+  cancelled:
+    "bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20",
 };
 
-function StatusBadge({ status }: { status: Claim["status"] }) {
+function StatusBadge({ status }: { status: ClaimStatus }) {
   return (
-    <span className={cn("text-micro font-semibold px-1.5 py-0.5 rounded", STATUS_STYLE[status])}>
+    <span
+      className={cn(
+        "text-micro font-semibold px-1.5 py-0.5 rounded",
+        STATUS_STYLE[status]
+      )}
+    >
       {status}
     </span>
   );
 }
 
+const TXN_LABEL: Record<TransactionType, string> = {
+  redemption: "Voucher Redemption",
+  reimbursement: "Reimbursement",
+  refund: "Refund",
+};
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 interface Props {
   data: EmployeeUtilisationRow[];
+  onViewVoucher?: (claim: FlatClaimRow) => void;
+  onViewDetails?: (claim: FlatClaimRow) => void;
 }
 
-export function OrganizationClaimsTable({ data }: Props) {
-  const flatData: FlatClaimRow[] = data.flatMap(emp =>
-    emp.claims.map(claim => ({
+export function OrganizationClaimsTable({
+  data,
+  onViewVoucher,
+  onViewDetails,
+}: Props) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<ClaimStatus | "all">("all");
+  const [txnFilter, setTxnFilter] = useState<TransactionType | "all">("all");
+
+  const flatData: FlatClaimRow[] = data.flatMap((emp) =>
+    emp.claims.map((claim) => ({
       ...claim,
       employeeId: emp.id,
       employeeName: emp.name,
@@ -40,60 +81,55 @@ export function OrganizationClaimsTable({ data }: Props) {
     }))
   );
 
+  const filteredData = flatData.filter((row) => {
+    const matchesSearch =
+      !searchQuery ||
+      [
+        row.id,
+        row.employeeName,
+        row.empCode,
+        row.provider,
+        row.location,
+        row.voucherCode,
+        row.voucherName,
+      ].some((f) => String(f).toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesStatus = statusFilter === "all" || row.status === statusFilter;
+    const matchesTxn = txnFilter === "all" || row.transactionType === txnFilter;
+    return matchesSearch && matchesStatus && matchesTxn;
+  });
+
   const columns: Column<FlatClaimRow>[] = [
     {
-      header: "Employee",
-      accessorKey: "employeeName",
+      header: "Claim ID",
+      accessorKey: "id",
       render: (row) => (
-        <div>
-          <p className="text-nav font-semibold text-foreground">{row.employeeName}</p>
-          <p className="text-caption text-muted-foreground font-medium mt-0.5">{row.empCode}</p>
+        <code className="text-caption font-mono text-muted-foreground">
+          {row.id}
+        </code>
+      ),
+    },
+    {
+      header: "Claim Title",
+      render: (row) => (
+        <div className="flex flex-col gap-0.5 min-w-0">
+          <p className="text-nav font-semibold text-foreground truncate">
+            {TXN_LABEL[row.transactionType]} at {row.provider}
+          </p>
+          <p className="text-caption text-muted-foreground font-medium truncate">
+            {row.location}
+          </p>
         </div>
       ),
     },
     {
-      header: "Branch",
-      accessorKey: "branch",
-      render: (row) => (
-        <p className="text-label font-semibold px-2 py-0.5 rounded-md bg-muted text-muted-foreground border border-border w-fit">
-          {row.branch}
-        </p>
-      ),
-    },
-    {
-      header: "Voucher",
-      accessorKey: "voucherCode",
-      render: (row) => (
-        <div className="flex items-center gap-2">
-          <StatusBadge status={row.status} />
-          <code className="text-caption font-mono text-muted-foreground">{row.voucherCode}</code>
-        </div>
-      ),
-    },
-    {
-      header: "Service",
-      accessorKey: "service",
-      render: (row) => (
-        <p className="text-nav font-medium text-foreground/80">{row.service}</p>
-      ),
-    },
-    {
-      header: "Provider",
-      accessorKey: "provider",
-      render: (row) => (
-        <div className="flex items-center gap-1.5 min-w-0">
-          <Storefront size={11} className="text-muted-foreground/60 shrink-0" />
-          <p className="text-nav text-foreground/70 font-medium truncate">{row.provider}</p>
-        </div>
-      ),
-    },
-    {
-      header: "Location",
+      header: "City",
       accessorKey: "location",
       render: (row) => (
         <div className="flex items-center gap-1.5 min-w-0">
           <MapPin size={11} className="text-muted-foreground/60 shrink-0" />
-          <p className="text-nav text-foreground/70 font-medium truncate">{row.location}</p>
+          <p className="text-nav text-foreground/70 font-medium truncate">
+            {row.location}
+          </p>
         </div>
       ),
     },
@@ -103,7 +139,23 @@ export function OrganizationClaimsTable({ data }: Props) {
       render: (row) => (
         <div className="flex items-center gap-1.5">
           <Calendar size={11} className="text-muted-foreground/60 shrink-0" />
-          <p className="text-caption text-muted-foreground font-medium whitespace-nowrap">{row.date}</p>
+          <p className="text-caption text-muted-foreground font-medium whitespace-nowrap">
+            {row.date}
+          </p>
+        </div>
+      ),
+    },
+    {
+      header: "Employee",
+      accessorKey: "employeeName",
+      render: (row) => (
+        <div>
+          <p className="text-nav font-semibold text-foreground">
+            {row.employeeName}
+          </p>
+          <p className="text-caption text-muted-foreground font-medium mt-0.5">
+            {row.empCode}
+          </p>
         </div>
       ),
     },
@@ -117,23 +169,109 @@ export function OrganizationClaimsTable({ data }: Props) {
         </p>
       ),
     },
+    {
+      header: "Status",
+      accessorKey: "status",
+      render: (row) => <StatusBadge status={row.status} />,
+    },
+    {
+      header: "Voucher",
+      render: (row) => (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onViewVoucher?.(row);
+          }}
+          className="flex items-center gap-1.5 text-primary hover:text-primary/80 transition-colors"
+        >
+          <Ticket size={14} weight="bold" />
+          <span className="text-caption font-semibold underline underline-offset-2">
+            {row.voucherName || row.voucherCode}
+          </span>
+        </button>
+      ),
+    },
+    {
+      header: "",
+      align: "right",
+      render: (row) => (
+        <ActionPopover
+          align="end"
+          actions={[
+            {
+              label: "View Details",
+              icon: <Eye size={14} />,
+              onClick: () => onViewDetails?.(row),
+            },
+            {
+              label: "View Voucher",
+              icon: <Ticket size={14} />,
+              onClick: () => onViewVoucher?.(row),
+            },
+            {
+              label: "Download PDF",
+              icon: <Download size={14} />,
+              onClick: () => console.log("Download PDF", row.id),
+            },
+          ]}
+        />
+      ),
+    },
   ];
 
-  if (flatData.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-16 text-center rounded-lg border border-dashed border-border">
-        <Receipt size={36} weight="duotone" className="text-muted-foreground/40 mb-3" />
-        <p className="text-muted-foreground font-medium text-nav">No claims recorded yet.</p>
-      </div>
-    );
-  }
-
   return (
-    <SharedDataTable
-      data={flatData}
-      columns={columns}
-      rowsPerPage={10}
-      defaultSort={{ key: "date", direction: "desc" }}
-    />
+    <div className="space-y-4">
+      <DataFilterBar
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Search claims..."
+        filters={
+          <div className="flex items-center gap-6">
+            <FilterItem
+              label="Status"
+              value={statusFilter}
+              onChange={(v) => setStatusFilter(v as ClaimStatus | "all")}
+              options={[
+                { label: "All Statuses", value: "all" },
+                { label: "Pre-auth", value: "pre-auth" },
+                { label: "Confirmed", value: "confirmed" },
+                { label: "Cancelled", value: "cancelled" },
+              ]}
+            />
+            <FilterItem
+              label="Type"
+              value={txnFilter}
+              onChange={(v) => setTxnFilter(v as TransactionType | "all")}
+              options={[
+                { label: "All Types", value: "all" },
+                { label: "Redemption", value: "redemption" },
+                { label: "Reimbursement", value: "reimbursement" },
+                { label: "Refund", value: "refund" },
+              ]}
+            />
+          </div>
+        }
+      />
+
+      {filteredData.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 text-center rounded-lg border border-dashed border-border">
+          <Receipt
+            size={36}
+            weight="duotone"
+            className="text-muted-foreground/40 mb-3"
+          />
+          <p className="text-muted-foreground font-medium text-nav">
+            No claims recorded yet.
+          </p>
+        </div>
+      ) : (
+        <SharedDataTable
+          data={filteredData}
+          columns={columns}
+          rowsPerPage={10}
+          defaultSort={{ key: "date", direction: "desc" }}
+        />
+      )}
+    </div>
   );
 }

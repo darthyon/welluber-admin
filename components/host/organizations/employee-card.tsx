@@ -33,6 +33,9 @@ interface EmployeeCardProps {
     employeeId: string;
     empCode: string;
     joinDate: string;
+    department?: string;
+    tier?: string;
+    employmentType?: string;
     benefitPolicies: EmployeeBenefitPolicy[];
     dependentsCount: number;
   };
@@ -73,7 +76,10 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
   };
 
   return (
-    <div className="group glass-card rounded-lg p-5 relative flex flex-col h-full overflow-hidden">
+    <div
+      className="group glass-card rounded-lg p-5 relative flex flex-col h-full overflow-hidden cursor-pointer"
+      onClick={() => onView?.(employee.id)}
+    >
       {/* Decorative Accent */}
       <div className="absolute -right-8 -bottom-8 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all duration-500 pointer-events-none" />
 
@@ -104,6 +110,18 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
                 className="px-1.5 py-0.5 rounded-md text-micro"
               />
               <span className="text-micro text-muted-foreground/60 font-mono bg-background/50 px-1.5 py-0.5 rounded border border-border/40 tracking-tight">{employee.empCode}</span>
+            </div>
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {employee.department && (
+                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-muted text-muted-foreground border border-border/40 tracking-tight">
+                  {employee.department}
+                </span>
+              )}
+              {employee.tier && (
+                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-primary/5 text-primary border border-primary/10 tracking-tight">
+                  {employee.tier}
+                </span>
+              )}
             </div>
           </div>
         </div>

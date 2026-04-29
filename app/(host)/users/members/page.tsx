@@ -20,7 +20,7 @@ import { EntityAvatar } from "@/components/shared/entity-avatar";
 
 export default function MembersPage() {
   const [mounted, setMounted] = useState(false);
-  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [viewMode, setViewMode] = useState<ViewMode>("list");
 
   useEffect(() => {
     setMounted(true);
@@ -77,7 +77,7 @@ export default function MembersPage() {
       )
     },
     {
-      header: "Organization",
+              header: "Organisation",
       accessorKey: "organization",
       sortable: true,
       render: (row) => (
@@ -178,7 +178,7 @@ export default function MembersPage() {
                 ]}
               />
               <SearchableFilterItem 
-                label="Organization"
+                label="Organisation"
                 value={orgFilter}
                 onChange={setOrgFilter}
                 icon={<Buildings size={14} />}

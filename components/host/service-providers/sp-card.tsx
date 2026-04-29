@@ -48,10 +48,10 @@ export function SpCard({ sp }: SpCardProps) {
         {/* Header */}
         <div className="flex items-start justify-between mb-6 relative z-10">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-lg bg-muted border border-border/60 text-muted-foreground flex items-center justify-center">
+            <div className="w-11 h-11 rounded-full bg-muted border border-border/60 text-muted-foreground flex items-center justify-center overflow-hidden">
               {sp.logo ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={sp.logo} alt={sp.name} className="w-full h-full object-cover rounded-lg" />
+                <img src={sp.logo} alt={sp.name} className="w-full h-full object-cover" />
               ) : (
                 <Storefront size={22} weight="fill" />
               )}

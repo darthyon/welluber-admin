@@ -29,7 +29,7 @@ export function SpBranchesTab({ sp }: SpBranchesTabProps) {
   const [view, setView] = useQueryState("branchView", "list");
   const [selectedBranchId, setSelectedBranchId] = useQueryState("branchId");
   const updateQueryParams = useUpdateQueryParams();
-  const [branchesView, setBranchesView] = useState<ViewMode>("grid");
+  const [branchesView, setBranchesView] = useState<ViewMode>("list");
   const [branchSearch, setBranchSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<BranchStatusFilter>("all");
 

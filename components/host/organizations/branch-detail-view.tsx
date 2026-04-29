@@ -9,8 +9,7 @@ import {
   Users, 
   Plus, 
   TrendUp, 
-  CurrencyCircleDollar, 
-  TreeStructure,
+  Info,
   Clock,
   ClockCounterClockwise,
   DotsThreeVertical,
@@ -39,7 +38,7 @@ interface BranchDetailViewProps {
 }
 
 export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewProps) {
-  const [walletType, setWalletType] = useState<"independent" | "shared">("independent");
+  const [walletType, setWalletType] = useState<"new" | "existing">("new");
 
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isTopUpModalOpen, setIsTopUpModalOpen] = useState(false);
@@ -272,22 +271,23 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-lg bg-background border border-border text-muted-foreground flex items-center justify-center shadow-md shadow-black/5">
-                      {walletType === "independent" ? (
-                        <CurrencyCircleDollar size={24} weight="fill" />
-                      ) : (
-                        <TreeStructure size={24} weight="fill" />
-                      )}
+                      <Wallet size={24} weight="fill" />
                     </div>
                     <div>
                       <h4 className="font-semibold text-subtitle text-foreground tracking-tight">
-                        {walletType === "independent" ? "New Single Wallet" : "Existing Wallet"}
+                        KL HQ Wallet
                       </h4>
-                      <p className="text-label text-muted-foreground">Active Configuration</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-label text-muted-foreground">Active Configuration</span>
+                        <span className="px-1.5 py-0.5 rounded-md bg-muted border border-zinc-200 text-micro font-semibold text-muted-foreground">
+                          {walletType === "new" ? "New" : "Existing"}
+                        </span>
+                      </div>
                     </div>
                   </div>
                   
                   <div className="text-right">
-                    <p className="text-caption font-semibold tracking-tight text-muted-foreground/60 mb-1">Available balance</p>
+                    <p className="text-caption font-semibold tracking-tight text-muted-foreground/60 mb-1">Wallet Balance</p>
                     <p className="text-display font-semibold text-foreground tracking-tight">RM 45,000.00</p>
                     
                     <div className="flex items-center justify-end gap-2 mt-3">
@@ -313,22 +313,24 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
                   </div>
                 </div>
 
-                  <div className="pt-6 border-t border-border/40 grid grid-cols-2 lg:grid-cols-3 gap-6">
-                    <DetailField 
-                      label="Wallet ID" 
-                      value={<span className="font-mono text-caption bg-background px-1.5 py-0.5 rounded border border-border/60 tracking-tight text-foreground/70">WAL-BR01-2026</span>} 
-                    />
-                    <DetailField 
-                      label="Utilization" 
-                      value={<span className="text-body font-semibold text-foreground/80 tracking-tight">68% <span className="text-caption font-normal text-muted-foreground ml-1">(RM 30,600 spent)</span></span>} 
-                    />
-                  {walletType === "shared" && (
-                    <DetailField 
-                      label="Source Pool" 
-                      value={<span className="text-nav font-medium text-primary tracking-tight">Corporate Master HQ Wallet</span>} 
-                      className="md:col-span-1"
-                    />
-                  )}
+                <div className="pt-6 border-t border-border/40 grid grid-cols-2 lg:grid-cols-3 gap-6">
+                  <DetailField 
+                    label="Wallet ID" 
+                    value={<span className="font-mono text-caption bg-background px-1.5 py-0.5 rounded border border-border/60 tracking-tight text-foreground/70">WAL-BR01-2026</span>} 
+                  />
+                  <DetailField 
+                    label="Credit Remaining" 
+                    value={
+                      <div className="flex items-center gap-1">
+                        <span className="text-body font-semibold text-foreground/80 tracking-tight">RM 5,000</span>
+                        <Info size={14} className="text-muted-foreground/40" />
+                      </div>
+                    } 
+                  />
+                  <DetailField 
+                    label="Total Credit Limit" 
+                    value={<span className="text-nav font-medium text-primary tracking-tight">RM 10,000</span>} 
+                  />
                 </div>
               </div>
             </div>

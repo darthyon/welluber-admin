@@ -3,7 +3,6 @@
 import { Buildings, DotsThreeVertical, Users, Shield, ChartPieSlice } from "@phosphor-icons/react";
 import { Organization } from "@/features/organizations/types";
 import { PulseStatus } from "@/components/shared/pulse-status";
-import { StackedAvatars } from "@/components/shared/stacked-avatars";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -50,7 +49,7 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
       onClick: () => console.log("Invite clicked") 
     },
     { 
-      label: "Organization settings", 
+      label: "Organisation settings", 
       isSectionTitle: true 
     },
     { 
@@ -108,7 +107,6 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
                 <span className="text-body font-semibold text-foreground block">
                   {org.employeeCount.toLocaleString()} <span className="text-caption font-normal text-muted-foreground/60">pax</span>
                 </span>
-                <StackedAvatars count={org.employeeCount} className="mt-1" />
               </div>
             </div>
 

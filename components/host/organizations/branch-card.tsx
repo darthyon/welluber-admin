@@ -12,6 +12,7 @@ interface BranchCardProps {
     name: string;
     type: string;
     walletModel: string;
+    walletName?: string;
     address?: {
       city: string;
       state: string;
@@ -29,8 +30,8 @@ interface BranchCardProps {
 
 export function BranchCard({ branch, onView, onEdit }: BranchCardProps) {
   // Map internal wallet models to user-friendly labels
-  const walletLabel = branch.walletModel === "Cash Balance" ? "Single Wallet" : 
-                    branch.walletModel === "Shared HQ Wallet" ? "Existing Wallet" : 
+  const walletLabel = branch.walletModel === "New" ? "New" :
+                    branch.walletModel === "Existing" ? "Existing" :
                     branch.walletModel;
 
   return (
@@ -78,14 +79,17 @@ export function BranchCard({ branch, onView, onEdit }: BranchCardProps) {
       <div className="mt-auto space-y-4 pt-6 relative z-10">
         <div className="flex items-center justify-between border-t border-border/40 pt-4">
           <div className="flex flex-col gap-1">
-            <span className="text-caption font-semibold text-muted-foreground/60">Wallet model</span>
+            <span className="text-caption font-semibold text-muted-foreground/60">Wallet</span>
             <div className="flex items-center gap-1.5 text-label font-semibold text-foreground">
               <Wallet size={14} weight="bold" className="text-primary" />
-              <span>{walletLabel}</span>
-              {branch.balance && (
-                <span className="text-muted-foreground font-normal ml-1 border-l border-border pl-2">{branch.balance}</span>
-              )}
+              <span className="truncate max-w-[120px]">{branch.walletName || "Unnamed Wallet"}</span>
+              <span className="px-1 py-0 rounded bg-muted border border-border text-micro font-semibold text-muted-foreground">
+                {walletLabel}
+              </span>
             </div>
+            {branch.balance && (
+              <span className="text-caption text-muted-foreground/60 font-medium pl-5">{branch.balance}</span>
+            )}
           </div>
           
           {branch.employeesCount && (

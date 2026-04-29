@@ -1,0 +1,133 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import {
+  CaretLeft,
+  User,
+  Briefcase,
+  Shield,
+  Users,
+  NavigationArrow,
+} from "@phosphor-icons/react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav";
+import { SuccessModal } from "@/components/shared/success-modal";
+import { toast } from "sonner";
+import { EmployeeFormContent } from "@/components/host/employees/employee-form-content";
+
+const ANCHOR_ITEMS = [
+  { id: "personal-identity", label: "Personal Identity" },
+  { id: "employment-configuration", label: "Employment Configuration" },
+  { id: "benefit-policy-assignment", label: "Benefit Policy Assignment" },
+  { id: "dependent-links", label: "Dependent Links" },
+];
+
+export default function NewEmployeePage() {
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  const handleSubmit = async (data: any) => {
+    setIsSubmitting(true);
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    setIsSubmitting(false);
+    toast.success("Employee registered successfully");
+    setShowSuccess(true);
+  };
+
+  return (
+    <div className="pb-24 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start">
+        {/* Left Column: Navigation */}
+        <aside className="hidden xl:block w-52 shrink-0 sticky top-20 self-start">
+          <FloatingAnchorNav items={ANCHOR_ITEMS} />
+        </aside>
+
+        {/* Right Column: Form Content */}
+        <div className="flex-1">
+          <div className="flex flex-col gap-6">
+            {/* Header */}
+            <div className="flex flex-col gap-4">
+              <button
+                onClick={() => router.back()}
+                className="inline-flex items-center gap-1.5 text-nav font-medium text-muted-foreground hover:text-foreground transition-colors w-fit"
+              >
+                <CaretLeft size={16} /> Back
+              </button>
+              <div>
+                <h1 className="text-heading font-semibold tracking-tight text-foreground">
+                  Add New Employee
+                </h1>
+                <p className="text-muted-foreground text-nav mt-1">
+                  Register a new employee and assign them to a branch and benefit
+                  policy.
+                </p>
+              </div>
+            </div>
+
+            <EmployeeFormContent
+              mode="create"
+              onSubmit={handleSubmit}
+              isSubmitting={isSubmitting}
+            />
+
+            {/* Floating Action Bar */}
+            <div className="fixed bottom-8 left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[calc(50%+104px)] z-50 flex items-center gap-4 p-2 px-6 bg-background/80 backdrop-blur-2xl border border-border shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-full animate-in slide-in-from-bottom-10 duration-700 ease-out">
+              <Button
+                variant="ghost"
+                size="lg"
+                className="text-nav font-semibold px-6 transition-colors"
+                onClick={() => router.back()}
+              >
+                Cancel
+              </Button>
+              <div className="w-px h-6 bg-border/40" />
+              <Button
+                type="submit"
+                form="employeeForm"
+                disabled={isSubmitting}
+                size="lg"
+                className="text-nav font-semibold px-8 flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  <>
+                    Create Employee
+                    <NavigationArrow size={14} weight="bold" className="rotate-90" />
+                  </>
+                )}
+              </Button>
+            </div>
+
+            {/* Spacer */}
+            <div className="h-[60vh]" />
+          </div>
+        </div>
+      </div>
+
+      <SuccessModal
+        isOpen={showSuccess}
+        onClose={() => setShowSuccess(false)}
+        title="Employee Registered"
+        message="The employee profile has been successfully established and benefit policies pinned."
+        primaryAction={{
+          label: "Add Another Employee",
+          onClick: () => {
+            setShowSuccess(false);
+            window.location.reload();
+          },
+        }}
+        secondaryAction={{
+          label: "View Employee",
+          onClick: () => router.push(`/employees/emp_new`),
+        }}
+      />
+    </div>
+  );
+}

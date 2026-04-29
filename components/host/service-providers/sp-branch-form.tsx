@@ -24,7 +24,7 @@ import { toast } from "sonner";
 const ANCHOR_ITEMS = [
   { id: "branch-identity", label: "Branch Identity" },
   { id: "location-mapping", label: "Location Mapping" },
-  { id: "service-catalog", label: "Service Catalog" },
+  { id: "service-catalog", label: "Service Catalogue" },
   { id: "governance", label: "Governance" },
   { id: "operating-hours", label: "Operating Hours" },
   { id: "benefits", label: "Benefits" },

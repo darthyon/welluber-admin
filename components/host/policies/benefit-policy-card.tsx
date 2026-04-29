@@ -91,21 +91,8 @@ export function BenefitPolicyCard({ policy, onView, onClone }: BenefitPolicyCard
         </p>
 
         <div className="mt-8 pt-6 border-t border-border/60 flex items-center justify-between">
-          <div className="flex -space-x-2">
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="w-7 h-7 rounded-full border-2 border-background bg-muted flex items-center justify-center text-micro font-semibold text-muted-foreground/60 overflow-hidden shadow-sm ring-1 ring-border/40"
-              >
-                <img
-                  src={`https://i.pravatar.cc/100?img=${parseInt(policy.id) + i + 10}`}
-                  alt="User"
-                />
-              </div>
-            ))}
-            <div className="w-7 h-7 rounded-full border-2 border-background bg-muted flex items-center justify-center text-micro font-semibold text-muted-foreground/60 shadow-sm ring-1 ring-border/40">
-              +12
-            </div>
+          <div className="flex items-center gap-1.5 text-muted-foreground/60">
+            <span className="text-micro font-semibold">12 enrolled</span>
           </div>
           <div className="text-right">
             <p className="text-body font-semibold text-foreground tracking-tight">
