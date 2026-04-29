@@ -42,7 +42,7 @@ function WalletDetailContent() {
   const { wallets } = useWallets();
   const { transactions } = useWalletTransactions(walletId);
 
-  const [activeTab, setActiveTab] = useQueryState("tab", "transactions");
+  const [activeTab, setActiveTab] = useQueryState("tab", "details");
   const [searchQuery, setSearchQuery] = useState("");
   const [period, setPeriod] = useState<"By Month" | "By Quarter" | "By Year">("By Month");
 
@@ -160,13 +160,22 @@ function WalletDetailContent() {
 
           <div className="flex items-center gap-8 mt-8 border-b border-border">
             <button
+              onClick={() => setActiveTab("details")}
+              className={cn(
+                "h-10 px-0 border-b-2 text-body font-medium transition-all relative",
+                activeTab === "details" ? "border-primary text-primary" : "border-transparent text-muted-foreground/60 hover:text-foreground"
+              )}
+            >
+              Wallet Details
+            </button>
+            <button
               onClick={() => setActiveTab("transactions")}
               className={cn(
                 "h-10 px-0 border-b-2 text-body font-medium transition-all relative",
                 activeTab === "transactions" ? "border-primary text-primary" : "border-transparent text-muted-foreground/60 hover:text-foreground"
               )}
             >
-              Transaction records
+              Transactions
             </button>
             <button
               onClick={() => setActiveTab("settings")}
@@ -175,14 +184,37 @@ function WalletDetailContent() {
                 activeTab === "settings" ? "border-primary text-primary" : "border-transparent text-muted-foreground/60 hover:text-foreground"
               )}
             >
-              General settings
+              Settings
             </button>
           </div>
         </div>
       </div>
 
       <div className="p-6 lg:p-8 space-y-8">
-        {activeTab === "transactions" ? (
+        {activeTab === "details" && (
+          <div className="space-y-8 animate-in fade-in transition-all duration-300">
+            <DetailSection title="Wallet configuration" icon={<Wallet size={18} />}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-7">
+                <DetailField label="Wallet name" value={wallet.name} />
+                <DetailField
+                  label="Status"
+                  value={
+                    <div className="flex items-center gap-3">
+                      <StatusBadge status={wallet.status} variant={wallet.status === "active" ? "emerald" : "zinc"} />
+                      <button className="text-caption font-semibold text-primary hover:opacity-70 transition-opacity">Change status</button>
+                    </div>
+                  }
+                />
+                <DetailField label="Organization" value={wallet.orgName} />
+                <DetailField label="Branch" value={wallet.branchName} />
+                <DetailField label="Creation date" value={new Date(wallet.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} />
+                <DetailField label="Last activity" value={new Date(wallet.updatedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} />
+              </div>
+            </DetailSection>
+          </div>
+        )}
+
+        {activeTab === "transactions" && (
            <>
              <div className="bg-primary rounded-xl relative p-8 text-white">
                 {/* Wallet illustration — anchored bottom right, overflows card */}
@@ -383,12 +415,12 @@ function WalletDetailContent() {
                      sortable: true,
                      render: (trx: any) => (
                        <div className="flex items-center gap-4 py-1">
-                          <div className={cn(
-                            "h-9 w-9 rounded-lg flex items-center justify-center shrink-0 shadow-sm",
-                            trx.type === "topup" ? "bg-primary/20 text-primary" : "bg-rose-50 text-rose-600"
-                          )}>
-                            {trx.type === "topup" ? <ArrowUpRight size={15} weight="bold" /> : <ArrowDownRight size={15} weight="bold" />}
-                          </div>
+                         <div className={cn(
+                           "h-9 w-9 rounded-lg flex items-center justify-center shrink-0 shadow-sm",
+                           trx.type === "topup" ? "bg-primary/20 text-primary" : "bg-rose-50 text-rose-600"
+                         )}>
+                           {trx.type === "topup" ? <ArrowUpRight size={15} weight="bold" /> : <ArrowDownRight size={15} weight="bold" />}
+                         </div>
                          <div className="space-y-0.5">
                            <p className="text-body font-semibold tracking-tight text-foreground">{trx.description}</p>
                            <p className="text-caption font-semibold text-muted-foreground/50 font-mono">ID: {trx.id}</p>
@@ -403,10 +435,10 @@ function WalletDetailContent() {
                       align: "right",
                       render: (trx: any) => (
                         <div className="text-right">
-                           <p className={cn(
-                             "text-subtitle font-semibold tracking-tight",
-                             trx.amount > 0 && trx.type === "topup" ? "text-primary" : "text-foreground"
-                           )}>
+                          <p className={cn(
+                            "text-subtitle font-semibold tracking-tight",
+                            trx.amount > 0 && trx.type === "topup" ? "text-primary" : "text-foreground"
+                          )}>
                             {trx.type === "topup" ? "+" : "-"} RM {Math.abs(trx.amount).toLocaleString()}
                           </p>
                           <p className="text-caption font-medium text-muted-foreground/50 text-nowrap">Balance after: RM {trx.balanceAfter.toLocaleString()}</p>
@@ -428,10 +460,10 @@ function WalletDetailContent() {
                       render: (trx: any) => (
                         <div className="space-y-0.5">
                           {trx.voucherName ? (
-                            <div className="space-y-0.5">
-                              <p className="text-body font-semibold text-primary cursor-pointer hover:underline underline-offset-2">{trx.voucherName}</p>
-                              <p className="text-caption font-semibold text-muted-foreground/50 font-mono cursor-pointer hover:underline underline-offset-2">{trx.claimId}</p>
-                            </div>
+                            <>
+                              <p className="text-body font-semibold text-foreground">{trx.voucherName}</p>
+                              <p className="text-caption font-semibold text-muted-foreground/50 font-mono">{trx.claimId}</p>
+                            </>
                           ) : (
                             <span className="text-caption text-muted-foreground/60">—</span>
                           )}
@@ -454,83 +486,66 @@ function WalletDetailContent() {
                         </div>
                       )
                     },
-                   {
-                     header: "Actions",
-                     align: "right",
-                     render: (trx: any) => (
-                       <ActionPopover
-                         actions={[
-                           { label: "View detail record", onClick: () => {} },
-                           { label: "Download voucher", onClick: () => {} },
-                         ]}
-                       />
-                     )
-                   }
-                 ]}
-                 data={filteredTransactions}
-               />
-            </div>
-           </>
-          ) : (
-            <div className="space-y-8 animate-in fade-in transition-all duration-300">
-              <DetailSection title="Wallet configuration" icon={<Wallet size={18} />}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-7">
-                  <DetailField label="Wallet name" value={wallet.name} />
-                  <DetailField
-                    label="Status"
-                    value={
-                      <div className="flex items-center gap-3">
-                        <StatusBadge status={wallet.status} variant={wallet.status === "active" ? "emerald" : "zinc"} />
-                        <button className="text-caption font-semibold text-primary hover:opacity-70 transition-opacity">Change status</button>
-                      </div>
+                    {
+                      header: "Actions",
+                      align: "right",
+                      render: (trx: any) => (
+                        <ActionPopover
+                          actions={[
+                            { label: "View detail record", onClick: () => {} },
+                            { label: "Download voucher", onClick: () => {} },
+                          ]}
+                        />
+                      )
                     }
-                  />
-                  <DetailField label="Organization" value={wallet.orgName} />
-                  <DetailField label="Branch" value={wallet.branchName} />
-                  <DetailField label="Creation date" value={new Date(wallet.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} />
-                  <DetailField label="Last activity" value={new Date(wallet.updatedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} />
-                </div>
-              </DetailSection>
+                  ]}
+                  data={filteredTransactions}
+                />
+             </div>
+            </>
+        )}
 
-              {/* Danger Zone Aligned with Org Module */}
-              <DetailSection
-                title="Danger Zone"
-                icon={<Gear size={18} weight="duotone" />}
-                description="Confirm how you want to change the wallet lifecycle."
-              >
-                <div className="space-y-4">
-                  <div className="rounded-lg border border-border bg-muted/20 p-4">
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="space-y-1">
-                        <p className="text-nav font-semibold text-foreground">Suspend Wallet</p>
-                        <p className="text-label text-muted-foreground">
-                          Pause all deductions and activities temporarily.
-                        </p>
-                      </div>
-                      <Button variant="outline" className="text-label h-9" onClick={() => openDangerAction("suspend")}>
-                        Suspend
-                      </Button>
+        {activeTab === "settings" && (
+          <div className="space-y-8 animate-in fade-in transition-all duration-300">
+            {/* Danger Zone Aligned with Org Module */}
+            <DetailSection
+              title="Danger Zone"
+              icon={<Gear size={18} weight="duotone" />}
+              description="Confirm how you want to change the wallet lifecycle."
+            >
+              <div className="space-y-4">
+                <div className="rounded-lg border border-border bg-muted/20 p-4">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="space-y-1">
+                      <p className="text-nav font-semibold text-foreground">Suspend Wallet</p>
+                      <p className="text-label text-muted-foreground">
+                        Pause all deductions and activities temporarily.
+                      </p>
                     </div>
-                  </div>
-
-                  <div className="rounded-lg border border-rose-200 bg-rose-50/60 p-4">
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="space-y-1">
-                        <p className="text-nav font-semibold text-foreground">Terminate Wallet Permanently</p>
-                        <p className="text-label text-muted-foreground">
-                          Instantly shutdown fiscal operations for this branch.
-                        </p>
-                      </div>
-                      <Button variant="destructive" className="text-label h-9" onClick={() => openDangerAction("terminate")}>
-                        Terminate
-                      </Button>
-                    </div>
+                    <Button variant="outline" className="text-label h-9" onClick={() => openDangerAction("suspend")}>
+                      Suspend
+                    </Button>
                   </div>
                 </div>
-              </DetailSection>
-            </div>
-          )}
-        </div>
+
+                <div className="rounded-lg border border-rose-200 bg-rose-50/60 p-4">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="space-y-1">
+                      <p className="text-nav font-semibold text-foreground">Terminate Wallet Permanently</p>
+                      <p className="text-label text-muted-foreground">
+                        Instantly shutdown fiscal operations for this branch.
+                      </p>
+                    </div>
+                    <Button variant="destructive" className="text-label h-9" onClick={() => openDangerAction("terminate")}>
+                      Terminate
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </DetailSection>
+          </div>
+        )}
+      </div>
 
       <ConfirmationModal
         isOpen={isDangerModalOpen}
