@@ -190,45 +190,41 @@ function WalletDetailContent() {
       <div className="p-6 lg:p-8 space-y-8">
         {activeTab === "transactions" ? (
            <>
-             <div className="bg-primary/5 border border-primary/10 rounded-lg overflow-hidden relative p-8">
-                <div className="absolute top-0 right-0 p-8 opacity-[0.03]">
-                  <Wallet size={80} weight="fill" />
-                </div>
+             <div className="bg-primary rounded-xl overflow-hidden relative p-8 text-white">
                 <div className="relative z-10">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
-                    <div className="space-y-1">
-                      <p className="text-label font-semibold text-primary/70 tracking-tight">Wallet Balance</p>
-                      <h2 className={cn(
-                        "text-4xl font-semibold tracking-tight",
-                        wallet.balance < 0 ? "text-rose-500" : "text-foreground"
-                      )}>
-                        {wallet.balance < 0 ? "-" : ""}RM {Math.abs(wallet.balance).toLocaleString()}
-                      </h2>
-                      <div className="flex items-center gap-3 mt-4">
-                        <div className={cn(
-                          "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-caption font-semibold transition-all",
-                          wallet.pendingDeductions > 0
-                            ? "bg-amber-50 border-amber-200 text-amber-700"
-                            : "bg-muted border-zinc-200 text-muted-foreground/60"
-                        )}>
-                          <Ticket size={14} weight="fill" />
-                          {wallet.pendingDeductions === 0 ? "0" : `RM ${wallet.pendingDeductions.toLocaleString()}`} pending claims
+                    {/* Left: Balance */}
+                    <div className="space-y-4 flex-1">
+                      <div className="space-y-1">
+                        <p className="text-label font-semibold text-white/70 tracking-tight">Total Balance</p>
+                        <h2 className="text-4xl font-semibold tracking-tight text-white">
+                          RM {Math.abs(wallet.balance).toLocaleString()}
+                        </h2>
+                      </div>
+                      <div className="inline-flex items-center gap-3 px-4 py-2.5 rounded-xl border border-white/20 bg-white/10 backdrop-blur-sm">
+                        <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+                          <Wallet size={16} weight="fill" className="text-white" />
                         </div>
-                        {wallet.balance < 0 && (
-                          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-rose-200 bg-rose-50 text-caption font-semibold text-rose-700">
-                            Overdrawn
-                          </div>
-                        )}
+                        <div>
+                          <p className="text-caption font-semibold text-white/70">Available Balance</p>
+                          <p className="text-body font-semibold text-white">
+                            RM {(wallet.balance - wallet.pendingDeductions).toLocaleString()}
+                          </p>
+                        </div>
                       </div>
                     </div>
 
+                    {/* Divider */}
+                    <div className="hidden md:block w-px h-24 bg-white/20" />
+
+                    {/* Right: Credit */}
                     <div className="space-y-3 min-w-[240px]">
-                      <div className="flex items-center gap-2 text-label font-semibold text-primary/70 tracking-tight">
+                      <div className="flex items-center gap-2 text-label font-semibold text-white/70 tracking-tight">
                         Credit Remaining
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Info size={14} className="text-muted-foreground/40 cursor-help" />
+                              <Info size={14} className="text-white/40 cursor-help" />
                             </TooltipTrigger>
                             <TooltipContent>
                               <p className="text-nav max-w-[200px]">Org-level overdraft remaining before hard block</p>
@@ -236,11 +232,17 @@ function WalletDetailContent() {
                           </Tooltip>
                         </TooltipProvider>
                       </div>
-                      <div className="text-2xl font-semibold text-foreground">
+                      <div className="text-2xl font-semibold text-white">
                         RM {orgCreditRemaining.toLocaleString()}
                       </div>
-                      <div className="text-caption text-muted-foreground/60">
-                        Total Credit Limit: RM {orgCreditLimit.toLocaleString()}
+                      <div className="text-caption text-white/60">
+                        Total credit limit: RM {orgCreditLimit.toLocaleString()}
+                      </div>
+                      <div className="w-full h-1.5 bg-white/20 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-white rounded-full transition-all"
+                          style={{ width: `${Math.min((orgCreditUsed / orgCreditLimit) * 100, 100)}%` }}
+                        />
                       </div>
                     </div>
                   </div>
@@ -312,12 +314,12 @@ function WalletDetailContent() {
                      sortable: true,
                      render: (trx: any) => (
                        <div className="flex items-center gap-4 py-1">
-                         <div className={cn(
-                           "h-9 w-9 rounded-lg flex items-center justify-center shrink-0 shadow-sm",
-                           trx.type === "topup" ? "bg-emerald-50 text-emerald-600" : "bg-muted text-muted-foreground"
-                         )}>
-                           {trx.type === "topup" ? <ArrowUpRight size={15} weight="bold" /> : <ArrowDownRight size={15} weight="bold" />}
-                         </div>
+                          <div className={cn(
+                            "h-9 w-9 rounded-lg flex items-center justify-center shrink-0 shadow-sm",
+                            trx.type === "topup" ? "bg-primary/20 text-primary" : "bg-rose-50 text-rose-600"
+                          )}>
+                            {trx.type === "topup" ? <ArrowUpRight size={15} weight="bold" /> : <ArrowDownRight size={15} weight="bold" />}
+                          </div>
                          <div className="space-y-0.5">
                            <p className="text-body font-semibold tracking-tight text-foreground">{trx.description}</p>
                            <p className="text-caption font-semibold text-muted-foreground/50 font-mono">ID: {trx.id}</p>
@@ -332,10 +334,10 @@ function WalletDetailContent() {
                       align: "right",
                       render: (trx: any) => (
                         <div className="text-right">
-                          <p className={cn(
-                            "text-subtitle font-semibold tracking-tight",
-                            trx.amount > 0 && trx.type === "topup" ? "text-emerald-600" : "text-foreground"
-                          )}>
+                           <p className={cn(
+                             "text-subtitle font-semibold tracking-tight",
+                             trx.amount > 0 && trx.type === "topup" ? "text-primary" : "text-foreground"
+                           )}>
                             {trx.type === "topup" ? "+" : "-"} RM {Math.abs(trx.amount).toLocaleString()}
                           </p>
                           <p className="text-caption font-medium text-muted-foreground/50 text-nowrap">Balance after: RM {trx.balanceAfter.toLocaleString()}</p>
