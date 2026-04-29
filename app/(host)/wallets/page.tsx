@@ -4,19 +4,17 @@ import {
   Plus,
   Wallet as WalletIcon,
   MagnifyingGlass,
-  FadersHorizontal,
   CheckCircle,
   ArrowsClockwise,
   Ticket,
+  Buildings,
 } from "@phosphor-icons/react"
 import { Button } from "@/components/ui/button"
 import { DataFilterBar } from "@/components/shared/data-filter-bar"
 import { FilterItem } from "@/components/shared/filter-item"
 import { EmptyState } from "@/components/shared/empty-state"
 import { useWallets } from "@/features/wallets/hooks"
-import {
-  WALLET_STATUS_OPTIONS,
-} from "@/features/wallets/constants"
+import { WALLET_STATUS_OPTIONS } from "@/features/wallets/constants"
 import type { Wallet } from "@/features/wallets/types"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { BentoGrid, BentoCard } from "@/components/shared/bento-grid"
@@ -24,19 +22,179 @@ import {
   AdvancedFilterSheet,
   DEFAULT_ADVANCED_FILTERS,
 } from "@/components/shared/advanced-filter-sheet"
-import { useState } from "react"
+import { ExpandableDataTable } from "@/components/shared/expandable-data-table"
+import { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { ActionPopover } from "@/components/shared/action-popover"
-import { SharedDataTable } from "@/components/shared/data-table"
+import { UpdateBalanceModal } from "@/components/host/wallets/update-balance-modal"
+import { RecordTopupModal } from "@/components/host/wallets/record-topup-modal"
+
+interface OrgRow {
+  id: string
+  orgId: string
+  orgName: string
+  walletCount: number
+  totalBalance: number
+  activeCount: number
+  suspendedCount: number
+  wallets: Wallet[]
+}
+
+function useOrgRows(wallets: Wallet[]): OrgRow[] {
+  return useMemo(() => {
+    const map = new Map<string, OrgRow>()
+    wallets.forEach((w) => {
+      const existing = map.get(w.orgId)
+      if (existing) {
+        existing.wallets.push(w)
+        existing.walletCount += 1
+        existing.totalBalance += w.balance
+        if (w.status === "active") existing.activeCount += 1
+        else if (w.status === "suspended") existing.suspendedCount += 1
+      } else {
+        map.set(w.orgId, {
+          id: w.orgId,
+          orgId: w.orgId,
+          orgName: w.orgName,
+          walletCount: 1,
+          totalBalance: w.balance,
+          activeCount: w.status === "active" ? 1 : 0,
+          suspendedCount: w.status === "suspended" ? 1 : 0,
+          wallets: [w],
+        })
+      }
+    })
+    return Array.from(map.values())
+  }, [wallets])
+}
 
 export default function WalletsPage() {
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false)
+  const [expandedOrgIds, setExpandedOrgIds] = useState<Set<string>>(new Set())
+  const [updateBalanceWallet, setUpdateBalanceWallet] = useState<Wallet | null>(null)
+  const [recordTopupWallet, setRecordTopupWallet] = useState<Wallet | null>(null)
   const { wallets, summary, filters, setFilters } = useWallets()
   const router = useRouter()
 
-  const activeAdvancedCount =
-    (filters.utilization[1] < 100 ? 1 : 0)
+  const orgRows = useOrgRows(wallets)
+
+  const activeAdvancedCount = filters.utilization[1] < 100 ? 1 : 0
+
+  const isExpanded = (row: OrgRow) => expandedOrgIds.has(row.orgId)
+
+  const onToggleExpand = (row: OrgRow) => {
+    setExpandedOrgIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(row.orgId)) next.delete(row.orgId)
+      else next.add(row.orgId)
+      return next
+    })
+  }
+
+  const renderExpanded = (row: OrgRow) => (
+    <div className="px-4 py-4">
+      <div className="rounded-lg border border-border/60 bg-card overflow-hidden">
+        {/* Nested Header */}
+        <div className="grid grid-cols-12 gap-4 px-4 py-2.5 bg-muted/30 border-b border-border/60 text-caption font-semibold text-muted-foreground/60 tracking-tight">
+          <div className="col-span-3">Wallet Name</div>
+          <div className="col-span-2">Branch</div>
+          <div className="col-span-2 text-right">Balance</div>
+          <div className="col-span-2 text-right">Pending</div>
+          <div className="col-span-1 text-center">Status</div>
+          <div className="col-span-2 text-right">Actions</div>
+        </div>
+
+        {/* Wallet Rows */}
+        {row.wallets.map((wallet) => (
+          <div
+            key={wallet.id}
+            className="grid grid-cols-12 gap-4 px-4 py-3 items-center border-b border-border/40 last:border-b-0 hover:bg-muted/20 transition-colors cursor-pointer"
+            onClick={() => router.push(`/wallets/${wallet.id}`)}
+          >
+            <div className="col-span-3">
+              <span className="block text-nav font-semibold text-foreground">
+                {wallet.name}
+              </span>
+              <span className="block font-mono text-micro tracking-tight text-muted-foreground/50">
+                {wallet.id}
+              </span>
+            </div>
+
+            <div className="col-span-2">
+              <span className="text-nav text-muted-foreground">
+                {wallet.branchName}
+              </span>
+            </div>
+
+            <div className="col-span-2 text-right">
+              <span
+                className={cn(
+                  "text-nav font-semibold",
+                  wallet.balance < 0 ? "text-rose-500" : "text-foreground"
+                )}
+              >
+                {wallet.balance < 0 ? "-" : ""}RM{" "}
+                {Math.abs(wallet.balance).toLocaleString()}
+              </span>
+            </div>
+
+            <div className="col-span-2 text-right">
+              {wallet.pendingDeductions > 0 ? (
+                <div className="inline-flex items-center gap-1 rounded-md border border-amber-200 bg-amber-50 px-1.5 py-0.5 text-micro font-semibold text-amber-700">
+                  <Ticket size={10} weight="fill" />
+                  RM {wallet.pendingDeductions.toLocaleString()}
+                </div>
+              ) : (
+                <span className="text-micro text-muted-foreground/50">—</span>
+              )}
+            </div>
+
+            <div className="col-span-1 flex justify-center">
+              <StatusBadge
+                status={wallet.status}
+                variant={wallet.status === "active" ? "emerald" : "zinc"}
+                className="rounded-md px-1.5 py-0.5 text-micro"
+              />
+            </div>
+
+            <div
+              className="col-span-2 text-right"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <ActionPopover
+                actions={[
+                  {
+                    label: "View wallet detail",
+                    onClick: () => router.push(`/wallets/${wallet.id}`),
+                  },
+                  {
+                    label: "Update balance",
+                    onClick: () => setUpdateBalanceWallet(wallet),
+                  },
+                  {
+                    label: "Record manual top-up",
+                    onClick: () => setRecordTopupWallet(wallet),
+                  },
+                  {
+                    label:
+                      wallet.status === "suspended"
+                        ? "Resume wallet"
+                        : "Suspend wallet",
+                    onClick: () => console.log("Toggle status", wallet.id),
+                    className:
+                      wallet.status === "suspended"
+                        ? "text-emerald-600 font-semibold"
+                        : "text-destructive font-semibold",
+                  },
+                ]}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
 
   return (
     <div className="space-y-6">
@@ -70,7 +228,7 @@ export default function WalletsPage() {
         </div>
       </div>
 
-      {/* Summary Metrics (Bento Style) */}
+      {/* Summary Metrics */}
       <BentoGrid className="gap-3">
         <BentoCard
           title="Total Balance"
@@ -91,7 +249,7 @@ export default function WalletsPage() {
         <BentoCard
           title="Total Wallets"
           value={summary.totalWallets.toString()}
-          icon={WalletIcon}
+          icon={Buildings}
         />
       </BentoGrid>
 
@@ -99,7 +257,7 @@ export default function WalletsPage() {
       <DataFilterBar
         searchQuery={filters.search}
         onSearchChange={(v) => setFilters({ ...filters, search: v })}
-        searchPlaceholder="Search wallet names, orgs, or branches..."
+        searchPlaceholder="Search organisations or wallet names..."
         filters={
           <>
             <FilterItem
@@ -120,132 +278,106 @@ export default function WalletsPage() {
         }}
       />
 
-      {/* Wallet Table */}
+      {/* Org-first Expandable Table */}
       <div className="min-h-[400px]">
-        {wallets.length > 0 ? (
-          <SharedDataTable
-            data={wallets}
-            onRowClick={(wallet) => router.push(`/wallets/${wallet.id}`)}
+        {orgRows.length > 0 ? (
+          <ExpandableDataTable
+            data={orgRows}
+            isExpanded={isExpanded}
+            onToggleExpand={onToggleExpand}
+            renderExpanded={renderExpanded}
             columns={[
               {
-                header: "Wallet Name",
-                accessorKey: "name",
-                sortable: true,
-                render: (wallet: Wallet) => (
-                  <div className="space-y-0.5">
-                    <span className="block text-body font-semibold text-foreground">
-                      {wallet.name}
-                    </span>
-                    <span className="block font-mono text-micro tracking-tight text-muted-foreground/60">
-                      {wallet.id}
-                    </span>
-                  </div>
-                ),
-              },
-              {
-                header: "Organization",
+                header: "Organisation",
                 accessorKey: "orgName",
                 sortable: true,
-                render: (wallet: Wallet) => (
-                  <span className="text-nav font-medium text-foreground">
-                    {wallet.orgName}
-                  </span>
-                ),
-              },
-              {
-                header: "Branch",
-                accessorKey: "branchName",
-                sortable: true,
-                render: (wallet: Wallet) => (
-                  <span className="text-nav text-muted-foreground">
-                    {wallet.branchName}
-                  </span>
-                ),
-              },
-              {
-                header: "Balance",
-                accessorKey: "balance",
-                sortable: true,
-                align: "right",
-                render: (wallet: Wallet) => (
-                  <div className="text-right">
-                    <span
-                      className={cn(
-                        "text-body font-semibold",
-                        wallet.balance < 0 ? "text-rose-500" : "text-foreground"
-                      )}
-                    >
-                      {wallet.balance < 0 ? "-" : ""}RM{" "}
-                      {Math.abs(wallet.balance).toLocaleString()}
-                    </span>
+                render: (row: OrgRow) => (
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-muted/60 border border-border/60 flex items-center justify-center text-muted-foreground shrink-0">
+                      <Buildings size={20} weight="fill" />
+                    </div>
+                    <div>
+                      <span className="block text-body font-semibold text-foreground">
+                        {row.orgName}
+                      </span>
+                      <span className="block font-mono text-micro tracking-tight text-muted-foreground/60">
+                        {row.orgId}
+                      </span>
+                    </div>
                   </div>
                 ),
               },
               {
-                header: "Pending",
-                accessorKey: "pendingDeductions",
+                header: "Wallets",
+                accessorKey: "walletCount",
                 sortable: true,
                 align: "right",
-                render: (wallet: Wallet) => (
-                  <div className="text-right">
-                    {wallet.pendingDeductions > 0 ? (
-                      <div className="inline-flex items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-2 py-1 text-caption font-semibold text-amber-700">
-                        <Ticket size={12} weight="fill" />
-                        RM {wallet.pendingDeductions.toLocaleString()}
-                      </div>
-                    ) : (
-                      <span className="text-caption text-muted-foreground/60">—</span>
+                render: (row: OrgRow) => (
+                  <span className="text-nav font-semibold text-foreground">
+                    {row.walletCount}
+                  </span>
+                ),
+              },
+              {
+                header: "Total Balance",
+                accessorKey: "totalBalance",
+                sortable: true,
+                align: "right",
+                render: (row: OrgRow) => (
+                  <span
+                    className={cn(
+                      "text-body font-semibold",
+                      row.totalBalance < 0 ? "text-rose-500" : "text-foreground"
                     )}
-                  </div>
+                  >
+                    {row.totalBalance < 0 ? "-" : ""}RM{" "}
+                    {Math.abs(row.totalBalance).toLocaleString()}
+                  </span>
                 ),
               },
               {
                 header: "Status",
-                accessorKey: "status",
+                accessorKey: "suspendedCount",
                 sortable: true,
                 align: "center",
-                render: (wallet: Wallet) => (
-                  <StatusBadge
-                    status={wallet.status}
-                    variant={wallet.status === "active" ? "emerald" : "zinc"}
-                    className="rounded-md px-1.5 py-0.5 text-micro"
-                  />
-                ),
+                render: (row: OrgRow) =>
+                  row.suspendedCount > 0 ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <StatusBadge
+                        status="active"
+                        variant="emerald"
+                        className="rounded-md px-1.5 py-0.5 text-micro"
+                      />
+                      <span className="text-caption text-muted-foreground/60">
+                        +{row.suspendedCount} suspended
+                      </span>
+                    </div>
+                  ) : (
+                    <StatusBadge
+                      status="active"
+                      variant="emerald"
+                      className="rounded-md px-1.5 py-0.5 text-micro"
+                    />
+                  ),
               },
               {
                 header: "Actions",
                 align: "right",
-                render: (wallet: Wallet) => (
-                  <div onClick={(e) => e.stopPropagation()}>
-                    <ActionPopover
-                      actions={[
-                        {
-                          label: "View wallet detail",
-                          onClick: () => router.push(`/wallets/${wallet.id}`),
-                        },
-                        {
-                          label: "Update balance",
-                          onClick: () => console.log("Update balance", wallet.id),
-                        },
-                        {
-                          label: "Record manual top-up",
-                          onClick: () => console.log("Top-up", wallet.id),
-                        },
-                        { label: "Wallet lifecycle", isSectionTitle: true },
-                        {
-                          label:
-                            wallet.status === "suspended"
-                              ? "Resume wallet"
-                              : "Suspend wallet",
-                          onClick: () => console.log("Toggle status", wallet.id),
-                          className:
-                            wallet.status === "suspended"
-                              ? "text-emerald-600 font-semibold"
-                              : "text-destructive font-semibold",
-                        },
-                      ]}
-                    />
-                  </div>
+                render: (row: OrgRow) => (
+                  <ActionPopover
+                    actions={[
+                      {
+                        label: "View organisation",
+                        onClick: () =>
+                          router.push(`/organizations/${row.orgId}`),
+                      },
+                      {
+                        label: "Create wallet",
+                        onClick: () =>
+                          console.log("Create wallet", row.orgId),
+                      },
+                    ]}
+                  />
                 ),
               },
             ]}
@@ -285,6 +417,24 @@ export default function WalletsPage() {
         showWalletModel={false}
         description="Filter wallets by utilisation levels and specific billing models."
       />
+
+      {/* Modals */}
+      {updateBalanceWallet && (
+        <UpdateBalanceModal
+          isOpen={!!updateBalanceWallet}
+          onClose={() => setUpdateBalanceWallet(null)}
+          walletId={updateBalanceWallet.id}
+          walletName={updateBalanceWallet.name}
+        />
+      )}
+      {recordTopupWallet && (
+        <RecordTopupModal
+          isOpen={!!recordTopupWallet}
+          onClose={() => setRecordTopupWallet(null)}
+          walletId={recordTopupWallet.id}
+          walletName={recordTopupWallet.name}
+        />
+      )}
     </div>
   )
 }
