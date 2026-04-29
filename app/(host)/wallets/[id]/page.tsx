@@ -184,12 +184,12 @@ function WalletDetailContent() {
       <div className="p-6 lg:p-8 space-y-8">
         {activeTab === "transactions" ? (
            <>
-             <div className="bg-primary rounded-xl overflow-hidden relative p-8 text-white">
-                {/* Wallet illustration — fixed bottom right, contained */}
+             <div className="bg-primary rounded-xl relative p-8 text-white">
+                {/* Wallet illustration — anchored bottom right, overflows card */}
                 <img
                   src="/img-wallet.webp"
                   alt=""
-                  className="absolute right-4 bottom-4 w-48 h-auto object-contain opacity-90 pointer-events-none hidden lg:block"
+                  className="absolute right-0 bottom-0 w-64 h-auto object-contain opacity-90 pointer-events-none hidden lg:block"
                 />
 
                 <div className="relative z-10">
