@@ -184,12 +184,12 @@ function WalletDetailContent() {
       <div className="p-6 lg:p-8 space-y-8">
         {activeTab === "transactions" ? (
            <>
-             <div className="bg-primary rounded-xl overflow-hidden relative p-8 text-white min-h-[280px]">
-                {/* Wallet illustration — positioned right, larger and higher */}
+             <div className="bg-primary rounded-xl overflow-hidden relative p-8 text-white">
+                {/* Wallet illustration — fixed bottom right, large */}
                 <img
                   src="/img-wallet.webp"
                   alt=""
-                  className="absolute right-0 top-1/2 w-80 h-auto object-contain opacity-90 pointer-events-none -translate-y-1/2 translate-x-8 hidden lg:block"
+                  className="absolute right-0 bottom-0 w-96 h-auto object-contain opacity-90 pointer-events-none translate-x-8 translate-y-4 hidden lg:block"
                 />
 
                 <div className="relative z-10">
@@ -203,26 +203,58 @@ function WalletDetailContent() {
                           RM {(wallet.balance - wallet.pendingDeductions).toLocaleString()}
                         </h2>
                         <p className="text-caption text-white/50">
-                          Last updated: {new Date(wallet.updatedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}, {new Date(wallet.updatedAt).toLocaleTimeString('en-MY', { hour: '2-digit', minute: '2-digit' })}
+                          Last updated {new Date(wallet.updatedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}, {new Date(wallet.updatedAt).toLocaleTimeString('en-MY', { hour: '2-digit', minute: '2-digit' })}
                         </p>
                       </div>
 
-                      {/* Usage Stats */}
+                      {/* Monetary Stats */}
                       <div className="flex items-center gap-3">
                         {[
-                          { label: "Top-ups", count: transactions.filter(t => t.type === "topup").length },
-                          { label: "Settled", count: transactions.filter(t => t.type === "deduction").length },
-                          { label: "Adjusted", count: transactions.filter(t => t.type === "adjustment").length },
+                          { label: "Top-ups", amount: transactions.filter(t => t.type === "topup").reduce((sum, t) => sum + t.amount, 0) },
+                          { label: "Settled", amount: transactions.filter(t => t.type === "deduction").reduce((sum, t) => sum + t.amount, 0) },
+                          { label: "Adjusted", amount: transactions.filter(t => t.type === "adjustment").reduce((sum, t) => sum + t.amount, 0) },
                         ].map((stat) => (
-                          <div key={stat.label} className="flex items-center gap-2 px-3 py-2 rounded-lg border border-white/20 bg-white/10 backdrop-blur-sm">
+                          <div key={stat.label} className="flex flex-col gap-0.5 px-3 py-2 rounded-lg border border-white/20 bg-white/10 backdrop-blur-sm min-w-[100px]">
                             <span className="text-caption font-semibold text-white/70">{stat.label}</span>
-                            <span className="text-body font-semibold text-white">{stat.count}</span>
+                            <span className="text-nav font-semibold text-white">RM {stat.amount.toLocaleString()}</span>
                           </div>
                         ))}
                       </div>
+                    </div>
 
-                      {/* Action Buttons */}
-                      <div className="flex items-center gap-3">
+                    {/* Right Column: Credit + Buttons (before image) */}
+                    <div className="space-y-4 lg:min-w-[280px]">
+                      {/* Credit Remaining */}
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-label font-semibold text-white/70 tracking-tight">
+                          Credit Remaining
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Info size={14} className="text-white/40 cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p className="text-nav max-w-[220px]">How much more this company can spend before we block new purchases.</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </div>
+                        <div className="text-3xl font-semibold text-white">
+                          RM {orgCreditRemaining.toLocaleString()}
+                        </div>
+                        <div className="text-caption text-white/60">
+                          Total credit limit: RM {orgCreditLimit.toLocaleString()}
+                        </div>
+                        <div className="w-full h-2 bg-white/20 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-white rounded-full transition-all"
+                            style={{ width: `${Math.min((orgCreditUsed / orgCreditLimit) * 100, 100)}%` }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Buttons */}
+                      <div className="flex items-center gap-3 pt-2">
                         <Popover>
                           <PopoverTrigger asChild>
                             <button className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white text-primary font-semibold text-nav hover:bg-white/90 transition-colors shadow-lg shadow-black/20">
@@ -231,7 +263,7 @@ function WalletDetailContent() {
                               <CaretDown size={14} weight="bold" />
                             </button>
                           </PopoverTrigger>
-                          <PopoverContent className="w-48 p-1.5" align="start">
+                          <PopoverContent className="w-48 p-1.5" align="end">
                             <div className="flex flex-col gap-0.5">
                               <button
                                 onClick={() => setIsRecordTopupOpen(true)}
@@ -258,7 +290,7 @@ function WalletDetailContent() {
                               <CaretDown size={14} weight="bold" />
                             </button>
                           </PopoverTrigger>
-                          <PopoverContent className="w-48 p-1.5" align="start">
+                          <PopoverContent className="w-48 p-1.5" align="end">
                             <div className="flex flex-col gap-0.5">
                               <button
                                 onClick={() => {}}
@@ -277,35 +309,6 @@ function WalletDetailContent() {
                             </div>
                           </PopoverContent>
                         </Popover>
-                      </div>
-                    </div>
-
-                    {/* Right Column: Credit */}
-                    <div className="space-y-3 min-w-[260px] lg:text-right">
-                      <div className="flex items-center gap-2 text-label font-semibold text-white/70 tracking-tight lg:justify-end">
-                        Credit Remaining
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Info size={14} className="text-white/40 cursor-help" />
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p className="text-nav max-w-[220px]">How much more this company can spend before we block new purchases.</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      </div>
-                      <div className="text-3xl font-semibold text-white">
-                        RM {orgCreditRemaining.toLocaleString()}
-                      </div>
-                      <div className="text-caption text-white/60">
-                        Total credit limit: RM {orgCreditLimit.toLocaleString()}
-                      </div>
-                      <div className="w-full h-2 bg-white/20 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-white rounded-full transition-all"
-                          style={{ width: `${Math.min((orgCreditUsed / orgCreditLimit) * 100, 100)}%` }}
-                        />
                       </div>
                     </div>
                   </div>
