@@ -42,7 +42,7 @@ function WalletDetailContent() {
   const { wallets } = useWallets();
   const { transactions } = useWalletTransactions(walletId);
 
-  const [activeTab, setActiveTab] = useQueryState("tab", "details");
+  const [activeTab, setActiveTab] = useQueryState("tab", "transactions");
   const [searchQuery, setSearchQuery] = useState("");
   const [period, setPeriod] = useState<"By Month" | "By Quarter" | "By Year">("By Month");
 
@@ -160,15 +160,6 @@ function WalletDetailContent() {
 
           <div className="flex items-center gap-8 mt-8 border-b border-border">
             <button
-              onClick={() => setActiveTab("details")}
-              className={cn(
-                "h-10 px-0 border-b-2 text-body font-medium transition-all relative",
-                activeTab === "details" ? "border-primary text-primary" : "border-transparent text-muted-foreground/60 hover:text-foreground"
-              )}
-            >
-              Wallet Details
-            </button>
-            <button
               onClick={() => setActiveTab("transactions")}
               className={cn(
                 "h-10 px-0 border-b-2 text-body font-medium transition-all relative",
@@ -176,6 +167,15 @@ function WalletDetailContent() {
               )}
             >
               Transactions
+            </button>
+            <button
+              onClick={() => setActiveTab("details")}
+              className={cn(
+                "h-10 px-0 border-b-2 text-body font-medium transition-all relative",
+                activeTab === "details" ? "border-primary text-primary" : "border-transparent text-muted-foreground/60 hover:text-foreground"
+              )}
+            >
+              Wallet Details
             </button>
             <button
               onClick={() => setActiveTab("settings")}
@@ -191,29 +191,6 @@ function WalletDetailContent() {
       </div>
 
       <div className="p-6 lg:p-8 space-y-8">
-        {activeTab === "details" && (
-          <div className="space-y-8 animate-in fade-in transition-all duration-300">
-            <DetailSection title="Wallet configuration" icon={<Wallet size={18} />}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-7">
-                <DetailField label="Wallet name" value={wallet.name} />
-                <DetailField
-                  label="Status"
-                  value={
-                    <div className="flex items-center gap-3">
-                      <StatusBadge status={wallet.status} variant={wallet.status === "active" ? "emerald" : "zinc"} />
-                      <button className="text-caption font-semibold text-primary hover:opacity-70 transition-opacity">Change status</button>
-                    </div>
-                  }
-                />
-                <DetailField label="Organization" value={wallet.orgName} />
-                <DetailField label="Branch" value={wallet.branchName} />
-                <DetailField label="Creation date" value={new Date(wallet.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} />
-                <DetailField label="Last activity" value={new Date(wallet.updatedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} />
-              </div>
-            </DetailSection>
-          </div>
-        )}
-
         {activeTab === "transactions" && (
            <>
              <div className="bg-primary rounded-xl relative p-8 text-white">
@@ -503,6 +480,29 @@ function WalletDetailContent() {
                 />
              </div>
             </>
+        )}
+
+        {activeTab === "details" && (
+          <div className="space-y-8 animate-in fade-in transition-all duration-300">
+            <DetailSection title="Wallet configuration" icon={<Wallet size={18} />}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-7">
+                <DetailField label="Wallet name" value={wallet.name} />
+                <DetailField
+                  label="Status"
+                  value={
+                    <div className="flex items-center gap-3">
+                      <StatusBadge status={wallet.status} variant={wallet.status === "active" ? "emerald" : "zinc"} />
+                      <button className="text-caption font-semibold text-primary hover:opacity-70 transition-opacity">Change status</button>
+                    </div>
+                  }
+                />
+                <DetailField label="Organization" value={wallet.orgName} />
+                <DetailField label="Branch" value={wallet.branchName} />
+                <DetailField label="Creation date" value={new Date(wallet.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} />
+                <DetailField label="Last activity" value={new Date(wallet.updatedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} />
+              </div>
+            </DetailSection>
+          </div>
         )}
 
         {activeTab === "settings" && (
