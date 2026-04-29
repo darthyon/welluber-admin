@@ -184,132 +184,135 @@ function WalletDetailContent() {
       <div className="p-6 lg:p-8 space-y-8">
         {activeTab === "transactions" ? (
            <>
-             <div className="bg-primary rounded-xl overflow-hidden relative p-8 text-white">
-                {/* Wallet illustration — fixed bottom right, large */}
+             <div className="bg-primary rounded-xl overflow-hidden relative p-6 text-white">
+                {/* Wallet illustration — fixed bottom right */}
                 <img
                   src="/img-wallet.webp"
                   alt=""
-                  className="absolute right-0 bottom-0 w-96 h-auto object-contain opacity-90 pointer-events-none translate-x-8 translate-y-4 hidden lg:block"
+                  className="absolute right-0 bottom-0 w-[420px] h-auto object-contain opacity-90 pointer-events-none translate-x-6 translate-y-2 hidden lg:block"
                 />
 
                 <div className="relative z-10">
-                  <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-8">
-                    {/* Left Column */}
-                    <div className="space-y-5 flex-1">
-                      {/* Available Balance */}
-                      <div className="space-y-1">
-                        <p className="text-label font-semibold text-white/70 tracking-tight">Available Balance</p>
-                        <h2 className="text-5xl font-semibold tracking-tight text-white">
-                          RM {(wallet.balance - wallet.pendingDeductions).toLocaleString()}
-                        </h2>
-                        <p className="text-caption text-white/50">
-                          Last updated {new Date(wallet.updatedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}, {new Date(wallet.updatedAt).toLocaleTimeString('en-MY', { hour: '2-digit', minute: '2-digit' })}
-                        </p>
-                      </div>
-
-                      {/* Monetary Stats */}
-                      <div className="flex items-center gap-3">
-                        {[
-                          { label: "Top-ups", amount: transactions.filter(t => t.type === "topup").reduce((sum, t) => sum + t.amount, 0) },
-                          { label: "Settled", amount: transactions.filter(t => t.type === "deduction").reduce((sum, t) => sum + t.amount, 0) },
-                          { label: "Adjusted", amount: transactions.filter(t => t.type === "adjustment").reduce((sum, t) => sum + t.amount, 0) },
-                        ].map((stat) => (
-                          <div key={stat.label} className="flex flex-col gap-0.5 px-3 py-2 rounded-lg border border-white/20 bg-white/10 backdrop-blur-sm min-w-[100px]">
-                            <span className="text-caption font-semibold text-white/70">{stat.label}</span>
-                            <span className="text-nav font-semibold text-white">RM {stat.amount.toLocaleString()}</span>
-                          </div>
-                        ))}
-                      </div>
+                  {/* Single row with all sections */}
+                  <div className="flex flex-col xl:flex-row xl:items-center gap-4 xl:gap-0">
+                    {/* 1. Available Balance */}
+                    <div className="space-y-1 shrink-0">
+                      <p className="text-caption font-semibold text-white/60 tracking-tight">Available Balance</p>
+                      <h2 className="text-4xl font-semibold tracking-tight text-white">
+                        RM {(wallet.balance - wallet.pendingDeductions).toLocaleString()}
+                      </h2>
+                      <p className="text-micro text-white/40">
+                        Last updated {new Date(wallet.updatedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}, {new Date(wallet.updatedAt).toLocaleTimeString('en-MY', { hour: '2-digit', minute: '2-digit' })}
+                      </p>
                     </div>
 
-                    {/* Right Column: Credit + Buttons (before image) */}
-                    <div className="space-y-4 lg:min-w-[280px]">
-                      {/* Credit Remaining */}
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-label font-semibold text-white/70 tracking-tight">
-                          Credit Remaining
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Info size={14} className="text-white/40 cursor-help" />
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p className="text-nav max-w-[220px]">How much more this company can spend before we block new purchases.</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        </div>
-                        <div className="text-3xl font-semibold text-white">
-                          RM {orgCreditRemaining.toLocaleString()}
-                        </div>
-                        <div className="text-caption text-white/60">
-                          Total credit limit: RM {orgCreditLimit.toLocaleString()}
-                        </div>
-                        <div className="w-full h-2 bg-white/20 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-white rounded-full transition-all"
-                            style={{ width: `${Math.min((orgCreditUsed / orgCreditLimit) * 100, 100)}%` }}
-                          />
-                        </div>
-                      </div>
+                    {/* Divider 1 */}
+                    <div className="hidden xl:block w-px h-16 bg-white/15 mx-6" />
 
-                      {/* Buttons */}
-                      <div className="flex items-center gap-3 pt-2">
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <button className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white text-primary font-semibold text-nav hover:bg-white/90 transition-colors shadow-lg shadow-black/20">
-                              <Wallet size={16} weight="fill" />
-                              Add Balance
-                              <CaretDown size={14} weight="bold" />
-                            </button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-48 p-1.5" align="end">
-                            <div className="flex flex-col gap-0.5">
-                              <button
-                                onClick={() => setIsRecordTopupOpen(true)}
-                                className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-nav font-medium text-left text-foreground/80 hover:bg-muted hover:text-foreground transition-colors"
-                              >
-                                <ArrowUpRight size={16} className="text-emerald-600" />
-                                Manual Top-up
-                              </button>
-                              <button
-                                onClick={() => setIsUpdateBalanceOpen(true)}
-                                className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-nav font-medium text-left text-foreground/80 hover:bg-muted hover:text-foreground transition-colors"
-                              >
-                                <DotsThreeCircle size={16} className="text-blue-600" />
-                                Update Balance
-                              </button>
-                            </div>
-                          </PopoverContent>
-                        </Popover>
-
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <button className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-white/30 text-white font-semibold text-nav hover:bg-white/10 transition-colors">
-                              More Actions
-                              <CaretDown size={14} weight="bold" />
-                            </button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-48 p-1.5" align="end">
-                            <div className="flex flex-col gap-0.5">
-                              <button
-                                onClick={() => {}}
-                                className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-nav font-medium text-left text-foreground/80 hover:bg-muted hover:text-foreground transition-colors"
-                              >
-                                <DownloadSimple size={16} className="text-muted-foreground/60" />
-                                View Statement
-                              </button>
-                              <button
-                                onClick={() => openDangerAction("suspend")}
-                                className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-nav font-medium text-left text-rose-500 hover:bg-rose-50 transition-colors"
-                              >
-                                <WarningCircle size={16} />
-                                {wallet.status === "suspended" ? "Resume Wallet" : "Suspend Wallet"}
-                              </button>
-                            </div>
-                          </PopoverContent>
-                        </Popover>
+                    {/* 2. Credit Remaining */}
+                    <div className="space-y-1.5 shrink-0">
+                      <div className="flex items-center gap-1.5 text-caption font-semibold text-white/60 tracking-tight">
+                        Credit Remaining
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Info size={12} className="text-white/30 cursor-help" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p className="text-nav max-w-[200px]">How much more this company can spend before we block new purchases.</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       </div>
+                      <div className="text-2xl font-semibold text-white">
+                        RM {orgCreditRemaining.toLocaleString()}
+                      </div>
+                      <div className="w-32 h-1 bg-white/15 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-white/80 rounded-full transition-all"
+                          style={{ width: `${Math.min((orgCreditUsed / orgCreditLimit) * 100, 100)}%` }}
+                        />
+                      </div>
+                      <p className="text-micro text-white/40">Limit: RM {orgCreditLimit.toLocaleString()}</p>
+                    </div>
+
+                    {/* Divider 2 */}
+                    <div className="hidden xl:block w-px h-16 bg-white/15 mx-6" />
+
+                    {/* 3. Usage Stats */}
+                    <div className="flex items-center gap-3 shrink-0">
+                      {[
+                        { label: "Top-ups", amount: transactions.filter(t => t.type === "topup").reduce((sum, t) => sum + t.amount, 0), trend: "+12%" },
+                        { label: "Settled", amount: transactions.filter(t => t.type === "deduction").reduce((sum, t) => sum + t.amount, 0), trend: "+5%" },
+                        { label: "Adjusted", amount: transactions.filter(t => t.type === "adjustment").reduce((sum, t) => sum + t.amount, 0), trend: "—" },
+                      ].map((stat) => (
+                        <div key={stat.label} className="space-y-0.5">
+                          <p className="text-micro font-semibold text-white/50">{stat.label}</p>
+                          <p className="text-nav font-semibold text-white">RM {stat.amount.toLocaleString()}</p>
+                          <p className="text-micro text-white/40">{stat.trend}</p>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Divider 3 */}
+                    <div className="hidden xl:block w-px h-16 bg-white/15 mx-6" />
+
+                    {/* 4. Buttons */}
+                    <div className="flex items-center gap-2 shrink-0">
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <button className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white text-primary font-semibold text-caption hover:bg-white/90 transition-colors shadow-lg shadow-black/20">
+                            <Wallet size={14} weight="fill" />
+                            Add Balance
+                            <CaretDown size={12} weight="bold" />
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-44 p-1.5" align="end">
+                          <div className="flex flex-col gap-0.5">
+                            <button
+                              onClick={() => setIsRecordTopupOpen(true)}
+                              className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-nav font-medium text-left text-foreground/80 hover:bg-muted hover:text-foreground transition-colors"
+                            >
+                              <ArrowUpRight size={14} className="text-emerald-600" />
+                              Manual Top-up
+                            </button>
+                            <button
+                              onClick={() => setIsUpdateBalanceOpen(true)}
+                              className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-nav font-medium text-left text-foreground/80 hover:bg-muted hover:text-foreground transition-colors"
+                            >
+                              <DotsThreeCircle size={14} className="text-blue-600" />
+                              Update Balance
+                            </button>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <button className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-white/30 text-white font-semibold text-caption hover:bg-white/10 transition-colors">
+                            More Actions
+                            <CaretDown size={12} weight="bold" />
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-44 p-1.5" align="end">
+                          <div className="flex flex-col gap-0.5">
+                            <button
+                              onClick={() => {}}
+                              className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-nav font-medium text-left text-foreground/80 hover:bg-muted hover:text-foreground transition-colors"
+                            >
+                              <DownloadSimple size={14} className="text-muted-foreground/60" />
+                              View Statement
+                            </button>
+                            <button
+                              onClick={() => openDangerAction("suspend")}
+                              className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-nav font-medium text-left text-rose-500 hover:bg-rose-50 transition-colors"
+                            >
+                              <WarningCircle size={14} />
+                              {wallet.status === "suspended" ? "Resume Wallet" : "Suspend Wallet"}
+                            </button>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                   </div>
                 </div>
