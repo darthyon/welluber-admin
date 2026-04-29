@@ -804,39 +804,38 @@ function OrganizationDetailContent() {
               />
             ) : (
               <div className="space-y-6">
-                <DetailSection
-                  title="Branches"
-                  icon={<GitBranch size={18} weight="duotone" />}
-                  description="Manage geographical locations and their specific wallet configurations"
-                  action={
-                    <div className="flex items-center gap-2">
-                      <Button
-                        onClick={() => setIsInviteModalOpen("true")}
-                        variant="secondary"
-                        size="sm"
-                        className="flex h-8 items-center gap-2 rounded-full px-4 text-label font-medium"
-                      >
-                        <Plus size={14} weight="bold" /> Invite Admin
-                      </Button>
-                      <div className="h-4 w-[1px] bg-border" />
-                      <Button
-                        asChild
-                        variant="ghost"
-                        size="sm"
-                        className="flex h-8 items-center gap-2 rounded-full px-4 text-label font-medium text-primary hover:bg-primary/5"
-                      >
-                        <Link href={`/organizations/${orgId}/branches/new`}>
-                          <Plus size={14} weight="bold" /> Add Branch
-                        </Link>
-                      </Button>
-                      <div className="mx-1 h-4 w-[1px] bg-border" />
-                      <ViewToggle
-                        mode={branchesView}
-                        onChange={setBranchesView}
-                      />
-                    </div>
-                  }
-                >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-heading font-semibold text-foreground">Branches</h2>
+                    <p className="text-nav text-muted-foreground">Manage geographical locations and their specific wallet configurations</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      onClick={() => setIsInviteModalOpen("true")}
+                      variant="secondary"
+                      size="sm"
+                      className="flex h-8 items-center gap-2 rounded-full px-4 text-label font-medium"
+                    >
+                      <Plus size={14} weight="bold" /> Invite Admin
+                    </Button>
+                    <div className="h-4 w-[1px] bg-border" />
+                    <Button
+                      asChild
+                      variant="ghost"
+                      size="sm"
+                      className="flex h-8 items-center gap-2 rounded-full px-4 text-label font-medium text-primary hover:bg-primary/5"
+                    >
+                      <Link href={`/organizations/${orgId}/branches/new`}>
+                        <Plus size={14} weight="bold" /> Add Branch
+                      </Link>
+                    </Button>
+                    <div className="mx-1 h-4 w-[1px] bg-border" />
+                    <ViewToggle
+                      mode={branchesView}
+                      onChange={setBranchesView}
+                    />
+                  </div>
+                </div>
                   <DataFilterBar
                     searchQuery={branchSearch}
                     onSearchChange={setBranchSearch}
@@ -1052,7 +1051,6 @@ function OrganizationDetailContent() {
                       ]}
                     />
                   )}
-                </DetailSection>
               </div>
             )}
           </div>
@@ -1935,11 +1933,12 @@ function OrganizationDetailContent() {
                 }}
               />
             ) : (
-              <DetailSection
-                title="Benefit Policies"
-                icon={<Shield size={18} weight="duotone" />}
-                description="Manage which benefit structures are assigned to this organisation's workforce"
-                action={
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-heading font-semibold text-foreground">Benefit Policies</h2>
+                    <p className="text-nav text-muted-foreground">Manage which benefit structures are assigned to this organisation's workforce</p>
+                  </div>
                   <div className="flex items-center gap-2">
                     <Button
                       onClick={() => setIsLinkPolicyModalOpen("true")}
@@ -1958,8 +1957,7 @@ function OrganizationDetailContent() {
                       <Plus size={14} weight="bold" /> Create New
                     </Button>
                   </div>
-                }
-              >
+                </div>
                 <DataFilterBar
                   searchQuery={policySearch}
                   onSearchChange={setPolicySearch}
@@ -2041,38 +2039,34 @@ function OrganizationDetailContent() {
                     setEditingPolicyId(id)
                   }}
                 />
-              </DetailSection>
+              </div>
             )}
           </div>
         )}
         {activeTab === "claims" && (
-          <div className="animate-in fade-in">
-            <DetailSection
-              title="Claims"
-              icon={<SealCheck size={18} weight="duotone" />}
-              description="Claim history across all employees in this organisation"
-            >
-              <OrganizationClaimsTable
-                data={ORG_MOCK_UTILISATION}
-                onViewVoucher={(claim) => setSelectedVoucherClaim(claim)}
-                onViewDetails={(claim) => setSelectedVoucherClaim(claim)}
-              />
-            </DetailSection>
+          <div className="animate-in fade-in space-y-6">
+            <div>
+              <h2 className="text-heading font-semibold text-foreground">Claims</h2>
+              <p className="text-nav text-muted-foreground">Claim history across all employees in this organisation</p>
+            </div>
+            <OrganizationClaimsTable
+              data={ORG_MOCK_UTILISATION}
+              onViewVoucher={(claim) => setSelectedVoucherClaim(claim)}
+              onViewDetails={(claim) => setSelectedVoucherClaim(claim)}
+            />
           </div>
         )}
 
         {activeTab === "vouchers" && (
-          <div className="animate-in fade-in">
-            <DetailSection
-              title="Vouchers"
-              icon={<Ticket size={18} weight="duotone" />}
-              description="Voucher redemption records across all employees in this organisation"
-            >
-              <VouchersTable
-                data={ORG_MOCK_UTILISATION}
-                onViewVoucher={(voucher) => console.log("View voucher", voucher)}
-              />
-            </DetailSection>
+          <div className="animate-in fade-in space-y-6">
+            <div>
+              <h2 className="text-heading font-semibold text-foreground">Vouchers</h2>
+              <p className="text-nav text-muted-foreground">Voucher redemption records across all employees in this organisation</p>
+            </div>
+            <VouchersTable
+              data={ORG_MOCK_UTILISATION}
+              onViewVoucher={(voucher) => console.log("View voucher", voucher)}
+            />
           </div>
         )}
 

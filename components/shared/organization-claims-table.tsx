@@ -182,10 +182,10 @@ export function OrganizationClaimsTable({
             e.stopPropagation();
             onViewVoucher?.(row);
           }}
-          className="flex items-center gap-1.5 text-primary hover:text-primary/80 transition-colors"
+          className="flex items-center gap-1.5 text-primary hover:text-primary/80 transition-colors cursor-pointer"
         >
           <Ticket size={14} weight="bold" />
-          <span className="text-caption font-semibold underline underline-offset-2">
+          <span className="text-caption font-semibold hover:underline underline-offset-2">
             {row.voucherName || row.voucherCode}
           </span>
         </button>

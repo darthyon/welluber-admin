@@ -107,17 +107,16 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
   }
 
   return (
-    <div className="space-y-4">
-      <DetailSection
-        title="Vouchers"
-        icon={<Ticket size={16} weight="fill" />}
-        description="Create and manage provider vouchers, publish states, and activation periods."
-        action={
-          <Button size="sm" variant="secondary" className="h-8 text-label gap-2" onClick={handleAdd}>
-            <Plus size={14} weight="bold" /> Add voucher
-          </Button>
-        }
-      >
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-heading font-semibold text-foreground">Vouchers</h2>
+          <p className="text-nav text-muted-foreground">Create and manage provider vouchers, publish states, and activation periods.</p>
+        </div>
+        <Button size="sm" variant="secondary" className="h-8 text-label gap-2" onClick={handleAdd}>
+          <Plus size={14} weight="bold" /> Add voucher
+        </Button>
+      </div>
         <div className="space-y-4">
           <DataFilterBar
             searchQuery={voucherSearch}
@@ -236,7 +235,6 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
             />
           )}
         </div>
-      </DetailSection>
     </div>
   );
 }

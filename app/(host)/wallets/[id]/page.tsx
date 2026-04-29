@@ -36,6 +36,8 @@ import { SharedDataTable } from "@/components/shared/data-table";
 import { useState, Suspense } from "react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { UpdateBalanceModal } from "@/components/host/wallets/update-balance-modal";
+import { RecordTopupModal } from "@/components/host/wallets/record-topup-modal";
 
 function WalletDetailContent() {
   const params = useParams();
@@ -52,6 +54,10 @@ function WalletDetailContent() {
   const [isDangerModalOpen, setIsDangerModalOpen] = useState(false);
   const [dangerAction, setDangerAction] = useState<"suspend" | "terminate" | null>(null);
   const [isDangerSubmitting, setIsDangerSubmitting] = useState(false);
+
+  // Modal States
+  const [isUpdateBalanceOpen, setIsUpdateBalanceOpen] = useState(false);
+  const [isRecordTopupOpen, setIsRecordTopupOpen] = useState(false);
 
   const wallet = wallets.find(w => w.id === walletId);
 
@@ -154,14 +160,16 @@ function WalletDetailContent() {
             </div>
 
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="lg" className="text-nav font-medium rounded-full h-10 px-5 hover:bg-muted/10">
+              <Button variant="ghost" size="lg" className="text-nav font-medium rounded-full h-10 px-5 hover:bg-muted/10" onClick={() => setIsUpdateBalanceOpen(true)}>
                 <Wallet size={16} className="mr-2 opacity-60" />
                 Update Balance
               </Button>
               <ActionPopover
                 actions={[
                   { label: "View Statement", onClick: () => {} },
-                  { label: "Suspend Wallet", isDanger: true, onClick: () => openDangerAction("suspend") },
+                  { label: "Update balance", onClick: () => setIsUpdateBalanceOpen(true) },
+                  { label: "Record manual top-up", onClick: () => setIsRecordTopupOpen(true) },
+                  { label: wallet.status === "suspended" ? "Resume wallet" : "Suspend wallet", isDanger: wallet.status !== "suspended", onClick: () => openDangerAction("suspend") },
                 ]}
               />
             </div>
@@ -386,10 +394,10 @@ function WalletDetailContent() {
                       render: (trx: any) => (
                         <div className="space-y-0.5">
                           {trx.voucherName ? (
-                            <>
-                              <p className="text-body font-semibold text-foreground">{trx.voucherName}</p>
-                              <p className="text-caption font-semibold text-muted-foreground/50 font-mono">{trx.claimId}</p>
-                            </>
+                            <div className="space-y-0.5">
+                              <p className="text-body font-semibold text-primary cursor-pointer hover:underline underline-offset-2">{trx.voucherName}</p>
+                              <p className="text-caption font-semibold text-muted-foreground/50 font-mono cursor-pointer hover:underline underline-offset-2">{trx.claimId}</p>
+                            </div>
                           ) : (
                             <span className="text-caption text-muted-foreground/60">—</span>
                           )}
@@ -513,6 +521,23 @@ function WalletDetailContent() {
           }
         }}
       />
+
+      {wallet && (
+        <>
+          <UpdateBalanceModal
+            isOpen={isUpdateBalanceOpen}
+            onClose={() => setIsUpdateBalanceOpen(false)}
+            walletId={wallet.id}
+            walletName={wallet.name}
+          />
+          <RecordTopupModal
+            isOpen={isRecordTopupOpen}
+            onClose={() => setIsRecordTopupOpen(false)}
+            walletId={wallet.id}
+            walletName={wallet.name}
+          />
+        </>
+      )}
     </div>
   );
 }

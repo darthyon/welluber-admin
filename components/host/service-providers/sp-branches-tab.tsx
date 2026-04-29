@@ -104,26 +104,25 @@ export function SpBranchesTab({ sp }: SpBranchesTabProps) {
 
   // List view
   return (
-    <div className="space-y-4">
-      <DetailSection
-        title="Branches"
-        icon={<GitBranch size={18} weight="duotone" />}
-        description="Manage branch locations, services, and local administrators."
-        action={
-          <div className="flex items-center gap-2">
-            <Button
-              onClick={handleAdd}
-              variant="secondary"
-              size="sm"
-              className="flex items-center gap-2 text-label font-medium rounded-full h-8"
-            >
-              <Plus size={14} weight="bold" /> Add Branch
-            </Button>
-            <div className="h-4 w-[1px] bg-border mx-1" />
-            <ViewToggle mode={branchesView} onChange={setBranchesView} />
-          </div>
-        }
-      >
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-heading font-semibold text-foreground">Branches</h2>
+          <p className="text-nav text-muted-foreground">Manage branch locations, services, and local administrators.</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={handleAdd}
+            variant="secondary"
+            size="sm"
+            className="flex items-center gap-2 text-label font-medium rounded-full h-8"
+          >
+            <Plus size={14} weight="bold" /> Add Branch
+          </Button>
+          <div className="h-4 w-[1px] bg-border mx-1" />
+          <ViewToggle mode={branchesView} onChange={setBranchesView} />
+        </div>
+      </div>
         <DataFilterBar
           searchQuery={branchSearch}
           onSearchChange={setBranchSearch}
@@ -242,7 +241,6 @@ export function SpBranchesTab({ sp }: SpBranchesTabProps) {
             ]}
           />
         )}
-      </DetailSection>
     </div>
   );
 }

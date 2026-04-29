@@ -203,40 +203,39 @@ export function BrandDetailView({ brand, onBack, onEdit, onRemove }: BrandDetail
         </DetailSection>
 
         {/* Assigned Service Providers */}
-        <DetailSection 
-          title="Assigned Service Providers" 
-          icon={<Buildings size={18} weight="bold" className="text-primary" />}
-        >
-          <div className="space-y-4">
-            <DataFilterBar
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              searchPlaceholder="Search service providers..."
-              filters={
-                <FilterItem
-                  label="Status"
-                  value={statusFilter}
-                  onChange={setStatusFilter}
-                  options={[
-                      { label: "All Status", value: "all" },
-                      { label: "Active", value: "active" },
-                      { label: "Pending", value: "pending" },
-                  ]}
-                />
-              }
-            />
-            
-            <div className="border border-border/40 rounded-lg overflow-hidden mt-2 bg-card">
-                <TooltipProvider>
-                    <SharedDataTable
-                        data={filteredSps}
-                        columns={spColumns}
-                        rowsPerPage={5}
-                    />
-                </TooltipProvider>
-            </div>
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-heading font-semibold text-foreground">Assigned Service Providers</h2>
+            <p className="text-nav text-muted-foreground">Manage service providers linked to this brand</p>
           </div>
-        </DetailSection>
+          <DataFilterBar
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            searchPlaceholder="Search service providers..."
+            filters={
+              <FilterItem
+                label="Status"
+                value={statusFilter}
+                onChange={setStatusFilter}
+                options={[
+                    { label: "All Status", value: "all" },
+                    { label: "Active", value: "active" },
+                    { label: "Pending", value: "pending" },
+                ]}
+              />
+            }
+          />
+          
+          <div className="border border-border/40 rounded-lg overflow-hidden mt-2 bg-card">
+              <TooltipProvider>
+                  <SharedDataTable
+                      data={filteredSps}
+                      columns={spColumns}
+                      rowsPerPage={5}
+                  />
+              </TooltipProvider>
+          </div>
+        </div>
       </div>
     </div>
   );
