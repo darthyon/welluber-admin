@@ -283,7 +283,7 @@ const columns: Column<VoucherRedemption>[] = [
     header: "Voucher",
     render: (row) => (
       <div className="flex flex-col gap-0.5">
-        <p className="text-nav font-semibold text-foreground">
+        <p className="text-nav font-semibold text-primary cursor-pointer hover:underline underline-offset-2">
           {row.voucherName}
         </p>
         <code className="text-caption font-mono text-muted-foreground">

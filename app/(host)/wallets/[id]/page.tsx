@@ -1,19 +1,11 @@
 "use client";
 
 import {
-  ArrowLeft,
   ArrowUpRight,
   ArrowDownRight,
   Info,
-  Clock,
-  User,
-  DotsThreeVertical,
-  DotsThreeCircle,
-  Funnel,
-  DownloadSimple,
   Ticket,
   CalendarBlank,
-  Buildings,
   Gear,
   Wallet,
 } from "@phosphor-icons/react";
@@ -160,11 +152,8 @@ function WalletDetailContent() {
             </div>
 
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="lg" className="text-nav font-medium rounded-full h-10 px-5 hover:bg-muted/10" onClick={() => setIsUpdateBalanceOpen(true)}>
-                <Wallet size={16} className="mr-2 opacity-60" />
-                Update Balance
-              </Button>
               <ActionPopover
+                label="Quick Actions"
                 actions={[
                   { label: "View Statement", onClick: () => {} },
                   { label: "Update balance", onClick: () => setIsUpdateBalanceOpen(true) },
@@ -201,8 +190,7 @@ function WalletDetailContent() {
       <div className="p-6 lg:p-8 space-y-8">
         {activeTab === "transactions" ? (
            <>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 bg-primary/5 border border-primary/10 rounded-lg overflow-hidden relative p-8">
+             <div className="bg-primary/5 border border-primary/10 rounded-lg overflow-hidden relative p-8">
                 <div className="absolute top-0 right-0 p-8 opacity-[0.03]">
                   <Wallet size={80} weight="fill" />
                 </div>
@@ -258,31 +246,6 @@ function WalletDetailContent() {
                   </div>
                 </div>
               </div>
-
-              <div className="bg-card border border-border/60 rounded-lg p-5 space-y-5">
-                <h3 className="text-body font-semibold tracking-tight text-foreground/80">Quick actions</h3>
-                <div className="space-y-2.5 text-nav font-medium">
-                   <Button variant="ghost" className="w-full justify-start h-10 gap-3 px-3 hover:bg-muted/50 rounded-lg group">
-                    <div className="h-8 w-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 group-hover:bg-emerald-100 transition-colors">
-                      <ArrowUpRight size={14} weight="bold" />
-                    </div>
-                    Manual top-up
-                  </Button>
-                  <Button variant="ghost" className="w-full justify-start h-10 gap-3 px-3 hover:bg-muted/50 rounded-lg group">
-                    <div className="h-8 w-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 group-hover:bg-blue-100 transition-colors">
-                      <DotsThreeCircle size={14} weight="bold" />
-                    </div>
-                    Adjustment ledger
-                  </Button>
-                  <Button variant="ghost" className="w-full justify-start h-10 gap-3 px-3 hover:bg-muted/50 rounded-lg group">
-                    <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center text-muted-foreground group-hover:bg-muted/50 transition-colors">
-                      <DownloadSimple size={14} weight="bold" />
-                    </div>
-                    Export statement
-                  </Button>
-                </div>
-              </div>
-            </div>
 
             <div className="space-y-4 animate-in fade-in transition-all duration-300">
                <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">

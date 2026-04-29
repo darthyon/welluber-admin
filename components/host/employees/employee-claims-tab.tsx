@@ -48,7 +48,7 @@ const columns: Column<EmployeeClaim>[] = [
     render: (row) => (
       <div className="flex items-center gap-2">
         <StatusBadge status={row.status} />
-        <code className="text-caption font-mono text-muted-foreground">{row.voucherCode}</code>
+        <span className="text-caption font-semibold text-primary cursor-pointer hover:underline underline-offset-2">{row.voucherName || row.voucherCode}</span>
       </div>
     ),
   },

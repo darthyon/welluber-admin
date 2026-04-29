@@ -20,13 +20,15 @@ interface ActionPopoverProps {
   triggerClassName?: string;
   contentClassName?: string;
   align?: "start" | "center" | "end";
+  label?: string;
 }
 
 export function ActionPopover({ 
   actions, 
   triggerClassName, 
   contentClassName,
-  align = "end" 
+  align = "end",
+  label
 }: ActionPopoverProps) {
   return (
     <Popover>
@@ -34,10 +36,12 @@ export function ActionPopover({
         <button 
           onClick={(e) => e.stopPropagation()}
           className={cn(
-            "p-1.5 rounded-lg hover:bg-muted text-muted-foreground transition-colors shrink-0", 
+            "flex items-center gap-1.5 rounded-lg hover:bg-muted text-muted-foreground transition-colors shrink-0",
+            label ? "px-3 py-1.5 text-nav font-medium" : "p-1.5",
             triggerClassName
           )}
         >
+          {label && <span className="text-nav font-medium">{label}</span>}
           <DotsThreeVertical size={20} weight="bold" />
         </button>
       </PopoverTrigger>

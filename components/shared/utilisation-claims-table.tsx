@@ -127,7 +127,7 @@ export function UtilisationClaimsTable({ data }: Props) {
                         <span className={cn("text-micro font-semibold px-1.5 py-0.5 rounded", STATUS_STYLE[claim.status])}>
                           {claim.status}
                         </span>
-                        <code className="text-caption font-mono text-muted-foreground">{claim.voucherCode}</code>
+                        <span className="text-caption font-semibold text-primary cursor-pointer hover:underline underline-offset-2">{claim.voucherName || claim.voucherCode}</span>
                       </div>
 
                       <p className="text-label text-foreground/80 font-medium">{claim.service}</p>
