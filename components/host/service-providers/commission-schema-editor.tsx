@@ -56,7 +56,7 @@ export function CommissionSchemaEditor({ spId, serviceCategories, initialRows }:
                   ))}
                 </div>
 
-                <div className="flex justify-end items-center gap-1.5 text-emerald-600 text-label font-medium">
+                <div className="flex justify-end items-center gap-1.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 dark:bg-emerald-500/20 text-label font-medium px-2 py-0.5 rounded-full">
                   <CheckCircle size={14} weight="fill" />
                   Active
                 </div>

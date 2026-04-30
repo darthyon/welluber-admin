@@ -1,4 +1,4 @@
-@import "tailwindcss"; /* BUILD_ID: 2026-04-11T00:13:00Z */
+@import "tailwindcss"; /* BUILD_ID: 2026-04-30T19:45:00Z */
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
@@ -206,32 +206,36 @@
     --card-foreground: oklch(0.147 0.004 49.25);
     --popover: oklch(1 0 0);
     --popover-foreground: oklch(0.147 0.004 49.25);
-    --primary: oklch(0.457 0.24 277.023);
-    --primary-foreground: oklch(0.962 0.018 272.314);
+    --primary: oklch(0.457 0.215 277.023);
+    --primary-foreground: oklch(0.97 0.018 272.314);
     --secondary: oklch(0.93 0.025 200);
     --secondary-foreground: oklch(0.22 0.03 240);
-    --muted: oklch(0.96 0.01 240);
-    --muted-foreground: oklch(0.52 0.02 240);
-    --accent: oklch(0.94 0.02 276);
+    --muted: oklch(0.97 0.001 106.424);
+    --muted-foreground: oklch(0.54 0.013 58.071);
+    --accent: oklch(0.97 0.001 106.424);
     --accent-foreground: oklch(0.28 0.08 276);
     --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.91 0.008 240);
-    --input: oklch(0.91 0.008 240);
-    --ring: oklch(0.457 0.24 277.023);
+    --border: oklch(0.923 0.003 48.717);
+    --input: oklch(0.923 0.003 48.717);
+    --ring: oklch(0.457 0.215 277.023);
     --chart-1: oklch(0.785 0.115 274.713);
     --chart-2: oklch(0.585 0.233 277.117);
     --chart-3: oklch(0.511 0.262 276.966);
-    --chart-4: oklch(0.457 0.24 277.023);
+    --chart-4: oklch(0.457 0.215 277.023);
     --chart-5: oklch(0.398 0.195 277.366);
     --radius: 0.625rem;
     --sidebar: oklch(0.12 0.01 260 / 80%);
     --sidebar-foreground: oklch(0.985 0.001 106.423);
-    --sidebar-primary: oklch(0.457 0.24 277.023);
-    --sidebar-primary-foreground: oklch(0.962 0.018 272.314);
-    --sidebar-accent: oklch(0.457 0.24 277.023 / 8%);
-    --sidebar-accent-foreground: oklch(0.457 0.24 277.023);
+    --sidebar-primary: oklch(0.457 0.215 277.023);
+    --sidebar-primary-foreground: oklch(0.97 0.018 272.314);
+    --sidebar-accent: oklch(0.457 0.215 277.023 / 8%);
+    --sidebar-accent-foreground: oklch(0.457 0.215 277.023);
     --sidebar-border: oklch(0 0 0 / 8%);
-    --sidebar-ring: oklch(0.457 0.24 277.023);
+    --sidebar-ring: oklch(0.457 0.215 277.023);
+
+    /* RGB equivalents for glow shadows */
+    --primary-rgb: 67, 56, 202;
+    --emerald-rgb: 16, 185, 129;
 
     /* Semantic text colors — no opacity stacking */
     --text-secondary: oklch(0.45 0.02 240);
@@ -245,8 +249,8 @@
     --card-foreground: oklch(0.985 0.001 106.423);
     --popover: oklch(0.16 0.012 260);
     --popover-foreground: oklch(0.985 0.001 106.423);
-    --primary: oklch(0.585 0.233 277.117);
-    --primary-foreground: oklch(0.962 0.018 272.314);
+    --primary: oklch(0.56 0.208 277.117);
+    --primary-foreground: oklch(0.97 0.018 272.314);
     --secondary: oklch(0.20 0.02 200);
     --secondary-foreground: oklch(0.92 0.01 200);
     --muted: oklch(0.18 0.01 240);
@@ -256,20 +260,24 @@
     --destructive: oklch(0.704 0.191 22.216);
     --border: oklch(1 0 0 / 12%);
     --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.585 0.233 277.117);
+    --ring: oklch(0.56 0.208 277.117);
     --chart-1: oklch(0.785 0.115 274.713);
     --chart-2: oklch(0.585 0.233 277.117);
     --chart-3: oklch(0.511 0.262 276.966);
-    --chart-4: oklch(0.457 0.24 277.023);
+    --chart-4: oklch(0.457 0.215 277.023);
     --chart-5: oklch(0.398 0.195 277.366);
     --sidebar: oklch(0.12 0.01 260 / 92%);
     --sidebar-foreground: oklch(0.985 0.001 106.423);
-    --sidebar-primary: oklch(0.585 0.233 277.117);
-    --sidebar-primary-foreground: oklch(0.962 0.018 272.314);
-    --sidebar-accent: oklch(0.585 0.233 277.117 / 15%);
+    --sidebar-primary: oklch(0.56 0.208 277.117);
+    --sidebar-primary-foreground: oklch(0.97 0.018 272.314);
+    --sidebar-accent: oklch(0.56 0.208 277.117 / 15%);
     --sidebar-accent-foreground: oklch(0.985 0.001 106.423);
     --sidebar-border: oklch(1 0 0 / 15%);
-    --sidebar-ring: oklch(0.585 0.233 277.117);
+    --sidebar-ring: oklch(0.56 0.208 277.117);
+
+    /* RGB equivalents for glow shadows — dark mode */
+    --primary-rgb: 92, 93, 234;
+    --emerald-rgb: 52, 211, 153;
 
     /* Semantic text colors — dark mode */
     --text-secondary: oklch(0.72 0.015 240);

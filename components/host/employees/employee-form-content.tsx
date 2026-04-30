@@ -228,7 +228,7 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
                     )}
                   >
                     <div className={cn(
-                      "absolute top-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-all duration-300",
+                      "absolute top-0.5 h-4 w-4 rounded-full bg-background shadow-sm transition-all duration-300",
                       formData.isTaxable ? "left-[22px]" : "left-0.5"
                     )} />
                   </button>
@@ -366,7 +366,7 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
                     )}
                   >
                     <div className={cn(
-                      "absolute top-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-all duration-300",
+                      "absolute top-0.5 h-4 w-4 rounded-full bg-background shadow-sm transition-all duration-300",
                       formData.isProbation ? "left-[22px]" : "left-0.5"
                     )} />
                   </button>
@@ -509,7 +509,7 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
                 <button
                   type="button"
                   onClick={() => removePolicy(idx)}
-                  className="mt-6 p-1.5 text-faint hover:text-rose-500 transition-colors"
+                  className="mt-6 p-1.5 text-faint hover:text-destructive transition-colors"
                 >
                   <Trash size={18} />
                 </button>
@@ -546,7 +546,7 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
                   <button
                     type="button"
                     onClick={() => removeDependent(dep.id)}
-                    className="text-faint hover:text-rose-500 transition-colors"
+                    className="text-faint hover:text-destructive transition-colors"
                   >
                     <Trash size={16} />
                   </button>

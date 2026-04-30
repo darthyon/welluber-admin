@@ -200,15 +200,15 @@ export function SpVoucherForm({
               </Button>
               
               {isEditing && voucher?.status === "draft" && (
-                <Button
+                  <Button
                   type="button"
                   variant="outline"
                   onClick={onPublish}
                   disabled={isSubmitting || isPublishing}
-                  className="text-emerald-600 border-emerald-200 hover:bg-emerald-50 font-medium px-6 shadow-sm min-w-[120px] gap-2 rounded-full h-10"
+                  className="text-primary border-primary/20 hover:bg-primary/5 font-medium px-6 shadow-sm min-w-[120px] gap-2 rounded-full h-10"
                 >
                   {isPublishing ? (
-                    <div className="w-4 h-4 border-2 border-emerald-300 border-t-emerald-600 rounded-full animate-spin" />
+                    <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
                   ) : null}
                   <span>Publish</span>
                 </Button>
@@ -217,7 +217,7 @@ export function SpVoucherForm({
               <Button 
                 disabled={isSubmitting || isPublishing}
                 onClick={handleSubmit(onSave)}
-                className="bg-primary text-white hover:bg-primary/90 font-semibold px-8 shadow-sm shadow-primary/20 min-w-[160px] rounded-full h-10 gap-2"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold px-8 shadow-sm shadow-primary/20 min-w-[160px] rounded-full h-10 gap-2"
               >
                 {isSubmitting ? (
                   <>
@@ -566,7 +566,7 @@ export function SpVoucherForm({
 function FieldError({ msg }: { msg?: string }) {
   if (!msg) return null;
   return (
-    <div className="flex items-center gap-1.5 text-rose-500 text-label mt-1 font-medium animate-in fade-in slide-in-from-top-1">
+      <div className="flex items-center gap-1.5 text-destructive text-label mt-1 font-medium animate-in fade-in slide-in-from-top-1">
       <WarningCircle size={14} weight="fill" />
       <span>{msg}</span>
     </div>

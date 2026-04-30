@@ -60,7 +60,8 @@ import { BulkUploadWizard } from "@/components/host/organizations/bulk-upload-wi
 import { AssignedPolicyList } from "@/components/host/organizations/assigned-policy-list"
 import { LinkPolicyModal } from "@/components/host/organizations/link-policy-modal"
 import { BenefitPolicyWizard } from "@/components/host/policies/benefit-policy-wizard"
-import { BenefitPolicy } from "@/types/policy"
+import { PolicyDetailView } from "@/components/host/policies/policy-detail-view"
+import { BenefitPolicy, TierVariant } from "@/types/policy"
 import type { FlatClaimRow } from "@/types/claims"
 import { DetailSection } from "@/components/shared/detail-section"
 import { DetailField } from "@/components/shared/detail-field"
@@ -185,23 +186,17 @@ function OrganizationDetailContent() {
   >([
     {
       id: "pol_1",
+      organizationId: "org-123",
       name: "Wellness Allocation",
       code: "WELL-2026-HQ",
       description:
         "Standard wellness benefits for HQ staff including gym and mental health support.",
-      eligibility: {
-        roles: ["staff", "management"],
-        employeeTypes: ["full-time"],
-      },
-      benefitPoolType: {
-        employee: "Individual" as const,
-        dependents: "None" as const,
-      },
+      eligibleEmploymentTypes: ["full-time"],
+      benefitPoolType: "Individual" as const,
       utilisationMode: "Fixed" as const,
       refreshCycle: "Yearly" as const,
-      refreshStartReference: "OrgFY" as const,
-      activationMode: "JoinDate" as const,
-      status: "Published" as const,
+      refreshStartReference: "fy_start" as const,
+      status: "active" as const,
       assignedTo: "All Branches",
       employeeCount: 1240,
       lastUpdated: "24 Mar 2024",
@@ -210,23 +205,17 @@ function OrganizationDetailContent() {
     },
     {
       id: "pol_2",
+      organizationId: "org-123",
       name: "Lifestyle Pocket",
       code: "LIFE-2026-SUB",
       description:
         "Flexible lifestyle benefits for travel, food, and personal development.",
-      eligibility: {
-        roles: ["staff"],
-        employeeTypes: ["full-time", "part-time"],
-      },
-      benefitPoolType: {
-        employee: "Shared" as const,
-        dependents: "Shared" as const,
-      },
+      eligibleEmploymentTypes: ["full-time", "part-time"],
+      benefitPoolType: "Shared" as const,
       utilisationMode: "Prorated" as const,
       refreshCycle: "Monthly" as const,
-      refreshStartReference: "JoinDate" as const,
-      activationMode: "ProbationEnds" as const,
-      status: "Published" as const,
+      refreshStartReference: "join_date" as const,
+      status: "active" as const,
       assignedTo: "Subang Jaya",
       employeeCount: 450,
       lastUpdated: "02 Apr 2024",
@@ -248,18 +237,14 @@ function OrganizationDetailContent() {
       const matchesSearch =
         !policySearch ||
         p.name.toLowerCase().includes(searchLower) ||
-        p.code.toLowerCase().includes(searchLower) ||
+        p.code?.toLowerCase().includes(searchLower) ||
         p.description?.toLowerCase().includes(searchLower)
 
       const matchesStatus =
         policyStatusFilter === "all" ||
         (policyStatusFilter === "active"
-          ? p.status === "Published"
-          : p.status !== "Published")
-
-      const matchesRole =
-        policyFilters.role === "all" ||
-        p.eligibility.roles.includes(policyFilters.role.toLowerCase())
+          ? p.status === "active"
+          : p.status !== "active")
 
       const matchesService =
         policyFilters.mainService === "all" ||
@@ -272,7 +257,6 @@ function OrganizationDetailContent() {
       return (
         matchesSearch &&
         matchesStatus &&
-        matchesRole &&
         matchesService &&
         matchesGroup
       )
@@ -334,6 +318,33 @@ function OrganizationDetailContent() {
       coPayment: { required: false, type: "Percentage" as const, value: 0 },
     },
   ])
+  const [mockTiers] = useState<TierVariant[]>([
+    {
+      id: "t1",
+      organizationId: "org-123",
+      policyId: "pol_1",
+      name: "Band 1 — VP and above",
+      status: "complete",
+      eligibleEmploymentTypes: ["full-time"],
+      departmentIds: [],
+      overrides: [
+        { id: "o1", tierId: "t1", benefitId: "b1", amount: 5000 },
+        { id: "o2", tierId: "t1", benefitId: "b2", amount: 1000 },
+      ],
+    },
+    {
+      id: "t2",
+      organizationId: "org-123",
+      policyId: "pol_1",
+      name: "Band 2 — Manager / Senior",
+      status: "complete",
+      eligibleEmploymentTypes: ["full-time", "part-time"],
+      departmentIds: [],
+      overrides: [
+        { id: "o3", tierId: "t2", benefitId: "b1", amount: 2500 },
+      ],
+    },
+  ])
 
   const handleLinkPolicy = (policyId: string) => {
     // Mock linking logic
@@ -345,19 +356,16 @@ function OrganizationDetailContent() {
 
     const newPolicy = {
       id: policyId,
+      organizationId: "org-123",
       name: policyNames[policyId] || "Selected Policy",
       code: `WP-${policyId.split("_")[1].toUpperCase()}-2026`,
       description: "Automatically linked benefit policy.",
-      eligibility: { roles: [], employeeTypes: ["full-time"] },
-      benefitPoolType: {
-        employee: "Individual" as const,
-        dependents: "None" as const,
-      },
+      eligibleEmploymentTypes: ["full-time"],
+      benefitPoolType: "Individual" as const,
       utilisationMode: "Fixed" as const,
       refreshCycle: "Yearly" as const,
-      refreshStartReference: "OrgFY" as const,
-      activationMode: "JoinDate" as const,
-      status: "Published" as const,
+      refreshStartReference: "fy_start" as const,
+      status: "active" as const,
       assignedTo: "All Branches",
       employeeCount: 0,
       lastUpdated: new Date().toLocaleDateString("en-GB", {
@@ -485,7 +493,7 @@ function OrganizationDetailContent() {
                   />
                 </div>
                 <div className="flex items-center gap-3 text-body text-subtle">
-                  <span className="rounded border border-zinc-200 bg-white px-2 py-0.5 font-mono text-label tracking-widest text-faint uppercase">
+                  <span className="rounded border border-border bg-background px-2 py-0.5 font-mono text-label tracking-widest text-faint uppercase">
                     ORG-20260115-0001
                   </span>
                 </div>
@@ -773,7 +781,7 @@ function OrganizationDetailContent() {
                     key={i}
                     className="flex items-center gap-3 rounded-xl border border-border bg-muted/20 p-3 group hover:border-primary/30 transition-all"
                   >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-100 bg-white text-faint group-hover:text-primary transition-colors">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-background text-faint group-hover:text-primary transition-colors">
                       <Article size={20} weight="duotone" />
                     </div>
                     <div className="flex-1 overflow-hidden">
@@ -988,7 +996,7 @@ function OrganizationDetailContent() {
                                     {branch.balance}
                                   </span>
                                   {branch.claimsCount !== undefined && (
-                                    <span className="rounded-full border border-zinc-200 bg-muted px-1.5 text-label font-medium text-muted-foreground tabular-nums">
+                                    <span className="rounded-full border border-border bg-muted px-1.5 text-label font-medium text-muted-foreground tabular-nums">
                                       {branch.claimsCount}
                                     </span>
                                   )}
@@ -1279,7 +1287,7 @@ function OrganizationDetailContent() {
                                 accessorKey: "branch",
                                 sortable: true,
                                 render: (emp) => (
-                                  <span className="rounded-md border border-zinc-200 bg-muted/80 px-2 py-0.5 text-label font-semibold text-muted-foreground">
+                                  <span className="rounded-md border border-border bg-muted/80 px-2 py-0.5 text-label font-semibold text-muted-foreground">
                                     {emp.branch}
                                   </span>
                                 ),
@@ -1385,7 +1393,7 @@ function OrganizationDetailContent() {
                                                   )}
                                                   {policy.utilisation !==
                                                     undefined && (
-                                                    <div className="mt-0.5 text-label font-medium text-emerald-600">
+                                                    <div className="mt-0.5 text-label font-medium text-emerald-600 dark:text-emerald-400">
                                                       {policy.utilisation}%
                                                       Utilized
                                                     </div>
@@ -1440,7 +1448,7 @@ function OrganizationDetailContent() {
                                                       )}
                                                       {policy.utilisation !==
                                                         undefined && (
-                                                        <div className="mt-0.5 text-label font-medium text-emerald-600">
+                                                        <div className="mt-0.5 text-label font-medium text-emerald-600 dark:text-emerald-400">
                                                           {policy.utilisation}%
                                                           Utilized
                                                         </div>
@@ -1673,7 +1681,7 @@ function OrganizationDetailContent() {
                               header: "Relationship",
                               accessorKey: "relationship",
                               render: (dep) => (
-                                <span className="rounded-md border border-zinc-200 bg-muted px-2 py-0.5 text-label font-semibold text-muted-foreground">
+                                <span className="rounded-md border border-border bg-muted px-2 py-0.5 text-label font-semibold text-muted-foreground">
                                   {dep.relationship}
                                 </span>
                               ),
@@ -1770,8 +1778,8 @@ function OrganizationDetailContent() {
                                   className={cn(
                                     "mt-1 w-fit rounded-full px-1.5 py-0.5 text-label font-medium tracking-wider uppercase",
                                     ent.type === "Employee"
-                                      ? "border border-blue-100 bg-blue-50 text-blue-600"
-                                      : "border border-purple-100 bg-purple-50 text-purple-600"
+                                      ? "border border-primary/10 bg-primary/5 text-primary"
+                                      : "border border-primary/10 bg-primary/5 text-primary"
                                   )}
                                 >
                                   {ent.type}
@@ -1811,7 +1819,7 @@ function OrganizationDetailContent() {
                                 </div>
                                 <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
                                   <div
-                                    className="h-full rounded-full bg-emerald-500"
+                                    className="h-full rounded-full bg-emerald-500 dark:bg-emerald-400"
                                     style={{
                                       width: `${(parseFloat(ent.used.replace("RM ", "").replace(",", "")) / parseFloat(ent.allocated.replace("RM ", "").replace(",", ""))) * 100}%`,
                                     }}
@@ -1871,51 +1879,69 @@ function OrganizationDetailContent() {
         {/* Benefit Policies Tab */}
         {activeTab === "policies" && (
           <div className="animate-in transition-all duration-300 fade-in">
-            {isAddingPolicy || viewingPolicyId || editingPolicyId ? (
+            {viewingPolicyId ? (
+              <PolicyDetailView
+                policy={assignedPolicies.find((p) => p.id === viewingPolicyId)!}
+                groups={mockGroups.filter((g) => g.policyId === viewingPolicyId)}
+                benefits={mockBenefits.filter((b) =>
+                  mockGroups.some(
+                    (g) => g.id === b.groupId && g.policyId === viewingPolicyId
+                  )
+                )}
+                tiers={mockTiers.filter((t) => t.policyId === viewingPolicyId)}
+                onEdit={() => setEditingPolicyId(viewingPolicyId)}
+                onClone={() => {
+                  const p = assignedPolicies.find((p) => p.id === viewingPolicyId)
+                  if (p) {
+                    setToastMessage(`Cloned from ${p.name} — open Host Policies to edit`)
+                    setViewingPolicyId(null)
+                  }
+                }}
+                onDeactivate={() => {
+                  setAssignedPolicies((prev) =>
+                    prev.map((p) =>
+                      p.id === viewingPolicyId ? { ...p, status: "deactivated" as const } : p
+                    )
+                  )
+                  setToastMessage("Policy deactivated")
+                  setViewingPolicyId(null)
+                }}
+                onDelete={() => {
+                  setAssignedPolicies((prev) => prev.filter((p) => p.id !== viewingPolicyId))
+                  setToastMessage("Policy unlinked from organisation")
+                  setViewingPolicyId(null)
+                }}
+              />
+            ) : isAddingPolicy || editingPolicyId ? (
               <BenefitPolicyWizard
-                mode={
-                  editingPolicyId ? "edit" : viewingPolicyId ? "view" : "create"
-                }
+                mode={editingPolicyId ? "edit" : "create"}
                 initialData={
-                  viewingPolicyId || editingPolicyId
+                  editingPolicyId
                     ? {
                         policy: assignedPolicies.find(
-                          (p) => p.id === (viewingPolicyId || editingPolicyId)
+                          (p) => p.id === editingPolicyId
                         )!,
                         groups: mockGroups.filter(
-                          (g) =>
-                            g.policyId === (viewingPolicyId || editingPolicyId)
+                          (g) => g.policyId === editingPolicyId
                         ),
                         benefits: mockBenefits.filter((b) =>
                           mockGroups.some(
                             (g) =>
                               g.id === b.groupId &&
-                              g.policyId ===
-                                (viewingPolicyId || editingPolicyId)
+                              g.policyId === editingPolicyId
                           )
                         ),
                       }
                     : undefined
                 }
-                onEdit={() => {
-                  if (viewingPolicyId) {
-                    setEditingPolicyId(viewingPolicyId)
-                  }
-                }}
                 onCancel={() => {
-                  if (editingPolicyId && viewingPolicyId) {
-                    setEditingPolicyId(null)
-                  } else {
-                    setIsAddingPolicy(null)
-                    setViewingPolicyId(null)
-                    setEditingPolicyId(null)
-                  }
+                  setIsAddingPolicy(null)
+                  setEditingPolicyId(null)
                 }}
                 onSaveDraft={(data) => {
                   setToastMessage("Policy saved as draft")
                   setIsAddingPolicy(null)
                   setEditingPolicyId(null)
-                  setViewingPolicyId(null)
                 }}
                 onSuccess={(data) => {
                   if (editingPolicyId) {
@@ -1949,7 +1975,7 @@ function OrganizationDetailContent() {
                       <Plus size={14} weight="bold" /> Link Policy
                     </Button>
                     <Button
-                      onClick={() => setIsAddingPolicy("true")}
+                      onClick={() => router.push(`/organizations/${orgId}/policies/new`)}
                       variant="secondary"
                       size="sm"
                       className="flex h-8 items-center gap-2 rounded-full px-4 text-label font-medium"
@@ -2119,7 +2145,7 @@ function OrganizationDetailContent() {
                   </div>
                 </div>
 
-                <div className="rounded-lg border border-rose-200 bg-rose-50/60 p-4">
+                <div className="rounded-lg border border-rose-200 dark:border-rose-500/20 bg-rose-50/60 dark:bg-rose-500/10 p-4">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="space-y-1">
                       <p className="text-body font-medium text-foreground">
@@ -2194,11 +2220,11 @@ function OrganizationDetailContent() {
       />
 
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center rounded-lg bg-foreground px-5 py-3 text-white shadow-lg animate-in slide-in-from-bottom-4 fade-in">
+        <div className="fixed bottom-6 right-6 z-50 flex items-center rounded-lg bg-foreground px-5 py-3 text-primary-foreground shadow-lg animate-in slide-in-from-bottom-4 fade-in">
           <p className="text-body font-semibold">{toastMessage}</p>
           <button
             onClick={() => setToastMessage(null)}
-            className="ml-4 text-faint transition-colors hover:text-white"
+            className="ml-4 text-faint transition-colors hover:text-primary-foreground"
           >
             <Plus size={16} className="rotate-45" />
           </button>

@@ -42,7 +42,7 @@ export function UnassignPolicyModal({
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="text-heading font-semibold flex items-center gap-2">
-            <WarningCircle className="text-amber-500" size={20} />
+            <WarningCircle className="text-amber-600 dark:text-amber-400" size={20} />
             Unassign Benefit Policy
           </DialogTitle>
           <DialogDescription className="text-body text-muted-foreground">
@@ -53,10 +53,10 @@ export function UnassignPolicyModal({
 
         <div className="space-y-6 py-4">
           {/* Warning Message */}
-          <Card className="border-amber-500/20 bg-amber-500/5">
+          <Card className="border-amber-500/20 dark:border-amber-500/20 bg-amber-500/5 dark:bg-amber-500/10">
             <CardContent className="p-4">
               <div className="flex items-start gap-3">
-                <WarningCircle className="text-amber-500 shrink-0 mt-0.5" size={20} />
+                <WarningCircle className="text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" size={20} />
                 <div className="space-y-2">
                   <p className="text-body font-semibold text-amber-600 dark:text-amber-400">
                     {hasActiveClaims ? "Active Claims Detected" : "Policy Removal Warning"}

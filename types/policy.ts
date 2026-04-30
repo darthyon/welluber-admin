@@ -1,36 +1,62 @@
 export type PoolType = "Individual" | "Shared";
 export type UtilisationMode = "Fixed" | "Prorated";
+export type ProrateUnit = "Daily" | "Weekly" | "Monthly" | "Quarterly" | "Yearly";
 export type RefreshCycle = "Daily" | "Weekly" | "Monthly" | "Quarterly" | "Yearly";
-export type RefreshStartReference = "OrgFY" | "JoinDate" | "CustomDate";
-export type ActivationMode = "JoinDate" | "ProbationEnds" | "CustomDate";
-export type PolicyStatus = "Draft" | "Published" | "Unlisted" | "Deactivated";
+export type RefreshStartReference = "fy_start" | "join_date" | "custom_date";
+export type PolicyStatus = "draft" | "active" | "deactivated";
 export type DistributionType = "SharedAmount" | "IndividualBenefitAmount";
 
 export interface BenefitPolicy {
   id: string;
-  code: string;
+  code?: string;
   name: string;
-  description: string;
-  eligibility: {
-    roles: string[];
-    employeeTypes: string[];
-  };
-  benefitPoolType: {
-    employee: PoolType;
-    dependents: PoolType | "None";
-  };
+  description?: string;
+  organizationId: string; // Policy belongs to exactly one org
+  eligibleEmploymentTypes: string[];
+  benefitPoolType: PoolType;
   utilisationMode: UtilisationMode;
+  prorateUnit?: ProrateUnit;
   refreshCycle: RefreshCycle;
   refreshStartReference: RefreshStartReference;
-  activationMode: ActivationMode;
+  refreshCustomDate?: string; // ISO date string
   status: PolicyStatus;
+  createdAt?: string;
+  groupCount?: number;
+  clonedFrom?: string; // original policy id
+  templateId?: string; // reference to PolicyTemplate used, if any
+  assignedOrgs?: number;
+  // Employee eligibility filters
+  eligibility?: {
+    minAge?: number;
+    maxAge?: number;
+    gender?: "male" | "female" | "all";
+    tierIds?: string[];
+  };
+}
+
+export interface PolicyTemplate {
+  id: string;
+  name: string;
+  tagline: string;
+  icon: string; // Phosphor icon name
+  prefill: {
+    name?: string;
+    description?: string;
+    eligibleEmploymentTypes: string[];
+    benefitPoolType: PoolType;
+    utilisationMode: UtilisationMode;
+    refreshCycle: RefreshCycle;
+    refreshStartReference: RefreshStartReference;
+    groups: BenefitGroup[];
+    benefits: Benefit[];
+  };
 }
 
 export interface BenefitGroup {
   id: string;
   policyId: string;
   name: string;
-  description: string;
+  description?: string;
   distributionType: DistributionType;
   maxUsagePerCycle?: number;
 }
@@ -38,7 +64,7 @@ export interface BenefitGroup {
 export interface Benefit {
   id: string;
   groupId: string;
-  serviceId: string; // From Masterlist
+  serviceId: string; // From TaxonomyMainService
   amount: number;
   coPayment: {
     required: boolean;
@@ -52,4 +78,26 @@ export interface BenefitCategory {
   name: string;
   icon: string;
   color: string;
+}
+
+// Tier Variants (Org-scoped)
+export type TierStatus = "incomplete" | "complete";
+
+export interface TierVariant {
+  id: string;
+  policyId: string;
+  organizationId: string;
+  name: string;
+  status: TierStatus;
+  eligibleEmploymentTypes: string[];
+  departmentIds?: string[];
+  overrides: TierOverride[];
+}
+
+export interface TierOverride {
+  id: string;
+  tierId: string;
+  benefitId: string;
+  amount?: number;
+  maxUsagePerCycle?: number;
 }

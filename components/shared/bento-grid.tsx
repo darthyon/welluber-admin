@@ -128,7 +128,7 @@ export function BentoCard({
             className={cn(
               "flex h-7 w-7 items-center justify-center rounded-lg transition-colors",
               className?.includes("bg-primary")
-                ? "bg-white/10 text-white"
+                ? "bg-background/10 text-primary-foreground"
                 : "border border-primary/20 bg-primary/10 text-primary"
             )}
           >
@@ -167,9 +167,9 @@ export function BentoCard({
                 className={cn(
                   "inline-flex h-5 items-center gap-1.5 rounded px-2 py-1 text-label font-medium transition-all",
                   trend.isPositive !== false
-                    ? "bg-emerald-500/10 text-emerald-600"
+                    ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 dark:bg-emerald-500/20"
                     : "bg-destructive/10 text-destructive",
-                  className?.includes("bg-primary") && "bg-white/20 text-white"
+                  className?.includes("bg-primary") && "bg-background/20 text-primary-foreground"
                 )}
               >
                 {trend.isPositive !== false ? (

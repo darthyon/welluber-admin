@@ -129,7 +129,7 @@ export function LinkPolicyModal({
                         className={cn(
                           "flex h-10 w-10 items-center justify-center rounded-lg border transition-colors",
                           isSelected
-                            ? "border-primary bg-primary text-white"
+                            ? "border-primary bg-primary text-primary-foreground"
                             : "border-border bg-muted text-faint group-hover:bg-muted/80"
                         )}
                       >

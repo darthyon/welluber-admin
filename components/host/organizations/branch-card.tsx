@@ -115,7 +115,7 @@ export function BranchCard({ branch, onView, onEdit }: BranchCardProps) {
                 <div className="flex items-center gap-1.5 leading-tight">
                   <span className={cn(
                     "text-body font-medium text-foreground",
-                    branch.utilizationRate > 80 ? "text-rose-500" : branch.utilizationRate > 50 ? "text-amber-500" : "text-emerald-500"
+                    branch.utilizationRate > 80 ? "text-rose-600 dark:text-rose-400" : branch.utilizationRate > 50 ? "text-amber-600 dark:text-amber-400" : "text-emerald-600 dark:text-emerald-400"
                   )}>
                     {branch.balance}
                   </span>

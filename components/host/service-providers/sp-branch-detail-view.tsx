@@ -106,7 +106,7 @@ export function SpBranchDetailView({ branch, serviceCategories, onBack, onEdit }
             <div id="location-mapping" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
               <div className="p-6 space-y-6">
                 <div className="flex items-center gap-2 pb-2">
-                  <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                     <MapPin size={16} weight="fill" />
                   </div>
                   <div className="space-y-0.5">
@@ -132,7 +132,7 @@ export function SpBranchDetailView({ branch, serviceCategories, onBack, onEdit }
                         <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center p-1.5 border border-primary/30">
                           <div className="w-full h-full rounded-full bg-primary shadow-lg shadow-primary/40 ring-4 ring-background" />
                         </div>
-                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-background shadow-sm" />
+                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full border-2 border-background shadow-sm" />
                       </div>
                       <span className="text-label font-medium text-primary bg-background/90 backdrop-blur-sm px-2 py-0.5 rounded-full border border-primary/20">
                         Pinned
@@ -172,7 +172,7 @@ export function SpBranchDetailView({ branch, serviceCategories, onBack, onEdit }
             <div id="service-catalog" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
               <div className="p-6 space-y-6">
                 <div className="flex items-center gap-2 pb-2">
-                  <div className="w-8 h-8 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500">
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                     <Globe size={16} weight="fill" />
                   </div>
                   <div className="space-y-0.5">
@@ -240,7 +240,7 @@ export function SpBranchDetailView({ branch, serviceCategories, onBack, onEdit }
             <div id="governance" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
               <div className="p-6 space-y-6">
                 <div className="flex items-center gap-2 pb-2">
-                  <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500">
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                     <Users size={16} weight="fill" />
                   </div>
                   <div className="space-y-0.5">
@@ -287,7 +287,7 @@ export function SpBranchDetailView({ branch, serviceCategories, onBack, onEdit }
                               <div className="flex items-center gap-2 mt-1">
                                 <span className="text-label text-muted-foreground font-medium">{CONTACT_TYPE_LABEL[c.type] ?? c.type}</span>
                                 {c.isPublic && (
-                                  <Badge variant="outline" className="text-micro h-4 font-semibold border-emerald-500/20 text-emerald-600 bg-emerald-500/5">Public Profile</Badge>
+                                  <StatusBadge status="Public Profile" variant="emerald" className="text-micro h-4" />
                                 )}
                               </div>
                               <div className="flex flex-col gap-0.5 mt-2">
@@ -312,7 +312,7 @@ export function SpBranchDetailView({ branch, serviceCategories, onBack, onEdit }
             <div id="operating-hours" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
               <div className="p-6 space-y-6">
                 <div className="flex items-center gap-2 pb-2">
-                  <div className="w-8 h-8 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-500">
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                     <Clock size={16} weight="fill" />
                   </div>
                   <div className="space-y-0.5">
@@ -342,7 +342,7 @@ export function SpBranchDetailView({ branch, serviceCategories, onBack, onEdit }
             <div id="benefits" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
               <div className="p-6 space-y-6">
                 <div className="flex items-center gap-2 pb-2">
-                  <div className="w-8 h-8 rounded-full bg-zinc-500/10 flex items-center justify-center text-zinc-500">
+                  <div className="w-8 h-8 rounded-full bg-muted/10 flex items-center justify-center text-muted-foreground">
                     <CheckCircle size={16} weight="fill" />
                   </div>
                   <div className="space-y-0.5">

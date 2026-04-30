@@ -34,14 +34,14 @@ const TYPE_ICONS: Record<ActivityType, React.ReactElement> = {
 };
 
 const TYPE_COLORS: Record<ActivityType, string> = {
-  Create: "bg-blue-500",
-  Update: "bg-amber-500",
-  Delete: "bg-rose-500",
-  Approval: "bg-emerald-500",
-  Payout: "bg-indigo-500",
-  System: "bg-muted0",
-  SettingChange: "bg-purple-500",
-  Link: "bg-sky-500",
+  Create: "bg-primary",
+  Update: "bg-amber-500 dark:bg-amber-400",
+  Delete: "bg-rose-500 dark:bg-rose-400",
+  Approval: "bg-emerald-500 dark:bg-emerald-400",
+  Payout: "bg-primary",
+  System: "bg-muted",
+  SettingChange: "bg-primary",
+  Link: "bg-primary",
 };
 
 export function ActivityTimeline({ items, title, icon, className }: ActivityTimelineProps) {
@@ -73,7 +73,7 @@ export function ActivityTimeline({ items, title, icon, className }: ActivityTime
                 item.type ? `${TYPE_COLORS[type]} shadow-[0_0_8px_rgba(var(--primary-rgb),0.2)]` : "bg-muted-foreground/30"
               )}>
                 {item.type && (
-                  <div className="absolute inset-0 flex items-center justify-center text-white scale-0 group-hover:scale-100 transition-transform duration-200">
+                  <div className="absolute inset-0 flex items-center justify-center text-primary-foreground scale-0 group-hover:scale-100 transition-transform duration-200">
                     {/* Optional: Show small icon on hover if needed, or just keep it simple */}
                   </div>
                 )}
@@ -119,7 +119,7 @@ export function ActivityTimeline({ items, title, icon, className }: ActivityTime
 
         {items.length === 0 && (
           <div className="py-12 flex flex-col items-center justify-center text-center">
-            <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center text-faint mb-4 border border-dashed border-zinc-200">
+            <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center text-faint mb-4 border border-dashed border-border">
               <ClockCounterClockwise size={24} />
             </div>
             <p className="text-body text-subtle font-medium">No activities recorded in this period.</p>

@@ -288,7 +288,7 @@ export default function NewServiceProviderPage() {
               />
 
               {/* Floating Action Bar */}
-              <div className="fixed bottom-8 left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[calc(50%+104px)] z-50 flex items-center gap-4 p-2.5 px-6 bg-background/80 backdrop-blur-2xl border border-border/50 shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-full animate-in slide-in-from-bottom-10 duration-700 ease-out">
+              <div className="fixed bottom-8 left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[calc(50%+104px)] z-50 flex items-center gap-4 p-2.5 px-6 bg-background/80 backdrop-blur-2xl border border-border/50 shadow-lg rounded-full animate-in slide-in-from-bottom-10 duration-700 ease-out">
                 <Button variant="ghost" className="text-body font-semibold rounded-full h-10 px-6 hover:bg-black/5 transition-colors" onClick={() => router.back()}>
                   Cancel
                 </Button>

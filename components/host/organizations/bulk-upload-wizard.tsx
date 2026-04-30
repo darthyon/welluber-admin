@@ -309,7 +309,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
               }
               className={cn(
                 "w-20 rounded border border-border bg-background px-2 py-1 text-label font-semibold outline-none focus:border-primary/50",
-                !row.code && "border-rose-500/20 bg-rose-500/10 text-rose-400"
+                !row.code && "border-rose-500/20 dark:border-rose-500/20 bg-rose-500/10 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400"
               )}
               placeholder="ID"
             />
@@ -317,7 +317,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
             <span
               className={cn(
                 "text-body font-semibold",
-                !row.code ? "text-rose-500 italic" : "text-foreground"
+                !row.code ? "text-rose-600 dark:text-rose-400 italic" : "text-foreground"
               )}
             >
               {row.code || "Missing"}
@@ -340,7 +340,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
                 className={cn(
                   "w-full rounded border border-border bg-background px-2 py-0.5 text-label outline-none focus:border-primary/50",
                   row.dob === "Invalid" &&
-                    "border-rose-500/20 bg-rose-500/10 text-rose-400"
+                    "border-rose-500/20 dark:border-rose-500/20 bg-rose-500/10 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400"
                 )}
                 placeholder="DOB (YYYY-MM-DD)"
               />
@@ -367,7 +367,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
                   className={cn(
                     "text-label font-medium",
                     row.dob === "Invalid"
-                      ? "text-rose-400 italic"
+                      ? "text-rose-600 dark:text-rose-400 italic"
                       : "text-foreground"
                   )}
                 >
@@ -425,9 +425,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
                   {row.department}
                 </span>
                 {row.isNewDept && (
-                  <Badge variant="outline" className="text-[10px] h-4 px-1.5 bg-amber-500/10 text-amber-600 border-amber-500/20 font-semibold uppercase tracking-tighter rounded-full">
-                    Auto-create
-                  </Badge>
+                  <StatusBadge status="Auto-create" variant="amber" className="text-micro h-4 px-1.5 uppercase tracking-tighter" />
                 )}
               </div>
               <span className="text-label font-medium text-muted-foreground italic opacity-70">
@@ -447,15 +445,10 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
         <div className="flex flex-col gap-1">
            <div className="flex items-center gap-1.5 flex-wrap">
              <span className="text-label font-semibold text-primary bg-primary/5 px-1.5 py-0.5 rounded border border-primary/10">{row.tier}</span>
-             <span className={cn(
-               "text-label font-medium px-2 py-0.5 rounded-4xl border",
-               row.employeeStatus === "active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-rose-500/10 text-rose-600 border-rose-500/20"
-             )}>{row.employeeStatus}</span>
-             {row.isProbation && (
-               <span className="text-label font-medium px-2 py-0.5 rounded-4xl border bg-amber-500/10 text-amber-600 border-amber-500/20">
-                 Probation
-               </span>
-             )}
+              <StatusBadge status={row.employeeStatus} variant={row.employeeStatus === "active" ? "emerald" : "rose"} />
+              {row.isProbation && (
+                <StatusBadge status="Probation" variant="amber" />
+              )}
            </div>
            <div className="flex items-center gap-1.5 text-label font-medium text-muted-foreground flex-wrap">
              <span className="font-semibold text-subtle capitalize">{row.employmentType?.replace("-", " ")}</span>
@@ -463,7 +456,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
              <Globe size={10} />
              <span>{row.residency}</span>
              <span>•</span>
-             <span className={row.taxable ? "text-emerald-600 font-semibold" : "text-rose-500 font-semibold"}>{row.taxable ? "Taxable" : "Non-taxable"}</span>
+              <span className={row.taxable ? "text-emerald-600 dark:text-emerald-400 font-semibold" : "text-rose-600 dark:text-rose-400 font-semibold"}>{row.taxable ? "Taxable" : "Non-taxable"}</span>
            </div>
         </div>
       )
@@ -485,7 +478,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
             <span
               className={cn(
                 "text-body font-medium",
-                !row.mobile ? "text-rose-400 italic" : "text-muted-foreground"
+                !row.mobile ? "text-rose-600 dark:text-rose-400 italic" : "text-muted-foreground"
               )}
             >
               {row.mobile || "Missing Mobile"}
@@ -525,7 +518,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
                   "text-label font-medium",
                   row.email
                     ? "text-muted-foreground"
-                    : "text-rose-400 italic"
+                    : "text-rose-600 dark:text-rose-400 italic"
                 )}
               >
                 {row.email || "Missing email"}
@@ -548,7 +541,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
               className={cn(
                 "w-full rounded border border-border bg-background px-2 py-1 font-mono text-label outline-none focus:border-primary/50",
                 row.dob === "Invalid" &&
-                  "border-rose-500/20 bg-rose-500/10 text-rose-400"
+                  "border-rose-500/20 dark:border-rose-500/20 bg-rose-500/10 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400"
               )}
             />
           ) : (
@@ -556,7 +549,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
               className={cn(
                 "font-mono text-label",
                 row.dob === "Invalid" &&
-                  "font-semibold text-rose-600 underline decoration-wavy"
+                  "font-semibold text-rose-600 dark:text-rose-400 underline decoration-wavy"
               )}
             >
               {row.dob}
@@ -573,7 +566,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
             size={14}
             className={
               row.date === "Invalid Date"
-                ? "text-rose-500"
+                ? "text-rose-600 dark:text-rose-400"
                 : "text-faint"
             }
           />
@@ -586,7 +579,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
               className={cn(
                 "w-full rounded border border-border bg-background px-2 py-1 font-mono text-label outline-none focus:border-primary/50",
                 row.date === "Invalid Date" &&
-                  "border-rose-500/20 bg-rose-500/10 text-rose-400"
+                  "border-rose-500/20 dark:border-rose-500/20 bg-rose-500/10 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400"
               )}
             />
           ) : (
@@ -594,7 +587,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
               className={cn(
                 "font-mono text-label",
                 row.date === "Invalid Date" &&
-                  "font-semibold text-rose-600 underline decoration-wavy"
+                  "font-semibold text-rose-600 dark:text-rose-400 underline decoration-wavy"
               )}
             >
               {row.date}
@@ -621,11 +614,11 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
       header: "Status",
       render: (row) =>
         row.status === "Valid" ? (
-          <div className="flex w-fit items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-label leading-none font-semibold text-emerald-400">
+          <div className="flex w-fit items-center gap-1.5 rounded-full border border-emerald-500/20 dark:border-emerald-500/20 bg-emerald-500/10 dark:bg-emerald-500/20 px-2 py-0.5 text-label leading-none font-semibold text-emerald-600 dark:text-emerald-400">
             <CheckCircle size={12} weight="fill" /> Valid
           </div>
         ) : (
-          <div className="flex w-fit items-center gap-1.5 rounded-full border border-rose-500/20 bg-rose-500/10 px-2 py-0.5 text-label leading-none font-semibold text-rose-400">
+          <div className="flex w-fit items-center gap-1.5 rounded-full border border-rose-500/20 dark:border-rose-500/20 bg-rose-500/10 dark:bg-rose-500/20 px-2 py-0.5 text-label leading-none font-semibold text-rose-600 dark:text-rose-400">
             <WarningCircle size={12} weight="fill" /> {row.issue || "Issue"}
           </div>
         ),
@@ -658,15 +651,15 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
         {step === "preview" && (
           <div className="flex items-center gap-4 rounded-lg border border-border/50 bg-background px-4 py-2">
             <div className="flex items-center gap-1.5">
-              <div className="h-2 w-2 rounded-full bg-emerald-500" />
-              <span className="text-label font-semibold text-emerald-600">
+              <div className="h-2 w-2 rounded-full bg-emerald-500 dark:bg-emerald-400" />
+              <span className="text-label font-semibold text-emerald-600 dark:text-emerald-400">
                 {validCount} Valid
               </span>
             </div>
             <div className="h-3 w-[1px] bg-border" />
             <div className="flex items-center gap-1.5">
-              <div className="h-2 w-2 rounded-full bg-rose-500" />
-              <span className="text-label font-semibold text-rose-600">
+              <div className="h-2 w-2 rounded-full bg-rose-500 dark:bg-rose-400" />
+              <span className="text-label font-semibold text-rose-600 dark:text-rose-400">
                 {issueCount} Issues
               </span>
             </div>
@@ -765,7 +758,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
             <div className="flex flex-col gap-4 border-b border-border/50 py-3">
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-emerald-100 bg-emerald-50 text-emerald-600 shadow-sm shadow-emerald-500/5">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-emerald-100 dark:border-emerald-500/20 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shadow-sm shadow-emerald-500/5">
                     <FileCsv size={28} weight="fill" />
                   </div>
                   <div>
@@ -789,7 +782,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
                   <Button
                     onClick={handleConfirmImport}
                     disabled={showIssuesOnly && issueCount === 0}
-                    className="h-10 animate-in bg-primary px-10 font-semibold text-white shadow-lg shadow-primary/20 transition-all fade-in rounded-4xl hover:bg-primary/90"
+                    className="h-10 animate-in bg-primary px-10 font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-all fade-in rounded-4xl hover:bg-primary/90"
                   >
                     Confirm Import{" "}
                     <ArrowRight size={18} className="ml-2" weight="bold" />
@@ -822,7 +815,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
                       >
                         <div
                           className={cn(
-                            "absolute top-0.5 h-3 w-3 rounded-full bg-white shadow-sm transition-all duration-300",
+                            "absolute top-0.5 h-3 w-3 rounded-full bg-background shadow-sm transition-all duration-300",
                             isEditing ? "left-[17px]" : "left-0.5"
                           )}
                         />

@@ -131,7 +131,7 @@ export default function WalletsPage() {
               <span
                 className={cn(
                   "text-body font-semibold tabular-nums",
-                  wallet.balance < 0 ? "text-rose-500" : "text-foreground"
+                  wallet.balance < 0 ? "text-destructive" : "text-foreground"
                 )}
               >
                 {wallet.balance < 0 ? "-" : ""}RM{" "}
@@ -141,7 +141,7 @@ export default function WalletsPage() {
 
             <div className="col-span-2 text-right">
               {wallet.pendingDeductions > 0 ? (
-                <div className="inline-flex items-center gap-1 rounded-md border border-amber-200 bg-amber-50 px-1.5 py-0.5 text-label font-medium text-amber-700">
+                <div className="inline-flex items-center gap-1 rounded-md border border-amber-500/20 dark:border-amber-500/30 bg-amber-500/10 dark:bg-amber-500/20 px-1.5 py-0.5 text-label font-medium text-amber-600 dark:text-amber-400">
                   <Ticket size={10} weight="fill" />
                   RM {wallet.pendingDeductions.toLocaleString()}
                 </div>
@@ -184,7 +184,7 @@ export default function WalletsPage() {
                     onClick: () => console.log("Toggle status", wallet.id),
                     className:
                       wallet.status === "suspended"
-                        ? "text-emerald-600 font-semibold"
+                        ? "text-primary font-semibold"
                         : "text-destructive font-semibold",
                   },
                 ]}
@@ -327,7 +327,7 @@ export default function WalletsPage() {
                   <span
                     className={cn(
                       "text-body font-semibold tabular-nums",
-                      row.totalBalance < 0 ? "text-rose-500" : "text-foreground"
+                      row.totalBalance < 0 ? "text-destructive" : "text-foreground"
                     )}
                   >
                     {row.totalBalance < 0 ? "-" : ""}RM{" "}

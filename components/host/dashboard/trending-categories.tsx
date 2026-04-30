@@ -48,7 +48,7 @@ export function TrendingCategories() {
                     </span>
                     <span className={cn(
                       "text-label font-medium flex items-center gap-0.5 w-[42px] justify-end",
-                      category.trend > 0 ? "text-emerald-500" : "text-destructive"
+                      category.trend > 0 ? "text-emerald-600 dark:text-emerald-400" : "text-destructive"
                     )}>
                       {category.trend > 0 ? <TrendUp weight="bold" /> : <TrendDown weight="bold" />}
                       {Math.abs(category.trend)}%

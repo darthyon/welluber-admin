@@ -17,8 +17,9 @@ The UI should feel like reliable operational tooling: information-dense without 
 - **Theme**: Light-mode default with full dark mode support (class strategy via `next-themes`).
 - **Design system base**: shadcn/ui Luma preset + Radix primitives with custom refinements.
 - **Typography**: Geist Variable for UI + Geist Mono for IDs/technical values.
-- **Color**: Deep indigo as the sole brand accent, used sparingly (CTAs/primary actions). Warm-stone neutrals for borders/surfaces. OKLCH tokens.
+- **Color**: Deep indigo (`#4338CA`) as the sole brand accent, used sparingly (CTAs/primary actions). Warm-stone neutrals for borders/surfaces. OKLCH tokens.
 - **Layout**: Linear-inspired shell (240px sidebar, compact type), whitespace-as-structure, borders define surfaces, restrained shadows.
+- **Canonical spec**: See [`AGENTS.md`](../AGENTS.md) for enforced constraints.
 
 **References**: Linear, Vercel, Supabase, Midday.  
 **Anti-references**: neon-on-dark cyber dashboards, playful/toy fintech vibes, card-on-card “AI dashboard” templates, and dated enterprise styling (thick borders/bevels).

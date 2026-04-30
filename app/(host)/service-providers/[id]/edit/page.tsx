@@ -400,7 +400,7 @@ export default function EditServiceProviderPage() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="flex items-center justify-between p-4 bg-muted/20 border border-border rounded-lg group hover:border-primary/20 transition-all duration-300">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-9 h-9 rounded-lg bg-white border border-zinc-100 flex items-center justify-center text-faint group-hover:text-primary transition-colors">
+                                    <div className="w-9 h-9 rounded-lg bg-background border border-border flex items-center justify-center text-faint group-hover:text-primary transition-colors">
                                         <Article size={18} weight="duotone" />
                                     </div>
                                     <div className="space-y-0.5">
@@ -417,7 +417,7 @@ export default function EditServiceProviderPage() {
 
                             <div className="flex items-center justify-between p-4 bg-muted/20 border border-border rounded-lg group hover:border-primary/20 transition-all duration-300">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-9 h-9 rounded-lg bg-white border border-zinc-100 flex items-center justify-center text-faint group-hover:text-primary transition-colors">
+                                    <div className="w-9 h-9 rounded-lg bg-background border border-border flex items-center justify-center text-faint group-hover:text-primary transition-colors">
                                         <ShieldCheck size={18} weight="duotone" />
                                     </div>
                                     <div className="space-y-0.5">
@@ -460,7 +460,7 @@ export default function EditServiceProviderPage() {
           <div id="service-portfolio" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-24">
             <div className="p-6 space-y-6">
                 <div className="flex items-center gap-2 pb-2">
-                    <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                         <Tag size={16} weight="fill" />
                     </div>
                     <h3 className="text-lead font-semibold text-foreground">Service Portfolio</h3>
@@ -484,7 +484,7 @@ export default function EditServiceProviderPage() {
 
 
           {/* Floating Action Bar */}
-          <div className="fixed bottom-8 left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[calc(50%+104px)] z-50 flex items-center gap-4 p-2 px-6 bg-background/80 backdrop-blur-2xl border border-border shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-full animate-in slide-in-from-bottom-10 duration-700 ease-out">
+          <div className="fixed bottom-8 left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[calc(50%+104px)] z-50 flex items-center gap-4 p-2 px-6 bg-background/80 backdrop-blur-2xl border border-border shadow-lg rounded-full animate-in slide-in-from-bottom-10 duration-700 ease-out">
             <Button variant="ghost" size="lg" className="text-body font-semibold px-6 transition-colors" onClick={() => router.back()}>
               Cancel
             </Button>

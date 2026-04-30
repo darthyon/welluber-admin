@@ -70,7 +70,7 @@ export function DocumentUploadSection({
               className="flex items-center justify-between p-3 bg-muted/30 border border-border rounded-lg group hover:border-primary/30 transition-all shadow-sm"
             >
               <div className="flex items-center gap-3 overflow-hidden">
-                <div className="w-8 h-8 rounded-lg bg-white border border-zinc-100 flex items-center justify-center text-faint group-hover:text-primary transition-colors shrink-0">
+                <div className="w-8 h-8 rounded-lg bg-background border border-border flex items-center justify-center text-faint group-hover:text-primary transition-colors shrink-0">
                   <FileIcon size={16} weight="duotone" />
                 </div>
                 <div className="overflow-hidden">
@@ -98,7 +98,7 @@ export function DocumentUploadSection({
             error && "border-destructive/50 bg-destructive/5"
           )}
         >
-          <div className="w-10 h-10 rounded-full bg-white border border-zinc-100 flex items-center justify-center text-faint group-hover:text-primary transition-colors mb-3">
+          <div className="w-10 h-10 rounded-full bg-background border border-border flex items-center justify-center text-faint group-hover:text-primary transition-colors mb-3">
             <UploadSimple size={20} weight="bold" />
           </div>
           <p className="text-body font-medium text-foreground">Click to upload files</p>

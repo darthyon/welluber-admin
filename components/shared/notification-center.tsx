@@ -28,8 +28,8 @@ const DEFAULT_NOTIFICATIONS: NotificationItem[] = [
     time: "10 mins ago",
     context: "Physical therapy bundle submission (RM 1,200/mo).",
     icon: CheckCircle,
-    color: "text-amber-500",
-    bg: "bg-amber-500/10",
+    color: "text-amber-600 dark:text-amber-400",
+    bg: "bg-amber-500/10 dark:bg-amber-500/20",
     read: false,
   },
   {
@@ -64,8 +64,8 @@ const DEFAULT_NOTIFICATIONS: NotificationItem[] = [
     time: "5 hours ago",
     context: "Wallet provisioned successfully.",
     icon: CheckCircle,
-    color: "text-emerald-500",
-    bg: "bg-emerald-500/10",
+    color: "text-emerald-600 dark:text-emerald-400",
+    bg: "bg-emerald-500/10 dark:bg-emerald-500/20",
     read: true,
   },
   {

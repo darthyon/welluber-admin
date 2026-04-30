@@ -15,6 +15,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/shared/status-badge";
 import { BenefitPolicy, BenefitGroup, Benefit } from "@/types/policy";
 
 interface PolicyDetailSheetProps {
@@ -43,13 +44,11 @@ export function PolicyDetailSheet({ isOpen, onClose, policy, groups, benefits, o
                <div className="flex items-center gap-3 mt-1">
                  <span className="text-label font-mono text-faint tracking-tight leading-none">{policy.code}</span>
                  <div className="w-1.5 h-1.5 rounded-full bg-muted" />
-                 <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 font-semibold text-micro tracking-wider h-5">
-                   {policy.status}
-                 </Badge>
+                  <StatusBadge status={policy.status} variant="emerald" />
                </div>
              </div>
           </div>
-          <button onClick={onClose} className="p-2.5 hover:bg-muted rounded-full transition-colors group">
+          <button onClick={onClose} className="p-2.5 hover:bg-muted rounded-full transition-colors group" aria-label="Close panel">
             <X size={22} className="text-faint group-hover:text-foreground" />
           </button>
         </div>
@@ -59,12 +58,11 @@ export function PolicyDetailSheet({ isOpen, onClose, policy, groups, benefits, o
           <section className="space-y-6">
             <h4 className="text-label font-medium text-subtle">Policy rules & lifecycle</h4>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-              <RuleItem icon={Users} label="Target Workforce" value={policy.eligibility.roles.length > 0 ? policy.eligibility.roles.join(", ") : "All Roles"} />
-              <RuleItem icon={Briefcase} label="Employment" value={policy.eligibility.employeeTypes.join(", ")} />
-              <RuleItem icon={CurrencyCircleDollar} label="Pool Type" value={`${policy.benefitPoolType.employee} Pool`} />
+              <RuleItem icon={Briefcase} label="Eligible Types" value={policy.eligibleEmploymentTypes?.join(", ") || "—"} />
+              <RuleItem icon={CurrencyCircleDollar} label="Pool Type" value={`${policy.benefitPoolType} Pool`} />
               <RuleItem icon={Gear} label="Allocation" value={policy.utilisationMode} />
               <RuleItem icon={Clock} label="Refresh Cycle" value={policy.refreshCycle} />
-              <RuleItem icon={CheckCircle} label="Activation" value={policy.activationMode === "JoinDate" ? "Immediately" : policy.activationMode} />
+              <RuleItem icon={CheckCircle} label="Start Reference" value={policy.refreshStartReference === "fy_start" ? "Financial Year" : policy.refreshStartReference === "join_date" ? "Join Date" : "Custom Date"} />
             </div>
           </section>
 
@@ -73,10 +71,10 @@ export function PolicyDetailSheet({ isOpen, onClose, policy, groups, benefits, o
             <h4 className="text-label font-medium text-subtle">Nested benefit structure</h4>
             <div className="space-y-6">
               {groups.map((group) => (
-                <div key={group.id} className="rounded-lg border border-zinc-100 bg-muted/50 p-6 space-y-5">
+                <div key={group.id} className="rounded-lg border border-border bg-muted/50 p-6 space-y-5">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-white border border-zinc-100 flex items-center justify-center text-primary shadow-sm">
+                      <div className="w-9 h-9 rounded-lg bg-background border border-border flex items-center justify-center text-primary shadow-sm">
                         <TreeStructure size={20} weight="duotone" />
                       </div>
                       <div>
@@ -93,20 +91,18 @@ export function PolicyDetailSheet({ isOpen, onClose, policy, groups, benefits, o
                   </div>
 
                   {/* Benefits in Group */}
-                  <div className="space-y-2 pt-4 border-t border-zinc-200/50">
+                  <div className="space-y-2 pt-4 border-t border-border/50">
                     {benefits.filter(b => b.groupId === group.id).map((benefit) => (
-                      <div key={benefit.id} className="flex items-center justify-between p-3 rounded-lg bg-white border border-zinc-100 transition-all hover:border-primary/20">
+                      <div key={benefit.id} className="flex items-center justify-between p-3 rounded-lg bg-background border border-border transition-all hover:border-primary/20">
                         <div className="flex items-center gap-3">
-                           <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center text-faint border border-zinc-100">
+                           <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center text-faint border border-border">
                              <IdentificationCard size={16} weight="duotone" />
                            </div>
                            <div>
                              <p className="text-body font-medium text-foreground">Benefit ID: {benefit.serviceId}</p>
                              <div className="flex items-center gap-2 mt-0.5">
                                {benefit.coPayment.required && (
-                                 <Badge variant="outline" className="text-micro h-4 bg-rose-50 text-rose-600 border-rose-100 px-1 font-semibold">
-                                   Co-pay active
-                                 </Badge>
+                                <StatusBadge status="Co-pay active" variant="rose" className="text-label h-5 px-2" />
                                )}
                              </div>
                            </div>

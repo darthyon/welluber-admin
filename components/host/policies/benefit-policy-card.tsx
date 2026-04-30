@@ -2,29 +2,39 @@
 
 import { IdentificationCard } from "@phosphor-icons/react";
 import { StatusBadge } from "@/components/shared/status-badge";
-import { ActionPopover } from "@/components/shared/action-popover";
+import { ActionPopover, type ActionItem } from "@/components/shared/action-popover";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
-interface BenefitPolicy {
+interface BenefitPolicyCardItem {
   id: string;
   name: string;
-  code: string;
+  code?: string;
   description?: string;
-  utilisationMode: string;
-  status: string;
+  utilisationMode?: string;
+  status: "draft" | "active" | "deactivated";
+  groupCount?: number;
+  orgName?: string;
 }
 
 interface BenefitPolicyCardProps {
-  policy: BenefitPolicy;
+  policy: BenefitPolicyCardItem;
   onView: (id: string) => void;
-  onClone: (e: React.MouseEvent, policy: BenefitPolicy) => void;
+  onClone: (e: React.MouseEvent, policy: BenefitPolicyCardItem) => void;
+  onDeactivate?: (e: React.MouseEvent, policy: BenefitPolicyCardItem) => void;
+  onDelete?: (e: React.MouseEvent, policy: BenefitPolicyCardItem) => void;
 }
 
-export function BenefitPolicyCard({ policy, onView, onClone }: BenefitPolicyCardProps) {
-  const actions = [
-    { 
-      label: "View policy details", 
+const statusVariantMap: Record<string, "emerald" | "amber" | "rose"> = {
+  active: "emerald",
+  draft: "amber",
+  deactivated: "rose",
+};
+
+export function BenefitPolicyCard({ policy, onView, onClone, onDeactivate, onDelete }: BenefitPolicyCardProps) {
+  const actions: ActionItem[] = [
+    {
+      label: "View policy details",
       onClick: (e: React.MouseEvent) => {
         e.stopPropagation();
         onView(policy.id);
@@ -38,16 +48,35 @@ export function BenefitPolicyCard({ policy, onView, onClone }: BenefitPolicyCard
       },
       className: "text-primary font-semibold"
     },
-    {
-      label: "Management",
-      isSectionTitle: true
-    },
-    {
-      label: "Archived policy",
-      onClick: () => console.log("Archive"),
-      isDanger: true
-    }
   ];
+
+  if (policy.status === "active" && onDeactivate) {
+    actions.push(
+      { label: "Management", isSectionTitle: true },
+      {
+        label: "Deactivate policy",
+        onClick: (e: React.MouseEvent) => {
+          e.stopPropagation();
+          onDeactivate(e, policy);
+        },
+        isDanger: true
+      }
+    );
+  }
+
+  if ((policy.status === "draft" || policy.status === "deactivated") && onDelete) {
+    actions.push(
+      { label: "Management", isSectionTitle: true },
+      {
+        label: "Delete policy",
+        onClick: (e: React.MouseEvent) => {
+          e.stopPropagation();
+          onDelete(e, policy);
+        },
+        isDanger: true
+      }
+    );
+  }
 
   return (
     <motion.div
@@ -59,9 +88,9 @@ export function BenefitPolicyCard({ policy, onView, onClone }: BenefitPolicyCard
       <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-primary/5 rounded-full blur-3xl group-hover:w-40 group-hover:h-40 group-hover:bg-primary/10 transition-all duration-500 pointer-events-none" />
 
       {/* Top Section: Header & Actions */}
-      <div className="flex items-start justify-between mb-8 relative z-10">
+      <div className="flex items-start justify-between mb-6 relative z-10">
         <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-lg bg-muted border border-border/60 text-muted-foreground flex items-center justify-center transition-all duration-300 group-hover:bg-primary group-hover:text-white group-hover:border-primary/20">
+          <div className="w-12 h-12 rounded-lg bg-muted border border-border/60 text-muted-foreground flex items-center justify-center transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary/20">
             <IdentificationCard size={24} weight="fill" />
           </div>
 
@@ -70,10 +99,10 @@ export function BenefitPolicyCard({ policy, onView, onClone }: BenefitPolicyCard
               {policy.name}
             </h4>
             <div className="flex items-center gap-2">
-              <StatusBadge
-                status={policy.status}
-                variant={policy.status === "Published" ? "emerald" : "amber"}
-              />
+            <StatusBadge
+              status={policy.status}
+              variant={statusVariantMap[policy.status] || "zinc"}
+            />
               <span className="text-micro text-faint font-mono bg-background/50 px-1.5 py-0.5 rounded border border-border/40 tracking-tight">
                 {policy.code}
               </span>
@@ -90,16 +119,18 @@ export function BenefitPolicyCard({ policy, onView, onClone }: BenefitPolicyCard
           {policy.description || "No description provided."}
         </p>
 
-        <div className="mt-8 pt-6 border-t border-border/60 flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-faint">
-            <span className="text-label font-medium">12 enrolled</span>
+        <div className="mt-6 pt-5 border-t border-border/60 flex items-center justify-between">
+          <div className="flex items-center gap-3 text-faint">
+            <span className="text-label font-medium">{policy.groupCount ?? 0} groups</span>
+            <span className="w-1 h-1 rounded-full bg-muted" />
+            <span className="text-label font-medium">{policy.orgName || "Unassigned"}</span>
           </div>
           <div className="text-right">
             <p className="text-body font-semibold text-foreground">
-              RM {policy.utilisationMode === "Fixed" ? "2,400.00" : "Prorated"}
+              {policy.utilisationMode === "Fixed" ? "Fixed" : "Prorated"}
             </p>
             <p className="text-label text-faint font-medium">
-              Budget pool
+              Allocation
             </p>
           </div>
         </div>

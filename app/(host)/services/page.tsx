@@ -378,8 +378,8 @@ function ServicesContent() {
                         className={cn(
                           "w-10 h-10 rounded-lg border flex items-center justify-center transition-all group/icon",
                           selectedIcon === name 
-                            ? "bg-primary text-white border-primary shadow-lg shadow-primary/20 scale-110 z-10" 
-                            : "bg-muted border-zinc-200 text-faint hover:border-primary/30 hover:bg-white hover:text-primary"
+                            ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20 scale-110 z-10" 
+                            : "bg-muted border-border text-faint hover:border-primary/30 hover:bg-background hover:text-primary"
                         )}
                       >
                         <IconComp size={20} weight={selectedIcon === name ? "fill" : "duotone"} />

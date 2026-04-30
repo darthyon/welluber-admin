@@ -109,7 +109,7 @@ export function CustomMultiSelect({
                     e.stopPropagation();
                     toggleOption(s);
                   }}
-                  className="hover:text-rose-500 transition-colors shrink-0"
+                  className="hover:text-destructive transition-colors shrink-0"
                   type="button"
                 >
                   <X size={10} weight="bold" />

@@ -1,5 +1,7 @@
 # Typography & Color Scorecard
 
+> **Status:** Superseded by `AGENTS.md` (2026-04-30). Many items below have been resolved. This document is retained for historical reference only.
+
 **Date:** 2026-04-11  
 **Scope:** Full codebase audit — font tokens, color tokens, WCAG contrast, dark mode  
 **Method:** Automated token extraction + WCAG 2.1 contrast math + component-by-pattern grep

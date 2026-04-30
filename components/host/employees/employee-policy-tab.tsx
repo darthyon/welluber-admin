@@ -5,6 +5,7 @@ import { Shield, Users, CurrencyCircleDollar, Calendar, Warning, CheckCircle } f
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/shared/status-badge";
 import { Progress } from "@/components/ui/progress";
 import { AssignPolicyModal } from "./assign-policy-modal";
 import { UnassignPolicyModal } from "./unassign-policy-modal";
@@ -82,9 +83,7 @@ export function EmployeePolicyTab({ employeeId }: EmployeePolicyTabProps) {
                     <div>
                       <div className="flex items-center gap-3">
                         <h3 className="text-heading font-semibold text-foreground">{policy.name}</h3>
-                        <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20">
-                          {policy.status}
-                        </Badge>
+                        <StatusBadge status={policy.status} variant="emerald" />
                       </div>
                       <p className="text-body text-muted-foreground mt-1">{policy.description}</p>
                       
@@ -122,7 +121,7 @@ export function EmployeePolicyTab({ employeeId }: EmployeePolicyTabProps) {
                     <Card className="border-border bg-card">
                       <CardContent className="p-4">
                         <div className="flex items-center gap-2 mb-2">
-                          <CurrencyCircleDollar size={16} className="text-amber-500" />
+                          <CurrencyCircleDollar size={16} className="text-primary" />
                           <p className="text-label font-medium text-subtle">Total Spent</p>
                         </div>
                         <p className="text-display font-semibold text-foreground tabular-nums">RM {policy.totalSpent.toLocaleString()}</p>
@@ -131,7 +130,7 @@ export function EmployeePolicyTab({ employeeId }: EmployeePolicyTabProps) {
                     <Card className="border-border bg-card">
                       <CardContent className="p-4">
                         <div className="flex items-center gap-2 mb-2">
-                          <Shield size={16} className="text-emerald-500" />
+                          <Shield size={16} className="text-primary" />
                           <p className="text-label font-medium text-subtle">Utilization</p>
                         </div>
                         <div className="flex items-center gap-2">
@@ -154,7 +153,7 @@ export function EmployeePolicyTab({ employeeId }: EmployeePolicyTabProps) {
                   </Button>
                   <Button 
                     variant="outline" 
-                    className="gap-2 text-rose-600 border-rose-500/30 hover:bg-rose-500/10 hover:text-rose-600"
+                    className="gap-2 text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive"
                     onClick={handleUnassignPolicy}
                   >
                     <Warning size={18} />

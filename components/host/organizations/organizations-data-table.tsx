@@ -37,7 +37,7 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
       header: "Organisation name",
       accessorKey: "name",
       sortable: true,
-      headerClassName: "min-w-[220px]",
+      headerClassName: "min-w-[14rem]",
       render: (org) => (
         <div className="flex items-center gap-3">
           <EntityAvatar name={org.name} size="sm" />
@@ -63,11 +63,11 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
       header: "Needs Action",
       accessorKey: "needsAction",
       sortable: true,
-      headerClassName: "min-w-[160px]",
+      headerClassName: "min-w-[10rem]",
       render: (org) => {
         if (org.needsAction.length === 0) {
           return (
-            <Badge variant="outline" className="text-label px-2 h-5 bg-emerald-500/10 text-emerald-400 border-emerald-500/20 font-medium gap-1 animate-in fade-in duration-500">
+            <Badge variant="outline" className="text-label px-2 h-5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 dark:bg-emerald-500/20 border-emerald-500/20 font-medium gap-1 animate-in fade-in duration-500">
               <CheckCircle size={12} weight="fill" />
               All good
             </Badge>
@@ -86,7 +86,7 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
       header: "Utilisation & Claims",
       accessorKey: "utilizationRate",
       sortable: true,
-      headerClassName: "min-w-[180px]",
+      headerClassName: "min-w-[11rem]",
       render: (org) => (
         <div className="flex items-center gap-2.5">
           <UtilizationChart value={org.utilizationRate} mode="ring" size={32} strokeWidth={3} />
@@ -111,22 +111,22 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
     {
       header: "Service category",
       render: (org) => (
-        <div className="flex items-center gap-1 overflow-hidden max-w-[200px]">
+        <div className="flex items-center gap-1 overflow-hidden max-w-[12rem]">
           {org.services.length === 0 ? (
             <span className="text-label text-faint font-normal italic px-1">Unassigned</span>
           ) : (
             <>
               {org.services.slice(0, 1).map((service, i) => (
-                <Badge key={i} variant="secondary" className="bg-muted/50 font-medium text-micro px-1.5 py-0 h-4 border-border/40 whitespace-nowrap">
+                <Badge key={i} variant="secondary" className="bg-muted/50 font-medium text-label px-2 py-0 h-5 border-border/40 whitespace-nowrap">
                   {service}
                 </Badge>
               ))}
               {org.services.length > 1 && (
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
-                    <button 
+                    <button aria-label="View more services" 
                       onClick={(e) => e.stopPropagation()}
-                      className="text-micro text-muted-foreground hover:text-primary font-semibold px-1 transition-colors"
+                      className="text-micro text-muted-foreground hover:text-primary font-semibold px-1.5 py-1 transition-colors min-h-[28px] min-w-[28px] flex items-center justify-center"
                     >
                       +{org.services.length - 1}
                     </button>
@@ -150,7 +150,7 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
     },
     {
       header: "Benefit Policies",
-      headerClassName: "min-w-[120px]",
+      headerClassName: "min-w-[8rem]",
       render: (org) => (
         <div className="flex items-center gap-1 overflow-hidden">
           {org.policies.length === 0 ? (
@@ -158,16 +158,16 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
           ) : (
             <>
               {org.policies.slice(0, 1).map((policy, i) => (
-                <Badge key={i} variant="secondary" className="bg-primary/10 text-primary font-medium text-label px-1.5 py-0 h-4 border-primary/20 whitespace-nowrap">
+                <Badge key={i} variant="secondary" className="bg-primary/10 text-primary font-medium text-label px-1.5 py-0 h-5 border-primary/20 whitespace-nowrap">
                   {policy}
                 </Badge>
               ))}
               {org.policies.length > 1 && (
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
-                    <button 
+                    <button aria-label="View more services" 
                       onClick={(e) => e.stopPropagation()}
-                      className="text-label text-subtle hover:text-primary font-medium px-1 transition-colors"
+                      className="text-label text-subtle hover:text-primary font-medium px-1.5 py-1 transition-colors min-h-[28px] min-w-[28px] flex items-center justify-center"
                     >
                       +{org.policies.length - 1}
                     </button>
@@ -193,7 +193,7 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
       header: "Branches",
       accessorKey: "branches",
       sortable: true,
-      headerClassName: "min-w-[120px]",
+      headerClassName: "min-w-[8rem]",
       render: (org) => (
         <div className="flex items-center gap-1 overflow-hidden">
           {org.branches.length === 0 ? (
@@ -201,16 +201,16 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
           ) : (
             <>
               {org.branches.slice(0, 1).map((branch, i) => (
-                <Badge key={i} variant="secondary" className="bg-sky-500/10 text-sky-400 font-medium text-label px-1.5 py-0 h-4 border-sky-500/20 whitespace-nowrap">
+                <Badge key={i} variant="secondary" className="bg-primary/10 text-primary font-medium text-label px-1.5 py-0 h-5 border-primary/20 whitespace-nowrap">
                   {branch}
                 </Badge>
               ))}
               {org.branches.length > 1 && (
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
-                    <button 
+                    <button aria-label="View more services" 
                       onClick={(e) => e.stopPropagation()}
-                      className="text-label text-subtle hover:text-sky-600 font-medium px-1 transition-colors"
+                      className="text-label text-subtle hover:text-primary font-medium px-1.5 py-1 transition-colors min-h-[28px] min-w-[28px] flex items-center justify-center"
                     >
                       +{org.branches.length - 1}
                     </button>

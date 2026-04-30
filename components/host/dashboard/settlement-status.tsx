@@ -1,4 +1,5 @@
 import { ShieldCheck, ArrowRight } from "@phosphor-icons/react"
+import { PulseStatus } from "@/components/shared/pulse-status"
 
 export function SettlementStatus() {
   return (
@@ -12,9 +13,10 @@ export function SettlementStatus() {
             <h2 className="text-body leading-none font-semibold tracking-tight text-foreground">
               Settlement Status
             </h2>
-            <div
-              className="h-2 w-2 animate-pulse rounded-full bg-emerald-500"
-              title="System operational"
+            <PulseStatus
+              status="active"
+              showLabel={false}
+              className="bg-transparent border-0 px-0 py-0 dark:bg-transparent"
             />
           </div>
           <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-primary/20 bg-primary/10 text-primary">

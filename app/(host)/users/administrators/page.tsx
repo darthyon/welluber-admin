@@ -57,14 +57,10 @@ export default function AdministratorsPage() {
       accessorKey: "role",
       sortable: true,
       render: (row) => (
-        <span className={cn(
-          "px-2 py-0.5 rounded-md text-label font-medium border whitespace-nowrap",
-          row.role === "HostAdmin" ? "bg-primary/10 text-primary border-primary/20" :
-          row.role === "OrgAdmin" ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
-          "bg-amber-50 text-amber-600 border-amber-100"
-        )}>
-          {row.role === "HostAdmin" ? "Host admin" : row.role === "OrgAdmin" ? "Org admin" : "SP admin"}
-        </span>
+        <StatusBadge
+          status={row.role === "HostAdmin" ? "Host admin" : row.role === "OrgAdmin" ? "Org admin" : "SP admin"}
+          variant={row.role === "HostAdmin" ? "primary" : row.role === "OrgAdmin" ? "emerald" : "amber"}
+        />
       )
     },
     {

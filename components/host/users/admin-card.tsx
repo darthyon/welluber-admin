@@ -16,7 +16,7 @@ export function AdminCard({ admin }: AdminCardProps) {
     { label: "Edit permissions", onClick: () => console.log("Permissions") },
     { label: "View activity", onClick: () => console.log("Activity") },
     { label: "Reset password", onClick: () => console.log("Reset") },
-    { label: "Revoke access", onClick: () => console.log("Revoke"), className: "text-rose-600" },
+    { label: "Revoke access", onClick: () => console.log("Revoke"), className: "text-destructive" },
   ];
 
   const getRoleStyle = (role: string) => {
@@ -24,9 +24,9 @@ export function AdminCard({ admin }: AdminCardProps) {
       case "HostAdmin":
         return "bg-primary/10 text-primary border-primary/20";
       case "OrgAdmin":
-        return "bg-emerald-500/10 text-emerald-500 border-emerald-500/20";
+        return "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 dark:bg-emerald-500/20 border-emerald-500/20";
       case "SPAdmin":
-        return "bg-amber-500/10 text-amber-500 border-amber-500/20";
+        return "bg-amber-500/10 text-amber-600 dark:text-amber-400 dark:bg-amber-500/20 border-amber-500/20";
       default:
         return "bg-muted text-muted-foreground border-border";
     }

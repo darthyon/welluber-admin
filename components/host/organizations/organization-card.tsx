@@ -25,9 +25,9 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
 
   // Professional color mapping for utilization
   const getUtilColor = (val: number) => {
-    if (val > 80) return "text-rose-500";
-    if (val > 50) return "text-amber-500";
-    return "text-emerald-500";
+    if (val > 80) return "bg-rose-500/10 text-rose-600 dark:text-rose-400 dark:bg-rose-500/20";
+    if (val > 50) return "bg-amber-500/10 text-amber-600 dark:text-amber-400 dark:bg-amber-500/20";
+    return "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 dark:bg-emerald-500/20";
   };
 
   const formatCurrency = (val: number) => {
@@ -127,7 +127,7 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
                       / {formatCurrency(org.walletLimit)}
                     </span>
                     {org.claimsCount !== undefined && (
-                      <Badge variant="outline" className="h-3.5 px-1 text-[8px] font-semibold bg-muted/40 border-border/50 text-subtle tabular-nums">
+                      <Badge variant="outline" className="h-5 px-2 text-label font-semibold bg-muted/40 border-border/50 text-subtle tabular-nums">
                         {org.claimsCount} claims
                       </Badge>
                     )}

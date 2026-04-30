@@ -254,7 +254,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
             <div id="location-mapping" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
               <div className="p-6 space-y-6">
                 <div className="flex items-center gap-2 pb-2">
-                  <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                    <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400 dark:bg-emerald-500/20">
                     <MapPin size={16} weight="fill" />
                   </div>
                   <div className="space-y-0.5">
@@ -276,7 +276,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
             <div id="service-catalog" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
               <div className="p-6 space-y-6">
                 <div className="flex items-center gap-2 pb-2">
-                  <div className="w-8 h-8 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500">
+                    <div className="w-8 h-8 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-600 dark:text-amber-400 dark:bg-amber-500/20">
                     <Tag size={16} weight="fill" />
                   </div>
                   <div className="space-y-0.5">
@@ -353,7 +353,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
               <div className="p-6 space-y-6">
                 <div className="flex items-center justify-between pb-2">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                       <Users size={16} weight="fill" />
                     </div>
                     <div className="space-y-0.5">
@@ -488,7 +488,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
             <div id="operating-hours" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
               <div className="p-6 space-y-6">
                 <div className="flex items-center gap-2 pb-2">
-                  <div className="w-8 h-8 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-500">
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                     <Clock size={16} weight="fill" />
                   </div>
                   <div className="space-y-0.5">
@@ -523,7 +523,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
             <div id="benefits" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
               <div className="p-6 space-y-6">
                 <div className="flex items-center gap-2 pb-2">
-                  <div className="w-8 h-8 rounded-full bg-zinc-500/10 flex items-center justify-center text-zinc-500">
+                  <div className="w-8 h-8 rounded-full bg-muted/10 flex items-center justify-center text-muted-foreground">
                     <CheckCircle size={16} weight="fill" />
                   </div>
                   <div className="space-y-0.5">
@@ -569,7 +569,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
       </div>
 
       {/* Floating Action Bar */}
-      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[calc(50%+104px)] z-50 flex items-center gap-4 p-2 px-6 bg-white/80 backdrop-blur-2xl border border-border shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-full animate-in slide-in-from-bottom-10 duration-700 ease-out">
+      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[calc(50%+104px)] z-50 flex items-center gap-4 p-2 px-6 bg-background/80 backdrop-blur-2xl border border-border shadow-lg rounded-full animate-in slide-in-from-bottom-10 duration-700 ease-out">
         <Button 
           type="button" 
           variant="ghost" 

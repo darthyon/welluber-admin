@@ -122,7 +122,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
           <Button
             disabled={isSubmitting || isSuccess}
             onClick={handleSubmit}
-            className="bg-primary text-white hover:bg-primary/90 font-medium px-6 shadow-sm shadow-primary/20 min-w-[140px]"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 font-medium px-6 shadow-sm shadow-primary/20 min-w-[140px]"
           >
             {isSubmitting ? (
               <div className="flex items-center gap-2">
@@ -181,7 +181,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
                 <div className="space-y-1.5">
                   <label className="text-label font-medium text-faint">Status</label>
                   <div className="h-[38px] flex items-center px-3 bg-muted/20 border border-border rounded-lg text-body text-subtle font-medium">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 mr-2 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                    <span className="w-2 h-2 rounded-full bg-primary mr-2 " />
                     Pending activation
                   </div>
                 </div>
@@ -275,7 +275,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
                       <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-border bg-card">
                         <UploadSimple size={18} className="text-primary" />
                         <span className="text-body font-semibold text-foreground flex-1 truncate">{attachment.name}</span>
-                        <button onClick={removeAttachment} className="text-muted-foreground hover:text-destructive transition-colors">
+                        <button onClick={removeAttachment} className="text-muted-foreground hover:text-destructive transition-colors" aria-label="Remove attachment">
                           <X size={16} />
                         </button>
                       </div>
@@ -377,7 +377,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
                   <span className="text-muted-foreground font-medium">{step.label}</span>
                   <div className={cn(
                     "w-2 h-2 rounded-full",
-                    step.status ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" : "bg-muted"
+                    step.status ? "bg-primary" : "bg-muted"
                   )} />
                 </div>
               ))}

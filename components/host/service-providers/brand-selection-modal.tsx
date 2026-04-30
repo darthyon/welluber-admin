@@ -56,7 +56,7 @@ export function BrandSelectionModal({ isOpen, onClose, onSelect, brands }: Brand
                 className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-muted/60 transition-all group text-left"
               >
                 <div className="flex items-center gap-3">
-                  <Avatar className="h-10 w-10 rounded-full border border-border/60 shadow-sm bg-white shrink-0">
+                  <Avatar className="h-10 w-10 rounded-full border border-border/60 shadow-sm bg-background shrink-0">
                     {brand.logo && !brand.logo.includes("dicebear.com") && (
                       <AvatarImage src={brand.logo} className="object-contain p-1" />
                     )}

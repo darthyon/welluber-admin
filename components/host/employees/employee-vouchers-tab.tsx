@@ -156,7 +156,7 @@ function VoucherCard({ voucher }: { voucher: VoucherRedemption }) {
               </div>
             </div>
             {voucher.status === "confirmed" && (
-              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full shadow-sm" />
+              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-primary border-2 border-background rounded-full shadow-sm" />
             )}
           </div>
 

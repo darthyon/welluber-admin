@@ -59,7 +59,7 @@ export function CategoryDetailSheet({
         {/* Header */}
         <div className="flex items-center justify-between px-8 py-6 border-b border-border bg-muted/30">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-lg bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/20">
+            <div className="w-12 h-12 rounded-lg bg-primary text-primary-foreground flex items-center justify-center shadow-lg shadow-primary/20">
               <TreeStructure size={24} weight="fill" />
             </div>
             <div>

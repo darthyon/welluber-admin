@@ -73,8 +73,8 @@ export function ServicePortfolioTags({ mainServices, className }: ServicePortfol
       setVisibleCount(count);
     };
 
-    measure();
-    const ro = new ResizeObserver(measure);
+    requestAnimationFrame(measure);
+    const ro = new ResizeObserver(() => requestAnimationFrame(measure));
     ro.observe(container);
     return () => ro.disconnect();
   }, [mainServices]);

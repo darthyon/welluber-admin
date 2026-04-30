@@ -1,10 +1,22 @@
 # DESIGN.md — WellUber Admin
 
 > **Status:** Active
-> **Last Updated:** 2026-04-27
+> **Last Updated:** 2026-04-30
 > **Design Source:** shadcn/ui Luma preset + custom refinements
 > **Inspiration:** Linear, Vercel, Supabase, Midday
 > **Format:** [VoltAgent DESIGN.md](https://github.com/VoltAgent/awesome-design-md)
+
+---
+
+## 0. Agent System Instructions
+
+> [!IMPORTANT]
+> When generating code for this project, you MUST adhere to the following constraints:
+> - **STRICT NO BOLD POLICY**: Never use `font-bold` or `700`. Use `font-semibold` or `600` for all emphasis.
+> - **TOKEN FIRST**: Use OKLCH tokens (`primary`, `border`, `muted`) exclusively.
+> - **PILL SHAPE**: Use `rounded-4xl` for all buttons, badges, and switches.
+> - **MODERN SaaS**: Favor `glass-card` and `premium-glow` for high-fidelity surfaces.
+> - **SHARED COMPONENTS**: Before creating a new component, check if `StatusBadge`, `PulseStatus`, `Spinner`, `SuccessModal`, etc. already exist in `components/shared/`.
 
 ---
 
@@ -40,24 +52,25 @@ WellUber Admin is a **B2B SaaS admin console** for managing corporate wellness b
 | Foreground | `--foreground` | `oklch(0.147 0.004 49.25)` | Primary text, headings |
 | Card | `--card` | `oklch(1 0 0)` | Card surfaces, panels |
 | Muted | `--muted` | `oklch(0.97 0.001 106.424)` | Subtle backgrounds, search input |
-| Muted Foreground | `--muted-foreground` | `oklch(0.553 0.013 58.071)` | Secondary text, labels |
-| Primary | `--primary` | `oklch(0.457 0.24 277.023)` | CTAs, brand accent — **use sparingly** |
-| Primary Foreground | `--primary-foreground` | `oklch(0.962 0.018 272.314)` | Text on primary buttons |
+| Muted Foreground | `--muted-foreground` | `oklch(0.54 0.013 58.071)` | Secondary text, labels |
+| Primary | `--primary` | `oklch(0.457 0.215 277.023)` | CTAs, brand accent — **use sparingly** |
+| Primary Foreground | `--primary-foreground` | `oklch(0.97 0.018 272.314)` | Text on primary buttons |
 | Accent | `--accent` | `oklch(0.97 0.001 106.424)` | Active nav item, hover states |
 | Border | `--border` | `oklch(0.923 0.003 48.717)` | Warm stone dividers, card borders |
 | Destructive | `--destructive` | `oklch(0.577 0.245 27.325)` | Errors, delete actions |
-| Ring | `--ring` | `oklch(0.709 0.01 56.259)` | Focus rings |
+| Ring | `--ring` | `oklch(0.457 0.215 277.023)` | Focus rings |
 
 ### Dark Mode
 
 | Role | Token | Value |
 |---|---|---|
-| Background | `--background` | `oklch(0.147 0.004 49.25)` |
+| Background | `--background` | `oklch(0.12 0.01 260)` |
 | Foreground | `--foreground` | `oklch(0.985 0.001 106.423)` |
-| Card | `--card` | `oklch(0.216 0.006 56.043)` |
-| Muted | `--muted` | `oklch(0.268 0.007 34.298)` |
-| Primary | `--primary` | `oklch(0.585 0.233 277.117)` |
-| Border | `--border` | `oklch(1 0 0 / 10%)` |
+| Card | `--card` | `oklch(0.16 0.012 260)` |
+| Muted | `--muted` | `oklch(0.18 0.01 240)` |
+| Primary | `--primary` | `oklch(0.56 0.208 277.117)` |
+| Primary Foreground | `--primary-foreground` | `oklch(0.97 0.018 272.314)` |
+| Border | `--border` | `oklch(1 0 0 / 12%)` |
 
 ### Sidebar
 
@@ -65,7 +78,9 @@ WellUber Admin is a **B2B SaaS admin console** for managing corporate wellness b
 |---|---|---|
 | `--sidebar` | `oklch(0.12 0.01 260 / 80%)` | `oklch(0.12 0.01 260 / 92%)` |
 | `--sidebar-foreground` | `oklch(0.985 0.001 106.423)` | `oklch(0.985 0.001 106.423)` |
-| `--sidebar-border` | `oklch(0 0 0 / 8%)` | `oklch(1 0 0 / 10%)` |
+| `--sidebar-primary` | `oklch(0.457 0.215 277.023)` | `oklch(0.56 0.208 277.117)` |
+| `--sidebar-primary-foreground` | `oklch(0.97 0.018 272.314)` | `oklch(0.97 0.018 272.314)` |
+| `--sidebar-border` | `oklch(0 0 0 / 8%)` | `oklch(1 0 0 / 15%)` |
 
 ---
 
@@ -265,7 +280,7 @@ Status and state colors use **Tailwind utility classes** (not CSS custom propert
 
 ---
 
-## 13. Developer Actionability Checklist
+## 8. Developer Actionability Checklist
 
 Use this 5-point check before submitting any UI change:
 1.  **Typography**: Is there any `font-bold`? (Change to `font-semibold`).
@@ -276,18 +291,7 @@ Use this 5-point check before submitting any UI change:
 
 ---
 
-## 14. Agent System Instructions
-
-> [!IMPORTANT]
-> When generating code for this project, you MUST adhere to the following constraints:
-> - **STRICT NO BOLD POLICY**: Never use `font-bold` or `700`. Use `font-semibold` or `600` for all emphasis.
-> - **TOKEN FIRST**: Use OKLCH tokens (`primary`, `border`, `muted`) exclusively.
-> - **PILL SHAPE**: Use `rounded-4xl` for all buttons, badges, and switches.
-> - **MODERN SaaS**: Favor `glass-card` and `premium-glow` for high-fidelity surfaces.
-
----
-
-## 8. Responsive Behavior
+## 9. Responsive Behavior
 
 ### Breakpoints
 
@@ -306,15 +310,15 @@ Use this 5-point check before submitting any UI change:
 
 ---
 
-## 9. Agent Prompt Guide
+## 10. Agent Prompt Guide
 
 ### Quick Color Reference
 - Page background: white (`oklch(1 0 0)`)
 - Primary text: near-black (`oklch(0.147 0.004 49.25)`)
 - Secondary text: muted (`oklch(0.553 0.013 58.071)`)
 - Border: warm stone (`oklch(0.923 0.003 48.717)`)
-- Brand accent: deep indigo (`oklch(0.457 0.24 277.023)`)
-- Focus ring: soft stone (`oklch(0.709 0.01 56.259)`)
+- Brand accent: deep indigo (`oklch(0.457 0.215 277.023)` = `#4338CA`)
+- Focus ring: primary indigo (`oklch(0.457 0.215 277.023)`)
 
 ### Example Component Prompts
 - "Create a stat card: `bg-card border border-border rounded-lg p-4`. Label at 12px font-medium text-muted-foreground. Value at 24px font-semibold tracking-tight. Icon at 16px in muted-foreground/50."
@@ -323,7 +327,7 @@ Use this 5-point check before submitting any UI change:
 
 ---
 
-## 10. Design Changelog
+## 11. Design Changelog
 
 | Date | Change | Screens |
 |---|---|---|
@@ -333,10 +337,11 @@ Use this 5-point check before submitting any UI change:
 | 2026-04-10 | Typography audit — Added "Subtitle" (15px) and "Micro" (9px) roles, standardized Title Case rule, added Technical ID exception for uppercase, documented semantic color convention, reinforced `font-bold` prohibition | All |
 | 2026-04-22 | Service Provider Unification — Documented "Quiet Success" pattern, International Phone Input, Floating Anchor Nav, and Floating Action Bar | Service Provider, Forms |
 | 2026-04-27 | Token overhaul — primary to `oklch(0.457 0.24 277.023)` / dark `oklch(0.585 0.233 277.117)`, sidebar to dark frosted blue both modes, typography to rem, button variant clarification (ghost vs outline vs default) | All |
+| 2026-04-30 | Token reconciliation — primary locked to exact brand `#4338CA` (`oklch(0.457 0.215 277.023)`), dark primary adjusted for WCAG AA (`oklch(0.56 0.208 277.117)`), muted/border/accent aligned with latest spec, created root `AGENTS.md`, added `lint:design` guardrail | All |
 
 ---
 
-## 11. Icons
+## 12. Icons
 
 - **Library:** Phosphor Icons (`@phosphor-icons/react`)
 - **Default weight:** `regular`
@@ -348,7 +353,7 @@ Use this 5-point check before submitting any UI change:
 
 ---
 
-## 12. Persona-Specific Variations
+## 13. Persona-Specific Variations
 
 ### Navigation Width
 ```

@@ -36,22 +36,24 @@ export function SetupChecklist({ organization, className }: SetupChecklistProps)
       {items.map((item) => {
         const Icon = item.icon;
         return (
-          <div 
+          <div
             key={item.label}
             className={cn(
               "flex items-center justify-center w-7 h-7 rounded-md border transition-all relative group",
-              item.isComplete 
-                ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-600" 
-                : "bg-rose-500/5 border-rose-500/20 text-rose-500"
+              item.isComplete
+                ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 dark:bg-emerald-500/20 border-emerald-500/20"
+                : "bg-rose-500/10 text-rose-600 dark:text-rose-400 dark:bg-rose-500/20 border-rose-500/20"
             )}
             title={item.tooltip}
           >
             <Icon size={14} weight={item.isComplete ? "fill" : "bold"} />
-            
+
             {/* Absolute Status Indicator */}
             <div className={cn(
               "absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full border-2 border-card",
-              item.isComplete ? "bg-emerald-500" : "bg-rose-500"
+              item.isComplete
+                ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 dark:bg-emerald-500/20"
+                : "bg-rose-500/10 text-rose-600 dark:text-rose-400 dark:bg-rose-500/20"
             )} />
           </div>
         );

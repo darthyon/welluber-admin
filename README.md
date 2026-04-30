@@ -6,9 +6,10 @@ Precision infrastructure for corporate wellness management. Built with Next.js, 
 
 This project follows a **"Precision Infrastructure"** aesthetic — inspired by Linear and Vercel. 
 
-- **Primary Source of Truth**: [DESIGN.md](docs/design.md)
+- **Primary Source of Truth**: [`AGENTS.md`](AGENTS.md)
+- **Design Detail**: [`docs/design.md`](docs/design.md)
 - **Typography**: Geist Variable (Strict no-bold policy, use Semibold 600)
-- **Color**: OKLCH-based theme with deep indigo brand accent
+- **Color**: OKLCH-based theme with deep indigo brand accent (`#4338CA`)
 - **Radius**: Pill-shaped triggers (`rounded-4xl`), card-shaped surfaces (`rounded-lg`)
 
 ## 🛠 Adding Components

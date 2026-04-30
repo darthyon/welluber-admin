@@ -61,7 +61,7 @@ export function SuccessCelebration({ title, message, className }: SuccessCelebra
           damping: 20,
           delay: 0.1 
         }}
-        className="relative z-10 w-20 h-20 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500 mb-6 border-4 border-emerald-500/20 shadow-[0_0_20px_rgba(16,185,129,0.2)]"
+        className="relative z-10 w-20 h-20 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-6 border-4 border-emerald-500/20 dark:bg-emerald-500/20 shadow-[0_0_20px_rgba(var(--emerald-rgb),0.2)]"
       >
         <CheckCircle size={40} weight="fill" />
       </motion.div>

@@ -162,7 +162,7 @@ export function TaxProfileForm({ spId, initial }: TaxProfileFormProps) {
               )}
             </Button>
           ) : (
-            <span className="inline-flex items-center gap-1.5 text-label font-medium text-emerald-600">
+            <span className="inline-flex items-center gap-1.5 text-label font-medium text-emerald-600 dark:text-emerald-400">
               <CheckCircle size={14} weight="fill" /> Saved
             </span>
           )}

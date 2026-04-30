@@ -34,6 +34,7 @@ export function ActionPopover({
     <Popover>
       <PopoverTrigger asChild>
         <button 
+          data-testid="action-popover-trigger"
           onClick={(e) => e.stopPropagation()}
           className={cn(
             "flex items-center gap-1.5 rounded-lg hover:bg-muted text-muted-foreground transition-colors shrink-0",
@@ -80,7 +81,7 @@ export function ActionPopover({
                   className={cn(
                     "flex items-center gap-2 w-full px-3 py-2 rounded-lg text-body font-medium transition-colors text-left",
                     action.isDanger 
-                      ? "text-rose-500 hover:bg-rose-50" 
+                      ? "text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 dark:hover:bg-rose-500/20" 
                       : "text-subtle hover:bg-muted hover:text-foreground",
                     action.className
                   )}

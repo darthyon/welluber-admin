@@ -104,7 +104,7 @@ export function SettlementTaxSection({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex items-center justify-between p-4 bg-muted/20 border border-border rounded-lg group hover:border-primary/20 transition-all duration-300">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-white border border-zinc-100 flex items-center justify-center text-faint group-hover:text-primary transition-colors">
+                  <div className="w-9 h-9 rounded-lg bg-background border border-border flex items-center justify-center text-faint group-hover:text-primary transition-colors">
                     <Article size={18} weight="duotone" />
                   </div>
                   <div className="space-y-0.5">
@@ -121,7 +121,7 @@ export function SettlementTaxSection({
 
               <div className="flex items-center justify-between p-4 bg-muted/20 border border-border rounded-lg group hover:border-primary/20 transition-all duration-300">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-white border border-zinc-100 flex items-center justify-center text-faint group-hover:text-primary transition-colors">
+                  <div className="w-9 h-9 rounded-lg bg-background border border-border flex items-center justify-center text-faint group-hover:text-primary transition-colors">
                     <ShieldCheck size={18} weight="duotone" />
                   </div>
                   <div className="space-y-0.5">

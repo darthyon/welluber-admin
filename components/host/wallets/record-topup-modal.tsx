@@ -76,7 +76,7 @@ export function RecordTopupModal({
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-border">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-600">
+                <div className="w-10 h-10 rounded-lg bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary dark:text-primary-foreground">
                   <Wallet size={20} weight="fill" />
                 </div>
                 <div>
@@ -185,7 +185,7 @@ export function RecordTopupModal({
               <Button
                 onClick={handleSubmit}
                 disabled={isSubmitting || !amount || !reference}
-                className="text-body font-medium bg-emerald-600 hover:bg-emerald-700"
+                className="text-body font-medium bg-primary hover:bg-primary/90"
               >
                 {isSubmitting ? (
                   <div className="flex items-center gap-2">

@@ -52,7 +52,7 @@ export function SuccessModal({
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.98, opacity: 0, y: 10 }}
               transition={{ ease: [0.16, 1, 0.3, 1], duration: 0.6 }}
-              className="bg-card border border-border shadow-[0_20px_50px_rgba(0,0,0,0.15)] rounded-3xl w-full max-w-md overflow-hidden pointer-events-auto"
+              className="bg-card border border-border shadow-lg rounded-3xl w-full max-w-md overflow-hidden pointer-events-auto"
             >
               {/* Close Button */}
               <Button 

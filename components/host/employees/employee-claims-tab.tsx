@@ -160,7 +160,7 @@ export function EmployeeClaimsTab({ employeeId: _employeeId }: EmployeeClaimsTab
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-2">
-              <Receipt size={16} className="text-emerald-500" />
+              <Receipt size={16} className="text-emerald-600 dark:text-emerald-400" />
               <p className="text-label font-medium text-subtle">Confirmed</p>
             </div>
             <p className="text-display font-semibold text-foreground">{confirmedCount}</p>
@@ -169,7 +169,7 @@ export function EmployeeClaimsTab({ employeeId: _employeeId }: EmployeeClaimsTab
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-2">
-              <Receipt size={16} className="text-amber-500" />
+              <Receipt size={16} className="text-amber-600 dark:text-amber-400" />
               <p className="text-label font-medium text-subtle">Pre-auth</p>
             </div>
             <p className="text-display font-semibold text-foreground tabular-nums">{preAuthCount}</p>

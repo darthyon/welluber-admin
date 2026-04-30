@@ -220,7 +220,7 @@ export function ManualTopUpModal({
                     onClick={() => fileInputRef.current?.click()}
                     className={cn(
                       "border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all",
-                      attachment ? "border-emerald-500/50 bg-emerald-50/10" : "border-border hover:border-primary/50 hover:bg-primary/5",
+                      attachment ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 dark:bg-emerald-500/20" : "border-border hover:border-primary/50 hover:bg-primary/5",
                       errors.attachment && "border-destructive bg-destructive/5"
                     )}
                   >
@@ -240,7 +240,7 @@ export function ManualTopUpModal({
                             <img src={filePreview} alt="Preview" className="w-full h-full object-cover" />
                           </div>
                         ) : (
-                          <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600 mb-2">
+                          <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-2 dark:bg-emerald-500/20">
                             <FileText size={24} weight="duotone" />
                           </div>
                         )}

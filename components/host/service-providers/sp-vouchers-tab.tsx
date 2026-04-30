@@ -110,7 +110,7 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-heading font-semibold text-foreground">Vouchers</h2>
+          <h2 className="text-heading font-semibold text-foreground">Voucher Package</h2>
           <p className="text-body text-subtle">Create and manage provider vouchers, publish states, and activation periods.</p>
         </div>
         <Button size="sm" variant="secondary" className="h-8 text-label gap-2" onClick={handleAdd}>

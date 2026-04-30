@@ -101,7 +101,6 @@ export function BrandDataTable({ data, onRemove }: BrandDataTableProps) {
             {
               label: brand.status === "inactive" ? "Activate Brand" : "Deactivate Brand",
               onClick: () => console.log("toggle status", brand.id),
-              className: brand.status === "inactive" ? "text-emerald-600 font-semibold" : "text-amber-600 font-semibold",
             },
             {
               label: "Remove Brand",

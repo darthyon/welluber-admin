@@ -75,6 +75,9 @@
 pnpm dev          # Start dev server (Turbopack)
 pnpm build        # Production build
 pnpm lint         # ESLint check
+pnpm lint:design  # Design system guardrails (hardcoded colors, tokens, typography)
 pnpm typecheck    # TypeScript strict check
 pnpm format       # Prettier formatting
 ```
+
+Run **all** of these before submitting changes. `pnpm lint:design` is mandatory — it blocks hardcoded colors, `font-bold`, and token bypasses.

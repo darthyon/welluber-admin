@@ -35,8 +35,8 @@ export function ConfirmationModal({
 
   const toneClasses =
     tone === "danger"
-      ? "border-rose-200 bg-rose-50/60 text-rose-700"
-      : "border-amber-200 bg-amber-50/70 text-amber-700";
+      ? "border-rose-200 dark:border-rose-500/20 bg-rose-500/10 text-rose-600 dark:text-rose-400 dark:bg-rose-500/20"
+      : "border-amber-200 dark:border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-400 dark:bg-amber-500/20";
 
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">

@@ -83,7 +83,7 @@ export function FloatingAnchorNav({ items }: FloatingAnchorNavProps) {
                 className={cn(
                   "group flex w-full items-center border-l-2 py-2.5 px-4 text-left transition-all duration-300 rounded-r-lg",
                   isActive
-                    ? "border-primary text-primary font-medium bg-primary/[0.03] shadow-[inset_1px_0_0_0_rgba(var(--primary),0.1)]"
+                    ? "border-primary text-primary font-medium bg-primary/[0.03] "
                     : "border-transparent text-subtle hover:text-foreground hover:bg-muted/30"
                 )}
               >

@@ -19,11 +19,11 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50/50 p-6">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-muted/50 p-6">
       <div className="w-full max-w-2xl">
         <EmptyState
           isPageLevel
-          icon={<Warning size={48} weight="duotone" className="text-amber-500" />}
+          icon={<Warning size={48} weight="duotone" />}
           title="Something went wrong"
           description={
             error.message || 

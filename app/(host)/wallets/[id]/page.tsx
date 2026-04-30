@@ -137,7 +137,7 @@ function WalletDetailContent() {
 
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
             <div className="flex items-start gap-5">
-              <div className="w-15 h-15 rounded-lg bg-muted/80 flex items-center justify-center text-muted-foreground border border-zinc-200/60 transition-all">
+              <div className="w-15 h-15 rounded-lg bg-muted/80 flex items-center justify-center text-muted-foreground border border-border/60 transition-all">
                 <Wallet size={32} weight="fill" />
               </div>
               <div className="space-y-2">
@@ -146,7 +146,7 @@ function WalletDetailContent() {
                   <StatusBadge status={wallet.status} variant={wallet.status === "active" ? "emerald" : "zinc"} />
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-label text-faint bg-white px-2 py-0.5 rounded border border-zinc-200 uppercase tracking-widest">{wallet.id}</span>
+                  <span className="font-mono text-label text-faint bg-background px-2 py-0.5 rounded border border-border uppercase tracking-widest">{wallet.id}</span>
                   <span className="opacity-20 text-muted-foreground">•</span>
                   <span className="text-label font-medium text-faint">{wallet.orgName}</span>
                   <span className="opacity-20 text-muted-foreground">•</span>
@@ -193,9 +193,9 @@ function WalletDetailContent() {
       <div className="p-6 lg:p-8 space-y-8">
         {activeTab === "transactions" && (
            <>
-             <div className="bg-primary rounded-xl relative p-8 text-white">
+             <div className="bg-primary rounded-xl relative p-8 text-primary-foreground">
                 {/* Wallet illustration — anchored bottom right, overflows card */}
-                <img
+                <img loading="lazy"
                   src="/img-wallet.webp"
                   alt=""
                   className="absolute right-0 bottom-0 w-64 h-auto object-contain opacity-90 pointer-events-none hidden lg:block"
@@ -206,8 +206,8 @@ function WalletDetailContent() {
                   <div className="flex flex-col xl:flex-row xl:items-center gap-4 xl:gap-0">
                     {/* 1. Available Balance */}
                     <div className="space-y-1 shrink-0">
-                      <p className="text-label font-semibold text-white/60">Available Balance</p>
-                      <h2 className="text-4xl font-semibold tracking-tight text-white tabular-nums">
+                      <p className="text-label font-semibold text-primary-foreground/60">Available Balance</p>
+                      <h2 className="text-4xl font-semibold tracking-tight text-primary-foreground tabular-nums">
                         RM {(wallet.balance - wallet.pendingDeductions).toLocaleString()}
                       </h2>
                       <p className="text-label text-faint">
@@ -216,16 +216,16 @@ function WalletDetailContent() {
                     </div>
 
                     {/* Divider 1 */}
-                    <div className="hidden xl:block w-px h-16 bg-white/15 mx-6" />
+                    <div className="hidden xl:block w-px h-16 bg-primary-foreground/15 mx-6" />
 
                     {/* 2. Credit Remaining */}
                     <div className="space-y-1.5 shrink-0">
-                      <div className="flex items-center gap-1.5 text-label font-semibold text-white/60">
+                      <div className="flex items-center gap-1.5 text-label font-semibold text-primary-foreground/60">
                         Credit Remaining
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Info size={12} className="text-white/30 cursor-help" />
+                              <Info size={12} className="text-primary-foreground/30 cursor-help" />
                             </TooltipTrigger>
                             <TooltipContent>
                               <p className="text-body max-w-[200px]">How much more this company can spend before we block new purchases.</p>
@@ -233,12 +233,12 @@ function WalletDetailContent() {
                           </Tooltip>
                         </TooltipProvider>
                       </div>
-                      <div className="text-2xl font-semibold text-white">
+                      <div className="text-2xl font-semibold text-primary-foreground">
                         RM {orgCreditRemaining.toLocaleString()}
                       </div>
-                      <div className="w-32 h-1 bg-white/15 rounded-full overflow-hidden">
+                      <div className="w-32 h-1 bg-primary-foreground/15 rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-white/80 rounded-full transition-all"
+                          className="h-full bg-primary-foreground/80 rounded-full transition-all"
                           style={{ width: `${Math.min((orgCreditUsed / orgCreditLimit) * 100, 100)}%` }}
                         />
                       </div>
@@ -246,7 +246,7 @@ function WalletDetailContent() {
                     </div>
 
                     {/* Divider 2 */}
-                    <div className="hidden xl:block w-px h-16 bg-white/15 mx-6" />
+                    <div className="hidden xl:block w-px h-16 bg-primary-foreground/15 mx-6" />
 
                     {/* 3. Usage Stats */}
                     <div className="flex items-center gap-3 shrink-0">
@@ -256,21 +256,21 @@ function WalletDetailContent() {
                         { label: "Adjusted", amount: transactions.filter(t => t.type === "adjustment").reduce((sum, t) => sum + t.amount, 0), trend: "—" },
                       ].map((stat) => (
                         <div key={stat.label} className="space-y-0.5">
-                          <p className="text-label font-medium text-white/50">{stat.label}</p>
-                          <p className="text-body font-semibold text-white">RM {stat.amount.toLocaleString()}</p>
+                          <p className="text-label font-medium text-primary-foreground/50">{stat.label}</p>
+                          <p className="text-body font-semibold text-primary-foreground">RM {stat.amount.toLocaleString()}</p>
                           <p className="text-label text-faint">{stat.trend}</p>
                         </div>
                       ))}
                     </div>
 
                     {/* Divider 3 */}
-                    <div className="hidden xl:block w-px h-16 bg-white/15 mx-6" />
+                    <div className="hidden xl:block w-px h-16 bg-primary-foreground/15 mx-6" />
 
                     {/* 4. Buttons */}
                     <div className="flex items-center gap-2 shrink-0">
                       <Popover>
                         <PopoverTrigger asChild>
-                          <button className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white text-primary font-semibold text-label hover:bg-white/90 transition-colors shadow-lg shadow-black/20">
+                          <button className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary-foreground text-primary font-semibold text-label hover:bg-primary-foreground/90 transition-colors shadow-lg shadow-black/20">
                             <Wallet size={14} weight="fill" />
                             Add Balance
                             <CaretDown size={12} weight="bold" />
@@ -282,14 +282,14 @@ function WalletDetailContent() {
                               onClick={() => setIsRecordTopupOpen(true)}
                               className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-body font-medium text-left text-subtle hover:bg-muted hover:text-foreground transition-colors"
                             >
-                              <ArrowUpRight size={14} className="text-emerald-600" />
+                              <ArrowUpRight size={14} className="text-emerald-600 dark:text-emerald-400" />
                               Manual Top-up
                             </button>
                             <button
                               onClick={() => setIsUpdateBalanceOpen(true)}
                               className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-body font-medium text-left text-subtle hover:bg-muted hover:text-foreground transition-colors"
                             >
-                              <DotsThreeCircle size={14} className="text-blue-600" />
+                              <DotsThreeCircle size={14} className="text-primary" />
                               Update Balance
                             </button>
                           </div>
@@ -298,7 +298,7 @@ function WalletDetailContent() {
 
                       <Popover>
                         <PopoverTrigger asChild>
-                          <button className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-white/30 text-white font-semibold text-label hover:bg-white/10 transition-colors">
+                          <button className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-primary-foreground/30 text-primary-foreground font-semibold text-label hover:bg-primary-foreground/10 transition-colors">
                             More Actions
                             <CaretDown size={12} weight="bold" />
                           </button>
@@ -314,7 +314,7 @@ function WalletDetailContent() {
                             </button>
                             <button
                               onClick={() => openDangerAction("suspend")}
-                              className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-body font-medium text-left text-rose-500 hover:bg-rose-50 transition-colors"
+                              className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-body font-medium text-left text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors"
                             >
                               <WarningCircle size={14} />
                               {wallet.status === "suspended" ? "Resume Wallet" : "Suspend Wallet"}
@@ -344,7 +344,7 @@ function WalletDetailContent() {
                           key={p}
                           onClick={() => setPeriod(p as any)}
                           className={`px-3 py-1 text-label font-semibold rounded-md transition-all ${
-                            period === p ? "bg-white shadow-sm text-foreground" : "text-faint hover:text-foreground"
+                            period === p ? "bg-background shadow-sm text-foreground" : "text-faint hover:text-foreground"
                           }`}
                         >
                           {p}
@@ -352,7 +352,7 @@ function WalletDetailContent() {
                       ))}
                     </div>
 
-                    <select className="px-3 py-1 h-[32px] bg-white border border-border hover:bg-muted/30 rounded-lg text-label font-semibold text-foreground outline-none cursor-pointer transition-colors min-w-[120px]">
+                    <select className="px-3 py-1 h-[32px] bg-background border border-border hover:bg-muted/30 rounded-lg text-label font-semibold text-foreground outline-none cursor-pointer transition-colors min-w-[120px]">
                       {period === "By Month" && (
                         <>
                           <option>January 2026</option>
@@ -371,7 +371,7 @@ function WalletDetailContent() {
 
                     <Popover>
                       <PopoverTrigger asChild>
-                        <button className="flex items-center gap-2 px-3 py-1 h-[32px] bg-white border border-border hover:bg-muted/30 rounded-lg text-label font-semibold text-foreground transition-colors group">
+                        <button className="flex items-center gap-2 px-3 py-1 h-[32px] bg-background border border-border hover:bg-muted/30 rounded-lg text-label font-semibold text-foreground transition-colors group">
                           <CalendarBlank size={14} className="text-muted-foreground group-hover:text-foreground transition-colors" />
                           <span>Custom Range</span>
                         </button>
@@ -394,7 +394,7 @@ function WalletDetailContent() {
                        <div className="flex items-center gap-4 py-1">
                          <div className={cn(
                            "h-9 w-9 rounded-lg flex items-center justify-center shrink-0 shadow-sm",
-                           trx.type === "topup" ? "bg-primary/20 text-primary" : "bg-rose-50 text-rose-600"
+                            trx.type === "topup" ? "bg-primary/20 text-primary" : "bg-rose-500/10 text-rose-600 dark:text-rose-400 dark:bg-rose-500/20"
                          )}>
                            {trx.type === "topup" ? <ArrowUpRight size={15} weight="bold" /> : <ArrowDownRight size={15} weight="bold" />}
                          </div>
@@ -528,7 +528,7 @@ function WalletDetailContent() {
                   </div>
                 </div>
 
-                <div className="rounded-lg border border-rose-200 bg-rose-50/60 p-4">
+                <div className="rounded-lg border border-rose-200 dark:border-rose-500/20 bg-rose-50/60 dark:bg-rose-500/10 p-4">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="space-y-1">
                       <p className="text-body font-medium text-foreground">Terminate Wallet Permanently</p>

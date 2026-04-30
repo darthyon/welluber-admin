@@ -143,8 +143,8 @@ export function SharedDataTable<T extends { id: string | number }>({
                       (isFirstCol && !ghost) && "rounded-tl-xl",
                       (isLastCol && !ghost) && "rounded-tr-xl",
                       getCellAlignment(col.align),
-                      isFirst && "sticky left-0 z-30 bg-muted shadow-[0_1px_2px_-1px_rgba(0,0,0,0.05)] border-r border-border/40",
-                      isLast && "sticky right-0 z-30 bg-muted shadow-[0_1px_2px_-1px_rgba(0,0,0,0.05)] border-l border-border/40",
+                      isFirst && "sticky left-0 z-30 bg-muted shadow-sm border-r border-border/40",
+                      isLast && "sticky right-0 z-30 bg-muted shadow-sm border-l border-border/40",
                       isSorted && "text-foreground",
                       col.headerClassName
                     )}
@@ -195,8 +195,8 @@ export function SharedDataTable<T extends { id: string | number }>({
                         className={cn(
                           "p-4 text-body font-normal transition-colors",
                           getCellAlignment(col.align),
-                          isFirst && "sticky left-0 bg-card z-10 group-hover:bg-muted shadow-[0_1px_3px_-1px_rgba(0,0,0,0.08)] border-r border-border/40",
-                          isLast && "sticky right-0 bg-card z-10 group-hover:bg-muted shadow-[0_1px_3px_-1px_rgba(0,0,0,0.08)] border-l border-border/40",
+                          isFirst && "sticky left-0 bg-card z-10 group-hover:bg-muted shadow-sm border-r border-border/40",
+                          isLast && "sticky right-0 bg-card z-10 group-hover:bg-muted shadow-sm border-l border-border/40",
                           col.cellClassName
                         )}
                       >
@@ -255,7 +255,7 @@ export function SharedDataTable<T extends { id: string | number }>({
               disabled={currentPage === totalPages}
               className={cn(
                 "px-3 py-1.5 rounded-lg border border-border/80 text-foreground transition-all disabled:opacity-30 disabled:cursor-not-allowed",
-                !ghost ? "bg-card hover:bg-muted" : "bg-transparent hover:bg-muted/40 dark:hover:bg-white/5"
+                !ghost ? "bg-card hover:bg-muted" : "bg-transparent hover:bg-muted/40 dark:hover:bg-background/5"
               )}
             >
               Next

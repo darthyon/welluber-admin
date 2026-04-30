@@ -76,11 +76,12 @@ export function SpDataTable({ data }: SpDataTableProps) {
     },
     {
       header: "Tax Registered",
-      render: (sp) => (
-        <span className={sp.taxProfile.isTaxRegistered ? "text-label font-semibold text-emerald-600" : "text-label text-faint"}>
-          {sp.taxProfile.isTaxRegistered ? "Yes" : "No"}
-        </span>
-      ),
+      render: (sp) =>
+        sp.taxProfile.isTaxRegistered ? (
+          <StatusBadge status="Yes" variant="emerald" />
+        ) : (
+          <span className="text-label text-faint">No</span>
+        ),
     },
     {
       header: "Since",
@@ -106,7 +107,7 @@ export function SpDataTable({ data }: SpDataTableProps) {
             {
               label: sp.status === "suspended" ? "Activate SP" : "Suspend SP",
               onClick: () => console.log("toggle status", sp.id),
-              className: sp.status === "suspended" ? "text-emerald-600 font-semibold" : "text-destructive font-semibold",
+              className: sp.status === "suspended" ? "text-primary font-semibold" : "text-destructive font-semibold",
             },
           ]}
         />

@@ -17,7 +17,7 @@ export default function EmployeeError({
 
   return (
     <div className="container mx-auto px-4 py-16 max-w-4xl text-center">
-      <div className="w-16 h-16 rounded-full bg-rose-500/10 border border-rose-500/20 mx-auto flex items-center justify-center text-rose-500 mb-6">
+      <div className="w-16 h-16 rounded-full bg-destructive/10 border border-destructive/20 dark:border-destructive/30 mx-auto flex items-center justify-center text-destructive dark:bg-destructive/20 mb-6">
         <WarningCircle size={32} weight="fill" />
       </div>
       

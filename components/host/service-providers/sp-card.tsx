@@ -31,7 +31,7 @@ export function SpCard({ sp }: SpCardProps) {
     {
       label: sp.status === "suspended" ? "Activate SP" : "Suspend SP",
       onClick: () => console.log(sp.status === "suspended" ? "activate" : "suspend", sp.id),
-      className: sp.status === "suspended" ? "text-emerald-600 font-semibold" : "text-destructive font-semibold",
+      className: sp.status === "suspended" ? "text-emerald-600 dark:text-emerald-400 font-semibold" : "text-destructive font-semibold",
     },
   ];
 

@@ -1,8 +1,6 @@
 "use client"
 
 import * as React from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
 import {
   SquaresFour,
   Buildings,
@@ -10,32 +8,27 @@ import {
   Wallet,
   Shield,
   Gear,
-  House,
-  Lifebuoy,
-  List,
   Receipt,
   Storefront,
   TreeStructure,
-  UsersFour,
   CaretDoubleLeft,
   CaretDoubleRight,
-  ChartBar,
-  ClockCounterClockwise,
   SignOut,
   CaretUpDown,
   Check,
-  Plus,
   Users,
   Tag,
-  Calendar,
-  ChartLineUp,
+  ChartBar,
   ShieldCheck,
-  Monitor,
+  List,
 } from "@phosphor-icons/react"
 
 import { cn } from "@/lib/utils"
 import { WelluberLogo } from "@/components/shared/welluber-logo"
+import { WelluberMark } from "@/components/shared/welluber-mark"
 import { useSession } from "@/lib/session"
+import { NavMain } from "@/components/nav-main"
+import type { NavMainItem } from "@/components/nav-main"
 import {
   Avatar,
   AvatarFallback,
@@ -87,52 +80,57 @@ const personas = [
   },
 ]
 
-// Navigation Configuration (Host)
-const hostNavigation = [
+// Navigation Data
+const navOperations: NavMainItem[] = [
+  { title: "Dashboard", url: "/dashboard", icon: SquaresFour },
   {
-    title: "Operations",
+    title: "Organisations",
+    url: "#",
+    icon: Buildings,
     items: [
-      { id: "dashboard", label: "Dashboard", href: "/dashboard", icon: SquaresFour },
-      { id: "organizations", label: "Organisations", href: "/organizations", icon: Buildings },
-      { id: "providers", label: "Service Providers", href: "/service-providers", icon: Storefront },
-      { id: "settlements", label: "Settlement & Payouts", href: "/settlements", icon: CurrencyCircleDollar },
-      { id: "wallets", label: "Wallets", href: "/wallets", icon: Wallet },
+      { title: "All Organisations", url: "/organizations" },
+      { title: "Benefit Policies", url: "/policies" },
+      { title: "Claims", url: "/claims" },
+      { title: "Employees", url: "/employees" },
     ],
   },
   {
-    title: "Setup & config",
+    title: "Service Providers",
+    url: "#",
+    icon: Storefront,
     items: [
-      { id: "policies", label: "Benefit Policies", href: "/policies", icon: ShieldCheck },
-      { id: "services", label: "Services", href: "/services", icon: TreeStructure },
-      { id: "brands", label: "Brands", href: "/brands", icon: Tag },
-    ],
-  },
-  {
-    title: "User Management",
-    items: [
-      { id: "members", label: "Members", href: "/users/members", icon: Users },
-      { id: "administrators", label: "Administrators", href: "/users/administrators", icon: Shield },
-    ],
-  },
-  {
-    title: "Reporting & analysis",
-    items: [
-      { id: "claims", label: "Claims", href: "/claims", icon: Receipt },
-      { id: "reports", label: "Reports", href: "/reports", icon: ChartBar },
+      { title: "All Service Providers", url: "/service-providers" },
+      { title: "Voucher Packages", url: "/voucher-packages" },
     ],
   },
 ]
 
+const navSetup: NavMainItem[] = [
+  { title: "Services", url: "/services", icon: TreeStructure },
+  { title: "Brands", url: "/brands", icon: Tag },
+]
+
+const navUserMgmt: NavMainItem[] = [
+  { title: "Members", url: "/users/members", icon: Users },
+  { title: "Administrators", url: "/users/administrators", icon: Shield },
+]
+
+const navFinance: NavMainItem[] = [
+  { title: "Claims", url: "/claims", icon: Receipt },
+  { title: "Invoices", url: "/invoices", icon: List },
+  { title: "Settlements", url: "/settlements", icon: CurrencyCircleDollar },
+  { title: "Wallets", url: "/wallets", icon: Wallet },
+  { title: "Reports", url: "/reports", icon: ChartBar },
+]
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const pathname = usePathname()
   const { user } = useSession()
-  const { state, isMobile } = useSidebar()
+  const { state } = useSidebar()
   const [activePersona, setActivePersona] = React.useState(personas[0])
 
   return (
-    <Sidebar 
-      collapsible="icon" 
+    <Sidebar
+      collapsible="icon"
       className="sidebar-floating border-r-0 shadow-2xl overflow-hidden"
       {...props}
     >
@@ -140,17 +138,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <div className="absolute inset-0 bg-sidebar z-0" />
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-10 opacity-60">
         <div className="absolute -left-[40%] -top-[10%] w-[250%] h-[60%] bg-primary/30 blur-[130px] rounded-full" />
-        <div className="absolute -left-[30%] bottom-[10%] w-[220%] h-[50%] bg-blue-500/20 blur-[110px] rounded-full" />
+        <div className="absolute -left-[30%] bottom-[10%] w-[220%] h-[50%] bg-primary/20 blur-[110px] rounded-full" />
       </div>
       <div className="absolute inset-0 z-20 bg-black/60 backdrop-blur-3xl saturate-[300%]" />
 
       {/* Content Layer */}
       <div className="relative z-30 flex flex-col h-full">
         <SidebarHeader className="group-data-[collapsible=icon]:p-2 pt-7 pb-2">
-
           <div className="flex items-center justify-between px-2 mb-4">
+            {/* Expanded logo */}
             <div className="flex items-center group-data-[collapsible=icon]:hidden">
               <WelluberLogo width={120} height={31} className="opacity-90" />
+            </div>
+            {/* Collapsed mark */}
+            <div className="hidden group-data-[collapsible=icon]:flex items-center justify-center flex-1">
+              <WelluberMark size={32} className="opacity-90" />
             </div>
             <SidebarTrigger className="h-8 w-8 hover:bg-sidebar-foreground/10 transition-colors text-sidebar-foreground/50 hover:text-sidebar-foreground group-data-[collapsible=icon]:mx-auto">
               {state === "expanded" ? (
@@ -245,11 +247,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       </div>
                       <span className="text-body font-medium text-subtle group-hover/settings:text-primary transition-colors">Account Settings</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="flex items-center gap-3 px-3 py-2 cursor-pointer focus:bg-red-500/5 group/logout">
-                      <div className="flex aspect-square size-7 items-center justify-center rounded-lg bg-red-500/5 text-red-500/60 group-hover/logout:bg-red-500 group-hover/logout:text-white transition-all shadow-sm">
+                    <DropdownMenuItem className="flex items-center gap-3 px-3 py-2 cursor-pointer focus:bg-destructive/5 group/logout">
+                      <div className="flex aspect-square size-7 items-center justify-center rounded-lg bg-destructive/5 text-destructive/60 group-hover/logout:bg-destructive group-hover/logout:text-destructive-foreground transition-all shadow-sm">
                         <SignOut size={15} weight="fill" />
                       </div>
-                      <span className="text-body font-medium text-red-500/70 group-hover/logout:text-red-500 transition-colors">Log out</span>
+                      <span className="text-body font-medium text-destructive/70 group-hover/logout:text-destructive transition-colors">Log out</span>
                     </DropdownMenuItem>
                   </DropdownMenuGroup>
                 </DropdownMenuContent>
@@ -259,54 +261,41 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarHeader>
 
         <SidebarContent className="px-2 pt-3 no-scrollbar h-full">
-          {hostNavigation.map((section) => (
-            <SidebarGroup key={section.title} className="py-2.5">
-              <SidebarGroupLabel className="text-label font-medium text-sidebar-foreground/70 mb-2 px-3 group-data-[collapsible=icon]:hidden uppercase">
-                {section.title}
-              </SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu className="gap-1">
-                  {section.items.map((item) => {
-                    const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
-                    const Icon = item.icon
+          <SidebarGroup className="py-2.5">
+            <SidebarGroupLabel className="text-label font-medium text-sidebar-foreground/70 mb-2 px-3 group-data-[collapsible=icon]:hidden uppercase">
+              Operations
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <NavMain items={navOperations} />
+            </SidebarGroupContent>
+          </SidebarGroup>
 
-                    return (
-                      <SidebarMenuItem key={item.id}>
-                        <SidebarMenuButton
-                          asChild
-                          isActive={isActive}
-                          tooltip={item.label}
-                          className={cn(
-                            "transition-all duration-200 h-11 rounded-lg px-3 relative overflow-hidden group-data-[collapsible=icon]:!p-0 group-data-[collapsible=icon]:!justify-center",
-                            isActive 
-                              ? "bg-sidebar-foreground/10 text-sidebar-foreground backdrop-blur-md ring-1 ring-sidebar-foreground/10 shadow-lg shadow-black/20" 
-                              : "text-sidebar-foreground/60 hover:bg-sidebar-foreground/5 hover:text-sidebar-foreground"
-                          )}
-                        >
-                          <Link href={item.href} className="flex items-center gap-3.5 group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:justify-center">
-                            <Icon
-                              size={20}
-                              weight={isActive ? "fill" : "regular"}
-                              className={cn(
-                                "shrink-0 transition-colors",
-                                isActive ? "text-sidebar-primary" : "text-sidebar-foreground/50"
-                              )}
-                            />
-                            <span className={cn(
-                              "text-body font-normal truncate group-data-[collapsible=icon]:hidden",
-                              isActive ? "text-sidebar-foreground font-medium" : "text-sidebar-foreground/70"
-                            )}>
-                              {item.label}
-                            </span>
-                          </Link>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    )
-                  })}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          ))}
+          <SidebarGroup className="py-2.5">
+            <SidebarGroupLabel className="text-label font-medium text-sidebar-foreground/70 mb-2 px-3 group-data-[collapsible=icon]:hidden uppercase">
+              Setup & Config
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <NavMain items={navSetup} />
+            </SidebarGroupContent>
+          </SidebarGroup>
+
+          <SidebarGroup className="py-2.5">
+            <SidebarGroupLabel className="text-label font-medium text-sidebar-foreground/70 mb-2 px-3 group-data-[collapsible=icon]:hidden uppercase">
+              User Management
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <NavMain items={navUserMgmt} />
+            </SidebarGroupContent>
+          </SidebarGroup>
+
+          <SidebarGroup className="py-2.5">
+            <SidebarGroupLabel className="text-label font-medium text-sidebar-foreground/70 mb-2 px-3 group-data-[collapsible=icon]:hidden uppercase">
+              Finance & Reporting
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <NavMain items={navFinance} />
+            </SidebarGroupContent>
+          </SidebarGroup>
         </SidebarContent>
         <SidebarRail />
       </div>

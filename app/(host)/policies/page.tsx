@@ -1,146 +1,696 @@
 "use client";
 
-import { useState, useMemo, useEffect, Suspense } from "react";
+import { useState, useMemo, Suspense } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { BenefitPolicyWizard } from "@/components/host/policies/benefit-policy-wizard";
-import { BenefitPolicyCard } from "@/components/host/policies/benefit-policy-card";
 import { useQueryState, useUpdateQueryParams } from "@/hooks/use-tab-persistence";
-import { 
-  Plus, 
-  TreeStructure, 
-  IdentificationCard, 
-  Copy, 
-  MagnifyingGlass, 
-  Funnel,
-  Briefcase,
-  Users,
-  Calendar,
-  DownloadSimple
+import {
+  Plus,
+  TreeStructure,
+  IdentificationCard,
+  MagnifyingGlass,
+  DownloadSimple,
+  CheckCircle,
+  Warning,
+  Barbell,
+  Brain,
+  Circle,
+  PencilSimpleLine,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
-import { SectionedSearchSelect } from "@/components/shared/sectioned-search-select";
 import { EmptyState } from "@/components/shared/empty-state";
-import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { FilterItem } from "@/components/shared/filter-item";
 import { StatusBadge } from "@/components/shared/status-badge";
+import { SharedDataTable, Column } from "@/components/shared/data-table";
+import { ActionPopover, type ActionItem } from "@/components/shared/action-popover";
+import { BenefitPolicy, BenefitGroup, Benefit, TierVariant } from "@/types/policy";
+import { PolicyDetailView } from "@/components/host/policies/policy-detail-view";
+import { usePolicyTemplates } from "@/hooks/use-policy-templates";
 
-// ─── Taxonomy Data ───────────────────────────────────────────────────────────
-const SERVICE_TAXONOMY = [
-  { category: "Fitness & Exercise", services: ["Gym Access", "Personal Training", "Fitness Classes", "Swimming", "Martial Arts"] },
-  { category: "Massage & Bodywork", services: ["Traditional Massage", "Therapeutic Massage", "Reflexology"] },
-  { category: "Mental Health", services: ["Therapy & Counselling", "Life Coaching", "Meditation"] },
-  { category: "Medical & Allied Health", services: ["Physiotherapy", "Chiropractic", "Health Screening"] },
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+type StatusFilter = "all" | "draft" | "active" | "deactivated";
+
+interface PolicyListItem extends BenefitPolicy {
+  groupCount: number;
+  orgName?: string;
+  assignedOrgNames?: string[];
+  createdAt: string;
+}
+
+// ─── Constants ───────────────────────────────────────────────────────────────
+
+
+
+// ─── Mock Data ───────────────────────────────────────────────────────────────
+
+const INITIAL_POLICIES: PolicyListItem[] = [
+  {
+    id: "1",
+    name: "Standard Health 2026",
+    code: "BEN-STD-01",
+    description: "Comprehensive wellness policy for all full-time staff.",
+    organizationId: "ORG-20260115-0001",
+    eligibleEmploymentTypes: ["full-time"],
+    benefitPoolType: "Individual",
+    utilisationMode: "Fixed",
+    refreshCycle: "Yearly",
+    refreshStartReference: "fy_start",
+    status: "active",
+    groupCount: 3,
+    orgName: "Acme Corporation Sdn Bhd",
+    createdAt: "2024-01-15T10:00:00Z",
+  },
+  {
+    id: "2",
+    name: "Executive Wellness",
+    code: "BEN-EXC-02",
+    description: "Premium tier benefits including specialized clinical therapy.",
+    organizationId: "ORG-20260115-0001",
+    eligibleEmploymentTypes: ["full-time", "part-time"],
+    benefitPoolType: "Individual",
+    utilisationMode: "Prorated",
+    prorateUnit: "Monthly",
+    refreshCycle: "Quarterly",
+    refreshStartReference: "join_date",
+    status: "draft",
+    groupCount: 2,
+    orgName: "Acme Corporation Sdn Bhd",
+    createdAt: "2024-03-22T14:30:00Z",
+  },
+  {
+    id: "3",
+    name: "Contractor Lite",
+    code: "BEN-CON-03",
+    description: "Stripped-down benefits for contract and intern staff.",
+    organizationId: "ORG-20260201-0002",
+    eligibleEmploymentTypes: ["contract", "internship"],
+    benefitPoolType: "Shared",
+    utilisationMode: "Fixed",
+    refreshCycle: "Yearly",
+    refreshStartReference: "fy_start",
+    status: "deactivated",
+    groupCount: 1,
+    orgName: "Global Tech Solutions",
+    createdAt: "2023-11-05T09:15:00Z",
+  },
 ];
 
-const DEPARTMENTS = ["Engineering", "Product", "Design", "Marketing", "Sales", "HR", "Finance", "Operations"];
-const ROLES = ["Executive", "Management", "Staff", "Consultant", "Intern"];
-const AGE_RANGES = ["18-25", "26-35", "36-45", "46-55", "56+"];
+// ─── Clone Dialog ────────────────────────────────────────────────────────────
+
+function ClonePolicyDialog({
+  isOpen,
+  original,
+  onClose,
+  onConfirm,
+}: {
+  isOpen: boolean;
+  original: PolicyListItem | null;
+  onClose: () => void;
+  onConfirm: (name: string) => void;
+}) {
+  const [name, setName] = useState(() => (original ? `${original.name} — Copy` : ""));
+
+  if (!isOpen || !original) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex animate-in items-center justify-center bg-black/60 p-4 backdrop-blur-[2px] duration-300 fade-in">
+      <div className="w-full max-w-md animate-in overflow-hidden rounded-[24px] border border-border bg-card shadow-2xl duration-300 zoom-in-95">
+        <div className="p-8 pb-4">
+          <h3 className="text-heading font-semibold text-foreground text-balance">Clone Policy</h3>
+          <p className="text-body font-medium text-subtle mt-1">
+            Create a deep copy of <span className="text-foreground font-semibold">{original.name}</span>.
+          </p>
+        </div>
+
+        <div className="px-8 pb-2">
+          <label className="text-label font-medium text-subtle">New policy name</label>
+          <input
+            type="text"
+            className="mt-1.5 w-full px-4 py-2.5 bg-background border border-border rounded-lg text-body font-semibold text-foreground outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/40 transition-all"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </div>
+
+        <div className="flex items-center gap-3 border-t border-border bg-muted/30 p-8 pt-4 mt-6">
+          <Button variant="ghost" className="h-12 flex-1 rounded-lg font-semibold hover:bg-muted" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button
+            className="h-12 flex-1 rounded-lg font-semibold shadow-lg shadow-primary/20"
+            disabled={!name.trim()}
+            onClick={() => onConfirm(name.trim())}
+          >
+            Clone Policy
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Confirmation Dialog ─────────────────────────────────────────────────────
+
+function ConfirmDialog({
+  isOpen,
+  title,
+  description,
+  warning,
+  confirmLabel,
+  isDanger,
+  onClose,
+  onConfirm,
+}: {
+  isOpen: boolean;
+  title: string;
+  description: string;
+  warning?: string;
+  confirmLabel: string;
+  isDanger?: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+}) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex animate-in items-center justify-center bg-black/60 p-4 backdrop-blur-[2px] duration-300 fade-in">
+      <div className="w-full max-w-md animate-in overflow-hidden rounded-[24px] border border-border bg-card shadow-2xl duration-300 zoom-in-95">
+        <div className="p-8 pb-4">
+          <h3 className="text-heading font-semibold text-foreground text-balance">{title}</h3>
+          <p className="text-body font-medium text-subtle mt-1">{description}</p>
+          {warning && (
+            <div className="mt-3 flex items-start gap-2 p-3 rounded-lg bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20">
+              <Warning size={16} className="text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+              <p className="text-label text-amber-700 dark:text-amber-300">{warning}</p>
+            </div>
+          )}
+        </div>
+
+        <div className="flex items-center gap-3 border-t border-border bg-muted/30 p-8 pt-4">
+          <Button variant="ghost" className="h-12 flex-1 rounded-lg font-semibold hover:bg-muted" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button
+            className={cn(
+              "h-12 flex-1 rounded-lg font-semibold shadow-lg",
+              isDanger ? "bg-destructive text-primary-foreground shadow-rose-500/20 hover:bg-destructive/90" : "shadow-primary/20"
+            )}
+            onClick={onConfirm}
+          >
+            {confirmLabel}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const ICON_MAP: Record<string, React.ElementType> = {
+  Barbell, Brain, Circle, PencilSimpleLine,
+};
+
+// ─── Template Selection Modal ────────────────────────────────────────────────
+
+function PolicyTemplateModal({
+  isOpen,
+  onClose,
+  onSelect,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onSelect: (templateId: string | null) => void;
+}) {
+  const { templates: policyTemplates, isLoading: templatesLoading } = usePolicyTemplates();
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex animate-in items-center justify-center bg-black/60 p-4 backdrop-blur-[2px] duration-300 fade-in">
+      <div className="w-full max-w-2xl animate-in overflow-hidden rounded-[24px] border border-border bg-card shadow-2xl duration-300 zoom-in-95">
+        <div className="p-8 pb-4">
+          <h3 className="text-heading font-semibold text-foreground text-balance">Create Benefit Policy</h3>
+          <p className="text-body font-medium text-subtle mt-1">
+            Choose a starting template or build from scratch. You can edit everything after selecting.
+          </p>
+        </div>
+
+        <div className="px-8 pb-2">
+          {templatesLoading ? (
+            <div className="flex items-center gap-3 py-12 text-muted-foreground">
+              <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+              <span className="text-body font-medium">Loading templates...</span>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {policyTemplates.map((template) => {
+                const Icon = ICON_MAP[template.icon] || Circle;
+                return (
+                  <button
+                    type="button"
+                    key={template.id}
+                    onClick={() => onSelect(template.id)}
+                    className="relative text-left p-4 rounded-lg border border-border bg-card hover:border-primary/30 hover:bg-muted/30 transition-all duration-200 group"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0 transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                        <Icon size={20} weight="duotone" />
+                      </div>
+                      <div className="space-y-0.5 min-w-0">
+                        <h4 className="text-body font-semibold text-foreground leading-tight">{template.name}</h4>
+                        <p className="text-label text-muted-foreground leading-relaxed">{template.tagline}</p>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+
+              <button
+                type="button"
+                onClick={() => onSelect(null)}
+                className="relative text-left p-4 rounded-lg border border-dashed border-border bg-card hover:border-primary/30 hover:bg-muted/30 transition-all duration-200 group"
+              >
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-muted text-muted-foreground flex items-center justify-center shrink-0 transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                    <PencilSimpleLine size={20} weight="duotone" />
+                  </div>
+                  <div className="space-y-0.5 min-w-0">
+                    <h4 className="text-body font-semibold text-foreground leading-tight">Start from Scratch</h4>
+                    <p className="text-label text-muted-foreground leading-relaxed">Build your own policy with custom services and amounts.</p>
+                  </div>
+                </div>
+              </button>
+            </div>
+          )}
+        </div>
+
+        <div className="flex items-center justify-end border-t border-border bg-muted/30 p-8 pt-4 mt-6">
+          <Button variant="ghost" className="h-12 px-6 rounded-lg font-semibold hover:bg-muted" onClick={onClose}>
+            Cancel
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Main Content ────────────────────────────────────────────────────────────
 
 function PoliciesContent() {
-  const [wizardStatus, setWizardStatus] = useQueryState("wizard");
-  const [wizardMode, setWizardMode] = useQueryState("mode");
-  const [activePolicyId, setActivePolicyId] = useQueryState("policyId");
+  const router = useRouter();
+  const [wizardStatus] = useQueryState("wizard");
+  const [wizardMode] = useQueryState("mode");
+  const [activePolicyId] = useQueryState("policyId");
   const updateQueryParams = useUpdateQueryParams();
 
   const showWizard = wizardStatus === "open";
-  const [selectedPolicy, setSelectedPolicy] = useState<any>(null);
-  
-  // Mock policies list
-  const [policies, setPolicies] = useState<any[]>([
-    { id: "1", name: "Standard Health 2026", code: "BEN-STD-01", description: "Comprehensive wellness policy for all full-time staff.", utilisationMode: "Fixed", status: "Published" },
-    { id: "2", name: "Executive Wellness", code: "BEN-EXC-02", description: "Premium tier benefits including specialized clinical therapy.", utilisationMode: "Prorated", status: "Published" },
-  ]);
 
-  // Filters state
+
+  // State
+  const [policies, setPolicies] = useState<PolicyListItem[]>(INITIAL_POLICIES);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedService, setSelectedService] = useState("");
-  const [selectedDept, setSelectedDept] = useState("all");
-  const [selectedRole, setSelectedRole] = useState("all");
-  const [selectedAge, setSelectedAge] = useState("all");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [orgFilter, setOrgFilter] = useState<string>("all");
+
+  // Mock groups/benefits/tiers per policy
+  const [policyDataMap, setPolicyDataMap] = useState<Record<string, { groups: BenefitGroup[]; benefits: Benefit[]; tiers: TierVariant[] }>>({
+    "1": {
+      groups: [
+        { id: "g1", policyId: "1", name: "Physical Wellbeing", distributionType: "IndividualBenefitAmount" },
+        { id: "g2", policyId: "1", name: "Mental Fitness", distributionType: "IndividualBenefitAmount" },
+        { id: "g3", policyId: "1", name: "Nutritional Support", distributionType: "SharedAmount", maxUsagePerCycle: 500 },
+      ],
+      benefits: [
+        { id: "b1", groupId: "g1", serviceId: "s1", amount: 200, coPayment: { required: false, type: "Percentage", value: 0 } },
+        { id: "b2", groupId: "g1", serviceId: "s2", amount: 150, coPayment: { required: false, type: "Percentage", value: 0 } },
+        { id: "b3", groupId: "g2", serviceId: "s3", amount: 300, coPayment: { required: true, type: "Percentage", value: 10 } },
+        { id: "b4", groupId: "g3", serviceId: "s5", amount: 100, coPayment: { required: false, type: "Percentage", value: 0 } },
+      ],
+      tiers: [
+        {
+          id: "t1",
+          policyId: "1",
+          organizationId: "ORG-20260115-0001",
+          name: "Band 1 — VP and above",
+          status: "complete",
+          eligibleEmploymentTypes: ["full-time"],
+          departmentIds: [],
+          overrides: [
+            { id: "o1", tierId: "t1", benefitId: "b1", amount: 5000 },
+            { id: "o2", tierId: "t1", benefitId: "b3", amount: 1000 },
+          ],
+        },
+        {
+          id: "t2",
+          policyId: "1",
+          organizationId: "ORG-20260115-0001",
+          name: "Band 2 — Manager / Senior",
+          status: "complete",
+          eligibleEmploymentTypes: ["full-time", "part-time"],
+          departmentIds: [],
+          overrides: [
+            { id: "o3", tierId: "t2", benefitId: "b1", amount: 2500 },
+          ],
+        },
+        {
+          id: "t3",
+          policyId: "1",
+          organizationId: "ORG-20260115-0001",
+          name: "Band 3 — Executive / Associate",
+          status: "incomplete",
+          eligibleEmploymentTypes: ["full-time"],
+          departmentIds: [],
+          overrides: [],
+        },
+      ],
+    },
+    "2": {
+      groups: [
+        { id: "g4", policyId: "2", name: "Premium Wellness", distributionType: "IndividualBenefitAmount" },
+        { id: "g5", policyId: "2", name: "Clinical Therapy", distributionType: "IndividualBenefitAmount" },
+      ],
+      benefits: [
+        { id: "b5", groupId: "g4", serviceId: "s1", amount: 500, coPayment: { required: false, type: "Percentage", value: 0 } },
+        { id: "b6", groupId: "g5", serviceId: "s3", amount: 800, coPayment: { required: false, type: "Percentage", value: 0 } },
+      ],
+      tiers: [],
+    },
+    "3": {
+      groups: [
+        { id: "g6", policyId: "3", name: "Lite Benefits", distributionType: "SharedAmount", maxUsagePerCycle: 200 },
+      ],
+      benefits: [
+        { id: "b7", groupId: "g6", serviceId: "s1", amount: 50, coPayment: { required: false, type: "Percentage", value: 0 } },
+      ],
+      tiers: [],
+    },
+  });
+
+  // Dialogs
+  const [showTemplateModal, setShowTemplateModal] = useState(false);
+  const [cloneTarget, setCloneTarget] = useState<PolicyListItem | null>(null);
+  const [confirmDialog, setConfirmDialog] = useState<{
+    open: boolean;
+    title: string;
+    description: string;
+    warning?: string;
+    confirmLabel: string;
+    isDanger?: boolean;
+    onConfirm: () => void;
+  }>({ open: false, title: "", description: "", confirmLabel: "", onConfirm: () => {} });
+
+  const [toast, setToast] = useState<string | null>(null);
 
   const filteredPolicies = useMemo(() => {
     return policies.filter(p => {
-      const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                           p.code.toLowerCase().includes(searchQuery.toLowerCase());
-      
-      const matchesDept = selectedDept === "all" || false; // Mock filtering logic
-      return matchesSearch;
+      const matchesSearch = !searchQuery ||
+        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.code?.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesStatus = statusFilter === "all" || p.status === statusFilter;
+      const matchesOrg = orgFilter === "all" || p.orgName === orgFilter || p.organizationId === orgFilter;
+      return matchesSearch && matchesStatus && matchesOrg;
     });
-  }, [policies, searchQuery]);
+  }, [policies, searchQuery, statusFilter, orgFilter]);
 
-  // Synchronize selectedPolicy with activePolicyId
-  useEffect(() => {
-    if (activePolicyId) {
-      const policy = policies.find(p => p.id === activePolicyId);
-      if (policy) {
-        setSelectedPolicy({ policy, groups: [], benefits: [] });
+  const orgFilterOptions = useMemo(() => {
+    const allOrgs = new Map<string, string>();
+    policies.forEach(p => {
+      if (p.orgName || p.organizationId) {
+        allOrgs.set(p.organizationId, p.orgName || p.organizationId);
       }
-    } else if (!wizardMode || wizardMode === "create") {
-      // If no ID but in create mode, keep selectedPolicy as it is (might be a clone)
-    } else {
-      setSelectedPolicy(null);
-    }
-  }, [activePolicyId, policies, wizardMode]);
-
-  const handleClone = (e: React.MouseEvent, policy: any) => {
-    e.stopPropagation();
-    const clonedPolicy = {
-      ...policy,
-      id: undefined,
-      name: `${policy.name} (Clone)`,
-      code: `${policy.code}-CLONE`,
-      status: "Draft",
-    };
-    setSelectedPolicy({ policy: clonedPolicy, groups: [], benefits: [] });
-    updateQueryParams({
-      mode: "create",
-      wizard: "open",
-      policyId: null
     });
+    return [
+      { label: "All Organisations", value: "all" },
+      ...Array.from(allOrgs.entries()).map(([id, name]) => ({ label: name, value: id })),
+    ];
+  }, [policies]);
+
+  const statusCounts = useMemo(() => {
+    return {
+      all: policies.length,
+      draft: policies.filter(p => p.status === "draft").length,
+      active: policies.filter(p => p.status === "active").length,
+      deactivated: policies.filter(p => p.status === "deactivated").length,
+    };
+  }, [policies]);
+
+  const showToast = (message: string) => {
+    setToast(message);
+    setTimeout(() => setToast(null), 3000);
   };
+
+  // ── Actions ───────────────────────────────────────────────────────────────
 
   const handleCreateNew = () => {
-    setSelectedPolicy(null);
-    updateQueryParams({
-      mode: "create",
-      wizard: "open",
-      policyId: null
+    setShowTemplateModal(true);
+  };
+
+  const handleSelectTemplate = (templateId: string | null) => {
+    setShowTemplateModal(false);
+    if (templateId) {
+      router.push(`/policies/new?template=${templateId}`);
+    } else {
+      router.push("/policies/new");
+    }
+  };
+
+  const handleClone = (policy: PolicyListItem) => {
+    setCloneTarget(policy);
+  };
+
+  const confirmClone = (name: string) => {
+    if (!cloneTarget) return;
+    const newId = Math.random().toString(36).substr(2, 9);
+    const sourceData = policyDataMap[cloneTarget.id];
+    const newPolicy: PolicyListItem = {
+      ...cloneTarget,
+      id: newId,
+      name,
+      code: `${cloneTarget.code}-CLONE`,
+      status: "draft",
+      createdAt: new Date().toISOString(),
+      clonedFrom: cloneTarget.name,
+    };
+    // Deep clone groups, benefits, and tiers for the new policy
+    if (sourceData) {
+      const newGroups = sourceData.groups.map(g => ({
+        ...g,
+        id: `${g.id}-clone-${newId}`,
+        policyId: newId,
+      }));
+      const benefitIdMap = new Map<string, string>();
+      const newBenefits = sourceData.benefits.map(b => {
+        const newBenefitId = `${b.id}-clone-${newId}`;
+        benefitIdMap.set(b.id, newBenefitId);
+        const newGroupId = newGroups.find(g => g.name === sourceData.groups.find(sg => sg.id === b.groupId)?.name)?.id || b.groupId;
+        return { ...b, id: newBenefitId, groupId: newGroupId };
+      });
+      const newTiers = sourceData.tiers.map(t => ({
+        ...t,
+        id: `${t.id}-clone-${newId}`,
+        policyId: newId,
+        overrides: t.overrides.map(o => ({
+          ...o,
+          id: `${o.id}-clone-${newId}`,
+          tierId: `${t.id}-clone-${newId}`,
+          benefitId: benefitIdMap.get(o.benefitId) || o.benefitId,
+        })),
+      }));
+      setPolicyDataMap(prev => ({
+        ...prev,
+        [newId]: { groups: newGroups, benefits: newBenefits, tiers: newTiers },
+      }));
+    }
+    setPolicies(prev => [...prev, newPolicy]);
+    setCloneTarget(null);
+    showToast(`Policy "${name}" cloned successfully`);
+  };
+
+  const handleDeactivate = (policy: PolicyListItem) => {
+    const activeAssignments = 0; // Mock: would come from API
+    setConfirmDialog({
+      open: true,
+      title: "Deactivate Policy",
+      description: "Existing assignments will be unaffected. No new assignments will be possible.",
+      warning: activeAssignments > 0 ? `Policy has ${activeAssignments} active employee assignments.` : undefined,
+      confirmLabel: "Deactivate",
+      onConfirm: () => {
+        setPolicies(prev => prev.map(p => p.id === policy.id ? { ...p, status: "deactivated" as const } : p));
+        setConfirmDialog(prev => ({ ...prev, open: false }));
+        showToast(`Policy "${policy.name}" deactivated`);
+      },
     });
   };
 
-  if (showWizard) {
-    return (
-      <div className="flex flex-col flex-1">
-        <BenefitPolicyWizard 
-          mode={wizardMode as any || "create"}
-          initialData={selectedPolicy}
-          onEdit={() => setWizardMode("edit")}
-          onCancel={() => {
-            updateQueryParams({
-              wizard: null,
-              mode: null,
-              policyId: null
-            });
-          }}
-          onSuccess={(newData) => {
-            if (wizardMode === "create") {
-              const newPolicy = {
-                ...newData.policy,
-                id: Math.random().toString(36).substr(2, 9),
-              };
-              setPolicies([...policies, newPolicy]);
-            } else if (wizardMode === "edit") {
-              setPolicies(prev => prev.map(p => p.id === activePolicyId ? { ...p, ...newData.policy } : p));
-            }
-            updateQueryParams({
-              wizard: null,
-              mode: null,
-              policyId: null
-            });
-          }}
+  const handleDelete = (policy: PolicyListItem) => {
+    const activeAssignments = 0; // Mock: would come from API
+    if (activeAssignments > 0) {
+      showToast(`Cannot delete — ${activeAssignments} active assignments reference this policy.`);
+      return;
+    }
+    setConfirmDialog({
+      open: true,
+      title: `Permanently delete ${policy.name}?`,
+      description: "This action cannot be undone. All groups, services, and tier overrides will be permanently removed.",
+      confirmLabel: "Delete Policy",
+      isDanger: true,
+      onConfirm: () => {
+        setPolicies(prev => prev.filter(p => p.id !== policy.id));
+        setConfirmDialog(prev => ({ ...prev, open: false }));
+        showToast(`Policy "${policy.name}" deleted`);
+      },
+    });
+  };
+
+  const columns: Column<PolicyListItem>[] = [
+    {
+      header: "Policy Name",
+      accessorKey: "name",
+      render: (row) => (
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary border border-primary/10">
+            <IdentificationCard size={20} weight="duotone" />
+          </div>
+          <div>
+            <p className="text-body font-semibold text-foreground">{row.name}</p>
+            <p className="text-label font-mono text-faint tracking-tight leading-none mt-0.5">{row.code}</p>
+          </div>
+        </div>
+      ),
+    },
+    {
+      header: "Status",
+      accessorKey: "status",
+      render: (row) => (
+        <StatusBadge
+          status={row.status}
+          variant={row.status === "active" ? "emerald" : row.status === "draft" ? "amber" : "rose"}
+          dot
         />
-      </div>
-    );
+      ),
+    },
+    {
+      header: "Eligible Types",
+      render: (row) => (
+        <div className="flex flex-wrap gap-1">
+          {row.eligibleEmploymentTypes.map(t => (
+            <span key={t} className="px-2 py-0.5 rounded-full bg-muted text-label font-medium text-muted-foreground capitalize">
+              {t.replace("-", " ")}
+            </span>
+          ))}
+        </div>
+      ),
+    },
+    {
+      header: "Groups",
+      accessorKey: "groupCount",
+      align: "center",
+      render: (row) => <span className="text-body font-medium text-subtle tabular-nums">{row.groupCount}</span>,
+    },
+    {
+      header: "Organisation",
+      render: (row) => (
+        <span className="text-body text-subtle font-medium">
+          {row.orgName || row.organizationId || "—"}
+        </span>
+      ),
+    },
+    {
+      header: "Created",
+      accessorKey: "createdAt",
+      render: (row) => (
+        <span className="text-body text-faint font-medium">
+          {new Date(row.createdAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
+        </span>
+      ),
+    },
+    {
+      header: "Actions",
+      headerClassName: "text-right",
+      align: "right",
+      render: (row) => {
+        const actions: ActionItem[] = [
+          {
+            label: "View policy details",
+            onClick: (e: React.MouseEvent) => {
+              e.stopPropagation();
+              updateQueryParams({ policyId: row.id, mode: "view", wizard: "open" });
+            },
+          },
+          {
+            label: "Edit policy",
+            onClick: (e: React.MouseEvent) => {
+              e.stopPropagation();
+              router.push(`/policies/${row.id}/edit`);
+            },
+          },
+          {
+            label: "Clone policy",
+            onClick: (e: React.MouseEvent) => {
+              e.stopPropagation();
+              handleClone(row);
+            },
+            className: "text-primary font-semibold",
+          },
+        ];
+
+        if (row.status === "active") {
+          actions.push(
+            { label: "Management", isSectionTitle: true },
+            {
+              label: "Deactivate policy",
+              onClick: (e: React.MouseEvent) => {
+                e.stopPropagation();
+                handleDeactivate(row);
+              },
+              isDanger: true,
+            }
+          );
+        }
+
+        if (row.status === "draft" || row.status === "deactivated") {
+          actions.push(
+            { label: "Management", isSectionTitle: true },
+            {
+              label: "Delete policy",
+              onClick: (e: React.MouseEvent) => {
+                e.stopPropagation();
+                handleDelete(row);
+              },
+              isDanger: true,
+            }
+          );
+        }
+
+        return (
+          <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>
+            <ActionPopover actions={actions} />
+          </div>
+        );
+      },
+    },
+  ];
+
+  // Detail view
+  if (showWizard && wizardMode === "view" && activePolicyId) {
+    const policy = policies.find(p => p.id === activePolicyId);
+    const data = policy ? policyDataMap[policy.id] : undefined;
+    if (policy && data) {
+      return (
+        <div className="flex flex-col flex-1">
+          <PolicyDetailView
+            policy={policy}
+            groups={data.groups}
+            benefits={data.benefits}
+            tiers={data.tiers}
+            onEdit={() => router.push(`/policies/${policy.id}/edit`)}
+            onClone={() => handleClone(policy)}
+            onDeactivate={() => handleDeactivate(policy)}
+            onDelete={() => handleDelete(policy)}
+          />
+        </div>
+      );
+    }
   }
 
   return (
@@ -154,12 +704,12 @@ function PoliciesContent() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-           <Button variant="ghost" size="sm" className="h-9 text-body font-medium hover:bg-muted/50">
+          <Button variant="ghost" size="sm" className="h-9 text-body font-medium hover:bg-muted/50">
             <DownloadSimple size={16} className="mr-1.5 opacity-60" />
             Export
           </Button>
           <div className="h-4 w-[1px] bg-border mx-1" />
-          <Button 
+          <Button
             onClick={handleCreateNew}
             className="h-9 text-body font-medium shadow-sm"
           >
@@ -169,88 +719,98 @@ function PoliciesContent() {
         </div>
       </div>
 
-      {/* Toolbar */}
-      <DataFilterBar
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        searchPlaceholder="Search policies or benefit IDs..."
-        filters={
-          <>
-            <div className="w-[180px]">
-              <SectionedSearchSelect 
-                taxonomy={SERVICE_TAXONOMY}
-                value={selectedService}
-                onChange={setSelectedService}
-                placeholder="Filter by Service..."
-                className="h-9"
-              />
-            </div>
+      {/* Search + Filters */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+        <div className="relative w-full sm:w-80">
+          <MagnifyingGlass size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-faint" />
+          <input
+            type="text"
+            placeholder="Search policies or benefit IDs..."
+            className="w-full pl-9 pr-4 py-2 bg-background border border-border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/40 transition-all"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
 
-            <FilterItem 
-              label="Dept"
-              value={selectedDept}
-              onChange={setSelectedDept}
-              options={[
-                { label: "All Departments", value: "all" },
-                ...DEPARTMENTS.map(d => ({ label: d, value: d }))
-              ]}
-            />
+        <FilterItem
+          label="Organisation"
+          value={orgFilter}
+          onChange={setOrgFilter}
+          options={orgFilterOptions}
+        />
 
-            <FilterItem 
-              label="Role"
-              value={selectedRole}
-              onChange={setSelectedRole}
-              options={[
-                { label: "All Roles", value: "all" },
-                ...ROLES.map(r => ({ label: r, value: r }))
-              ]}
-            />
+        <FilterItem
+          label="Status"
+          value={statusFilter}
+          onChange={(v) => setStatusFilter(v as StatusFilter)}
+          options={[
+            { label: `All (${statusCounts.all})`, value: "all" },
+            { label: `Draft (${statusCounts.draft})`, value: "draft" },
+            { label: `Active (${statusCounts.active})`, value: "active" },
+            { label: `Deactivated (${statusCounts.deactivated})`, value: "deactivated" },
+          ]}
+        />
+      </div>
 
-            <FilterItem 
-              label="Age"
-              value={selectedAge}
-              onChange={setSelectedAge}
-              options={[
-                { label: "All Ages", value: "all" },
-                ...AGE_RANGES.map(a => ({ label: a, value: a }))
-              ]}
-            />
-          </>
-        }
-      />
-
+      {/* Table */}
       {filteredPolicies.length === 0 ? (
-        <EmptyState 
+        <EmptyState
           isPageLevel
           icon={<TreeStructure size={48} weight="duotone" />}
           title="No policies found"
           description="Design and oversee flexible benefit structures for your workforce. Adjust your filters or create a new policy to get started."
           action={
-            <Button 
+            <Button
               variant="default"
               onClick={handleCreateNew}
               className="mt-8 px-6 h-10 font-medium shadow-sm"
             >
-              Launch Wizard
+              Create New Policy
             </Button>
           }
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-           {filteredPolicies.map((p) => (
-             <BenefitPolicyCard 
-               key={p.id}
-               policy={p}
-               onView={(id) => {
-                 updateQueryParams({
-                   policyId: id,
-                   mode: "view",
-                   wizard: "open"
-                 });
-               }}
-               onClone={handleClone}
-             />
-           ))}
+        <SharedDataTable
+          data={filteredPolicies}
+          columns={columns}
+          onRowClick={(row) => updateQueryParams({ policyId: row.id, mode: "view", wizard: "open" })}
+        />
+      )}
+
+      {/* Clone Dialog */}
+      <ClonePolicyDialog
+        isOpen={!!cloneTarget}
+        original={cloneTarget}
+        onClose={() => setCloneTarget(null)}
+        onConfirm={confirmClone}
+      />
+
+      {/* Confirm Dialog */}
+      <ConfirmDialog
+        isOpen={confirmDialog.open}
+        title={confirmDialog.title}
+        description={confirmDialog.description}
+        warning={confirmDialog.warning}
+        confirmLabel={confirmDialog.confirmLabel}
+        isDanger={confirmDialog.isDanger}
+        onClose={() => setConfirmDialog(prev => ({ ...prev, open: false }))}
+        onConfirm={confirmDialog.onConfirm}
+      />
+
+      {/* Template Selection Modal */}
+      <PolicyTemplateModal
+        isOpen={showTemplateModal}
+        onClose={() => setShowTemplateModal(false)}
+        onSelect={handleSelectTemplate}
+      />
+
+      {/* Toast */}
+      {toast && (
+        <div className="fixed bottom-6 right-6 z-[200] animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <div className="flex items-center gap-2.5 px-4 py-3 bg-card border border-border rounded-lg shadow-xl">
+            <CheckCircle size={18} weight="fill" className="text-emerald-600 dark:text-emerald-400" />
+            <p className="text-body font-medium text-foreground">{toast}</p>
+          </div>
         </div>
       )}
     </div>

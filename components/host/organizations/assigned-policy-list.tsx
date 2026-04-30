@@ -11,7 +11,7 @@ interface AssignedPolicy {
   code: string;
   type: string;
   assignedTo: string; // "All Branches" or specific branch names
-  status: "Active" | "Inactive" | "Published";
+  status: "draft" | "active" | "deactivated";
   employeeCount: number;
   lastUpdated: string;
 }
@@ -72,9 +72,9 @@ export function AssignedPolicyList({ policies, onUnlink, onView, onEdit }: Assig
     {
       header: "Status",
       render: (policy) => (
-        <StatusBadge 
-          status={policy.status === "Published" ? "Active" : policy.status} 
-          variant={policy.status === "Published" || policy.status === "Active" ? "emerald" : "zinc"} 
+        <StatusBadge
+          status={policy.status}
+          variant={policy.status === "active" ? "emerald" : policy.status === "draft" ? "amber" : "zinc"}
         />
       )
     },

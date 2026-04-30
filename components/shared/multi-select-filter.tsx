@@ -83,7 +83,7 @@ export function MultiSelectFilter({
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  className="h-7 text-label font-semibold text-rose-500 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                  className="h-7 text-label font-semibold text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors"
                   onClick={() => onChange([])}
                 >
                   Clear Selection

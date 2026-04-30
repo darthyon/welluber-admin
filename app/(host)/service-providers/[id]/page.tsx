@@ -52,7 +52,7 @@ import {
 const TABS = [
   { id: "details", label: "SP Details", icon: Storefront },
   { id: "branches", label: "Branches", icon: GitBranch },
-  { id: "vouchers", label: "Vouchers", icon: Ticket },
+  { id: "vouchers", label: "Voucher Package", icon: Ticket },
   { id: "settings", label: "Settings", icon: Gear },
 ] as const;
 
@@ -156,7 +156,7 @@ export default function ServiceProviderDetailPage() {
 
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
             <div className="flex items-start gap-5">
-              <div className="w-15 h-15 rounded-lg bg-muted/80 flex items-center justify-center text-muted-foreground border border-zinc-200/60 transition-all">
+              <div className="w-15 h-15 rounded-lg bg-muted/80 flex items-center justify-center text-muted-foreground border border-border/60 transition-all">
                 <Storefront size={32} weight="fill" />
               </div>
               <div className="space-y-2">
@@ -378,14 +378,14 @@ export default function ServiceProviderDetailPage() {
                                 </div>
                                 <div className={cn(
                                     "flex items-center gap-2 px-3 py-1.5 rounded-full border text-body font-medium",
-                                    sp.appointedForEInvoice ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-600" : "bg-muted/50 border-border text-muted-foreground"
+                                    sp.appointedForEInvoice ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 dark:bg-emerald-500/20 border-emerald-500/20 dark:border-emerald-500/30" : "bg-muted/50 border-border text-muted-foreground"
                                 )}>
                                     <ShieldCheck size={14} weight={sp.appointedForEInvoice ? "fill" : "regular"} />
                                     Appointed Welluber for e-Invoice
                                 </div>
                             </div>
                             
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-white/50 border border-border rounded-lg">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-background/50 border border-border rounded-lg">
                                 <DetailField label="Classification Code" value={sp.classificationCode || "N/A"} />
                                 <DetailField label="Classification Descriptor" value={sp.classificationDescriptor || "N/A"} />
                             </div>
@@ -583,7 +583,7 @@ export default function ServiceProviderDetailPage() {
                         className={cn(
                           "w-full sm:w-auto text-body font-medium rounded-full transition-all",
                           currentStatus === "suspended"
-                            ? "text-emerald-600 border-emerald-200 hover:bg-emerald-50"
+                            ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 dark:bg-emerald-500/20 border-emerald-200 dark:border-emerald-500/20 hover:bg-emerald-50 dark:hover:bg-emerald-500/10"
                             : "text-destructive border-destructive/30 hover:bg-destructive/5"
                         )}
                         onClick={() => openDangerAction("status")}
@@ -604,7 +604,7 @@ export default function ServiceProviderDetailPage() {
                     </div>
                   </div>
 
-                  <div className="rounded-lg border border-rose-200 bg-rose-50/60 p-4">
+                  <div className="rounded-lg border border-rose-200 dark:border-rose-500/20 bg-rose-500/10 text-rose-600 dark:text-rose-400 dark:bg-rose-500/20 p-4">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div className="space-y-1">
                         <p className="text-body font-medium text-foreground">Remove Service Provider</p>

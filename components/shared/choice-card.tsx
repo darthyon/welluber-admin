@@ -37,7 +37,7 @@ export function ChoiceCard({
     >
       <div className={cn(
         "w-10 h-10 rounded-lg flex items-center justify-center shrink-0 transition-colors",
-        selected ? "bg-primary text-white" : "bg-muted text-muted-foreground group-hover:bg-muted/80"
+        selected ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground group-hover:bg-muted/80"
       )}>
         <Icon size={20} weight={selected ? "fill" : "regular"} />
       </div>
@@ -59,7 +59,7 @@ export function ChoiceCard({
         "w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ml-auto",
         selected ? "border-primary bg-primary" : "border-muted-foreground/30"
       )}>
-        {selected && <div className="w-1.5 h-1.5 rounded-full bg-white animate-in zoom-in-50 duration-200" />}
+        {selected && <div className="w-1.5 h-1.5 rounded-full bg-background animate-in zoom-in-50 duration-200" />}
       </div>
     </div>
   );

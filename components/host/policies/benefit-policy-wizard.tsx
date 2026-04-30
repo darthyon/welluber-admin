@@ -19,12 +19,9 @@ import {
   EyeSlash,
   CaretDown,
   Receipt,
-  Sparkle,
   Check,
   MagnifyingGlass,
-  Funnel,
-  SelectionAll,
-  Eraser,
+  Warning,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { ChoiceCard } from "@/components/shared/choice-card";
@@ -32,40 +29,34 @@ import { DetailSection } from "@/components/shared/detail-section";
 import { SuccessCelebration } from "@/components/shared/success-celebration";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
-import { BenefitPolicy, BenefitGroup, Benefit, PolicyStatus, DistributionType } from "@/types/policy";
+import { BenefitPolicy, BenefitGroup, Benefit, PolicyStatus, DistributionType, PoolType, UtilisationMode, ProrateUnit, RefreshCycle, RefreshStartReference } from "@/types/policy";
 import { UtilisationClaimsTable, type EmployeeUtilisationRow } from "@/components/shared/utilisation-claims-table";
-import { SharedDataTable, type Column } from "@/components/shared/data-table";
-import { FilterItem } from "@/components/shared/filter-item";
-import { DataFilterBar } from "@/components/shared/data-filter-bar";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const CONTENT_TABS = [
-  { id: 1, title: "Benefit Policy Details" },
-  { id: 2, title: "Benefit Pool & Cycle" },
+  { id: 1, title: "Overview" },
+  { id: 2, title: "Pool & Cycle" },
   { id: 3, title: "Benefit Groups" },
   { id: 4, title: "Utilisation & Claims", viewOnly: true },
 ];
 
 const CREATE_STEPS = [
-  { id: 1, title: "Target Workforce" },
-  { id: 2, title: "Benefit Pool & Cycle" },
-  { id: 3, title: "Benefit Groups" },
-  { id: 4, title: "Finalize & Review" },
+  { id: 1, title: "Basics" },
+  { id: 2, title: "Pool Config" },
+  { id: 3, title: "Groups & Services" },
+  { id: 4, title: "Review" },
 ];
 
 const EMPLOYMENT_TYPES = [
-  { id: "full-time", title: "Full-time", description: "Standard permanent role" },
-  { id: "part-time", title: "Part-time", description: "Standard part-time role" },
-  { id: "contract", title: "Contract", description: "Fixed-term engagement" },
-  { id: "internship", title: "Internship", description: "Temporary role" },
+  { id: "full-time", label: "Full-time" },
+  { id: "part-time", label: "Part-time" },
+  { id: "contract", label: "Contract" },
+  { id: "internship", label: "Internship" },
 ];
 
-const ROLES = [
-  { id: "executive", title: "Executive", description: "CXO, VPs, Directors" },
-  { id: "management", title: "Management", description: "Heads, Managers, Leads" },
-  { id: "staff", title: "Staff", description: "Senior and Junior associates" },
-];
+const PRORATE_UNITS: ProrateUnit[] = ["Daily", "Weekly", "Monthly", "Quarterly", "Yearly"];
+const REFRESH_CYCLES: RefreshCycle[] = ["Daily", "Weekly", "Monthly", "Quarterly", "Yearly"];
 
 const SERVICES = [
   { id: "s1", category: "Physical Wellbeing", name: "Gymnasium Facilities", subServices: ["Standard Gym Access", "Boutique Studio Memberships"] },
@@ -76,26 +67,10 @@ const SERVICES = [
   { id: "s6", category: "Personal Care", name: "Therapeutic Spa Services", subServices: ["Relaxation Massage", "Hydrotherapy"] },
 ];
 
-const MOCK_EMPLOYEES = [
-  { id: "emp-1", name: "Sarah Chen", email: "sarah.chen@welluber.com", department: "Engineering", role: "Staff", gender: "Female", age: 28, status: "Active", needsAction: "None", branch: "HQ (Kuala Lumpur)" },
-  { id: "emp-2", name: "Michael Rodriguez", email: "m.rodriguez@welluber.com", department: "Marketing", role: "Management", gender: "Male", age: 34, status: "Active", needsAction: "None", branch: "HQ (Kuala Lumpur)" },
-  { id: "emp-3", name: "Emily Wong", email: "emily.wong@welluber.com", department: "Product", role: "Staff", gender: "Female", age: 25, status: "Terminated", needsAction: "None", branch: "Subang Jaya" },
-  { id: "emp-4", name: "David Kim", email: "david.kim@welluber.com", department: "Engineering", role: "Management", gender: "Male", age: 41, status: "Active", needsAction: "Missing Info", branch: "HQ (Kuala Lumpur)" },
-  { id: "emp-5", name: "Jessica Taylor", email: "j.taylor@welluber.com", department: "Sales", role: "Staff", gender: "Female", age: 31, status: "Active", needsAction: "None", branch: "Penang Office" },
-  { id: "emp-6", name: "Alex Rivera", email: "alex.rivera@welluber.com", department: "Marketing", role: "Executive", gender: "Non-binary", age: 39, status: "Active", needsAction: "None", branch: "HQ (Kuala Lumpur)" },
-  { id: "emp-7", name: "Hassan Al-Fayed", email: "hassan.a@welluber.com", department: "Engineering", role: "Staff", gender: "Male", age: 27, status: "Active", needsAction: "None", branch: "Subang Jaya" },
-  { id: "emp-8", name: "Sophie Mueller", email: "sophie.m@welluber.com", department: "HR", role: "Management", gender: "Female", age: 36, status: "Active", needsAction: "Missing Info", branch: "HQ (Kuala Lumpur)" },
-  { id: "emp-9", name: "James Wilson", email: "james.w@welluber.com", department: "Sales", role: "Staff", gender: "Male", age: 29, status: "Active", needsAction: "None", branch: "Penang Office" },
-  { id: "emp-10", name: "Chloe Dupont", email: "chloe.d@welluber.com", department: "Product", role: "Staff", gender: "Female", age: 24, status: "Terminated", needsAction: "None", branch: "HQ (Kuala Lumpur)" },
-  { id: "emp-11", name: "Ryan Gupta", email: "ryan.g@welluber.com", department: "Engineering", role: "Staff", gender: "Male", age: 33, status: "Active", needsAction: "None", branch: "Subang Jaya" },
-  { id: "emp-12", name: "Maria Garcia", email: "maria.g@welluber.com", department: "Marketing", role: "Staff", gender: "Female", age: 30, status: "Active", needsAction: "None", branch: "HQ (Kuala Lumpur)" },
-];
-
 const STATUS_CONFIG: Record<PolicyStatus, { label: string; color: string; bg: string; icon: React.ElementType }> = {
-  Draft: { label: "Draft", color: "text-amber-600 dark:text-amber-400", bg: "bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/20", icon: NotePencil },
-  Published: { label: "Published", color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20", icon: CheckCircle },
-  Unlisted: { label: "Unlisted", color: "text-muted-foreground dark:text-faint", bg: "bg-muted dark:bg-muted0/10 border-zinc-200 dark:border-zinc-500/20", icon: EyeSlash },
-  Deactivated: { label: "Deactivated", color: "text-rose-600 dark:text-rose-400", bg: "bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/20", icon: XCircle },
+  draft: { label: "Draft", color: "text-amber-600 dark:text-amber-400", bg: "bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/20", icon: NotePencil },
+  active: { label: "Active", color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20", icon: CheckCircle },
+  deactivated: { label: "Deactivated", color: "text-rose-600 dark:text-rose-400", bg: "bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/20", icon: XCircle },
 };
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -185,124 +160,23 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [genContext, setGenContext] = useState("");
 
   const [policyData, setPolicyData] = useState<Partial<BenefitPolicy>>(initialData?.policy || {
-    code: "",
     name: "",
     description: "",
-    eligibility: { roles: [], employeeTypes: ["full-time"] },
-    benefitPoolType: { employee: "Individual", dependents: "None" },
+    eligibleEmploymentTypes: ["full-time"],
+    benefitPoolType: "Individual",
     utilisationMode: "Fixed",
     refreshCycle: "Yearly",
-    refreshStartReference: "OrgFY",
-    activationMode: "JoinDate",
-    status: "Draft",
+    refreshStartReference: "fy_start",
+    status: "draft",
   });
 
   const [groups, setGroups] = useState<BenefitGroup[]>(initialData?.groups || []);
   const [benefits, setBenefits] = useState<Benefit[]>(initialData?.benefits || []);
 
-  const [selectedEmployeeIds, setSelectedEmployeeIds] = useState<Set<string>>(new Set());
-  const [assignmentFilters, setAssignmentFilters] = useState({
-    department: "all",
-    role: "all",
-    gender: "all",
-    status: "all",
-    needsAction: "all",
-    branch: "all",
-    ageRange: "all",
-  });
-  const [isGenerated, setIsGenerated] = useState(false);
-  const [assignmentSearchQuery, setAssignmentSearchQuery] = useState("");
-
-  const filteredWorkforce = useMemo(() => {
-    return MOCK_EMPLOYEES.filter(emp => {
-      const searchMatch = !assignmentSearchQuery || 
-        emp.name.toLowerCase().includes(assignmentSearchQuery.toLowerCase()) || 
-        emp.email.toLowerCase().includes(assignmentSearchQuery.toLowerCase());
-      const deptMatch = assignmentFilters.department === "all" || emp.department === assignmentFilters.department;
-      const roleMatch = assignmentFilters.role === "all" || emp.role === assignmentFilters.role;
-      const genderMatch = assignmentFilters.gender === "all" || emp.gender === assignmentFilters.gender;
-      const statusMatch = assignmentFilters.status === "all" || emp.status === assignmentFilters.status;
-      const needsActionMatch = assignmentFilters.needsAction === "all" || emp.needsAction === assignmentFilters.needsAction;
-      const branchMatch = assignmentFilters.branch === "all" || emp.branch === assignmentFilters.branch;
-      
-      let ageMatch = true;
-      if (assignmentFilters.ageRange !== "all") {
-        if (assignmentFilters.ageRange === "20-30") ageMatch = emp.age >= 20 && emp.age <= 30;
-        else if (assignmentFilters.ageRange === "31-40") ageMatch = emp.age >= 31 && emp.age <= 40;
-        else if (assignmentFilters.ageRange === "41plus") ageMatch = emp.age > 40;
-      }
-
-      return searchMatch && deptMatch && roleMatch && genderMatch && statusMatch && needsActionMatch && branchMatch && ageMatch;
-    });
-  }, [assignmentSearchQuery, assignmentFilters]);
-
-  const toggleEmployeeSelection = useCallback((id: string) => {
-    setSelectedEmployeeIds(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }, []);
-
-  const assignVisibleWorkforce = useCallback(() => {
-    setSelectedEmployeeIds(prev => {
-      const next = new Set(prev);
-      filteredWorkforce.forEach(emp => next.add(emp.id));
-      return next;
-    });
-  }, [filteredWorkforce]);
-
-  const clearVisibleWorkforce = useCallback(() => {
-    setSelectedEmployeeIds(prev => {
-      const next = new Set(prev);
-      filteredWorkforce.forEach(emp => next.delete(emp.id));
-      return next;
-    });
-  }, [filteredWorkforce]);
-
-  const workforceColumns = useMemo(() => {
-    const cols: Column<typeof MOCK_EMPLOYEES[0]>[] = [
-      {
-        header: "Employee Name",
-        accessorKey: "name",
-        render: (row) => (
-          <div className="flex flex-col">
-            <span className="font-semibold text-foreground">{row.name}</span>
-            <span className="text-label text-faint font-medium">{row.email}</span>
-          </div>
-        )
-      },
-      { header: "Department", accessorKey: "department" },
-      { header: "Role", accessorKey: "role" },
-      { header: "Gender", accessorKey: "gender" },
-      { header: "Age", accessorKey: "age", align: "center" },
-    ];
-
-    if (!isViewMode) {
-      cols.unshift({
-        header: "",
-        headerClassName: "w-[50px]",
-        render: (row) => (
-          <button 
-            onClick={(e) => { e.stopPropagation(); toggleEmployeeSelection(row.id); }}
-            className={cn(
-              "w-5 h-5 rounded border flex items-center justify-center transition-all",
-              selectedEmployeeIds.has(row.id) ? "bg-primary border-primary text-white" : "border-border hover:border-primary/50 bg-background/50"
-            )}
-          >
-            {selectedEmployeeIds.has(row.id) && <Check size={12} weight="bold" />}
-          </button>
-        )
-      });
-    }
-
-    return cols;
-  }, [isViewMode, selectedEmployeeIds, toggleEmployeeSelection]);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [showPostCreateModal, setShowPostCreateModal] = useState(false);
 
   useEffect(() => {
     if (initialData) {
@@ -312,50 +186,110 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
     }
   }, [initialData]);
 
+  // ── Validation helpers ────────────────────────────────────────────────────
+
+  const validateStep = (step: number): boolean => {
+    const errors: Record<string, string> = {};
+
+    if (step === 1) {
+      if (!policyData.name?.trim()) errors.name = "Policy name is required";
+      else if (policyData.name.length > 100) errors.name = "Max 100 characters";
+      if (!policyData.eligibleEmploymentTypes || policyData.eligibleEmploymentTypes.length === 0) {
+        errors.eligibleEmploymentTypes = "Select at least one employment type";
+      }
+    }
+
+    if (step === 2) {
+      if (policyData.utilisationMode === "Prorated" && !policyData.prorateUnit) {
+        errors.prorateUnit = "Select a prorate unit for Prorated mode";
+      }
+      if (policyData.refreshStartReference === "custom_date" && !policyData.refreshCustomDate) {
+        errors.refreshCustomDate = "Enter a custom refresh date";
+      }
+      if (policyData.refreshStartReference === "custom_date" && policyData.refreshCustomDate) {
+        const d = new Date(policyData.refreshCustomDate);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (d < today) errors.refreshCustomDate = "Refresh date must be today or future";
+      }
+      if (policyData.utilisationMode === "Prorated" && policyData.prorateUnit && policyData.refreshCycle) {
+        const unitIdx = PRORATE_UNITS.indexOf(policyData.prorateUnit);
+        const cycleIdx = REFRESH_CYCLES.indexOf(policyData.refreshCycle);
+        if (cycleIdx < unitIdx) {
+          errors.refreshCycle = `${policyData.refreshCycle} is not valid for ${policyData.prorateUnit} prorate. Valid: ${PRORATE_UNITS.slice(unitIdx).join(", ")}`;
+        }
+      }
+    }
+
+    if (step === 3) {
+      if (groups.length === 0) errors.groups = "Add at least one benefit group";
+      groups.forEach((group, idx) => {
+        const groupBenefits = benefits.filter(b => b.groupId === group.id);
+        if (groupBenefits.length === 0) {
+          errors[`group_${idx}`] = `Select at least one service for ${group.name || "this group"}`;
+        }
+        groupBenefits.forEach((b, bIdx) => {
+          if (b.amount <= 0) errors[`benefit_${group.id}_${bIdx}`] = "Amount must be greater than 0";
+          if (b.coPayment.required && b.coPayment.value <= 0) {
+            errors[`copay_${group.id}_${bIdx}`] = "Co-payment value must be greater than 0";
+          }
+        });
+      });
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   // ── Handlers ──────────────────────────────────────────────────────────────
 
-  const toggleEligibility = (type: "roles" | "employeeTypes", id: string) => {
+  const toggleEmploymentType = (id: string) => {
     setPolicyData(prev => {
-      const current = prev.eligibility?.[type] || [];
+      const current = prev.eligibleEmploymentTypes || [];
       return {
         ...prev,
-        eligibility: {
-          ...prev.eligibility!,
-          [type]: current.includes(id) ? current.filter(x => x !== id) : [...current, id],
-        },
+        eligibleEmploymentTypes: current.includes(id) ? current.filter(x => x !== id) : [...current, id],
       };
     });
   };
 
   const addGroup = useCallback(() => {
     const newGroup: BenefitGroup = {
-      id: `ben-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      id: `grp-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
       policyId: policyData.id || "temp",
       name: "New Benefit Group",
-      description: "",
       distributionType: "IndividualBenefitAmount",
     };
-    setGroups([...groups, newGroup]);
-  }, [groups, policyData.id]);
+    setGroups(prev => [...prev, newGroup]);
+  }, [policyData.id]);
 
   const removeGroup = (groupId: string) => {
     setGroups(groups.filter(g => g.id !== groupId));
     setBenefits(benefits.filter(b => b.groupId !== groupId));
   };
 
-  const updateGroup = (groupId: string, field: keyof BenefitGroup, value: string | number | DistributionType) => {
+  const updateGroup = (groupId: string, field: keyof BenefitGroup, value: string | number | DistributionType | undefined) => {
     setGroups(groups.map(g => g.id === groupId ? { ...g, [field]: value } : g));
   };
 
-  const addBenefit = useCallback((groupId: string) => {
-    setBenefits([...benefits, {
-      id: `ben-svc-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-      groupId,
-      serviceId: SERVICES[0].id,
-      amount: 0,
-      coPayment: { required: false, type: "Percentage", value: 0 },
-    }]);
-  }, [benefits]);
+  const isServiceInGroup = (groupId: string, serviceId: string) => {
+    return benefits.some(b => b.groupId === groupId && b.serviceId === serviceId);
+  };
+
+  const toggleService = (groupId: string, serviceId: string) => {
+    const exists = benefits.find(b => b.groupId === groupId && b.serviceId === serviceId);
+    if (exists) {
+      setBenefits(benefits.filter(b => !(b.groupId === groupId && b.serviceId === serviceId)));
+    } else {
+      setBenefits([...benefits, {
+        id: `ben-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+        groupId,
+        serviceId,
+        amount: 0,
+        coPayment: { required: false, type: "Percentage", value: 0 },
+      }]);
+    }
+  };
 
   const updateBenefit = (benefitId: string, field: string, value: string | number | boolean) => {
     setBenefits(benefits.map(b => {
@@ -363,10 +297,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
       if (field.includes(".")) {
         const [parent, child] = field.split(".");
         if (parent === "coPayment") {
-          return { 
-            ...b, 
-            coPayment: { ...b.coPayment, [child]: value } 
-          } as Benefit;
+          return { ...b, coPayment: { ...b.coPayment, [child]: value } } as Benefit;
         }
         return { ...b, [parent]: { ...(b as any)[parent], [child]: value } };
       }
@@ -374,64 +305,52 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
     }));
   };
 
-  const removeBenefit = (benefitId: string) => {
-    setBenefits(benefits.filter(b => b.id !== benefitId));
-  };
-
-  const nextStep = async () => {
-    if (currentStep === 3 && !isGenerated) {
-      await generateIdentitySuggestions();
-    }
+  const nextStep = () => {
+    if (!validateStep(currentStep)) return;
     setCurrentStep(prev => Math.min(prev + 1, 4));
   };
+
   const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 1));
 
-  const goToStep = async (stepId: number) => {
-    if (isSubmitting || isGenerating) return;
-    
-    // If moving to step 4 for the first time, generate suggestions
-    if (stepId === 4 && !isGenerated) {
-      setCurrentStep(4);
-      await generateIdentitySuggestions();
-      return;
+  const goToStep = (stepId: number) => {
+    if (isSubmitting) return;
+    // Allow going back freely; going forward requires current step validation
+    if (stepId > currentStep) {
+      if (!validateStep(currentStep)) return;
     }
-    
     setCurrentStep(stepId);
   };
 
-  const generateIdentitySuggestions = async () => {
-    // Collect context for generation
-    const mainServices = benefits.map(b => SERVICES.find(s => s.id === b.serviceId)?.name).filter(Boolean);
-    const uniqueServices = Array.from(new Set(mainServices));
-    const deptFilter = assignmentFilters.department !== "all" ? assignmentFilters.department : "Whole Team";
-    
-    setGenContext(uniqueServices.slice(0, 2).join(" & ") + (uniqueServices.length > 2 ? "..." : ""));
-    setIsGenerating(true);
-    
-    await new Promise(resolve => setTimeout(resolve, 2200));
-
-    const primaryService = uniqueServices[0] || "Health";
-    const suggestedName = `${primaryService} ${new Date().getFullYear()} - ${deptFilter}`;
-    const suggestedCode = `BEN-${primaryService.substring(0, 3).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
-    const suggestedDesc = `A ${policyData.utilisationMode?.toLowerCase() || "standard"} wellbeing policy designed specifically for the ${deptFilter === "Whole Team" ? "workforce" : deptFilter + " department"}, focusing on ${uniqueServices.join(", ") || "essential services"}.`;
-
-    setPolicyData(prev => ({ 
-      ...prev, 
-      name: prev.name || suggestedName, 
-      code: prev.code || suggestedCode,
-      description: prev.description || suggestedDesc
-    }));
-    
-    setIsGenerated(true);
-    setIsGenerating(false);
-  };
-
   const handleSubmit = async () => {
+    if (!validateStep(currentStep)) return;
     setIsSubmitting(true);
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise(resolve => setTimeout(resolve, 1200));
     setIsSubmitting(false);
     setIsSuccess(true);
-    setTimeout(() => onSuccess({ policy: policyData, groups, benefits }), 2000);
+    setTimeout(() => onSuccess({ policy: policyData, groups, benefits }), 1800);
+  };
+
+  const handleSaveDraft = () => {
+    if (!validateStep(currentStep)) return;
+    if (mode === "create") {
+      setShowPostCreateModal(true);
+    } else {
+      onSaveDraft?.({ policy: policyData, groups, benefits });
+    }
+  };
+
+  const handleActivateFromModal = async () => {
+    setShowPostCreateModal(false);
+    setIsSubmitting(true);
+    await new Promise(resolve => setTimeout(resolve, 800));
+    setIsSubmitting(false);
+    setIsSuccess(true);
+    setTimeout(() => onSuccess({ policy: { ...policyData, status: "active" }, groups, benefits }), 1800);
+  };
+
+  const handleViewFromModal = () => {
+    setShowPostCreateModal(false);
+    onSaveDraft?.({ policy: policyData, groups, benefits });
   };
 
   // ── Success ────────────────────────────────────────────────────────────────
@@ -449,107 +368,77 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
 
   // ─ Step rendering helpers ─────────────────────────────────────────────────
 
-  const renderWorkforceStep = () => {
+  const renderBasicsStep = () => {
     return (
-      <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
-        <DetailSection 
-          title="Target Workforce" 
-          icon={<Users size={18} weight="duotone" />} 
-          description="Identify and assign employees to this benefit policy"
+      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500 max-w-3xl">
+        <DetailSection
+          title="Policy Basics"
+          icon={<IdentificationCard size={18} weight="duotone" />}
+          description="Name your policy and define who is eligible"
           ghost
-          action={
-            <div className="flex items-center gap-3">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={assignVisibleWorkforce}
-                className="h-8 px-3 gap-2 text-label font-semibold text-primary hover:bg-primary/5 transition-all"
-              >
-                <SelectionAll size={14} />
-                Assign Filtered
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={clearVisibleWorkforce}
-                className="h-8 px-3 gap-2 text-label font-semibold text-rose-500 hover:bg-rose-500/10 transition-all border-l border-border"
-              >
-                <Eraser size={14} />
-                Clear
-              </Button>
-              <span className="text-label font-semibold text-primary bg-primary/10 px-3 py-1.5 rounded-full ring-1 ring-primary/20">
-                {selectedEmployeeIds.size} Assigned
-              </span>
-            </div>
-          }
         >
           <div className="space-y-5">
-            {/* Filter Bar - Reusable DataFilterBar component */}
-            <DataFilterBar
-              searchQuery={assignmentSearchQuery}
-              onSearchChange={setAssignmentSearchQuery}
-              searchPlaceholder="Search employees..."
-              filters={
-                <>
-                  <FilterItem
-                    label="Department"
-                    options={[
-                      { label: "All Depts", value: "all" },
-                      { label: "Engineering", value: "Engineering" },
-                      { label: "Marketing", value: "Marketing" },
-                      { label: "Product", value: "Product" },
-                      { label: "Sales", value: "Sales" },
-                      { label: "HR", value: "HR" },
-                    ]}
-                    value={assignmentFilters.department}
-                    onChange={(v) => setAssignmentFilters({ ...assignmentFilters, department: v })}
-                  />
-                  <FilterItem
-                    label="Role"
-                    options={[
-                      { label: "All Roles", value: "all" },
-                      { label: "Executive", value: "Executive" },
-                      { label: "Management", value: "Management" },
-                      { label: "Staff", value: "Staff" },
-                    ]}
-                    value={assignmentFilters.role}
-                    onChange={(v) => setAssignmentFilters({ ...assignmentFilters, role: v })}
-                  />
-                  <FilterItem
-                    label="Age Range"
-                    options={[
-                      { label: "Any Age", value: "all" },
-                      { label: "20 - 30", value: "20-30" },
-                      { label: "31 - 40", value: "31-40" },
-                      { label: "41+", value: "41plus" },
-                    ]}
-                    value={assignmentFilters.ageRange}
-                    onChange={(v) => setAssignmentFilters({ ...assignmentFilters, ageRange: v })}
-                  />
-                  <FilterItem
-                    label="Branch"
-                    options={[
-                      { label: "All Branches", value: "all" },
-                      { label: "HQ (KL)", value: "HQ (Kuala Lumpur)" },
-                      { label: "Subang Jaya", value: "Subang Jaya" },
-                      { label: "Penang", value: "Penang Office" },
-                    ]}
-                    value={assignmentFilters.branch}
-                    onChange={(v) => setAssignmentFilters({ ...assignmentFilters, branch: v })}
-                  />
-                </>
-              }
-            />
+            <div className="space-y-1.5">
+              <label className="text-label font-medium text-subtle">
+                Policy Name <span className="text-rose-600 dark:text-rose-400">*</span>
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. Wellness Premium 2026"
+                className={cn(
+                  "w-full px-4 py-3 bg-background border rounded-lg text-body outline-none transition-all font-semibold text-foreground focus:ring-4 focus:ring-primary/10 focus:border-primary/40",
+                  validationErrors.name ? "border-rose-300 focus:border-rose-400 focus:ring-rose-100" : "border-border"
+                )}
+                value={policyData.name || ""}
+                onChange={(e) => setPolicyData({ ...policyData, name: e.target.value })}
+                disabled={isViewMode}
+              />
+              {validationErrors.name && <p className="text-label text-rose-600 dark:text-rose-400 font-medium">{validationErrors.name}</p>}
+              <p className="text-micro text-faint">Max 100 characters. Must be unique in your account.</p>
+            </div>
 
-            {/* Employee Table */}
-            <SharedDataTable 
-              data={filteredWorkforce} 
-              columns={workforceColumns}
-              rowsPerPage={6}
-              className="border-zinc-200/60"
-              ghost
-              onRowClick={(row) => toggleEmployeeSelection(row.id)}
-            />
+            <div className="space-y-1.5">
+              <label className="text-label font-medium text-subtle">Description</label>
+              <textarea
+                placeholder="Describe the purpose of this benefit policy..."
+                rows={3}
+                className="w-full px-4 py-3 bg-background border border-border rounded-lg text-body outline-none transition-all font-medium text-muted-foreground min-h-[80px] resize-none focus:ring-4 focus:ring-primary/10 focus:border-primary/40"
+                value={policyData.description || ""}
+                onChange={(e) => setPolicyData({ ...policyData, description: e.target.value })}
+                disabled={isViewMode}
+              />
+              <p className="text-micro text-faint">Optional. Max 300 characters.</p>
+            </div>
+
+            <div className="space-y-3">
+              <label className="text-label font-medium text-subtle">
+                Eligible Employment Types <span className="text-rose-600 dark:text-rose-400">*</span>
+              </label>
+              {validationErrors.eligibleEmploymentTypes && (
+                <p className="text-label text-rose-600 dark:text-rose-400 font-medium">{validationErrors.eligibleEmploymentTypes}</p>
+              )}
+              <div className="flex flex-wrap gap-2">
+                {EMPLOYMENT_TYPES.map((type) => {
+                  const selected = policyData.eligibleEmploymentTypes?.includes(type.id) || false;
+                  return (
+                    <button
+                      key={type.id}
+                      disabled={isViewMode}
+                      onClick={() => toggleEmploymentType(type.id)}
+                      className={cn(
+                        "px-4 py-2 rounded-full text-body font-semibold border transition-all",
+                        selected
+                          ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                          : "bg-background text-muted-foreground border-border hover:border-primary/30"
+                      )}
+                    >
+                      {selected && <Check size={12} weight="bold" className="inline mr-1.5" />}
+                      {type.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </DetailSection>
       </div>
@@ -559,29 +448,28 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
   const renderPoolStep = () => {
     if (isViewMode) {
       const refreshLabels: Record<string, string> = {
-        OrgFY: "Organisation Financial Year",
-        JoinDate: "Employee Join Date",
-        CustomDate: "Custom Start Date",
-      };
-      const activationLabels: Record<string, string> = {
-        JoinDate: "Immediately after joining",
-        ProbationEnds: "After probation period ends",
-        CustomDate: "Set specific activation date",
+        fy_start: "Organisation Financial Year",
+        join_date: "Employee Join Date",
+        custom_date: "Custom Start Date",
       };
       return (
         <div className="space-y-8 animate-in fade-in duration-300">
           <DetailSection title="Benefit Pool Strategy" icon={<Gear size={18} weight="duotone" />} description="Fund allocation configuration" ghost>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 p-1">
-              <ReadField label="Employee Pool Type" value={policyData.benefitPoolType?.employee} />
-              <ReadField label="Dependent Pool Type" value={policyData.benefitPoolType?.dependents} />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <ReadField label="Pool Type" value={policyData.benefitPoolType} />
               <ReadField label="Utilisation Mode" value={policyData.utilisationMode === "Fixed" ? "Fixed Allocation" : "Prorated Allocation"} />
+              {policyData.utilisationMode === "Prorated" && (
+                <ReadField label="Prorate Unit" value={policyData.prorateUnit} />
+              )}
             </div>
           </DetailSection>
           <DetailSection title="Cycle & Lifecycle" icon={<Gear size={18} weight="duotone" />} description="Refresh intervals and activation" ghost>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 p-1">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <ReadField label="Refresh Cycle" value={policyData.refreshCycle} />
               <ReadField label="Refresh Start Reference" value={refreshLabels[policyData.refreshStartReference || ""] || policyData.refreshStartReference} />
-              <ReadField label="Activation Mode" value={activationLabels[policyData.activationMode || ""] || policyData.activationMode} />
+              {policyData.refreshStartReference === "custom_date" && (
+                <ReadField label="Custom Refresh Date" value={policyData.refreshCustomDate} />
+              )}
             </div>
           </DetailSection>
         </div>
@@ -589,399 +477,414 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
     }
 
     return (
-      <div className="space-y-8">
-        <DetailSection title="Benefit Pool Strategy" icon={<Gear size={18} weight="duotone" />} description="Choose how funds are allocated across the workforce" ghost>
-          <div className="space-y-8 p-1">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-3">
-                <label className="text-label font-semibold text-faint tracking-wider">Employee pool type</label>
-                <div className="flex gap-2 p-1 bg-muted rounded-lg">
-                  {(["Individual", "Shared"] as const).map((type) => (
-                    <button
-                      key={type}
-                      onClick={() => setPolicyData({ ...policyData, benefitPoolType: { ...policyData.benefitPoolType!, employee: type } })}
-                      className={cn("flex-1 py-2 text-body font-semibold rounded-lg transition-all", policyData.benefitPoolType?.employee === type ? "bg-background text-primary shadow-sm" : "text-muted-foreground hover:text-foreground")}
-                    >{type}</button>
-                  ))}
-                </div>
-              </div>
-              <div className="space-y-3">
-                <label className="text-label font-semibold text-faint tracking-wider">Dependent Pool Type</label>
-                <div className="flex gap-2 p-1 bg-muted rounded-lg">
-                  {(["None", "Individual", "Shared"] as const).map((type) => (
-                    <button
-                      key={type}
-                      onClick={() => setPolicyData({ ...policyData, benefitPoolType: { ...policyData.benefitPoolType!, dependents: type } })}
-                      className={cn("flex-1 py-2 text-body font-semibold rounded-lg transition-all", policyData.benefitPoolType?.dependents === type ? "bg-background text-primary shadow-sm" : "text-muted-foreground hover:text-foreground")}
-                    >{type}</button>
-                  ))}
-                </div>
+      <div className="space-y-8 max-w-3xl">
+        <DetailSection title="Benefit Pool Strategy" icon={<Gear size={18} weight="duotone" />} description="Choose how funds are allocated" ghost>
+          <div className="space-y-6">
+            <div className="space-y-3">
+              <label className="text-label font-medium text-subtle">Pool Type</label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <ChoiceCard
+                  title="Individual"
+                  description="Each employee gets their own separate budget."
+                  icon={Users}
+                  selected={policyData.benefitPoolType === "Individual"}
+                  onSelect={() => setPolicyData({ ...policyData, benefitPoolType: "Individual" as PoolType })}
+                />
+                <ChoiceCard
+                  title="Shared"
+                  description="Employees share a common pool of funds."
+                  icon={Briefcase}
+                  selected={policyData.benefitPoolType === "Shared"}
+                  onSelect={() => setPolicyData({ ...policyData, benefitPoolType: "Shared" as PoolType })}
+                />
               </div>
             </div>
+
             <div className="space-y-3">
               <label className="text-label font-medium text-subtle">Utilisation Mode</label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <ChoiceCard title="Fixed Allocation" description="Full benefit amounts granted upfront upon assignment." icon={Gear} selected={policyData.utilisationMode === "Fixed"} onSelect={() => setPolicyData({ ...policyData, utilisationMode: "Fixed" })} />
+                <ChoiceCard title="Fixed Allocation" description="Full benefit amounts granted upfront upon assignment." icon={Gear} selected={policyData.utilisationMode === "Fixed"} onSelect={() => setPolicyData({ ...policyData, utilisationMode: "Fixed", prorateUnit: undefined })} />
                 <ChoiceCard title="Prorated Allocation" description="Benefit amounts calculated based on join date/time." icon={Gear} selected={policyData.utilisationMode === "Prorated"} onSelect={() => setPolicyData({ ...policyData, utilisationMode: "Prorated" })} />
               </div>
             </div>
+
+            {policyData.utilisationMode === "Prorated" && (
+              <div className="space-y-1.5">
+                <label className="text-label font-medium text-subtle">
+                  Prorate Unit <span className="text-rose-600 dark:text-rose-400">*</span>
+                </label>
+                <select
+                  className={cn(
+                    "w-full px-4 py-2.5 bg-background border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all",
+                    validationErrors.prorateUnit ? "border-rose-300" : "border-border"
+                  )}
+                  value={policyData.prorateUnit || ""}
+                  onChange={(e) => setPolicyData({ ...policyData, prorateUnit: e.target.value as ProrateUnit })}
+                >
+                  <option value="">Select prorate unit...</option>
+                  {PRORATE_UNITS.map(u => <option key={u} value={u}>{u}</option>)}
+                </select>
+                {validationErrors.prorateUnit && <p className="text-label text-rose-600 dark:text-rose-400 font-medium">{validationErrors.prorateUnit}</p>}
+              </div>
+            )}
           </div>
         </DetailSection>
 
-        <DetailSection title="Cycle & Lifecycle" icon={<Gear size={18} weight="duotone" />} description="Refresh intervals and activation triggers" ghost>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-1">
+        <DetailSection title="Cycle & Lifecycle" icon={<Gear size={18} weight="duotone" />} description="Refresh intervals and start reference" ghost>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="space-y-1.5">
               <label className="text-label font-medium text-subtle">Refresh Cycle</label>
               <select
-                className="w-full px-4 py-2 bg-muted/20 border border-border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all"
+                className={cn(
+                  "w-full px-4 py-2.5 bg-background border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all",
+                  validationErrors.refreshCycle ? "border-rose-300" : "border-border"
+                )}
                 value={policyData.refreshCycle}
-                onChange={(e) => setPolicyData({ ...policyData, refreshCycle: e.target.value as any })}
+                onChange={(e) => setPolicyData({ ...policyData, refreshCycle: e.target.value as RefreshCycle })}
               >
-                {["Daily", "Weekly", "Monthly", "Quarterly", "Yearly"].map(c => <option key={c} value={c}>{c}</option>)}
+                {REFRESH_CYCLES.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
+              {validationErrors.refreshCycle && <p className="text-label text-rose-600 dark:text-rose-400 font-medium">{validationErrors.refreshCycle}</p>}
             </div>
+
             <div className="space-y-1.5">
               <label className="text-label font-medium text-subtle">Refresh Start Reference</label>
-              <select
-                className="w-full px-4 py-2 bg-transparent border border-zinc-200 rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10"
-                value={policyData.refreshStartReference}
-                onChange={(e) => setPolicyData({ ...policyData, refreshStartReference: e.target.value as any })}
-              >
-                <option value="OrgFY">Organisation Financial Year</option>
-                <option value="JoinDate">Employee Joining Date</option>
-                <option value="CustomDate">Custom Start Date</option>
-              </select>
-            </div>
-            <div className="space-y-1.5 md:col-span-2">
-              <label className="text-label font-medium text-subtle">Activation Mode</label>
-              <div className="grid grid-cols-1 gap-2 mt-2">
-                {(["JoinDate", "ProbationEnds", "CustomDate"] as const).map((m) => (
+              <div className="grid grid-cols-1 gap-2">
+                {(["fy_start", "join_date", "custom_date"] as const).map((ref) => (
                   <button
-                    key={m}
-                    onClick={() => setPolicyData({ ...policyData, activationMode: m })}
-                    className={cn("flex items-center gap-3 px-4 py-2.5 rounded-lg border text-body font-medium transition-all text-left", policyData.activationMode === m ? "border-primary bg-primary/5 text-primary" : "border-border bg-card text-muted-foreground hover:border-border/80")}
+                    key={ref}
+                    onClick={() => setPolicyData({ ...policyData, refreshStartReference: ref })}
+                    className={cn(
+                      "flex items-center gap-3 px-4 py-2.5 rounded-lg border text-body font-medium transition-all text-left",
+                      policyData.refreshStartReference === ref ? "border-primary bg-primary/5 text-primary" : "border-border bg-card text-muted-foreground hover:border-border/80"
+                    )}
                   >
-                    <div className={cn("w-4 h-4 rounded-full border flex items-center justify-center shrink-0", policyData.activationMode === m ? "border-primary" : "border-zinc-200")}>
-                      {policyData.activationMode === m && <div className="w-2 h-2 rounded-full bg-primary" />}
+                    <div className={cn("w-4 h-4 rounded-full border flex items-center justify-center shrink-0", policyData.refreshStartReference === ref ? "border-primary" : "border-border")}>
+                      {policyData.refreshStartReference === ref && <div className="w-2 h-2 rounded-full bg-primary" />}
                     </div>
-                    {m === "JoinDate" ? "Immediately after joining" : m === "ProbationEnds" ? "After probation period ends" : "Set specific activation date"}
+                    {ref === "fy_start" ? "Organisation Financial Year" : ref === "join_date" ? "Employee Join Date" : "Custom Start Date"}
                   </button>
                 ))}
               </div>
             </div>
+
+            {policyData.refreshStartReference === "custom_date" && (
+              <div className="md:col-span-2 space-y-1.5">
+                <label className="text-label font-medium text-subtle">
+                  Custom Refresh Date <span className="text-rose-600 dark:text-rose-400">*</span>
+                </label>
+                <input
+                  type="date"
+                  className={cn(
+                    "w-full px-4 py-2.5 bg-background border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all",
+                    validationErrors.refreshCustomDate ? "border-rose-300" : "border-border"
+                  )}
+                  value={policyData.refreshCustomDate || ""}
+                  onChange={(e) => setPolicyData({ ...policyData, refreshCustomDate: e.target.value })}
+                />
+                {validationErrors.refreshCustomDate && <p className="text-label text-rose-600 dark:text-rose-400 font-medium">{validationErrors.refreshCustomDate}</p>}
+              </div>
+            )}
           </div>
         </DetailSection>
       </div>
     );
   };
 
-  const renderStructureStep = () => (
-    <DetailSection
-      title="Benefit Groups"
-      icon={<TreeStructure size={18} weight="duotone" />}
-      description="Organize services into logical groups with budget controls"
-      ghost
-      action={
-        !isViewMode ? (
-          <Button onClick={addGroup} size="sm" className="rounded-full flex items-center gap-2 text-label h-8 px-4">
-            <Plus size={14} weight="bold" />
-            Add Group
-          </Button>
-        ) : undefined
-      }
-    >
-      {groups.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 bg-muted/20 rounded-lg border border-dashed border-border text-center">
-          <TreeStructure size={36} weight="duotone" className="text-faint mb-3 mx-auto" />
-          <p className="text-muted-foreground font-medium text-body">{isViewMode ? "No benefit groups configured." : "No benefit groups yet."}</p>
-          {!isViewMode && (
-            <Button variant="ghost" onClick={addGroup} className="mt-2 text-primary font-semibold text-body">
-              Create your first group
-            </Button>
-          )}
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {groups.map((group) => (
-            <div key={group.id} className="rounded-lg border border-border bg-card/40 overflow-hidden animate-in fade-in zoom-in-95 duration-300 h-full flex flex-col hover:border-primary/20 transition-all">
-              {/* Card header */}
-              <div className="flex items-start justify-between gap-3 p-4 border-b border-border">
-                <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                    <TreeStructure size={18} weight="duotone" />
-                  </div>
-                  {isViewMode ? (
-                    <div className="min-w-0">
-                      <p className="text-body font-semibold text-foreground truncate">{group.name}</p>
-                      {group.description && <p className="text-label text-muted-foreground truncate">{group.description}</p>}
-                    </div>
-                  ) : (
-                    <div className="flex-1 min-w-0">
-                      <input
-                        className="text-body font-semibold text-foreground bg-transparent border-none p-0 outline-none w-full focus:ring-0 truncate"
-                        value={group.name}
-                        onChange={(e) => updateGroup(group.id, "name", e.target.value)}
-                        placeholder="Group Name"
-                      />
-                      <input
-                        className="text-label text-muted-foreground bg-transparent border-none p-0 outline-none w-full focus:ring-0"
-                        value={group.description}
-                        onChange={(e) => updateGroup(group.id, "description", e.target.value)}
-                        placeholder="Brief description..."
-                      />
-                    </div>
-                  )}
-                </div>
-                {!isViewMode && (
-                  <button onClick={() => removeGroup(group.id)} className="w-8 h-8 rounded-lg flex items-center justify-center text-faint hover:text-rose-500 transition-colors shrink-0">
-                    <Trash size={16} />
-                  </button>
-                )}
-              </div>
+  const renderGroupsStep = () => {
+    const groupErrors = validationErrors;
 
-              {/* Card body */}
-              <div className="p-4 space-y-4">
-                {/* Distribution type + max usage */}
-                <div className="flex items-center gap-4 flex-wrap">
-                  <div className="space-y-1">
-                    <p className="text-label font-medium text-muted-foreground">Distribution</p>
-                    {isViewMode ? (
-                      <p className="text-label font-semibold text-subtle">{group.distributionType === "SharedAmount" ? "Shared Pool" : "Individual Per Service"}</p>
-                    ) : (
-                      <div className="flex p-0.5 bg-muted rounded-lg">
-                        {(["SharedAmount", "IndividualBenefitAmount"] as const).map((type) => (
-                          <button key={type} onClick={() => updateGroup(group.id, "distributionType", type)}
-                            className={cn("px-2.5 py-1 text-label font-medium rounded-md transition-all", group.distributionType === type ? "bg-background text-primary shadow-sm" : "text-muted-foreground")}
-                          >
-                            {type === "SharedAmount" ? "Shared Pool" : "Individual"}
-                          </button>
-                        ))}
+    return (
+      <DetailSection
+        title="Benefit Groups & Services"
+        icon={<TreeStructure size={18} weight="duotone" />}
+        description="Organize services into logical groups with budget controls"
+        ghost
+        action={
+          !isViewMode ? (
+            <Button onClick={addGroup} size="sm" className="rounded-full flex items-center gap-2 text-label h-8 px-4">
+              <Plus size={14} weight="bold" />
+              Add Group
+            </Button>
+          ) : undefined
+        }
+      >
+        {groups.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 bg-muted/20 rounded-lg border border-dashed border-border text-center">
+            <TreeStructure size={36} weight="duotone" className="text-faint mb-3 mx-auto" />
+            <p className="text-muted-foreground font-medium text-body">{isViewMode ? "No benefit groups configured." : "No benefit groups yet."}</p>
+            {!isViewMode && (
+              <Button variant="ghost" onClick={addGroup} className="mt-2 text-primary font-semibold text-body">
+                Create your first group
+              </Button>
+            )}
+            {groupErrors.groups && <p className="text-label text-rose-600 dark:text-rose-400 font-medium mt-2">{groupErrors.groups}</p>}
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {groups.map((group, gIdx) => {
+              const groupBenefits = benefits.filter(b => b.groupId === group.id);
+              return (
+                <div key={group.id} className="rounded-lg border border-border bg-card/40 overflow-hidden animate-in fade-in zoom-in-95 duration-300">
+                  {/* Card header */}
+                  <div className="flex items-start justify-between gap-3 p-4 border-b border-border">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                        <TreeStructure size={18} weight="duotone" />
                       </div>
-                    )}
-                  </div>
-                  {group.distributionType === "SharedAmount" && (
-                    <div className="space-y-1">
-                      <p className="text-label font-medium text-muted-foreground">Max Usage</p>
                       {isViewMode ? (
-                        <p className="text-label font-semibold text-foreground">{group.maxUsagePerCycle ? `RM ${group.maxUsagePerCycle.toFixed(2)}` : "—"}</p>
+                        <div className="min-w-0">
+                          <p className="text-body font-semibold text-foreground truncate">{group.name}</p>
+                          {group.description && <p className="text-label text-muted-foreground truncate">{group.description}</p>}
+                        </div>
                       ) : (
-                        <input type="number" className="w-28 px-2.5 py-1 border border-border bg-background rounded-lg text-label outline-none focus:ring-2 focus:ring-primary/10" value={group.maxUsagePerCycle} onChange={(e) => updateGroup(group.id, "maxUsagePerCycle", parseFloat(e.target.value))} placeholder="0.00" />
+                        <div className="flex-1 min-w-0 grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <input
+                            className="text-body font-semibold text-foreground bg-transparent border border-border rounded-md px-2.5 py-1.5 outline-none focus:ring-2 focus:ring-primary/10 w-full"
+                            value={group.name}
+                            onChange={(e) => updateGroup(group.id, "name", e.target.value)}
+                            placeholder="Group Name"
+                          />
+                          <input
+                            className="text-label text-muted-foreground bg-transparent border border-border rounded-md px-2.5 py-1.5 outline-none focus:ring-2 focus:ring-primary/10 w-full"
+                            value={group.description || ""}
+                            onChange={(e) => updateGroup(group.id, "description", e.target.value)}
+                            placeholder="Brief description..."
+                          />
+                        </div>
                       )}
                     </div>
-                  )}
-                </div>
-
-                {/* Services */}
-                <div className="space-y-2">
-                  <p className="text-label font-medium text-muted-foreground">Services</p>
-                  <div className="space-y-1.5">
-                    {benefits.filter(b => b.groupId === group.id).map((benefit) => (
-                      <div key={benefit.id} className="flex items-center gap-3 px-3 py-2 rounded-lg bg-muted/40 border border-border">
-                        <div className="flex-1 min-w-0">
-                          {isViewMode ? (
-                            <p className="text-label font-semibold text-foreground truncate">{SERVICES.find(s => s.id === benefit.serviceId)?.name}</p>
-                          ) : (
-                            <select className="w-full bg-transparent border-none p-0 text-label font-semibold text-subtle outline-none" value={benefit.serviceId} onChange={(e) => updateBenefit(benefit.id, "serviceId", e.target.value)}>
-                              {SERVICES.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                            </select>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-3 shrink-0">
-                          {isViewMode ? (
-                            <span className="text-label font-semibold text-foreground font-mono">RM {benefit.amount.toFixed(2)}</span>
-                          ) : (
-                            <input type="number" className="w-20 px-2 py-1 bg-background border border-border rounded-lg text-label font-mono outline-none text-right" value={benefit.amount} onChange={(e) => updateBenefit(benefit.id, "amount", parseFloat(e.target.value))} />
-                          )}
-                          {isViewMode ? (
-                            <span className={cn("text-label font-medium px-2 py-0.5 rounded-full", benefit.coPayment.required ? "bg-primary/10 text-primary" : "bg-muted text-faint")}>
-                              {benefit.coPayment.required ? "Co-pay" : "No co-pay"}
-                            </span>
-                          ) : (
-                            <button onClick={() => updateBenefit(benefit.id, "coPayment.required", !benefit.coPayment.required)} className={cn("w-8 h-4 rounded-full transition-colors relative shrink-0", benefit.coPayment.required ? "bg-primary" : "bg-muted/50")}>
-                              <div className={cn("w-3 h-3 rounded-full bg-white absolute top-[2px] transition-all", benefit.coPayment.required ? "right-0.5" : "left-0.5")} />
-                            </button>
-                          )}
-                          {!isViewMode && (
-                            <button onClick={() => removeBenefit(benefit.id)} className="text-faint hover:text-rose-500 transition-colors">
-                              <Trash size={14} />
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    ))}
+                    {!isViewMode && (
+                      <button onClick={() => removeGroup(group.id)} className="w-8 h-8 rounded-lg flex items-center justify-center text-faint hover:text-rose-600 dark:hover:text-rose-400 transition-colors shrink-0">
+                        <Trash size={16} />
+                      </button>
+                    )}
                   </div>
-                  {!isViewMode && (
-                    <button onClick={() => addBenefit(group.id)} className="w-full h-8 border-dashed border-2 border-zinc-200 rounded-lg text-label font-semibold text-faint hover:border-primary/40 hover:text-primary transition-all flex items-center justify-center gap-1.5">
-                      <Plus size={12} />
-                      Add Service
-                    </button>
-                  )}
+
+                  {/* Card body */}
+                  <div className="p-4 space-y-4">
+                    {/* Distribution type + max usage */}
+                    <div className="flex items-start gap-6 flex-wrap">
+                      <div className="space-y-1.5">
+                        <p className="text-label font-medium text-muted-foreground">Distribution</p>
+                        {isViewMode ? (
+                          <p className="text-label font-semibold text-subtle">{group.distributionType === "SharedAmount" ? "Shared Pool" : "Individual Per Service"}</p>
+                        ) : (
+                          <div className="flex p-0.5 bg-muted rounded-lg">
+                            {(["SharedAmount", "IndividualBenefitAmount"] as const).map((type) => (
+                              <button key={type} onClick={() => updateGroup(group.id, "distributionType", type)}
+                                className={cn("px-2.5 py-1 text-label font-medium rounded-md transition-all", group.distributionType === type ? "bg-background text-primary shadow-sm" : "text-muted-foreground")}
+                              >
+                                {type === "SharedAmount" ? "Shared Pool" : "Individual"}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      {group.distributionType === "SharedAmount" && (
+                        <div className="space-y-1.5">
+                          <p className="text-label font-medium text-muted-foreground">Max Usage / Cycle</p>
+                          {isViewMode ? (
+                            <p className="text-label font-semibold text-foreground">{group.maxUsagePerCycle ? `RM ${group.maxUsagePerCycle.toFixed(2)}` : "—"}</p>
+                          ) : (
+                            <input type="number" className="w-28 px-2.5 py-1 border border-border bg-background rounded-lg text-label outline-none focus:ring-2 focus:ring-primary/10" value={group.maxUsagePerCycle || ""} onChange={(e) => updateGroup(group.id, "maxUsagePerCycle", e.target.value === "" ? undefined : parseFloat(e.target.value))} placeholder="0.00" />
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Services checklist */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <p className="text-label font-medium text-muted-foreground">Services</p>
+                        {groupErrors[`group_${gIdx}`] && <p className="text-label text-rose-600 dark:text-rose-400 font-medium">{groupErrors[`group_${gIdx}`]}</p>}
+                      </div>
+                      <div className="divide-y divide-border/50 border border-border/60 rounded-lg overflow-hidden">
+                        {SERVICES.map((service) => {
+                          const benefit = groupBenefits.find(b => b.serviceId === service.id);
+                          const isChecked = !!benefit;
+                          return (
+                            <div key={service.id} className={cn(
+                              "transition-colors",
+                              isChecked && "bg-muted/30"
+                            )}>
+                              <div className="flex items-center gap-3 px-4 py-3">
+                                {!isViewMode && (
+                                  <button
+                                    onClick={() => toggleService(group.id, service.id)}
+                                    className={cn(
+                                      "w-5 h-5 rounded border flex items-center justify-center transition-all shrink-0",
+                                      isChecked ? "bg-primary border-primary text-primary-foreground" : "border-border hover:border-primary/50 bg-background"
+                                    )}
+                                  >
+                                    {isChecked && <Check size={12} weight="bold" />}
+                                  </button>
+                                )}
+                                {isViewMode && isChecked && <Check size={14} weight="bold" className="text-primary shrink-0" />}
+                                <span className={cn("text-body font-medium flex-1", isChecked ? "text-foreground" : "text-muted-foreground")}>
+                                  {service.name}
+                                </span>
+                                <span className="text-label text-faint">{service.category}</span>
+                              </div>
+
+                              {isChecked && (
+                                <div className="px-4 pb-4">
+                                  <div className="flex items-start gap-4 flex-wrap pl-8">
+                                    <div className="space-y-1.5">
+                                      <label className="text-micro font-medium text-faint">Amount (RM)</label>
+                                      {isViewMode ? (
+                                        <p className="text-label font-semibold text-foreground font-mono">RM {benefit!.amount.toFixed(2)}</p>
+                                      ) : (
+                                        <input
+                                          type="number"
+                                          className={cn(
+                                            "w-24 px-2 py-1.5 bg-background border rounded-lg text-label font-mono outline-none text-right",
+                                            groupErrors[`benefit_${group.id}_${service.id}`] ? "border-rose-300" : "border-border"
+                                          )}
+                                          value={benefit!.amount || ""}
+                                          onChange={(e) => updateBenefit(benefit!.id, "amount", e.target.value === "" ? 0 : parseFloat(e.target.value))}
+                                        />
+                                      )}
+                                      {groupErrors[`benefit_${group.id}_${service.id}`] && <p className="text-micro text-rose-600 dark:text-rose-400">{groupErrors[`benefit_${group.id}_${service.id}`]}</p>}
+                                    </div>
+
+                                    <div className="space-y-1.5">
+                                      <label className="text-micro font-medium text-faint">Co-payment</label>
+                                      <div className="flex items-center gap-2">
+                                        {isViewMode ? (
+                                          <span className={cn("text-label font-medium px-2 py-0.5 rounded-full", benefit!.coPayment.required ? "bg-primary/10 text-primary" : "bg-muted text-faint")}>
+                                            {benefit!.coPayment.required ? "Active" : "None"}
+                                          </span>
+                                        ) : (
+                                          <button
+                                            onClick={() => updateBenefit(benefit!.id, "coPayment.required", !benefit!.coPayment.required)}
+                                            className={cn("w-8 h-4 rounded-full transition-colors relative shrink-0", benefit!.coPayment.required ? "bg-primary" : "bg-muted/50")}
+                                          >
+                                            <div className={cn("w-3 h-3 rounded-full bg-background absolute top-[2px] transition-all", benefit!.coPayment.required ? "right-0.5" : "left-0.5")} />
+                                          </button>
+                                        )}
+                                        {benefit!.coPayment.required && (
+                                          <>
+                                            {isViewMode ? (
+                                              <span className="text-label font-semibold text-foreground font-mono">
+                                                {benefit!.coPayment.type === "Percentage" ? `${benefit!.coPayment.value}%` : `RM ${benefit!.coPayment.value.toFixed(2)}`}
+                                              </span>
+                                            ) : (
+                                              <div className="flex items-center gap-1.5">
+                                                <select
+                                                  className="px-1.5 py-1.5 bg-background border border-border rounded text-label outline-none"
+                                                  value={benefit!.coPayment.type}
+                                                  onChange={(e) => updateBenefit(benefit!.id, "coPayment.type", e.target.value)}
+                                                >
+                                                  <option value="Percentage">%</option>
+                                                  <option value="Fixed">RM</option>
+                                                </select>
+                                                <input
+                                                  type="number"
+                                                  className={cn(
+                                                    "w-16 px-2 py-1.5 bg-background border rounded-lg text-label font-mono outline-none text-right",
+                                                    groupErrors[`copay_${group.id}_${service.id}`] ? "border-rose-300" : "border-border"
+                                                  )}
+                                                  value={benefit!.coPayment.value || ""}
+                                                  onChange={(e) => updateBenefit(benefit!.id, "coPayment.value", e.target.value === "" ? 0 : parseFloat(e.target.value))}
+                                                />
+                                              </div>
+                                            )}
+                                          </>
+                                        )}
+                                      </div>
+                                      {groupErrors[`copay_${group.id}_${service.id}`] && <p className="text-micro text-rose-600 dark:text-rose-400">{groupErrors[`copay_${group.id}_${service.id}`]}</p>}
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </DetailSection>
-  );
+              );
+            })}
+          </div>
+        )}
+      </DetailSection>
+    );
+  };
 
   const renderReviewStep = () => (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 relative">
-      {/* Inline Generation Overlay */}
-      <AnimatePresence>
-        {isGenerating && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 z-50 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center rounded-3xl"
-          >
-            <motion.div
-              animate={{ 
-                scale: [1, 1.2, 1],
-                rotate: [0, 10, -10, 0]
-              }}
-              transition={{ repeat: Infinity, duration: 2 }}
-              className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-6 shadow-2xl shadow-primary/20 ring-4 ring-primary/5"
-            >
-              <Sparkle size={40} weight="fill" className="animate-pulse" />
-            </motion.div>
-            <h3 className="text-heading font-semibold text-foreground">Crafting Policy Identity...</h3>
-            <p className="text-muted-foreground mt-2 flex items-center gap-2">
-              Optimizing for <span className="text-primary font-semibold">{genContext || "Workforce"}</span>
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <div className="text-center mb-8">
-        <div className="w-14 h-14 rounded-lg bg-primary/10 flex items-center justify-center text-primary mx-auto mb-4 shadow-sm">
-          <ShieldCheck size={28} weight="duotone" />
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="mb-10">
+        <div className="flex items-center gap-4">
+          <div className="w-11 h-11 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
+            <ShieldCheck size={22} weight="duotone" />
+          </div>
+          <div>
+            <h3 className="text-display font-semibold text-foreground tracking-tight">Review & Finalize</h3>
+            <p className="text-subtle mt-0.5">Verify your configuration before saving.</p>
+          </div>
         </div>
-        <h3 className="text-display font-semibold text-foreground tracking-tight">Finalize & Launch Policy</h3>
-        <p className="text-muted-foreground mt-1">Review the AI-suggested identity and verify configured benefits.</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-        {/* Left Column: AI Identity */}
-        <div className="lg:col-span-3 space-y-6">
-          <DetailSection 
-            title="Policy Identity" 
-            icon={<IdentificationCard size={18} weight="duotone" />} 
-            description="AI-generated suggestions based on your configuration"
-            ghost
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 p-1">
-              <div className="space-y-1.5 flex-1">
-                <label className="text-label font-medium text-subtle pl-1">Policy Name</label>
-                <div className={cn(
-                  "relative group transition-all",
-                  !isGenerated && "opacity-50 grayscale pointer-events-none"
-                )}>
-                  <input
-                    placeholder="e.g. Wellness Premium 2026"
-                    className="w-full px-4 py-3 bg-white border border-border rounded-lg text-body outline-none transition-all font-semibold text-foreground focus:ring-4 focus:ring-primary/10 focus:border-primary/40 group-hover:border-primary/30"
-                    value={policyData.name}
-                    onChange={(e) => setPolicyData({ ...policyData, name: e.target.value })}
-                  />
-                  {isGenerated && <Sparkle size={14} weight="fill" className="absolute right-3 top-1/2 -translate-y-1/2 text-primary opacity-40 group-hover:opacity-100 transition-opacity" />}
-                </div>
-              </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        {/* Basics */}
+        <DetailSection title="Basics" icon={<IdentificationCard size={18} weight="duotone" />} ghost>
+          <div className="space-y-4">
+            <ReadField label="Policy Name" value={policyData.name || undefined} />
+            <ReadField label="Description" value={policyData.description || undefined} />
+            <ReadField label="Eligible Employment Types" value={policyData.eligibleEmploymentTypes?.join(", ")} />
+          </div>
+        </DetailSection>
 
-              <div className="space-y-1.5 flex-1">
-                <label className="text-label font-medium text-subtle pl-1">Benefit ID</label>
-                <input
-                  placeholder="e.g. BEN-W-01"
-                  className="w-full px-4 py-3 bg-white border border-border rounded-lg text-body outline-none transition-all font-semibold font-mono text-foreground focus:ring-4 focus:ring-zinc-500/5 focus:border-zinc-400"
-                  value={policyData.code}
-                  onChange={(e) => setPolicyData({ ...policyData, code: e.target.value })}
-                />
-              </div>
+        {/* Pool & Cycle */}
+        <DetailSection title="Pool & Cycle" icon={<Gear size={18} weight="duotone" />} ghost>
+          <div className="space-y-4">
+            <ReadField label="Pool Type" value={policyData.benefitPoolType} />
+            <ReadField label="Utilisation Mode" value={policyData.utilisationMode} />
+            {policyData.utilisationMode === "Prorated" && <ReadField label="Prorate Unit" value={policyData.prorateUnit} />}
+            <ReadField label="Refresh Cycle" value={policyData.refreshCycle} />
+            <ReadField label="Start Reference" value={policyData.refreshStartReference === "fy_start" ? "Financial Year" : policyData.refreshStartReference === "join_date" ? "Join Date" : "Custom Date"} />
+            {policyData.refreshStartReference === "custom_date" && <ReadField label="Custom Date" value={policyData.refreshCustomDate} />}
+          </div>
+        </DetailSection>
 
-              <div className="space-y-1.5 md:col-span-2">
-                <label className="text-label font-medium text-subtle pl-1">Suggested Description</label>
-                <div className="relative group">
-                  <Quotes size={16} className="absolute left-3 top-4 text-faint" />
-                  <textarea
-                    placeholder="Describe the purpose of this benefit..."
-                    className="w-full pl-10 pr-4 py-3.5 bg-white border border-border rounded-lg text-body leading-relaxed outline-none transition-all font-medium text-muted-foreground min-h-[100px] resize-none focus:ring-4 focus:ring-primary/5 focus:border-primary/20 group-hover:border-primary/10"
-                    value={policyData.description}
-                    onChange={(e) => setPolicyData({ ...policyData, description: e.target.value })}
-                  />
-                </div>
-              </div>
-            </div>
-          </DetailSection>
-
-          <DetailSection 
-            title="Workforce Summary" 
-            icon={<Users size={18} weight="duotone" />} 
-            description="Individuals assigned to this policy"
-            ghost
-          >
-            <div className="p-5 rounded-lg border border-zinc-200/50 flex items-center justify-between transition-all hover:border-primary/20 bg-transparent">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center border border-zinc-200/60">
-                  <SelectionAll size={20} className="text-muted-foreground" />
-                </div>
-                <div>
-                  <p className="text-body font-semibold text-foreground">{selectedEmployeeIds.size} Employees Selected</p>
-                  <p className="text-label text-muted-foreground font-medium">Assignment effective immediately upon activation</p>
-                </div>
-              </div>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => goToStep(1)}
-                className="text-primary font-semibold text-label hover:bg-primary/5 transition-colors"
-              >
-                Change Selection
-              </Button>
-            </div>
-          </DetailSection>
-        </div>
-
-        {/* Right Column: Structure Preview */}
-        <div className="lg:col-span-2 space-y-6">
-          <DetailSection 
-            title="Benefits Recap" 
-            icon={<TreeStructure size={18} weight="duotone" />} 
-            description="Budget and service breakdown"
-            ghost
-          >
-            <div className="space-y-3">
-              {groups.length === 0 ? (
-                <p className="text-center py-8 text-body text-faint font-medium bg-muted/50 rounded-lg border border-dashed border-zinc-200">No benefit groups configured.</p>
-              ) : groups.map(group => (
-                 <div key={group.id} className="p-4 rounded-lg border border-zinc-200/60 flex items-center justify-between bg-transparent hover:border-primary/20 transition-all cursor-default">
+        {/* Groups Summary */}
+        <DetailSection title="Groups & Services" icon={<TreeStructure size={18} weight="duotone" />} className="lg:col-span-2" ghost>
+          <div className="space-y-4">
+            {groups.length === 0 ? (
+              <p className="text-center py-6 text-body text-faint font-medium">No benefit groups configured.</p>
+            ) : groups.map(group => {
+              const groupBenefits = benefits.filter(b => b.groupId === group.id);
+              return (
+                <div key={group.id} className="p-4 rounded-lg border border-border/60 flex items-center justify-between bg-transparent">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-primary shadow-sm border border-zinc-200/60">
+                    <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center text-primary shadow-sm border border-border/60">
                       <TreeStructure size={16} />
                     </div>
                     <div>
                       <p className="text-body font-medium text-foreground">{group.name}</p>
-                      <p className="text-label text-muted-foreground font-semibold">{benefits.filter(b => b.groupId === group.id).length} services</p>
+                      <p className="text-label text-muted-foreground font-semibold">{groupBenefits.length} services · {group.distributionType === "SharedAmount" ? "Shared Pool" : "Individual"}</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-body font-semibold text-primary">{group.distributionType === "SharedAmount" ? `RM ${group.maxUsagePerCycle?.toFixed(2)}` : "Individual"}</p>
+                    <p className="text-body font-semibold text-primary">
+                      {group.distributionType === "SharedAmount" ? `RM ${group.maxUsagePerCycle?.toFixed(2) || "0.00"}` : `${groupBenefits.length} benefits`}
+                    </p>
                   </div>
                 </div>
-              ))}
-              
-              <div className="mt-4 p-4 rounded-lg border border-zinc-200/60 bg-transparent flex items-center justify-between">
-                <div>
-                  <p className="text-label font-medium text-subtle leading-none">Global Refresh</p>
-                  <p className="text-body font-semibold text-foreground mt-1">{policyData.refreshCycle}</p>
-                </div>
-                <div className="h-8 w-px bg-muted/50 mx-2" />
-                <div className="flex-1 text-right">
-                  <p className="text-label font-medium text-subtle leading-none">Trigger</p>
-                  <p className="text-body font-semibold text-foreground mt-1 truncate">{policyData.activationMode === "JoinDate" ? "On Joining" : "Post-probation"}</p>
-                </div>
-              </div>
-            </div>
-          </DetailSection>
+              );
+            })}
+          </div>
+        </DetailSection>
+      </div>
+
+      {/* Info callout */}
+      <div className="flex items-start gap-3 p-4 rounded-lg bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20">
+        <NotePencil size={18} className="text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+        <div>
+          <p className="text-body font-semibold text-amber-700 dark:text-amber-300">Saved as Draft</p>
+          <p className="text-label text-amber-600 dark:text-amber-400 mt-0.5">Activate to make this policy visible to organisations.</p>
         </div>
       </div>
     </div>
@@ -991,14 +894,14 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
 
   // ── Status section renderer (used in content area for edit/view) ──────────
   const renderStatusSection = () => (
-    <div className="mt-12 pt-8 border-t border-zinc-100">
+    <div className="mt-10 pt-6 border-t border-border">
       <div className="flex items-start justify-between">
         <div>
           <h4 className="text-body font-medium text-foreground">Policy Status</h4>
           <p className="text-label text-faint mt-0.5">Control the visibility and lifecycle state of this policy.</p>
         </div>
         <StatusPicker
-          value={(policyData.status as PolicyStatus) || "Draft"}
+          value={(policyData.status as PolicyStatus) || "draft"}
           onChange={(s) => setPolicyData({ ...policyData, status: s })}
           disabled={isViewMode}
         />
@@ -1009,13 +912,13 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
   return (
     <div className="flex flex-col h-full bg-transparent">
       {/* Sticky header + nav */}
-      <div className="bg-background/80 backdrop-blur-md sticky top-0 z-10 transition-all border-none shadow-none">
+      <div className="bg-background/80 backdrop-blur-md sticky top-0 z-10 transition-all border-none shadow-none px-6">
         {/* Title + actions row */}
         <div className="flex items-center justify-between py-5">
           <div className="flex items-center gap-4">
             <button
               onClick={onCancel}
-              className="w-10 h-10 rounded-lg border border-zinc-200/60 flex items-center justify-center hover:bg-muted/50 transition-all shadow-none"
+              className="w-10 h-10 rounded-lg border border-border/60 flex items-center justify-center hover:bg-muted/50 transition-all shadow-none"
             >
               <CaretLeft size={20} weight="bold" />
             </button>
@@ -1030,7 +933,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
               onEdit && (
                 <Button
                   onClick={onEdit}
-                  className="rounded-full px-6 flex items-center gap-2 bg-primary text-white shadow-none"
+                  className="rounded-full px-6 flex items-center gap-2 bg-primary text-primary-foreground shadow-none"
                 >
                   <NotePencil size={16} weight="bold" />
                   Edit Policy
@@ -1039,7 +942,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
             ) : (
               <>
                 <button
-                  onClick={() => onSaveDraft?.({ policy: policyData, groups, benefits })}
+                  onClick={handleSaveDraft}
                   className="text-muted-foreground font-medium text-body px-4 py-2 rounded-full hover:bg-muted transition-colors"
                 >
                   Save as Draft
@@ -1050,8 +953,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                 {mode === "create" && currentStep < 4 ? (
                   <Button
                     onClick={nextStep}
-                    disabled={currentStep === 1 && selectedEmployeeIds.size === 0}
-                    className="rounded-full px-8 bg-primary text-white shadow-none"
+                    className="rounded-full px-8 bg-primary text-primary-foreground shadow-none"
                   >
                     Next Step
                     <CaretRight size={16} weight="bold" className="ml-2" />
@@ -1060,7 +962,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                   <Button
                     onClick={handleSubmit}
                     disabled={isSubmitting}
-                    className="rounded-full px-8 bg-primary text-white shadow-none min-w-[140px]"
+                    className="rounded-full px-8 bg-primary text-primary-foreground shadow-none min-w-[140px]"
                   >
                     {isSubmitting ? "Finalizing..." : mode === "edit" ? "Save Changes" : "Launch Policy"}
                   </Button>
@@ -1070,6 +972,15 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
           </div>
         </div>
 
+        {/* Active policy edit banner */}
+        {mode === "edit" && policyData.status === "active" && policyData.organizationId && (
+          <div className="flex items-start gap-2.5 px-4 py-2.5 rounded-lg bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 mb-3">
+            <Warning size={16} className="text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+            <p className="text-label text-amber-700 dark:text-amber-300 font-medium">
+              Changes apply to future assignments only. Existing employee assignments are unaffected.
+            </p>
+          </div>
+        )}
 
         {/* Underline tabs — view & edit; hide tab 4 in edit */}
         {(isViewMode || mode === "edit") && (
@@ -1082,7 +993,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                   "px-5 py-3 text-body font-semibold transition-all border-b-2 -mb-px",
                   currentStep === tab.id
                     ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground hover:border-zinc-200"
+                    : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
                 )}
               >
                 {tab.title}
@@ -1093,21 +1004,21 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
 
         {/* Numbered stepper — create only */}
         {mode === "create" && (
-          <div className="flex items-center gap-4 pb-4">
-            {CREATE_STEPS.map((step) => (
+          <div className="flex items-center gap-2 pb-5">
+            {CREATE_STEPS.map((step, idx) => (
               <button
                 key={step.id}
                 onClick={() => goToStep(step.id)}
                 className={cn(
-                  "flex items-center gap-2 group transition-all cursor-pointer",
+                  "flex items-center gap-2 group transition-all cursor-pointer shrink-0",
                   currentStep === step.id ? "opacity-100" : "opacity-40 hover:opacity-100"
                 )}
               >
                 <div className={cn(
-                  "w-6 h-6 rounded-lg flex items-center justify-center text-label font-medium shadow-sm transition-all group-hover:shadow-md",
-                  currentStep === step.id ? "bg-primary text-white ring-2 ring-primary/20 ring-offset-2" : "bg-muted text-muted-foreground group-hover:bg-muted/50"
+                  "w-7 h-7 rounded-md flex items-center justify-center text-label font-semibold shadow-sm transition-all",
+                  currentStep === step.id ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground group-hover:bg-muted/50"
                 )}>
-                  {currentStep > step.id ? "✓" : step.id}
+                  {currentStep > step.id ? <Check size={14} weight="bold" /> : step.id}
                 </div>
                 <span className={cn(
                   "text-body font-semibold whitespace-nowrap transition-colors",
@@ -1115,15 +1026,17 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                 )}>
                   {step.title}
                 </span>
-                {step.id < 4 && <div className="w-6 h-[1.5px] bg-muted ml-2" />}
+                {idx < CREATE_STEPS.length - 1 && (
+                  <div className="w-8 h-[2px] bg-muted rounded-full mx-1" />
+                )}
               </button>
             ))}
           </div>
         )}
       </div>
-      
+
       {/* Content */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden px-1 pt-8">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden px-6 pt-8 pb-12">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentStep}
@@ -1134,12 +1047,12 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
           >
             {currentStep === 1 && (
               <>
-                {renderWorkforceStep()}
+                {renderBasicsStep()}
                 {(isViewMode || mode === "edit") && renderStatusSection()}
               </>
             )}
             {currentStep === 2 && renderPoolStep()}
-            {currentStep === 3 && renderStructureStep()}
+            {currentStep === 3 && renderGroupsStep()}
             {currentStep === 4 && mode === "create" && renderReviewStep()}
             {currentStep === 4 && isViewMode && (
               <DetailSection
@@ -1154,6 +1067,73 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
           </motion.div>
         </AnimatePresence>
       </div>
+
+      {/* Post-creation activation modal (SCR-POL-03) */}
+      <AnimatePresence>
+        {showPostCreateModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4 backdrop-blur-[2px]"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 8 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 8 }}
+              transition={{ duration: 0.2 }}
+              className="w-full max-w-md overflow-hidden rounded-[24px] border border-border bg-card shadow-2xl"
+            >
+              <div className="p-8 pb-4">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary border border-primary/10">
+                    <ShieldCheck size={20} weight="duotone" />
+                  </div>
+                  <div>
+                    <h3 className="text-heading font-semibold text-foreground">Policy Created</h3>
+                    <p className="text-label text-muted-foreground">{policyData.name}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 mt-4">
+                  <span className={cn(
+                    "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-label font-medium border",
+                    STATUS_CONFIG.draft.bg, STATUS_CONFIG.draft.color
+                  )}>
+                    <NotePencil size={12} weight="fill" />
+                    Draft
+                  </span>
+                  <span className="text-label text-faint">
+                    {groups.length} group{groups.length !== 1 ? "s" : ""}
+                  </span>
+                </div>
+              </div>
+
+              <div className="px-8 pb-2 space-y-3">
+                <Button
+                  onClick={handleActivateFromModal}
+                  className="w-full h-12 rounded-lg font-semibold shadow-lg shadow-primary/20"
+                >
+                  Activate & set up tiers →
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={handleViewFromModal}
+                  className="w-full h-11 rounded-lg font-semibold hover:bg-muted"
+                >
+                  View policy
+                </Button>
+                <button
+                  onClick={handleViewFromModal}
+                  className="w-full text-center text-label font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
+                >
+                  Skip — let org admin handle tiers
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -1200,5 +1180,3 @@ const MOCK_UTILISATION: EmployeeUtilisationRow[] = [
     ],
   },
 ];
-
-

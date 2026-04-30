@@ -195,7 +195,7 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
                   value.lat && value.lon ? "text-primary" : "text-faint"
                 )} />
                 {value.lat && value.lon && !isSearching && (
-                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-background shadow-sm" />
+                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 dark:bg-emerald-400 rounded-full border-2 border-background shadow-sm" />
                 )}
               </div>
               <div className={cn(

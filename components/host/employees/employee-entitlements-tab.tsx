@@ -4,6 +4,7 @@ import { Gift, CurrencyCircleDollar, Calendar, ArrowClockwise, ChartLineUp } fro
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { StatusBadge } from "@/components/shared/status-badge";
 
 interface EmployeeEntitlementsTabProps {
   employeeId: string;
@@ -192,9 +193,7 @@ export function EmployeeEntitlementsTab({ employeeId }: EmployeeEntitlementsTabP
                 </div>
                 <div>
                   <p className="text-label font-medium text-subtle">Status</p>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-label font-medium bg-emerald-500/10 text-emerald-600">
-                    Active
-                  </span>
+                  <StatusBadge status="Active" variant="emerald" />
                 </div>
               </div>
             </CardContent>

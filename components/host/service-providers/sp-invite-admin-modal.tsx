@@ -114,9 +114,9 @@ export function SpInviteAdminModal({
             <form onSubmit={handleSubmit(onSubmit)} className="p-5 space-y-4">
               {/* Warning for duplicate email (not error — they can manage multiple SPs) */}
               {isDuplicateEmail && watchedEmail && (
-                <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2.5">
-                  <Warning size={14} className="text-amber-600 mt-0.5 shrink-0" />
-                  <p className="text-label text-amber-700 leading-relaxed">
+                <div className="flex items-start gap-2 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-lg px-3 py-2.5">
+                  <Warning size={14} className="text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
+                  <p className="text-label text-amber-700 dark:text-amber-400 leading-relaxed">
                     This email is already an SP Admin for another provider. They can manage multiple SPs from one account.
                   </p>
                 </div>

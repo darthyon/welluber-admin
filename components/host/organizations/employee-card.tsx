@@ -28,6 +28,7 @@ interface EmployeeCardProps {
     id: string;
     name: string;
     email: string;
+    organization?: string;
     branch: string;
     status: string;
     employeeId: string;
@@ -54,7 +55,7 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
   const currentItem = employee.benefitPolicies[policyIndex] || employee.benefitPolicies[0];
 
   useEffect(() => {
-    const timer = setTimeout(() => {
+    const calculateConstraints = () => {
       if (scrollRef.current && innerRef.current) {
         const outerWidth = scrollRef.current.offsetWidth;
         const innerWidth = innerRef.current.scrollWidth;
@@ -63,8 +64,27 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
           right: 0
         });
       }
-    }, 100);
-    return () => clearTimeout(timer);
+    };
+
+    // Use ResizeObserver to avoid layout thrashing
+    const observer = new ResizeObserver(() => {
+      requestAnimationFrame(calculateConstraints);
+    });
+
+    if (scrollRef.current) {
+      observer.observe(scrollRef.current);
+    }
+    if (innerRef.current) {
+      observer.observe(innerRef.current);
+    }
+
+    // Initial calculation
+    const timer = setTimeout(calculateConstraints, 100);
+
+    return () => {
+      clearTimeout(timer);
+      observer.disconnect();
+    };
   }, [currentItem]);
 
   const nextItem = () => {
@@ -93,7 +113,7 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
                </div>
             </div>
             {employee.status === "Linked" && (
-              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full shadow-sm" />
+              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 dark:bg-emerald-500/20 border-2 border-white rounded-full shadow-sm" />
             )}
           </div>
 
@@ -112,13 +132,18 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
               <span className="text-micro text-faint font-mono bg-background/50 px-1.5 py-0.5 rounded border border-border/40 tracking-tight">{employee.empCode}</span>
             </div>
             <div className="flex items-center gap-1.5 flex-wrap">
+              {employee.organization && (
+                <span className="text-micro font-medium px-1.5 py-0.5 rounded bg-muted text-subtle border border-border/40">
+                  {employee.organization}
+                </span>
+              )}
               {employee.department && (
-                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-muted text-muted-foreground border border-border/40">
+                <span className="text-micro font-semibold px-1.5 py-0.5 rounded bg-muted text-muted-foreground border border-border/40">
                   {employee.department}
                 </span>
               )}
               {employee.tier && (
-                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-primary/5 text-primary border border-primary/10">
+                <span className="text-micro font-semibold px-1.5 py-0.5 rounded bg-primary/5 text-primary border border-primary/10">
                   {employee.tier}
                 </span>
               )}
@@ -207,22 +232,23 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between text-label font-semibold">
                   <span className="text-faint font-semibold">Utilisation</span>
-                  <span className={cn(
-                    "px-1.5 py-0.5 rounded shrink-0 font-semibold",
-                    currentItem.utilisation > 80 ? "bg-rose-500/10 text-rose-500" : "bg-emerald-500/10 text-emerald-500"
-                  )}>
-                    {currentItem.utilisation}%
-                  </span>
+                  <StatusBadge
+                    status={`${currentItem.utilisation}%`}
+                    variant={currentItem.utilisation > 80 ? "rose" : "emerald"}
+                    className="shrink-0 font-semibold"
+                  />
                 </div>
 
                 <div className="relative h-2 w-full bg-muted/60 rounded-full overflow-hidden">
-                  <motion.div 
+                  <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${currentItem.utilisation}%` }}
                     transition={{ duration: 0.8, ease: "easeOut" }}
                     className={cn(
                       "h-full rounded-full",
-                      currentItem.utilisation > 80 ? "bg-rose-500" : "bg-emerald-500 shadow-[0_0_8px_rgba(var(--emerald-rgb),0.4)]"
+                      currentItem.utilisation > 80
+                        ? "bg-rose-500/10 text-rose-600 dark:text-rose-400 dark:bg-rose-500/20"
+                        : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 dark:bg-emerald-500/20 shadow-[0_0_8px_rgba(var(--emerald-rgb),0.4)]"
                     )}
                   />
                 </div>

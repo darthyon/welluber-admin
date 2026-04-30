@@ -79,14 +79,14 @@ export function UtilisationClaimsTable({ data }: Props) {
                   <span className="text-faint">
                     RM {emp.used.toLocaleString("en-MY", { minimumFractionDigits: 2 })}
                   </span>
-                  <span className={cn("font-semibold", isHigh ? "text-rose-500" : "text-primary")}>{pct}%</span>
+                  <span className={cn("font-semibold", isHigh ? "text-rose-600 dark:text-rose-400" : "text-primary")}>{pct}%</span>
                 </div>
                 <div className="h-1.5 bg-muted rounded-full overflow-hidden">
                   <div
                     className={cn(
                       "h-full rounded-full transition-all duration-700",
                       isHigh
-                        ? "bg-rose-500"
+                        ? "bg-rose-500 dark:bg-rose-400"
                         : "bg-primary shadow-[0_0_6px_rgba(var(--primary-rgb),0.35)]"
                     )}
                     style={{ width: `${pct}%` }}

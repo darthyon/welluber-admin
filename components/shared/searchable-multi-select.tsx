@@ -157,7 +157,7 @@ export function SearchableMultiSelect({
             <button
               type="button"
               onClick={() => onChange([])}
-              className="text-label font-medium text-rose-500 hover:text-rose-600 transition-colors"
+              className="text-label font-medium bg-rose-500/10 text-rose-600 dark:text-rose-400 dark:bg-rose-500/20 hover:text-rose-600 dark:hover:text-rose-300 transition-colors"
             >
               Clear All
             </button>
@@ -247,7 +247,7 @@ export function SearchableMultiSelect({
               {s}
               <button 
                 onClick={() => removeOption(s)}
-                className="hover:text-rose-500 transition-colors"
+                className="hover:text-rose-500 dark:hover:text-rose-400 transition-colors"
                 type="button"
                 aria-label={`Remove ${s}`}
               >

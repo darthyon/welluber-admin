@@ -13,7 +13,7 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <button className="w-9 h-9 flex items-center justify-center rounded-lg border border-border hover:bg-accent transition-colors">
+      <button className="w-9 h-9 flex items-center justify-center rounded-lg border border-border hover:bg-accent transition-colors" aria-label="Toggle theme">
         <Sun size={16} className="text-muted-foreground" />
       </button>
     )

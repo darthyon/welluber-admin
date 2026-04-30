@@ -69,7 +69,7 @@ export function TopUpHistoryModal({ isOpen, onClose, branchId, branchName }: Top
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-border">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500">
+            <div className="w-8 h-8 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-600 dark:text-amber-400 dark:bg-amber-500/20">
               <ClockCounterClockwise size={18} weight="duotone" />
             </div>
             <div>

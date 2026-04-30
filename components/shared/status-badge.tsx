@@ -16,7 +16,7 @@ const colorConfig: Record<StatusColor, string> = {
   amber: "bg-amber-500/10 text-amber-600 dark:text-amber-400 dark:bg-amber-500/20 border-amber-500/20 dark:border-amber-500/30",
   rose: "bg-rose-500/10 text-rose-600 dark:text-rose-400 dark:bg-rose-500/20 border-rose-500/20 dark:border-rose-500/30",
   primary: "bg-primary/10 text-primary border-primary/20",
-  zinc: "bg-muted/10 text-muted-foreground dark:text-faint dark:bg-muted/20 border-zinc-500/20 dark:border-zinc-500/30",
+  zinc: "bg-muted/10 text-muted-foreground dark:text-faint dark:bg-muted/20 border-border/20 dark:border-border/30",
 };
 
 const dotConfig: Record<string, string> = {

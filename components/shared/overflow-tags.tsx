@@ -55,10 +55,10 @@ export function OverflowTags({ items, className }: OverflowTagsProps) {
       setVisibleCount(count);
     };
 
-    // Initial measure
-    measure();
+    // Initial measure - wrapped in rAF to avoid forced synchronous layout
+    requestAnimationFrame(measure);
 
-    const ro = new ResizeObserver(measure);
+    const ro = new ResizeObserver(() => requestAnimationFrame(measure));
     ro.observe(container);
     return () => ro.disconnect();
   }, [items]);

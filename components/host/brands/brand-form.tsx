@@ -11,6 +11,7 @@ import { Brand, BrandStatus } from "@/types/brand";
 import { LogoUpload } from "@/components/shared/logo-upload";
 import { MASTER_SERVICE_TAXONOMY } from "@/features/providers/service-taxonomy";
 import { SearchableMultiSelect } from "@/components/shared/searchable-multi-select";
+import { StatusBadge } from "@/components/shared/status-badge";
 
 const brandSchema = z.object({
   name: z.string().min(2, "Brand name must be at least 2 characters"),
@@ -129,12 +130,11 @@ export function BrandForm({ initialData, onSubmit, onCancel, isSubmitting }: Bra
               name="status"
               render={({ field }) => (
                 <div className="flex items-center gap-2">
-                  <span className={cn(
-                    "text-label font-medium transition-colors",
-                    field.value === "active" ? "text-emerald-600" : "text-faint"
-                  )}>
-                    {field.value === "active" ? "Active" : "Inactive"}
-                  </span>
+                  {field.value === "active" ? (
+                    <StatusBadge status="Active" variant="emerald" />
+                  ) : (
+                    <span className="text-label font-medium text-faint">Inactive</span>
+                  )}
                   <Switch 
                     checked={field.value === "active"} 
                     onCheckedChange={(checked) => field.onChange(checked ? "active" : "inactive")}

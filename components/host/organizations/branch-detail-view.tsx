@@ -136,7 +136,7 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
                         </div>
                      </div>
                      <div className="flex items-center gap-2 relative z-10">
-                       <Badge variant="outline" className="text-label font-medium border-emerald-500/20 text-emerald-600 bg-emerald-500/5">Admin</Badge>
+                       <StatusBadge status="Admin" variant="emerald" />
                        <ActionPopover 
                          actions={[
                            { label: "View Details", onClick: () => console.log("View", admin.name) },
@@ -159,7 +159,7 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
             </DetailSection>
             
             <div className="bg-primary/95 dark:bg-primary/20 rounded-lg p-6 text-primary-foreground dark:text-primary overflow-hidden relative group border border-primary/20 shadow-lg shadow-primary/5">
-              <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-white/10 dark:bg-primary/20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-1000" />
+              <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-background/10 dark:bg-primary/20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-1000" />
               <h4 className="text-lead font-semibold mb-2 tracking-tight">Branch quick stats</h4>
               <div className="space-y-4 relative z-10">
                 <div>
@@ -217,7 +217,7 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
                       <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center p-1.5 border border-primary/30">
                         <div className="w-full h-full rounded-full bg-primary shadow-lg shadow-primary/40 ring-4 ring-background" />
                       </div>
-                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-background shadow-sm" />
+                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full border-2 border-background shadow-sm" />
                     </div>
                     <span className="text-label font-medium text-primary bg-background/90 backdrop-blur-sm px-2 py-0.5 rounded-full border border-primary/20">
                       Pinned
@@ -284,7 +284,7 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
                       </h4>
                       <div className="flex items-center gap-2 mt-1">
                         <span className="text-label text-muted-foreground">Active Configuration</span>
-                        <span className="px-1.5 py-0.5 rounded-md bg-muted border border-zinc-200 text-label font-medium text-muted-foreground">
+                        <span className="px-1.5 py-0.5 rounded-md bg-muted border border-border text-label font-medium text-muted-foreground">
                           {walletType === "new" ? "New" : "Existing"}
                         </span>
                       </div>

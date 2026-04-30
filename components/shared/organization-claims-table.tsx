@@ -17,36 +17,13 @@ import { SharedDataTable, type Column } from "@/components/shared/data-table";
 import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { FilterItem } from "@/components/shared/filter-item";
 import { ActionPopover } from "@/components/shared/action-popover";
+import { StatusBadge } from "@/components/shared/status-badge";
 import type {
   ClaimStatus,
   TransactionType,
   EmployeeUtilisationRow,
   FlatClaimRow,
 } from "@/types/claims";
-
-// ─── Status badge ─────────────────────────────────────────────────────────────
-
-const STATUS_STYLE: Record<ClaimStatus, string> = {
-  "pre-auth":
-    "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20",
-  confirmed:
-    "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20",
-  cancelled:
-    "bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20",
-};
-
-function StatusBadge({ status }: { status: ClaimStatus }) {
-  return (
-    <span
-      className={cn(
-        "text-label font-medium px-1.5 py-0.5 rounded",
-        STATUS_STYLE[status]
-      )}
-    >
-      {status}
-    </span>
-  );
-}
 
 const TXN_LABEL: Record<TransactionType, string> = {
   redemption: "Voucher Redemption",
@@ -172,7 +149,18 @@ export function OrganizationClaimsTable({
     {
       header: "Status",
       accessorKey: "status",
-      render: (row) => <StatusBadge status={row.status} />,
+      render: (row) => (
+        <StatusBadge
+          status={row.status}
+          variant={
+            row.status === "pre-auth"
+              ? "amber"
+              : row.status === "confirmed"
+                ? "emerald"
+                : "rose"
+          }
+        />
+      ),
     },
     {
       header: "Voucher",

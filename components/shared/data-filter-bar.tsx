@@ -114,7 +114,7 @@ export function DataFilterBar({
             <FadersHorizontal size={18} weight={(advancedFilter.activeCount ?? 0) > 0 ? "fill" : "bold"} />
             Advanced Filters
             {(advancedFilter.activeCount ?? 0) > 0 && (
-              <Badge className="ml-1 h-5 min-w-[20px] px-1.5 bg-primary text-white border-0 text-label font-medium">
+              <Badge className="ml-1 h-5 min-w-[20px] px-1.5 bg-primary text-primary-foreground border-0 text-label font-medium">
                 {advancedFilter.activeCount}
               </Badge>
             )}

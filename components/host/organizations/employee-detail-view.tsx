@@ -140,26 +140,14 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
                 {employeeData.designation} • {employeeData.department} • {employeeData.tier}
               </p>
               <div className="flex items-center gap-2 mt-2 flex-wrap">
-                <span className={cn(
-                  "text-label font-medium px-2 py-0.5 rounded-4xl border",
-                  employeeData.employeeStatus === "active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-rose-500/10 text-rose-600 border-rose-500/20"
-                )}>
-                  {employeeData.employeeStatus}
-                </span>
+                <StatusBadge status={employeeData.employeeStatus} variant={employeeData.employeeStatus === "active" ? "emerald" : "rose"} />
                 {employeeData.isProbation && (
-                  <span className="text-label font-medium px-2 py-0.5 rounded-4xl border bg-amber-500/10 text-amber-600 border-amber-500/20">
-                    Probation
-                  </span>
+                  <StatusBadge status="Probation" variant="amber" />
                 )}
                 <span className="text-label font-medium px-2 py-0.5 rounded-4xl bg-muted text-muted-foreground border border-border">
                   {employeeData.residencyStatus}
                 </span>
-                <span className={cn(
-                  "text-label font-medium px-2 py-0.5 rounded-4xl border",
-                  employeeData.isTaxable ? "bg-primary/10 text-primary border-primary/20" : "bg-rose-500/10 text-rose-600 border-rose-500/20"
-                )}>
-                  {employeeData.isTaxable ? "Taxable" : "Non-taxable"}
-                </span>
+                <StatusBadge status={employeeData.isTaxable ? "Taxable" : "Non-taxable"} variant={employeeData.isTaxable ? "primary" : "rose"} />
               </div>
             </div>
           </div>
@@ -317,11 +305,11 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
                         </div>
                         <div className="w-24 space-y-1">
                           <div className="flex justify-between text-label font-medium">
-                            <span className={cn(policy.utilisation > 80 ? "text-rose-500" : "text-primary")}>{policy.utilisation}%</span>
+                            <span className={cn(policy.utilisation > 80 ? "text-rose-600 dark:text-rose-400" : "text-primary")}>{policy.utilisation}%</span>
                           </div>
                           <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
                             <div
-                              className={cn("h-full rounded-full transition-all", policy.utilisation > 80 ? "bg-rose-500" : "bg-primary shadow-[0_0_8px_rgba(var(--primary-rgb),0.4)]")}
+                              className={cn("h-full rounded-full transition-all", policy.utilisation > 80 ? "bg-rose-500 dark:bg-rose-400" : "bg-primary shadow-[0_0_8px_rgba(var(--primary-rgb),0.4)]")}
                               style={{ width: `${policy.utilisation}%` }}
                             />
                           </div>
