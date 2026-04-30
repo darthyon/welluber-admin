@@ -63,10 +63,10 @@ export function CategoryDetailSheet({
               <TreeStructure size={24} weight="fill" />
             </div>
             <div>
-              <h2 className="text-heading font-semibold tracking-tight text-foreground">
+              <h2 className="text-heading font-semibold text-foreground text-balance">
                 {category.category}
               </h2>
-              <p className="text-nav text-muted-foreground mt-0.5">
+              <p className="text-body text-subtle mt-0.5">
                 Manage services and sub-services for this category.
               </p>
             </div>
@@ -75,7 +75,7 @@ export function CategoryDetailSheet({
             <Button
               variant="ghost"
               size="sm"
-              className="h-9 px-4 text-nav font-medium gap-2 hover:bg-primary/5 text-primary"
+              className="h-9 px-4 text-body font-medium gap-2 hover:bg-primary/5 text-primary"
               onClick={() => onOpenDialog({ type: "service", mode: "add", parentId: category.category })}
             >
               <Plus size={16} weight="bold" />
@@ -83,7 +83,7 @@ export function CategoryDetailSheet({
             </Button>
             <button 
               onClick={onClose}
-              className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-muted text-muted-foreground/60 hover:text-foreground transition-all border border-transparent hover:border-border"
+              className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-muted text-faint hover:text-foreground transition-all border border-transparent hover:border-border"
             >
               <X size={20} weight="bold" />
             </button>
@@ -106,12 +106,12 @@ export function CategoryDetailSheet({
                   {/* Service Card Header */}
                   <div className="flex items-start justify-between mb-6">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center text-muted-foreground/30 group-hover/service:bg-primary/10 group-hover/service:text-primary transition-all duration-300">
+                      <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center text-faint group-hover/service:bg-primary/10 group-hover/service:text-primary transition-all duration-300">
                         <IconComp size={24} weight="duotone" />
                       </div>
                       <div>
-                        <h4 className="text-subtitle font-semibold text-foreground group-hover/service:text-primary transition-colors leading-tight">{service}</h4>
-                        <p className="text-label font-medium text-muted-foreground/60 mt-1">Main service</p>
+                        <h4 className="text-lead font-semibold text-foreground group-hover/service:text-primary transition-colors leading-tight">{service}</h4>
+                        <p className="text-label font-medium text-faint mt-1">Main service</p>
                       </div>
                     </div>
 
@@ -123,13 +123,13 @@ export function CategoryDetailSheet({
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-48">
                         <DropdownMenuItem 
-                          className="gap-2 text-nav font-medium py-2"
+                          className="gap-2 text-body font-medium py-2"
                           onClick={() => onOpenDialog({ type: "service", mode: "edit", id: service, initialValue: service })}
                         >
                           <PencilSimple size={16} /> Rename Service
                         </DropdownMenuItem>
                         <DropdownMenuItem 
-                          className="gap-2 text-nav font-medium py-2 text-destructive focus:text-destructive"
+                          className="gap-2 text-body font-medium py-2 text-destructive focus:text-destructive"
                           onClick={() => onDelete("service", service)}
                         >
                           <Trash size={16} /> Delete Service
@@ -141,7 +141,7 @@ export function CategoryDetailSheet({
                   {/* Tier 3: Sub-services */}
                   <div className="space-y-3 mt-auto">
                     <div className="flex items-center justify-between">
-                      <span className="text-label font-semibold text-muted-foreground/40">Sub-services</span>
+                      <span className="text-label font-semibold text-faint">Sub-services</span>
                     </div>
                     
                     <div className="flex flex-wrap gap-2 min-h-[32px]">
@@ -152,7 +152,7 @@ export function CategoryDetailSheet({
                           title={spec}
                         >
                           <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/30 group-hover/spec:bg-primary/40 transition-colors" />
-                          <span className="text-caption font-semibold text-muted-foreground group-hover/spec:text-foreground transition-colors truncate max-w-[140px]">{spec}</span>
+                          <span className="text-label font-medium text-subtle group-hover/spec:text-foreground transition-colors truncate max-w-[140px]">{spec}</span>
                           
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -162,13 +162,13 @@ export function CategoryDetailSheet({
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-32">
                               <DropdownMenuItem 
-                                className="text-caption py-1 font-medium"
+                                className="text-label py-1 font-medium"
                                 onClick={() => onOpenDialog({ type: "spec", mode: "edit", id: spec, parentId: service, initialValue: spec })}
                               >
                                 Rename
                               </DropdownMenuItem>
                               <DropdownMenuItem 
-                                className="text-caption py-1 font-medium text-destructive focus:text-destructive"
+                                className="text-label py-1 font-medium text-destructive focus:text-destructive"
                                 onClick={() => onDelete("spec", spec, service)}
                               >
                                 Remove
@@ -178,11 +178,11 @@ export function CategoryDetailSheet({
                         </div>
                       ))}
                       <button 
-                        className="flex items-center gap-2 px-3 py-1.5 bg-muted/10 border border-dashed border-border rounded-lg text-muted-foreground/60 hover:text-primary hover:border-primary/40 hover:bg-primary/[0.04] transition-all"
+                        className="flex items-center gap-2 px-3 py-1.5 bg-muted/10 border border-dashed border-border rounded-lg text-faint hover:text-primary hover:border-primary/40 hover:bg-primary/[0.04] transition-all"
                         onClick={() => onOpenDialog({ type: "spec", mode: "add", parentId: service })}
                       >
                         <Plus size={12} weight="bold" />
-                        <span className="text-caption font-semibold">Add sub-service</span>
+                        <span className="text-label font-semibold">Add sub-service</span>
                       </button>
                     </div>
                   </div>
@@ -197,7 +197,7 @@ export function CategoryDetailSheet({
           <Button 
             variant="ghost"
             onClick={onClose}
-            className="text-nav font-medium h-10 px-6"
+            className="text-body font-medium h-10 px-6"
           >
             Close Drawer
           </Button>

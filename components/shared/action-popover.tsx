@@ -37,11 +37,11 @@ export function ActionPopover({
           onClick={(e) => e.stopPropagation()}
           className={cn(
             "flex items-center gap-1.5 rounded-lg hover:bg-muted text-muted-foreground transition-colors shrink-0",
-            label ? "px-3 py-1.5 text-nav font-medium" : "p-1.5",
+            label ? "px-3 py-1.5 text-body font-medium" : "p-1.5",
             triggerClassName
           )}
         >
-          {label && <span className="text-nav font-medium">{label}</span>}
+          {label && <span className="text-body font-medium">{label}</span>}
           <DotsThreeVertical size={20} weight="bold" />
         </button>
       </PopoverTrigger>
@@ -58,7 +58,7 @@ export function ActionPopover({
           {actions.map((action, i) => {
             if (action.isSectionTitle) {
               return (
-                <div key={i} className="px-3 py-1.5 text-micro font-semibold text-muted-foreground opacity-50 select-none">
+                <div key={i} className="px-3 py-1.5 text-label font-medium text-muted-foreground opacity-50 select-none">
                   {action.label}
                 </div>
               );
@@ -78,14 +78,14 @@ export function ActionPopover({
                     }
                   }}
                   className={cn(
-                    "flex items-center gap-2 w-full px-3 py-2 rounded-lg text-nav font-medium transition-colors text-left",
+                    "flex items-center gap-2 w-full px-3 py-2 rounded-lg text-body font-medium transition-colors text-left",
                     action.isDanger 
                       ? "text-rose-500 hover:bg-rose-50" 
-                      : "text-foreground/80 hover:bg-muted hover:text-foreground",
+                      : "text-subtle hover:bg-muted hover:text-foreground",
                     action.className
                   )}
                 >
-                  {action.icon && <span className="text-muted-foreground/60">{action.icon}</span>}
+                  {action.icon && <span className="text-faint">{action.icon}</span>}
                   {action.label}
                 </Component>
                 {/* Visual separator before section titles (except first) */}

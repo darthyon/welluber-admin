@@ -39,7 +39,7 @@ function StatusBadge({ status }: { status: ClaimStatus }) {
   return (
     <span
       className={cn(
-        "text-micro font-semibold px-1.5 py-0.5 rounded",
+        "text-label font-medium px-1.5 py-0.5 rounded",
         STATUS_STYLE[status]
       )}
     >
@@ -103,7 +103,7 @@ export function OrganizationClaimsTable({
       header: "Claim ID",
       accessorKey: "id",
       render: (row) => (
-        <code className="text-caption font-mono text-muted-foreground">
+        <code className="text-label font-mono text-muted-foreground">
           {row.id}
         </code>
       ),
@@ -112,10 +112,10 @@ export function OrganizationClaimsTable({
       header: "Claim Title",
       render: (row) => (
         <div className="flex flex-col gap-0.5 min-w-0">
-          <p className="text-nav font-semibold text-foreground truncate">
+          <p className="text-body font-medium text-foreground truncate">
             {TXN_LABEL[row.transactionType]} at {row.provider}
           </p>
-          <p className="text-caption text-muted-foreground font-medium truncate">
+          <p className="text-label text-muted-foreground font-medium truncate">
             {row.location}
           </p>
         </div>
@@ -126,8 +126,8 @@ export function OrganizationClaimsTable({
       accessorKey: "location",
       render: (row) => (
         <div className="flex items-center gap-1.5 min-w-0">
-          <MapPin size={11} className="text-muted-foreground/60 shrink-0" />
-          <p className="text-nav text-foreground/70 font-medium truncate">
+          <MapPin size={11} className="text-faint shrink-0" />
+          <p className="text-body text-subtle font-medium truncate">
             {row.location}
           </p>
         </div>
@@ -138,8 +138,8 @@ export function OrganizationClaimsTable({
       accessorKey: "date",
       render: (row) => (
         <div className="flex items-center gap-1.5">
-          <Calendar size={11} className="text-muted-foreground/60 shrink-0" />
-          <p className="text-caption text-muted-foreground font-medium whitespace-nowrap">
+          <Calendar size={11} className="text-faint shrink-0" />
+          <p className="text-label text-muted-foreground font-medium whitespace-nowrap">
             {row.date}
           </p>
         </div>
@@ -150,10 +150,10 @@ export function OrganizationClaimsTable({
       accessorKey: "employeeName",
       render: (row) => (
         <div>
-          <p className="text-nav font-semibold text-foreground">
+          <p className="text-body font-medium text-foreground">
             {row.employeeName}
           </p>
-          <p className="text-caption text-muted-foreground font-medium mt-0.5">
+          <p className="text-label text-muted-foreground font-medium mt-0.5">
             {row.empCode}
           </p>
         </div>
@@ -164,7 +164,7 @@ export function OrganizationClaimsTable({
       accessorKey: "amount",
       align: "right",
       render: (row) => (
-        <p className="text-nav font-semibold font-mono text-foreground">
+        <p className="text-body font-semibold font-mono text-foreground">
           RM {row.amount.toFixed(2)}
         </p>
       ),
@@ -185,7 +185,7 @@ export function OrganizationClaimsTable({
           className="flex items-center gap-1.5 text-primary hover:text-primary/80 transition-colors cursor-pointer"
         >
           <Ticket size={14} weight="bold" />
-          <span className="text-caption font-semibold hover:underline underline-offset-2">
+          <span className="text-label font-semibold hover:underline underline-offset-2">
             {row.voucherName || row.voucherCode}
           </span>
         </button>
@@ -258,9 +258,9 @@ export function OrganizationClaimsTable({
           <Receipt
             size={36}
             weight="duotone"
-            className="text-muted-foreground/40 mb-3"
+            className="text-faint mb-3"
           />
-          <p className="text-muted-foreground font-medium text-nav">
+          <p className="text-muted-foreground font-medium text-body">
             No claims recorded yet.
           </p>
         </div>

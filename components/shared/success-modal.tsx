@@ -59,7 +59,7 @@ export function SuccessModal({
                 variant="ghost"
                 size="icon-sm"
                 onClick={onClose}
-                className="absolute top-4 right-4 text-muted-foreground/40 hover:text-foreground"
+                className="absolute top-4 right-4 text-faint hover:text-foreground"
               >
                 <X size={16} />
               </Button>
@@ -100,8 +100,8 @@ export function SuccessModal({
                   transition={{ delay: 0.4 }}
                   className="space-y-2"
                 >
-                  <h2 className="text-subtitle font-semibold tracking-tight text-foreground">{title}</h2>
-                  <p className="text-nav text-muted-foreground leading-relaxed px-4">
+                  <h2 className="text-lead font-semibold tracking-tight text-foreground">{title}</h2>
+                  <p className="text-body text-subtle leading-relaxed px-4">
                     {message}
                   </p>
                 </motion.div>
@@ -116,7 +116,7 @@ export function SuccessModal({
                     asChild={!!primaryAction.href}
                     onClick={primaryAction.onClick}
                     size="lg"
-                    className="w-full text-nav font-semibold flex items-center justify-center gap-2"
+                    className="w-full text-body font-semibold flex items-center justify-center gap-2"
                   >
                     {primaryAction.href ? (
                       <Link href={primaryAction.href}>
@@ -137,7 +137,7 @@ export function SuccessModal({
                       variant="ghost"
                       onClick={secondaryAction.onClick}
                       size="lg"
-                      className="w-full text-nav font-semibold text-muted-foreground hover:text-foreground"
+                      className="w-full text-body font-semibold text-muted-foreground hover:text-foreground"
                     >
                       {secondaryAction.href ? (
                         <Link href={secondaryAction.href}>

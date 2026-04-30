@@ -9,7 +9,7 @@ export function SettlementStatus() {
       <div className="relative z-10 flex h-full flex-col">
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <h2 className="text-nav leading-none font-semibold tracking-tight text-foreground">
+            <h2 className="text-body leading-none font-semibold tracking-tight text-foreground">
               Settlement Status
             </h2>
             <div
@@ -30,7 +30,7 @@ export function SettlementStatus() {
             <span className="text-heading font-medium text-muted-foreground">
               RM
             </span>
-            <span className="text-display leading-tight font-semibold tracking-tight text-foreground">
+            <span className="text-display leading-tight font-semibold tracking-tight text-foreground tabular-nums">
               18.2M
             </span>
           </div>
@@ -50,13 +50,13 @@ export function SettlementStatus() {
               style={{ width: "85%" }}
             ></div>
           </div>
-          <div className="flex justify-between text-caption font-medium text-muted-foreground">
+          <div className="flex justify-between text-label font-medium text-muted-foreground">
             <span>Cycle Progress</span>
             <span>26 Days Elapsed</span>
           </div>
         </div>
 
-        <button className="mt-5 flex w-full items-center justify-center gap-1.5 rounded-lg border border-border bg-background py-2 text-nav font-semibold text-foreground shadow-sm transition-all duration-200 hover:border-border/80 hover:bg-muted/50 active:scale-[0.98]">
+        <button className="mt-5 flex w-full items-center justify-center gap-1.5 rounded-lg border border-border bg-background py-2 text-body font-medium text-foreground shadow-sm transition-all duration-200 hover:border-border/80 hover:bg-muted/50 active:scale-[0.98]">
           Trigger Payout <ArrowRight size={14} weight="bold" />
         </button>
       </div>

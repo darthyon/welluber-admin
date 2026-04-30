@@ -404,7 +404,7 @@ const SidebarGroupLabel = React.forwardRef<
       ref={ref}
       data-sidebar="group-label"
       className={cn(
-        "duration-200 flex h-8 shrink-0 items-center rounded-md px-2 text-caption font-semibold text-sidebar-foreground/70 outline-none ring-sidebar-ring transition-[margin,opaicty] ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0 tracking-tight",
+        "duration-200 flex h-8 shrink-0 items-center rounded-md px-2 text-label font-medium text-sidebar-foreground/70 outline-none ring-sidebar-ring transition-[margin,opaicty] ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0 tracking-tight",
         "group-data-[collapsible=icon]:-ml-8 group-data-[collapsible=icon]:opacity-0",
         className
       )}
@@ -487,7 +487,7 @@ const sidebarMenuButtonVariants = cva(
       },
       size: {
         default: "h-8 text-body",
-        sm: "h-7 text-caption",
+        sm: "h-7 text-label",
         lg: "h-12 text-body group-data-[collapsible=icon]:!p-0",
       },
     },
@@ -590,7 +590,7 @@ const SidebarMenuBadge = ({
     <div
       data-sidebar="menu-badge"
       className={cn(
-        "absolute right-1 flex h-5 min-w-5 items-center justify-center rounded-md px-1 text-caption font-medium tabular-nums text-sidebar-foreground select-none pointer-events-none",
+        "absolute right-1 flex h-5 min-w-5 items-center justify-center rounded-md px-1 text-label font-medium tabular-nums text-sidebar-foreground select-none pointer-events-none",
         "group-data-[collapsible=icon]:hidden",
         className
       )}
@@ -674,7 +674,7 @@ const SidebarMenuSubButton = ({
       className={cn(
         "flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 text-sidebar-foreground outline-none ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-sidebar-accent-foreground",
         "data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground",
-        size === "sm" && "text-caption",
+        size === "sm" && "text-label",
         size === "md" && "text-body",
         "group-data-[collapsible=icon]:hidden",
         className

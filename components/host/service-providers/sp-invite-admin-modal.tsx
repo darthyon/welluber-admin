@@ -87,7 +87,7 @@ export function SpInviteAdminModal({
               message={`Invite sent to ${invitedEmail}. They can activate their account within 60 minutes.`}
             />
             <div className="mt-6 flex justify-center">
-              <Button onClick={onClose} variant="ghost" className="text-nav">
+              <Button onClick={onClose} variant="ghost" className="text-body">
                 Close
               </Button>
             </div>
@@ -97,7 +97,7 @@ export function SpInviteAdminModal({
             {/* Header */}
             <div className="flex items-center justify-between p-5 border-b border-border">
               <div>
-                <h2 className="text-subtitle font-semibold text-foreground">Invite SP Admin</h2>
+                <h2 className="text-lead font-semibold text-foreground">Invite SP Admin</h2>
                 <p className="text-label text-muted-foreground mt-0.5">
                   Send a magic link to {spName}
                 </p>
@@ -123,21 +123,21 @@ export function SpInviteAdminModal({
               )}
 
               <div className="space-y-1.5">
-                <label className="text-nav font-medium text-foreground">Full Name</label>
+                <label className="text-body font-medium text-foreground">Full Name</label>
                 <input
                   {...register("name")}
                   className={inputCls(!!errors.name)}
                   placeholder="e.g. Sara Lim"
                 />
                 {errors.name && (
-                  <p className="text-caption text-destructive flex items-center gap-1">
+                  <p className="text-label text-destructive flex items-center gap-1">
                     <WarningCircle size={12} /> {errors.name.message}
                   </p>
                 )}
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-nav font-medium text-foreground">Email Address</label>
+                <label className="text-body font-medium text-foreground">Email Address</label>
                 <input
                   {...register("email")}
                   className={inputCls(!!errors.email)}
@@ -145,7 +145,7 @@ export function SpInviteAdminModal({
                   type="email"
                 />
                 {errors.email && (
-                  <p className="text-caption text-destructive flex items-center gap-1">
+                  <p className="text-label text-destructive flex items-center gap-1">
                     <WarningCircle size={12} /> {errors.email.message}
                   </p>
                 )}
@@ -153,8 +153,8 @@ export function SpInviteAdminModal({
 
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <label className="text-nav font-medium text-foreground">Restricted to Branches (Optional)</label>
-                  <span className="text-micro text-muted-foreground">Default: All Branches</span>
+                  <label className="text-body font-medium text-foreground">Restricted to Branches (Optional)</label>
+                  <span className="text-label text-muted-foreground">Default: All Branches</span>
                 </div>
                 <Controller
                   control={control}
@@ -203,22 +203,22 @@ export function SpInviteAdminModal({
                   )}
                 />
                 {errors.branchIds && (
-                  <p className="text-caption text-destructive flex items-center gap-1">
+                  <p className="text-label text-destructive flex items-center gap-1">
                     <WarningCircle size={12} /> {errors.branchIds.message}
                   </p>
                 )}
               </div>
 
-              <p className="text-caption text-muted-foreground bg-muted/50 border border-border rounded-lg px-3 py-2">
+              <p className="text-label text-muted-foreground bg-muted/50 border border-border rounded-lg px-3 py-2">
                 A magic link will be sent to this address. The link expires in{" "}
                 <span className="font-semibold text-foreground">60 minutes</span>.
               </p>
 
               <div className="flex items-center justify-end gap-3 pt-1">
-                <Button type="button" variant="ghost" onClick={onClose} className="text-nav">
+                <Button type="button" variant="ghost" onClick={onClose} className="text-body">
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isSubmitting} className="text-nav gap-2">
+                <Button type="submit" disabled={isSubmitting} className="text-body gap-2">
                   {isSubmitting ? (
                     <>
                       <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

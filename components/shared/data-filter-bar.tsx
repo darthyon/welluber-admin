@@ -62,7 +62,7 @@ export function DataFilterBar({
             weight="bold" 
             className={cn(
               "absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-200",
-              isFocused || searchQuery ? "text-primary" : "text-muted-foreground/50 group-hover:text-muted-foreground/80"
+              isFocused || searchQuery ? "text-primary" : "text-faint group-hover:text-subtle"
             )} 
           />
           <input
@@ -74,14 +74,14 @@ export function DataFilterBar({
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             className={cn(
-              "w-full pl-11 pr-10 py-2.5 bg-background/5 border border-border/60 rounded-lg text-body font-medium outline-none transition-all placeholder:text-muted-foreground/40",
+              "w-full pl-11 pr-10 py-2.5 bg-background/5 border border-border/60 rounded-lg text-body font-medium outline-none transition-all placeholder:text-faint",
               "focus:border-primary/40 focus:bg-background/20 focus:shadow-[0_0_12px_rgba(var(--primary-rgb),0.1)]"
             )}
           />
           {searchQuery && (
             <button
               onClick={handleClear}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-lg text-muted-foreground/40 hover:text-primary hover:bg-primary/5 transition-all"
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-lg text-faint hover:text-primary hover:bg-primary/5 transition-all"
             >
               <X size={14} weight="bold" />
             </button>
@@ -105,7 +105,7 @@ export function DataFilterBar({
             size="sm"
             onClick={advancedFilter.onToggle}
             className={cn(
-              "h-10 px-4 gap-2 text-nav font-semibold rounded-lg border border-border/60 transition-all",
+              "h-10 px-4 gap-2 text-body font-semibold rounded-lg border border-border/60 transition-all",
               advancedFilter.isOpen || (advancedFilter.activeCount ?? 0) > 0 
                 ? "bg-primary/10 border-primary/30 text-primary hover:bg-primary/20" 
                 : "bg-background/40 text-muted-foreground hover:bg-accent border-border/40"
@@ -114,7 +114,7 @@ export function DataFilterBar({
             <FadersHorizontal size={18} weight={(advancedFilter.activeCount ?? 0) > 0 ? "fill" : "bold"} />
             Advanced Filters
             {(advancedFilter.activeCount ?? 0) > 0 && (
-              <Badge className="ml-1 h-5 min-w-[20px] px-1.5 bg-primary text-white border-0 text-micro font-semibold">
+              <Badge className="ml-1 h-5 min-w-[20px] px-1.5 bg-primary text-white border-0 text-label font-medium">
                 {advancedFilter.activeCount}
               </Badge>
             )}

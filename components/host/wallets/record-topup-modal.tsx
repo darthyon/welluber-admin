@@ -83,7 +83,7 @@ export function RecordTopupModal({
                   <h3 className="text-body font-semibold text-foreground">
                     Record Manual Top-up
                   </h3>
-                  <p className="text-caption text-muted-foreground">
+                  <p className="text-label text-muted-foreground">
                     {walletName}
                   </p>
                 </div>
@@ -100,7 +100,7 @@ export function RecordTopupModal({
             {/* Body */}
             <div className="px-6 py-5 space-y-5">
               <div className="space-y-1.5">
-                <label className="text-nav font-semibold text-foreground">
+                <label className="text-body font-medium text-foreground">
                   Top-up Amount (RM)
                 </label>
                 <input
@@ -115,7 +115,7 @@ export function RecordTopupModal({
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-nav font-semibold text-foreground">
+                <label className="text-body font-medium text-foreground">
                   Reference Number
                 </label>
                 <input
@@ -129,10 +129,10 @@ export function RecordTopupModal({
 
               {/* Attachment */}
               <div className="space-y-1.5">
-                <label className="text-nav font-semibold text-foreground">
+                <label className="text-body font-medium text-foreground">
                   Payment Receipt
                 </label>
-                <p className="text-caption text-muted-foreground/60">
+                <p className="text-label text-faint">
                   Attach proof of payment (optional)
                 </p>
                 {attachment ? (
@@ -152,12 +152,12 @@ export function RecordTopupModal({
                   <label className="flex flex-col items-center justify-center gap-2 px-4 py-6 rounded-lg border-2 border-dashed border-border/60 bg-muted/20 hover:border-primary/30 hover:bg-muted/30 transition-all cursor-pointer group">
                     <UploadSimple
                       size={24}
-                      className="text-muted-foreground/40 group-hover:text-primary transition-colors"
+                      className="text-faint group-hover:text-primary transition-colors"
                     />
-                    <span className="text-nav font-semibold text-muted-foreground group-hover:text-foreground transition-colors">
+                    <span className="text-body font-semibold text-muted-foreground group-hover:text-foreground transition-colors">
                       Click to upload receipt
                     </span>
-                    <span className="text-caption text-muted-foreground/40">
+                    <span className="text-label text-faint">
                       JPG, PNG, PDF up to 5MB
                     </span>
                     <input
@@ -178,14 +178,14 @@ export function RecordTopupModal({
                 variant="ghost"
                 onClick={onClose}
                 disabled={isSubmitting}
-                className="text-nav font-medium"
+                className="text-body font-medium"
               >
                 Cancel
               </Button>
               <Button
                 onClick={handleSubmit}
                 disabled={isSubmitting || !amount || !reference}
-                className="text-nav font-medium bg-emerald-600 hover:bg-emerald-700"
+                className="text-body font-medium bg-emerald-600 hover:bg-emerald-700"
               >
                 {isSubmitting ? (
                   <div className="flex items-center gap-2">

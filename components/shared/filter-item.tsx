@@ -35,7 +35,7 @@ export function FilterItem({ label, options, value, onChange, icon }: FilterItem
             variant="outline"
             size="sm"
             className={cn(
-              "h-9 px-3 gap-2 text-nav font-normal border-border/60 bg-transparent hover:bg-muted/50 hover:border-border transition-all rounded-lg",
+              "h-9 px-3 gap-2 text-body font-normal border-border/60 bg-transparent hover:bg-muted/50 hover:border-border transition-all rounded-lg",
               value !== "all" && "border-primary/20 bg-primary/5 text-primary hover:bg-primary/10 hover:border-primary/30"
             )}
           >
@@ -51,7 +51,7 @@ export function FilterItem({ label, options, value, onChange, icon }: FilterItem
                 key={option.value}
                 onClick={() => onChange(option.value)}
                 className={cn(
-                  "flex items-center justify-between w-full px-3 py-2 text-nav rounded-lg transition-all text-left font-normal",
+                  "flex items-center justify-between w-full px-3 py-2 text-body rounded-lg transition-all text-left font-normal",
                   value === option.value
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground"

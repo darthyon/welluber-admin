@@ -74,7 +74,7 @@ export function InviteAdminModal({ targetId, isOpen, onClose, title = "Invite Ad
           ) : (
 
             <form id="inviteAdminForm" onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-              <p className="text-nav text-muted-foreground mb-4">
+              <p className="text-body text-subtle mb-4">
                 Enter the details below to invite an administrator. They will receive an email with a secure link to join.
               </p>
               
@@ -83,14 +83,14 @@ export function InviteAdminModal({ targetId, isOpen, onClose, title = "Invite Ad
                 <input 
                   {...register("name")}
                   className={cn(
-                    "w-full px-3 py-2 bg-background border rounded-md text-nav outline-none transition-colors",
+                    "w-full px-3 py-2 bg-background border rounded-md text-body outline-none transition-colors",
                     errors.name ? "border-destructive focus:border-destructive" : "border-border focus:border-foreground/30 focus:bg-muted/30"
                   )}
                   placeholder="e.g. John Doe"
                   autoFocus
                 />
                 {errors.name && (
-                  <p className="text-caption text-destructive flex items-center gap-1 mt-1">
+                  <p className="text-label text-destructive flex items-center gap-1 mt-1">
                     <WarningCircle size={12} /> {errors.name.message}
                   </p>
                 )}
@@ -101,13 +101,13 @@ export function InviteAdminModal({ targetId, isOpen, onClose, title = "Invite Ad
                 <input 
                   {...register("position")}
                   className={cn(
-                    "w-full px-3 py-2 bg-background border rounded-md text-nav outline-none transition-colors",
+                    "w-full px-3 py-2 bg-background border rounded-md text-body outline-none transition-colors",
                     errors.position ? "border-destructive focus:border-destructive" : "border-border focus:border-foreground/30 focus:bg-muted/30"
                   )}
                   placeholder="e.g. Branch Manager, Finance Admin"
                 />
                 {errors.position && (
-                  <p className="text-caption text-destructive flex items-center gap-1 mt-1">
+                  <p className="text-label text-destructive flex items-center gap-1 mt-1">
                     <WarningCircle size={12} /> {errors.position.message}
                   </p>
                 )}
@@ -119,13 +119,13 @@ export function InviteAdminModal({ targetId, isOpen, onClose, title = "Invite Ad
                   type="email"
                   {...register("email")}
                   className={cn(
-                    "w-full px-3 py-2 bg-background border rounded-md text-nav outline-none transition-colors",
+                    "w-full px-3 py-2 bg-background border rounded-md text-body outline-none transition-colors",
                     errors.email ? "border-destructive focus:border-destructive" : "border-border focus:border-foreground/30 focus:bg-muted/30"
                   )}
                   placeholder="name@company.com"
                 />
                 {errors.email && (
-                  <p className="text-caption text-destructive flex items-center gap-1 mt-1">
+                  <p className="text-label text-destructive flex items-center gap-1 mt-1">
                     <WarningCircle size={12} /> {errors.email.message}
                   </p>
                 )}
@@ -142,7 +142,7 @@ export function InviteAdminModal({ targetId, isOpen, onClose, title = "Invite Ad
               variant="secondary"
               onClick={onClose}
               disabled={isSubmitting}
-              className="text-nav font-medium"
+              className="text-body font-medium"
             >
               Cancel
             </Button>
@@ -150,7 +150,7 @@ export function InviteAdminModal({ targetId, isOpen, onClose, title = "Invite Ad
               form="inviteAdminForm"
               type="submit"
               disabled={isSubmitting}
-              className="text-nav font-medium flex items-center gap-2"
+              className="text-body font-medium flex items-center gap-2"
             >
               {isSubmitting ? (
                 <>

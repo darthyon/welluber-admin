@@ -21,7 +21,7 @@ export function RegisteredAddressSection({
             <MapPin size={16} weight="fill" />
           </div>
           <div className="space-y-0.5">
-            <h3 className="text-subtitle font-semibold text-foreground">Registered Business Address</h3>
+            <h3 className="text-lead font-semibold text-foreground">Registered Business Address</h3>
             <p className="text-label text-muted-foreground">Official business address as per SSM registration.</p>
           </div>
         </div>

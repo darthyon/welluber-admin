@@ -26,7 +26,7 @@ export function BrandIdentitySection({
           <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
             <Tag size={16} weight="fill" />
           </div>
-          <h3 className="text-subtitle font-semibold text-foreground">Brand Identity</h3>
+          <h3 className="text-lead font-semibold text-foreground">Brand Identity</h3>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div className="space-y-1.5 sm:col-span-2">

@@ -74,7 +74,7 @@ export default function EmployeePage() {
           <Button
             variant="ghost"
             size="sm"
-            className="gap-2 text-nav font-medium text-muted-foreground hover:text-primary"
+            className="gap-2 text-body font-medium text-subtle hover:text-primary"
             onClick={() => window.history.back()}
           >
             <ArrowLeft size={16} />
@@ -86,7 +86,7 @@ export default function EmployeePage() {
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center border border-primary/20">
-              <span className="font-semibold text-heading">
+              <span className="font-medium text-heading">
                 {(() => {
                   const parts = employee.name.trim().split(/\s+/).filter(Boolean)
                   return parts.length >= 2
@@ -97,10 +97,10 @@ export default function EmployeePage() {
             </div>
             <div>
               <div className="flex items-center gap-3">
-                <h2 className="text-heading font-semibold tracking-tight text-foreground">{employee.name}</h2>
+                <h2 className="text-heading font-semibold text-foreground text-balance">{employee.name}</h2>
                 <StatusBadge status={employee.status} variant="emerald" />
               </div>
-              <p className="text-nav text-muted-foreground mt-0.5">
+              <p className="text-body text-subtle mt-0.5">
                 {employee.designation} • {employee.department}
               </p>
             </div>
@@ -111,7 +111,7 @@ export default function EmployeePage() {
               asChild
               variant="secondary"
               size="lg"
-              className="text-nav font-medium rounded-full transition-all"
+              className="text-body font-medium rounded-full transition-all"
             >
               <Link href={`/employees/${employeeId}/edit`}>
                 <PencilSimpleLine size={16} weight="bold" className="mr-1.5" />
@@ -181,7 +181,7 @@ export default function EmployeePage() {
                 icon={<Shield size={18} weight="bold" className="text-primary" />}
               >
                 {employee.assignedPolicies.length === 0 ? (
-                  <p className="text-nav text-muted-foreground italic">No benefit policies assigned.</p>
+                  <p className="text-body text-subtle italic">No benefit policies assigned.</p>
                 ) : (
                   <div className="space-y-4">
                     {employee.assignedPolicies.map((policy, idx) => (
@@ -190,10 +190,10 @@ export default function EmployeePage() {
                           <Shield size={18} weight="duotone" />
                         </div>
                         <div className="flex-1">
-                          <p className="text-nav font-semibold text-foreground">{policy.policyName}</p>
-                          <p className="text-caption text-muted-foreground">{policy.benefitGroupName}</p>
+                          <p className="text-body font-medium text-foreground">{policy.policyName}</p>
+                          <p className="text-label text-subtle">{policy.benefitGroupName}</p>
                         </div>
-                        <Badge variant="secondary" className="text-micro">Active</Badge>
+                        <Badge variant="secondary" className="text-label">Active</Badge>
                       </div>
                     ))}
                   </div>
@@ -208,13 +208,13 @@ export default function EmployeePage() {
                 icon={<Users size={18} weight="bold" className="text-primary" />}
               >
                 {employee.dependents.length === 0 ? (
-                  <p className="text-nav text-muted-foreground italic">No dependents registered.</p>
+                  <p className="text-body text-subtle italic">No dependents registered.</p>
                 ) : (
                   <div className="space-y-4">
                     {employee.dependents.map((dep) => (
                       <div key={dep.id} className="p-4 bg-muted/20 border border-border rounded-lg">
                         <div className="flex items-center gap-2 mb-3">
-                          <Badge variant="outline" className="text-micro uppercase tracking-wider">{dep.relationship}</Badge>
+                          <Badge variant="outline" className="text-label uppercase tracking-wider">{dep.relationship}</Badge>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
                           <DetailField label="Full Name" value={dep.name} />

@@ -71,14 +71,14 @@ export function LinkPolicyModal({
       <div className="w-full max-w-lg animate-in overflow-hidden rounded-[24px] border border-border bg-card shadow-2xl duration-300 zoom-in-95">
         <div className="flex items-center justify-between border-b border-border p-8 pb-4">
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-border bg-muted text-muted-foreground/40">
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-border bg-muted text-faint">
               <ShieldCheck size={24} weight="duotone" />
             </div>
             <div>
-              <h3 className="text-heading font-semibold tracking-tight text-foreground">
+              <h3 className="text-heading font-semibold text-foreground text-balance">
                 Link benefit policy
               </h3>
-              <p className="text-nav font-medium text-muted-foreground">
+              <p className="text-body font-medium text-subtle">
                 Assign a policy to this organisation
               </p>
             </div>
@@ -89,7 +89,7 @@ export function LinkPolicyModal({
           >
             <X
               size={20}
-              className="text-muted-foreground/50 group-hover:text-foreground"
+              className="text-faint group-hover:text-foreground"
             />
           </button>
         </div>
@@ -98,7 +98,7 @@ export function LinkPolicyModal({
           <div className="group relative">
             <MagnifyingGlass
               size={18}
-              className="absolute top-1/2 left-4 -translate-y-1/2 text-muted-foreground/40 transition-colors group-focus-within:text-primary"
+              className="absolute top-1/2 left-4 -translate-y-1/2 text-faint transition-colors group-focus-within:text-primary"
             />
             <input
               type="text"
@@ -130,7 +130,7 @@ export function LinkPolicyModal({
                           "flex h-10 w-10 items-center justify-center rounded-lg border transition-colors",
                           isSelected
                             ? "border-primary bg-primary text-white"
-                            : "border-border bg-muted text-muted-foreground/30 group-hover:bg-muted/80"
+                            : "border-border bg-muted text-faint group-hover:bg-muted/80"
                         )}
                       >
                         <IdentificationCard
@@ -147,7 +147,7 @@ export function LinkPolicyModal({
                         >
                           {policy.name}
                         </p>
-                        <p className="font-mono text-caption leading-none tracking-tight text-muted-foreground/50">
+                        <p className="font-mono text-label leading-none tracking-tight text-faint">
                           {policy.code}
                         </p>
                       </div>
@@ -167,9 +167,9 @@ export function LinkPolicyModal({
               )
             })}
             {filteredPolicies.length === 0 && (
-              <div className="space-y-2 py-10 text-center text-muted-foreground/40">
+              <div className="space-y-2 py-10 text-center text-faint">
                 <MagnifyingGlass size={32} className="mx-auto opacity-20" />
-                <p className="text-nav font-medium">
+                <p className="text-body font-medium">
                   No matching policies found.
                 </p>
               </div>

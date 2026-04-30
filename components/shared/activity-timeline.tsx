@@ -85,12 +85,12 @@ export function ActivityTimeline({ items, title, icon, className }: ActivityTime
                   <h4 className="text-[13.5px] font-semibold text-foreground group-hover:text-primary transition-colors duration-200 tracking-tight">
                     {item.title}
                   </h4>
-                  <span className="text-micro font-semibold text-muted-foreground/40 tracking-wider tabular-nums">
+                  <span className="text-label font-medium text-faint tracking-wider tabular-nums">
                     {item.timestamp.split(',')[1]?.trim() || item.timestamp}
                   </span>
                 </div>
                 
-                <p className="text-[12.5px] text-muted-foreground leading-relaxed font-medium opacity-80">
+                <p className="text-[12.5px] text-muted-foreground leading-relaxed font-medium">
                     {item.description}
                 </p>
 
@@ -100,15 +100,15 @@ export function ActivityTimeline({ items, title, icon, className }: ActivityTime
                       <div className="w-4 h-4 rounded-full bg-muted border border-border flex items-center justify-center overflow-hidden">
                         <User size={10} className="text-muted-foreground" />
                       </div>
-                      <span className="text-caption text-muted-foreground/60">
+                      <span className="text-label text-faint">
                         by <span className="text-foreground font-semibold">{item.user}</span>
                       </span>
                     </div>
                   )}
                   {item.user && item.timestamp.includes(',') && (
-                    <span className="text-micro text-muted-foreground/30">•</span>
+                    <span className="text-micro text-faint">•</span>
                   )}
-                  <span className="text-caption text-muted-foreground/50">
+                  <span className="text-label text-faint">
                     {item.timestamp.includes(',') ? item.timestamp.split(',')[0] : item.timestamp}
                   </span>
                 </div>
@@ -119,10 +119,10 @@ export function ActivityTimeline({ items, title, icon, className }: ActivityTime
 
         {items.length === 0 && (
           <div className="py-12 flex flex-col items-center justify-center text-center">
-            <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground/40 mb-4 border border-dashed border-zinc-200">
+            <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center text-faint mb-4 border border-dashed border-zinc-200">
               <ClockCounterClockwise size={24} />
             </div>
-            <p className="text-nav text-muted-foreground font-medium">No activities recorded in this period.</p>
+            <p className="text-body text-subtle font-medium">No activities recorded in this period.</p>
           </div>
         )}
       </div>

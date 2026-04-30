@@ -64,16 +64,16 @@ export function EmployeeEntitlementsTab({ employeeId }: EmployeeEntitlementsTabP
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="border-border">
           <CardHeader className="pb-3">
-            <CardTitle className="text-nav font-semibold text-muted-foreground flex items-center gap-2">
+            <CardTitle className="text-body font-semibold text-muted-foreground flex items-center gap-2">
               <CurrencyCircleDollar size={18} />
               Total Allocated
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-display font-semibold text-foreground">
+            <div className="text-display font-semibold text-foreground tabular-nums">
               RM {totalAllocated.toLocaleString()}
             </div>
-            <p className="text-caption text-muted-foreground mt-1">
+            <p className="text-label text-muted-foreground mt-1">
               Across all benefit pools
             </p>
           </CardContent>
@@ -81,16 +81,16 @@ export function EmployeeEntitlementsTab({ employeeId }: EmployeeEntitlementsTabP
 
         <Card className="border-border">
           <CardHeader className="pb-3">
-            <CardTitle className="text-nav font-semibold text-muted-foreground flex items-center gap-2">
+            <CardTitle className="text-body font-semibold text-muted-foreground flex items-center gap-2">
               <Gift size={18} />
               Current Balance
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-display font-semibold text-foreground">
+            <div className="text-display font-semibold text-foreground tabular-nums">
               RM {totalBalance.toLocaleString()}
             </div>
-            <p className="text-caption text-muted-foreground mt-1">
+            <p className="text-label text-muted-foreground mt-1">
               Available for use
             </p>
           </CardContent>
@@ -98,7 +98,7 @@ export function EmployeeEntitlementsTab({ employeeId }: EmployeeEntitlementsTabP
 
         <Card className="border-border">
           <CardHeader className="pb-3">
-            <CardTitle className="text-nav font-semibold text-muted-foreground flex items-center gap-2">
+            <CardTitle className="text-body font-semibold text-muted-foreground flex items-center gap-2">
               <ChartLineUp size={18} />
               Overall Utilization
             </CardTitle>
@@ -135,29 +135,29 @@ export function EmployeeEntitlementsTab({ employeeId }: EmployeeEntitlementsTabP
                     </div>
                     <div>
                       <h4 className="text-body font-semibold text-foreground">{entitlement.name}</h4>
-                      <p className="text-caption text-muted-foreground">{entitlement.benefitGroup}</p>
+                      <p className="text-label text-muted-foreground">{entitlement.benefitGroup}</p>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
                     <div>
-                      <p className="text-caption font-semibold text-muted-foreground">Allocated</p>
-                      <p className="text-nav font-semibold text-foreground">RM {entitlement.allocatedAmount.toLocaleString()}</p>
+                      <p className="text-label font-medium text-subtle">Allocated</p>
+                      <p className="text-body font-medium text-foreground">RM {entitlement.allocatedAmount.toLocaleString()}</p>
                     </div>
                     <div>
-                      <p className="text-caption font-semibold text-muted-foreground">Balance</p>
-                      <p className="text-nav font-semibold text-foreground">RM {entitlement.currentBalance.toLocaleString()}</p>
+                      <p className="text-label font-medium text-subtle">Balance</p>
+                      <p className="text-body font-medium text-foreground">RM {entitlement.currentBalance.toLocaleString()}</p>
                     </div>
                     <div>
-                      <p className="text-caption font-semibold text-muted-foreground">Utilization</p>
+                      <p className="text-label font-medium text-subtle">Utilization</p>
                       <div className="flex items-center gap-2">
                         <Progress value={entitlement.utilization} className="h-2 w-24" />
-                        <span className="text-nav font-semibold text-foreground">{entitlement.utilization}%</span>
+                        <span className="text-body font-medium text-foreground">{entitlement.utilization}%</span>
                       </div>
                     </div>
                     <div>
-                      <p className="text-caption font-semibold text-muted-foreground">Refresh Cycle</p>
-                      <p className="text-nav font-semibold text-foreground">{entitlement.refreshCycle}</p>
+                      <p className="text-label font-medium text-subtle">Refresh Cycle</p>
+                      <p className="text-body font-medium text-foreground">{entitlement.refreshCycle}</p>
                     </div>
                   </div>
                 </div>
@@ -167,7 +167,7 @@ export function EmployeeEntitlementsTab({ employeeId }: EmployeeEntitlementsTabP
                     <ArrowClockwise size={16} />
                     Refresh Pool
                   </Button>
-                  <div className="text-caption text-muted-foreground text-center">
+                  <div className="text-label text-muted-foreground text-center">
                     <Calendar size={12} className="inline mr-1" />
                     Next: {entitlement.nextRefresh}
                   </div>
@@ -177,22 +177,22 @@ export function EmployeeEntitlementsTab({ employeeId }: EmployeeEntitlementsTabP
               {/* Additional Details */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-border">
                 <div>
-                  <p className="text-caption font-semibold text-muted-foreground">Last Refreshed</p>
-                  <p className="text-nav text-foreground">{entitlement.lastRefreshed}</p>
+                  <p className="text-label font-medium text-subtle">Last Refreshed</p>
+                  <p className="text-body text-foreground">{entitlement.lastRefreshed}</p>
                 </div>
                 <div>
-                  <p className="text-caption font-semibold text-muted-foreground">Spent</p>
-                  <p className="text-nav text-foreground">
+                  <p className="text-label font-medium text-subtle">Spent</p>
+                  <p className="text-body text-foreground">
                     RM {(entitlement.allocatedAmount - entitlement.currentBalance).toLocaleString()}
                   </p>
                 </div>
                 <div>
-                  <p className="text-caption font-semibold text-muted-foreground">Days Remaining</p>
-                  <p className="text-nav text-foreground">15 days</p>
+                  <p className="text-label font-medium text-subtle">Days Remaining</p>
+                  <p className="text-body text-foreground">15 days</p>
                 </div>
                 <div>
-                  <p className="text-caption font-semibold text-muted-foreground">Status</p>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-micro font-semibold bg-emerald-500/10 text-emerald-600">
+                  <p className="text-label font-medium text-subtle">Status</p>
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-label font-medium bg-emerald-500/10 text-emerald-600">
                     Active
                   </span>
                 </div>
@@ -205,7 +205,7 @@ export function EmployeeEntitlementsTab({ employeeId }: EmployeeEntitlementsTabP
       {/* Empty State (commented out for reference)
       {entitlements.length === 0 && (
         <div className="text-center py-12 border-2 border-dashed border-border rounded-lg">
-          <Gift size={48} className="mx-auto text-muted-foreground/40" />
+          <Gift size={48} className="mx-auto text-faint" />
           <h3 className="text-heading font-semibold text-foreground mt-4">No entitlements assigned</h3>
           <p className="text-body text-muted-foreground mt-2 max-w-md mx-auto">
             This employee doesn't have any benefit entitlements yet. Assign a benefit policy to get started.

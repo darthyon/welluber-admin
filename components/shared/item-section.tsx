@@ -50,11 +50,11 @@ export function ItemSection({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <div className="w-6 h-6 rounded-full bg-border flex items-center justify-center">
-            <span className="text-caption font-semibold text-muted-foreground/80">
+            <span className="text-label font-semibold text-subtle">
               {index}
             </span>
           </div>
-          <span className="text-label font-semibold text-muted-foreground/60 tracking-tight">
+          <span className="text-label font-semibold text-faint">
             {label}
           </span>
         </div>
@@ -65,7 +65,7 @@ export function ItemSection({
             variant="ghost"
             size="icon"
             onClick={onRemove}
-            className="w-8 h-8 rounded-lg text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 transition-all font-semibold"
+            className="w-8 h-8 rounded-lg text-faint hover:text-destructive hover:bg-destructive/10 transition-all font-semibold"
           >
             <Trash size={18} />
           </Button>

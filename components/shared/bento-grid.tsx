@@ -115,10 +115,10 @@ export function BentoCard({
       <div className="relative z-10 mb-6 flex items-start justify-between">
         <CardTitle
           className={cn(
-            "text-nav font-semibold tracking-tight transition-colors",
+            "text-body font-medium transition-colors",
             className?.includes("bg-primary")
               ? "text-primary-foreground/80"
-              : "text-muted-foreground"
+              : "text-subtle"
           )}
         >
           {title}
@@ -143,7 +143,7 @@ export function BentoCard({
             <TooltipProvider>
               <Tooltip delayDuration={300}>
                 <TooltipTrigger asChild>
-                  <h4 className="cursor-help text-display leading-tight font-semibold tracking-tight text-foreground">
+                  <h4 className="cursor-help text-display leading-tight font-semibold tracking-tight text-foreground tabular-nums">
                     {value}
                   </h4>
                 </TooltipTrigger>
@@ -165,7 +165,7 @@ export function BentoCard({
             <div className="flex h-6 items-center gap-2">
               <span
                 className={cn(
-                  "inline-flex h-5 items-center gap-1.5 rounded px-2 py-1 text-caption font-semibold tracking-tight transition-all",
+                  "inline-flex h-5 items-center gap-1.5 rounded px-2 py-1 text-label font-medium transition-all",
                   trend.isPositive !== false
                     ? "bg-emerald-500/10 text-emerald-600"
                     : "bg-destructive/10 text-destructive",
@@ -182,10 +182,10 @@ export function BentoCard({
               {trend.label && (
                 <span
                   className={cn(
-                    "text-caption leading-none font-medium whitespace-nowrap",
+                    "text-label leading-none font-medium whitespace-nowrap",
                     className?.includes("bg-primary")
                       ? "text-primary-foreground/80"
-                      : "text-muted-foreground/80"
+                      : "text-subtle"
                   )}
                 >
                   {trend.label}
@@ -196,10 +196,10 @@ export function BentoCard({
           {!trend && description && !children && (
             <p
               className={cn(
-                "flex items-center gap-1.5 text-caption font-medium",
+                "flex items-center gap-1.5 text-label font-medium",
                 className?.includes("bg-primary")
                   ? "text-primary-foreground/80"
-                  : "text-muted-foreground"
+                  : "text-subtle"
               )}
             >
               {description}

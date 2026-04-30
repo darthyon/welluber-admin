@@ -127,7 +127,7 @@ export function NotificationCenter({ notifications = DEFAULT_NOTIFICATIONS }: No
           <div className="p-4 border-b border-border bg-muted/20">
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-semibold text-body">Notification Center</h3>
-              <button className="text-caption text-primary hover:underline font-medium">
+              <button className="text-label text-primary hover:underline font-medium">
                 Mark all as read
               </button>
             </div>
@@ -183,8 +183,8 @@ export function NotificationCenter({ notifications = DEFAULT_NOTIFICATIONS }: No
                       <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-start gap-2 mb-1">
                           <p className={cn(
-                            "text-nav leading-normal break-words pr-2",
-                            !item.read ? "font-semibold text-foreground" : "font-medium text-foreground/80"
+                            "text-body leading-normal break-words pr-2",
+                            !item.read ? "font-semibold text-foreground" : "font-medium text-subtle"
                           )}>
                             {item.title}
                           </p>
@@ -196,7 +196,7 @@ export function NotificationCenter({ notifications = DEFAULT_NOTIFICATIONS }: No
 
                         {item.type === "action" && (
                           <div className="mt-2.5">
-                            <span className="inline-flex text-caption font-medium text-primary hover:underline items-center gap-1">
+                            <span className="inline-flex text-label font-medium text-primary hover:underline items-center gap-1">
                               Review Item <ArrowRight size={10} />
                             </span>
                           </div>
@@ -209,7 +209,7 @@ export function NotificationCenter({ notifications = DEFAULT_NOTIFICATIONS }: No
             ) : (
               <div className="px-4 py-8 text-center flex flex-col items-center justify-center text-muted-foreground">
                 <Lightning size={24} className="mb-2 opacity-50" />
-                <p className="text-nav font-medium text-foreground/80">You&apos;re all caught up</p>
+                <p className="text-body font-medium text-subtle">You&apos;re all caught up</p>
                 <p className="text-label">No immediate actions required.</p>
               </div>
             )}

@@ -23,7 +23,7 @@ export function ProviderProfileSection({
           <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
             <Storefront size={16} weight="fill" />
           </div>
-          <h3 className="text-subtitle font-semibold text-foreground">Provider Profile</h3>
+          <h3 className="text-lead font-semibold text-foreground">Provider Profile</h3>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -36,7 +36,7 @@ export function ProviderProfileSection({
               placeholder="e.g. Zenith Yoga Studio Sdn Bhd"
             />
             {errors.name && (
-              <p className="text-caption text-destructive flex items-center gap-1 mt-1 font-medium">
+              <p className="text-label text-destructive flex items-center gap-1 mt-1 font-medium">
                 <WarningCircle size={12} weight="fill" /> {errors.name.message}
               </p>
             )}
@@ -45,7 +45,7 @@ export function ProviderProfileSection({
           <div className="space-y-1.5">
             <label htmlFor="website" className={labelCls}>Website Link</label>
             <div className="relative">
-              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/40">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-faint">
                 <Globe size={16} />
               </div>
               <input
@@ -57,7 +57,7 @@ export function ProviderProfileSection({
               />
             </div>
             {errors.website && (
-              <p className="text-caption text-destructive flex items-center gap-1 mt-1 font-medium">
+              <p className="text-label text-destructive flex items-center gap-1 mt-1 font-medium">
                 <WarningCircle size={12} weight="fill" /> {errors.website.message}
               </p>
             )}

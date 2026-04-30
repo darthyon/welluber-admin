@@ -129,13 +129,13 @@ export default function EditServiceProviderPage() {
 
   const inputCls = (hasError?: boolean) =>
     cn(
-      "w-full px-3 py-2.5 bg-background border rounded-lg text-nav outline-none transition-all duration-200",
+      "w-full px-3 py-2.5 bg-background border rounded-lg text-body outline-none transition-all duration-200",
       hasError
         ? "border-destructive focus:ring-2 focus:ring-destructive/10"
         : "border-border focus:border-primary/40 focus:ring-2 focus:ring-primary/10 focus:bg-muted/10"
     );
 
-  const labelCls = "text-nav font-semibold text-foreground/80 mb-1.5 block";
+  const labelCls = "text-body font-semibold text-subtle mb-1.5 block";
 
   const SERVICE_PORTFOLIO_TAXONOMY = MASTER_SERVICE_TAXONOMY
     .filter(group => brandCategories.length === 0 || brandCategories.includes(group.category))
@@ -159,13 +159,13 @@ export default function EditServiceProviderPage() {
             <div className="flex flex-col gap-4">
               <button
                 onClick={() => router.back()}
-                className="inline-flex items-center gap-1.5 text-nav font-medium text-muted-foreground hover:text-foreground transition-colors w-fit"
+                className="inline-flex items-center gap-1.5 text-body font-medium text-subtle hover:text-foreground transition-colors w-fit"
               >
                 <CaretLeft size={16} /> Back
               </button>
               <div>
-                <h1 className="text-heading font-semibold tracking-tight text-foreground">Edit Service Provider</h1>
-                <p className="text-muted-foreground text-nav mt-1">Update profile, compliance details, and backend settings.</p>
+                <h1 className="text-heading font-semibold text-foreground text-balance">Edit Service Provider</h1>
+                <p className="text-subtle text-body mt-1">Update profile, compliance details, and backend settings.</p>
               </div>
             </div>
 
@@ -178,7 +178,7 @@ export default function EditServiceProviderPage() {
                     <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                         <Storefront size={16} weight="fill" />
                     </div>
-                    <h3 className="text-subtitle font-semibold text-foreground">Provider Profile</h3>
+                    <h3 className="text-lead font-semibold text-foreground">Provider Profile</h3>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -193,7 +193,7 @@ export default function EditServiceProviderPage() {
                     <div className="space-y-1.5 sm:col-span-2">
                         <label className={labelCls}>Website Link</label>
                         <div className="relative">
-                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/40">
+                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-faint">
                                 <Globe size={16} />
                             </div>
                             <input
@@ -223,7 +223,7 @@ export default function EditServiceProviderPage() {
                     <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                         <IdentificationCard size={16} weight="fill" />
                     </div>
-                    <h3 className="text-subtitle font-semibold text-foreground">Registration & Compliance</h3>
+                    <h3 className="text-lead font-semibold text-foreground">Registration & Compliance</h3>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -267,8 +267,8 @@ export default function EditServiceProviderPage() {
                                                 : "border-border hover:border-border-hover bg-muted/5"
                                         )}
                                     >
-                                        <span className={cn("text-nav font-semibold", businessType === type.id ? "text-primary" : "text-foreground")}>{type.label}</span>
-                                        <span className="text-micro text-muted-foreground mt-0.5 leading-tight">{type.docs}</span>
+                                        <span className={cn("text-body font-semibold", businessType === type.id ? "text-primary" : "text-foreground")}>{type.label}</span>
+                                        <span className="text-label text-subtle mt-0.5 leading-tight">{type.docs}</span>
                                     </button>
                                 ))}
                             </div>
@@ -304,7 +304,7 @@ export default function EditServiceProviderPage() {
                         <MapPin size={16} weight="fill" />
                     </div>
                     <div className="space-y-0.5">
-                      <h3 className="text-subtitle font-semibold text-foreground">Registered Business Address</h3>
+                      <h3 className="text-lead font-semibold text-foreground">Registered Business Address</h3>
                       <p className="text-label text-muted-foreground">Official business address as per SSM registration.</p>
                     </div>
                 </div>
@@ -332,7 +332,7 @@ export default function EditServiceProviderPage() {
                     <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                         <Bank size={16} weight="fill" />
                     </div>
-                    <h3 className="text-subtitle font-semibold text-foreground">Settlement & Tax Compliance</h3>
+                    <h3 className="text-lead font-semibold text-foreground">Settlement & Tax Compliance</h3>
                 </div>
 
                 <div className="space-y-8">
@@ -384,7 +384,7 @@ export default function EditServiceProviderPage() {
                         <div className="space-y-1.5">
                             <label className={labelCls}>Expired Commission Fee</label>
                             <div className="relative">
-                                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/40 font-semibold text-nav">%</div>
+                                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-faint font-semibold text-body">%</div>
                                 <input
                                     {...register("expiredCommissionFee", { valueAsNumber: true })}
                                     className={cn(inputCls(), "pl-9")}
@@ -400,12 +400,12 @@ export default function EditServiceProviderPage() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="flex items-center justify-between p-4 bg-muted/20 border border-border rounded-lg group hover:border-primary/20 transition-all duration-300">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-9 h-9 rounded-lg bg-white border border-zinc-100 flex items-center justify-center text-muted-foreground/60 group-hover:text-primary transition-colors">
+                                    <div className="w-9 h-9 rounded-lg bg-white border border-zinc-100 flex items-center justify-center text-faint group-hover:text-primary transition-colors">
                                         <Article size={18} weight="duotone" />
                                     </div>
                                     <div className="space-y-0.5">
-                                        <p className="text-nav font-semibold text-foreground">Needs e-Invoice?</p>
-                                        <p className="text-micro text-muted-foreground font-medium">Submission required</p>
+                                        <p className="text-body font-medium text-foreground">Needs e-Invoice?</p>
+                                        <p className="text-label text-subtle font-medium">Submission required</p>
                                     </div>
                                 </div>
                                 <Controller
@@ -417,12 +417,12 @@ export default function EditServiceProviderPage() {
 
                             <div className="flex items-center justify-between p-4 bg-muted/20 border border-border rounded-lg group hover:border-primary/20 transition-all duration-300">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-9 h-9 rounded-lg bg-white border border-zinc-100 flex items-center justify-center text-muted-foreground/60 group-hover:text-primary transition-colors">
+                                    <div className="w-9 h-9 rounded-lg bg-white border border-zinc-100 flex items-center justify-center text-faint group-hover:text-primary transition-colors">
                                         <ShieldCheck size={18} weight="duotone" />
                                     </div>
                                     <div className="space-y-0.5">
-                                        <p className="text-nav font-semibold text-foreground">Appointed Welluber?</p>
-                                        <p className="text-micro text-muted-foreground font-medium">For submission</p>
+                                        <p className="text-body font-medium text-foreground">Appointed Welluber?</p>
+                                        <p className="text-label text-subtle font-medium">For submission</p>
                                     </div>
                                 </div>
                                 <Controller
@@ -463,7 +463,7 @@ export default function EditServiceProviderPage() {
                     <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500">
                         <Tag size={16} weight="fill" />
                     </div>
-                    <h3 className="text-subtitle font-semibold text-foreground">Service Portfolio</h3>
+                    <h3 className="text-lead font-semibold text-foreground">Service Portfolio</h3>
                 </div>
 
                 <div className="space-y-4">
@@ -474,7 +474,7 @@ export default function EditServiceProviderPage() {
                         placeholder="Search services..."
                     />
                     {errors.mainServices && (
-                        <p className="text-caption text-destructive flex items-center gap-1 font-medium">
+                        <p className="text-label text-destructive flex items-center gap-1 font-medium">
                             <WarningCircle size={12} weight="fill" /> {errors.mainServices.message}
                         </p>
                     )}
@@ -485,7 +485,7 @@ export default function EditServiceProviderPage() {
 
           {/* Floating Action Bar */}
           <div className="fixed bottom-8 left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[calc(50%+104px)] z-50 flex items-center gap-4 p-2 px-6 bg-background/80 backdrop-blur-2xl border border-border shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-full animate-in slide-in-from-bottom-10 duration-700 ease-out">
-            <Button variant="ghost" size="lg" className="text-nav font-semibold px-6 transition-colors" onClick={() => router.back()}>
+            <Button variant="ghost" size="lg" className="text-body font-semibold px-6 transition-colors" onClick={() => router.back()}>
               Cancel
             </Button>
             <div className="w-px h-6 bg-border/40" />
@@ -493,7 +493,7 @@ export default function EditServiceProviderPage() {
               type="submit"
               disabled={isSubmitting}
               size="lg"
-              className="text-nav font-semibold px-8 flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="text-body font-semibold px-8 flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
             >
               {isSubmitting ? (
                 <>

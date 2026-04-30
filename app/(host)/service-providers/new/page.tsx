@@ -133,13 +133,13 @@ export default function NewServiceProviderPage() {
 
   const inputCls = (hasError?: boolean) =>
     cn(
-      "w-full px-3 py-2.5 bg-background border rounded-lg text-nav outline-none transition-all duration-200",
+      "w-full px-3 py-2.5 bg-background border rounded-lg text-body outline-none transition-all duration-200",
       hasError
         ? "border-destructive focus:ring-2 focus:ring-destructive/10"
         : "border-border focus:border-primary/40 focus:ring-2 focus:ring-primary/10 focus:bg-muted/10"
     );
 
-  const labelCls = "text-nav font-semibold text-foreground/80 mb-1.5 block";
+  const labelCls = "text-body font-semibold text-subtle mb-1.5 block";
 
   const SERVICE_PORTFOLIO_TAXONOMY = MASTER_SERVICE_TAXONOMY
     .filter(group => brandCategories.length === 0 || brandCategories.includes(group.category))
@@ -154,12 +154,12 @@ export default function NewServiceProviderPage() {
         <div>
           <button
             onClick={() => router.back()}
-            className="inline-flex items-center gap-1.5 text-nav font-medium text-muted-foreground hover:text-foreground transition-colors mb-4"
+            className="inline-flex items-center gap-1.5 text-body font-medium text-subtle hover:text-foreground transition-colors mb-4"
           >
             <CaretLeft size={16} /> Back
           </button>
-          <h1 className="text-heading font-semibold tracking-tight text-foreground">Add Service Provider</h1>
-          <p className="text-muted-foreground text-nav mt-1">Select how you want to categorize this service provider account.</p>
+          <h1 className="text-heading font-semibold text-foreground text-balance">Add Service Provider</h1>
+          <p className="text-subtle text-body mt-1">Select how you want to categorize this service provider account.</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
@@ -171,7 +171,7 @@ export default function NewServiceProviderPage() {
               <Plus size={20} weight="bold" />
             </div>
             <div>
-              <h3 className="text-subtitle font-semibold text-foreground">New Brand</h3>
+              <h3 className="text-lead font-semibold text-foreground">New Brand</h3>
               <p className="text-label text-muted-foreground mt-1 leading-relaxed">Create a fresh brand record and link this service provider account to it.</p>
             </div>
           </button>
@@ -184,7 +184,7 @@ export default function NewServiceProviderPage() {
               <Tag size={20} weight="fill" />
             </div>
             <div>
-              <h3 className="text-subtitle font-semibold text-foreground">Existing Brand</h3>
+              <h3 className="text-lead font-semibold text-foreground">Existing Brand</h3>
               <p className="text-label text-muted-foreground mt-1 leading-relaxed">Select from your existing portfolio of brands to link this service provider.</p>
             </div>
           </button>
@@ -215,14 +215,14 @@ export default function NewServiceProviderPage() {
             <div className="flex flex-col gap-4">
               <button
                 onClick={() => setStep("selection")}
-                className="inline-flex items-center gap-1.5 text-nav font-medium text-muted-foreground hover:text-foreground transition-colors w-fit"
+                className="inline-flex items-center gap-1.5 text-body font-medium text-subtle hover:text-foreground transition-colors w-fit"
               >
                 <CaretLeft size={16} /> Change Brand Selection
               </button>
               <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-heading font-semibold tracking-tight text-foreground">Account Details</h1>
-                  <p className="text-muted-foreground text-nav mt-1">
+                  <h1 className="text-heading font-semibold text-foreground text-balance">Account Details</h1>
+                  <p className="text-subtle text-body mt-1">
                     {brandType === "new" ? "Registering a new brand and its first service provider." : `Adding a new provider under the ${selectedBrand?.name} brand.`}
                   </p>
                 </div>
@@ -230,9 +230,9 @@ export default function NewServiceProviderPage() {
                   <div className="flex items-center gap-2 bg-muted/40 px-3 py-1.5 rounded-lg border border-border/40">
                     <Avatar className="h-6 w-6 rounded-full">
                       <AvatarImage src={selectedBrand.logo} />
-                      <AvatarFallback className="text-micro font-semibold">{selectedBrand.name.substring(0,2)}</AvatarFallback>
+                      <AvatarFallback className="text-label font-medium">{selectedBrand.name.substring(0,2)}</AvatarFallback>
                     </Avatar>
-                    <span className="text-label font-semibold text-foreground/80">{selectedBrand.name}</span>
+                    <span className="text-label font-semibold text-subtle">{selectedBrand.name}</span>
                   </div>
                 )}
               </div>
@@ -289,14 +289,14 @@ export default function NewServiceProviderPage() {
 
               {/* Floating Action Bar */}
               <div className="fixed bottom-8 left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[calc(50%+104px)] z-50 flex items-center gap-4 p-2.5 px-6 bg-background/80 backdrop-blur-2xl border border-border/50 shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-full animate-in slide-in-from-bottom-10 duration-700 ease-out">
-                <Button variant="ghost" className="text-nav font-semibold rounded-full h-10 px-6 hover:bg-black/5 transition-colors" onClick={() => router.back()}>
+                <Button variant="ghost" className="text-body font-semibold rounded-full h-10 px-6 hover:bg-black/5 transition-colors" onClick={() => router.back()}>
                   Cancel
                 </Button>
                 <div className="w-px h-6 bg-border/40" />
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="text-nav font-semibold rounded-full h-10 px-8 flex items-center gap-2 bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  className="text-body font-semibold rounded-full h-10 px-8 flex items-center gap-2 bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >
                   {isSubmitting ? (
                     <>

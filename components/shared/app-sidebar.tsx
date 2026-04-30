@@ -152,7 +152,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <div className="flex items-center group-data-[collapsible=icon]:hidden">
               <WelluberLogo width={120} height={31} className="opacity-90" />
             </div>
-            <SidebarTrigger className="h-8 w-8 hover:bg-sidebar-foreground/10 transition-colors text-sidebar-foreground/40 hover:text-sidebar-foreground group-data-[collapsible=icon]:mx-auto">
+            <SidebarTrigger className="h-8 w-8 hover:bg-sidebar-foreground/10 transition-colors text-sidebar-foreground/50 hover:text-sidebar-foreground group-data-[collapsible=icon]:mx-auto">
               {state === "expanded" ? (
                 <CaretDoubleLeft size={16} weight="bold" />
               ) : (
@@ -174,12 +174,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       <activePersona.icon size={19} weight="fill" />
                     </div>
                     <div className="grid flex-1 text-left text-body leading-tight group-data-[collapsible=icon]:hidden ml-3">
-                      <span className="truncate font-semibold tracking-tight text-nav text-sidebar-foreground/90">
+                      <span className="truncate font-medium text-body text-sidebar-foreground">
                         {activePersona.name}
                       </span>
-                      <span className="truncate text-micro font-medium text-sidebar-foreground/40 tracking-tight">Admin account</span>
+                      <span className="truncate text-label font-medium text-sidebar-foreground/80">Admin account</span>
                     </div>
-                    <CaretUpDown className="ml-auto size-4 text-sidebar-foreground/20 group-data-[collapsible=icon]:hidden" />
+                    <CaretUpDown className="ml-auto size-4 text-sidebar-foreground/50 group-data-[collapsible=icon]:hidden" />
                   </SidebarMenuButton>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
@@ -192,7 +192,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     <div className="flex items-center gap-2 px-3 py-2.5 text-left text-body">
                       <Avatar className="h-9 w-9 rounded-full shadow-lg ring-2 ring-primary/10 transition-transform hover:scale-105 active:scale-95 duration-200">
                         <AvatarImage src={user?.image || ""} alt={user?.name || ""} />
-                        <AvatarFallback className="bg-primary/10 text-primary font-semibold text-nav tracking-tight">
+                        <AvatarFallback className="bg-primary/10 text-primary font-medium text-body">
                           {(() => {
                             const n = user?.name || ""
                             const parts = n.trim().split(/\s+/).filter(Boolean)
@@ -203,14 +203,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         </AvatarFallback>
                       </Avatar>
                       <div className="grid flex-1 text-left leading-tight">
-                        <span className="truncate font-semibold tracking-tight text-foreground">{user?.name || "Yon Yusuf"}</span>
-                        <span className="truncate text-caption text-muted-foreground font-medium">{user?.email || "yon@welluber.com"}</span>
+                        <span className="truncate font-semibold text-foreground">{user?.name || "Yon Yusuf"}</span>
+                        <span className="truncate text-label text-subtle font-medium">{user?.email || "yon@welluber.com"}</span>
                       </div>
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator className="bg-border/50" />
                   <DropdownMenuGroup>
-                    <DropdownMenuLabel className="px-3 py-1.5 text-micro font-semibold tracking-tight text-muted-foreground/60">
+                    <DropdownMenuLabel className="px-3 py-1.5 text-label font-medium text-faint">
                       Select account type
                     </DropdownMenuLabel>
                     {personas.map((persona) => (
@@ -226,8 +226,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           <persona.icon size={15} weight="fill" />
                         </div>
                         <span className={cn(
-                          "text-nav font-medium tracking-tight",
-                          activePersona.id === persona.id ? "text-primary font-semibold" : "text-foreground/70"
+                          "text-body font-medium",
+                          activePersona.id === persona.id ? "text-primary font-semibold" : "text-subtle"
                         )}>
                           {persona.name}
                         </span>
@@ -243,13 +243,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       <div className="flex aspect-square size-7 items-center justify-center rounded-lg bg-muted/30 text-muted-foreground group-hover/settings:bg-primary/5 group-hover/settings:text-primary transition-colors border border-transparent group-hover/settings:border-primary/10">
                         <Gear size={15} weight="fill" />
                       </div>
-                      <span className="text-nav font-medium text-foreground/70 group-hover/settings:text-primary transition-colors">Account Settings</span>
+                      <span className="text-body font-medium text-subtle group-hover/settings:text-primary transition-colors">Account Settings</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem className="flex items-center gap-3 px-3 py-2 cursor-pointer focus:bg-red-500/5 group/logout">
                       <div className="flex aspect-square size-7 items-center justify-center rounded-lg bg-red-500/5 text-red-500/60 group-hover/logout:bg-red-500 group-hover/logout:text-white transition-all shadow-sm">
                         <SignOut size={15} weight="fill" />
                       </div>
-                      <span className="text-nav font-medium text-red-500/70 group-hover/logout:text-red-500 transition-colors">Log out</span>
+                      <span className="text-body font-medium text-red-500/70 group-hover/logout:text-red-500 transition-colors">Log out</span>
                     </DropdownMenuItem>
                   </DropdownMenuGroup>
                 </DropdownMenuContent>
@@ -261,7 +261,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarContent className="px-2 pt-3 no-scrollbar h-full">
           {hostNavigation.map((section) => (
             <SidebarGroup key={section.title} className="py-2.5">
-              <SidebarGroupLabel className="text-caption font-semibold tracking-tight text-sidebar-foreground/50 mb-2 px-3 group-data-[collapsible=icon]:hidden uppercase">
+              <SidebarGroupLabel className="text-label font-medium text-sidebar-foreground/70 mb-2 px-3 group-data-[collapsible=icon]:hidden uppercase">
                 {section.title}
               </SidebarGroupLabel>
               <SidebarGroupContent>
@@ -289,12 +289,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                               weight={isActive ? "fill" : "regular"}
                               className={cn(
                                 "shrink-0 transition-colors",
-                                isActive ? "text-sidebar-primary" : "text-sidebar-foreground/40"
+                                isActive ? "text-sidebar-primary" : "text-sidebar-foreground/50"
                               )}
                             />
                             <span className={cn(
-                              "text-body font-semibold tracking-tight truncate group-data-[collapsible=icon]:hidden",
-                              isActive ? "text-sidebar-foreground" : "text-sidebar-foreground/70"
+                              "text-body font-normal truncate group-data-[collapsible=icon]:hidden",
+                              isActive ? "text-sidebar-foreground font-medium" : "text-sidebar-foreground/70"
                             )}>
                               {item.label}
                             </span>

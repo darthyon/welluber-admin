@@ -81,7 +81,7 @@ function SearchableSelect({
           </div>
           <div className="max-h-[180px] overflow-y-auto p-1">
             {filtered.length === 0 ? (
-              <p className="text-caption text-muted-foreground text-center py-3">No results found.</p>
+              <p className="text-label text-muted-foreground text-center py-3">No results found.</p>
             ) : (
               filtered.map(opt => (
                 <button
@@ -132,11 +132,11 @@ export function ActivityChart() {
       <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-6 gap-4">
         <div className="flex flex-col">
           <div className="flex items-center gap-1.5 mb-0.5">
-            <h2 className="text-nav font-semibold text-foreground tracking-tight">Voucher Lifecycle</h2>
+            <h2 className="text-body font-medium text-foreground tracking-tight">Voucher Lifecycle</h2>
             <TooltipProvider>
               <Tooltip delayDuration={0}>
                 <TooltipTrigger asChild>
-                  <Info size={14} className="text-muted-foreground/60 cursor-help hover:text-primary transition-colors" />
+                  <Info size={14} className="text-faint cursor-help hover:text-primary transition-colors" />
                 </TooltipTrigger>
                 <TooltipContent side="top" className="text-label font-medium leading-relaxed max-w-[220px]">
                   Volume of newly issued vs redeemed vouchers (Check-ins)
@@ -226,11 +226,11 @@ export function ActivityChart() {
       <div className="mt-4 flex items-center justify-center gap-6">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-sm bg-primary/30" />
-          <span className="text-caption font-medium text-muted-foreground">Vouchers Issued</span>
+          <span className="text-label font-medium text-muted-foreground">Vouchers Issued</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-sm bg-primary" />
-          <span className="text-caption font-medium text-muted-foreground">Verified Check-ins</span>
+          <span className="text-label font-medium text-muted-foreground">Verified Check-ins</span>
         </div>
       </div>
     </div>

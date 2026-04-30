@@ -99,13 +99,13 @@ export default function EditOrganizationPage() {
 
   const inputCls = (hasError?: boolean) =>
     cn(
-      "w-full px-3 py-2.5 bg-background border rounded-lg text-nav outline-none transition-all duration-200",
+      "w-full px-3 py-2.5 bg-background border rounded-lg text-body outline-none transition-all duration-200",
       hasError
         ? "border-destructive focus:ring-2 focus:ring-destructive/10"
         : "border-border focus:border-primary/40 focus:ring-2 focus:ring-primary/10 focus:bg-muted/10"
     );
 
-  const labelCls = "text-nav font-semibold text-foreground/80 mb-1.5 block";
+  const labelCls = "text-body font-semibold text-subtle mb-1.5 block";
 
   const getDocRequirements = (type: string) => {
     switch (type) {
@@ -133,13 +133,13 @@ export default function EditOrganizationPage() {
             <div className="flex flex-col gap-4">
               <button
                 onClick={() => router.back()}
-                className="inline-flex items-center gap-1.5 text-nav font-medium text-muted-foreground hover:text-foreground transition-colors w-fit"
+                className="inline-flex items-center gap-1.5 text-body font-medium text-subtle hover:text-foreground transition-colors w-fit"
               >
                 <CaretLeft size={16} /> Back
               </button>
               <div>
-                <h1 className="text-heading font-semibold tracking-tight text-foreground">Edit Organisation</h1>
-                <p className="text-muted-foreground text-nav mt-1">Make changes to the corporate client&apos;s core identity.</p>
+                <h1 className="text-heading font-semibold text-foreground text-balance">Edit Organisation</h1>
+                <p className="text-subtle text-body mt-1">Make changes to the corporate client&apos;s core identity.</p>
               </div>
             </div>
 
@@ -152,7 +152,7 @@ export default function EditOrganizationPage() {
                     <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                       <Buildings size={16} weight="fill" />
                     </div>
-                    <h3 className="text-subtitle font-semibold text-foreground">Organisation Profile</h3>
+                    <h3 className="text-lead font-semibold text-foreground">Organisation Profile</h3>
                   </div>
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -164,7 +164,7 @@ export default function EditOrganizationPage() {
                         placeholder="e.g. Acme Corporation Sdn Bhd"
                       />
                       {errors.name && (
-                        <p className="text-caption text-destructive flex items-center gap-1 mt-1">
+                        <p className="text-label text-destructive flex items-center gap-1 mt-1">
                           <WarningCircle size={12} /> {errors.name.message}
                         </p>
                       )}
@@ -205,7 +205,7 @@ export default function EditOrganizationPage() {
                     <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                       <IdentificationCard size={16} weight="fill" />
                     </div>
-                    <h3 className="text-subtitle font-semibold text-foreground">Registration & Compliance</h3>
+                    <h3 className="text-lead font-semibold text-foreground">Registration & Compliance</h3>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -242,8 +242,8 @@ export default function EditOrganizationPage() {
                                 : "border-border hover:border-border-hover bg-muted/5"
                             )}
                           >
-                            <span className={cn("text-nav font-semibold", orgType === type.id ? "text-primary" : "text-foreground")}>{type.label}</span>
-                            <span className="text-micro text-muted-foreground mt-0.5 leading-tight">{type.docs}</span>
+                            <span className={cn("text-body font-semibold", orgType === type.id ? "text-primary" : "text-foreground")}>{type.label}</span>
+                            <span className="text-label text-subtle mt-0.5 leading-tight">{type.docs}</span>
                           </button>
                         ))}
                       </div>
@@ -276,7 +276,7 @@ export default function EditOrganizationPage() {
                       <MapPin size={16} weight="fill" />
                     </div>
                     <div className="space-y-0.5">
-                      <h3 className="text-subtitle font-semibold text-foreground">Registered Business Address</h3>
+                      <h3 className="text-lead font-semibold text-foreground">Registered Business Address</h3>
                       <p className="text-label text-muted-foreground">Official business address as per SSM registration.</p>
                     </div>
                   </div>
@@ -304,7 +304,7 @@ export default function EditOrganizationPage() {
                     <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                       <Bank size={16} weight="fill" />
                     </div>
-                    <h3 className="text-subtitle font-semibold text-foreground">Settlement & Platform</h3>
+                    <h3 className="text-lead font-semibold text-foreground">Settlement & Platform</h3>
                   </div>
 
                   {/* Bank Information */}
@@ -354,7 +354,7 @@ export default function EditOrganizationPage() {
                     <div className="space-y-1.5">
                       <label className={labelCls}>Credit Limit</label>
                       <div className="relative">
-                        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/50 font-semibold text-nav">RM</div>
+                        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-faint font-semibold text-body">RM</div>
                         <input 
                           type="number"
                           {...register("creditLimit", { valueAsNumber: true })}
@@ -369,7 +369,7 @@ export default function EditOrganizationPage() {
 
               {/* Floating Action Bar */}
               <div className="fixed bottom-8 left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[calc(50%+104px)] z-50 flex items-center gap-4 p-2 px-6 bg-background/80 backdrop-blur-2xl border border-border shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-full animate-in slide-in-from-bottom-10 duration-700 ease-out">
-                <Button variant="ghost" size="lg" className="text-nav font-semibold px-6 transition-colors" onClick={() => router.back()}>
+                <Button variant="ghost" size="lg" className="text-body font-semibold px-6 transition-colors" onClick={() => router.back()}>
                   Cancel
                 </Button>
                 <div className="w-px h-6 bg-border/40" />
@@ -377,7 +377,7 @@ export default function EditOrganizationPage() {
                   type="submit"
                   disabled={isSubmitting}
                   size="lg"
-                  className="text-nav font-semibold px-8 flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  className="text-body font-semibold px-8 flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >
                   {isSubmitting ? (
                     <>

@@ -135,7 +135,7 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
     cn(
       "w-full px-3 py-2 bg-background border rounded-lg text-body outline-none transition-all font-medium",
       hasError 
-        ? "border-destructive ring-destructive/10 text-destructive placeholder:text-destructive/40" 
+        ? "border-destructive ring-destructive/10 text-destructive placeholder:text-destructive/60" 
         : "border-border focus:ring-2 focus:ring-primary/10 focus:border-primary/30 hover:border-border-hover text-foreground"
     );
 
@@ -146,7 +146,12 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
         <div className="relative group h-full">
           <div className="aspect-[16/10] lg:aspect-auto lg:h-full min-h-[350px] rounded-lg border-2 border-border bg-muted/30 flex items-center justify-center relative overflow-hidden transition-all duration-500 group-hover:border-primary/20 shadow-sm">
             {/* Mock Map Background */}
-            <div className="absolute inset-0 bg-[url('https://api.mapbox.com/styles/v1/mapbox/light-v10/static/101.7036,3.1390,12/800x400?access_token=pk.eyJ1IjoibW9ja2Rlc2lnbiIsImEiOiJjbGZnbXhsenQwMG1xM3lvM2wwNmwwNmwwNmwwIn0')] bg-cover bg-center grayscale group-hover:grayscale-0 transition-all duration-1000" />
+            <div
+              className="absolute inset-0 bg-cover bg-center grayscale group-hover:grayscale-0 transition-all duration-1000"
+              style={{
+                backgroundImage: `url('https://api.mapbox.com/styles/v1/mapbox/light-v10/static/101.7036,3.1390,12/800x400?access_token=${process.env.NEXT_PUBLIC_MAPBOX_TOKEN}')`,
+              }}
+            />
             <div className="absolute inset-0 bg-primary/5 group-hover:bg-transparent transition-colors duration-700" />
             <div className="absolute inset-0 opacity-[0.05] bg-[radial-gradient(#000000_1px,transparent_1px)] [background-size:16px_16px]" />
             
@@ -187,7 +192,7 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
               <div className="relative">
                 <MapPin size={48} weight="fill" className={cn(
                   "transition-colors duration-500 drop-shadow-lg",
-                  value.lat && value.lon ? "text-primary" : "text-muted-foreground/40"
+                  value.lat && value.lon ? "text-primary" : "text-faint"
                 )} />
                 {value.lat && value.lon && !isSearching && (
                   <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-background shadow-sm" />
@@ -197,7 +202,7 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
                 "px-3 py-1 bg-background/90 backdrop-blur-sm border border-border/50 rounded-full shadow-lg transition-all",
                 value.lat && value.lon ? "scale-100 opacity-100" : "scale-90 opacity-0"
               )}>
-                <span className="text-micro font-semibold text-primary whitespace-nowrap tracking-tight">
+                <span className="text-label font-medium text-primary whitespace-nowrap">
                   {isSearching ? "Locating..." : "Pinned Location"}
                 </span>
               </div>
@@ -216,14 +221,14 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
                   onChange={(e) => handleSearchChange(e.target.value)}
                   onFocus={() => searchQuery.length > 2 && setShowSuggestions(true)}
                   onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleManualSearch())}
-                  className="w-full pl-10 pr-12 py-3.5 bg-background shadow-2xl shadow-black/10 border-border border-2 rounded-lg text-body font-medium outline-none focus:border-primary/40 focus:ring-4 focus:ring-primary/5 transition-all placeholder:text-muted-foreground/60"
+                  className="w-full pl-10 pr-12 py-3.5 bg-background shadow-2xl shadow-black/10 border-border border-2 rounded-lg text-body font-medium outline-none focus:border-primary/40 focus:ring-4 focus:ring-primary/5 transition-all placeholder:text-faint"
                 />
                 
                 {/* Suggestions Dropdown */}
                 {showSuggestions && (
                   <div className="absolute bottom-full mb-2 inset-x-0 bg-background border border-border rounded-lg shadow-2xl overflow-hidden animate-in slide-in-from-bottom-2 duration-200">
                     <div className="p-2 border-b border-border/40 bg-muted/30">
-                      <p className="text-micro font-semibold text-muted-foreground/40 uppercase tracking-widest px-4">Suggestions</p>
+                      <p className="text-label font-medium text-faint uppercase tracking-widest px-4">Suggestions</p>
                     </div>
                     <div className="max-h-60 overflow-y-auto">
                       {suggestions.length > 0 ? (
@@ -239,16 +244,16 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
                                 <MapTrifold size={16} />
                               </div>
                               <div>
-                                <p className="text-nav font-semibold text-foreground group-hover:text-primary transition-colors">{s.label}</p>
-                                <p className="text-caption text-muted-foreground line-clamp-1">{s.sub}</p>
+                                <p className="text-body font-medium text-foreground group-hover:text-primary transition-colors">{s.label}</p>
+                                <p className="text-label text-muted-foreground line-clamp-1">{s.sub}</p>
                               </div>
                             </div>
-                            <CaretRight size={14} className="text-muted-foreground/40 group-hover:text-primary transition-colors" />
+                            <CaretRight size={14} className="text-faint group-hover:text-primary transition-colors" />
                           </button>
                         ))
                       ) : (
                         <div className="p-4 text-center">
-                          <p className="text-caption text-muted-foreground italic">No matches found. Press Enter to search manually.</p>
+                          <p className="text-label text-muted-foreground italic">No matches found. Press Enter to search manually.</p>
                         </div>
                       )}
                     </div>
@@ -278,7 +283,7 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
       <div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-500 delay-100">
         <div className="space-y-4">
           <div className="space-y-1.5">
-            <label className="text-nav font-medium text-foreground">Street Address <span className="text-destructive">*</span></label>
+            <label className="text-body font-medium text-foreground">Street Address <span className="text-destructive">*</span></label>
             <input
               value={value.line}
               onChange={(e) => handleChange("line", e.target.value)}
@@ -286,7 +291,7 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
               className={inputCls(!!errors?.line)}
             />
             {errors?.line && (
-              <p className="text-caption text-destructive flex items-center gap-1 mt-1">
+              <p className="text-label text-destructive flex items-center gap-1 mt-1">
                 <XCircle size={12} weight="fill" /> {errors.line.message}
               </p>
             )}
@@ -294,7 +299,7 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-nav font-medium text-foreground">City <span className="text-destructive">*</span></label>
+              <label className="text-body font-medium text-foreground">City <span className="text-destructive">*</span></label>
               <input
                 value={value.city}
                 onChange={(e) => handleChange("city", e.target.value)}
@@ -303,7 +308,7 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-nav font-medium text-foreground">Postal Code <span className="text-destructive">*</span></label>
+              <label className="text-body font-medium text-foreground">Postal Code <span className="text-destructive">*</span></label>
               <input
                 value={value.postalCode}
                 onChange={(e) => handleChange("postalCode", e.target.value)}
@@ -314,7 +319,7 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-nav font-medium text-foreground">State <span className="text-destructive">*</span></label>
+            <label className="text-body font-medium text-foreground">State <span className="text-destructive">*</span></label>
             <select
               value={value.state}
               onChange={(e) => handleChange("state", e.target.value)}
@@ -333,20 +338,20 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
 
         <div className="pt-4 border-t border-border/60 grid grid-cols-2 gap-4">
            <div className="space-y-1.5">
-            <label className="text-nav font-medium text-foreground">Latitude</label>
+            <label className="text-body font-medium text-foreground">Latitude</label>
             <input
               value={value.lat ?? ""}
               onChange={(e) => handleChange("lat", e.target.value)}
-              className={cn(inputCls(), "font-mono text-nav bg-muted/10")}
+              className={cn(inputCls(), "font-mono text-body bg-muted/10")}
               placeholder="0.0000"
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-nav font-medium text-foreground">Longitude</label>
+            <label className="text-body font-medium text-foreground">Longitude</label>
             <input
               value={value.lon ?? ""}
               onChange={(e) => handleChange("lon", e.target.value)}
-              className={cn(inputCls(), "font-mono text-nav bg-muted/10")}
+              className={cn(inputCls(), "font-mono text-body bg-muted/10")}
               placeholder="0.0000"
             />
           </div>

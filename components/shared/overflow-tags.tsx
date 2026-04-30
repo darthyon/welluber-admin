@@ -77,7 +77,7 @@ export function OverflowTags({ items, className }: OverflowTagsProps) {
             data-tag={String(i)}
             variant="secondary"
             className={cn(
-              "text-micro font-semibold bg-background/50 border-border/60 text-muted-foreground/80 px-2 py-0.5 h-5 shrink-0 whitespace-nowrap transition-colors hover:text-primary hover:border-primary/30",
+              "text-label font-medium bg-background/50 border-border/60 text-subtle px-2 py-0.5 h-5 shrink-0 whitespace-nowrap transition-colors hover:text-primary hover:border-primary/30",
               // Keep in DOM for measurement but visually hide overflow items
               i >= visibleCount && "invisible pointer-events-none"
             )}
@@ -91,7 +91,7 @@ export function OverflowTags({ items, className }: OverflowTagsProps) {
             <TooltipTrigger asChild>
               <button
                 onClick={(e) => e.stopPropagation()}
-                className="text-micro text-muted-foreground/60 hover:text-primary font-semibold px-1.5 shrink-0 whitespace-nowrap transition-colors"
+                className="text-micro text-faint hover:text-primary font-semibold px-1.5 shrink-0 whitespace-nowrap transition-colors"
               >
                 +{hiddenItems.length}
               </button>
@@ -101,13 +101,13 @@ export function OverflowTags({ items, className }: OverflowTagsProps) {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex flex-col gap-0.5 py-1">
-                <span className="text-micro font-semibold text-muted-foreground/60 px-2 py-0.5 uppercase tracking-wider">
+                <span className="text-label font-medium text-faint px-2 py-0.5 uppercase tracking-wider">
                   More items
                 </span>
                 {hiddenItems.map((item, i) => (
                   <div
                     key={i}
-                    className="text-label px-2 py-1 hover:bg-accent/40 rounded-lg text-foreground/80 font-medium transition-colors"
+                    className="text-label px-2 py-1 hover:bg-accent/40 rounded-lg text-subtle font-medium transition-colors"
                   >
                     {item}
                   </div>

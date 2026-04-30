@@ -175,8 +175,8 @@ export default function ServiceProviderDetailPage() {
                     }
                   />
                 </div>
-                <div className="flex items-center gap-3 text-nav text-muted-foreground">
-                  <span className="font-mono text-caption text-muted-foreground/60 bg-muted px-2 py-0.5 rounded border border-border tracking-widest">
+                <div className="flex items-center gap-3 text-body text-subtle">
+                  <span className="font-mono text-label text-faint bg-muted px-2 py-0.5 rounded border border-border tracking-widest">
                     {sp.registrationNo}
                   </span>
                 </div>
@@ -184,7 +184,7 @@ export default function ServiceProviderDetailPage() {
             </div>
 
             <div className="flex items-center gap-2">
-              <Button asChild variant="secondary" size="lg" className="text-nav font-medium rounded-full transition-all">
+              <Button asChild variant="secondary" size="lg" className="text-body font-medium rounded-full transition-all">
                 <Link href={`/service-providers/${spId}/edit`}>
                   <PencilSimpleLine size={16} weight="bold" className="mr-1.5" />
                   Edit Service Provider
@@ -248,7 +248,7 @@ export default function ServiceProviderDetailPage() {
                   value={
                     <div className="flex flex-wrap gap-1.5 mt-0.5">
                       {sp.mainServices?.map((service, i) => (
-                        <Badge key={i} variant="secondary" className="text-micro font-semibold bg-muted/40">{service}</Badge>
+                        <Badge key={i} variant="secondary" className="text-label font-medium bg-muted/40">{service}</Badge>
                       ))}
                       {(!sp.mainServices || sp.mainServices.length === 0) && (
                         <span className="text-label text-muted-foreground italic">None selected</span>
@@ -283,17 +283,17 @@ export default function ServiceProviderDetailPage() {
                 <DetailField label="SST Registration No." value={sp.taxProfile?.taxRegNo || "N/A"} />
                 
                 <div className="sm:col-span-3 pt-4">
-                  <p className="text-micro font-semibold text-muted-foreground/50 uppercase tracking-widest mb-3">Compliance Documents</p>
+                  <p className="text-label font-medium text-faint uppercase tracking-widest mb-3">Compliance Documents</p>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {(sp.documents || []).length > 0 ? (
                       sp.documents?.map((doc, i) => (
                         <div key={i} className="flex items-center gap-3 p-3 bg-muted/20 border border-border rounded-lg">
-                          <div className="w-9 h-9 rounded-lg bg-muted border border-border flex items-center justify-center text-muted-foreground/60">
+                          <div className="w-9 h-9 rounded-lg bg-muted border border-border flex items-center justify-center text-faint">
                             <Files size={18} weight="duotone" />
                           </div>
                           <div className="flex-1 overflow-hidden">
                             <p className="text-label font-semibold text-foreground truncate">{doc}</p>
-                            <p className="text-micro text-muted-foreground font-medium">Document attached</p>
+                            <p className="text-label text-subtle font-medium">Document attached</p>
                           </div>
                         </div>
                       ))
@@ -302,7 +302,7 @@ export default function ServiceProviderDetailPage() {
                     )}
                   </div>
                   {sp.businessType && (
-                    <p className="text-caption text-muted-foreground mt-3">
+                    <p className="text-label text-muted-foreground mt-3">
                       Categorized as: <span className="font-semibold text-foreground">{BUSINESS_TYPE_LABELS[sp.businessType] || sp.businessType}</span>
                     </p>
                   )}
@@ -342,27 +342,27 @@ export default function ServiceProviderDetailPage() {
                         {/* Billing & Tax Settings */}
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-6 border-t border-border/40">
                             <div className="space-y-1">
-                                <div className="flex items-center gap-2 text-muted-foreground/60 mb-1">
+                                <div className="flex items-center gap-2 text-faint mb-1">
                                     <Clock size={14} />
-                                    <span className="text-micro font-semibold uppercase tracking-wider">Payment Cycle</span>
+                                    <span className="text-label font-medium uppercase tracking-wider">Payment Cycle</span>
                                 </div>
-                                <p className="text-nav font-semibold text-foreground">{sp.paymentCycle || "Not Set"}</p>
+                                <p className="text-body font-medium text-foreground">{sp.paymentCycle || "Not Set"}</p>
                             </div>
 
                             <div className="space-y-1">
-                                <div className="flex items-center gap-2 text-muted-foreground/60 mb-1">
+                                <div className="flex items-center gap-2 text-faint mb-1">
                                     <CreditCard size={14} />
-                                    <span className="text-micro font-semibold uppercase tracking-wider">Credit Terms</span>
+                                    <span className="text-label font-medium uppercase tracking-wider">Credit Terms</span>
                                 </div>
-                                <p className="text-nav font-semibold text-foreground">{sp.creditTerms || "Not Set"}</p>
+                                <p className="text-body font-medium text-foreground">{sp.creditTerms || "Not Set"}</p>
                             </div>
 
                             <div className="space-y-1">
-                                <div className="flex items-center gap-2 text-muted-foreground/60 mb-1">
+                                <div className="flex items-center gap-2 text-faint mb-1">
                                     <Article size={14} />
-                                    <span className="text-micro font-semibold uppercase tracking-wider">Expired Commission Fee</span>
+                                    <span className="text-label font-medium uppercase tracking-wider">Expired Commission Fee</span>
                                 </div>
-                                <p className="text-nav font-semibold text-foreground">{(sp.expiredCommissionFee ?? 0) * 100}%</p>
+                                <p className="text-body font-medium text-foreground">{(sp.expiredCommissionFee ?? 0) * 100}%</p>
                             </div>
                         </div>
 
@@ -370,14 +370,14 @@ export default function ServiceProviderDetailPage() {
                         <div className="pt-6 border-t border-border/40 space-y-4">
                             <div className="flex flex-wrap gap-4">
                                 <div className={cn(
-                                    "flex items-center gap-2 px-3 py-1.5 rounded-full border text-nav font-medium",
+                                    "flex items-center gap-2 px-3 py-1.5 rounded-full border text-body font-medium",
                                     sp.needsEInvoiceSubmission ? "bg-primary/5 border-primary/20 text-primary" : "bg-muted/50 border-border text-muted-foreground"
                                 )}>
                                     <ShieldCheck size={14} weight={sp.needsEInvoiceSubmission ? "fill" : "regular"} />
                                     Needs e-Invoice Submission
                                 </div>
                                 <div className={cn(
-                                    "flex items-center gap-2 px-3 py-1.5 rounded-full border text-nav font-medium",
+                                    "flex items-center gap-2 px-3 py-1.5 rounded-full border text-body font-medium",
                                     sp.appointedForEInvoice ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-600" : "bg-muted/50 border-border text-muted-foreground"
                                 )}>
                                     <ShieldCheck size={14} weight={sp.appointedForEInvoice ? "fill" : "regular"} />
@@ -452,7 +452,7 @@ export default function ServiceProviderDetailPage() {
                 }
               >
                 {sp.admins.length === 0 ? (
-                  <p className="text-nav text-muted-foreground italic">
+                  <p className="text-body text-subtle italic">
                     No administrators yet. Send an invite to give portal access.
                   </p>
                 ) : (
@@ -463,7 +463,7 @@ export default function ServiceProviderDetailPage() {
                         accessorKey: "name",
                         sortable: true,
                         render: (admin: any) => (
-                          <span className="text-nav font-medium text-foreground">{admin.name}</span>
+                          <span className="text-body font-medium text-foreground">{admin.name}</span>
                         ),
                       },
                       {
@@ -471,19 +471,19 @@ export default function ServiceProviderDetailPage() {
                         accessorKey: "email",
                         sortable: true,
                         render: (admin: any) => (
-                          <span className="text-nav text-muted-foreground">{admin.email}</span>
+                          <span className="text-body text-subtle">{admin.email}</span>
                         ),
                       },
                       {
                         header: "User Type",
-                        render: () => <span className="text-nav text-muted-foreground">SP Admin</span>,
+                        render: () => <span className="text-body text-subtle">SP Admin</span>,
                       },
                       {
                         header: "Branches",
                         render: (admin: any) => {
                           if (admin.branchIds && admin.branchIds.length > 0) {
                             if (admin.branchIds.includes("all")) {
-                              return <span className="text-nav text-muted-foreground">All Branches</span>;
+                              return <span className="text-body text-subtle">All Branches</span>;
                             }
 
                             const branchNames = admin.branchIds.map((id: string) => {
@@ -492,16 +492,16 @@ export default function ServiceProviderDetailPage() {
                             });
                             
                             if (branchNames.length <= 2) {
-                              return <span className="text-nav text-muted-foreground">{branchNames.join(", ")}</span>;
+                              return <span className="text-body text-subtle">{branchNames.join(", ")}</span>;
                             }
                             return (
-                              <span className="text-nav text-muted-foreground">
+                              <span className="text-body text-subtle">
                                 {branchNames.length} Branches
                               </span>
                             );
                           }
                           return (
-                            <span className="text-nav text-muted-foreground">
+                            <span className="text-body text-subtle">
                               {sp.branches.length > 1 ? "All Branches" : sp.branches[0]?.name ?? "All Branches"}
                             </span>
                           );
@@ -568,7 +568,7 @@ export default function ServiceProviderDetailPage() {
                   <div className="rounded-lg border border-border bg-muted/20 p-4">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div className="space-y-1">
-                        <p className="text-nav font-semibold text-foreground">
+                        <p className="text-body font-medium text-foreground">
                           {currentStatus === "suspended" ? "Reactivate Service Provider" : "Suspend Service Provider"}
                         </p>
                         <p className="text-label text-muted-foreground">
@@ -581,7 +581,7 @@ export default function ServiceProviderDetailPage() {
                         variant="outline"
                         size="lg"
                         className={cn(
-                          "w-full sm:w-auto text-nav font-medium rounded-full transition-all",
+                          "w-full sm:w-auto text-body font-medium rounded-full transition-all",
                           currentStatus === "suspended"
                             ? "text-emerald-600 border-emerald-200 hover:bg-emerald-50"
                             : "text-destructive border-destructive/30 hover:bg-destructive/5"
@@ -607,7 +607,7 @@ export default function ServiceProviderDetailPage() {
                   <div className="rounded-lg border border-rose-200 bg-rose-50/60 p-4">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div className="space-y-1">
-                        <p className="text-nav font-semibold text-foreground">Remove Service Provider</p>
+                        <p className="text-body font-medium text-foreground">Remove Service Provider</p>
                         <p className="text-label text-muted-foreground">
                           Permanently remove the provider, branches, vouchers, and admin access.
                         </p>
@@ -615,7 +615,7 @@ export default function ServiceProviderDetailPage() {
                       <Button
                         variant="destructive"
                         size="lg"
-                        className="w-full sm:w-auto text-nav font-medium rounded-full transition-all"
+                        className="w-full sm:w-auto text-body font-medium rounded-full transition-all"
                         onClick={() => openDangerAction("remove")}
                       >
                         Remove Service Provider

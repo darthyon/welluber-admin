@@ -146,11 +146,11 @@ function WalletDetailContent() {
                   <StatusBadge status={wallet.status} variant={wallet.status === "active" ? "emerald" : "zinc"} />
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-caption text-muted-foreground/60 bg-white px-2 py-0.5 rounded border border-zinc-200 uppercase tracking-widest">{wallet.id}</span>
+                  <span className="font-mono text-label text-faint bg-white px-2 py-0.5 rounded border border-zinc-200 uppercase tracking-widest">{wallet.id}</span>
                   <span className="opacity-20 text-muted-foreground">•</span>
-                  <span className="text-label font-medium text-muted-foreground/60">{wallet.orgName}</span>
+                  <span className="text-label font-medium text-faint">{wallet.orgName}</span>
                   <span className="opacity-20 text-muted-foreground">•</span>
-                  <span className="text-label font-medium text-muted-foreground/60">{wallet.branchName}</span>
+                  <span className="text-label font-medium text-faint">{wallet.branchName}</span>
                 </div>
               </div>
             </div>
@@ -163,7 +163,7 @@ function WalletDetailContent() {
               onClick={() => setActiveTab("transactions")}
               className={cn(
                 "h-10 px-0 border-b-2 text-body font-medium transition-all relative",
-                activeTab === "transactions" ? "border-primary text-primary" : "border-transparent text-muted-foreground/60 hover:text-foreground"
+                activeTab === "transactions" ? "border-primary text-primary" : "border-transparent text-faint hover:text-foreground"
               )}
             >
               Transactions
@@ -172,7 +172,7 @@ function WalletDetailContent() {
               onClick={() => setActiveTab("details")}
               className={cn(
                 "h-10 px-0 border-b-2 text-body font-medium transition-all relative",
-                activeTab === "details" ? "border-primary text-primary" : "border-transparent text-muted-foreground/60 hover:text-foreground"
+                activeTab === "details" ? "border-primary text-primary" : "border-transparent text-faint hover:text-foreground"
               )}
             >
               Wallet Details
@@ -181,7 +181,7 @@ function WalletDetailContent() {
               onClick={() => setActiveTab("settings")}
               className={cn(
                 "h-10 px-0 border-b-2 text-body font-medium transition-all relative",
-                activeTab === "settings" ? "border-primary text-primary" : "border-transparent text-muted-foreground/60 hover:text-foreground"
+                activeTab === "settings" ? "border-primary text-primary" : "border-transparent text-faint hover:text-foreground"
               )}
             >
               Settings
@@ -206,11 +206,11 @@ function WalletDetailContent() {
                   <div className="flex flex-col xl:flex-row xl:items-center gap-4 xl:gap-0">
                     {/* 1. Available Balance */}
                     <div className="space-y-1 shrink-0">
-                      <p className="text-caption font-semibold text-white/60 tracking-tight">Available Balance</p>
-                      <h2 className="text-4xl font-semibold tracking-tight text-white">
+                      <p className="text-label font-semibold text-white/60">Available Balance</p>
+                      <h2 className="text-4xl font-semibold tracking-tight text-white tabular-nums">
                         RM {(wallet.balance - wallet.pendingDeductions).toLocaleString()}
                       </h2>
-                      <p className="text-micro text-white/40">
+                      <p className="text-label text-faint">
                         Last updated {new Date(wallet.updatedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}, {new Date(wallet.updatedAt).toLocaleTimeString('en-MY', { hour: '2-digit', minute: '2-digit' })}
                       </p>
                     </div>
@@ -220,7 +220,7 @@ function WalletDetailContent() {
 
                     {/* 2. Credit Remaining */}
                     <div className="space-y-1.5 shrink-0">
-                      <div className="flex items-center gap-1.5 text-caption font-semibold text-white/60 tracking-tight">
+                      <div className="flex items-center gap-1.5 text-label font-semibold text-white/60">
                         Credit Remaining
                         <TooltipProvider>
                           <Tooltip>
@@ -228,7 +228,7 @@ function WalletDetailContent() {
                               <Info size={12} className="text-white/30 cursor-help" />
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p className="text-nav max-w-[200px]">How much more this company can spend before we block new purchases.</p>
+                              <p className="text-body max-w-[200px]">How much more this company can spend before we block new purchases.</p>
                             </TooltipContent>
                           </Tooltip>
                         </TooltipProvider>
@@ -242,7 +242,7 @@ function WalletDetailContent() {
                           style={{ width: `${Math.min((orgCreditUsed / orgCreditLimit) * 100, 100)}%` }}
                         />
                       </div>
-                      <p className="text-micro text-white/40">Limit: RM {orgCreditLimit.toLocaleString()}</p>
+                      <p className="text-label text-faint">Limit: RM {orgCreditLimit.toLocaleString()}</p>
                     </div>
 
                     {/* Divider 2 */}
@@ -256,9 +256,9 @@ function WalletDetailContent() {
                         { label: "Adjusted", amount: transactions.filter(t => t.type === "adjustment").reduce((sum, t) => sum + t.amount, 0), trend: "—" },
                       ].map((stat) => (
                         <div key={stat.label} className="space-y-0.5">
-                          <p className="text-micro font-semibold text-white/50">{stat.label}</p>
-                          <p className="text-nav font-semibold text-white">RM {stat.amount.toLocaleString()}</p>
-                          <p className="text-micro text-white/40">{stat.trend}</p>
+                          <p className="text-label font-medium text-white/50">{stat.label}</p>
+                          <p className="text-body font-semibold text-white">RM {stat.amount.toLocaleString()}</p>
+                          <p className="text-label text-faint">{stat.trend}</p>
                         </div>
                       ))}
                     </div>
@@ -270,7 +270,7 @@ function WalletDetailContent() {
                     <div className="flex items-center gap-2 shrink-0">
                       <Popover>
                         <PopoverTrigger asChild>
-                          <button className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white text-primary font-semibold text-caption hover:bg-white/90 transition-colors shadow-lg shadow-black/20">
+                          <button className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white text-primary font-semibold text-label hover:bg-white/90 transition-colors shadow-lg shadow-black/20">
                             <Wallet size={14} weight="fill" />
                             Add Balance
                             <CaretDown size={12} weight="bold" />
@@ -280,14 +280,14 @@ function WalletDetailContent() {
                           <div className="flex flex-col gap-0.5">
                             <button
                               onClick={() => setIsRecordTopupOpen(true)}
-                              className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-nav font-medium text-left text-foreground/80 hover:bg-muted hover:text-foreground transition-colors"
+                              className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-body font-medium text-left text-subtle hover:bg-muted hover:text-foreground transition-colors"
                             >
                               <ArrowUpRight size={14} className="text-emerald-600" />
                               Manual Top-up
                             </button>
                             <button
                               onClick={() => setIsUpdateBalanceOpen(true)}
-                              className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-nav font-medium text-left text-foreground/80 hover:bg-muted hover:text-foreground transition-colors"
+                              className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-body font-medium text-left text-subtle hover:bg-muted hover:text-foreground transition-colors"
                             >
                               <DotsThreeCircle size={14} className="text-blue-600" />
                               Update Balance
@@ -298,7 +298,7 @@ function WalletDetailContent() {
 
                       <Popover>
                         <PopoverTrigger asChild>
-                          <button className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-white/30 text-white font-semibold text-caption hover:bg-white/10 transition-colors">
+                          <button className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-white/30 text-white font-semibold text-label hover:bg-white/10 transition-colors">
                             More Actions
                             <CaretDown size={12} weight="bold" />
                           </button>
@@ -307,14 +307,14 @@ function WalletDetailContent() {
                           <div className="flex flex-col gap-0.5">
                             <button
                               onClick={() => {}}
-                              className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-nav font-medium text-left text-foreground/80 hover:bg-muted hover:text-foreground transition-colors"
+                              className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-body font-medium text-left text-subtle hover:bg-muted hover:text-foreground transition-colors"
                             >
-                              <DownloadSimple size={14} className="text-muted-foreground/60" />
+                              <DownloadSimple size={14} className="text-faint" />
                               View Statement
                             </button>
                             <button
                               onClick={() => openDangerAction("suspend")}
-                              className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-nav font-medium text-left text-rose-500 hover:bg-rose-50 transition-colors"
+                              className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-body font-medium text-left text-rose-500 hover:bg-rose-50 transition-colors"
                             >
                               <WarningCircle size={14} />
                               {wallet.status === "suspended" ? "Resume Wallet" : "Suspend Wallet"}
@@ -343,8 +343,8 @@ function WalletDetailContent() {
                         <button
                           key={p}
                           onClick={() => setPeriod(p as any)}
-                          className={`px-3 py-1 text-caption font-semibold rounded-md transition-all ${
-                            period === p ? "bg-white shadow-sm text-foreground" : "text-muted-foreground/60 hover:text-foreground"
+                          className={`px-3 py-1 text-label font-semibold rounded-md transition-all ${
+                            period === p ? "bg-white shadow-sm text-foreground" : "text-faint hover:text-foreground"
                           }`}
                         >
                           {p}
@@ -352,7 +352,7 @@ function WalletDetailContent() {
                       ))}
                     </div>
 
-                    <select className="px-3 py-1 h-[32px] bg-white border border-border hover:bg-muted/30 rounded-lg text-caption font-semibold text-foreground outline-none cursor-pointer transition-colors min-w-[120px]">
+                    <select className="px-3 py-1 h-[32px] bg-white border border-border hover:bg-muted/30 rounded-lg text-label font-semibold text-foreground outline-none cursor-pointer transition-colors min-w-[120px]">
                       {period === "By Month" && (
                         <>
                           <option>January 2026</option>
@@ -371,7 +371,7 @@ function WalletDetailContent() {
 
                     <Popover>
                       <PopoverTrigger asChild>
-                        <button className="flex items-center gap-2 px-3 py-1 h-[32px] bg-white border border-border hover:bg-muted/30 rounded-lg text-caption font-semibold text-foreground transition-colors group">
+                        <button className="flex items-center gap-2 px-3 py-1 h-[32px] bg-white border border-border hover:bg-muted/30 rounded-lg text-label font-semibold text-foreground transition-colors group">
                           <CalendarBlank size={14} className="text-muted-foreground group-hover:text-foreground transition-colors" />
                           <span>Custom Range</span>
                         </button>
@@ -399,8 +399,8 @@ function WalletDetailContent() {
                            {trx.type === "topup" ? <ArrowUpRight size={15} weight="bold" /> : <ArrowDownRight size={15} weight="bold" />}
                          </div>
                          <div className="space-y-0.5">
-                           <p className="text-body font-semibold tracking-tight text-foreground">{trx.description}</p>
-                           <p className="text-caption font-semibold text-muted-foreground/50 font-mono">ID: {trx.id}</p>
+                           <p className="text-body font-semibold text-foreground">{trx.description}</p>
+                           <p className="text-label font-semibold text-faint font-mono">ID: {trx.id}</p>
                          </div>
                        </div>
                      )
@@ -413,12 +413,12 @@ function WalletDetailContent() {
                       render: (trx: any) => (
                         <div className="text-right">
                           <p className={cn(
-                            "text-subtitle font-semibold tracking-tight",
+                            "text-lead font-semibold tracking-tight tabular-nums",
                             trx.amount > 0 && trx.type === "topup" ? "text-primary" : "text-foreground"
                           )}>
                             {trx.type === "topup" ? "+" : "-"} RM {Math.abs(trx.amount).toLocaleString()}
                           </p>
-                          <p className="text-caption font-medium text-muted-foreground/50 text-nowrap">Balance after: RM {trx.balanceAfter.toLocaleString()}</p>
+                          <p className="text-label font-medium text-faint text-nowrap tabular-nums">Balance after: RM {trx.balanceAfter.toLocaleString()}</p>
                         </div>
                       )
                     },
@@ -439,10 +439,10 @@ function WalletDetailContent() {
                           {trx.voucherName ? (
                             <>
                               <p className="text-body font-semibold text-foreground">{trx.voucherName}</p>
-                              <p className="text-caption font-semibold text-muted-foreground/50 font-mono">{trx.claimId}</p>
+                              <p className="text-label font-semibold text-faint font-mono">{trx.claimId}</p>
                             </>
                           ) : (
-                            <span className="text-caption text-muted-foreground/60">—</span>
+                            <span className="text-label text-faint">—</span>
                           )}
                         </div>
                       )
@@ -454,10 +454,10 @@ function WalletDetailContent() {
                       align: "center",
                       render: (trx: any) => (
                         <div className="text-center">
-                          <p className="text-nav font-semibold text-foreground/80 tracking-tight">
+                          <p className="text-body font-semibold text-subtle">
                             {new Date(trx.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                           </p>
-                          <p className="text-caption font-semibold text-muted-foreground/40">
+                          <p className="text-label font-semibold text-faint">
                             {new Date(trx.createdAt).toLocaleTimeString('en-MY', { hour: '2-digit', minute: '2-digit' })}
                           </p>
                         </div>
@@ -492,7 +492,7 @@ function WalletDetailContent() {
                   value={
                     <div className="flex items-center gap-3">
                       <StatusBadge status={wallet.status} variant={wallet.status === "active" ? "emerald" : "zinc"} />
-                      <button className="text-caption font-semibold text-primary hover:opacity-70 transition-opacity">Change status</button>
+                      <button className="text-label font-semibold text-primary hover:opacity-70 transition-opacity">Change status</button>
                     </div>
                   }
                 />
@@ -517,7 +517,7 @@ function WalletDetailContent() {
                 <div className="rounded-lg border border-border bg-muted/20 p-4">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="space-y-1">
-                      <p className="text-nav font-semibold text-foreground">Suspend Wallet</p>
+                      <p className="text-body font-medium text-foreground">Suspend Wallet</p>
                       <p className="text-label text-muted-foreground">
                         Pause all deductions and activities temporarily.
                       </p>
@@ -531,7 +531,7 @@ function WalletDetailContent() {
                 <div className="rounded-lg border border-rose-200 bg-rose-50/60 p-4">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="space-y-1">
-                      <p className="text-nav font-semibold text-foreground">Terminate Wallet Permanently</p>
+                      <p className="text-body font-medium text-foreground">Terminate Wallet Permanently</p>
                       <p className="text-label text-muted-foreground">
                         Instantly shutdown fiscal operations for this branch.
                       </p>

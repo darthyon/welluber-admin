@@ -24,9 +24,9 @@ export function EntityAvatar({
 
   const sizeClasses = {
     sm: "h-8 w-8 text-micro",
-    md: "h-10 w-10 text-caption",
-    lg: "h-12 w-12 text-nav",
-    xl: "h-14 w-14 text-subtitle",
+    md: "h-10 w-10 text-label",
+    lg: "h-12 w-12 text-body",
+    xl: "h-14 w-14 text-lead",
   };
 
   return (

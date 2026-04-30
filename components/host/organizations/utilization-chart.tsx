@@ -60,7 +60,7 @@ export function UtilizationChart({
             className={cn("transition-all duration-700 ease-in-out", getStatusColor(value).split(' ')[1])}
           />
         </svg>
-        <span className="absolute text-micro font-semibold tabular-nums">
+        <span className="absolute text-label font-medium tabular-nums">
           {Math.round(value)}%
         </span>
       </div>

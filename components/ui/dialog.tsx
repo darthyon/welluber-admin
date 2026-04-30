@@ -38,7 +38,7 @@ export function Dialog({ open, onOpenChange, children }: DialogProps) {
               {/* Close Button */}
               <button
                 onClick={() => onOpenChange(false)}
-                className="absolute right-4 top-4 rounded-full p-1 text-muted-foreground/60 hover:text-foreground hover:bg-muted transition-all z-[160]"
+                className="absolute right-4 top-4 rounded-full p-1 text-faint hover:text-foreground hover:bg-muted transition-all z-[160]"
               >
                 <X size={18} weight="bold" />
               </button>
@@ -65,9 +65,9 @@ export function DialogFooter({ children, className }: { children: React.ReactNod
 }
 
 export function DialogTitle({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <h2 className={cn("text-subtitle font-semibold tracking-tight text-foreground", className)}>{children}</h2>;
+  return <h2 className={cn("text-lead font-semibold tracking-tight text-foreground", className)}>{children}</h2>;
 }
 
 export function DialogDescription({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <p className={cn("text-nav text-muted-foreground", className)}>{children}</p>;
+  return <p className={cn("text-body text-subtle", className)}>{children}</p>;
 }

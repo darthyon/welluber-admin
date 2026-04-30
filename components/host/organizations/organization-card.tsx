@@ -78,13 +78,13 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
             <div className="space-y-1.5">
               <Link 
                 href={`/organizations/${org.id}`}
-                className="font-semibold text-body text-foreground hover:text-primary transition-colors block leading-tight tracking-tight"
+                className="font-semibold text-body text-foreground hover:text-primary transition-colors block leading-tight"
               >
                 {org.name}
               </Link>
               <div className="flex items-center gap-2">
                 <PulseStatus status={org.status as any} showLabel={true} className="px-1.5 py-0.5 rounded-md text-micro" />
-                <span className="text-micro text-muted-foreground/60 font-mono bg-background/50 px-1.5 py-0.5 rounded border border-border/40 tracking-tight">{org.id}</span>
+                <span className="text-micro text-faint font-mono bg-background/50 px-1.5 py-0.5 rounded border border-border/40 tracking-tight">{org.id}</span>
               </div>
             </div>
           </div>
@@ -99,22 +99,22 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
           <div className="grid grid-cols-2 gap-4">
             {/* Workforce / Employees */}
           <div className="space-y-2.5">
-            <div className="flex items-center gap-1.5 text-muted-foreground/40">
+            <div className="flex items-center gap-1.5 text-faint">
               <Users size={14} weight="bold" />
-              <span className="text-caption font-semibold text-muted-foreground/60 tracking-tight">Workforce</span>
+              <span className="text-label font-semibold text-faint">Workforce</span>
             </div>
               <div className="space-y-2">
                 <span className="text-body font-semibold text-foreground block">
-                  {org.employeeCount.toLocaleString()} <span className="text-caption font-normal text-muted-foreground/60">pax</span>
+                  {org.employeeCount.toLocaleString()} <span className="text-label font-normal text-faint">pax</span>
                 </span>
               </div>
             </div>
 
             {/* Utilization */}
             <div className="space-y-2.5">
-              <div className="flex items-center gap-1.5 text-muted-foreground/40">
+              <div className="flex items-center gap-1.5 text-faint">
                 <ChartPieSlice size={14} weight="bold" />
-                <span className="text-caption font-semibold text-muted-foreground/60 tracking-tight leading-none">Utilisation & Claims</span>
+                <span className="text-label font-semibold text-faint leading-none">Utilisation & Claims</span>
               </div>
               <div className="flex items-center gap-3">
                 <UtilizationChart value={org.utilizationRate} mode="ring" size={44} strokeWidth={4} />
@@ -123,11 +123,11 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
                     {formatCurrency(org.totalWalletBalance)}
                   </span>
                   <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-micro text-muted-foreground/60 font-medium tabular-nums">
+                    <span className="text-micro text-faint font-medium tabular-nums">
                       / {formatCurrency(org.walletLimit)}
                     </span>
                     {org.claimsCount !== undefined && (
-                      <Badge variant="outline" className="h-3.5 px-1 text-[8px] font-semibold bg-muted/40 border-border/50 text-muted-foreground/80 tabular-nums">
+                      <Badge variant="outline" className="h-3.5 px-1 text-[8px] font-semibold bg-muted/40 border-border/50 text-subtle tabular-nums">
                         {org.claimsCount} claims
                       </Badge>
                     )}
@@ -139,23 +139,23 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
 
           {/* Row 2: Active Policies (Full Width) */}
           <div className="pt-2">
-            <div className="flex items-center gap-1.5 text-muted-foreground/40 mb-3">
+            <div className="flex items-center gap-1.5 text-faint mb-3">
               <Shield size={14} weight="bold" />
-              <span className="text-caption font-semibold text-muted-foreground/60 tracking-tight leading-none">Benefit policies</span>
+              <span className="text-label font-semibold text-faint leading-none">Benefit policies</span>
               <span className="h-2 w-2 rounded-full bg-border flex items-center justify-center">
                 <span className="h-1 w-1 rounded-full bg-muted-foreground/40" />
               </span>
             </div>
             <div className="flex flex-wrap gap-2">
               {org.policies.length === 0 ? (
-                <span className="text-caption text-muted-foreground/40 font-semibold italic">Unassigned</span>
+                <span className="text-label text-faint font-semibold italic">Unassigned</span>
               ) : (
                 <>
                   {org.policies.slice(0, 3).map((policy, i) => (
                     <Badge 
                       key={i} 
                       variant="secondary" 
-                      className="bg-background/40 hover:bg-background/60 text-caption font-medium px-2.5 py-0.5 border-border/60 h-6 transition-colors text-foreground/70"
+                      className="bg-background/40 hover:bg-background/60 text-label font-medium px-2.5 py-0.5 border-border/60 h-6 transition-colors text-subtle"
                     >
                       {policy}
                     </Badge>
@@ -165,7 +165,7 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
                       <TooltipTrigger asChild>
                         <button 
                           onClick={(e) => e.stopPropagation()}
-                          className="text-caption text-muted-foreground/80 hover:text-primary font-semibold px-1.5 underline decoration-border underline-offset-4 transition-colors"
+                          className="text-label text-subtle hover:text-primary font-semibold px-1.5 underline decoration-border underline-offset-4 transition-colors"
                         >
                           +{org.policies.length - 3} more
                         </button>
@@ -175,10 +175,10 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
                         onClick={(e) => e.stopPropagation()}
                       >
                         <div className="flex flex-col gap-1.5">
-                          <label className="text-caption font-semibold text-muted-foreground tracking-tight pl-1">Benefit ID</label>
+                          <label className="text-label font-medium text-subtle pl-1">Benefit ID</label>
                           <div className="max-h-[160px] overflow-y-auto px-1 space-y-1">
                             {org.policies.slice(3).map((policy, i) => (
-                              <div key={i} className="text-label px-2 py-1.5 hover:bg-accent rounded-lg text-foreground/80 transition-colors truncate font-medium">
+                              <div key={i} className="text-label px-2 py-1.5 hover:bg-accent rounded-lg text-subtle transition-colors truncate font-medium">
                                 {policy}
                               </div>
                             ))}

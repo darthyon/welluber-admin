@@ -39,8 +39,8 @@ export function VoucherDetailSheet({ claim, onClose }: VoucherDetailSheetProps) 
               <Ticket size={20} weight="bold" />
             </div>
             <div>
-              <h3 className="text-nav font-semibold text-foreground">Voucher Details</h3>
-              <p className="text-caption text-muted-foreground font-medium">
+              <h3 className="text-body font-medium text-foreground">Voucher Details</h3>
+              <p className="text-label text-muted-foreground font-medium">
                 {claim.voucherCode}
               </p>
             </div>
@@ -57,7 +57,7 @@ export function VoucherDetailSheet({ claim, onClose }: VoucherDetailSheetProps) 
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* Voucher Name */}
           <div className="space-y-1.5">
-            <label className="text-caption font-semibold text-muted-foreground/70 flex items-center gap-1.5">
+            <label className="text-label font-semibold text-subtle flex items-center gap-1.5">
               <Ticket size={14} /> Voucher Name
             </label>
             <p className="text-body font-semibold text-foreground">
@@ -68,18 +68,18 @@ export function VoucherDetailSheet({ claim, onClose }: VoucherDetailSheetProps) 
           {/* Voucher ID + Date row */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-caption font-semibold text-muted-foreground/70 flex items-center gap-1.5">
+              <label className="text-label font-semibold text-subtle flex items-center gap-1.5">
                 <IdentificationBadge size={14} /> Voucher ID
               </label>
-              <code className="text-nav font-mono text-foreground block">
+              <code className="text-body font-mono text-foreground block">
                 {claim.voucherCode}
               </code>
             </div>
             <div className="space-y-1.5">
-              <label className="text-caption font-semibold text-muted-foreground/70 flex items-center gap-1.5">
+              <label className="text-label font-semibold text-subtle flex items-center gap-1.5">
                 <Calendar size={14} /> Date
               </label>
-              <p className="text-nav font-semibold text-foreground">
+              <p className="text-body font-medium text-foreground">
                 {claim.date}
               </p>
             </div>
@@ -87,7 +87,7 @@ export function VoucherDetailSheet({ claim, onClose }: VoucherDetailSheetProps) 
 
           {/* Employee */}
           <div className="space-y-1.5">
-            <label className="text-caption font-semibold text-muted-foreground/70 flex items-center gap-1.5">
+            <label className="text-label font-semibold text-subtle flex items-center gap-1.5">
               <User size={14} /> Employee
             </label>
             <div className="flex items-center gap-3 p-3 rounded-lg border border-border bg-muted/20">
@@ -95,25 +95,25 @@ export function VoucherDetailSheet({ claim, onClose }: VoucherDetailSheetProps) 
                 {claim.employeeName.split(" ").map((n) => n[0]).join("")}
               </div>
               <div>
-                <p className="text-nav font-semibold text-foreground">{claim.employeeName}</p>
-                <p className="text-caption text-muted-foreground font-medium">{claim.empCode}</p>
+                <p className="text-body font-medium text-foreground">{claim.employeeName}</p>
+                <p className="text-label text-muted-foreground font-medium">{claim.empCode}</p>
               </div>
             </div>
           </div>
 
           {/* Redeemed By */}
           <div className="space-y-1.5">
-            <label className="text-caption font-semibold text-muted-foreground/70 flex items-center gap-1.5">
+            <label className="text-label font-semibold text-subtle flex items-center gap-1.5">
               <User size={14} /> Redeemed By
             </label>
-            <p className="text-nav font-semibold text-foreground">
-              {claim.employeeName} <span className="text-caption text-muted-foreground font-medium">(Employee)</span>
+            <p className="text-body font-medium text-foreground">
+              {claim.employeeName} <span className="text-label text-muted-foreground font-medium">(Employee)</span>
             </p>
           </div>
 
           {/* Amount */}
           <div className="space-y-1.5">
-            <label className="text-caption font-semibold text-muted-foreground/70 flex items-center gap-1.5">
+            <label className="text-label font-semibold text-subtle flex items-center gap-1.5">
               <CreditCard size={14} /> Amount
             </label>
             <p className="text-display font-semibold font-mono text-foreground">
@@ -123,22 +123,22 @@ export function VoucherDetailSheet({ claim, onClose }: VoucherDetailSheetProps) 
 
           {/* Service Provider */}
           <div className="space-y-1.5">
-            <label className="text-caption font-semibold text-muted-foreground/70 flex items-center gap-1.5">
+            <label className="text-label font-semibold text-subtle flex items-center gap-1.5">
               <Storefront size={14} /> Service Provider
             </label>
-            <p className="text-nav font-semibold text-foreground">
+            <p className="text-body font-medium text-foreground">
               {claim.provider}
             </p>
           </div>
 
           {/* Branch + City */}
           <div className="space-y-1.5">
-            <label className="text-caption font-semibold text-muted-foreground/70 flex items-center gap-1.5">
+            <label className="text-label font-semibold text-subtle flex items-center gap-1.5">
               <Buildings size={14} /> Branch
             </label>
             <div className="p-3 rounded-lg border border-border bg-muted/20 space-y-1">
-              <p className="text-nav font-semibold text-foreground">{claim.branch}</p>
-              <div className="flex items-center gap-1.5 text-caption text-muted-foreground font-medium">
+              <p className="text-body font-medium text-foreground">{claim.branch}</p>
+              <div className="flex items-center gap-1.5 text-label text-muted-foreground font-medium">
                 <MapPin size={12} />
                 {claim.location}
               </div>

@@ -28,7 +28,7 @@ export function Slider({
     <div className={cn("space-y-3", className)}>
       {(label || value !== undefined) && (
         <div className="flex items-center justify-between">
-          {label && <label className="text-nav font-medium text-foreground">{label}</label>}
+          {label && <label className="text-body font-medium text-foreground">{label}</label>}
           <span className="text-label font-mono font-medium text-primary bg-primary/10 px-2 py-0.5 rounded">
             {value}{unit}
           </span>

@@ -55,7 +55,7 @@ export function LogoUpload({
 
   return (
     <div className={cn("space-y-2", className)}>
-      {label && <label className="text-nav font-medium text-foreground">{label}</label>}
+      {label && <label className="text-body font-medium text-foreground">{label}</label>}
       
       <div 
         onClick={() => !disabled && fileInputRef.current?.click()}
@@ -81,7 +81,7 @@ export function LogoUpload({
             {!disabled && (
               <button
                 onClick={handleClear}
-                className="absolute top-1 right-1 p-1 bg-background border border-border/60 rounded-full text-muted-foreground/60 hover:text-destructive hover:border-destructive shadow-sm transition-all opacity-0 group-hover:opacity-100"
+                className="absolute top-1 right-1 p-1 bg-background border border-border/60 rounded-full text-faint hover:text-destructive hover:border-destructive shadow-sm transition-all opacity-0 group-hover:opacity-100"
               >
                 <X size={12} weight="bold" />
               </button>
@@ -89,19 +89,19 @@ export function LogoUpload({
           </div>
         ) : (
           <div className="flex flex-col items-center gap-2 p-4 text-center">
-            <div className="w-10 h-10 rounded-full bg-background border border-border/40 flex items-center justify-center text-muted-foreground/40 group-hover:text-primary transition-colors">
+            <div className="w-10 h-10 rounded-full bg-background border border-border/40 flex items-center justify-center text-faint group-hover:text-primary transition-colors">
               <UploadSimple size={18} weight="bold" />
             </div>
             <div className="space-y-0.5">
               <p className="text-label font-semibold text-foreground">Click to upload</p>
-              <p className="text-micro text-muted-foreground/60 font-medium tracking-tight">SVG, PNG or JPG (max. 800x800px)</p>
+              <p className="text-label text-faint font-medium">SVG, PNG or JPG (max. 800x800px)</p>
             </div>
           </div>
         )}
       </div>
 
       {error && (
-        <p className="text-caption text-destructive flex items-center gap-1 mt-1 font-medium">
+        <p className="text-label text-destructive flex items-center gap-1 mt-1 font-medium">
           <WarningCircle size={12} weight="bold" />
           {error}
         </p>

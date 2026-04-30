@@ -130,7 +130,7 @@ function StatusBadge({ status }: { status: ClaimStatus }) {
   return (
     <span
       className={cn(
-        "text-micro font-semibold px-2 py-0.5 rounded-4xl",
+        "text-label font-medium px-2 py-0.5 rounded-4xl",
         STATUS_STYLE[status]
       )}
     >
@@ -168,7 +168,7 @@ function VoucherCard({ voucher }: { voucher: VoucherRedemption }) {
             </div>
             <div className="flex items-center gap-2">
               <StatusBadge status={voucher.status} />
-              <code className="text-micro text-muted-foreground/60 font-mono bg-background/50 px-1.5 py-0.5 rounded border border-border/40 tracking-tight">
+              <code className="text-micro text-faint font-mono bg-background/50 px-1.5 py-0.5 rounded border border-border/40 tracking-tight">
                 {voucher.voucherCode}
               </code>
             </div>
@@ -196,7 +196,7 @@ function VoucherCard({ voucher }: { voucher: VoucherRedemption }) {
         {/* Category & Benefit Type */}
         <div className="space-y-2">
           <div className="flex items-center gap-1.5">
-            <span className="text-caption font-semibold tracking-tight text-muted-foreground/60">
+            <span className="text-label font-semibold text-faint">
               Category
             </span>
           </div>
@@ -204,7 +204,7 @@ function VoucherCard({ voucher }: { voucher: VoucherRedemption }) {
             <span className="text-label font-semibold text-primary bg-primary/5 px-2 py-0.5 rounded border border-primary/10">
               {voucher.category}
             </span>
-            <span className="text-micro font-semibold text-muted-foreground/80 bg-muted px-2 py-0.5 rounded border border-border/40">
+            <span className="text-label font-medium text-subtle bg-muted px-2 py-0.5 rounded border border-border/40">
               {voucher.benefitType}
             </span>
           </div>
@@ -212,17 +212,17 @@ function VoucherCard({ voucher }: { voucher: VoucherRedemption }) {
 
         {/* Redeemed By */}
         <div className="space-y-2">
-          <div className="flex items-center gap-1.5 text-muted-foreground/30">
+          <div className="flex items-center gap-1.5 text-faint">
             <User size={14} weight="bold" />
-            <span className="text-caption font-semibold tracking-tight text-muted-foreground/60">
+            <span className="text-label font-semibold text-faint">
               Redeemed By
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-nav font-semibold text-foreground">
+            <span className="text-body font-medium text-foreground">
               {voucher.redeemedBy}
             </span>
-            <span className="text-micro font-semibold text-muted-foreground/60 bg-muted px-1.5 py-0.5 rounded border border-border/40">
+            <span className="text-label font-medium text-faint bg-muted px-1.5 py-0.5 rounded border border-border/40">
               {voucher.redeemedByType}
             </span>
           </div>
@@ -230,17 +230,17 @@ function VoucherCard({ voucher }: { voucher: VoucherRedemption }) {
 
         {/* Provider */}
         <div className="bg-muted/30 rounded-lg px-4 py-3 border border-border/60">
-          <div className="flex items-center gap-1.5 text-muted-foreground/30 mb-2">
+          <div className="flex items-center gap-1.5 text-faint mb-2">
             <Storefront size={14} weight="bold" />
-            <span className="text-caption font-semibold tracking-tight text-muted-foreground/60">
+            <span className="text-label font-semibold text-faint">
               Service Provider
             </span>
           </div>
           <div className="space-y-1">
-            <p className="text-nav font-semibold text-foreground truncate">
+            <p className="text-body font-medium text-foreground truncate">
               {voucher.provider}
             </p>
-            <div className="flex items-center gap-1 text-caption text-muted-foreground font-medium">
+            <div className="flex items-center gap-1 text-label text-muted-foreground font-medium">
               <MapPin size={12} className="shrink-0" />
               {voucher.city}
             </div>
@@ -251,19 +251,19 @@ function VoucherCard({ voucher }: { voucher: VoucherRedemption }) {
       {/* Footer */}
       <div className="mt-5 pt-4 border-t border-border/40 grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <div className="flex items-center gap-1.5 text-muted-foreground/30">
+          <div className="flex items-center gap-1.5 text-faint">
             <Calendar size={14} weight="bold" />
-            <span className="text-caption font-semibold tracking-tight text-muted-foreground/60">
+            <span className="text-label font-semibold text-faint">
               Date
             </span>
           </div>
-          <span className="text-label font-semibold text-foreground/80 block">
+          <span className="text-label font-semibold text-subtle block">
             {voucher.date}
           </span>
         </div>
         <div className="space-y-1.5 text-right">
-          <div className="flex items-center justify-end gap-1.5 text-muted-foreground/30">
-            <span className="text-caption font-semibold tracking-tight text-muted-foreground/60">
+          <div className="flex items-center justify-end gap-1.5 text-faint">
+            <span className="text-label font-semibold text-faint">
               Amount
             </span>
           </div>
@@ -283,10 +283,10 @@ const columns: Column<VoucherRedemption>[] = [
     header: "Voucher",
     render: (row) => (
       <div className="flex flex-col gap-0.5">
-        <p className="text-nav font-semibold text-primary cursor-pointer hover:underline underline-offset-2">
+        <p className="text-body font-semibold text-primary cursor-pointer hover:underline underline-offset-2">
           {row.voucherName}
         </p>
-        <code className="text-caption font-mono text-muted-foreground">
+        <code className="text-label font-mono text-muted-foreground">
           {row.voucherCode}
         </code>
       </div>
@@ -299,7 +299,7 @@ const columns: Column<VoucherRedemption>[] = [
         <span className="text-label font-semibold text-primary bg-primary/5 px-2 py-0.5 rounded border border-primary/10 w-fit">
           {row.category}
         </span>
-        <span className="text-micro font-semibold text-muted-foreground/80">
+        <span className="text-label font-medium text-subtle">
           {row.benefitType}
         </span>
       </div>
@@ -310,8 +310,8 @@ const columns: Column<VoucherRedemption>[] = [
     accessorKey: "date",
     render: (row) => (
       <div className="flex items-center gap-1.5">
-        <Calendar size={11} className="text-muted-foreground/60 shrink-0" />
-        <p className="text-caption text-muted-foreground font-medium whitespace-nowrap">
+        <Calendar size={11} className="text-faint shrink-0" />
+        <p className="text-label text-muted-foreground font-medium whitespace-nowrap">
           {row.date}
         </p>
       </div>
@@ -321,10 +321,10 @@ const columns: Column<VoucherRedemption>[] = [
     header: "Redeemed By",
     render: (row) => (
       <div>
-        <p className="text-nav font-semibold text-foreground">
+        <p className="text-body font-medium text-foreground">
           {row.redeemedBy}
         </p>
-        <p className="text-caption text-muted-foreground font-medium mt-0.5">
+        <p className="text-label text-muted-foreground font-medium mt-0.5">
           {row.redeemedByType}
         </p>
       </div>
@@ -335,7 +335,7 @@ const columns: Column<VoucherRedemption>[] = [
     accessorKey: "amount",
     align: "right",
     render: (row) => (
-      <p className="text-nav font-semibold font-mono text-foreground">
+      <p className="text-body font-semibold font-mono text-foreground">
         RM {row.amount.toFixed(2)}
       </p>
     ),
@@ -344,8 +344,8 @@ const columns: Column<VoucherRedemption>[] = [
     header: "Service Provider",
     render: (row) => (
       <div className="flex items-center gap-1.5 min-w-0">
-        <Storefront size={11} className="text-muted-foreground/60 shrink-0" />
-        <p className="text-nav text-foreground/70 font-medium truncate">
+        <Storefront size={11} className="text-faint shrink-0" />
+        <p className="text-body text-subtle font-medium truncate">
           {row.provider}
         </p>
       </div>
@@ -356,12 +356,12 @@ const columns: Column<VoucherRedemption>[] = [
     render: (row) => (
       <div className="flex flex-col gap-0.5">
         <div className="flex items-center gap-1.5">
-          <Buildings size={11} className="text-muted-foreground/60 shrink-0" />
-          <p className="text-nav font-semibold text-foreground truncate">
+          <Buildings size={11} className="text-faint shrink-0" />
+          <p className="text-body font-medium text-foreground truncate">
             {row.branch}
           </p>
         </div>
-        <div className="flex items-center gap-1.5 text-caption text-muted-foreground font-medium">
+        <div className="flex items-center gap-1.5 text-label text-muted-foreground font-medium">
           <MapPin size={11} className="shrink-0" />
           {row.city}
         </div>
@@ -463,9 +463,9 @@ export function EmployeeVouchersTab({ employeeId: _employeeId }: EmployeeVoucher
           <Ticket
             size={36}
             weight="duotone"
-            className="text-muted-foreground/40 mb-3"
+            className="text-faint mb-3"
           />
-          <p className="text-muted-foreground font-medium text-nav">
+          <p className="text-muted-foreground font-medium text-body">
             No vouchers found.
           </p>
         </div>

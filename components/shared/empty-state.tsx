@@ -57,8 +57,8 @@ export function EmptyState({
 
       <h3
         className={cn(
-          "relative z-10 font-semibold tracking-tight text-foreground",
-          isPageLevel ? "mb-3 text-display" : "mb-1.5 text-subtitle"
+          "relative z-10 font-semibold tracking-tight text-foreground text-balance",
+          isPageLevel ? "mb-3 text-heading" : "mb-1.5 text-lead"
         )}
       >
         {title}
@@ -67,10 +67,10 @@ export function EmptyState({
       {description && (
         <p
           className={cn(
-            "relative z-10 leading-relaxed font-medium text-muted-foreground opacity-60",
+            "relative z-10 leading-relaxed font-normal text-subtle text-pretty",
             isPageLevel
-              ? "mb-10 max-w-sm text-section"
-              : "mb-8 max-w-[260px] text-nav"
+              ? "mb-10 max-w-sm text-body"
+              : "mb-8 max-w-[260px] text-body"
           )}
         >
           {description}

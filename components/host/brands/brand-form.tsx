@@ -64,14 +64,14 @@ export function BrandForm({ initialData, onSubmit, onCancel, isSubmitting }: Bra
       <div className="grid grid-cols-1 gap-6">
         {/* Brand name */}
         <div className="space-y-1.5">
-          <label className="text-caption font-medium text-foreground">Brand name</label>
+          <label className="text-label font-medium text-foreground">Brand name</label>
           <input
             {...register("name")}
             className={inputCls(!!errors.name)}
             placeholder="e.g. Zenith Wellness Group"
           />
           {errors.name && (
-            <p className="text-caption text-destructive flex items-center gap-1 mt-1">
+            <p className="text-label text-destructive flex items-center gap-1 mt-1">
               <WarningCircle size={12} /> {errors.name.message}
             </p>
           )}
@@ -80,7 +80,7 @@ export function BrandForm({ initialData, onSubmit, onCancel, isSubmitting }: Bra
         <div className="p-4 bg-muted/20 border border-border rounded-lg space-y-4">
           <div className="flex items-center gap-2 pb-1 text-primary">
             <Tag size={16} weight="fill" />
-            <h3 className="text-nav font-semibold">Service categories</h3>
+            <h3 className="text-body font-semibold">Service categories</h3>
           </div>
           <Controller
             control={control}
@@ -95,7 +95,7 @@ export function BrandForm({ initialData, onSubmit, onCancel, isSubmitting }: Bra
             )}
           />
           {errors.serviceCategories && (
-            <p className="text-caption text-destructive flex items-center gap-1 mt-1">
+            <p className="text-label text-destructive flex items-center gap-1 mt-1">
               <WarningCircle size={12} /> {errors.serviceCategories.message}
             </p>
           )}
@@ -119,8 +119,8 @@ export function BrandForm({ initialData, onSubmit, onCancel, isSubmitting }: Bra
         {initialData && (
           <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border/40">
             <div className="space-y-0.5">
-              <h4 className="text-caption font-semibold text-foreground leading-tight">Brand status</h4>
-              <p className="text-caption text-muted-foreground opacity-70">
+              <h4 className="text-label font-semibold text-foreground leading-tight">Brand status</h4>
+              <p className="text-label text-muted-foreground">
                 Only active brands can have new service providers assigned.
               </p>
             </div>
@@ -130,8 +130,8 @@ export function BrandForm({ initialData, onSubmit, onCancel, isSubmitting }: Bra
               render={({ field }) => (
                 <div className="flex items-center gap-2">
                   <span className={cn(
-                    "text-micro font-semibold tracking-tight transition-colors",
-                    field.value === "active" ? "text-emerald-600" : "text-muted-foreground/60"
+                    "text-label font-medium transition-colors",
+                    field.value === "active" ? "text-emerald-600" : "text-faint"
                   )}>
                     {field.value === "active" ? "Active" : "Inactive"}
                   </span>
@@ -154,7 +154,7 @@ export function BrandForm({ initialData, onSubmit, onCancel, isSubmitting }: Bra
             variant="ghost"
             onClick={onCancel}
             disabled={isSubmitting}
-            className="text-nav font-medium text-muted-foreground hover:text-foreground"
+            className="text-body font-medium text-subtle hover:text-foreground"
           >
             Cancel
           </Button>
@@ -162,7 +162,7 @@ export function BrandForm({ initialData, onSubmit, onCancel, isSubmitting }: Bra
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="text-nav font-semibold px-6"
+          className="text-body font-semibold px-6"
         >
           {isSubmitting ? (
             <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

@@ -17,7 +17,7 @@ export function ViewToggle({ mode, onChange, className }: ViewToggleProps) {
       <button
         onClick={() => onChange("grid")}
         className={cn(
-          "flex items-center gap-2 px-3 h-full rounded-md text-nav font-medium transition-all duration-200",
+          "flex items-center gap-2 px-3 h-full rounded-md text-body font-medium transition-all duration-200",
           mode === "grid" 
             ? "bg-background text-foreground shadow-sm border border-border/50" 
             : "text-muted-foreground hover:text-foreground"
@@ -29,7 +29,7 @@ export function ViewToggle({ mode, onChange, className }: ViewToggleProps) {
       <button
         onClick={() => onChange("list")}
         className={cn(
-          "flex items-center gap-2 px-3 h-full rounded-md text-nav font-medium transition-all duration-200",
+          "flex items-center gap-2 px-3 h-full rounded-md text-body font-medium transition-all duration-200",
           mode === "list" 
             ? "bg-background text-foreground shadow-sm border border-border/50" 
             : "text-muted-foreground hover:text-foreground"

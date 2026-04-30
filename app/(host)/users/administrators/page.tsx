@@ -47,8 +47,8 @@ export default function AdministratorsPage() {
       sortable: true,
       render: (row) => (
         <div className="flex flex-col">
-          <span className="font-semibold text-foreground text-body tracking-tight">{row.name}</span>
-          <span className="text-caption text-muted-foreground font-medium">{row.email}</span>
+          <span className="font-semibold text-foreground text-body">{row.name}</span>
+          <span className="text-label text-muted-foreground font-medium">{row.email}</span>
         </div>
       )
     },
@@ -58,7 +58,7 @@ export default function AdministratorsPage() {
       sortable: true,
       render: (row) => (
         <span className={cn(
-          "px-2 py-0.5 rounded-md text-micro font-semibold border whitespace-nowrap",
+          "px-2 py-0.5 rounded-md text-label font-medium border whitespace-nowrap",
           row.role === "HostAdmin" ? "bg-primary/10 text-primary border-primary/20" :
           row.role === "OrgAdmin" ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
           "bg-amber-50 text-amber-600 border-amber-100"
@@ -76,16 +76,16 @@ export default function AdministratorsPage() {
           {row.entity ? (
             <>
               {row.entity.type === "Organization" ? (
-                <Buildings size={16} className="text-muted-foreground/60" />
+                <Buildings size={16} className="text-faint" />
               ) : (
-                <Storefront size={16} className="text-muted-foreground/60" />
+                <Storefront size={16} className="text-faint" />
               )}
-              <span className="text-nav font-semibold text-foreground">{row.entity.name}</span>
+              <span className="text-body font-medium text-foreground">{row.entity.name}</span>
             </>
           ) : (
              <div className="flex items-center gap-2">
                <Shield size={16} className="text-primary/60" />
-               <span className="text-label font-semibold text-primary tracking-tight">Platform Core</span>
+               <span className="text-label font-semibold text-primary">Platform Core</span>
              </div>
           )}
         </div>
@@ -128,7 +128,7 @@ export default function AdministratorsPage() {
       headerClassName: "text-right",
       align: "right",
       render: (row) => (
-        <Button variant="ghost" size="sm" className="h-8 text-caption font-semibold text-muted-foreground/60 hover:text-primary hover:bg-primary/5 transition-all">
+        <Button variant="ghost" size="sm" className="h-8 text-label font-semibold text-faint hover:text-primary hover:bg-primary/5 transition-all">
           Manage Access
         </Button>
       )
@@ -140,15 +140,15 @@ export default function AdministratorsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-heading font-semibold tracking-tight text-foreground">Administrators</h1>
-          <p className="text-muted-foreground text-nav mt-1 font-normal opacity-80">
+          <h1 className="text-heading font-semibold text-foreground text-balance">Administrators</h1>
+          <p className="text-subtle text-body mt-1 font-normal">
             Configure system access for host, organization, and service provider administrative staff. Define ownership and audit access logs.
           </p>
         </div>
         <div className="flex items-center gap-2">
           <ViewToggle mode={viewMode} onChange={setViewMode} />
           
-          <Button asChild variant="ghost" size="sm" className="h-9 text-nav font-medium hover:bg-muted/50">
+          <Button asChild variant="ghost" size="sm" className="h-9 text-body font-medium hover:bg-muted/50">
             <Link href="/audit-log">
               <DownloadSimple size={16} className="mr-1.5 opacity-60" />
               Audit Logs
@@ -157,7 +157,7 @@ export default function AdministratorsPage() {
 
           <div className="h-4 w-[1px] bg-border mx-1" />
 
-          <Button asChild className="h-9 text-nav font-medium shadow-sm">
+          <Button asChild className="h-9 text-body font-medium shadow-sm">
             <Link href="/users/administrators/invite">
               <Plus size={16} weight="bold" className="mr-1.5" />
               Invite Administrator

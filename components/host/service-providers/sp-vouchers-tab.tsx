@@ -111,7 +111,7 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-heading font-semibold text-foreground">Vouchers</h2>
-          <p className="text-nav text-muted-foreground">Create and manage provider vouchers, publish states, and activation periods.</p>
+          <p className="text-body text-subtle">Create and manage provider vouchers, publish states, and activation periods.</p>
         </div>
         <Button size="sm" variant="secondary" className="h-8 text-label gap-2" onClick={handleAdd}>
           <Plus size={14} weight="bold" /> Add voucher
@@ -156,8 +156,8 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
                   sortable: true,
                   render: (voucher) => (
                     <div className="space-y-1">
-                      <p className="text-nav font-semibold text-foreground leading-none">{voucher.name}</p>
-                      <p className="text-caption font-mono text-muted-foreground bg-muted w-fit px-1.5 py-0.5 rounded leading-none border border-border/50">
+                      <p className="text-body font-medium text-foreground leading-none">{voucher.name}</p>
+                      <p className="text-label font-mono text-muted-foreground bg-muted w-fit px-1.5 py-0.5 rounded leading-none border border-border/50">
                         {voucher.code}
                       </p>
                     </div>
@@ -170,7 +170,7 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
                     <p className="text-label text-muted-foreground leading-relaxed line-clamp-2 max-w-[300px]">
                       {voucher.description || "—"}
                       {voucher.bookingRequired && (
-                        <span className="ml-2 inline-flex items-center gap-1 text-micro font-semibold text-primary/70 tracking-tighter bg-primary/5 px-1.5 py-0.5 rounded border border-primary/10">
+                        <span className="ml-2 inline-flex items-center gap-1 text-label font-medium text-primary/70 tracking-tighter bg-primary/5 px-1.5 py-0.5 rounded border border-primary/10">
                           Booking Required
                         </span>
                       )}
@@ -180,12 +180,12 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
                 {
                   header: "Period",
                   render: (voucher) => (
-                    <div className="text-caption text-muted-foreground space-y-0.5">
-                      <p className="font-medium text-foreground/80">{new Date(voucher.activationPeriod.startDate).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</p>
+                    <div className="text-label text-muted-foreground space-y-0.5">
+                      <p className="font-medium text-subtle">{new Date(voucher.activationPeriod.startDate).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</p>
                       {voucher.activationPeriod.endDate ? (
-                        <p className="opacity-70">→ {new Date(voucher.activationPeriod.endDate).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</p>
+                        <p>→ {new Date(voucher.activationPeriod.endDate).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</p>
                       ) : (
-                        <p className="text-micro text-muted-foreground/60 italic">Open-ended</p>
+                        <p className="text-label text-faint italic">Open-ended</p>
                       )}
                     </div>
                   ),
@@ -197,9 +197,9 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
                   render: (voucher) => (
                     <div className="space-y-0.5">
                       {voucher.initialPrice !== voucher.finalPrice && (
-                        <p className="text-micro text-muted-foreground/60 line-through">RM {voucher.initialPrice}</p>
+                        <p className="text-label text-faint line-through">RM {voucher.initialPrice}</p>
                       )}
-                      <p className="text-nav font-semibold text-foreground font-mono">RM {voucher.finalPrice}</p>
+                      <p className="text-body font-medium text-foreground font-mono">RM {voucher.finalPrice}</p>
                     </div>
                   ),
                 },

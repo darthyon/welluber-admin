@@ -27,8 +27,8 @@ export function SpDataTable({ data }: SpDataTableProps) {
       headerClassName: "min-w-[220px]",
       render: (sp) => (
         <div className="flex flex-col">
-          <span className="font-semibold text-nav text-foreground tracking-tight">{sp.name}</span>
-          <span className="text-caption text-muted-foreground mt-0.5 font-mono tracking-tight">{sp.registrationNo}</span>
+          <span className="font-semibold text-body text-foreground">{sp.name}</span>
+          <span className="text-label text-muted-foreground mt-0.5 font-mono tracking-tight">{sp.registrationNo}</span>
         </div>
       ),
     },
@@ -49,7 +49,7 @@ export function SpDataTable({ data }: SpDataTableProps) {
       render: (sp) => (
         <div className="max-w-[240px]">
           {sp.mainServices.length === 0 ? (
-            <span className="text-micro text-muted-foreground/50 font-medium italic px-1">None</span>
+            <span className="text-label text-faint font-medium italic px-1">None</span>
           ) : (
             <ServicePortfolioTags mainServices={sp.mainServices} />
           )}
@@ -62,7 +62,7 @@ export function SpDataTable({ data }: SpDataTableProps) {
       sortable: true,
       align: "right",
       render: (sp) => (
-        <span className="text-nav font-semibold text-foreground/80">{sp.activeVoucherCount}</span>
+        <span className="text-body font-semibold text-subtle">{sp.activeVoucherCount}</span>
       ),
     },
     {
@@ -71,13 +71,13 @@ export function SpDataTable({ data }: SpDataTableProps) {
       sortable: true,
       align: "right",
       render: (sp) => (
-        <span className="text-nav font-medium text-muted-foreground">{sp.branches.length}</span>
+        <span className="text-body font-medium text-subtle">{sp.branches.length}</span>
       ),
     },
     {
       header: "Tax Registered",
       render: (sp) => (
-        <span className={sp.taxProfile.isTaxRegistered ? "text-caption font-semibold text-emerald-600" : "text-caption text-muted-foreground/50"}>
+        <span className={sp.taxProfile.isTaxRegistered ? "text-label font-semibold text-emerald-600" : "text-label text-faint"}>
           {sp.taxProfile.isTaxRegistered ? "Yes" : "No"}
         </span>
       ),

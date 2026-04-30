@@ -32,7 +32,7 @@ export function RegistrationComplianceSection({
           <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
             <IdentificationCard size={16} weight="fill" />
           </div>
-          <h3 className="text-subtitle font-semibold text-foreground">Registration & Compliance</h3>
+          <h3 className="text-lead font-semibold text-foreground">Registration & Compliance</h3>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -82,8 +82,8 @@ export function RegistrationComplianceSection({
                         : "border-border hover:border-border-hover bg-muted/5"
                     )}
                   >
-                    <span className={cn("text-nav font-semibold", businessType === type.id ? "text-primary" : "text-foreground")}>{type.label}</span>
-                    <span className="text-micro text-muted-foreground mt-0.5 leading-tight">{type.docs}</span>
+                    <span className={cn("text-body font-semibold", businessType === type.id ? "text-primary" : "text-foreground")}>{type.label}</span>
+                    <span className="text-label text-muted-foreground mt-0.5 leading-tight">{type.docs}</span>
                   </button>
                 ))}
               </div>

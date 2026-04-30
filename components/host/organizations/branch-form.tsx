@@ -101,10 +101,10 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
             <CaretLeft size={20} weight="bold" />
           </button>
           <div>
-            <h2 className="text-heading font-semibold tracking-tight text-foreground">
+            <h2 className="text-heading font-semibold text-foreground text-balance">
               {isEditing ? "Edit Branch" : "Add New Branch"}
             </h2>
-            <p className="text-nav text-muted-foreground mt-1">
+            <p className="text-body text-subtle mt-1">
               Configure location, personnel, and financial mapping for this branch.
             </p>
           </div>
@@ -157,7 +157,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
           >
             <div className="space-y-5 p-1">
               <div className="space-y-1.5">
-                <label className="text-micro font-semibold text-muted-foreground/40 tracking-tight">Branch Name</label>
+                <label className="text-label font-medium text-faint">Branch Name</label>
                 <input
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -168,7 +168,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-micro font-semibold text-muted-foreground/40 tracking-tight">Branch Type</label>
+                  <label className="text-label font-medium text-faint">Branch Type</label>
                   <select
                     value={formData.type}
                     onChange={(e) => setFormData({ ...formData, type: e.target.value })}
@@ -179,8 +179,8 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-micro font-semibold text-muted-foreground/40 tracking-tight">Status</label>
-                  <div className="h-[38px] flex items-center px-3 bg-muted/20 border border-border rounded-lg text-nav text-muted-foreground font-medium">
+                  <label className="text-label font-medium text-faint">Status</label>
+                  <div className="h-[38px] flex items-center px-3 bg-muted/20 border border-border rounded-lg text-body text-subtle font-medium">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 mr-2 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
                     Pending activation
                   </div>
@@ -209,7 +209,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
             description="Define how this branch is funded"
           >
             {/* Org limits info */}
-            <div className="mb-4 flex items-center gap-3 px-3 py-2 rounded-lg border border-border/60 bg-muted/20 text-nav text-muted-foreground">
+            <div className="mb-4 flex items-center gap-3 px-3 py-2 rounded-lg border border-border/60 bg-muted/20 text-body text-subtle">
               <Info size={16} className="text-primary shrink-0" />
               <span className="font-medium">
                 Organization limits: Wallet RM {ORG_LIMITS.walletLimit.toLocaleString()} · Credit RM {ORG_LIMITS.creditLimit.toLocaleString()}
@@ -217,10 +217,10 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Info size={14} className="text-muted-foreground/40 cursor-help ml-auto" />
+                    <Info size={14} className="text-faint cursor-help ml-auto" />
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p className="text-nav max-w-[220px]">Wallet limit is the max prepaid funds. Credit limit is the max overdraft before hard block.</p>
+                    <p className="text-body max-w-[220px]">Wallet limit is the max prepaid funds. Credit limit is the max overdraft before hard block.</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -247,7 +247,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
               {walletType === "new" ? (
                 <div className="space-y-5 animate-in fade-in slide-in-from-top-2 duration-300">
                   <div className="space-y-1.5">
-                    <label className="text-nav font-semibold text-foreground">Wallet Name</label>
+                    <label className="text-body font-medium text-foreground">Wallet Name</label>
                     <input
                       value={walletName}
                       onChange={(e) => setWalletName(e.target.value)}
@@ -256,7 +256,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-nav font-semibold text-foreground">Initial Amount (RM)</label>
+                    <label className="text-body font-medium text-foreground">Initial Amount (RM)</label>
                     <input
                       type="number"
                       value={initialAmount}
@@ -264,13 +264,13 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
                       placeholder="0.00"
                       className="w-full px-3 py-2.5 bg-card border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-semibold text-foreground hover:border-border/80"
                     />
-                    <p className="text-caption text-muted-foreground/40 font-medium">Top-up amount to seed this wallet.</p>
+                    <p className="text-label text-faint font-medium">Top-up amount to seed this wallet.</p>
                   </div>
 
                   {/* Attachment upload */}
                   <div className="space-y-1.5">
-                    <label className="text-nav font-semibold text-foreground">Payment Receipt</label>
-                    <p className="text-caption text-muted-foreground/40 font-medium">Attach proof of payment for manual top-ups.</p>
+                    <label className="text-body font-medium text-foreground">Payment Receipt</label>
+                    <p className="text-label text-faint font-medium">Attach proof of payment for manual top-ups.</p>
                     {attachment ? (
                       <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-border bg-card">
                         <UploadSimple size={18} className="text-primary" />
@@ -281,9 +281,9 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
                       </div>
                     ) : (
                       <label className="flex flex-col items-center justify-center gap-2 px-4 py-6 rounded-lg border-2 border-dashed border-border/60 bg-muted/20 hover:border-primary/30 hover:bg-muted/30 transition-all cursor-pointer group">
-                        <UploadSimple size={24} className="text-muted-foreground/40 group-hover:text-primary transition-colors" />
-                        <span className="text-nav font-semibold text-muted-foreground group-hover:text-foreground transition-colors">Click to upload receipt</span>
-                        <span className="text-caption text-muted-foreground/40">JPG, PNG, PDF up to 5MB</span>
+                        <UploadSimple size={24} className="text-faint group-hover:text-primary transition-colors" />
+                        <span className="text-body font-semibold text-muted-foreground group-hover:text-foreground transition-colors">Click to upload receipt</span>
+                        <span className="text-label text-faint">JPG, PNG, PDF up to 5MB</span>
                         <input
                           type="file"
                           accept=".jpg,.jpeg,.png,.pdf"
@@ -296,17 +296,17 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-nav font-semibold text-foreground">Default Currency</label>
+                    <label className="text-body font-medium text-foreground">Default Currency</label>
                     <div className="flex items-center gap-3 w-full px-3 py-2 bg-muted/20 border border-border rounded-lg text-body">
-                      <span className="w-8 h-5 bg-muted rounded-sm flex items-center justify-center text-micro font-semibold text-muted-foreground">MYR</span>
+                      <span className="w-8 h-5 bg-muted rounded-sm flex items-center justify-center text-label font-medium text-muted-foreground">MYR</span>
                       <span className="text-foreground font-semibold whitespace-nowrap">Malaysian Ringgit (RM)</span>
-                      <span className="ml-auto text-caption text-muted-foreground/40 font-semibold tracking-tight">Locked</span>
+                      <span className="ml-auto text-label text-faint font-semibold">Locked</span>
                     </div>
                   </div>
                 </div>
               ) : (
                 <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <label className="text-nav font-semibold text-foreground">Bridge to Existing Wallet</label>
+                  <label className="text-body font-medium text-foreground">Bridge to Existing Wallet</label>
                   <select
                     value={existingWalletId}
                     onChange={(e) => setExistingWalletId(e.target.value)}
@@ -319,19 +319,19 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
                       </option>
                     ))}
                   </select>
-                  <p className="text-caption text-muted-foreground/40 mt-1.5 font-medium italic">
+                  <p className="text-label text-faint mt-1.5 font-medium italic">
                     * This branch will consume funds from the selected centralized liquidity pool.
                   </p>
                 </div>
               )}
 
               <div className="p-4 rounded-lg border border-border bg-muted/20 space-y-3">
-                <div className="flex items-start gap-3 text-nav text-muted-foreground">
+                <div className="flex items-start gap-3 text-body text-subtle">
                   <CheckCircle size={18} weight="fill" className="text-primary mt-0.5 shrink-0" />
                   <span>Administrative fees are consolidated at the parent organization level for all linked accounts.</span>
                 </div>
                 {walletType === "new" && (
-                  <div className="flex items-start gap-3 text-nav text-muted-foreground animate-in fade-in duration-300">
+                  <div className="flex items-start gap-3 text-body text-subtle animate-in fade-in duration-300">
                     <CheckCircle size={18} weight="fill" className="text-primary mt-0.5 shrink-0" />
                     <span>A 1.5% administrative fee applies to all standalone wallets.</span>
                   </div>
@@ -350,7 +350,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
           >
              <div className="p-1">
                <div className="border-2 border-dashed border-border/60 rounded-lg p-8 flex flex-col items-center text-center space-y-3 hover:border-primary/20 hover:bg-muted/30 transition-all cursor-pointer group">
-                  <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground/30 group-hover:bg-primary/10 group-hover:text-primary transition-all duration-300">
+                  <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center text-faint group-hover:bg-primary/10 group-hover:text-primary transition-all duration-300">
                     <PaperPlaneTilt size={20} />
                   </div>
                   <div>
@@ -365,7 +365,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
           </DetailSection>
 
           <div className="p-4 rounded-lg border border-border bg-card shadow-sm space-y-4">
-            <h4 className="text-nav font-semibold text-muted-foreground/40 tracking-tight">Branch setup guide</h4>
+            <h4 className="text-body font-semibold text-faint tracking-tight">Branch setup guide</h4>
             <div className="space-y-3">
               {[
                 { label: "Identity Verified", status: true },
@@ -373,7 +373,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
                 { label: "Financial Pool Linked", status: false },
                 { label: "Admins Invited", status: false }
               ].map((step, i) => (
-                <div key={i} className="flex items-center justify-between text-nav">
+                <div key={i} className="flex items-center justify-between text-body">
                   <span className="text-muted-foreground font-medium">{step.label}</span>
                   <div className={cn(
                     "w-2 h-2 rounded-full",

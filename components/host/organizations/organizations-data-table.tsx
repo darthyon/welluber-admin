@@ -42,8 +42,8 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
         <div className="flex items-center gap-3">
           <EntityAvatar name={org.name} size="sm" />
           <div className="flex flex-col">
-            <span className="font-semibold text-nav text-foreground tracking-tight leading-tight">{org.name}</span>
-            <span className="text-caption text-muted-foreground mt-0.5 font-mono tracking-tight">{org.id}</span>
+            <span className="font-medium text-body text-foreground leading-tight">{org.name}</span>
+            <span className="text-label text-subtle mt-0.5 font-mono tracking-tight">{org.id}</span>
           </div>
         </div>
       )
@@ -67,7 +67,7 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
       render: (org) => {
         if (org.needsAction.length === 0) {
           return (
-            <Badge variant="outline" className="text-micro px-2 h-5 bg-emerald-500/10 text-emerald-400 border-emerald-500/20 font-semibold gap-1 animate-in fade-in duration-500">
+            <Badge variant="outline" className="text-label px-2 h-5 bg-emerald-500/10 text-emerald-400 border-emerald-500/20 font-medium gap-1 animate-in fade-in duration-500">
               <CheckCircle size={12} weight="fill" />
               All good
             </Badge>
@@ -92,16 +92,16 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
           <UtilizationChart value={org.utilizationRate} mode="ring" size={32} strokeWidth={3} />
           <div className="flex flex-col justify-center">
             <div className="flex items-center gap-1.5 leading-tight">
-              <span className="text-label font-semibold text-foreground">
+              <span className="text-label font-medium text-foreground">
                 {formatCurrency(org.totalWalletBalance)}
               </span>
               {org.claimsCount !== undefined && (
-                <span className="text-micro font-semibold px-1.5 rounded-full bg-muted text-muted-foreground/60 border border-border tabular-nums leading-none flex items-center">
+                <span className="text-label font-medium px-1.5 rounded-full bg-muted text-faint border border-border tabular-nums leading-none flex items-center">
                   {org.claimsCount}
                 </span>
               )}
             </div>
-            <span className="text-micro text-muted-foreground/60 font-medium tabular-nums mt-0.5">
+            <span className="text-label text-faint font-medium tabular-nums mt-0.5">
               / {formatCurrency(org.walletLimit)}
             </span>
           </div>
@@ -113,7 +113,7 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
       render: (org) => (
         <div className="flex items-center gap-1 overflow-hidden max-w-[200px]">
           {org.services.length === 0 ? (
-            <span className="text-micro text-muted-foreground/50 font-medium italic px-1">Unassigned</span>
+            <span className="text-label text-faint font-normal italic px-1">Unassigned</span>
           ) : (
             <>
               {org.services.slice(0, 1).map((service, i) => (
@@ -133,9 +133,9 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
                   </TooltipTrigger>
                   <TooltipContent className="w-52 bg-card rounded-lg border-border shadow-2xl z-[200]">
                     <div className="flex flex-col gap-1">
-                      <span className="text-micro font-semibold text-muted-foreground/70 mb-1 px-1">Service category</span>
+                      <span className="text-label font-medium text-subtle mb-1 px-1">Service category</span>
                       {org.services.slice(1).map((service, i) => (
-                        <div key={i} className="text-caption px-2 py-1.5 hover:bg-muted rounded text-foreground transition-colors font-medium">
+                        <div key={i} className="text-label px-2 py-1.5 hover:bg-muted rounded text-foreground transition-colors font-medium">
                           {service}
                         </div>
                       ))}
@@ -154,11 +154,11 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
       render: (org) => (
         <div className="flex items-center gap-1 overflow-hidden">
           {org.policies.length === 0 ? (
-            <span className="text-micro text-muted-foreground/50 font-medium italic px-1">Unassigned</span>
+            <span className="text-label text-faint font-normal italic px-1">Unassigned</span>
           ) : (
             <>
               {org.policies.slice(0, 1).map((policy, i) => (
-                <Badge key={i} variant="secondary" className="bg-primary/10 text-primary font-semibold text-micro px-1.5 py-0 h-4 border-primary/20 whitespace-nowrap">
+                <Badge key={i} variant="secondary" className="bg-primary/10 text-primary font-medium text-label px-1.5 py-0 h-4 border-primary/20 whitespace-nowrap">
                   {policy}
                 </Badge>
               ))}
@@ -167,16 +167,16 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
                   <TooltipTrigger asChild>
                     <button 
                       onClick={(e) => e.stopPropagation()}
-                      className="text-micro text-muted-foreground hover:text-primary font-semibold px-1 transition-colors"
+                      className="text-label text-subtle hover:text-primary font-medium px-1 transition-colors"
                     >
                       +{org.policies.length - 1}
                     </button>
                   </TooltipTrigger>
                   <TooltipContent className="w-52 bg-card rounded-lg border-border shadow-2xl z-[200]">
                     <div className="flex flex-col gap-1">
-                      <span className="text-micro font-semibold text-muted-foreground/70 mb-1 px-1">Benefit policies</span>
+                      <span className="text-label font-medium text-subtle mb-1 px-1">Benefit policies</span>
                       {org.policies.slice(1).map((policy, i) => (
-                        <div key={i} className="text-caption px-2 py-1.5 hover:bg-muted rounded text-foreground transition-colors font-medium">
+                        <div key={i} className="text-label px-2 py-1.5 hover:bg-muted rounded text-foreground transition-colors font-medium">
                           {policy}
                         </div>
                       ))}
@@ -197,11 +197,11 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
       render: (org) => (
         <div className="flex items-center gap-1 overflow-hidden">
           {org.branches.length === 0 ? (
-            <span className="text-micro text-muted-foreground/50 font-medium italic px-1">Unassigned</span>
+            <span className="text-label text-faint font-normal italic px-1">Unassigned</span>
           ) : (
             <>
               {org.branches.slice(0, 1).map((branch, i) => (
-                <Badge key={i} variant="secondary" className="bg-sky-500/10 text-sky-400 font-semibold text-micro px-1.5 py-0 h-4 border-sky-500/20 whitespace-nowrap">
+                <Badge key={i} variant="secondary" className="bg-sky-500/10 text-sky-400 font-medium text-label px-1.5 py-0 h-4 border-sky-500/20 whitespace-nowrap">
                   {branch}
                 </Badge>
               ))}
@@ -210,16 +210,16 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
                   <TooltipTrigger asChild>
                     <button 
                       onClick={(e) => e.stopPropagation()}
-                      className="text-micro text-muted-foreground hover:text-sky-600 font-semibold px-1 transition-colors"
+                      className="text-label text-subtle hover:text-sky-600 font-medium px-1 transition-colors"
                     >
                       +{org.branches.length - 1}
                     </button>
                   </TooltipTrigger>
                   <TooltipContent className="w-52 bg-card rounded-lg border-border shadow-2xl z-[200]">
                     <div className="flex flex-col gap-1">
-                      <span className="text-micro font-semibold text-muted-foreground/70 mb-1 px-1">Branches</span>
+                      <span className="text-label font-medium text-subtle mb-1 px-1">Branches</span>
                       {org.branches.slice(1).map((branch, i) => (
-                        <div key={i} className="text-caption px-2 py-1.5 hover:bg-muted rounded text-foreground transition-colors font-medium">
+                        <div key={i} className="text-label px-2 py-1.5 hover:bg-muted rounded text-foreground transition-colors font-medium">
                           {branch}
                         </div>
                       ))}
@@ -237,7 +237,7 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
       accessorKey: "employeeCount",
       sortable: true,
       align: "right",
-      render: (org) => <span className="text-nav font-semibold text-foreground/80">{org.employeeCount.toLocaleString()}</span>
+      render: (org) => <span className="text-body font-medium text-foreground">{org.employeeCount.toLocaleString()}</span>
     },
     {
       header: "Joined",

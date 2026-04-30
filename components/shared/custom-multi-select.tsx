@@ -119,7 +119,7 @@ export function CustomMultiSelect({
         ))}
           <input 
             type="text"
-            className="flex-1 bg-transparent border-0 outline-none text-nav placeholder:text-muted-foreground/40 min-w-[80px] h-7 px-1"
+            className="flex-1 bg-transparent border-0 outline-none text-body placeholder:text-faint min-w-[80px] h-7 px-1"
             placeholder={selected.length === 0 ? placeholder : ""}
           value={query}
           disabled={disabled}
@@ -137,7 +137,7 @@ export function CustomMultiSelect({
             }
           }}
         />
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center text-muted-foreground/40 gap-1.5 pl-2">
+        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center text-faint gap-1.5 pl-2">
           {!disabled && selected.length > 0 && (
             <button
               type="button"
@@ -164,7 +164,7 @@ export function CustomMultiSelect({
           {showAddCustom && (
             <button
               onClick={addCustom}
-              className="w-full text-left px-3 py-2 rounded-lg text-nav bg-primary/10 text-primary font-semibold flex items-center gap-2 mb-1 border-b border-border/20"
+              className="w-full text-left px-3 py-2 rounded-lg text-body bg-primary/10 text-primary font-semibold flex items-center gap-2 mb-1 border-b border-border/20"
             >
               <Plus size={14} weight="bold" />
               <span>Add custom: &quot;{query}&quot;</span>
@@ -176,7 +176,7 @@ export function CustomMultiSelect({
               key={opt}
               onClick={() => toggleOption(opt)}
               type="button"
-                className="w-full text-left px-3 py-2 rounded-lg text-nav hover:bg-accent/40 text-muted-foreground/80 hover:text-foreground transition-colors flex items-center justify-between group font-semibold"
+                className="w-full text-left px-3 py-2 rounded-lg text-body hover:bg-accent/40 text-subtle hover:text-foreground transition-colors flex items-center justify-between group font-semibold"
             >
               <span className="truncate">{opt}</span>
               <Check size={14} className="opacity-0 group-hover:opacity-40" />

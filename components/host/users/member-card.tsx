@@ -34,7 +34,7 @@ export function MemberCard({ member }: MemberCardProps) {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(var(--primary-rgb),0.03),transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
       <div className="flex items-start justify-between mb-8 relative z-10">
         <div className="flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-lg bg-muted border border-border/60 text-muted-foreground/60 flex items-center justify-center">
+          <div className="w-11 h-11 rounded-lg bg-muted border border-border/60 text-faint flex items-center justify-center">
             <Users size={22} weight="fill" />
           </div>
           <div className="space-y-1.5">
@@ -48,7 +48,7 @@ export function MemberCard({ member }: MemberCardProps) {
                 className="px-1.5 py-0.5 text-micro"
               />
               <span className={cn(
-                "px-2 py-0.5 rounded-full text-micro font-semibold border",
+                "px-2 py-0.5 rounded-full text-label font-medium border",
                 member.type === "Employee" 
                   ? "bg-blue-500/10 text-blue-600 border-blue-500/20" 
                   : "bg-purple-500/10 text-purple-600 border-purple-500/20"
@@ -66,19 +66,19 @@ export function MemberCard({ member }: MemberCardProps) {
         {/* Row 1: Email & Organization */}
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2.5">
-            <div className="flex items-center gap-1.5 text-muted-foreground/30">
+            <div className="flex items-center gap-1.5 text-faint">
               <UserCircle size={14} weight="bold" />
-              <span className="text-caption font-semibold tracking-tight text-muted-foreground/60">Email</span>
+              <span className="text-label font-semibold text-faint">Email</span>
             </div>
-            <span className="text-label font-semibold text-foreground/80 block truncate font-mono" title={member.email}>
+            <span className="text-label font-semibold text-subtle block truncate font-mono" title={member.email}>
               {member.email}
             </span>
           </div>
 
           <div className="space-y-2.5">
-            <div className="flex items-center gap-1.5 text-muted-foreground/30">
+            <div className="flex items-center gap-1.5 text-faint">
               <Buildings size={14} weight="bold" />
-              <span className="text-caption font-semibold tracking-tight text-muted-foreground/60">Organization</span>
+              <span className="text-label font-semibold text-faint">Organization</span>
             </div>
             <span className="text-label font-semibold text-foreground truncate block" title={member.organization.name}>
               {member.organization.name}
@@ -89,9 +89,9 @@ export function MemberCard({ member }: MemberCardProps) {
         {/* Row 2: Branch & Last Active */}
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2.5">
-            <div className="flex items-center gap-1.5 text-muted-foreground/30">
+            <div className="flex items-center gap-1.5 text-faint">
               <TreeStructure size={14} weight="bold" />
-              <span className="text-caption font-semibold tracking-tight text-muted-foreground/60">Branch</span>
+              <span className="text-label font-semibold text-faint">Branch</span>
             </div>
             <span className="text-label font-semibold text-foreground truncate block font-mono" title={member.branch?.name || "-"}>
               {member.branch?.name || "-"}
@@ -99,11 +99,11 @@ export function MemberCard({ member }: MemberCardProps) {
           </div>
 
           <div className="space-y-2.5">
-            <div className="flex items-center gap-1.5 text-muted-foreground/30">
+            <div className="flex items-center gap-1.5 text-faint">
               <Clock size={14} weight="bold" />
-              <span className="text-caption font-semibold tracking-tight text-muted-foreground/60">Last Active</span>
+              <span className="text-label font-semibold text-faint">Last Active</span>
             </div>
-            <span className="text-label font-semibold text-foreground/80 block">
+            <span className="text-label font-semibold text-subtle block">
               {member.lastActive}
             </span>
           </div>

@@ -49,7 +49,7 @@ export default function EmployeeError({
       
       {error.digest && (
         <div className="mt-8 p-4 bg-muted rounded-lg text-left">
-          <p className="text-micro font-mono text-muted-foreground">
+          <p className="text-label font-mono text-muted-foreground">
             Error ID: {error.digest}
           </p>
         </div>

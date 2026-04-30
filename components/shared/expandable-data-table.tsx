@@ -127,7 +127,7 @@ export function ExpandableDataTable<T extends { id: string | number }>({
                     key={i}
                     onClick={() => col.sortable && col.accessorKey && handleSort(col.accessorKey)}
                     className={cn(
-                      "font-semibold text-muted-foreground text-nav p-4 whitespace-nowrap z-20 tracking-tight transition-colors",
+                      "font-semibold text-subtle text-body p-4 whitespace-nowrap z-20 transition-colors",
                       !ghost ? "bg-muted/30" : "bg-transparent",
                       col.sortable && "cursor-pointer hover:bg-primary/5 hover:text-primary",
                       getCellAlignment(col.align),
@@ -178,7 +178,7 @@ export function ExpandableDataTable<T extends { id: string | number }>({
                         <td
                           key={i}
                           className={cn(
-                            "p-4 text-nav transition-colors",
+                            "p-4 text-body transition-colors",
                             getCellAlignment(col.align),
                             col.cellClassName
                           )}
@@ -190,7 +190,7 @@ export function ExpandableDataTable<T extends { id: string | number }>({
                                   e.stopPropagation();
                                   onToggleExpand(row);
                                 }}
-                                className="text-muted-foreground/60 hover:text-foreground transition-colors shrink-0"
+                                className="text-faint hover:text-foreground transition-colors shrink-0"
                               >
                                 {expanded ? (
                                   <CaretDownExpanded size={16} weight="bold" />

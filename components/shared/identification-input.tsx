@@ -31,9 +31,9 @@ export function IdentificationInput({ type, number, onTypeChange, onNumberChange
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
           <button className="flex items-center gap-1.5 px-3 h-full border-r border-border/50 hover:bg-muted transition-colors shrink-0">
-            <selectedType.icon size={16} className="text-muted-foreground/60" />
-            <span className="text-nav font-semibold text-foreground">{selectedType.label}</span>
-            <CaretDown size={12} className={cn("text-muted-foreground/40 transition-transform", isOpen && "rotate-180")} />
+            <selectedType.icon size={16} className="text-faint" />
+            <span className="text-body font-medium text-foreground">{selectedType.label}</span>
+            <CaretDown size={12} className={cn("text-faint transition-transform", isOpen && "rotate-180")} />
           </button>
         </PopoverTrigger>
         <PopoverContent align="start" className="w-[200px] p-1 border-border shadow-2xl z-[200]">
@@ -52,13 +52,13 @@ export function IdentificationInput({ type, number, onTypeChange, onNumberChange
               >
                 <div className={cn(
                   "w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border transition-all",
-                  type === t.id ? "bg-primary/10 border-primary/20 text-primary" : "bg-muted border-border/40 text-muted-foreground/60"
+                  type === t.id ? "bg-primary/10 border-primary/20 text-primary" : "bg-muted border-border/40 text-faint"
                 )}>
                   <t.icon size={18} />
                 </div>
                 <div>
-                  <p className={cn("text-nav font-semibold", type === t.id ? "text-primary" : "text-foreground")}>{t.label}</p>
-                  <p className="text-micro text-muted-foreground/40 leading-tight">{t.description}</p>
+                  <p className={cn("text-body font-semibold", type === t.id ? "text-primary" : "text-foreground")}>{t.label}</p>
+                  <p className="text-label text-faint leading-tight">{t.description}</p>
                 </div>
               </button>
             ))}

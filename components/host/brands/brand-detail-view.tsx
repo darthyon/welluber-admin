@@ -59,8 +59,8 @@ export function BrandDetailView({ brand, onBack, onEdit, onRemove }: BrandDetail
       headerClassName: "min-w-[200px]",
       render: (sp) => (
         <div className="flex flex-col">
-          <span className="font-semibold text-body text-foreground tracking-tight">{sp.name}</span>
-          <span className="text-caption text-muted-foreground mt-0.5 font-mono tracking-tight">{sp.registrationNo}</span>
+          <span className="font-semibold text-body text-foreground">{sp.name}</span>
+          <span className="text-label text-muted-foreground mt-0.5 font-mono tracking-tight">{sp.registrationNo}</span>
         </div>
       ),
     },
@@ -93,14 +93,14 @@ export function BrandDetailView({ brand, onBack, onEdit, onRemove }: BrandDetail
         header: "Vouchers",
         align: "right",
         render: (sp) => (
-          <span className="text-nav font-semibold text-foreground/80">{sp.activeVoucherCount}</span>
+          <span className="text-body font-semibold text-subtle">{sp.activeVoucherCount}</span>
         ),
     },
     {
       header: "Branches",
       align: "right",
       render: (sp) => (
-        <span className="text-nav font-medium text-muted-foreground">{sp.branches.length}</span>
+        <span className="text-body font-medium text-subtle">{sp.branches.length}</span>
       ),
     },
     {
@@ -123,7 +123,7 @@ export function BrandDetailView({ brand, onBack, onEdit, onRemove }: BrandDetail
       <div className="flex flex-col gap-4">
         <button 
           onClick={onBack}
-          className="flex items-center gap-1.5 text-nav font-medium text-muted-foreground hover:text-primary transition-colors w-fit group"
+          className="flex items-center gap-1.5 text-body font-medium text-subtle hover:text-primary transition-colors w-fit group"
         >
           <CaretLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
           Back to Brand List
@@ -185,7 +185,7 @@ export function BrandDetailView({ brand, onBack, onEdit, onRemove }: BrandDetail
               value={
                 <div className="flex flex-wrap gap-1.5 mt-0.5">
                   {brand.serviceCategories?.map((cat, i) => (
-                    <Badge key={i} variant="secondary" className="text-caption font-medium">{cat}</Badge>
+                    <Badge key={i} variant="secondary" className="text-label font-medium">{cat}</Badge>
                   ))}
                   {(!brand.serviceCategories || brand.serviceCategories.length === 0) && (
                     <span className="text-label text-muted-foreground italic">None assigned</span>
@@ -206,7 +206,7 @@ export function BrandDetailView({ brand, onBack, onEdit, onRemove }: BrandDetail
         <div className="space-y-6">
           <div>
             <h2 className="text-heading font-semibold text-foreground">Assigned Service Providers</h2>
-            <p className="text-nav text-muted-foreground">Manage service providers linked to this brand</p>
+            <p className="text-body text-subtle">Manage service providers linked to this brand</p>
           </div>
           <DataFilterBar
             searchQuery={searchQuery}

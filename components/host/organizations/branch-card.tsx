@@ -60,7 +60,7 @@ export function BranchCard({ branch, onView, onEdit }: BranchCardProps) {
               {branch.address && (
                 <>
                   <span className="w-1 h-1 rounded-full bg-border" />
-                  <span className="text-caption font-medium opacity-80">{branch.address.city}, {branch.address.state}</span>
+                  <span className="text-label font-medium text-subtle">{branch.address.city}, {branch.address.state}</span>
                 </>
               )}
             </div>
@@ -79,22 +79,22 @@ export function BranchCard({ branch, onView, onEdit }: BranchCardProps) {
       <div className="mt-auto space-y-4 pt-6 relative z-10">
         <div className="flex items-center justify-between border-t border-border/40 pt-4">
           <div className="flex flex-col gap-1">
-            <span className="text-caption font-semibold text-muted-foreground/60">Wallet</span>
+            <span className="text-label font-semibold text-faint">Wallet</span>
             <div className="flex items-center gap-1.5 text-label font-semibold text-foreground">
               <Wallet size={14} weight="bold" className="text-primary" />
               <span className="truncate max-w-[120px]">{branch.walletName || "Unnamed Wallet"}</span>
-              <span className="px-1 py-0 rounded bg-muted border border-border text-micro font-semibold text-muted-foreground">
+              <span className="px-1 py-0 rounded bg-muted border border-border text-label font-medium text-muted-foreground">
                 {walletLabel}
               </span>
             </div>
             {branch.balance && (
-              <span className="text-caption text-muted-foreground/60 font-medium pl-5">{branch.balance}</span>
+              <span className="text-label text-faint font-medium pl-5">{branch.balance}</span>
             )}
           </div>
           
           {branch.employeesCount && (
             <div className="flex flex-col items-end gap-1 text-right">
-              <span className="text-caption font-semibold text-muted-foreground/60">Workforce</span>
+              <span className="text-label font-semibold text-faint">Workforce</span>
               <div className="flex items-center gap-1.5 text-label font-semibold text-foreground">
                 <Users size={14} weight="bold" className="text-primary" />
                 <span>{branch.employeesCount.toLocaleString()}</span>
@@ -105,28 +105,28 @@ export function BranchCard({ branch, onView, onEdit }: BranchCardProps) {
 
         {branch.utilizationRate !== undefined && (
           <div className="space-y-2.5 pt-4 border-t border-border/40">
-            <div className="flex items-center gap-1.5 text-muted-foreground/30">
+            <div className="flex items-center gap-1.5 text-faint">
               <ChartPieSlice size={14} weight="bold" />
-              <span className="text-caption font-semibold text-muted-foreground/60 leading-none">Utilisation & Claims</span>
+              <span className="text-label font-semibold text-faint leading-none">Utilisation & Claims</span>
             </div>
             <div className="flex items-center gap-3">
               <UtilizationChart value={branch.utilizationRate} mode="ring" size={40} strokeWidth={4} />
               <div className="flex flex-col justify-center">
                 <div className="flex items-center gap-1.5 leading-tight">
                   <span className={cn(
-                    "text-nav font-semibold text-foreground",
+                    "text-body font-medium text-foreground",
                     branch.utilizationRate > 80 ? "text-rose-500" : branch.utilizationRate > 50 ? "text-amber-500" : "text-emerald-500"
                   )}>
                     {branch.balance}
                   </span>
                   {branch.claimsCount !== undefined && (
-                    <span className="text-micro font-semibold px-1.5 rounded-full bg-muted text-muted-foreground/60 border border-border tabular-nums leading-none flex items-center">
+                    <span className="text-label font-medium px-1.5 rounded-full bg-muted text-faint border border-border tabular-nums leading-none flex items-center">
                       {branch.claimsCount}
                     </span>
                   )}
                 </div>
                 {branch.limit && (
-                  <span className="text-micro text-muted-foreground/60 font-medium tabular-nums mt-0.5">
+                  <span className="text-label text-faint font-medium tabular-nums mt-0.5">
                     / {branch.limit}
                   </span>
                 )}

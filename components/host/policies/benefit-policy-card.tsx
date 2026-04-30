@@ -74,7 +74,7 @@ export function BenefitPolicyCard({ policy, onView, onClone }: BenefitPolicyCard
                 status={policy.status}
                 variant={policy.status === "Published" ? "emerald" : "amber"}
               />
-              <span className="text-micro text-muted-foreground/60 font-mono bg-background/50 px-1.5 py-0.5 rounded border border-border/40 tracking-tight">
+              <span className="text-micro text-faint font-mono bg-background/50 px-1.5 py-0.5 rounded border border-border/40 tracking-tight">
                 {policy.code}
               </span>
             </div>
@@ -86,19 +86,19 @@ export function BenefitPolicyCard({ policy, onView, onClone }: BenefitPolicyCard
 
       {/* Content Section */}
       <div className="relative z-10">
-        <p className="text-nav text-muted-foreground/80 line-clamp-2 leading-relaxed font-normal opacity-95">
+        <p className="text-body text-subtle line-clamp-2 leading-relaxed font-normal">
           {policy.description || "No description provided."}
         </p>
 
         <div className="mt-8 pt-6 border-t border-border/60 flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-muted-foreground/60">
-            <span className="text-micro font-semibold">12 enrolled</span>
+          <div className="flex items-center gap-1.5 text-faint">
+            <span className="text-label font-medium">12 enrolled</span>
           </div>
           <div className="text-right">
-            <p className="text-body font-semibold text-foreground tracking-tight">
+            <p className="text-body font-semibold text-foreground">
               RM {policy.utilisationMode === "Fixed" ? "2,400.00" : "Prorated"}
             </p>
-            <p className="text-micro text-muted-foreground/60 font-semibold tracking-tight">
+            <p className="text-label text-faint font-medium">
               Budget pool
             </p>
           </div>

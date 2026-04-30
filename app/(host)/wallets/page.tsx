@@ -96,7 +96,7 @@ export default function WalletsPage() {
     <div className="px-4 py-4">
       <div className="rounded-lg border border-border/60 bg-card overflow-hidden">
         {/* Nested Header */}
-        <div className="grid grid-cols-12 gap-4 px-4 py-2.5 bg-muted/30 border-b border-border/60 text-caption font-semibold text-muted-foreground/60 tracking-tight">
+        <div className="grid grid-cols-12 gap-4 px-4 py-2.5 bg-muted/30 border-b border-border/60 text-label font-semibold text-faint">
           <div className="col-span-3">Wallet Name</div>
           <div className="col-span-2">Branch</div>
           <div className="col-span-2 text-right">Balance</div>
@@ -113,16 +113,16 @@ export default function WalletsPage() {
             onClick={() => router.push(`/wallets/${wallet.id}`)}
           >
             <div className="col-span-3">
-              <span className="block text-nav font-semibold text-foreground">
+              <span className="block text-body font-medium text-foreground">
                 {wallet.name}
               </span>
-              <span className="block font-mono text-micro tracking-tight text-muted-foreground/50">
+              <span className="block font-mono text-label text-faint">
                 {wallet.id}
               </span>
             </div>
 
             <div className="col-span-2">
-              <span className="text-nav text-muted-foreground">
+              <span className="text-body text-subtle">
                 {wallet.branchName}
               </span>
             </div>
@@ -130,7 +130,7 @@ export default function WalletsPage() {
             <div className="col-span-2 text-right">
               <span
                 className={cn(
-                  "text-nav font-semibold",
+                  "text-body font-semibold tabular-nums",
                   wallet.balance < 0 ? "text-rose-500" : "text-foreground"
                 )}
               >
@@ -141,12 +141,12 @@ export default function WalletsPage() {
 
             <div className="col-span-2 text-right">
               {wallet.pendingDeductions > 0 ? (
-                <div className="inline-flex items-center gap-1 rounded-md border border-amber-200 bg-amber-50 px-1.5 py-0.5 text-micro font-semibold text-amber-700">
+                <div className="inline-flex items-center gap-1 rounded-md border border-amber-200 bg-amber-50 px-1.5 py-0.5 text-label font-medium text-amber-700">
                   <Ticket size={10} weight="fill" />
                   RM {wallet.pendingDeductions.toLocaleString()}
                 </div>
               ) : (
-                <span className="text-micro text-muted-foreground/50">—</span>
+                <span className="text-micro text-faint">—</span>
               )}
             </div>
 
@@ -201,10 +201,10 @@ export default function WalletsPage() {
       {/* Header */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-heading font-semibold tracking-tight text-foreground">
+          <h1 className="text-heading font-semibold text-foreground text-balance">
             Wallets
           </h1>
-          <p className="mt-1 text-nav font-normal text-muted-foreground opacity-80">
+          <p className="mt-1 text-body font-normal text-muted-foreground">
             Monitor and manage organisation/branch fiscal balances.
           </p>
         </div>
@@ -213,7 +213,7 @@ export default function WalletsPage() {
           <Button
             variant="ghost"
             size="sm"
-            className="h-9 text-nav font-medium hover:bg-muted/50"
+            className="h-9 text-body font-medium hover:bg-muted/50"
           >
             <ArrowsClockwise size={16} className="mr-1.5 opacity-60" />
             Refresh
@@ -221,7 +221,7 @@ export default function WalletsPage() {
 
           <div className="mx-1 h-4 w-[1px] bg-border" />
 
-          <Button className="h-9 text-nav font-medium shadow-sm">
+          <Button className="h-9 text-body font-medium shadow-sm">
             <Plus size={16} weight="bold" className="mr-1.5" />
             Create Wallet
           </Button>
@@ -300,7 +300,7 @@ export default function WalletsPage() {
                       <span className="block text-body font-semibold text-foreground">
                         {row.orgName}
                       </span>
-                      <span className="block font-mono text-micro tracking-tight text-muted-foreground/60">
+                      <span className="block font-mono text-label text-faint">
                         {row.orgId}
                       </span>
                     </div>
@@ -313,7 +313,7 @@ export default function WalletsPage() {
                 sortable: true,
                 align: "right",
                 render: (row: OrgRow) => (
-                  <span className="text-nav font-semibold text-foreground">
+                  <span className="text-body font-medium text-foreground">
                     {row.walletCount}
                   </span>
                 ),
@@ -326,7 +326,7 @@ export default function WalletsPage() {
                 render: (row: OrgRow) => (
                   <span
                     className={cn(
-                      "text-body font-semibold",
+                      "text-body font-semibold tabular-nums",
                       row.totalBalance < 0 ? "text-rose-500" : "text-foreground"
                     )}
                   >
@@ -348,7 +348,7 @@ export default function WalletsPage() {
                         variant="emerald"
                         className="rounded-md px-1.5 py-0.5 text-micro"
                       />
-                      <span className="text-caption text-muted-foreground/60">
+                      <span className="text-label text-faint">
                         +{row.suspendedCount} suspended
                       </span>
                     </div>

@@ -109,16 +109,16 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
                 variant={employee.status === "Linked" ? "emerald" : "amber"} 
                 className="px-1.5 py-0.5 rounded-md text-micro"
               />
-              <span className="text-micro text-muted-foreground/60 font-mono bg-background/50 px-1.5 py-0.5 rounded border border-border/40 tracking-tight">{employee.empCode}</span>
+              <span className="text-micro text-faint font-mono bg-background/50 px-1.5 py-0.5 rounded border border-border/40 tracking-tight">{employee.empCode}</span>
             </div>
             <div className="flex items-center gap-1.5 flex-wrap">
               {employee.department && (
-                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-muted text-muted-foreground border border-border/40 tracking-tight">
+                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-muted text-muted-foreground border border-border/40">
                   {employee.department}
                 </span>
               )}
               {employee.tier && (
-                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-primary/5 text-primary border border-primary/10 tracking-tight">
+                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-primary/5 text-primary border border-primary/10">
                   {employee.tier}
                 </span>
               )}
@@ -143,20 +143,20 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
         {/* Row 1: Branch & Email */}
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2.5">
-            <div className="flex items-center gap-1.5 text-muted-foreground/30">
+            <div className="flex items-center gap-1.5 text-faint">
               <Buildings size={14} weight="bold" />
-              <span className="text-caption font-semibold tracking-tight text-muted-foreground/60">Branch</span>
+              <span className="text-label font-semibold text-faint">Branch</span>
             </div>
-            <span className="text-nav font-semibold text-foreground block truncate" title={employee.branch}>
+            <span className="text-body font-medium text-foreground block truncate" title={employee.branch}>
               {employee.branch}
             </span>
           </div>
           <div className="space-y-2.5 font-mono">
-            <div className="flex items-center gap-1.5 text-muted-foreground/30">
+            <div className="flex items-center gap-1.5 text-faint">
               <UserCircle size={14} weight="bold" />
-              <span className="text-caption font-semibold tracking-tight text-muted-foreground/60">Email</span>
+              <span className="text-label font-semibold text-faint">Email</span>
             </div>
-            <span className="text-caption font-semibold text-muted-foreground/80 block truncate" title={employee.email}>
+            <span className="text-label font-semibold text-subtle block truncate" title={employee.email}>
               {employee.email}
             </span>
           </div>
@@ -164,9 +164,9 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
           
         {/* Policy Carousel Section */}
         <div className="bg-muted/30 rounded-lg px-4 py-4 border border-border/60 relative overflow-hidden group/policy min-h-[140px]">
-          <div className="flex items-center gap-1.5 text-muted-foreground/30 mb-3">
+          <div className="flex items-center gap-1.5 text-faint mb-3">
             <Shield size={14} weight="bold" />
-            <span className="text-caption font-semibold tracking-tight text-muted-foreground/60">Benefit Policy</span>
+            <span className="text-label font-semibold text-faint">Benefit Policy</span>
           </div>
           <AnimatePresence mode="wait">
             <motion.div
@@ -178,7 +178,7 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
               className="space-y-3.5"
             >
               <div className="flex flex-col gap-2.5 overflow-hidden flex-1">
-                <span className="text-nav font-semibold text-foreground truncate" title={currentItem.policyName}>
+                <span className="text-body font-medium text-foreground truncate" title={currentItem.policyName}>
                   {currentItem.policyName}
                 </span>
                 
@@ -195,7 +195,7 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
                     {currentItem.benefitGroups.map((group: string, idx: number) => (
                       <div 
                         key={idx}
-                        className="bg-background/40 border border-border/60 text-muted-foreground/80 px-2.5 py-1 rounded-full text-micro font-semibold shadow-sm whitespace-nowrap shrink-0 hover:border-primary/40 hover:text-primary transition-all duration-300 pointer-events-none"
+                        className="bg-background/40 border border-border/60 text-subtle px-2.5 py-1 rounded-full text-label font-medium shadow-sm whitespace-nowrap shrink-0 hover:border-primary/40 hover:text-primary transition-all duration-300 pointer-events-none"
                       >
                         {group}
                       </div>
@@ -205,8 +205,8 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
               </div>
 
               <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-caption font-semibold tracking-tight">
-                  <span className="text-muted-foreground/60 font-semibold">Utilisation</span>
+                <div className="flex items-center justify-between text-label font-semibold">
+                  <span className="text-faint font-semibold">Utilisation</span>
                   <span className={cn(
                     "px-1.5 py-0.5 rounded shrink-0 font-semibold",
                     currentItem.utilisation > 80 ? "bg-rose-500/10 text-rose-500" : "bg-emerald-500/10 text-emerald-500"
@@ -236,21 +236,21 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
       {/* Footer Metadata: Standardized Fields */}
       <div className="mt-5 pt-4 border-t border-border/40 grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <div className="flex items-center gap-1.5 text-muted-foreground/30">
+          <div className="flex items-center gap-1.5 text-faint">
             <Users size={14} weight="bold" />
-            <span className="text-caption font-semibold tracking-tight text-muted-foreground/60">Workforce</span>
+            <span className="text-label font-semibold text-faint">Workforce</span>
           </div>
-          <span className="text-label font-semibold text-foreground/80 block">
+          <span className="text-label font-semibold text-subtle block">
             {employee.dependentsCount} (Dependents)
           </span>
         </div>
         
         <div className="space-y-1.5">
-          <div className="flex items-center gap-1.5 text-muted-foreground/30">
+          <div className="flex items-center gap-1.5 text-faint">
             <Clock size={14} weight="bold" />
-            <span className="text-caption font-semibold tracking-tight text-muted-foreground/60">Last Active</span>
+            <span className="text-label font-semibold text-faint">Last Active</span>
           </div>
-          <span className="text-label font-semibold text-foreground/80 block">
+          <span className="text-label font-semibold text-subtle block">
             {employee.joinDate}
           </span>
         </div>

@@ -38,8 +38,8 @@ export default function DashboardPage() {
       <section>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4">
           <div>
-            <h1 className="text-heading font-semibold tracking-tight text-foreground">System Overview</h1>
-            <p className="text-muted-foreground text-nav mt-1">
+            <h1 className="text-title font-semibold text-foreground text-balance">System Overview</h1>
+            <p className="text-subtle text-body mt-1">
               Real-time flexi-benefit insights and all-time platform health
             </p>
           </div>
@@ -54,7 +54,7 @@ export default function DashboardPage() {
             trend={{ value: "+1.2%", label: "growth", isPositive: true }}
           >
             <div className="flex flex-col items-end gap-1.5 ml-auto">
-              <span className="text-micro font-medium text-muted-foreground/50 tracking-[0.05em] group-hover:text-primary/60 transition-colors">64% Employees</span>
+              <span className="text-label font-medium text-faint tracking-[0.05em] group-hover:text-primary/60 transition-colors">64% Employees</span>
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
@@ -71,7 +71,7 @@ export default function DashboardPage() {
                        <span className="w-2 h-2 rounded-full bg-primary" />
                        82,402 Employees (64%)
                     </p>
-                    <p className="flex items-center gap-2 mt-1 text-muted-foreground">
+                    <p className="flex items-center gap-2 mt-1 text-subtle">
                        <span className="w-2 h-2 rounded-full bg-primary/30" />
                        46,090 Dependents (36%)
                     </p>
@@ -105,7 +105,7 @@ export default function DashboardPage() {
             trend={{ value: "+3.2%", label: "growth", isPositive: true }}
           >
             <div className="flex flex-col items-end gap-1.5 ml-auto">
-              <span className="text-micro font-medium text-muted-foreground/50 tracking-[0.05em] group-hover:text-primary/60 transition-colors">88% Claims</span>
+              <span className="text-label font-medium text-faint tracking-[0.05em] group-hover:text-primary/60 transition-colors">88% Claims</span>
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
@@ -122,7 +122,7 @@ export default function DashboardPage() {
                        <span className="w-2 h-2 rounded-full bg-primary" />
                        RM 18.2M Claims (88%)
                     </p>
-                    <p className="flex items-center gap-2 mt-1 text-muted-foreground">
+                    <p className="flex items-center gap-2 mt-1 text-subtle">
                        <span className="w-2 h-2 rounded-full bg-primary/30" />
                        RM 2.4M Net Profit (12%)
                     </p>
@@ -138,8 +138,8 @@ export default function DashboardPage() {
       <section className="space-y-4">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
-            <h2 className="text-subtitle font-semibold text-foreground">Performance</h2>
-            <p className="text-muted-foreground text-nav mt-1">
+            <h2 className="text-lead font-semibold text-foreground">Performance</h2>
+            <p className="text-subtle text-body mt-1">
               Ecosystem activity and settlement volume over time
             </p>
           </div>
@@ -152,7 +152,7 @@ export default function DashboardPage() {
                   key={p}
                   onClick={() => setPeriod(p as any)}
                   className={`px-3 py-1.5 text-label font-medium rounded transition-colors ${
-                    period === p ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
+                    period === p ? "bg-background shadow-sm text-foreground" : "text-subtle hover:text-foreground"
                   }`}
                 >
                   {p}

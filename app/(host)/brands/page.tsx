@@ -23,21 +23,21 @@ export default function BrandsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-heading font-semibold tracking-tight text-foreground">Brands</h1>
-          <p className="text-muted-foreground text-nav mt-1 font-normal opacity-80">
+          <h1 className="text-heading font-semibold text-foreground text-balance">Brands</h1>
+          <p className="text-subtle text-body mt-1 font-normal opacity-80">
             Create brands and manage the hierarchy of service providers under each brand.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" className="h-9 text-nav font-medium hover:bg-muted/50">
+          <Button variant="ghost" size="sm" className="h-9 text-body font-medium hover:bg-muted/50">
             <DownloadSimple size={16} className="mr-1.5 opacity-60" />
             Export
           </Button>
 
           <div className="h-4 w-[1px] bg-border mx-1" />
 
-          <Button asChild className="h-9 text-nav font-medium shadow-sm">
+          <Button asChild className="h-9 text-body font-medium shadow-sm">
             <Link href="/brands/new">
               <Plus size={16} weight="bold" className="mr-1.5" />
               Add Brand

@@ -150,14 +150,14 @@ export function SearchableMultiSelect({
       {/* Header with Clear All only */}
       {(taxonomy.length > 0 || staticOptions.length > 0) && (
         <div className="flex items-center justify-between px-2 py-1.5 border-b border-border/50 mb-1">
-          <span className="text-micro font-semibold text-muted-foreground tracking-tight">
+          <span className="text-label font-medium text-muted-foreground">
             {query ? "Filtered Results" : title}
           </span>
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={() => onChange([])}
-              className="text-micro font-semibold text-rose-500 hover:text-rose-600 transition-colors"
+              className="text-label font-medium text-rose-500 hover:text-rose-600 transition-colors"
             >
               Clear All
             </button>
@@ -179,7 +179,7 @@ export function SearchableMultiSelect({
                 onMouseEnter={() => setActiveIndex(idx)}
                 type="button"
                 className={cn(
-                  "w-full text-left px-3 py-1.5 rounded-lg text-nav transition-colors flex items-center justify-between group font-semibold text-primary",
+                  "w-full text-left px-3 py-1.5 rounded-lg text-body transition-colors flex items-center justify-between group font-semibold text-primary",
                   isHighlighted ? "bg-muted/50" : "hover:bg-muted/50"
                 )}
               >
@@ -192,7 +192,7 @@ export function SearchableMultiSelect({
           {filteredTaxonomy.map((group) => (
             <div key={group.category} className="mb-2">
               {(taxonomy.length > 1 || staticOptions.length > 0) && (
-                <div className="px-3 py-1.5 text-micro font-semibold tracking-tight text-muted-foreground/50 select-none">
+                <div className="px-3 py-1.5 text-label font-medium text-faint select-none">
                   {group.category}
                 </div>
               )}
@@ -211,7 +211,7 @@ export function SearchableMultiSelect({
                     onMouseEnter={() => setActiveIndex(globalIdx)}
                     type="button"
                     className={cn(
-                      "w-full text-left px-3 py-1.5 rounded-lg text-nav transition-colors flex items-center justify-between group font-normal",
+                      "w-full text-left px-3 py-1.5 rounded-lg text-body transition-colors flex items-center justify-between group font-normal",
                       isHighlighted ? "bg-muted/50" : "hover:bg-muted/50"
                     )}
                   >
@@ -243,7 +243,7 @@ export function SearchableMultiSelect({
           aria-controls={`${id}-listbox`}
         >
           {selected.map((s) => (
-            <Badge key={s} variant="secondary" className="bg-primary/10 text-primary border-primary/20 px-2 py-0.5 text-caption font-medium gap-1 group whitespace-nowrap">
+            <Badge key={s} variant="secondary" className="bg-primary/10 text-primary border-primary/20 px-2 py-0.5 text-label font-medium gap-1 group whitespace-nowrap">
               {s}
               <button 
                 onClick={() => removeOption(s)}
@@ -258,7 +258,7 @@ export function SearchableMultiSelect({
           <input 
             ref={inputRef}
             type="text"
-            className="flex-1 bg-transparent border-0 outline-none text-nav placeholder:text-muted-foreground/60 min-w-[120px] h-6 px-1"
+            className="flex-1 bg-transparent border-0 outline-none text-body placeholder:text-faint min-w-[120px] h-6 px-1"
             placeholder={selected.length === 0 ? placeholder : ""}
             value={query}
             onFocus={() => setIsOpen(true)}

@@ -55,8 +55,8 @@ export default function MembersPage() {
         <div className="flex items-center gap-3">
           <EntityAvatar name={row.name} size="sm" />
           <div className="flex flex-col">
-            <span className="font-semibold text-foreground text-body tracking-tight hover:text-primary transition-colors cursor-pointer">{row.name}</span>
-            <span className="text-caption text-muted-foreground font-medium opacity-70">{row.email}</span>
+            <span className="font-semibold text-foreground text-body hover:text-primary transition-colors cursor-pointer">{row.name}</span>
+            <span className="text-label text-muted-foreground font-medium">{row.email}</span>
           </div>
         </div>
       )
@@ -67,7 +67,7 @@ export default function MembersPage() {
       sortable: true,
       render: (row) => (
         <span className={cn(
-          "px-2 py-0.5 rounded-full text-micro font-semibold border backdrop-blur-sm",
+          "px-2 py-0.5 rounded-full text-label font-medium border backdrop-blur-sm",
           row.type === "Employee" 
             ? "bg-blue-500/10 text-blue-600 border-blue-500/20" 
             : "bg-purple-500/10 text-purple-600 border-purple-500/20"
@@ -82,8 +82,8 @@ export default function MembersPage() {
       sortable: true,
       render: (row) => (
         <div className="flex items-center gap-2">
-          <Buildings size={16} className="text-muted-foreground/40" />
-          <span className="text-nav font-semibold text-foreground/80">{row.organization.name}</span>
+          <Buildings size={16} className="text-faint" />
+          <span className="text-body font-semibold text-subtle">{row.organization.name}</span>
         </div>
       )
     },
@@ -93,8 +93,8 @@ export default function MembersPage() {
       sortable: true,
       render: (row) => (
         <div className="flex items-center gap-2">
-          <TreeStructure size={16} className="text-muted-foreground/40" />
-          <span className="text-nav font-medium text-muted-foreground">{row.branch?.name || "-"}</span>
+          <TreeStructure size={16} className="text-faint" />
+          <span className="text-body font-medium text-subtle">{row.branch?.name || "-"}</span>
         </div>
       )
     },
@@ -114,7 +114,7 @@ export default function MembersPage() {
       accessorKey: "joinedDate",
       sortable: true,
       render: (row) => (
-        <span className="text-label font-medium text-muted-foreground/80 tracking-tight">{row.joinedDate}</span>
+        <span className="text-label font-medium text-subtle">{row.joinedDate}</span>
       )
     },
     {
@@ -122,7 +122,7 @@ export default function MembersPage() {
       accessorKey: "lastActive",
       sortable: true,
       render: (row) => (
-        <span className="text-label font-medium text-muted-foreground/80 tracking-tight">{row.lastActive}</span>
+        <span className="text-label font-medium text-subtle">{row.lastActive}</span>
       )
     },
   ];
@@ -132,15 +132,15 @@ export default function MembersPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-heading font-semibold tracking-tight text-foreground">Members</h1>
-          <p className="text-muted-foreground text-nav mt-1 font-normal opacity-80">
+          <h1 className="text-heading font-semibold text-foreground text-balance">Members</h1>
+          <p className="text-subtle text-body mt-1 font-normal">
             Record of global workforce members, including employees and their dependents who have signed up on the app. Track activation status and member activity.
           </p>
         </div>
         <div className="flex items-center gap-2">
           <ViewToggle mode={viewMode} onChange={setViewMode} />
           
-          <Button variant="ghost" size="sm" className="h-9 text-nav font-medium hover:bg-muted/50">
+          <Button variant="ghost" size="sm" className="h-9 text-body font-medium hover:bg-muted/50">
             <DownloadSimple size={16} className="mr-1.5 opacity-60" />
             Export
           </Button>

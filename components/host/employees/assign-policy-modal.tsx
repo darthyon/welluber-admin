@@ -150,12 +150,12 @@ export function AssignPolicyModal({
                   <div className="flex items-start justify-between">
                     <div className="space-y-2">
                       <div className="flex items-center gap-3">
-                        <h4 className="text-nav font-semibold text-foreground">{policy.name}</h4>
+                        <h4 className="text-body font-medium text-foreground">{policy.name}</h4>
                         <Badge variant="outline" className="text-xs">
                           RM {policy.totalAllocated.toLocaleString()}
                         </Badge>
                       </div>
-                      <p className="text-caption text-muted-foreground">{policy.description}</p>
+                      <p className="text-label text-muted-foreground">{policy.description}</p>
                       
                       <div className="flex flex-wrap gap-2">
                         {policy.benefitGroups.map((group) => (
@@ -186,8 +186,8 @@ export function AssignPolicyModal({
                 <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-3">
                   <MagnifyingGlass size={24} className="text-muted-foreground" />
                 </div>
-                <p className="text-nav font-semibold text-foreground">No policies found</p>
-                <p className="text-caption text-muted-foreground mt-1">
+                <p className="text-body font-medium text-foreground">No policies found</p>
+                <p className="text-label text-muted-foreground mt-1">
                   Try adjusting your search terms or check if policies are available.
                 </p>
               </div>
@@ -200,8 +200,8 @@ export function AssignPolicyModal({
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-caption font-semibold text-muted-foreground">Selected Policy</p>
-                    <p className="text-nav font-semibold text-foreground">{selectedPolicy.name}</p>
+                    <p className="text-label font-medium text-subtle">Selected Policy</p>
+                    <p className="text-body font-medium text-foreground">{selectedPolicy.name}</p>
                   </div>
                   <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
                     RM {selectedPolicy.totalAllocated.toLocaleString()}

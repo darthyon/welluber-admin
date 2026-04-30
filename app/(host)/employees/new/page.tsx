@@ -52,15 +52,15 @@ export default function NewEmployeePage() {
             <div className="flex flex-col gap-4">
               <button
                 onClick={() => router.back()}
-                className="inline-flex items-center gap-1.5 text-nav font-medium text-muted-foreground hover:text-foreground transition-colors w-fit"
+                className="inline-flex items-center gap-1.5 text-body font-medium text-subtle hover:text-foreground transition-colors w-fit"
               >
                 <CaretLeft size={16} /> Back
               </button>
               <div>
-                <h1 className="text-heading font-semibold tracking-tight text-foreground">
+                <h1 className="text-heading font-semibold text-foreground text-balance">
                   Add New Employee
                 </h1>
-                <p className="text-muted-foreground text-nav mt-1">
+                <p className="text-subtle text-body mt-1">
                   Register a new employee and assign them to a branch and benefit
                   policy.
                 </p>
@@ -78,7 +78,7 @@ export default function NewEmployeePage() {
               <Button
                 variant="ghost"
                 size="lg"
-                className="text-nav font-semibold px-6 transition-colors"
+                className="text-body font-medium px-6 transition-colors"
                 onClick={() => router.back()}
               >
                 Cancel
@@ -89,7 +89,7 @@ export default function NewEmployeePage() {
                 form="employeeForm"
                 disabled={isSubmitting}
                 size="lg"
-                className="text-nav font-semibold px-8 flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                className="text-body font-medium px-8 flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
                 {isSubmitting ? (
                   <>

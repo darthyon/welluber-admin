@@ -25,7 +25,7 @@ export function Breadcrumbs({ items, className }: BreadcrumbsProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <nav aria-label="Breadcrumb" className={cn("flex items-center text-nav text-muted-foreground", className)}>
+    <nav aria-label="Breadcrumb" className={cn("flex items-center text-body text-subtle", className)}>
       <ol className="flex items-center space-x-2">
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
@@ -53,7 +53,7 @@ export function Breadcrumbs({ items, className }: BreadcrumbsProps) {
                       onClick={() => setOpenIndex(openIndex === index ? null : index)}
                       className="p-0.5 hover:bg-muted rounded transition-colors"
                     >
-                      <CaretDown size={12} weight="bold" className="text-muted-foreground/60" />
+                      <CaretDown size={12} weight="bold" className="text-faint" />
                     </button>
                   )}
 
@@ -76,7 +76,7 @@ export function Breadcrumbs({ items, className }: BreadcrumbsProps) {
               </li>
               {!isLast && (
                 <li>
-                  <CaretRight size={12} weight="bold" className="text-muted-foreground/60 mx-1" />
+                  <CaretRight size={12} weight="bold" className="text-faint mx-1" />
                 </li>
               )}
             </Fragment>

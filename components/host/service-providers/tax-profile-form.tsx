@@ -94,8 +94,8 @@ export function TaxProfileForm({ spId, initial }: TaxProfileFormProps) {
       {/* SST Registered toggle */}
       <div className="flex items-center justify-between py-2 border-b border-border/50">
         <div>
-          <p className="text-nav font-medium text-foreground">SST Registered</p>
-          <p className="text-caption text-muted-foreground mt-0.5">
+          <p className="text-body font-medium text-foreground">SST Registered</p>
+          <p className="text-label text-muted-foreground mt-0.5">
             Wellness centres above RM 500,000 taxable turnover must register for SST.
           </p>
         </div>
@@ -105,14 +105,14 @@ export function TaxProfileForm({ spId, initial }: TaxProfileFormProps) {
       <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] gap-4 items-end">
         {currentRegistered && (
           <div className="space-y-1.5 md:self-stretch">
-            <label className="text-nav font-medium text-foreground">SST Registration Number</label>
+            <label className="text-body font-medium text-foreground">SST Registration Number</label>
             <input
               {...register("taxRegNo")}
               className={inputCls(!!errors.taxRegNo)}
               placeholder="e.g. SST-2024-001234"
             />
             {errors.taxRegNo && (
-              <p className="text-caption text-destructive flex items-center gap-1 mt-1">
+              <p className="text-label text-destructive flex items-center gap-1 mt-1">
                 <WarningCircle size={12} /> {errors.taxRegNo.message}
               </p>
             )}
@@ -120,9 +120,9 @@ export function TaxProfileForm({ spId, initial }: TaxProfileFormProps) {
         )}
 
         <div className="space-y-1.5">
-          <label className="text-nav font-medium text-foreground flex items-center justify-between">
+          <label className="text-body font-medium text-foreground flex items-center justify-between">
             Tax Rate
-            <span className="text-caption font-normal text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+            <span className="text-label font-normal text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
               Default: 8% (SST Group C)
             </span>
           </label>
@@ -140,7 +140,7 @@ export function TaxProfileForm({ spId, initial }: TaxProfileFormProps) {
             </span>
           </div>
           {errors.taxRate && (
-            <p className="text-caption text-destructive flex items-center gap-1 mt-1">
+            <p className="text-label text-destructive flex items-center gap-1 mt-1">
               <WarningCircle size={12} /> {errors.taxRate.message}
             </p>
           )}
@@ -148,7 +148,7 @@ export function TaxProfileForm({ spId, initial }: TaxProfileFormProps) {
 
         <div className="flex flex-col items-start md:items-end gap-2 md:self-end">
           {isDirty ? (
-            <Button type="button" size="sm" disabled={isSaving} onClick={handleSaveClick} className="text-nav">
+            <Button type="button" size="sm" disabled={isSaving} onClick={handleSaveClick} className="text-body">
               {isSaving ? (
                 <>
                   <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-1.5" />

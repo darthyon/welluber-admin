@@ -21,7 +21,7 @@ const STATUS_STYLE: Record<ClaimStatus, string> = {
 
 function StatusBadge({ status }: { status: ClaimStatus }) {
   return (
-    <span className={cn("text-micro font-semibold px-1.5 py-0.5 rounded", STATUS_STYLE[status])}>
+    <span className={cn("text-label font-medium px-1.5 py-0.5 rounded", STATUS_STYLE[status])}>
       {status}
     </span>
   );
@@ -48,7 +48,7 @@ const columns: Column<EmployeeClaim>[] = [
     render: (row) => (
       <div className="flex items-center gap-2">
         <StatusBadge status={row.status} />
-        <span className="text-caption font-semibold text-primary cursor-pointer hover:underline underline-offset-2">{row.voucherName || row.voucherCode}</span>
+        <span className="text-label font-semibold text-primary cursor-pointer hover:underline underline-offset-2">{row.voucherName || row.voucherCode}</span>
       </div>
     ),
   },
@@ -56,7 +56,7 @@ const columns: Column<EmployeeClaim>[] = [
     header: "Service",
     accessorKey: "service",
     render: (row) => (
-      <p className="text-nav font-medium text-foreground/80">{row.service}</p>
+      <p className="text-body font-medium text-subtle">{row.service}</p>
     ),
   },
   {
@@ -64,8 +64,8 @@ const columns: Column<EmployeeClaim>[] = [
     accessorKey: "provider",
     render: (row) => (
       <div className="flex items-center gap-1.5 min-w-0">
-        <Storefront size={11} className="text-muted-foreground/60 shrink-0" />
-        <p className="text-nav text-foreground/70 font-medium truncate">{row.provider}</p>
+        <Storefront size={11} className="text-faint shrink-0" />
+        <p className="text-body text-subtle font-medium truncate">{row.provider}</p>
       </div>
     ),
   },
@@ -74,8 +74,8 @@ const columns: Column<EmployeeClaim>[] = [
     accessorKey: "location",
     render: (row) => (
       <div className="flex items-center gap-1.5 min-w-0">
-        <MapPin size={11} className="text-muted-foreground/60 shrink-0" />
-        <p className="text-nav text-foreground/70 font-medium truncate">{row.location}</p>
+        <MapPin size={11} className="text-faint shrink-0" />
+        <p className="text-body text-subtle font-medium truncate">{row.location}</p>
       </div>
     ),
   },
@@ -84,8 +84,8 @@ const columns: Column<EmployeeClaim>[] = [
     accessorKey: "date",
     render: (row) => (
       <div className="flex items-center gap-1.5">
-        <Calendar size={11} className="text-muted-foreground/60 shrink-0" />
-        <p className="text-caption text-muted-foreground font-medium whitespace-nowrap">{row.date}</p>
+        <Calendar size={11} className="text-faint shrink-0" />
+        <p className="text-label text-muted-foreground font-medium whitespace-nowrap">{row.date}</p>
       </div>
     ),
   },
@@ -95,7 +95,7 @@ const columns: Column<EmployeeClaim>[] = [
     align: "right",
     sortable: true,
     render: (row) => (
-      <p className="text-nav font-semibold font-mono text-foreground">
+      <p className="text-body font-semibold font-mono text-foreground">
         RM {row.amount.toFixed(2)}
       </p>
     ),
@@ -104,7 +104,7 @@ const columns: Column<EmployeeClaim>[] = [
     header: "Benefit Group",
     accessorKey: "benefitGroup",
     render: (row) => (
-      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 text-micro font-semibold">
+      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 text-label font-medium">
         {row.benefitGroup}
       </Badge>
     ),
@@ -152,7 +152,7 @@ export function EmployeeClaimsTab({ employeeId: _employeeId }: EmployeeClaimsTab
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-2">
               <Receipt size={16} className="text-primary" />
-              <p className="text-caption font-semibold text-muted-foreground">Total Claims</p>
+              <p className="text-label font-medium text-subtle">Total Claims</p>
             </div>
             <p className="text-display font-semibold text-foreground">{filteredClaims.length}</p>
           </CardContent>
@@ -161,7 +161,7 @@ export function EmployeeClaimsTab({ employeeId: _employeeId }: EmployeeClaimsTab
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-2">
               <Receipt size={16} className="text-emerald-500" />
-              <p className="text-caption font-semibold text-muted-foreground">Confirmed</p>
+              <p className="text-label font-medium text-subtle">Confirmed</p>
             </div>
             <p className="text-display font-semibold text-foreground">{confirmedCount}</p>
           </CardContent>
@@ -170,18 +170,18 @@ export function EmployeeClaimsTab({ employeeId: _employeeId }: EmployeeClaimsTab
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-2">
               <Receipt size={16} className="text-amber-500" />
-              <p className="text-caption font-semibold text-muted-foreground">Pre-auth</p>
+              <p className="text-label font-medium text-subtle">Pre-auth</p>
             </div>
-            <p className="text-display font-semibold text-foreground">{preAuthCount}</p>
+            <p className="text-display font-semibold text-foreground tabular-nums">{preAuthCount}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-2">
               <Receipt size={16} className="text-foreground" />
-              <p className="text-caption font-semibold text-muted-foreground">Total Amount</p>
+              <p className="text-label font-medium text-subtle">Total Amount</p>
             </div>
-            <p className="text-display font-semibold text-foreground">RM {totalAmount.toLocaleString()}</p>
+            <p className="text-display font-semibold text-foreground tabular-nums">RM {totalAmount.toLocaleString()}</p>
           </CardContent>
         </Card>
       </div>

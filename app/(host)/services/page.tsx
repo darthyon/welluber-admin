@@ -226,13 +226,13 @@ function ServicesContent() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-heading font-semibold tracking-tight text-foreground">Services</h1>
-          <p className="text-muted-foreground text-nav mt-1 font-normal opacity-80">
+          <h1 className="text-heading font-semibold text-foreground text-balance">Services</h1>
+          <p className="text-subtle text-body mt-1 font-normal">
             Define and manage the global service taxonomy. Group services into categories and link them to brands and providers.
           </p>
         </div>
         <Button 
-          className="h-9 text-nav font-medium shadow-sm transition-all hover:scale-[1.02]"
+          className="h-9 text-body font-medium shadow-sm transition-all hover:scale-[1.02]"
           onClick={() => handleOpenDialog({ type: "category", mode: "add" })}
         >
           <Plus size={16} weight="bold" className="mr-1.5" />
@@ -243,15 +243,15 @@ function ServicesContent() {
       {/* Toolbar */}
       <div className="flex items-center gap-3">
         <div className="relative flex-1 max-w-sm">
-          <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/60" size={16} />
+          <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-faint" size={16} />
           <Input 
             placeholder="Search categories, services or specs..." 
-            className="pl-9 h-10 text-nav bg-background/50 focus:bg-background transition-colors"
+            className="pl-9 h-10 text-body bg-background/50 focus:bg-background transition-colors"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <div className="flex items-center gap-2 text-caption font-semibold text-muted-foreground ml-auto">
+        <div className="flex items-center gap-2 text-label font-medium text-subtle ml-auto">
           <span>{filteredTaxonomy.length} Categories</span>
           <span className="w-1 h-1 rounded-full bg-border" />
           <span>{filteredTaxonomy.reduce((acc, cat) => acc + cat.services.length, 0)} Main Services</span>
@@ -294,8 +294,8 @@ function ServicesContent() {
                       <TreeStructure size={16} weight="duotone" />
                     </div>
                     <div>
-                      <p className="text-nav font-semibold text-foreground leading-tight">{category.category}</p>
-                      <p className="text-caption text-muted-foreground">{category.services.length} service{category.services.length !== 1 ? "s" : ""}</p>
+                      <p className="text-body font-medium text-foreground leading-tight">{category.category}</p>
+                      <p className="text-label text-muted-foreground">{category.services.length} service{category.services.length !== 1 ? "s" : ""}</p>
                     </div>
                   </div>
                   <div onClick={(e) => e.stopPropagation()} className="relative z-20">
@@ -306,7 +306,7 @@ function ServicesContent() {
                 {/* Services list */}
                 <div className="relative z-10 h-7 flex items-center">
                   {category.services.length === 0 ? (
-                    <span className="text-caption text-muted-foreground italic">No services yet</span>
+                    <span className="text-label text-muted-foreground italic">No services yet</span>
                   ) : (
                     <OverflowTags items={category.services} className="w-full" />
                   )}
@@ -350,7 +350,7 @@ function ServicesContent() {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder={dialogConfig?.type === "category" ? "e.g. Fitness & Exercise" : "e.g. Yoga"}
-                  className="h-10 text-nav"
+                  className="h-10 text-body"
                   autoFocus
                 />
               </div>
@@ -362,7 +362,7 @@ function ServicesContent() {
                     {selectedIcon && (
                       <button 
                         onClick={() => setSelectedIcon(null)}
-                        className="text-micro text-primary font-semibold hover:underline"
+                        className="text-label text-primary font-semibold hover:underline"
                       >
                         Clear
                       </button>
@@ -379,7 +379,7 @@ function ServicesContent() {
                           "w-10 h-10 rounded-lg border flex items-center justify-center transition-all group/icon",
                           selectedIcon === name 
                             ? "bg-primary text-white border-primary shadow-lg shadow-primary/20 scale-110 z-10" 
-                            : "bg-muted border-zinc-200 text-muted-foreground/60 hover:border-primary/30 hover:bg-white hover:text-primary"
+                            : "bg-muted border-zinc-200 text-faint hover:border-primary/30 hover:bg-white hover:text-primary"
                         )}
                       >
                         <IconComp size={20} weight={selectedIcon === name ? "fill" : "duotone"} />
@@ -391,10 +391,10 @@ function ServicesContent() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setIsDialogOpen(false)} className="h-10 text-nav font-medium">
+            <Button variant="ghost" onClick={() => setIsDialogOpen(false)} className="h-10 text-body font-medium">
               Cancel
             </Button>
-            <Button onClick={handleSave} className="h-10 px-6 text-nav font-semibold">
+            <Button onClick={handleSave} className="h-10 px-6 text-body font-semibold">
               {dialogConfig?.mode === "add" ? "Save " + dialogConfig?.type : "Update"}
             </Button>
           </DialogFooter>

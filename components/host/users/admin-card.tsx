@@ -49,7 +49,7 @@ export function AdminCard({ admin }: AdminCardProps) {
     >
       <div className="flex items-start justify-between mb-8 relative z-10">
         <div className="flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-lg bg-muted border border-border/60 text-muted-foreground/60 flex items-center justify-center">
+          <div className="w-11 h-11 rounded-lg bg-muted border border-border/60 text-faint flex items-center justify-center">
             {admin.role === "HostAdmin" ? <Shield size={22} weight="fill" /> : 
              admin.role === "OrgAdmin" ? <Buildings size={22} weight="fill" /> : 
              <Storefront size={22} weight="fill" />}
@@ -64,7 +64,7 @@ export function AdminCard({ admin }: AdminCardProps) {
                 variant={admin.status === "Active" ? "emerald" : "rose"} 
                 className="px-1.5 py-0.5 rounded-md text-micro"
               />
-              <span className="text-micro text-muted-foreground/60 font-mono bg-background/50 px-1.5 py-0.5 rounded border border-border/40 tracking-tight">Admin</span>
+              <span className="text-micro text-faint font-mono bg-background/50 px-1.5 py-0.5 rounded border border-border/40 tracking-tight">Admin</span>
             </div>
           </div>
         </div>
@@ -77,22 +77,22 @@ export function AdminCard({ admin }: AdminCardProps) {
         {/* Row 1: Email & User Type */}
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2.5">
-            <div className="flex items-center gap-1.5 text-muted-foreground/30">
+            <div className="flex items-center gap-1.5 text-faint">
               <EnvelopeSimple size={14} weight="bold" />
-              <span className="text-caption font-semibold tracking-tight text-muted-foreground/60">Email Address</span>
+              <span className="text-label font-semibold text-faint">Email Address</span>
             </div>
-            <span className="text-label font-semibold text-foreground/80 block truncate font-mono" title={admin.email}>
+            <span className="text-label font-semibold text-subtle block truncate font-mono" title={admin.email}>
               {admin.email}
             </span>
           </div>
 
           <div className="space-y-2.5">
-            <div className="flex items-center gap-1.5 text-muted-foreground/30">
+            <div className="flex items-center gap-1.5 text-faint">
               <Shield size={14} weight="bold" />
-              <span className="text-caption font-semibold tracking-tight text-muted-foreground/60">User Type</span>
+              <span className="text-label font-semibold text-faint">User Type</span>
             </div>
             <span className={cn(
-              "inline-flex px-2 py-0.5 rounded-md text-micro font-semibold border mt-0.5",
+              "inline-flex px-2 py-0.5 rounded-md text-label font-medium border mt-0.5",
               getRoleStyle(admin.role)
             )}>
               {getRoleLabel(admin.role)}
@@ -103,9 +103,9 @@ export function AdminCard({ admin }: AdminCardProps) {
         {/* Row 2: Entity & Last Active */}
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2.5">
-            <div className="flex items-center gap-1.5 text-muted-foreground/30">
+            <div className="flex items-center gap-1.5 text-faint">
               <Buildings size={14} weight="bold" />
-              <span className="text-caption font-semibold tracking-tight text-muted-foreground/60">Entity</span>
+              <span className="text-label font-semibold text-faint">Entity</span>
             </div>
             <span className="text-label font-semibold text-foreground truncate block" title={admin.entity?.name || "Platform Core"}>
               {admin.entity?.name || "Platform Core"}
@@ -113,11 +113,11 @@ export function AdminCard({ admin }: AdminCardProps) {
           </div>
 
           <div className="space-y-2.5">
-            <div className="flex items-center gap-1.5 text-muted-foreground/30">
+            <div className="flex items-center gap-1.5 text-faint">
               <Clock size={14} weight="bold" />
-              <span className="text-caption font-semibold tracking-tight text-muted-foreground/60">Last Active</span>
+              <span className="text-label font-semibold text-faint">Last Active</span>
             </div>
-            <span className="text-label font-semibold text-foreground/80 block">
+            <span className="text-label font-semibold text-subtle block">
               {admin.lastActive}
             </span>
           </div>

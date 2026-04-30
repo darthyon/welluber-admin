@@ -34,8 +34,8 @@ export function UtilisationClaimsTable({ data }: Props) {
   if (data.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center rounded-lg border border-dashed border-border">
-        <Receipt size={36} weight="duotone" className="text-muted-foreground/40 mb-3" />
-        <p className="text-muted-foreground font-medium text-nav">No utilisation data yet.</p>
+        <Receipt size={36} weight="duotone" className="text-faint mb-3" />
+        <p className="text-muted-foreground font-medium text-body">No utilisation data yet.</p>
       </div>
     );
   }
@@ -44,11 +44,11 @@ export function UtilisationClaimsTable({ data }: Props) {
     <div className="border border-border rounded-lg bg-card shadow-sm overflow-hidden flex flex-col">
       {/* Table header */}
       <div className="grid grid-cols-[2.5fr_1.5fr_140px_260px_80px] p-4 bg-muted/30 border-b border-border/60">
-        <p className="text-nav font-semibold text-muted-foreground tracking-tight whitespace-nowrap">Employee</p>
-        <p className="text-nav font-semibold text-muted-foreground tracking-tight whitespace-nowrap">Branch</p>
-        <p className="text-nav font-semibold text-muted-foreground tracking-tight whitespace-nowrap text-right pr-4">Allocated</p>
-        <p className="text-nav font-semibold text-muted-foreground tracking-tight whitespace-nowrap pl-3 text-left">Utilisation & Claims</p>
-        <p className="text-nav font-semibold text-muted-foreground tracking-tight whitespace-nowrap text-center">Claims</p>
+        <p className="text-body font-semibold text-muted-foreground whitespace-nowrap">Employee</p>
+        <p className="text-body font-semibold text-muted-foreground whitespace-nowrap">Branch</p>
+        <p className="text-body font-semibold text-muted-foreground whitespace-nowrap text-right pr-4">Allocated</p>
+        <p className="text-body font-semibold text-muted-foreground whitespace-nowrap pl-3 text-left">Utilisation & Claims</p>
+        <p className="text-body font-semibold text-muted-foreground whitespace-nowrap text-center">Claims</p>
       </div>
 
       {data.map((emp) => {
@@ -64,19 +64,19 @@ export function UtilisationClaimsTable({ data }: Props) {
               onClick={() => toggle(emp.id)}
             >
               <div>
-                <p className="text-nav font-semibold text-foreground group-hover:text-primary transition-colors">{emp.name}</p>
-                <p className="text-caption text-muted-foreground font-medium mt-0.5">{emp.empCode}</p>
+                <p className="text-body font-medium text-foreground group-hover:text-primary transition-colors">{emp.name}</p>
+                <p className="text-label text-muted-foreground font-medium mt-0.5">{emp.empCode}</p>
               </div>
 
               <p className="text-label font-semibold px-2 py-0.5 rounded-md bg-muted text-muted-foreground border border-border w-fit">{emp.branch}</p>
 
-              <p className="text-nav font-mono font-semibold text-foreground text-right pr-4">
+              <p className="text-body font-mono font-semibold text-foreground text-right pr-4">
                 RM {emp.allocated.toLocaleString("en-MY", { minimumFractionDigits: 2 })}
               </p>
 
               <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-caption">
-                  <span className="text-muted-foreground/60">
+                <div className="flex items-center justify-between text-label">
+                  <span className="text-faint">
                     RM {emp.used.toLocaleString("en-MY", { minimumFractionDigits: 2 })}
                   </span>
                   <span className={cn("font-semibold", isHigh ? "text-rose-500" : "text-primary")}>{pct}%</span>
@@ -99,7 +99,7 @@ export function UtilisationClaimsTable({ data }: Props) {
                 <CaretDown
                   size={13}
                   weight="bold"
-                  className={cn("text-muted-foreground/60 transition-transform duration-200", isExpanded && "rotate-180")}
+                  className={cn("text-faint transition-transform duration-200", isExpanded && "rotate-180")}
                 />
               </div>
             </button>
@@ -110,12 +110,12 @@ export function UtilisationClaimsTable({ data }: Props) {
                 {/* Claims sub-header */}
                 <div className="grid grid-cols-[140px_1fr_1fr_1fr_110px_90px] gap-3 px-10 py-2.5 border-b border-border/40">
                   {["Voucher", "Service", "Provider", "Location", "Date", "Amount"].map((h) => (
-                    <p key={h} className="text-caption font-semibold text-muted-foreground/60 font-sans">{h}</p>
+                    <p key={h} className="text-label font-semibold text-faint font-sans">{h}</p>
                   ))}
                 </div>
 
                 {emp.claims.length === 0 ? (
-                  <p className="text-label text-muted-foreground/60 italic px-10 py-4">No claims recorded yet.</p>
+                  <p className="text-label text-faint italic px-10 py-4">No claims recorded yet.</p>
                 ) : (
                   emp.claims.map((claim) => (
                     <div
@@ -124,27 +124,27 @@ export function UtilisationClaimsTable({ data }: Props) {
                     >
                       {/* Voucher + status */}
                       <div className="flex items-center gap-2">
-                        <span className={cn("text-micro font-semibold px-1.5 py-0.5 rounded", STATUS_STYLE[claim.status])}>
+                        <span className={cn("text-label font-medium px-1.5 py-0.5 rounded", STATUS_STYLE[claim.status])}>
                           {claim.status}
                         </span>
-                        <span className="text-caption font-semibold text-primary cursor-pointer hover:underline underline-offset-2">{claim.voucherName || claim.voucherCode}</span>
+                        <span className="text-label font-semibold text-primary cursor-pointer hover:underline underline-offset-2">{claim.voucherName || claim.voucherCode}</span>
                       </div>
 
-                      <p className="text-label text-foreground/80 font-medium">{claim.service}</p>
+                      <p className="text-label text-subtle font-medium">{claim.service}</p>
 
                       <div className="flex items-center gap-1.5 min-w-0">
-                        <Storefront size={11} className="text-muted-foreground/60 shrink-0" />
-                        <p className="text-label text-foreground/70 truncate">{claim.provider}</p>
+                        <Storefront size={11} className="text-faint shrink-0" />
+                        <p className="text-label text-subtle truncate">{claim.provider}</p>
                       </div>
 
                       <div className="flex items-center gap-1.5 min-w-0">
-                        <MapPin size={11} className="text-muted-foreground/60 shrink-0" />
-                        <p className="text-label text-foreground/70 truncate">{claim.location}</p>
+                        <MapPin size={11} className="text-faint shrink-0" />
+                        <p className="text-label text-subtle truncate">{claim.location}</p>
                       </div>
 
                       <div className="flex items-center gap-1.5">
-                        <Calendar size={11} className="text-muted-foreground/60 shrink-0" />
-                        <p className="text-caption text-muted-foreground whitespace-nowrap">{claim.date}</p>
+                        <Calendar size={11} className="text-faint shrink-0" />
+                        <p className="text-label text-muted-foreground whitespace-nowrap">{claim.date}</p>
                       </div>
 
                       <p className="text-label font-semibold font-mono text-foreground text-right">

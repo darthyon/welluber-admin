@@ -47,7 +47,7 @@ export function UserNav({ user: userProp }: UserNavProps) {
       <DropdownMenuTrigger asChild>
         <button
           title={user?.name || "Guest"}
-          className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-caption font-semibold border border-border hover:ring-2 hover:ring-ring/20 transition-all outline-none"
+          className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-label font-semibold border border-border hover:ring-2 hover:ring-ring/20 transition-all outline-none"
         >
           {initials}
         </button>
@@ -56,7 +56,7 @@ export function UserNav({ user: userProp }: UserNavProps) {
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-body font-medium leading-none">{user?.name || "Guest"}</p>
-            <p className="text-caption leading-none text-muted-foreground">
+            <p className="text-label leading-none text-muted-foreground">
               {user?.email || "guest@welluber.com"}
             </p>
           </div>

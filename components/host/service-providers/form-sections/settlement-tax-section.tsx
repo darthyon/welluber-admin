@@ -28,7 +28,7 @@ export function SettlementTaxSection({
           <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
             <Bank size={16} weight="fill" />
           </div>
-          <h3 className="text-subtitle font-semibold text-foreground">Settlement & Tax Compliance</h3>
+          <h3 className="text-lead font-semibold text-foreground">Settlement & Tax Compliance</h3>
         </div>
 
         <div className="space-y-8">
@@ -86,7 +86,7 @@ export function SettlementTaxSection({
             <div className="space-y-1.5">
               <label htmlFor="expiredCommissionFee" className={labelCls}>Expired Commission Fee</label>
               <div className="relative">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/40 font-semibold text-nav">%</div>
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-faint font-semibold text-body">%</div>
                 <input
                   id="expiredCommissionFee"
                   {...register("expiredCommissionFee", { valueAsNumber: true })}
@@ -104,12 +104,12 @@ export function SettlementTaxSection({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex items-center justify-between p-4 bg-muted/20 border border-border rounded-lg group hover:border-primary/20 transition-all duration-300">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-white border border-zinc-100 flex items-center justify-center text-muted-foreground/60 group-hover:text-primary transition-colors">
+                  <div className="w-9 h-9 rounded-lg bg-white border border-zinc-100 flex items-center justify-center text-faint group-hover:text-primary transition-colors">
                     <Article size={18} weight="duotone" />
                   </div>
                   <div className="space-y-0.5">
-                    <p className="text-nav font-semibold text-foreground">Needs e-Invoice?</p>
-                    <p className="text-micro text-muted-foreground font-medium">Submission required</p>
+                    <p className="text-body font-medium text-foreground">Needs e-Invoice?</p>
+                    <p className="text-label text-muted-foreground font-medium">Submission required</p>
                   </div>
                 </div>
                 <Controller
@@ -121,12 +121,12 @@ export function SettlementTaxSection({
 
               <div className="flex items-center justify-between p-4 bg-muted/20 border border-border rounded-lg group hover:border-primary/20 transition-all duration-300">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-white border border-zinc-100 flex items-center justify-center text-muted-foreground/60 group-hover:text-primary transition-colors">
+                  <div className="w-9 h-9 rounded-lg bg-white border border-zinc-100 flex items-center justify-center text-faint group-hover:text-primary transition-colors">
                     <ShieldCheck size={18} weight="duotone" />
                   </div>
                   <div className="space-y-0.5">
-                    <p className="text-nav font-semibold text-foreground">Appointed Welluber?</p>
-                    <p className="text-micro text-muted-foreground font-medium">For submission</p>
+                    <p className="text-body font-medium text-foreground">Appointed Welluber?</p>
+                    <p className="text-label text-muted-foreground font-medium">For submission</p>
                   </div>
                 </div>
                 <Controller

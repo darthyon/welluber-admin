@@ -484,8 +484,8 @@ function OrganizationDetailContent() {
                     }
                   />
                 </div>
-                <div className="flex items-center gap-3 text-nav text-muted-foreground">
-                  <span className="rounded border border-zinc-200 bg-white px-2 py-0.5 font-mono text-caption tracking-widest text-muted-foreground/60 uppercase">
+                <div className="flex items-center gap-3 text-body text-subtle">
+                  <span className="rounded border border-zinc-200 bg-white px-2 py-0.5 font-mono text-label tracking-widest text-faint uppercase">
                     ORG-20260115-0001
                   </span>
                 </div>
@@ -497,7 +497,7 @@ function OrganizationDetailContent() {
                 asChild
                 variant="secondary"
                 size="lg"
-                className="rounded-full text-nav font-medium transition-all"
+                className="rounded-full text-body font-medium transition-all"
               >
                 <Link href={`/organizations/${orgId}/edit`}>
                   <PencilSimpleLine
@@ -653,7 +653,7 @@ function OrganizationDetailContent() {
                     accessorKey: "name",
                     sortable: true,
                     render: (admin: any) => (
-                      <span className="text-nav font-medium text-foreground">
+                      <span className="text-body font-medium text-foreground">
                         {admin.name}
                       </span>
                     ),
@@ -663,7 +663,7 @@ function OrganizationDetailContent() {
                     accessorKey: "email",
                     sortable: true,
                     render: (admin: any) => (
-                      <span className="text-nav text-muted-foreground">
+                      <span className="text-body text-subtle">
                         {admin.email}
                       </span>
                     ),
@@ -673,7 +673,7 @@ function OrganizationDetailContent() {
                     accessorKey: "role",
                     sortable: true,
                     render: (admin: any) => (
-                      <span className="text-nav text-muted-foreground">
+                      <span className="text-body text-subtle">
                         {admin.role}
                       </span>
                     ),
@@ -683,7 +683,7 @@ function OrganizationDetailContent() {
                     accessorKey: "joinDate",
                     sortable: true,
                     render: (admin: any) => (
-                      <span className="text-label font-medium text-muted-foreground/80">
+                      <span className="text-label font-medium text-subtle">
                         {admin.joinDate}
                       </span>
                     ),
@@ -693,7 +693,7 @@ function OrganizationDetailContent() {
                     accessorKey: "lastActive",
                     sortable: true,
                     render: (admin: any) => (
-                      <span className="text-label font-medium text-muted-foreground/80">
+                      <span className="text-label font-medium text-subtle">
                         {admin.lastActive}
                       </span>
                     ),
@@ -773,14 +773,14 @@ function OrganizationDetailContent() {
                     key={i}
                     className="flex items-center gap-3 rounded-xl border border-border bg-muted/20 p-3 group hover:border-primary/30 transition-all"
                   >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-100 bg-white text-muted-foreground/60 group-hover:text-primary transition-colors">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-100 bg-white text-faint group-hover:text-primary transition-colors">
                       <Article size={20} weight="duotone" />
                     </div>
                     <div className="flex-1 overflow-hidden">
-                      <p className="truncate text-nav font-semibold text-foreground">
+                      <p className="truncate text-body font-medium text-foreground">
                         {doc.name}
                       </p>
-                      <p className="text-micro font-medium text-muted-foreground">
+                      <p className="text-label font-medium text-subtle">
                         {doc.type} • {doc.size}
                       </p>
                     </div>
@@ -807,7 +807,7 @@ function OrganizationDetailContent() {
                 <div className="flex items-center justify-between">
                   <div>
                     <h2 className="text-heading font-semibold text-foreground">Branches</h2>
-                    <p className="text-nav text-muted-foreground">Manage geographical locations and their specific wallet configurations</p>
+                    <p className="text-body text-subtle">Manage geographical locations and their specific wallet configurations</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <Button
@@ -917,7 +917,7 @@ function OrganizationDetailContent() {
                           accessorKey: "name",
                           sortable: true,
                           render: (branch: any) => (
-                            <span className="text-nav font-medium text-foreground transition-colors group-hover:text-primary">
+                            <span className="text-body font-medium text-foreground transition-colors group-hover:text-primary">
                               {branch.name}
                             </span>
                           ),
@@ -938,7 +938,7 @@ function OrganizationDetailContent() {
                           accessorKey: "type",
                           sortable: true,
                           render: (branch: any) => (
-                            <span className="text-nav text-muted-foreground">
+                            <span className="text-body text-subtle">
                               {branch.type}
                             </span>
                           ),
@@ -948,7 +948,7 @@ function OrganizationDetailContent() {
                           accessorKey: "employees",
                           sortable: true,
                           render: (branch: any) => (
-                            <span className="text-nav text-muted-foreground">
+                            <span className="text-body text-subtle">
                               {branch.employees}
                             </span>
                           ),
@@ -960,10 +960,10 @@ function OrganizationDetailContent() {
                           headerClassName: "min-w-[150px]",
                           render: (branch: any) => (
                             <div className="flex flex-col">
-                              <span className="text-nav font-semibold tracking-tight text-foreground">
+                              <span className="text-body font-semibold text-foreground">
                                 {branch.walletModel}
                               </span>
-                              <span className="mt-0.5 text-caption font-medium text-muted-foreground">
+                              <span className="mt-0.5 text-label font-medium text-muted-foreground">
                                 {branch.balance}
                               </span>
                             </div>
@@ -988,12 +988,12 @@ function OrganizationDetailContent() {
                                     {branch.balance}
                                   </span>
                                   {branch.claimsCount !== undefined && (
-                                    <span className="rounded-full border border-zinc-200 bg-muted px-1.5 text-micro font-semibold text-muted-foreground tabular-nums">
+                                    <span className="rounded-full border border-zinc-200 bg-muted px-1.5 text-label font-medium text-muted-foreground tabular-nums">
                                       {branch.claimsCount}
                                     </span>
                                   )}
                                 </div>
-                                <span className="mt-0.5 text-micro font-medium text-muted-foreground/60 tabular-nums">
+                                <span className="mt-0.5 text-label font-medium text-faint tabular-nums">
                                   / {branch.limit || "RM 0.00"}
                                 </span>
                               </div>
@@ -1083,7 +1083,7 @@ function OrganizationDetailContent() {
                           <h2 className="text-heading font-semibold text-foreground">
                             Employee Directory
                           </h2>
-                          <p className="text-nav text-muted-foreground">
+                          <p className="text-body text-subtle">
                             Manage workforce records and branch assignments
                           </p>
                         </div>
@@ -1255,10 +1255,10 @@ function OrganizationDetailContent() {
                                 sortable: true,
                                 render: (emp) => (
                                   <div className="flex flex-col">
-                                    <span className="text-nav font-semibold text-foreground transition-colors group-hover:text-primary">
+                                    <span className="text-body font-medium text-foreground transition-colors group-hover:text-primary">
                                       {emp.name}
                                     </span>
-                                    <span className="mt-0.5 text-caption font-medium text-muted-foreground">
+                                    <span className="mt-0.5 text-label font-medium text-muted-foreground">
                                       {emp.email}
                                     </span>
                                   </div>
@@ -1269,7 +1269,7 @@ function OrganizationDetailContent() {
                                 accessorKey: "empCode",
                                 sortable: true,
                                 render: (emp) => (
-                                  <span className="text-nav font-medium text-muted-foreground">
+                                  <span className="text-body font-medium text-subtle">
                                     {emp.empCode}
                                   </span>
                                 ),
@@ -1319,7 +1319,7 @@ function OrganizationDetailContent() {
                                 accessorKey: "joinDate",
                                 sortable: true,
                                 render: (emp) => (
-                                  <span className="text-label font-medium text-muted-foreground/80">
+                                  <span className="text-label font-medium text-subtle">
                                     {emp.joinDate}
                                   </span>
                                 ),
@@ -1329,7 +1329,7 @@ function OrganizationDetailContent() {
                                 accessorKey: "lastActive",
                                 sortable: true,
                                 render: (emp) => (
-                                  <span className="text-label font-medium text-muted-foreground/80">
+                                  <span className="text-label font-medium text-subtle">
                                     {emp.lastActive}
                                   </span>
                                 ),
@@ -1351,7 +1351,7 @@ function OrganizationDetailContent() {
                                                   {policy.benefitGroups &&
                                                     policy.benefitGroups
                                                       .length > 0 && (
-                                                      <span className="ml-1 max-w-[80px] truncate font-medium text-muted-foreground/80">
+                                                      <span className="ml-1 max-w-[80px] truncate font-medium text-subtle">
                                                         (
                                                         {
                                                           policy.benefitGroups
@@ -1373,19 +1373,19 @@ function OrganizationDetailContent() {
                                                   {policy.benefitGroups &&
                                                   policy.benefitGroups.length >
                                                     0 ? (
-                                                    <div className="text-caption leading-snug text-muted-foreground">
+                                                    <div className="text-label leading-snug text-muted-foreground">
                                                       {policy.benefitGroups.join(
                                                         ", "
                                                       )}
                                                     </div>
                                                   ) : (
-                                                    <div className="text-caption text-muted-foreground italic">
+                                                    <div className="text-label text-muted-foreground italic">
                                                       No specific groups.
                                                     </div>
                                                   )}
                                                   {policy.utilisation !==
                                                     undefined && (
-                                                    <div className="mt-0.5 text-caption font-medium text-emerald-600">
+                                                    <div className="mt-0.5 text-label font-medium text-emerald-600">
                                                       {policy.utilisation}%
                                                       Utilized
                                                     </div>
@@ -1401,7 +1401,7 @@ function OrganizationDetailContent() {
                                                 onClick={(e) =>
                                                   e.stopPropagation()
                                                 }
-                                                className="cursor-help px-1 text-caption font-semibold text-muted-foreground transition-colors hover:text-primary"
+                                                className="cursor-help px-1 text-label font-medium text-subtle transition-colors hover:text-primary"
                                               >
                                                 +
                                                 {emp.benefitPolicies.length - 2}
@@ -1411,7 +1411,7 @@ function OrganizationDetailContent() {
                                               side="right"
                                               className="z-[200] flex w-56 flex-col gap-2 p-2"
                                             >
-                                              <div className="px-1 text-caption font-semibold tracking-tight text-muted-foreground opacity-60">
+                                              <div className="px-1 text-label font-semibold text-muted-foreground opacity-60">
                                                 Other policies
                                               </div>
                                               {emp.benefitPolicies
@@ -1428,19 +1428,19 @@ function OrganizationDetailContent() {
                                                       {policy.benefitGroups &&
                                                       policy.benefitGroups
                                                         .length > 0 ? (
-                                                        <div className="text-caption leading-snug text-muted-foreground">
+                                                        <div className="text-label leading-snug text-muted-foreground">
                                                           {policy.benefitGroups.join(
                                                             ", "
                                                           )}
                                                         </div>
                                                       ) : (
-                                                        <div className="text-caption text-muted-foreground italic">
+                                                        <div className="text-label text-muted-foreground italic">
                                                           No specific groups.
                                                         </div>
                                                       )}
                                                       {policy.utilisation !==
                                                         undefined && (
-                                                        <div className="mt-0.5 text-caption font-medium text-emerald-600">
+                                                        <div className="mt-0.5 text-label font-medium text-emerald-600">
                                                           {policy.utilisation}%
                                                           Utilized
                                                         </div>
@@ -1453,7 +1453,7 @@ function OrganizationDetailContent() {
                                         )}
                                       </>
                                     ) : (
-                                      <span className="text-micro font-medium text-muted-foreground/50 italic">
+                                      <span className="text-label font-medium text-faint italic">
                                         None
                                       </span>
                                     )}
@@ -1612,7 +1612,7 @@ function OrganizationDetailContent() {
                           <h2 className="text-heading font-semibold text-foreground">
                             Dependent Directory
                           </h2>
-                          <p className="text-nav text-muted-foreground">
+                          <p className="text-body text-subtle">
                             Manage family members linked to employee benefits
                           </p>
                         </div>
@@ -1649,7 +1649,7 @@ function OrganizationDetailContent() {
                               header: "Dependent Name",
                               accessorKey: "name",
                               render: (dep) => (
-                                <span className="text-nav font-medium text-foreground">
+                                <span className="text-body font-medium text-foreground">
                                   {dep.name}
                                 </span>
                               ),
@@ -1663,7 +1663,7 @@ function OrganizationDetailContent() {
                                     setActiveEmployeeSubTab("directory")
                                     router.push(`/employees/${dep.employeeId}`)
                                   }}
-                                  className="text-nav font-medium text-primary hover:underline"
+                                  className="text-body font-medium text-primary hover:underline"
                                 >
                                   {dep.employeeName}
                                 </button>
@@ -1692,7 +1692,7 @@ function OrganizationDetailContent() {
                               header: "Joined Date",
                               accessorKey: "joinDate",
                               render: (dep) => (
-                                <span className="text-label font-medium text-muted-foreground/80">
+                                <span className="text-label font-medium text-subtle">
                                   {dep.joinDate}
                                 </span>
                               ),
@@ -1731,7 +1731,7 @@ function OrganizationDetailContent() {
                           <h2 className="text-heading font-semibold text-foreground">
                             Entitlements
                           </h2>
-                          <p className="text-nav text-muted-foreground">
+                          <p className="text-body text-subtle">
                             View all beneficiaries and their assigned benefit
                             allocations
                           </p>
@@ -1763,12 +1763,12 @@ function OrganizationDetailContent() {
                             accessorKey: "beneficiaryName",
                             render: (ent) => (
                               <div className="flex flex-col">
-                                <span className="text-nav font-semibold text-foreground">
+                                <span className="text-body font-medium text-foreground">
                                   {ent.beneficiaryName}
                                 </span>
                                 <span
                                   className={cn(
-                                    "mt-1 w-fit rounded-full px-1.5 py-0.5 text-micro font-semibold tracking-wider uppercase",
+                                    "mt-1 w-fit rounded-full px-1.5 py-0.5 text-label font-medium tracking-wider uppercase",
                                     ent.type === "Employee"
                                       ? "border border-blue-100 bg-blue-50 text-blue-600"
                                       : "border border-purple-100 bg-purple-50 text-purple-600"
@@ -1792,7 +1792,7 @@ function OrganizationDetailContent() {
                             header: "Policy",
                             accessorKey: "policy",
                             render: (ent) => (
-                              <span className="text-nav font-semibold text-primary">
+                              <span className="text-body font-semibold text-primary">
                                 {ent.policy}
                               </span>
                             ),
@@ -1801,7 +1801,7 @@ function OrganizationDetailContent() {
                             header: "Utilisation",
                             render: (ent) => (
                               <div className="flex w-[140px] flex-col gap-1.5">
-                                <div className="flex justify-between text-caption font-medium">
+                                <div className="flex justify-between text-label font-medium">
                                   <span className="text-muted-foreground">
                                     {ent.used}
                                   </span>
@@ -1851,7 +1851,7 @@ function OrganizationDetailContent() {
                           <h2 className="text-heading font-semibold text-foreground">
                             Claims
                           </h2>
-                          <p className="text-nav text-muted-foreground">
+                          <p className="text-body text-subtle">
                             Complete claim history and reimbursement status for
                             the workforce
                           </p>
@@ -1937,7 +1937,7 @@ function OrganizationDetailContent() {
                 <div className="flex items-center justify-between">
                   <div>
                     <h2 className="text-heading font-semibold text-foreground">Benefit Policies</h2>
-                    <p className="text-nav text-muted-foreground">Manage which benefit structures are assigned to this organisation's workforce</p>
+                    <p className="text-body text-subtle">Manage which benefit structures are assigned to this organisation's workforce</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <Button
@@ -2047,7 +2047,7 @@ function OrganizationDetailContent() {
           <div className="animate-in fade-in space-y-6">
             <div>
               <h2 className="text-heading font-semibold text-foreground">Claims</h2>
-              <p className="text-nav text-muted-foreground">Claim history across all employees in this organisation</p>
+              <p className="text-body text-subtle">Claim history across all employees in this organisation</p>
             </div>
             <OrganizationClaimsTable
               data={ORG_MOCK_UTILISATION}
@@ -2061,7 +2061,7 @@ function OrganizationDetailContent() {
           <div className="animate-in fade-in space-y-6">
             <div>
               <h2 className="text-heading font-semibold text-foreground">Vouchers</h2>
-              <p className="text-nav text-muted-foreground">Voucher redemption records across all employees in this organisation</p>
+              <p className="text-body text-subtle">Voucher redemption records across all employees in this organisation</p>
             </div>
             <VouchersTable
               data={ORG_MOCK_UTILISATION}
@@ -2081,7 +2081,7 @@ function OrganizationDetailContent() {
                 <div className="rounded-lg border border-border bg-muted/20 p-4">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="space-y-1">
-                      <p className="text-nav font-semibold text-foreground">
+                      <p className="text-body font-medium text-foreground">
                         Deactivate Organisation
                       </p>
                       <p className="text-label text-muted-foreground">
@@ -2101,7 +2101,7 @@ function OrganizationDetailContent() {
                 <div className="rounded-lg border border-border bg-muted/20 p-4">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="space-y-1">
-                      <p className="text-nav font-semibold text-foreground">
+                      <p className="text-body font-medium text-foreground">
                         Suspend Organisation
                       </p>
                       <p className="text-label text-muted-foreground">
@@ -2122,7 +2122,7 @@ function OrganizationDetailContent() {
                 <div className="rounded-lg border border-rose-200 bg-rose-50/60 p-4">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="space-y-1">
-                      <p className="text-nav font-semibold text-foreground">
+                      <p className="text-body font-medium text-foreground">
                         Remove Organisation
                       </p>
                       <p className="text-label text-muted-foreground">
@@ -2195,10 +2195,10 @@ function OrganizationDetailContent() {
 
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 flex items-center rounded-lg bg-foreground px-5 py-3 text-white shadow-lg animate-in slide-in-from-bottom-4 fade-in">
-          <p className="text-nav font-semibold">{toastMessage}</p>
+          <p className="text-body font-semibold">{toastMessage}</p>
           <button
             onClick={() => setToastMessage(null)}
-            className="ml-4 text-muted-foreground/60 transition-colors hover:text-white"
+            className="ml-4 text-faint transition-colors hover:text-white"
           >
             <Plus size={16} className="rotate-45" />
           </button>

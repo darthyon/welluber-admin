@@ -75,7 +75,7 @@ function StatusBadge({ status }: { status: ClaimStatus }) {
   return (
     <span
       className={cn(
-        "text-micro font-semibold px-1.5 py-0.5 rounded",
+        "text-label font-medium px-1.5 py-0.5 rounded",
         STATUS_STYLE[status]
       )}
     >
@@ -118,10 +118,10 @@ export function VouchersTable({ data, onViewVoucher }: Props) {
       header: "Voucher",
       render: (row) => (
         <div className="flex flex-col gap-0.5">
-          <p className="text-nav font-semibold text-primary cursor-pointer hover:underline underline-offset-2">
+          <p className="text-body font-semibold text-primary cursor-pointer hover:underline underline-offset-2">
             {row.voucherName}
           </p>
-          <code className="text-caption font-mono text-muted-foreground">
+          <code className="text-label font-mono text-muted-foreground">
             {row.voucherCode}
           </code>
         </div>
@@ -132,8 +132,8 @@ export function VouchersTable({ data, onViewVoucher }: Props) {
       accessorKey: "date",
       render: (row) => (
         <div className="flex items-center gap-1.5">
-          <Calendar size={11} className="text-muted-foreground/60 shrink-0" />
-          <p className="text-caption text-muted-foreground font-medium whitespace-nowrap">
+          <Calendar size={11} className="text-faint shrink-0" />
+          <p className="text-label text-muted-foreground font-medium whitespace-nowrap">
             {row.date}
           </p>
         </div>
@@ -143,10 +143,10 @@ export function VouchersTable({ data, onViewVoucher }: Props) {
       header: "Employee",
       render: (row) => (
         <div>
-          <p className="text-nav font-semibold text-foreground">
+          <p className="text-body font-medium text-foreground">
             {row.employeeName}
           </p>
-          <p className="text-caption text-muted-foreground font-medium mt-0.5">
+          <p className="text-label text-muted-foreground font-medium mt-0.5">
             {row.empCode}
           </p>
         </div>
@@ -156,10 +156,10 @@ export function VouchersTable({ data, onViewVoucher }: Props) {
       header: "Redeemed By",
       render: (row) => (
         <div>
-          <p className="text-nav font-semibold text-foreground">
+          <p className="text-body font-medium text-foreground">
             {row.redeemedBy}
           </p>
-          <p className="text-caption text-muted-foreground font-medium mt-0.5">
+          <p className="text-label text-muted-foreground font-medium mt-0.5">
             {row.redeemedByType}
           </p>
         </div>
@@ -170,7 +170,7 @@ export function VouchersTable({ data, onViewVoucher }: Props) {
       accessorKey: "amount",
       align: "right",
       render: (row) => (
-        <p className="text-nav font-semibold font-mono text-foreground">
+        <p className="text-body font-semibold font-mono text-foreground">
           RM {row.amount.toFixed(2)}
         </p>
       ),
@@ -179,8 +179,8 @@ export function VouchersTable({ data, onViewVoucher }: Props) {
       header: "Service Provider",
       render: (row) => (
         <div className="flex items-center gap-1.5 min-w-0">
-          <Storefront size={11} className="text-muted-foreground/60 shrink-0" />
-          <p className="text-nav text-foreground/70 font-medium truncate">
+          <Storefront size={11} className="text-faint shrink-0" />
+          <p className="text-body text-subtle font-medium truncate">
             {row.provider}
           </p>
         </div>
@@ -191,12 +191,12 @@ export function VouchersTable({ data, onViewVoucher }: Props) {
       render: (row) => (
         <div className="flex flex-col gap-0.5">
           <div className="flex items-center gap-1.5">
-            <Buildings size={11} className="text-muted-foreground/60 shrink-0" />
-            <p className="text-nav font-semibold text-foreground truncate">
+            <Buildings size={11} className="text-faint shrink-0" />
+            <p className="text-body font-medium text-foreground truncate">
               {row.branch}
             </p>
           </div>
-          <div className="flex items-center gap-1.5 text-caption text-muted-foreground font-medium">
+          <div className="flex items-center gap-1.5 text-label text-muted-foreground font-medium">
             <MapPin size={11} className="shrink-0" />
             {row.city}
           </div>
@@ -257,9 +257,9 @@ export function VouchersTable({ data, onViewVoucher }: Props) {
           <Ticket
             size={36}
             weight="duotone"
-            className="text-muted-foreground/40 mb-3"
+            className="text-faint mb-3"
           />
-          <p className="text-muted-foreground font-medium text-nav">
+          <p className="text-muted-foreground font-medium text-body">
             No vouchers found.
           </p>
         </div>

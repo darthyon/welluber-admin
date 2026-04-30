@@ -59,7 +59,7 @@ export function DependentCard({
                 variant="emerald"
                 className="rounded-md px-1.5 py-0.5 text-micro"
               />
-              <span className="rounded-md border border-border/40 bg-background/50 px-1.5 py-0.5 text-micro font-semibold tracking-tight text-muted-foreground/60">
+              <span className="rounded-md border border-border/40 bg-background/50 px-1.5 py-0.5 text-label font-medium text-faint">
                 {dependent.relationship}
               </span>
             </div>
@@ -85,27 +85,27 @@ export function DependentCard({
       <div className="relative z-10 flex-1 space-y-6">
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2.5">
-            <div className="flex items-center gap-1.5 text-muted-foreground/30">
+            <div className="flex items-center gap-1.5 text-faint">
               <User size={14} weight="bold" />
-              <span className="text-caption font-semibold tracking-tight text-muted-foreground/60">
+              <span className="text-label font-semibold text-faint">
                 Linked Employee
               </span>
             </div>
             <button
               onClick={() => onViewEmployee?.(dependent.employeeId)}
-              className="text-nav font-semibold text-primary hover:underline"
+              className="text-body font-semibold text-primary hover:underline"
             >
               {dependent.employeeName}
             </button>
           </div>
           <div className="space-y-2.5">
-            <div className="flex items-center gap-1.5 text-muted-foreground/30">
+            <div className="flex items-center gap-1.5 text-faint">
               <IdentificationCard size={14} weight="bold" />
-              <span className="text-caption font-semibold tracking-tight text-muted-foreground/60">
+              <span className="text-label font-semibold text-faint">
                 Relationship
               </span>
             </div>
-            <span className="block text-nav font-semibold text-foreground">
+            <span className="block text-body font-medium text-foreground">
               {dependent.relationship}
             </span>
           </div>
@@ -114,24 +114,24 @@ export function DependentCard({
 
       <div className="mt-5 grid grid-cols-2 gap-4 border-t border-border/40 pt-4">
         <div className="space-y-1.5">
-          <div className="flex items-center gap-1.5 text-muted-foreground/30">
+          <div className="flex items-center gap-1.5 text-faint">
             <Heart size={14} weight="bold" />
-            <span className="text-caption font-semibold tracking-tight text-muted-foreground/60">
+            <span className="text-label font-semibold text-faint">
               Status
             </span>
           </div>
-          <span className="block text-label font-semibold text-foreground/80">
+          <span className="block text-label font-semibold text-subtle">
             {dependent.status}
           </span>
         </div>
         <div className="space-y-1.5">
-          <div className="flex items-center gap-1.5 text-muted-foreground/30">
+          <div className="flex items-center gap-1.5 text-faint">
             <Clock size={14} weight="bold" />
-            <span className="text-caption font-semibold tracking-tight text-muted-foreground/60">
+            <span className="text-label font-semibold text-faint">
               Joined
             </span>
           </div>
-          <span className="block text-label font-semibold text-foreground/80">
+          <span className="block text-label font-semibold text-subtle">
             {dependent.joinDate}
           </span>
         </div>

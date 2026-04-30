@@ -108,7 +108,7 @@ export function SpBranchesTab({ sp }: SpBranchesTabProps) {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-heading font-semibold text-foreground">Branches</h2>
-          <p className="text-nav text-muted-foreground">Manage branch locations, services, and local administrators.</p>
+          <p className="text-body text-subtle">Manage branch locations, services, and local administrators.</p>
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -185,8 +185,8 @@ export function SpBranchesTab({ sp }: SpBranchesTabProps) {
                       <GitBranch size={18} weight="fill" />
                     </div>
                     <div>
-                      <p className="text-nav font-semibold text-foreground group-hover:text-primary transition-colors">{branch.name}</p>
-                      <p className="text-caption font-medium text-muted-foreground">{branch.isActive ? "Active branch" : "Inactive branch"}</p>
+                      <p className="text-body font-medium text-foreground group-hover:text-primary transition-colors">{branch.name}</p>
+                      <p className="text-label font-medium text-muted-foreground">{branch.isActive ? "Active branch" : "Inactive branch"}</p>
                     </div>
                   </div>
                 ),
@@ -194,7 +194,7 @@ export function SpBranchesTab({ sp }: SpBranchesTabProps) {
               {
                 header: "Location",
                 render: (branch) => (
-                  <span className="text-nav text-muted-foreground">
+                  <span className="text-body text-subtle">
                     {branch.address.city}, {branch.address.state}
                   </span>
                 ),
@@ -204,12 +204,12 @@ export function SpBranchesTab({ sp }: SpBranchesTabProps) {
                 render: (branch) => (
                   <div className="flex flex-wrap gap-1.5">
                     {branch.services.slice(0, 2).map((service) => (
-                      <span key={service.service} className="inline-flex items-center px-2 py-0.5 rounded-full bg-muted text-caption font-medium text-muted-foreground border border-border">
+                      <span key={service.service} className="inline-flex items-center px-2 py-0.5 rounded-full bg-muted text-label font-medium text-muted-foreground border border-border">
                         {service.service}
                       </span>
                     ))}
                     {branch.services.length > 2 && (
-                      <span className="text-caption font-medium text-muted-foreground/60">
+                      <span className="text-label font-medium text-faint">
                         +{branch.services.length - 2} more
                       </span>
                     )}

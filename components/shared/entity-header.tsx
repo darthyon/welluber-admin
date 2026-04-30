@@ -32,10 +32,10 @@ export function EntityHeader({
         </div>
         <div>
           <div className="flex items-center gap-3">
-            <h2 className="text-heading font-semibold tracking-tight text-foreground">{title}</h2>
+            <h2 className="text-heading font-semibold text-foreground text-balance">{title}</h2>
             {status && <StatusBadge status={status} variant={statusVariant} />}
           </div>
-          {subtitle && <p className="text-nav text-muted-foreground mt-0.5">{subtitle}</p>}
+          {subtitle && <p className="text-body text-subtle mt-0.5">{subtitle}</p>}
         </div>
       </div>
       

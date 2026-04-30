@@ -104,9 +104,9 @@ export function SectionedSearchSelect({
         onClick={() => !disabled && setIsOpen(!isOpen)}
         disabled={disabled}
         className={cn(
-          "w-full flex items-center justify-between px-4 py-2.5 rounded-lg border bg-background text-nav transition-all text-left pr-12",
+          "w-full flex items-center justify-between px-4 py-2.5 rounded-lg border bg-background text-body transition-all text-left pr-12",
           isOpen ? "border-primary ring-2 ring-primary/10" : "border-border hover:border-foreground/20",
-          !value && "text-muted-foreground/40",
+          !value && "text-faint",
           disabled && "opacity-60 cursor-not-allowed bg-muted"
         )}
       >
@@ -118,13 +118,13 @@ export function SectionedSearchSelect({
           <button
             type="button"
             onClick={handleClear}
-            className="p-1 rounded-md hover:bg-muted text-muted-foreground/60 hover:text-foreground transition-colors pointer-events-auto"
+            className="p-1 rounded-md hover:bg-muted text-faint hover:text-foreground transition-colors pointer-events-auto"
             title="Clear selection"
           >
             <X size={12} weight="bold" />
           </button>
         )}
-        <CaretDown size={14} className={cn("text-muted-foreground/60 transition-transform shrink-0", isOpen && "rotate-180", disabled && "opacity-40")} />
+        <CaretDown size={14} className={cn("text-faint transition-transform shrink-0", isOpen && "rotate-180", disabled && "opacity-40")} />
       </div>
 
       {isOpen && typeof document !== "undefined" && createPortal(
@@ -134,11 +134,11 @@ export function SectionedSearchSelect({
           style={dropdownStyle}
         >
           <div className="p-2 border-b border-border flex items-center gap-2 bg-muted/30">
-            <MagnifyingGlass size={16} className="text-muted-foreground/60 shrink-0" />
+            <MagnifyingGlass size={16} className="text-faint shrink-0" />
             <input
               ref={searchRef}
               type="text"
-              className="w-full bg-transparent border-0 outline-none text-nav h-8 text-foreground"
+              className="w-full bg-transparent border-0 outline-none text-body h-8 text-foreground"
               placeholder="Search services..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -148,7 +148,7 @@ export function SectionedSearchSelect({
             {filteredTaxonomy.length > 0 ? (
               filteredTaxonomy.map((group) => (
                 <div key={group.category} className="mb-2 last:mb-0">
-                  <div className="px-3 py-2 text-micro font-semibold text-muted-foreground/40 select-none uppercase tracking-wider">
+                  <div className="px-3 py-2 text-label font-medium text-faint select-none uppercase tracking-wider">
                     {group.category}
                   </div>
                   {group.services.map((opt) => (
@@ -157,8 +157,8 @@ export function SectionedSearchSelect({
                       onClick={() => handleSelect(opt)}
                       type="button"
                       className={cn(
-                        "w-full text-left px-3 py-2 rounded-lg text-nav transition-colors flex items-center justify-between group",
-                        value === opt ? "bg-primary/5 text-primary font-semibold" : "hover:bg-muted text-foreground/80"
+                        "w-full text-left px-3 py-2 rounded-lg text-body transition-colors flex items-center justify-between group",
+                        value === opt ? "bg-primary/5 text-primary font-semibold" : "hover:bg-muted text-subtle"
                       )}
                     >
                       <span>{opt}</span>
@@ -168,7 +168,7 @@ export function SectionedSearchSelect({
                 </div>
               ))
             ) : (
-              <div className="p-4 text-center text-muted-foreground/40 text-label">
+              <div className="p-4 text-center text-faint text-label">
                 No services found matching &quot;{query}&quot;
               </div>
             )}

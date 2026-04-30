@@ -138,19 +138,19 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
             <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
               <User size={16} weight="fill" />
             </div>
-            <h3 className="text-subtitle font-semibold text-foreground">Personal Identity</h3>
+            <h3 className="text-lead font-semibold text-foreground">Personal Identity</h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="space-y-1.5">
-              <label className="text-caption font-semibold text-muted-foreground/70">
+              <label className="text-label font-medium text-subtle">
                 Employee Full Name <span className="text-destructive">*</span>
               </label>
               <div className="relative">
-                <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/40" />
+                <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-faint" />
                 <input
                   placeholder="e.g. Sarah Jenkins"
-                  className="w-full pl-10 pr-3 py-2 bg-background border border-border rounded-lg text-nav outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all"
+                  className="w-full pl-10 pr-3 py-2 bg-background border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
@@ -159,7 +159,7 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
             </div>
 
             <div className="space-y-1.5 flex flex-col">
-              <label className="text-caption font-semibold text-muted-foreground/70">
+              <label className="text-label font-medium text-subtle">
                 Date of Birth <span className="text-destructive">*</span>
               </label>
               <DatePickerField
@@ -170,7 +170,7 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-caption font-semibold text-muted-foreground/70">
+              <label className="text-label font-medium text-subtle">
                 Identification (IC / Passport) <span className="text-destructive">*</span>
               </label>
               <IdentificationInput
@@ -182,11 +182,11 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-caption font-semibold text-muted-foreground/70">
+              <label className="text-label font-medium text-subtle">
                 Gender <span className="text-destructive">*</span>
               </label>
               <select
-                className="w-full px-3 py-2 bg-background border border-border rounded-lg text-nav outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all"
+                className="w-full px-3 py-2 bg-background border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all"
                 value={formData.gender}
                 onChange={(e) => setFormData({ ...formData, gender: e.target.value as any })}
               >
@@ -197,15 +197,15 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
             </div>
 
             <div className="space-y-1.5 col-span-2">
-              <label className="text-caption font-semibold text-muted-foreground/70">Residency & Taxable Status</label>
+              <label className="text-label font-medium text-subtle">Residency & Taxable Status</label>
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center gap-3 p-3 rounded-lg border border-border bg-muted/20">
-                  <Globe size={18} className="text-muted-foreground/40" />
+                  <Globe size={18} className="text-faint" />
                   <div className="flex-1">
-                    <p className="text-nav font-semibold text-foreground">Residency</p>
+                    <p className="text-body font-medium text-foreground">Residency</p>
                   </div>
                   <select
-                    className="bg-background px-2 py-1 rounded text-xs font-semibold outline-none border border-border"
+                    className="bg-background px-2 py-1 rounded text-label font-medium outline-none border border-border"
                     value={formData.residencyStatus}
                     onChange={(e) => setFormData({ ...formData, residencyStatus: e.target.value as any })}
                   >
@@ -215,9 +215,9 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
                 </div>
 
                 <div className="flex items-center gap-3 p-3 rounded-lg border border-border bg-muted/20">
-                  <CreditCard size={18} className="text-muted-foreground/40" />
+                  <CreditCard size={18} className="text-faint" />
                   <div className="flex-1">
-                    <p className="text-nav font-semibold text-foreground">Taxable</p>
+                    <p className="text-body font-medium text-foreground">Taxable</p>
                   </div>
                   <button
                     type="button"
@@ -237,13 +237,13 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-caption font-semibold text-muted-foreground/70">Corporate Email</label>
+              <label className="text-label font-medium text-subtle">Corporate Email</label>
               <div className="relative">
-                <Envelope size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/40" />
+                <Envelope size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-faint" />
                 <input
                   type="email"
                   placeholder="sarah.j@acme.com"
-                  className="w-full pl-10 pr-3 py-2 bg-background border border-border rounded-lg text-nav outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all"
+                  className="w-full pl-10 pr-3 py-2 bg-background border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 />
@@ -251,7 +251,7 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-caption font-semibold text-muted-foreground/70">
+              <label className="text-label font-medium text-subtle">
                 Mobile Phone Number <span className="text-destructive">*</span>
               </label>
               <PhoneInput
@@ -270,13 +270,13 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
             <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
               <Briefcase size={16} weight="fill" />
             </div>
-            <h3 className="text-subtitle font-semibold text-foreground">Employment Configuration</h3>
+            <h3 className="text-lead font-semibold text-foreground">Employment Configuration</h3>
           </div>
 
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="space-y-1.5">
-                <label className="text-caption font-semibold text-muted-foreground/70">
+                <label className="text-label font-medium text-subtle">
                   Join Date <span className="text-destructive">*</span>
                 </label>
                 <DatePickerField
@@ -287,18 +287,18 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-caption font-semibold text-muted-foreground/70">Employee Code</label>
+                <label className="text-label font-medium text-subtle">Employee Code</label>
                 <div className="relative flex items-center h-[38px] bg-background border border-border rounded-lg px-2 focus-within:ring-2 focus-within:ring-primary/10 focus-within:border-primary/30 transition-all">
                   <input
                     placeholder="ACM-XXXX"
-                    className="flex-1 bg-transparent border-none outline-none text-nav px-1 font-mono tracking-tight"
+                    className="flex-1 bg-transparent border-none outline-none text-body px-1 font-mono tracking-tight"
                     value={formData.empCode}
                     onChange={(e) => setFormData({ ...formData, empCode: e.target.value })}
                   />
                   <button
                     type="button"
                     onClick={generateEmpCode}
-                    className="w-7 h-7 rounded bg-muted flex items-center justify-center text-muted-foreground/50 hover:bg-primary/10 hover:text-primary transition-all ml-1"
+                    className="w-7 h-7 rounded bg-muted flex items-center justify-center text-faint hover:bg-primary/10 hover:text-primary transition-all ml-1"
                     title="Auto-generate"
                   >
                     <DiceFive size={16} />
@@ -307,29 +307,29 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-caption font-semibold text-muted-foreground/70">Department</label>
+                <label className="text-label font-medium text-subtle">Department</label>
                 <input
                   placeholder="e.g. Engineering"
-                  className="w-full px-3 py-2 bg-background border border-border rounded-lg text-nav outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all"
+                  className="w-full px-3 py-2 bg-background border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all"
                   value={formData.department}
                   onChange={(e) => setFormData({ ...formData, department: e.target.value })}
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-caption font-semibold text-muted-foreground/70">Role / Designation</label>
+                <label className="text-label font-medium text-subtle">Role / Designation</label>
                 <input
                   placeholder="e.g. Senior Software Engineer"
-                  className="w-full px-3 py-2 bg-background border border-border rounded-lg text-nav outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all"
+                  className="w-full px-3 py-2 bg-background border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all"
                   value={formData.role}
                   onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-caption font-semibold text-muted-foreground/70">Position Level (Tier)</label>
+                <label className="text-label font-medium text-subtle">Position Level (Tier)</label>
                 <select
-                  className="w-full px-3 py-2 bg-background border border-border rounded-lg text-nav outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all"
+                  className="w-full px-3 py-2 bg-background border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all"
                   value={formData.tier}
                   onChange={(e) => setFormData({ ...formData, tier: e.target.value })}
                 >
@@ -342,9 +342,9 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-caption font-semibold text-muted-foreground/70">Status</label>
+                <label className="text-label font-medium text-subtle">Status</label>
                 <select
-                  className="w-full px-3 py-2 bg-background border border-border rounded-lg text-nav outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all"
+                  className="w-full px-3 py-2 bg-background border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all"
                   value={formData.status}
                   onChange={(e) => setFormData({ ...formData, status: e.target.value as "active" | "inactive" })}
                 >
@@ -354,9 +354,9 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-caption font-semibold text-muted-foreground/70">Is Probation</label>
+                <label className="text-label font-medium text-subtle">Is Probation</label>
                 <div className="flex items-center gap-4 p-3 rounded-lg border border-border bg-muted/20">
-                  <span className="text-nav font-semibold text-foreground flex-1">{formData.isProbation ? "Yes" : "No"}</span>
+                  <span className="text-body font-medium text-foreground flex-1">{formData.isProbation ? "Yes" : "No"}</span>
                   <button
                     type="button"
                     onClick={() => setFormData({ ...formData, isProbation: !formData.isProbation })}
@@ -375,7 +375,7 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-caption font-semibold text-muted-foreground/70">Employment Type</label>
+              <label className="text-label font-medium text-subtle">Employment Type</label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {EMPLOYMENT_TYPES.map((type) => (
                   <ChoiceCard
@@ -394,8 +394,8 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
               <div className="p-5 rounded-lg border border-border bg-muted/10 space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h5 className="text-body font-semibold text-foreground tracking-tight">Probation Details</h5>
-                    <p className="text-caption text-muted-foreground mt-0.5 font-medium opacity-70">Choose how the probation period is defined</p>
+                    <h5 className="text-body font-medium text-foreground tracking-tight">Probation Details</h5>
+                    <p className="text-label text-subtle mt-0.5 font-normal">Choose how the probation period is defined</p>
                   </div>
                 </div>
 
@@ -418,18 +418,18 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
                     >
                       <div className="flex items-center gap-1.5">
                         <span className={cn(
-                          "text-sm font-semibold",
+                          "text-body font-medium",
                           formData.probationMode === opt.id ? "text-primary" : "text-foreground"
                         )}>{opt.icon} {opt.label}</span>
                       </div>
-                      <span className="text-xs text-muted-foreground/40 mt-0.5">{opt.desc}</span>
+                      <span className="text-label text-faint mt-0.5">{opt.desc}</span>
                     </button>
                   ))}
                 </div>
 
                 {formData.probationMode === "date" && (
                   <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-200">
-                    <label className="text-caption font-semibold text-muted-foreground/70">Probation end date</label>
+                    <label className="text-label font-medium text-subtle">Probation end date</label>
                     <DatePickerField
                       value={formData.probationEndDate}
                       onChange={(v) => setFormData({ ...formData, probationEndDate: v })}
@@ -463,7 +463,7 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
             <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
               <Shield size={16} weight="fill" />
             </div>
-            <h3 className="text-subtitle font-semibold text-foreground">Benefit Policy Assignment</h3>
+            <h3 className="text-lead font-semibold text-foreground">Benefit Policy Assignment</h3>
           </div>
 
           <div className="space-y-4">
@@ -471,9 +471,9 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
               <div key={idx} className="p-4 rounded-lg border border-border bg-background shadow-sm flex items-start justify-between gap-4">
                 <div className="flex-1 grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-micro font-semibold text-muted-foreground/60 tracking-tight">Select benefit policy</label>
+                    <label className="text-label font-medium text-subtle">Select benefit policy</label>
                     <select
-                      className="w-full px-3 py-2 bg-background border border-border rounded-lg text-nav outline-none focus:ring-2 focus:ring-primary/10 transition-all"
+                      className="w-full px-3 py-2 bg-background border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 transition-all"
                       value={assigned.policyId}
                       onChange={(e) => {
                         const pol = MOCK_POLICIES.find((p) => p.id === e.target.value);
@@ -490,9 +490,9 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
                     </select>
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-micro font-semibold text-muted-foreground/60 tracking-tight">Select benefit group</label>
+                    <label className="text-label font-medium text-subtle">Select benefit group</label>
                     <select
-                      className="w-full px-3 py-2 bg-background border border-border rounded-lg text-nav outline-none focus:ring-2 focus:ring-primary/10 transition-all"
+                      className="w-full px-3 py-2 bg-background border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 transition-all"
                       value={assigned.benefitGroupId}
                       onChange={(e) => {
                         const updated = [...assignedPolicies];
@@ -509,7 +509,7 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
                 <button
                   type="button"
                   onClick={() => removePolicy(idx)}
-                  className="mt-6 p-1.5 text-muted-foreground/30 hover:text-rose-500 transition-colors"
+                  className="mt-6 p-1.5 text-faint hover:text-rose-500 transition-colors"
                 >
                   <Trash size={18} />
                 </button>
@@ -518,7 +518,7 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
 
             <Button
               variant="outline"
-              className="w-full border-dashed border-border h-12 text-muted-foreground/60 hover:text-primary hover:border-primary/40 hover:bg-muted/30 transition-all"
+              className="w-full border-dashed border-border h-12 text-faint hover:text-primary hover:border-primary/40 hover:bg-muted/30 transition-all"
               onClick={addPolicy}
               type="button"
             >
@@ -535,18 +535,18 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
             <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
               <Users size={16} weight="fill" />
             </div>
-            <h3 className="text-subtitle font-semibold text-foreground">Dependent Links</h3>
+            <h3 className="text-lead font-semibold text-foreground">Dependent Links</h3>
           </div>
 
           <div className="space-y-5">
             {dependents.map((dep) => (
               <div key={dep.id} className="p-5 rounded-lg border border-border bg-muted/5 space-y-5">
                 <div className="flex items-center justify-between">
-                  <span className="text-micro font-semibold text-primary bg-primary/10 px-2.5 py-1 rounded-full tracking-wider uppercase">Dependent unit</span>
+                  <span className="text-label font-medium text-primary bg-primary/10 px-2.5 py-1 rounded-full tracking-wider uppercase">Dependent unit</span>
                   <button
                     type="button"
                     onClick={() => removeDependent(dep.id)}
-                    className="text-muted-foreground/30 hover:text-rose-500 transition-colors"
+                    className="text-faint hover:text-rose-500 transition-colors"
                   >
                     <Trash size={16} />
                   </button>
@@ -554,11 +554,11 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
 
                 <div className="grid grid-cols-2 gap-5">
                   <div className="space-y-1.5 col-span-2 sm:col-span-1">
-                    <label className="text-caption font-semibold text-muted-foreground/60 tracking-tight">Relationship</label>
+                    <label className="text-label font-medium text-subtle">Relationship</label>
                     <select
                       value={dep.relationship}
                       onChange={(e) => updateDependent(dep.id, "relationship", e.target.value)}
-                      className="w-full px-3 py-2 bg-background border border-border rounded-lg text-nav outline-none focus:ring-2 focus:ring-primary/10 transition-all"
+                      className="w-full px-3 py-2 bg-background border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 transition-all"
                     >
                       {RELATIONSHIPS.map((r) => (
                         <option key={r} value={r}>{r}</option>
@@ -566,25 +566,25 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
                     </select>
                   </div>
                   <div className="space-y-1.5 col-span-2 sm:col-span-1">
-                    <label className="text-caption font-semibold text-muted-foreground/60 tracking-tight">Full name</label>
+                    <label className="text-label font-medium text-subtle">Full name</label>
                     <input
                       value={dep.name}
                       onChange={(e) => updateDependent(dep.id, "name", e.target.value)}
-                      className="w-full px-3 py-2 bg-background border border-border rounded-lg text-nav outline-none focus:ring-2 focus:ring-primary/10 transition-all"
+                      className="w-full px-3 py-2 bg-background border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 transition-all"
                       placeholder="Full Name"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-caption font-semibold text-muted-foreground/60 tracking-tight">Email address</label>
+                    <label className="text-label font-medium text-subtle">Email address</label>
                     <input
                       value={dep.email}
                       onChange={(e) => updateDependent(dep.id, "email", e.target.value)}
-                      className="w-full px-3 py-2 bg-background border border-border rounded-lg text-nav outline-none focus:ring-2 focus:ring-primary/10 transition-all"
+                      className="w-full px-3 py-2 bg-background border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 transition-all"
                       placeholder="Email"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-caption font-semibold text-muted-foreground/60 tracking-tight">Phone number</label>
+                    <label className="text-label font-medium text-subtle">Phone number</label>
                     <PhoneInput
                       value={dep.phone}
                       onChange={(v) => updateDependent(dep.id, "phone", v)}
@@ -596,7 +596,7 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
 
             <Button
               variant="outline"
-              className="w-full border-dashed border-border h-14 text-muted-foreground/60 hover:text-primary hover:border-primary/40 hover:bg-muted/30 transition-all"
+              className="w-full border-dashed border-border h-14 text-faint hover:text-primary hover:border-primary/40 hover:bg-muted/30 transition-all"
               onClick={addDependent}
               type="button"
             >

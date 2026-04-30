@@ -63,7 +63,7 @@ export default function EditBrandPage() {
       <div className="mb-8 space-y-4">
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-1.5 text-nav font-medium text-muted-foreground hover:text-primary transition-colors group"
+          className="flex items-center gap-1.5 text-body font-medium text-subtle hover:text-primary transition-colors group"
         >
           <CaretLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
           Back
@@ -71,7 +71,7 @@ export default function EditBrandPage() {
 
         <div>
           <h1 className="text-display font-semibold tracking-tight text-foreground">Edit Brand</h1>
-          <p className="text-muted-foreground text-nav mt-1 font-normal opacity-80">
+          <p className="text-subtle text-body mt-1 font-normal opacity-80">
             Update the brand identity for {brand.name}.
           </p>
         </div>

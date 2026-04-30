@@ -34,7 +34,7 @@ export function BrandSelectionModal({ isOpen, onClose, onSelect, brands }: Brand
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="p-6 pb-2">
           <DialogTitle className="text-heading font-semibold tracking-tight">Select Existing Brand</DialogTitle>
-          <DialogDescription className="text-nav text-muted-foreground">
+          <DialogDescription className="text-body text-subtle">
             Search and choose a brand to link this service provider account.
           </DialogDescription>
         </DialogHeader>
@@ -60,7 +60,7 @@ export function BrandSelectionModal({ isOpen, onClose, onSelect, brands }: Brand
                     {brand.logo && !brand.logo.includes("dicebear.com") && (
                       <AvatarImage src={brand.logo} className="object-contain p-1" />
                     )}
-                    <AvatarFallback className="text-nav font-semibold bg-primary/[0.03] text-primary/70">
+                    <AvatarFallback className="text-body font-semibold bg-primary/[0.03] text-primary/70">
                         {brand.name.substring(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
@@ -68,7 +68,7 @@ export function BrandSelectionModal({ isOpen, onClose, onSelect, brands }: Brand
                     <span className="text-body font-semibold text-foreground group-hover:text-primary transition-colors leading-tight">
                         {brand.name}
                     </span>
-                    <span className="text-caption text-muted-foreground opacity-70">
+                    <span className="text-label text-muted-foreground">
                         {brand.assignedSpCount} SPs • ID: {brand.id}
                     </span>
                   </div>
@@ -83,8 +83,8 @@ export function BrandSelectionModal({ isOpen, onClose, onSelect, brands }: Brand
                 <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto text-muted-foreground mb-3 opacity-40">
                     <MagnifyingGlass size={24} weight="light" />
                 </div>
-                <p className="text-nav font-medium text-muted-foreground">No brands found</p>
-                <p className="text-caption text-muted-foreground/60 mt-1">Try a different search term.</p>
+                <p className="text-body font-medium text-subtle">No brands found</p>
+                <p className="text-label text-faint mt-1">Try a different search term.</p>
             </div>
           )}
         </div>

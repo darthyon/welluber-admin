@@ -77,27 +77,27 @@ export function PhoneInput({
           >
             <span className="flex items-center gap-2">
               <span className="text-lg leading-none">{selectedCountry.flag}</span>
-              <span className="text-nav">{selectedCountry.dialCode}</span>
+              <span className="text-body">{selectedCountry.dialCode}</span>
             </span>
             <ChevronsUpDown className="ml-1 h-3 w-3 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[200px] p-0" align="start">
           <div className="p-1 max-h-[300px] overflow-y-auto">
-             <p className="text-micro font-semibold text-muted-foreground/50 uppercase tracking-widest px-3 py-2">Select Country</p>
+             <p className="text-label font-medium text-faint uppercase tracking-widest px-3 py-2">Select Country</p>
             {COUNTRIES.map((country) => (
               <button
                 key={country.code}
                 type="button"
                 className={cn(
-                  "flex w-full items-center gap-3 px-3 py-2 text-nav rounded-md hover:bg-muted transition-colors",
+                  "flex w-full items-center gap-3 px-3 py-2 text-body rounded-md hover:bg-muted transition-colors",
                   selectedCountry.code === country.code && "bg-muted/50"
                 )}
                 onClick={() => handleCountrySelect(country)}
               >
                 <span className="text-xl leading-none">{country.flag}</span>
                 <span className="flex-1 text-left font-medium">{country.name}</span>
-                <span className="text-muted-foreground text-caption">{country.dialCode}</span>
+                <span className="text-muted-foreground text-label">{country.dialCode}</span>
                 {selectedCountry.code === country.code && (
                   <Check className="h-4 w-4 text-primary" />
                 )}

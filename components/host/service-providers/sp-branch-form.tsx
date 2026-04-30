@@ -195,17 +195,17 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
         <button
           type="button"
           onClick={onCancel}
-          className="inline-flex items-center gap-1.5 text-nav font-medium text-muted-foreground hover:text-foreground transition-colors w-fit"
+          className="inline-flex items-center gap-1.5 text-body font-medium text-subtle hover:text-foreground transition-colors w-fit"
         >
           <CaretLeft size={16} />
           Back to Branches
         </button>
         
         <div>
-          <h1 className="text-heading font-semibold tracking-tight text-foreground">
+          <h1 className="text-heading font-semibold text-foreground text-balance">
             {isEditing ? "Edit Branch" : "Add New Branch"}
           </h1>
-          <p className="text-muted-foreground text-nav mt-1">Configure location, access, and operating details.</p>
+          <p className="text-subtle text-body mt-1">Configure location, access, and operating details.</p>
         </div>
       </div>
 
@@ -225,15 +225,15 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                   <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                     <Building size={16} weight="fill" />
                   </div>
-                  <h3 className="text-subtitle font-semibold text-foreground">Branch Identity</h3>
+                  <h3 className="text-lead font-semibold text-foreground">Branch Identity</h3>
                 </div>
 
                 <div className="space-y-5">
                   <div className="space-y-1.5">
-                    <label className="text-nav font-semibold text-foreground">Branch Name <span className="text-destructive">*</span></label>
+                    <label className="text-body font-medium text-foreground">Branch Name <span className="text-destructive">*</span></label>
                     <input {...register("name")} className={inputCls(!!errors.name)} placeholder="e.g. Zenith KLCC" />
                     {errors.name && (
-                      <p className="text-caption text-destructive flex items-center gap-1 mt-1">
+                      <p className="text-label text-destructive flex items-center gap-1 mt-1">
                         <WarningCircle size={12} /> {errors.name.message}
                       </p>
                     )}
@@ -241,8 +241,8 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
 
                   <div className="flex items-center justify-between rounded-lg border border-border bg-muted/20 px-4 py-3">
                     <div>
-                      <p className="text-nav font-semibold text-foreground">Active</p>
-                      <p className="text-caption text-muted-foreground">Inactive branches are hidden from the marketplace.</p>
+                      <p className="text-body font-medium text-foreground">Active</p>
+                      <p className="text-label text-muted-foreground">Inactive branches are hidden from the marketplace.</p>
                     </div>
                     <Switch checked={watch("isActive")} onCheckedChange={(v) => setValue("isActive", v)} />
                   </div>
@@ -258,7 +258,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                     <MapPin size={16} weight="fill" />
                   </div>
                   <div className="space-y-0.5">
-                    <h3 className="text-subtitle font-semibold text-foreground">Location Mapping</h3>
+                    <h3 className="text-lead font-semibold text-foreground">Location Mapping</h3>
                     <p className="text-label text-muted-foreground">Address and map coordinates for this branch.</p>
                   </div>
                 </div>
@@ -280,7 +280,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                     <Tag size={16} weight="fill" />
                   </div>
                   <div className="space-y-0.5">
-                    <h3 className="text-subtitle font-semibold text-foreground">Service Catalog</h3>
+                    <h3 className="text-lead font-semibold text-foreground">Service Catalog</h3>
                     <p className="text-label text-muted-foreground">Select services and manage specific sub-types.</p>
                   </div>
                 </div>
@@ -340,7 +340,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                   </div>
 
                   {errors.services && (
-                    <p className="text-caption text-destructive flex items-center gap-1">
+                    <p className="text-label text-destructive flex items-center gap-1">
                       <WarningCircle size={12} /> {errors.services.message}
                     </p>
                   )}
@@ -357,7 +357,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                       <Users size={16} weight="fill" />
                     </div>
                     <div className="space-y-0.5">
-                      <h3 className="text-subtitle font-semibold text-foreground">Branch Governance</h3>
+                      <h3 className="text-lead font-semibold text-foreground">Branch Governance</h3>
                       <p className="text-label text-muted-foreground">Administrators and PICs for this location.</p>
                     </div>
                   </div>
@@ -386,24 +386,24 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                 <div className="space-y-8">
                   {/* Administrators Section */}
                   <div className="space-y-4">
-                    <p className="text-micro font-semibold text-muted-foreground/50 uppercase tracking-widest px-1">Local Administrators</p>
+                    <p className="text-label font-medium text-faint uppercase tracking-widest px-1">Local Administrators</p>
                     <div className="space-y-4">
                       {adminFields.map((field, i) => (
                         <div key={field.id} className="p-4 rounded-lg border border-border bg-muted/10 space-y-4 relative group">
                           <button 
                             type="button"
                             onClick={() => removeAdmin(i)}
-                            className="absolute top-4 right-4 text-muted-foreground/40 hover:text-destructive transition-colors"
+                            className="absolute top-4 right-4 text-faint hover:text-destructive transition-colors"
                           >
                             <Trash size={16} />
                           </button>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-1.5">
-                              <label className="text-caption font-semibold text-muted-foreground tracking-tight">Name</label>
+                              <label className="text-label font-medium text-subtle">Name</label>
                               <input {...register(`administrators.${i}.name`)} className={inputCls(!!(errors.administrators as any)?.[i]?.name)} placeholder="Full name" />
                             </div>
                             <div className="space-y-1.5">
-                              <label className="text-caption font-semibold text-muted-foreground tracking-tight">Corporate Email</label>
+                              <label className="text-label font-medium text-subtle">Corporate Email</label>
                               <input type="email" {...register(`administrators.${i}.email`)} className={inputCls(!!(errors.administrators as any)?.[i]?.email)} placeholder="name@company.com" />
                             </div>
                           </div>
@@ -427,28 +427,28 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
 
                   {/* PICs Section */}
                   <div className="space-y-4">
-                    <p className="text-micro font-semibold text-muted-foreground/50 uppercase tracking-widest px-1">Persons In Charge (PIC)</p>
+                    <p className="text-label font-medium text-faint uppercase tracking-widest px-1">Persons In Charge (PIC)</p>
                     <div className="space-y-4">
                       {contactFields.map((field, i) => (
                         <div key={field.id} className="p-4 rounded-lg border border-border bg-muted/10 space-y-4 relative group">
                           <button 
                             type="button"
                             onClick={() => removeContact(i)}
-                            className="absolute top-4 right-4 text-muted-foreground/40 hover:text-destructive transition-colors"
+                            className="absolute top-4 right-4 text-faint hover:text-destructive transition-colors"
                           >
                             <Trash size={16} />
                           </button>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-1.5">
-                              <label className="text-caption font-semibold text-muted-foreground tracking-tight">Name <span className="text-destructive">*</span></label>
+                              <label className="text-label font-medium text-subtle">Name <span className="text-destructive">*</span></label>
                               <input {...register(`contacts.${i}.name`)} className={inputCls(!!(errors.contacts as any)?.[i]?.name)} placeholder="Full name" />
                             </div>
                             <div className="space-y-1.5">
-                              <label className="text-caption font-semibold text-muted-foreground tracking-tight">Corporate Email <span className="text-destructive">*</span></label>
+                              <label className="text-label font-medium text-subtle">Corporate Email <span className="text-destructive">*</span></label>
                               <input type="email" {...register(`contacts.${i}.email`)} className={inputCls(!!(errors.contacts as any)?.[i]?.email)} placeholder="name@company.com" />
                             </div>
                             <div className="space-y-1.5">
-                              <label className="text-caption font-semibold text-muted-foreground tracking-tight">Job Role</label>
+                              <label className="text-label font-medium text-subtle">Job Role</label>
                               <select {...register(`contacts.${i}.type`)} className={cn(inputCls(), "appearance-none cursor-pointer bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236b7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1.25rem_1.25rem] bg-[right_0.5rem_center] bg-no-repeat pr-10")}>
                                 {BRANCH_CONTACT_TYPES.map((t) => (
                                   <option key={t.value} value={t.value}>{t.label}</option>
@@ -456,7 +456,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                               </select>
                             </div>
                             <div className="space-y-1.5">
-                              <label className="text-caption font-semibold text-muted-foreground tracking-tight">Phone <span className="text-destructive">*</span></label>
+                              <label className="text-label font-medium text-subtle">Phone <span className="text-destructive">*</span></label>
                               <Controller
                                 control={control}
                                 name={`contacts.${i}.phone`}
@@ -492,7 +492,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                     <Clock size={16} weight="fill" />
                   </div>
                   <div className="space-y-0.5">
-                    <h3 className="text-subtitle font-semibold text-foreground">Operating Hours</h3>
+                    <h3 className="text-lead font-semibold text-foreground">Operating Hours</h3>
                     <p className="text-label text-muted-foreground">Weekly open and close schedule.</p>
                   </div>
                 </div>
@@ -501,10 +501,10 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                     const isClosed = watch(`operatingHours.${key}.isClosed`);
                     return (
                       <div key={key} className="grid grid-cols-[90px_1fr] md:grid-cols-[100px_1fr_120px_120px] gap-3 items-center py-1.5">
-                        <span className="text-nav font-medium text-foreground">{label.slice(0, 3)}</span>
+                        <span className="text-body font-medium text-foreground">{label.slice(0, 3)}</span>
                         <div className="flex items-center gap-2">
                           <Switch checked={!isClosed} onCheckedChange={(v) => setValue(`operatingHours.${key}.isClosed`, !v)} />
-                          <span className="text-caption text-muted-foreground ml-1">{isClosed ? "Closed" : "Open"}</span>
+                          <span className="text-label text-muted-foreground ml-1">{isClosed ? "Closed" : "Open"}</span>
                         </div>
                         {!isClosed && (
                           <>
@@ -527,7 +527,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                     <CheckCircle size={16} weight="fill" />
                   </div>
                   <div className="space-y-0.5">
-                    <h3 className="text-subtitle font-semibold text-foreground">Benefits</h3>
+                    <h3 className="text-lead font-semibold text-foreground">Benefits</h3>
                     <p className="text-label text-muted-foreground">Amenities and benefits available at this branch.</p>
                   </div>
                 </div>
@@ -575,7 +575,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
           variant="ghost" 
           size="lg"
           onClick={onCancel}
-          className="text-nav font-semibold px-6"
+          className="text-body font-semibold px-6"
         >
           Cancel
         </Button>
@@ -584,7 +584,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
           type="submit"
           disabled={isSubmitting}
           size="lg"
-          className="text-nav font-semibold px-8 flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
+          className="text-body font-semibold px-8 flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
         >
           {isSubmitting ? (
             <>

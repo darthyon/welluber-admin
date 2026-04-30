@@ -73,7 +73,7 @@ export function SpBranchCard({ branch, onView, onEdit }: SpBranchCardProps) {
       {/* Services (Pills) - Standardized row height */}
       <div className="relative z-10 h-7 flex items-center mb-6">
         {branch.services.length === 0 ? (
-          <span className="text-caption text-muted-foreground italic">No services yet</span>
+          <span className="text-label text-muted-foreground italic">No services yet</span>
         ) : (
           <OverflowTags 
             items={branch.services.map(s => s.service)} 
@@ -85,7 +85,7 @@ export function SpBranchCard({ branch, onView, onEdit }: SpBranchCardProps) {
       {/* Footer Footer Footer (Operating Hours Matching Org staff/wallet styling) */}
       <div className="mt-auto pt-4 border-t border-border/40 relative z-10">
         <div className="flex flex-col gap-1">
-          <span className="text-micro font-semibold tracking-tight text-muted-foreground/60">Operating hours</span>
+          <span className="text-label font-medium text-faint">Operating hours</span>
           <div className="flex items-center gap-1.5 text-label font-semibold text-foreground">
             <Clock size={14} weight="duotone" className="text-primary" />
             <span>{getHoursSummary(branch)}</span>

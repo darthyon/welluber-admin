@@ -59,11 +59,11 @@ export function DetailSection({
               </div>
             )}
             <div>
-              <CardTitle className="text-subtitle font-semibold">
+              <CardTitle className="text-lead font-semibold">
                 {title}
               </CardTitle>
               {description && (
-                <p className="text-caption text-muted-foreground mt-1">{description}</p>
+                <p className="text-label text-subtle mt-1">{description}</p>
               )}
             </div>
           </div>
@@ -87,11 +87,11 @@ export function DetailSection({
               </div>
             )}
             <div>
-              <CardTitle className="text-subtitle font-semibold">
+              <CardTitle className="text-lead font-semibold">
                 {title}
               </CardTitle>
               {description && (
-                <p className="text-caption text-muted-foreground mt-1">{description}</p>
+                <p className="text-label text-subtle mt-1">{description}</p>
               )}
             </div>
           </div>

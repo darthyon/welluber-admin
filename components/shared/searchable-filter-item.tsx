@@ -54,7 +54,7 @@ export function SearchableFilterItem({
             variant="outline"
             size="sm"
             className={cn(
-              "h-9 px-3 gap-2 text-nav font-normal border-border/60 bg-card hover:bg-muted/50 hover:border-border transition-all rounded-lg",
+              "h-9 px-3 gap-2 text-body font-normal border-border/60 bg-card hover:bg-muted/50 hover:border-border transition-all rounded-lg",
               value !== "all" && "border-primary/20 bg-primary/5 text-primary hover:bg-primary/10 hover:border-primary/30"
             )}
           >
@@ -73,7 +73,7 @@ export function SearchableFilterItem({
                 placeholder={placeholder}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-transparent border-0 outline-none text-nav h-7 focus:ring-0 placeholder:text-muted-foreground/60"
+                className="w-full bg-transparent border-0 outline-none text-body h-7 focus:ring-0 placeholder:text-faint"
               />
               {searchQuery && (
                 <button 
@@ -96,7 +96,7 @@ export function SearchableFilterItem({
                       setSearchQuery("");
                     }}
                     className={cn(
-                      "flex items-center justify-between w-full px-3 py-2 text-nav rounded-lg transition-all text-left font-normal",
+                      "flex items-center justify-between w-full px-3 py-2 text-body rounded-lg transition-all text-left font-normal",
                       value === option.value
                         ? "bg-primary/10 text-primary font-semibold"
                         : "text-muted-foreground hover:bg-muted hover:text-foreground"

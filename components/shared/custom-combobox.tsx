@@ -82,9 +82,9 @@ export function CustomComboBox({
           }}
           onFocus={() => setIsOpen(true)}
           className={cn(
-            "w-full px-4 py-2.5 rounded-lg border bg-background/5 text-nav transition-all outline-none pr-10",
+            "w-full px-4 py-2.5 rounded-lg border bg-background/5 text-body transition-all outline-none pr-10",
             isOpen ? "border-primary ring-2 ring-primary/10" : "border-border/60 hover:border-primary/30 transition-all",
-            !value && "placeholder:text-muted-foreground/40"
+            !value && "placeholder:text-faint"
           )}
           placeholder={placeholder}
         />
@@ -92,7 +92,7 @@ export function CustomComboBox({
           className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer flex items-center justify-center h-full w-8"
           onClick={() => setIsOpen(!isOpen)}
         >
-          <CaretDown size={14} className={cn("text-muted-foreground/40 transition-transform", isOpen && "rotate-180")} />
+          <CaretDown size={14} className={cn("text-faint transition-transform", isOpen && "rotate-180")} />
         </div>
       </div>
 
@@ -105,7 +105,7 @@ export function CustomComboBox({
           {showAddCustom && (
             <button
               onClick={() => handleSelect(value)}
-            className="w-full text-left px-3 py-2 rounded-lg text-nav bg-primary/10 text-primary font-semibold flex items-center gap-2 mb-1 border-b border-border/20"
+            className="w-full text-left px-3 py-2 rounded-lg text-body bg-primary/10 text-primary font-semibold flex items-center gap-2 mb-1 border-b border-border/20"
             >
               <Plus size={14} weight="bold" />
               <span>Add custom: &quot;{value}&quot;</span>
@@ -118,8 +118,8 @@ export function CustomComboBox({
               onClick={() => handleSelect(opt)}
               type="button"
               className={cn(
-                "w-full text-left px-3 py-2 rounded-lg text-nav transition-colors flex items-center justify-between group",
-                value === opt ? "bg-primary/10 text-primary font-semibold" : "hover:bg-accent/40 text-muted-foreground/80 hover:text-foreground"
+                "w-full text-left px-3 py-2 rounded-lg text-body transition-colors flex items-center justify-between group",
+                value === opt ? "bg-primary/10 text-primary font-semibold" : "hover:bg-accent/40 text-subtle hover:text-foreground"
               )}
             >
               <span className="truncate">{opt}</span>

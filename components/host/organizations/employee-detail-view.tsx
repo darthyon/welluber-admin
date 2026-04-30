@@ -115,7 +115,7 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
       <div className="flex flex-col gap-4">
         <button 
           onClick={onBack}
-          className="flex items-center gap-1.5 text-nav font-medium text-muted-foreground hover:text-primary transition-colors w-fit group"
+          className="flex items-center gap-1.5 text-body font-medium text-subtle hover:text-primary transition-colors w-fit group"
         >
           <CaretLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
           Back to Employee Directory
@@ -141,21 +141,21 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
               </p>
               <div className="flex items-center gap-2 mt-2 flex-wrap">
                 <span className={cn(
-                  "text-micro font-semibold px-2 py-0.5 rounded-4xl border",
+                  "text-label font-medium px-2 py-0.5 rounded-4xl border",
                   employeeData.employeeStatus === "active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-rose-500/10 text-rose-600 border-rose-500/20"
                 )}>
                   {employeeData.employeeStatus}
                 </span>
                 {employeeData.isProbation && (
-                  <span className="text-micro font-semibold px-2 py-0.5 rounded-4xl border bg-amber-500/10 text-amber-600 border-amber-500/20">
+                  <span className="text-label font-medium px-2 py-0.5 rounded-4xl border bg-amber-500/10 text-amber-600 border-amber-500/20">
                     Probation
                   </span>
                 )}
-                <span className="text-micro font-semibold px-2 py-0.5 rounded-4xl bg-muted text-muted-foreground border border-border">
+                <span className="text-label font-medium px-2 py-0.5 rounded-4xl bg-muted text-muted-foreground border border-border">
                   {employeeData.residencyStatus}
                 </span>
                 <span className={cn(
-                  "text-micro font-semibold px-2 py-0.5 rounded-4xl border",
+                  "text-label font-medium px-2 py-0.5 rounded-4xl border",
                   employeeData.isTaxable ? "bg-primary/10 text-primary border-primary/20" : "bg-rose-500/10 text-rose-600 border-rose-500/20"
                 )}>
                   {employeeData.isTaxable ? "Taxable" : "Non-taxable"}
@@ -313,10 +313,10 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
                       <div className="flex items-center gap-4 shrink-0">
                         <div className="text-right">
                           <div className="text-label font-semibold text-foreground">{policy.spent} / {policy.limit}</div>
-                          <div className="text-caption font-semibold text-muted-foreground/80 mt-0.5">Utilised</div>
+                          <div className="text-label font-semibold text-subtle mt-0.5">Utilised</div>
                         </div>
                         <div className="w-24 space-y-1">
-                          <div className="flex justify-between text-micro font-semibold">
+                          <div className="flex justify-between text-label font-medium">
                             <span className={cn(policy.utilisation > 80 ? "text-rose-500" : "text-primary")}>{policy.utilisation}%</span>
                           </div>
                           <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
@@ -326,8 +326,8 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
                             />
                           </div>
                         </div>
-                        <div className="flex items-center gap-1.5 text-muted-foreground/30">
-                          <span className="text-caption font-semibold">{policy.claims.length}</span>
+                        <div className="flex items-center gap-1.5 text-faint">
+                          <span className="text-label font-semibold">{policy.claims.length}</span>
                           <CaretDown size={13} weight="bold" className={cn("transition-transform duration-200", isExpanded && "rotate-180")} />
                         </div>
                       </div>
@@ -338,29 +338,29 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
                       <div className="border-t border-border bg-muted/30">
                         <div className="grid grid-cols-[120px_1fr_1fr_1fr_100px_80px] gap-3 px-6 py-2 border-b border-border">
                           {["Voucher", "Service", "Provider", "Location", "Date", "Amount"].map(h => (
-                            <p key={h} className="text-caption font-semibold text-muted-foreground/60 tracking-tight">{h}</p>
+                            <p key={h} className="text-label font-semibold text-faint">{h}</p>
                           ))}
                         </div>
                         {policy.claims.length === 0 ? (
-                          <p className="text-label text-muted-foreground/40 italic px-6 py-4 font-medium">No claims recorded.</p>
+                          <p className="text-label text-faint italic px-6 py-4 font-medium">No claims recorded.</p>
                         ) : policy.claims.map(claim => (
                           <div key={claim.id} className="grid grid-cols-[120px_1fr_1fr_1fr_100px_80px] gap-3 px-6 py-3 border-b border-border last:border-0 hover:bg-muted/80 transition-colors items-center">
                             <div className="flex items-center gap-1.5">
-                              <span className={cn("text-micro font-semibold px-1.5 py-0.5 rounded-full", CLAIM_STATUS_STYLE[claim.status])}>{claim.status}</span>
-                              <code className="text-micro font-mono text-muted-foreground/60 truncate tracking-tighter">{claim.voucherCode}</code>
+                              <span className={cn("text-label font-medium px-1.5 py-0.5 rounded-full", CLAIM_STATUS_STYLE[claim.status])}>{claim.status}</span>
+                              <code className="text-micro font-mono text-faint truncate tracking-tighter">{claim.voucherCode}</code>
                             </div>
                             <p className="text-label text-foreground font-medium truncate">{claim.service}</p>
                             <div className="flex items-center gap-1.5 min-w-0">
-                               <Storefront size={11} className="text-muted-foreground/30 shrink-0" />
+                               <Storefront size={11} className="text-faint shrink-0" />
                                <p className="text-label text-muted-foreground font-medium truncate">{claim.provider}</p>
                             </div>
                             <div className="flex items-center gap-1.5 min-w-0">
-                               <MapPin size={11} className="text-muted-foreground/30 shrink-0" />
+                               <MapPin size={11} className="text-faint shrink-0" />
                                <p className="text-label text-muted-foreground font-medium truncate">{claim.location}</p>
                             </div>
                             <div className="flex items-center gap-1.5">
-                               <Calendar size={11} className="text-muted-foreground/30 shrink-0" />
-                               <p className="text-caption text-muted-foreground/50 font-semibold tracking-tight whitespace-nowrap">{claim.date}</p>
+                               <Calendar size={11} className="text-faint shrink-0" />
+                               <p className="text-label text-faint font-semibold whitespace-nowrap">{claim.date}</p>
                             </div>
                             <p className="text-label font-semibold font-mono text-foreground text-right tracking-tighter">RM {claim.amount.toFixed(2)}</p>
                           </div>
@@ -381,14 +381,14 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
             icon={<Users size={18} weight="bold" className="text-primary" />}
           >
             <div className="bg-muted/20 border border-dashed border-border rounded-lg p-8 flex flex-col items-center text-center">
-              <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground/50 mb-4 border border-dashed border-border/40">
+              <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center text-faint mb-4 border border-dashed border-border/40">
                 <Users size={24} />
               </div>
               <h5 className="text-body font-semibold text-foreground tracking-tight">0 Dependents</h5>
-              <p className="text-label text-muted-foreground mt-1 max-w-[180px] font-medium opacity-70">
+              <p className="text-label text-muted-foreground mt-1 max-w-[180px] font-medium">
                 No dependents have been added to this employee profile yet.
               </p>
-              <Button variant="link" className="text-primary h-auto p-0 mt-4 font-semibold text-nav hover:no-underline hover:text-primary/80">
+              <Button variant="link" className="text-primary h-auto p-0 mt-4 font-semibold text-body hover:no-underline hover:text-primary/80">
                 Add Dependent
               </Button>
             </div>

@@ -91,18 +91,18 @@ export function EmployeePolicyTab({ employeeId }: EmployeePolicyTabProps) {
                       <div className="flex flex-wrap gap-4 mt-4">
                         <div className="flex items-center gap-2">
                           <Calendar size={16} className="text-muted-foreground" />
-                          <span className="text-caption font-semibold text-muted-foreground">Effective:</span>
-                          <span className="text-nav font-semibold text-foreground">{policy.effectiveDate}</span>
+                          <span className="text-label font-medium text-subtle">Effective:</span>
+                          <span className="text-body font-medium text-foreground">{policy.effectiveDate}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <Calendar size={16} className="text-muted-foreground" />
-                          <span className="text-caption font-semibold text-muted-foreground">Expires:</span>
-                          <span className="text-nav font-semibold text-foreground">{policy.expiryDate}</span>
+                          <span className="text-label font-medium text-subtle">Expires:</span>
+                          <span className="text-body font-medium text-foreground">{policy.expiryDate}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <Users size={16} className="text-muted-foreground" />
-                          <span className="text-caption font-semibold text-muted-foreground">Pool Type:</span>
-                          <span className="text-nav font-semibold text-foreground">{policy.poolType}</span>
+                          <span className="text-label font-medium text-subtle">Pool Type:</span>
+                          <span className="text-body font-medium text-foreground">{policy.poolType}</span>
                         </div>
                       </div>
                     </div>
@@ -114,29 +114,29 @@ export function EmployeePolicyTab({ employeeId }: EmployeePolicyTabProps) {
                       <CardContent className="p-4">
                         <div className="flex items-center gap-2 mb-2">
                           <CurrencyCircleDollar size={16} className="text-primary" />
-                          <p className="text-caption font-semibold text-muted-foreground">Total Allocated</p>
+                          <p className="text-label font-medium text-subtle">Total Allocated</p>
                         </div>
-                        <p className="text-display font-semibold text-foreground">RM {policy.totalAllocated.toLocaleString()}</p>
+                        <p className="text-display font-semibold text-foreground tabular-nums">RM {policy.totalAllocated.toLocaleString()}</p>
                       </CardContent>
                     </Card>
                     <Card className="border-border bg-card">
                       <CardContent className="p-4">
                         <div className="flex items-center gap-2 mb-2">
                           <CurrencyCircleDollar size={16} className="text-amber-500" />
-                          <p className="text-caption font-semibold text-muted-foreground">Total Spent</p>
+                          <p className="text-label font-medium text-subtle">Total Spent</p>
                         </div>
-                        <p className="text-display font-semibold text-foreground">RM {policy.totalSpent.toLocaleString()}</p>
+                        <p className="text-display font-semibold text-foreground tabular-nums">RM {policy.totalSpent.toLocaleString()}</p>
                       </CardContent>
                     </Card>
                     <Card className="border-border bg-card">
                       <CardContent className="p-4">
                         <div className="flex items-center gap-2 mb-2">
                           <Shield size={16} className="text-emerald-500" />
-                          <p className="text-caption font-semibold text-muted-foreground">Utilization</p>
+                          <p className="text-label font-medium text-subtle">Utilization</p>
                         </div>
                         <div className="flex items-center gap-2">
                           <Progress value={policy.totalUtilization} className="h-2 flex-1" />
-                          <span className="text-nav font-semibold text-foreground">{policy.totalUtilization}%</span>
+                          <span className="text-body font-medium text-foreground">{policy.totalUtilization}%</span>
                         </div>
                       </CardContent>
                     </Card>
@@ -180,24 +180,24 @@ export function EmployeePolicyTab({ employeeId }: EmployeePolicyTabProps) {
                     <div className="space-y-4">
                       <div>
                         <div className="flex justify-between items-center mb-1">
-                          <p className="text-caption font-semibold text-muted-foreground">Allocated</p>
-                          <p className="text-nav font-semibold text-foreground">RM {group.amount.toLocaleString()}</p>
+                          <p className="text-label font-medium text-subtle">Allocated</p>
+                          <p className="text-body font-medium text-foreground">RM {group.amount.toLocaleString()}</p>
                         </div>
                         <div className="flex justify-between items-center mb-1">
-                          <p className="text-caption font-semibold text-muted-foreground">Spent</p>
-                          <p className="text-nav font-semibold text-foreground">RM {group.spent.toLocaleString()}</p>
+                          <p className="text-label font-medium text-subtle">Spent</p>
+                          <p className="text-body font-medium text-foreground">RM {group.spent.toLocaleString()}</p>
                         </div>
                         <div className="flex justify-between items-center">
-                          <p className="text-caption font-semibold text-muted-foreground">Balance</p>
-                          <p className="text-nav font-semibold text-foreground">
+                          <p className="text-label font-medium text-subtle">Balance</p>
+                          <p className="text-body font-medium text-foreground">
                             RM {(group.amount - group.spent).toLocaleString()}
                           </p>
                         </div>
                       </div>
                       <div>
                         <div className="flex justify-between items-center mb-1">
-                          <p className="text-caption font-semibold text-muted-foreground">Utilization</p>
-                          <p className="text-nav font-semibold text-foreground">{group.utilization}%</p>
+                          <p className="text-label font-medium text-subtle">Utilization</p>
+                          <p className="text-body font-medium text-foreground">{group.utilization}%</p>
                         </div>
                         <Progress value={group.utilization} className="h-2" />
                       </div>
@@ -222,7 +222,7 @@ export function EmployeePolicyTab({ employeeId }: EmployeePolicyTabProps) {
                 <CardContent>
                   <div className="space-y-3">
                     <div>
-                      <p className="text-caption font-semibold text-muted-foreground">Employee Types</p>
+                      <p className="text-label font-medium text-subtle">Employee Types</p>
                       <div className="flex flex-wrap gap-2 mt-1">
                         {policy.eligibility.employeeTypes.map((type, idx) => (
                           <Badge key={idx} variant="secondary" className="bg-primary/10 text-primary">
@@ -232,7 +232,7 @@ export function EmployeePolicyTab({ employeeId }: EmployeePolicyTabProps) {
                       </div>
                     </div>
                     <div>
-                      <p className="text-caption font-semibold text-muted-foreground">Roles</p>
+                      <p className="text-label font-medium text-subtle">Roles</p>
                       <div className="flex flex-wrap gap-2 mt-1">
                         {policy.eligibility.roles.map((role, idx) => (
                           <Badge key={idx} variant="outline">
@@ -255,16 +255,16 @@ export function EmployeePolicyTab({ employeeId }: EmployeePolicyTabProps) {
                 <CardContent>
                   <div className="space-y-3">
                     <div>
-                      <p className="text-caption font-semibold text-muted-foreground">Refresh Cycle</p>
-                      <p className="text-nav font-semibold text-foreground">{policy.refreshCycle}</p>
+                      <p className="text-label font-medium text-subtle">Refresh Cycle</p>
+                      <p className="text-body font-medium text-foreground">{policy.refreshCycle}</p>
                     </div>
                     <div>
-                      <p className="text-caption font-semibold text-muted-foreground">Next Refresh</p>
-                      <p className="text-nav font-semibold text-foreground">01 May 2024</p>
+                      <p className="text-label font-medium text-subtle">Next Refresh</p>
+                      <p className="text-body font-medium text-foreground">01 May 2024</p>
                     </div>
                     <div>
-                      <p className="text-caption font-semibold text-muted-foreground">Days Remaining</p>
-                      <p className="text-nav font-semibold text-foreground">15 days</p>
+                      <p className="text-label font-medium text-subtle">Days Remaining</p>
+                      <p className="text-body font-medium text-foreground">15 days</p>
                     </div>
                   </div>
                 </CardContent>
@@ -276,7 +276,7 @@ export function EmployeePolicyTab({ employeeId }: EmployeePolicyTabProps) {
         /* Empty State - No Policy Assigned */
         <Card className="border-border border-dashed">
           <CardContent className="p-12 text-center">
-            <div className="w-16 h-16 rounded-full bg-muted/50 border border-border mx-auto flex items-center justify-center text-muted-foreground/60">
+            <div className="w-16 h-16 rounded-full bg-muted/50 border border-border mx-auto flex items-center justify-center text-faint">
               <Shield size={32} />
             </div>
             <h3 className="text-heading font-semibold text-foreground mt-6">No Policy Assigned</h3>

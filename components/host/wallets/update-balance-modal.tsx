@@ -70,7 +70,7 @@ export function UpdateBalanceModal({
                   <h3 className="text-body font-semibold text-foreground">
                     Update Balance
                   </h3>
-                  <p className="text-caption text-muted-foreground">
+                  <p className="text-label text-muted-foreground">
                     {walletName}
                   </p>
                 </div>
@@ -87,7 +87,7 @@ export function UpdateBalanceModal({
             {/* Body */}
             <div className="px-6 py-5 space-y-5">
               <div className="space-y-1.5">
-                <label className="text-nav font-semibold text-foreground">
+                <label className="text-body font-medium text-foreground">
                   Adjustment Amount (RM)
                 </label>
                 <input
@@ -98,13 +98,13 @@ export function UpdateBalanceModal({
                   placeholder="e.g. -50.00 or 100.00"
                   className="w-full px-3 py-2.5 bg-card border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-semibold text-foreground"
                 />
-                <p className="text-caption text-muted-foreground/60">
+                <p className="text-label text-faint">
                   Use negative values to reduce balance.
                 </p>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-nav font-semibold text-foreground">
+                <label className="text-body font-medium text-foreground">
                   Reason
                 </label>
                 <textarea
@@ -123,14 +123,14 @@ export function UpdateBalanceModal({
                 variant="ghost"
                 onClick={onClose}
                 disabled={isSubmitting}
-                className="text-nav font-medium"
+                className="text-body font-medium"
               >
                 Cancel
               </Button>
               <Button
                 onClick={handleSubmit}
                 disabled={isSubmitting || !amount || !reason}
-                className="text-nav font-medium bg-primary hover:bg-primary/90"
+                className="text-body font-medium bg-primary hover:bg-primary/90"
               >
                 {isSubmitting ? (
                   <div className="flex items-center gap-2">
