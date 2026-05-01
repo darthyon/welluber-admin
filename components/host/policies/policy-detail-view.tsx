@@ -229,7 +229,7 @@ function OverviewTab({
           <div className="col-span-2 md:col-span-4">
             <DetailField
               label="Eligible Employment Types"
-              value={policy.eligibleEmploymentTypes.map((t) => t.replace("-", " ")).join(", ")}
+               value={policy.eligibleEmploymentTypes.map((t) => t.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")).join(", ")}
             />
           </div>
         </div>

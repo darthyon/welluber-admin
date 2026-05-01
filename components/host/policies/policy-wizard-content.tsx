@@ -13,9 +13,11 @@ import {
   ShieldCheck,
   DiceFive,
   PencilSimpleLine,
+  CaretDown,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { ChoiceCard } from "@/components/shared/choice-card";
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 import {
   BenefitPolicy,
@@ -451,78 +453,89 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
         </div>
       </div>
 
-      {/* Employee Eligibility Filters */}
+      {/* Advanced Filters — collapsed accordion, only when needed */}
       <div className="pt-4 border-t border-border/60">
-        <h4 className="text-body font-semibold text-foreground mb-3">Additional Eligibility Filters</h4>
-        <p className="text-label text-muted-foreground mb-4">Narrow which employees are automatically assigned this policy.</p>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div className="space-y-1.5">
-            <FieldLabel>Age Range (Min)</FieldLabel>
-            <input
-              type="number"
-              placeholder="e.g. 18"
-              className="w-full px-4 py-2.5 bg-background border border-border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all"
-              value={policyData.eligibility?.minAge || ""}
-              onChange={(e) =>
-                setPolicyData({
-                  ...policyData,
-                  eligibility: {
-                    ...policyData.eligibility,
-                    minAge: e.target.value ? parseInt(e.target.value) : undefined,
-                  },
-                })
-              }
+        <Collapsible defaultOpen={false}>
+          <CollapsibleTrigger className="group flex items-center gap-2 w-full text-left">
+            <CaretDown
+              size={14}
+              weight="bold"
+              className="text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180"
             />
-            <HelpText>Leave blank for no minimum.</HelpText>
-          </div>
-
-          <div className="space-y-1.5">
-            <FieldLabel>Age Range (Max)</FieldLabel>
-            <input
-              type="number"
-              placeholder="e.g. 65"
-              className="w-full px-4 py-2.5 bg-background border border-border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all"
-              value={policyData.eligibility?.maxAge || ""}
-              onChange={(e) =>
-                setPolicyData({
-                  ...policyData,
-                  eligibility: {
-                    ...policyData.eligibility,
-                    maxAge: e.target.value ? parseInt(e.target.value) : undefined,
-                  },
-                })
-              }
-            />
-            <HelpText>Leave blank for no maximum.</HelpText>
-          </div>
-
-          <div className="space-y-1.5">
-            <FieldLabel>Gender</FieldLabel>
-            <div className="flex gap-2">
-              {(["all", "male", "female"] as const).map((g) => (
-                <button
-                  type="button"
-                  key={g}
-                  onClick={() =>
+            <span className="text-body font-semibold text-foreground">Advanced Filters</span>
+            <span className="text-label text-faint font-medium ml-1">(optional)</span>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="mt-4">
+            <p className="text-label text-muted-foreground mb-4">Narrow which employees are automatically assigned this policy.</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <div className="space-y-1.5">
+                <FieldLabel>Age Range (Min)</FieldLabel>
+                <input
+                  type="number"
+                  placeholder="e.g. 18"
+                  className="w-full px-4 py-2.5 bg-background border border-border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all"
+                  value={policyData.eligibility?.minAge || ""}
+                  onChange={(e) =>
                     setPolicyData({
                       ...policyData,
-                      eligibility: { ...policyData.eligibility, gender: g },
+                      eligibility: {
+                        ...policyData.eligibility,
+                        minAge: e.target.value ? parseInt(e.target.value) : undefined,
+                      },
                     })
                   }
-                  className={cn(
-                    "flex-1 px-3 py-2 rounded-lg border text-body font-medium transition-all capitalize",
-                    policyData.eligibility?.gender === g || (!policyData.eligibility?.gender && g === "all")
-                      ? "border-primary bg-primary/5 text-primary"
-                      : "border-border bg-card text-muted-foreground hover:border-border/80"
-                  )}
-                >
-                  {g}
-                </button>
-              ))}
+                />
+                <HelpText>Leave blank for no minimum.</HelpText>
+              </div>
+
+              <div className="space-y-1.5">
+                <FieldLabel>Age Range (Max)</FieldLabel>
+                <input
+                  type="number"
+                  placeholder="e.g. 65"
+                  className="w-full px-4 py-2.5 bg-background border border-border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all"
+                  value={policyData.eligibility?.maxAge || ""}
+                  onChange={(e) =>
+                    setPolicyData({
+                      ...policyData,
+                      eligibility: {
+                        ...policyData.eligibility,
+                        maxAge: e.target.value ? parseInt(e.target.value) : undefined,
+                      },
+                    })
+                  }
+                />
+                <HelpText>Leave blank for no maximum.</HelpText>
+              </div>
+
+              <div className="space-y-1.5">
+                <FieldLabel>Gender</FieldLabel>
+                <div className="flex gap-2">
+                  {(["all", "male", "female"] as const).map((g) => (
+                    <button
+                      type="button"
+                      key={g}
+                      onClick={() =>
+                        setPolicyData({
+                          ...policyData,
+                          eligibility: { ...policyData.eligibility, gender: g },
+                        })
+                      }
+                      className={cn(
+                        "flex-1 px-3 py-2 rounded-lg border text-body font-medium transition-all capitalize",
+                        policyData.eligibility?.gender === g || (!policyData.eligibility?.gender && g === "all")
+                          ? "border-primary bg-primary/5 text-primary"
+                          : "border-border bg-card text-muted-foreground hover:border-border/80"
+                      )}
+                    >
+                      {g}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          </CollapsibleContent>
+        </Collapsible>
       </div>
     </div>
   );
@@ -870,11 +883,6 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
     </div>
   );
 
-  // ── Review section ────────────────────────────────────────────────────────
-  const renderReviewSection = () => (
-    <PolicyReviewCards policy={policyData} groups={groups} benefits={benefits} />
-  );
-
   // ── Main render ───────────────────────────────────────────────────────────
   return (
     <form
@@ -906,14 +914,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
         </div>
       </section>
 
-      {/* Review — inline only in edit mode */}
-      {mode === "edit" && (
-        <section id="review" className="scroll-mt-32">
-          <div className="bg-card border border-border rounded-lg shadow-sm overflow-hidden">
-            <div className="p-6">{renderReviewSection()}</div>
-          </div>
-        </section>
-      )}
+      {/* Review step is handled by the parent in create mode; edit mode renders everything inline */}
     </form>
   );
 }

@@ -445,6 +445,9 @@ function TierPanel({
   onSetOverride: (tierId: string, benefitId: string, amount?: number) => void;
   onRemove: () => void;
 }) {
+  const [mode, setMode] = useState<"view" | "edit">("view");
+  const [validationError, setValidationError] = useState<string | null>(null);
+
   const toggleEmploymentType = (type: string) => {
     const current = tier.eligibleEmploymentTypes;
     const next = current.includes(type)
@@ -473,10 +476,7 @@ function TierPanel({
     return tier.overrides.find((o) => o.benefitId === benefitId)?.amount;
   };
 
-  const [validationError, setValidationError] = useState<string | null>(null);
-
   const handleSave = () => {
-    // Validate employment types are subset of policy types
     const invalidTypes = tier.eligibleEmploymentTypes.filter(
       (t) => !policy.eligibleEmploymentTypes.includes(t)
     );
@@ -492,6 +492,7 @@ function TierPanel({
     }
     setValidationError(null);
     onUpdate(tier.id, { status: "complete" });
+    setMode("view");
   };
 
   return (
@@ -507,23 +508,51 @@ function TierPanel({
         <div>
           <h3 className="text-heading font-semibold text-foreground">{tier.name}</h3>
           <p className="text-body text-muted-foreground mt-1">
-            Configure eligibility rules and benefit overrides for this tier.
+            {mode === "edit"
+              ? "Configure eligibility rules and benefit overrides for this tier."
+              : "Eligibility rules and benefit overrides for this tier."}
           </p>
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onRemove}
-          className="h-8 px-3 text-label font-semibold text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-500/10 shrink-0"
-        >
-          <Trash size={14} weight="bold" className="mr-1.5" />
-          Remove Tier
-        </Button>
+        {mode === "edit" ? (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onRemove}
+            className="h-8 px-3 text-label font-semibold text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-500/10 shrink-0"
+          >
+            <Trash size={14} weight="bold" className="mr-1.5" />
+            Remove Tier
+          </Button>
+        ) : (
+          <div className="flex items-center gap-2 shrink-0">
+            {tier.status === "complete" && (
+              <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 dark:bg-emerald-500/20 text-label font-medium">
+                <CheckCircle size={12} weight="fill" />
+                Complete
+              </span>
+            )}
+            {tier.status === "incomplete" && (
+              <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 dark:bg-amber-500/20 text-label font-medium">
+                <WarningCircle size={12} weight="fill" />
+                Incomplete
+              </span>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setMode("edit")}
+              className="h-8 px-3 rounded-4xl text-label font-semibold"
+            >
+              <NotePencil size={14} weight="bold" className="mr-1" />
+              Edit Tier
+            </Button>
+          </div>
+        )}
       </div>
 
-      {/* Validation error */}
+      {/* Validation error — edit mode only */}
       <AnimatePresence>
-        {validationError && (
+        {mode === "edit" && validationError && (
           <motion.div
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
@@ -538,73 +567,114 @@ function TierPanel({
 
       {/* Eligibility */}
       <div className="space-y-3">
-        <h4 className="text-subtitle font-semibold text-foreground">Eligibility Rules</h4>
+        <h4 className="text-body font-semibold text-foreground">Eligibility Rules</h4>
 
         <div className="space-y-1.5">
-          <label className="text-label font-medium text-muted-foreground">
+          <label className="text-label font-medium text-subtle">
             Employment Types <span className="text-rose-600 dark:text-rose-400">*</span>
           </label>
-          <div className="flex flex-wrap gap-2">
-            {EMPLOYMENT_TYPES.map((type) => {
-              const selected = tier.eligibleEmploymentTypes.includes(type.id);
-              const isValid = policy.eligibleEmploymentTypes.includes(type.id);
-              return (
-                <button
-                  key={type.id}
-                  disabled={!isValid}
-                  onClick={() => toggleEmploymentType(type.id)}
-                  className={cn(
-                    "px-3 py-1.5 rounded-full text-body font-semibold border transition-all",
-                    selected
-                      ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                      : isValid
-                        ? "bg-background text-muted-foreground border-border hover:border-primary/30"
-                        : "bg-muted text-faint border-border cursor-not-allowed"
-                  )}
-                  title={!isValid ? `${type.label} is not eligible for this policy` : undefined}
-                >
-                  {selected && <Check size={12} weight="bold" className="inline mr-1.5" />}
-                  {type.label}
-                </button>
-              );
-            })}
-          </div>
-          <p className="text-micro text-faint">
-            Only types selected in the policy basics are available.
-          </p>
+          {mode === "edit" ? (
+            <>
+              <div className="flex flex-wrap gap-2">
+                {EMPLOYMENT_TYPES.map((type) => {
+                  const selected = tier.eligibleEmploymentTypes.includes(type.id);
+                  const isValid = policy.eligibleEmploymentTypes.includes(type.id);
+                  return (
+                    <button
+                      key={type.id}
+                      disabled={!isValid}
+                      onClick={() => toggleEmploymentType(type.id)}
+                      className={cn(
+                        "px-3 py-1.5 rounded-full text-body font-semibold border transition-all",
+                        selected
+                          ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                          : isValid
+                            ? "bg-background text-muted-foreground border-border hover:border-primary/30"
+                            : "bg-muted text-faint border-border cursor-not-allowed"
+                      )}
+                      title={!isValid ? `${type.label} is not eligible for this policy` : undefined}
+                    >
+                      {selected && <Check size={12} weight="bold" className="inline mr-1.5" />}
+                      {type.label}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-micro text-faint">
+                Only types selected in the policy basics are available.
+              </p>
+            </>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {tier.eligibleEmploymentTypes.length > 0 ? (
+                EMPLOYMENT_TYPES.filter((t) => tier.eligibleEmploymentTypes.includes(t.id)).map((type) => (
+                  <span
+                    key={type.id}
+                    className="px-3 py-1.5 rounded-full text-body font-semibold border bg-primary/10 text-primary border-primary/20"
+                  >
+                    {type.label}
+                  </span>
+                ))
+              ) : (
+                <span className="text-body text-faint italic">None selected</span>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-label font-medium text-muted-foreground">Departments</label>
-          <div className="flex flex-wrap gap-2">
-            {DEPARTMENTS.map((dept) => {
-              const selected = (tier.departmentIds || []).includes(dept);
-              return (
-                <button
-                  key={dept}
-                  onClick={() => toggleDepartment(dept)}
-                  className={cn(
-                    "px-3 py-1.5 rounded-full text-body font-semibold border transition-all",
-                    selected
-                      ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                      : "bg-background text-muted-foreground border-border hover:border-primary/30"
-                  )}
-                >
-                  {selected && <Check size={12} weight="bold" className="inline mr-1.5" />}
-                  {dept}
-                </button>
-              );
-            })}
-          </div>
+          <label className="text-label font-medium text-subtle">Departments</label>
+          {mode === "edit" ? (
+            <div className="flex flex-wrap gap-2">
+              {DEPARTMENTS.map((dept) => {
+                const selected = (tier.departmentIds || []).includes(dept);
+                return (
+                  <button
+                    key={dept}
+                    onClick={() => toggleDepartment(dept)}
+                    className={cn(
+                      "px-3 py-1.5 rounded-full text-body font-semibold border transition-all",
+                      selected
+                        ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                        : "bg-background text-muted-foreground border-border hover:border-primary/30"
+                    )}
+                  >
+                    {selected && <Check size={12} weight="bold" className="inline mr-1.5" />}
+                    {dept}
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {tier.departmentIds && tier.departmentIds.length > 0 ? (
+                tier.departmentIds.map((dept) => (
+                  <span
+                    key={dept}
+                    className="px-3 py-1.5 rounded-full text-body font-semibold border bg-primary/10 text-primary border-primary/20"
+                  >
+                    {dept}
+                  </span>
+                ))
+              ) : (
+                <span className="text-body text-faint italic">All departments</span>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
+      {/* Separator */}
+      <div className="border-t border-border" />
+
       {/* Overrides */}
       <div className="space-y-4">
-        <h4 className="text-subtitle font-semibold text-foreground">Benefit Overrides</h4>
-        <p className="text-body text-muted-foreground">
-          Leave empty to inherit the base amount. Enter a value to override.
-        </p>
+        <h4 className="text-body font-semibold text-foreground">Benefit Overrides</h4>
+        {mode === "edit" && (
+          <p className="text-body text-muted-foreground">
+            Leave empty to inherit the base amount. Enter a value to override.
+          </p>
+        )}
 
         {groups.map((group) => {
           const groupBenefits = benefits.filter((b) => b.groupId === group.id);
@@ -626,47 +696,65 @@ function TierPanel({
                         <IdentificationCard size={16} className="text-faint shrink-0" />
                         <span className="text-body text-foreground truncate">Service {benefit.serviceId}</span>
                       </div>
-                      <div className="flex items-center gap-3 shrink-0">
-                        <span className="text-label text-faint font-mono tabular-nums">
-                          Base: RM {baseAmount.toFixed(2)}
-                        </span>
-                        <div className="relative">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-label text-muted-foreground font-mono">
-                            RM
+                      {mode === "edit" ? (
+                        <div className="flex items-center gap-3 shrink-0">
+                          <span className="text-label text-faint font-mono tabular-nums">
+                            Base: RM {baseAmount.toFixed(2)}
                           </span>
-                          <input
-                            type="number"
-                            placeholder={baseAmount.toFixed(2)}
-                            className={cn(
-                              "w-28 pl-9 pr-3 py-1.5 bg-background border rounded-lg text-label font-mono text-right outline-none focus:ring-2 transition-all",
-                              hasOverride
-                                ? "border-primary focus:ring-primary/20 text-primary font-semibold"
-                                : "border-border focus:ring-primary/10 text-foreground placeholder:text-faint"
-                            )}
-                            value={hasOverride ? overrideAmount : ""}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              if (val === "") {
-                                onSetOverride(tier.id, benefit.id, undefined);
-                              } else {
-                                const num = parseFloat(val);
-                                if (!isNaN(num) && num > 0) {
-                                  onSetOverride(tier.id, benefit.id, num);
+                          <div className="relative">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-label text-muted-foreground font-mono">
+                              RM
+                            </span>
+                            <input
+                              type="number"
+                              placeholder={baseAmount.toFixed(2)}
+                              className={cn(
+                                "w-28 pl-9 pr-3 py-1.5 bg-background border rounded-lg text-label font-mono text-right outline-none focus:ring-2 transition-all",
+                                hasOverride
+                                  ? "border-primary focus:ring-primary/20 text-primary font-semibold"
+                                  : "border-border focus:ring-primary/10 text-foreground placeholder:text-faint"
+                              )}
+                              value={hasOverride ? overrideAmount : ""}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                if (val === "") {
+                                  onSetOverride(tier.id, benefit.id, undefined);
+                                } else {
+                                  const num = parseFloat(val);
+                                  if (!isNaN(num) && num > 0) {
+                                    onSetOverride(tier.id, benefit.id, num);
+                                  }
                                 }
-                              }
-                            }}
-                          />
+                              }}
+                            />
+                          </div>
+                          {hasOverride && (
+                            <button
+                              onClick={() => onSetOverride(tier.id, benefit.id, undefined)}
+                              className="p-1 rounded text-faint hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors"
+                              title="Clear override"
+                            >
+                              <X size={14} weight="bold" />
+                            </button>
+                          )}
                         </div>
-                        {hasOverride && (
-                          <button
-                            onClick={() => onSetOverride(tier.id, benefit.id, undefined)}
-                            className="p-1 rounded text-faint hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors"
-                            title="Clear override"
+                      ) : (
+                        <div className="flex items-center gap-3 shrink-0">
+                          <span className="text-label text-faint font-mono tabular-nums">
+                            Base: RM {baseAmount.toFixed(2)}
+                          </span>
+                          <span
+                            className={cn(
+                              "inline-flex items-center px-3 py-1.5 rounded-lg text-label font-mono tabular-nums font-semibold min-w-[6rem] justify-end",
+                              hasOverride
+                                ? "bg-primary/10 text-primary"
+                                : "text-faint"
+                            )}
                           >
-                            <X size={14} weight="bold" />
-                          </button>
-                        )}
-                      </div>
+                            {hasOverride ? `RM ${overrideAmount!.toFixed(2)}` : "Inherits base"}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
@@ -679,22 +767,24 @@ function TierPanel({
         })}
       </div>
 
-      {/* Save */}
-      <div className="flex items-center gap-3 pt-2">
-        <Button
-          onClick={handleSave}
-          className="h-10 px-6 rounded-4xl text-body font-medium shadow-sm"
-        >
-          <Check size={16} weight="bold" className="mr-1.5" />
-          Save Tier
-        </Button>
-        {tier.status === "complete" && (
-          <span className="flex items-center gap-1.5 text-label font-medium text-emerald-600 dark:text-emerald-400">
-            <CheckCircle size={14} weight="fill" />
-            Saved
-          </span>
-        )}
-      </div>
+      {/* Save — edit mode only */}
+      {mode === "edit" && (
+        <div className="flex items-center gap-3 pt-2">
+          <Button
+            onClick={handleSave}
+            className="h-10 px-6 rounded-4xl text-body font-medium shadow-sm"
+          >
+            <Check size={16} weight="bold" className="mr-1.5" />
+            Save Tier
+          </Button>
+          {tier.status === "complete" && (
+            <span className="flex items-center gap-1.5 text-label font-medium text-emerald-600 dark:text-emerald-400">
+              <CheckCircle size={14} weight="fill" />
+              Saved
+            </span>
+          )}
+        </div>
+      )}
     </motion.div>
   );
 }
