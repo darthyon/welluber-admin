@@ -15,6 +15,7 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { FilterItem } from "@/components/shared/filter-item";
 import { EntityAvatar } from "@/components/shared/entity-avatar";
+import { SetupChecklist } from "./setup-checklist";
 
 interface OrganizationsDataTableProps {
   data: Organization[];
@@ -67,17 +68,22 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
       render: (org) => {
         if (org.needsAction.length === 0) {
           return (
-            <Badge variant="outline" className="text-label px-2 h-5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 dark:bg-emerald-500/20 border-emerald-500/20 font-medium gap-1 animate-in fade-in duration-500">
-              <CheckCircle size={12} weight="fill" />
-              All good
-            </Badge>
+            <div className="space-y-2">
+              <Badge variant="outline" className="text-label px-2 h-5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 dark:bg-emerald-500/20 border-emerald-500/20 font-medium gap-1 animate-in fade-in duration-500">
+                <CheckCircle size={12} weight="fill" />
+                All good
+              </Badge>
+            </div>
           );
         }
         return (
-          <div className="flex flex-wrap gap-1">
-            {org.needsAction.map((action, i) => (
-              <StatusBadge key={i} status={action} variant="rose" className="h-5" />
-            ))}
+          <div className="space-y-2">
+            <div className="flex flex-wrap gap-1">
+              {org.needsAction.map((action, i) => (
+                <StatusBadge key={i} status={action} variant="rose" className="h-5" />
+              ))}
+            </div>
+            <SetupChecklist organization={org} />
           </div>
         );
       }

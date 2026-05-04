@@ -21,8 +21,10 @@ import { cn } from "@/lib/utils";
 import { createOrganizationSchema, CreateOrganizationData } from "@/features/organizations/schemas";
 import { createOrganization } from "@/features/organizations/actions";
 import { Button } from "@/components/ui/button";
-import { SuccessModal } from "@/components/shared/success-modal";
 import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { OrgSetupGuide } from "@/components/host/organizations/org-setup-guide";
+import { Organization } from "@/features/organizations/types";
 import { LocationPicker } from "@/components/shared/location-picker";
 import { DocumentUploadSection } from "@/components/shared/document-upload-section";
 import { toast } from "sonner";
@@ -45,6 +47,7 @@ export default function NewOrganizationPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [orgId, setOrgId] = useState<string | null>(null);
+  const [createdOrg, setCreatedOrg] = useState<Organization | null>(null);
 
   const { register, handleSubmit, control, watch, setValue, formState: { errors } } = useForm<CreateOrganizationData>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -69,7 +72,25 @@ export default function NewOrganizationPage() {
     try {
       const res = await createOrganization(data);
       if (res.success) {
-        setOrgId(res.data.id);
+        const id = res.data.id;
+        setOrgId(id);
+        setCreatedOrg({
+          ...res.data,
+          id,
+          tiers: [],
+          policies: [],
+          branches: [],
+          employeeCount: 0,
+          employeesWithoutPolicy: 0,
+          picId: null,
+          utilizationRate: 0,
+          totalWalletBalance: 0,
+          walletLimit: 0,
+          creditLimit: 0,
+          needsAction: [],
+          services: [],
+          documents: [],
+        } as unknown as Organization);
         toast.success("Organisation registered successfully");
         setShowSuccess(true);
       }
@@ -383,20 +404,26 @@ export default function NewOrganizationPage() {
         </div>
       </div>
 
-      <SuccessModal
-        isOpen={showSuccess}
-        onClose={() => setShowSuccess(false)}
-        title="Organisation Registered"
-        message="The corporate profile has been successfully established. You can now proceed to assign benefit policies or onboard employees."
-        primaryAction={{
-          label: "Assign Benefit Policy",
-          href: `/organizations/${orgId}?tab=policies&addPolicy=true`
-        }}
-        secondaryAction={{
-          label: "Onboard Employees",
-          href: `/employees/new?org=${orgId}`
-        }}
-      />
+      <Dialog open={showSuccess} onOpenChange={setShowSuccess}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-heading font-semibold">Organisation created</DialogTitle>
+            <DialogDescription className="text-body text-muted-foreground">
+              Here&apos;s what to set up to get your team covered.
+            </DialogDescription>
+          </DialogHeader>
+
+          {createdOrg && (
+            <OrgSetupGuide organization={createdOrg} compact className="my-2" />
+          )}
+
+          <DialogFooter>
+            <Button variant="ghost" asChild>
+              <Link href={`/organizations/${orgId}`}>Do this later</Link>
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

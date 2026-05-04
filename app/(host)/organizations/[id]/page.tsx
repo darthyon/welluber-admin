@@ -58,6 +58,7 @@ import { EmployeeDetailView } from "@/components/host/organizations/employee-det
 
 import { BulkUploadWizard } from "@/components/host/organizations/bulk-upload-wizard"
 import { AssignedPolicyList } from "@/components/host/organizations/assigned-policy-list"
+import { OrgSetupGuide } from "@/components/host/organizations/org-setup-guide"
 import { LinkPolicyModal } from "@/components/host/organizations/link-policy-modal"
 import { BenefitPolicyWizard } from "@/components/host/policies/benefit-policy-wizard"
 import { PolicyDetailView } from "@/components/host/policies/policy-detail-view"
@@ -443,6 +444,16 @@ function OrganizationDetailContent() {
   const orgName =
     orgId === "org_2" ? "Global Tech Solutions" : "Acme Corporation Sdn Bhd"
 
+  const orgForSetup = {
+    id: orgId,
+    name: orgName,
+    tiers: [] as import("@/features/organizations/types").OrgTier[],
+    policies: assignedPolicies.map((p) => p.name),
+    employeeCount: 0,
+    employeesWithoutPolicy: 0,
+    picId: null,
+  } as import("@/features/organizations/types").Organization
+
   return (
     <div className="pb-12">
       <LinkPolicyModal
@@ -582,6 +593,7 @@ function OrganizationDetailContent() {
       <div className="p-6 lg:p-8">
         {activeTab === "profile" && (
           <div className="animate-in space-y-6 fade-in">
+            <OrgSetupGuide organization={orgForSetup} />
             {/* Account Details */}
             <DetailSection
               title="Account Details"

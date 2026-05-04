@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, X, User, Shield, Buildings } from "@phosphor-icons/react";
+import { User, Shield, Users, Rows } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { Organization } from "@/features/organizations/types";
 
@@ -11,23 +11,29 @@ interface SetupChecklistProps {
 
 export function SetupChecklist({ organization, className }: SetupChecklistProps) {
   const items = [
-    { 
-      label: "PIC", 
-      isComplete: !!organization.picId, 
-      icon: User,
-      tooltip: organization.picId ? "PIC Assigned" : "Missing PIC"
+    {
+      label: "T",
+      isComplete: (organization.tiers?.length ?? 0) > 0,
+      icon: Rows,
+      tooltip: (organization.tiers?.length ?? 0) > 0 ? "Tiers defined" : "Missing tiers",
     },
-    { 
-      label: "POL", 
-      isComplete: organization.policies.length > 0, 
+    {
+      label: "POL",
+      isComplete: organization.policies.length > 0,
       icon: Shield,
-      tooltip: organization.policies.length > 0 ? "Policies Configured" : "No Policies"
+      tooltip: organization.policies.length > 0 ? "Policies configured" : "No policies",
     },
-    { 
-      label: "BR", 
-      isComplete: organization.branches.length > 0, 
-      icon: Buildings,
-      tooltip: organization.branches.length > 0 ? "Branches Added" : "No Branches"
+    {
+      label: "EMP",
+      isComplete: organization.employeeCount > 0,
+      icon: Users,
+      tooltip: organization.employeeCount > 0 ? "Employees added" : "No employees",
+    },
+    {
+      label: "PIC",
+      isComplete: !!organization.picId,
+      icon: User,
+      tooltip: organization.picId ? "PIC assigned" : "Missing PIC",
     },
   ];
 
@@ -47,14 +53,12 @@ export function SetupChecklist({ organization, className }: SetupChecklistProps)
             title={item.tooltip}
           >
             <Icon size={14} weight={item.isComplete ? "fill" : "bold"} />
-
-            {/* Absolute Status Indicator */}
-            <div className={cn(
-              "absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full border-2 border-card",
-              item.isComplete
-                ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 dark:bg-emerald-500/20"
-                : "bg-rose-500/10 text-rose-600 dark:text-rose-400 dark:bg-rose-500/20"
-            )} />
+            <div
+              className={cn(
+                "absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full border-2 border-card",
+                item.isComplete ? "bg-emerald-500" : "bg-rose-500"
+              )}
+            />
           </div>
         );
       })}

@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { ActionPopover } from "@/components/shared/action-popover";
 import { UtilizationChart } from "./utilization-chart";
 import { EntityAvatar } from "@/components/shared/entity-avatar";
+import { SetupChecklist } from "./setup-checklist";
 
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 
@@ -152,9 +153,9 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
               ) : (
                 <>
                   {org.policies.slice(0, 3).map((policy, i) => (
-                    <Badge 
-                      key={i} 
-                      variant="secondary" 
+                    <Badge
+                      key={i}
+                      variant="secondary"
                       className="bg-background/40 hover:bg-background/60 text-label font-medium px-2.5 py-0.5 border-border/60 h-6 transition-colors text-subtle"
                     >
                       {policy}
@@ -163,15 +164,15 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
                   {org.policies.length > 3 && (
                     <Tooltip delayDuration={0}>
                       <TooltipTrigger asChild>
-                        <button 
+                        <button
                           onClick={(e) => e.stopPropagation()}
                           className="text-label text-subtle hover:text-primary font-semibold px-1.5 underline decoration-border underline-offset-4 transition-colors"
                         >
                           +{org.policies.length - 3} more
                         </button>
                       </TooltipTrigger>
-                      <TooltipContent 
-                        className="w-56 bg-popover rounded-lg border border-border shadow-2xl z-[200] p-1" 
+                      <TooltipContent
+                        className="w-56 bg-popover rounded-lg border border-border shadow-2xl z-[200] p-1"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <div className="flex flex-col gap-1.5">
@@ -191,6 +192,17 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
               )}
             </div>
           </div>
+
+          {/* Setup health — only when incomplete */}
+          {((org.tiers?.length ?? 0) === 0 || org.policies.length === 0 || org.employeeCount === 0) && (
+            <div
+              className="pt-3 mt-1 border-t border-border/50 flex items-center justify-between"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <span className="text-micro text-faint font-medium">Setup</span>
+              <SetupChecklist organization={org} />
+            </div>
+          )}
         </div>
       </motion.div>
     </TooltipProvider>
