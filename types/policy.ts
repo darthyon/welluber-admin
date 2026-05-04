@@ -26,6 +26,7 @@ export interface BenefitPolicy {
   activationMode: ActivationMode;
   activationCustomDate?: string; // ISO date string, only when activationMode === "custom_date"
   status: PolicyStatus;
+  totalCapAmount?: number; // policy-level spending ceiling (RM), optional
   createdAt?: string;
   groupCount?: number;
   clonedFrom?: string; // original policy id
@@ -75,6 +76,8 @@ export interface Benefit {
   groupId: string;
   serviceId: string; // From TaxonomyMainService
   amount: number;
+  employeeAmount?: number; // employee portion when split (coversDependents)
+  dependantAmount?: number; // dependant portion when split (coversDependents)
   coPayment: {
     required: boolean;
     type: "Percentage" | "Fixed";
@@ -100,6 +103,7 @@ export interface TierVariant {
   status: TierStatus;
   eligibleEmploymentTypes: string[];
   departmentIds?: string[];
+  roleIds?: string[]; // role-based eligibility, optional
   overrides: TierOverride[];
 }
 
