@@ -1,8 +1,10 @@
 export type PoolType = "Individual" | "Shared";
+export type DependentsPoolType = "Individual" | "Shared" | "SharedWithEmployee";
 export type UtilisationMode = "Fixed" | "Prorated";
-export type ProrateUnit = "Daily" | "Weekly" | "Monthly" | "Quarterly" | "Yearly";
+export type ProrateUnit = "Daily" | "Weekly" | "Monthly" | "Quarterly";
 export type RefreshCycle = "Daily" | "Weekly" | "Monthly" | "Quarterly" | "Yearly";
 export type RefreshStartReference = "fy_start" | "join_date" | "custom_date";
+export type ActivationMode = "after_join" | "after_probation" | "custom_date";
 export type PolicyStatus = "draft" | "active" | "deactivated";
 export type DistributionType = "SharedAmount" | "IndividualBenefitAmount";
 
@@ -13,12 +15,16 @@ export interface BenefitPolicy {
   description?: string;
   organizationId: string; // Policy belongs to exactly one org
   eligibleEmploymentTypes: string[];
-  benefitPoolType: PoolType;
+  coversDependents: boolean;
+  benefitPoolType: PoolType; // employee pool type
+  dependentsPoolType?: DependentsPoolType; // only when coversDependents is true
   utilisationMode: UtilisationMode;
   prorateUnit?: ProrateUnit;
   refreshCycle: RefreshCycle;
   refreshStartReference: RefreshStartReference;
   refreshCustomDate?: string; // ISO date string
+  activationMode: ActivationMode;
+  activationCustomDate?: string; // ISO date string, only when activationMode === "custom_date"
   status: PolicyStatus;
   createdAt?: string;
   groupCount?: number;
@@ -43,10 +49,13 @@ export interface PolicyTemplate {
     name?: string;
     description?: string;
     eligibleEmploymentTypes: string[];
+    coversDependents: boolean;
     benefitPoolType: PoolType;
+    dependentsPoolType?: DependentsPoolType;
     utilisationMode: UtilisationMode;
     refreshCycle: RefreshCycle;
     refreshStartReference: RefreshStartReference;
+    activationMode: ActivationMode;
     groups: BenefitGroup[];
     benefits: Benefit[];
   };

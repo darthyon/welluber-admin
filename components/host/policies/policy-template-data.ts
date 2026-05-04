@@ -10,10 +10,12 @@ export const POLICY_TEMPLATES: PolicyTemplate[] = [
       name: "Active Living Plan",
       description: "Gym access, fitness classes, and recovery services for active employees.",
       eligibleEmploymentTypes: ["full-time"],
+      coversDependents: false,
       benefitPoolType: "Individual",
       utilisationMode: "Fixed",
       refreshCycle: "Yearly",
       refreshStartReference: "fy_start",
+      activationMode: "after_join",
       groups: [
         {
           id: "grp-active-wellbeing",
@@ -46,10 +48,12 @@ export const POLICY_TEMPLATES: PolicyTemplate[] = [
       name: "Mind & Care Essentials",
       description: "Therapy, mindfulness, and nutrition support for holistic employee wellbeing.",
       eligibleEmploymentTypes: ["full-time"],
+      coversDependents: false,
       benefitPoolType: "Individual",
       utilisationMode: "Fixed",
       refreshCycle: "Yearly",
       refreshStartReference: "fy_start",
+      activationMode: "after_join",
       groups: [
         {
           id: "grp-mind-psych",
@@ -82,10 +86,12 @@ export const POLICY_TEMPLATES: PolicyTemplate[] = [
       name: "Full Circle Wellness",
       description: "Full-spectrum physical, mental, and nutritional coverage for every employee.",
       eligibleEmploymentTypes: ["full-time"],
+      coversDependents: false,
       benefitPoolType: "Individual",
       utilisationMode: "Fixed",
       refreshCycle: "Yearly",
       refreshStartReference: "fy_start",
+      activationMode: "after_join",
       groups: [
         {
           id: "grp-full-physical",

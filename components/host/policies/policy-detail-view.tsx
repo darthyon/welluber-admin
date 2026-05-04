@@ -55,6 +55,7 @@ function formatCadence(policy: BenefitPolicy): string {
   const parts: string[] = [];
   parts.push(`${policy.refreshCycle} refresh`);
   parts.push(`${policy.utilisationMode} allocation`);
+  if (policy.coversDependents) parts.push("+dependents");
   if (policy.refreshStartReference === "fy_start") parts.push("FY start");
   else if (policy.refreshStartReference === "join_date") parts.push("Join date");
   else parts.push("Custom date");
@@ -239,11 +240,15 @@ function OverviewTab({
       <DetailSection
         title="Pool & Cycle"
         icon={<Gear size={18} weight="duotone" />}
-        description="Fund allocation and refresh configuration"
+        description="Fund allocation, refresh configuration, and activation"
       >
         <div className="grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-4">
-          <DetailField label="Pool Type" value={policy.benefitPoolType} />
-          <DetailField label="Utilisation Mode" value={policy.utilisationMode} />
+          <DetailField label="Dependents" value={policy.coversDependents ? "Covered" : "Employee Only"} />
+          <DetailField label="Employee Pool Type" value={policy.benefitPoolType} />
+          {policy.coversDependents && (
+            <DetailField label="Dependents Pool Type" value={policy.dependentsPoolType === "SharedWithEmployee" ? "Shared with Employee" : policy.dependentsPoolType || "—"} />
+          )}
+          <DetailField label="Utilisation Mode" value={policy.utilisationMode === "Fixed" ? "Fixed Allocation" : "Prorated Allocation"} />
           {policy.utilisationMode === "Prorated" && (
             <DetailField label="Prorate Unit" value={policy.prorateUnit || "—"} />
           )}
@@ -254,6 +259,13 @@ function OverviewTab({
           />
           {policy.refreshStartReference === "custom_date" && (
             <DetailField label="Custom Date" value={policy.refreshCustomDate || "—"} />
+          )}
+          <DetailField
+            label="Activation"
+            value={policy.activationMode === "after_join" ? "After Join Date" : policy.activationMode === "after_probation" ? "After Probation Ends" : "Custom Date"}
+          />
+          {policy.activationMode === "custom_date" && (
+            <DetailField label="Activation Date" value={policy.activationCustomDate || "—"} />
           )}
         </div>
       </DetailSection>

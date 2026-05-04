@@ -8,6 +8,8 @@ import {
   IdentificationCard,
   Quotes,
   Users,
+  User,
+  UsersFour,
   Briefcase,
   Gear,
   TreeStructure,
@@ -22,6 +24,10 @@ import {
   Check,
   MagnifyingGlass,
   Warning,
+  CalendarCheck,
+  RocketLaunch,
+  ClockCountdown,
+  type IconProps,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { ChoiceCard } from "@/components/shared/choice-card";
@@ -29,7 +35,7 @@ import { DetailSection } from "@/components/shared/detail-section";
 import { SuccessCelebration } from "@/components/shared/success-celebration";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
-import { BenefitPolicy, BenefitGroup, Benefit, PolicyStatus, DistributionType, PoolType, UtilisationMode, ProrateUnit, RefreshCycle, RefreshStartReference } from "@/types/policy";
+import { BenefitPolicy, BenefitGroup, Benefit, PolicyStatus, DistributionType, PoolType, DependentsPoolType, UtilisationMode, ProrateUnit, RefreshCycle, RefreshStartReference, ActivationMode } from "@/types/policy";
 import { UtilisationClaimsTable, type EmployeeUtilisationRow } from "@/components/shared/utilisation-claims-table";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -55,8 +61,32 @@ const EMPLOYMENT_TYPES = [
   { id: "internship", label: "Internship" },
 ];
 
-const PRORATE_UNITS: ProrateUnit[] = ["Daily", "Weekly", "Monthly", "Quarterly", "Yearly"];
+const PRORATE_UNITS: ProrateUnit[] = ["Daily", "Weekly", "Monthly", "Quarterly"];
 const REFRESH_CYCLES: RefreshCycle[] = ["Daily", "Weekly", "Monthly", "Quarterly", "Yearly"];
+
+const DEPENDENTS_POOL_OPTIONS: { value: DependentsPoolType; title: string; description: string; icon: React.ElementType<IconProps> }[] = [
+  { value: "Individual", title: "Individual", description: "Each dependent has their own benefit pool.", icon: User },
+  { value: "Shared", title: "Shared", description: "All dependents share the same pool.", icon: UsersFour },
+  { value: "SharedWithEmployee", title: "Shared with Employee", description: "Dependents share the employee's pool.", icon: Users },
+];
+
+const ACTIVATION_MODES: { value: ActivationMode; label: string; description: string; icon: React.ElementType<IconProps> }[] = [
+  { value: "after_join", label: "After Join Date", description: "Policy activates when the employee joins.", icon: RocketLaunch },
+  { value: "after_probation", label: "After Probation Ends", description: "Policy activates once probation is completed.", icon: ClockCountdown },
+  { value: "custom_date", label: "Custom Date", description: "Set a specific activation date.", icon: CalendarCheck },
+];
+
+function getAvailableRefreshCycles(
+  utilisationMode: "Fixed" | "Prorated",
+  prorateUnit?: ProrateUnit
+): RefreshCycle[] {
+  if (utilisationMode === "Fixed") {
+    return ["Daily", "Weekly", "Monthly", "Quarterly", "Yearly"];
+  }
+  if (!prorateUnit) return REFRESH_CYCLES;
+  const unitIdx = PRORATE_UNITS.indexOf(prorateUnit);
+  return REFRESH_CYCLES.slice(unitIdx + 1);
+}
 
 const SERVICES = [
   { id: "s1", category: "Physical Wellbeing", name: "Gymnasium Facilities", subServices: ["Standard Gym Access", "Boutique Studio Memberships"] },
@@ -165,10 +195,12 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
     name: "",
     description: "",
     eligibleEmploymentTypes: ["full-time"],
+    coversDependents: false,
     benefitPoolType: "Individual",
     utilisationMode: "Fixed",
     refreshCycle: "Yearly",
     refreshStartReference: "fy_start",
+    activationMode: "after_join",
     status: "draft",
   });
 
@@ -203,20 +235,23 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
       if (policyData.utilisationMode === "Prorated" && !policyData.prorateUnit) {
         errors.prorateUnit = "Select a prorate unit for Prorated mode";
       }
+
+      if (policyData.coversDependents && !policyData.dependentsPoolType) {
+        errors.dependentsPoolType = "Select a pool type for dependents";
+      }
+
       if (policyData.refreshStartReference === "custom_date" && !policyData.refreshCustomDate) {
         errors.refreshCustomDate = "Enter a custom refresh date";
       }
-      if (policyData.refreshStartReference === "custom_date" && policyData.refreshCustomDate) {
-        const d = new Date(policyData.refreshCustomDate);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        if (d < today) errors.refreshCustomDate = "Refresh date must be today or future";
+
+      if (policyData.activationMode === "custom_date" && !policyData.activationCustomDate) {
+        errors.activationCustomDate = "Enter a custom activation date";
       }
-      if (policyData.utilisationMode === "Prorated" && policyData.prorateUnit && policyData.refreshCycle) {
-        const unitIdx = PRORATE_UNITS.indexOf(policyData.prorateUnit);
-        const cycleIdx = REFRESH_CYCLES.indexOf(policyData.refreshCycle);
-        if (cycleIdx < unitIdx) {
-          errors.refreshCycle = `${policyData.refreshCycle} is not valid for ${policyData.prorateUnit} prorate. Valid: ${PRORATE_UNITS.slice(unitIdx).join(", ")}`;
+
+      if (policyData.utilisationMode === "Prorated" && policyData.prorateUnit) {
+        const available = getAvailableRefreshCycles("Prorated", policyData.prorateUnit);
+        if (policyData.refreshCycle && !available.includes(policyData.refreshCycle)) {
+          errors.refreshCycle = `${policyData.refreshCycle} is not valid for ${policyData.prorateUnit} prorate. Valid: ${available.join(", ")}`;
         }
       }
     }
@@ -446,6 +481,8 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
   };
 
   const renderPoolStep = () => {
+    const availableCycles = getAvailableRefreshCycles(policyData.utilisationMode ?? "Fixed", policyData.prorateUnit);
+
     if (isViewMode) {
       const refreshLabels: Record<string, string> = {
         fy_start: "Organisation Financial Year",
@@ -456,7 +493,11 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
         <div className="space-y-8 animate-in fade-in duration-300">
           <DetailSection title="Benefit Pool Strategy" icon={<Gear size={18} weight="duotone" />} description="Fund allocation configuration" ghost>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <ReadField label="Pool Type" value={policyData.benefitPoolType} />
+              <ReadField label="Dependents" value={policyData.coversDependents ? "Covered" : "Employee Only"} />
+              <ReadField label="Employee Pool Type" value={policyData.benefitPoolType} />
+              {policyData.coversDependents && (
+                <ReadField label="Dependents Pool Type" value={policyData.dependentsPoolType === "SharedWithEmployee" ? "Shared with Employee" : policyData.dependentsPoolType} />
+              )}
               <ReadField label="Utilisation Mode" value={policyData.utilisationMode === "Fixed" ? "Fixed Allocation" : "Prorated Allocation"} />
               {policyData.utilisationMode === "Prorated" && (
                 <ReadField label="Prorate Unit" value={policyData.prorateUnit} />
@@ -470,6 +511,10 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
               {policyData.refreshStartReference === "custom_date" && (
                 <ReadField label="Custom Refresh Date" value={policyData.refreshCustomDate} />
               )}
+              <ReadField label="Activation" value={policyData.activationMode === "after_join" ? "After Join Date" : policyData.activationMode === "after_probation" ? "After Probation Ends" : "Custom Date"} />
+              {policyData.activationMode === "custom_date" && (
+                <ReadField label="Custom Activation Date" value={policyData.activationCustomDate} />
+              )}
             </div>
           </DetailSection>
         </div>
@@ -480,13 +525,35 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
       <div className="space-y-8 max-w-3xl">
         <DetailSection title="Benefit Pool Strategy" icon={<Gear size={18} weight="duotone" />} description="Choose how funds are allocated" ghost>
           <div className="space-y-6">
+            {/* ── Cover Dependents ── */}
             <div className="space-y-3">
-              <label className="text-label font-medium text-subtle">Pool Type</label>
+              <label className="text-label font-medium text-subtle">Cover Dependents</label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <ChoiceCard
+                  title="Employee Only"
+                  description="This policy covers employees only."
+                  icon={User}
+                  selected={policyData.coversDependents !== true}
+                  onSelect={() => setPolicyData({ ...policyData, coversDependents: false, dependentsPoolType: undefined })}
+                />
+                <ChoiceCard
+                  title="Cover Dependents"
+                  description="This policy also covers employee dependents."
+                  icon={Users}
+                  selected={policyData.coversDependents === true}
+                  onSelect={() => setPolicyData({ ...policyData, coversDependents: true })}
+                />
+              </div>
+            </div>
+
+            {/* ── Employee Pool Type ── */}
+            <div className="space-y-3">
+              <label className="text-label font-medium text-subtle">Employee Pool Type</label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <ChoiceCard
                   title="Individual"
-                  description="Each employee gets their own separate budget."
-                  icon={Users}
+                  description="Each employee gets their own benefit pool."
+                  icon={User}
                   selected={policyData.benefitPoolType === "Individual"}
                   onSelect={() => setPolicyData({ ...policyData, benefitPoolType: "Individual" as PoolType })}
                 />
@@ -500,11 +567,34 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
               </div>
             </div>
 
+            {/* ── Dependents Pool Type ── */}
+            {policyData.coversDependents && (
+              <div className="space-y-3">
+                <label className="text-label font-medium text-subtle">
+                  Dependents Pool Type <span className="text-rose-600 dark:text-rose-400">*</span>
+                </label>
+                {validationErrors.dependentsPoolType && <p className="text-label text-rose-600 dark:text-rose-400 font-medium">{validationErrors.dependentsPoolType}</p>}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {DEPENDENTS_POOL_OPTIONS.map((opt) => (
+                    <ChoiceCard
+                      key={opt.value}
+                      title={opt.title}
+                      description={opt.description}
+                      icon={opt.icon}
+                      selected={policyData.dependentsPoolType === opt.value}
+                      onSelect={() => setPolicyData({ ...policyData, dependentsPoolType: opt.value })}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* ── Utilisation Mode ── */}
             <div className="space-y-3">
               <label className="text-label font-medium text-subtle">Utilisation Mode</label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <ChoiceCard title="Fixed Allocation" description="Full benefit amounts granted upfront upon assignment." icon={Gear} selected={policyData.utilisationMode === "Fixed"} onSelect={() => setPolicyData({ ...policyData, utilisationMode: "Fixed", prorateUnit: undefined })} />
-                <ChoiceCard title="Prorated Allocation" description="Benefit amounts calculated based on join date/time." icon={Gear} selected={policyData.utilisationMode === "Prorated"} onSelect={() => setPolicyData({ ...policyData, utilisationMode: "Prorated" })} />
+                <ChoiceCard title="Fixed Allocation" description="Full benefit pool is granted upon assignment." icon={Gear} selected={policyData.utilisationMode === "Fixed"} onSelect={() => setPolicyData({ ...policyData, utilisationMode: "Fixed", prorateUnit: undefined })} />
+                <ChoiceCard title="Prorated Allocation" description="Benefit amounts are prorated based on time." icon={Gear} selected={policyData.utilisationMode === "Prorated"} onSelect={() => setPolicyData({ ...policyData, utilisationMode: "Prorated" })} />
               </div>
             </div>
 
@@ -519,7 +609,13 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                     validationErrors.prorateUnit ? "border-rose-300" : "border-border"
                   )}
                   value={policyData.prorateUnit || ""}
-                  onChange={(e) => setPolicyData({ ...policyData, prorateUnit: e.target.value as ProrateUnit })}
+                  onChange={(e) => {
+                    const newUnit = e.target.value as ProrateUnit;
+                    const newAvailable = newUnit ? getAvailableRefreshCycles("Prorated", newUnit) : REFRESH_CYCLES;
+                    const currentCycle = policyData.refreshCycle;
+                    const adjustedCycle = currentCycle && newAvailable.includes(currentCycle) ? currentCycle : newAvailable[0];
+                    setPolicyData({ ...policyData, prorateUnit: newUnit || undefined, refreshCycle: adjustedCycle });
+                  }}
                 >
                   <option value="">Select prorate unit...</option>
                   {PRORATE_UNITS.map(u => <option key={u} value={u}>{u}</option>)}
@@ -542,7 +638,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                 value={policyData.refreshCycle}
                 onChange={(e) => setPolicyData({ ...policyData, refreshCycle: e.target.value as RefreshCycle })}
               >
-                {REFRESH_CYCLES.map(c => <option key={c} value={c}>{c}</option>)}
+                {availableCycles.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
               {validationErrors.refreshCycle && <p className="text-label text-rose-600 dark:text-rose-400 font-medium">{validationErrors.refreshCycle}</p>}
             </div>
@@ -562,7 +658,10 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                     <div className={cn("w-4 h-4 rounded-full border flex items-center justify-center shrink-0", policyData.refreshStartReference === ref ? "border-primary" : "border-border")}>
                       {policyData.refreshStartReference === ref && <div className="w-2 h-2 rounded-full bg-primary" />}
                     </div>
-                    {ref === "fy_start" ? "Organisation Financial Year" : ref === "join_date" ? "Employee Join Date" : "Custom Start Date"}
+                    <div className="flex flex-col">
+                      <span>{ref === "fy_start" ? "Organisation Financial Year" : ref === "join_date" ? "Employee Joining Date" : "Custom Date"}</span>
+                      <span className="text-label text-faint font-normal">{ref === "fy_start" ? "Follows the organisation's FY settings" : ref === "join_date" ? "Based on the employee's join date" : "Set a fixed start date"}</span>
+                    </div>
                   </button>
                 ))}
               </div>
@@ -583,6 +682,63 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                   onChange={(e) => setPolicyData({ ...policyData, refreshCustomDate: e.target.value })}
                 />
                 {validationErrors.refreshCustomDate && <p className="text-label text-rose-600 dark:text-rose-400 font-medium">{validationErrors.refreshCustomDate}</p>}
+              </div>
+            )}
+          </div>
+
+          {/* ── Activation Mode ── */}
+          <div className="mt-8 pt-6 border-t border-border space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-7 h-7 rounded-md bg-primary/10 text-primary flex items-center justify-center border border-primary/20 shrink-0">
+                <RocketLaunch size={14} weight="duotone" />
+              </div>
+              <div>
+                <h4 className="text-body font-semibold text-foreground">Activation</h4>
+                <p className="text-label text-muted-foreground">When the policy takes effect for new members</p>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              {ACTIVATION_MODES.map((mode) => {
+                const Icon = mode.icon;
+                return (
+                  <button
+                    type="button"
+                    key={mode.value}
+                    onClick={() => setPolicyData({ ...policyData, activationMode: mode.value, activationCustomDate: mode.value !== "custom_date" ? undefined : policyData.activationCustomDate })}
+                    className={cn(
+                      "flex items-center gap-3 px-4 py-3 rounded-lg border text-body font-medium transition-all text-left w-full",
+                      policyData.activationMode === mode.value ? "border-primary bg-primary/5 text-primary" : "border-border bg-card text-muted-foreground hover:border-border/80"
+                    )}
+                  >
+                    <div className={cn("w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0", policyData.activationMode === mode.value ? "border-primary" : "border-border")}>
+                      {policyData.activationMode === mode.value && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
+                    </div>
+                    <Icon size={18} weight={policyData.activationMode === mode.value ? "fill" : "regular"} className="shrink-0" />
+                    <div className="flex flex-col">
+                      <span>{mode.label}</span>
+                      <span className="text-label text-faint font-normal">{mode.description}</span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {policyData.activationMode === "custom_date" && (
+              <div className="space-y-1.5 pt-2">
+                <label className="text-label font-medium text-subtle">
+                  Custom Activation Date <span className="text-rose-600 dark:text-rose-400">*</span>
+                </label>
+                <input
+                  type="date"
+                  className={cn(
+                    "w-full px-4 py-2.5 bg-background border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all",
+                    validationErrors.activationCustomDate ? "border-rose-300" : "border-border"
+                  )}
+                  value={policyData.activationCustomDate || ""}
+                  onChange={(e) => setPolicyData({ ...policyData, activationCustomDate: e.target.value })}
+                />
+                {validationErrors.activationCustomDate && <p className="text-label text-rose-600 dark:text-rose-400 font-medium">{validationErrors.activationCustomDate}</p>}
               </div>
             )}
           </div>
@@ -840,12 +996,16 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
         {/* Pool & Cycle */}
         <DetailSection title="Pool & Cycle" icon={<Gear size={18} weight="duotone" />} ghost>
           <div className="space-y-4">
-            <ReadField label="Pool Type" value={policyData.benefitPoolType} />
-            <ReadField label="Utilisation Mode" value={policyData.utilisationMode} />
+            <ReadField label="Dependents" value={policyData.coversDependents ? "Covered" : "Employee Only"} />
+            <ReadField label="Employee Pool Type" value={policyData.benefitPoolType} />
+            {policyData.coversDependents && <ReadField label="Dependents Pool Type" value={policyData.dependentsPoolType === "SharedWithEmployee" ? "Shared with Employee" : policyData.dependentsPoolType} />}
+            <ReadField label="Utilisation Mode" value={policyData.utilisationMode === "Fixed" ? "Fixed Allocation" : "Prorated Allocation"} />
             {policyData.utilisationMode === "Prorated" && <ReadField label="Prorate Unit" value={policyData.prorateUnit} />}
             <ReadField label="Refresh Cycle" value={policyData.refreshCycle} />
             <ReadField label="Start Reference" value={policyData.refreshStartReference === "fy_start" ? "Financial Year" : policyData.refreshStartReference === "join_date" ? "Join Date" : "Custom Date"} />
             {policyData.refreshStartReference === "custom_date" && <ReadField label="Custom Date" value={policyData.refreshCustomDate} />}
+            <ReadField label="Activation" value={policyData.activationMode === "after_join" ? "After Join Date" : policyData.activationMode === "after_probation" ? "After Probation Ends" : "Custom Date"} />
+            {policyData.activationMode === "custom_date" && <ReadField label="Activation Date" value={policyData.activationCustomDate} />}
           </div>
         </DetailSection>
 
