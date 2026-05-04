@@ -12,6 +12,7 @@ import {
 
 export interface EmployeeDirectoryItem {
   id: string
+  orgId?: string
   name: string
   email: string
   organization: string
@@ -269,6 +270,7 @@ export function EmployeeDirectoryTable({
 export const MOCK_EMPLOYEES: EmployeeDirectoryItem[] = [
   {
     id: "emp_1",
+    orgId: "ORG-20260115-0001",
     name: "Robert Fox",
     email: "robert.f@acme.com",
     organization: "ACME Corporation",
@@ -291,6 +293,7 @@ export const MOCK_EMPLOYEES: EmployeeDirectoryItem[] = [
   },
   {
     id: "emp_2",
+    orgId: "ORG-20260115-0001",
     name: "Jenny Wilson",
     email: "jenny.w@acme.com",
     organization: "ACME Corporation",
@@ -312,6 +315,7 @@ export const MOCK_EMPLOYEES: EmployeeDirectoryItem[] = [
   },
   {
     id: "emp_3",
+    orgId: "ORG-20260301-0002",
     name: "Dianne Russell",
     email: "dianne.r@acme.com",
     organization: "Global Health Ltd",
@@ -341,6 +345,7 @@ export const MOCK_EMPLOYEES: EmployeeDirectoryItem[] = [
   },
   {
     id: "emp_4",
+    orgId: "ORG-20260401-0003",
     name: "Marvin McKinney",
     email: "marvin@acme.com",
     organization: "Zenith Wellness",

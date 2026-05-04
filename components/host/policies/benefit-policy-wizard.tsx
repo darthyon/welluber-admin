@@ -37,6 +37,8 @@ import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { BenefitPolicy, BenefitGroup, Benefit, PolicyStatus, DistributionType, PoolType, DependentsPoolType, UtilisationMode, ProrateUnit, RefreshCycle, RefreshStartReference, ActivationMode } from "@/types/policy";
 import { UtilisationClaimsTable, type EmployeeUtilisationRow } from "@/components/shared/utilisation-claims-table";
+import { OrgTier } from "@/features/organizations/types";
+import { MOCK_EMPLOYEES, type EmployeeDirectoryItem } from "@/components/host/employees/employee-directory-table";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -51,7 +53,8 @@ const CREATE_STEPS = [
   { id: 1, title: "Basics" },
   { id: 2, title: "Pool Config" },
   { id: 3, title: "Groups & Services" },
-  { id: 4, title: "Review" },
+  { id: 4, title: "Assign Employees" },
+  { id: 5, title: "Review" },
 ];
 
 const EMPLOYMENT_TYPES = [
@@ -173,10 +176,12 @@ function StatusPicker({ value, onChange, disabled }: { value: PolicyStatus; onCh
 
 interface BenefitPolicyWizardProps {
   onCancel: () => void;
-  onSuccess: (data: { policy: Partial<BenefitPolicy>; groups: BenefitGroup[]; benefits: Benefit[] }) => void;
+  onSuccess: (data: { policy: Partial<BenefitPolicy>; groups: BenefitGroup[]; benefits: Benefit[]; assignedEmployeeIds?: string[] }) => void;
   onSaveDraft?: (data: { policy: Partial<BenefitPolicy>; groups: BenefitGroup[]; benefits: Benefit[] }) => void;
   onEdit?: () => void;
   mode?: "create" | "edit" | "view";
+  orgId?: string;
+  orgTiers?: OrgTier[];
   initialData?: {
     policy: Partial<BenefitPolicy>;
     groups: BenefitGroup[];
@@ -184,7 +189,7 @@ interface BenefitPolicyWizardProps {
   };
 }
 
-export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, mode = "create", initialData }: BenefitPolicyWizardProps) {
+export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, mode = "create", orgId, orgTiers, initialData }: BenefitPolicyWizardProps) {
   const isViewMode = mode === "view";
 
   const [currentStep, setCurrentStep] = useState(1);
@@ -206,6 +211,11 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
 
   const [groups, setGroups] = useState<BenefitGroup[]>(initialData?.groups || []);
   const [benefits, setBenefits] = useState<Benefit[]>(initialData?.benefits || []);
+  const [splitBenefitIds, setSplitBenefitIds] = useState<Set<string>>(new Set());
+
+  // Employee assignment step state
+  const [assignedEmployeeIds, setAssignedEmployeeIds] = useState<string[]>([]);
+  const [assignmentOrgId, setAssignmentOrgId] = useState<string>(orgId ?? "");
 
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [showPostCreateModal, setShowPostCreateModal] = useState(false);
@@ -342,7 +352,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
 
   const nextStep = () => {
     if (!validateStep(currentStep)) return;
-    setCurrentStep(prev => Math.min(prev + 1, 4));
+    setCurrentStep(prev => Math.min(prev + 1, 5));
   };
 
   const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 1));
@@ -362,7 +372,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
     await new Promise(resolve => setTimeout(resolve, 1200));
     setIsSubmitting(false);
     setIsSuccess(true);
-    setTimeout(() => onSuccess({ policy: policyData, groups, benefits }), 1800);
+    setTimeout(() => onSuccess({ policy: policyData, groups, benefits, assignedEmployeeIds }), 1800);
   };
 
   const handleSaveDraft = () => {
@@ -474,6 +484,39 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                 })}
               </div>
             </div>
+
+            {/* Tier eligibility */}
+            {orgTiers && orgTiers.length > 0 && (
+              <div className="space-y-3">
+                <label className="text-label font-medium text-subtle">Eligible Tiers</label>
+                <div className="flex flex-wrap gap-2">
+                  {orgTiers.map((tier) => {
+                    const selected = policyData.eligibility?.tierIds?.includes(tier.id) ?? false;
+                    return (
+                      <button
+                        key={tier.id}
+                        type="button"
+                        disabled={isViewMode}
+                        onClick={() => {
+                          const current = policyData.eligibility?.tierIds ?? [];
+                          const updated = selected
+                            ? current.filter((id) => id !== tier.id)
+                            : [...current, tier.id];
+                          setPolicyData({ ...policyData, eligibility: { ...policyData.eligibility, tierIds: updated } });
+                        }}
+                        className={cn(
+                          "px-3 py-1.5 rounded-lg border text-label font-medium transition-all",
+                          selected ? "bg-primary/5 border-primary text-primary" : "bg-background border-border text-muted-foreground hover:border-primary/30"
+                        )}
+                      >
+                        {tier.code} — {tier.label}
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="text-micro text-faint">Leave all unchecked to apply to all tiers.</p>
+              </div>
+            )}
           </div>
         </DetailSection>
       </div>
@@ -588,6 +631,26 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                 </div>
               </div>
             )}
+
+            {/* ── Policy Spending Cap ── */}
+            <div className="space-y-1.5">
+              <label className="text-label font-medium text-subtle">Policy Spending Cap (RM)</label>
+              <input
+                type="number"
+                min={0}
+                placeholder="e.g. 3000"
+                className="w-full md:w-64 px-4 py-2.5 bg-background border border-border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all"
+                value={policyData.totalCapAmount ?? ""}
+                onChange={(e) =>
+                  setPolicyData({
+                    ...policyData,
+                    totalCapAmount: e.target.value === "" ? undefined : parseFloat(e.target.value),
+                  })
+                }
+                disabled={isViewMode}
+              />
+              <p className="text-micro text-faint">Optional. Maximum total an employee can claim under this policy per cycle.</p>
+            </div>
 
             {/* ── Utilisation Mode ── */}
             <div className="space-y-3">
@@ -837,16 +900,19 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                           </div>
                         )}
                       </div>
-                      {group.distributionType === "SharedAmount" && (
-                        <div className="space-y-1.5">
-                          <p className="text-label font-medium text-muted-foreground">Max Usage / Cycle</p>
-                          {isViewMode ? (
-                            <p className="text-label font-semibold text-foreground">{group.maxUsagePerCycle ? `RM ${group.maxUsagePerCycle.toFixed(2)}` : "—"}</p>
-                          ) : (
-                            <input type="number" className="w-28 px-2.5 py-1 border border-border bg-background rounded-lg text-label outline-none focus:ring-2 focus:ring-primary/10" value={group.maxUsagePerCycle || ""} onChange={(e) => updateGroup(group.id, "maxUsagePerCycle", e.target.value === "" ? undefined : parseFloat(e.target.value))} placeholder="0.00" />
+                      <div className="space-y-1.5">
+                        <p className="text-label font-medium text-muted-foreground">
+                          Group Cap (RM)
+                          {group.distributionType !== "SharedAmount" && (
+                            <span className="text-faint font-normal ml-1">(optional)</span>
                           )}
-                        </div>
-                      )}
+                        </p>
+                        {isViewMode ? (
+                          <p className="text-label font-semibold text-foreground">{group.maxUsagePerCycle ? `RM ${group.maxUsagePerCycle.toFixed(2)}` : "—"}</p>
+                        ) : (
+                          <input type="number" className="w-28 px-2.5 py-1 border border-border bg-background rounded-lg text-label outline-none focus:ring-2 focus:ring-primary/10" value={group.maxUsagePerCycle || ""} onChange={(e) => updateGroup(group.id, "maxUsagePerCycle", e.target.value === "" ? undefined : parseFloat(e.target.value))} placeholder="0.00" />
+                        )}
+                      </div>
                     </div>
 
                     {/* Services checklist */}
@@ -886,6 +952,69 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                               {isChecked && (
                                 <div className="px-4 pb-4">
                                   <div className="flex items-start gap-4 flex-wrap pl-8">
+                                    {!isViewMode && policyData.coversDependents && (
+                                      <div className="flex items-center gap-2 w-full mb-1">
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            const next = new Set(splitBenefitIds);
+                                            if (next.has(benefit!.id)) {
+                                              next.delete(benefit!.id);
+                                              updateBenefit(benefit!.id, "employeeAmount", 0);
+                                              updateBenefit(benefit!.id, "dependantAmount", 0);
+                                            } else {
+                                              next.add(benefit!.id);
+                                            }
+                                            setSplitBenefitIds(next);
+                                          }}
+                                          className={cn(
+                                            "w-7 h-3.5 rounded-full transition-colors relative shrink-0",
+                                            splitBenefitIds.has(benefit!.id) ? "bg-primary" : "bg-muted/50"
+                                          )}
+                                        >
+                                          <div className={cn("w-2.5 h-2.5 rounded-full bg-background absolute top-[2px] transition-all", splitBenefitIds.has(benefit!.id) ? "right-0.5" : "left-0.5")} />
+                                        </button>
+                                        <span className="text-micro text-faint font-medium">Split employee / dependant amounts</span>
+                                      </div>
+                                    )}
+
+                                    {splitBenefitIds.has(benefit!.id) ? (
+                                      <>
+                                        <div className="space-y-1.5">
+                                          <label className="text-micro font-medium text-faint">Employee (RM)</label>
+                                          <input
+                                            type="number"
+                                            className="w-24 px-2 py-1.5 bg-background border border-border rounded-lg text-label font-mono outline-none text-right"
+                                            value={benefit!.employeeAmount || ""}
+                                            onChange={(e) => {
+                                              const emp = e.target.value === "" ? 0 : parseFloat(e.target.value);
+                                              const dep = benefit!.dependantAmount ?? 0;
+                                              updateBenefit(benefit!.id, "employeeAmount", emp);
+                                              updateBenefit(benefit!.id, "amount", emp + dep);
+                                            }}
+                                          />
+                                        </div>
+                                        <div className="space-y-1.5">
+                                          <label className="text-micro font-medium text-faint">Dependant (RM)</label>
+                                          <input
+                                            type="number"
+                                            className="w-24 px-2 py-1.5 bg-background border border-border rounded-lg text-label font-mono outline-none text-right"
+                                            value={benefit!.dependantAmount || ""}
+                                            onChange={(e) => {
+                                              const dep = e.target.value === "" ? 0 : parseFloat(e.target.value);
+                                              const emp = benefit!.employeeAmount ?? 0;
+                                              updateBenefit(benefit!.id, "dependantAmount", dep);
+                                              updateBenefit(benefit!.id, "amount", emp + dep);
+                                            }}
+                                          />
+                                        </div>
+                                        <div className="self-end pb-1.5">
+                                          <span className="text-micro text-faint font-medium">
+                                            Total: RM {((benefit!.employeeAmount ?? 0) + (benefit!.dependantAmount ?? 0)).toLocaleString()}
+                                          </span>
+                                        </div>
+                                      </>
+                                    ) : (
                                     <div className="space-y-1.5">
                                       <label className="text-micro font-medium text-faint">Amount (RM)</label>
                                       {isViewMode ? (
@@ -903,6 +1032,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                                       )}
                                       {groupErrors[`benefit_${group.id}_${service.id}`] && <p className="text-micro text-rose-600 dark:text-rose-400">{groupErrors[`benefit_${group.id}_${service.id}`]}</p>}
                                     </div>
+                                    )}
 
                                     <div className="space-y-1.5">
                                       <label className="text-micro font-medium text-faint">Co-payment</label>
@@ -966,6 +1096,182 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
           </div>
         )}
       </DetailSection>
+    );
+  };
+
+  const renderEmployeeAssignmentStep = () => {
+    const activeOrgId = orgId ?? assignmentOrgId;
+
+    // Derive eligible employees from mock data
+    const eligibleEmployees: EmployeeDirectoryItem[] = activeOrgId
+      ? MOCK_EMPLOYEES.filter((emp) => {
+          if (emp.orgId !== activeOrgId) return false;
+          if (
+            policyData.eligibleEmploymentTypes?.length &&
+            emp.employmentType &&
+            !policyData.eligibleEmploymentTypes.includes(emp.employmentType)
+          )
+            return false;
+          const tierIds = policyData.eligibility?.tierIds;
+          if (tierIds?.length && emp.tier && !tierIds.includes(emp.tier)) return false;
+          return true;
+        })
+      : [];
+
+    const assignCount = assignedEmployeeIds.filter(
+      (id) => !MOCK_EMPLOYEES.find((e) => e.id === id)?.benefitPolicies?.length
+    ).length;
+    const reassignCount = assignedEmployeeIds.filter(
+      (id) => (MOCK_EMPLOYEES.find((e) => e.id === id)?.benefitPolicies?.length ?? 0) > 0
+    ).length;
+
+    // Minimal org options for global picker
+    const MOCK_ORG_OPTIONS = [
+      { id: "ORG-20260115-0001", name: "Acme Corporation Sdn Bhd" },
+      { id: "ORG-20260301-0002", name: "Global Tech Solutions" },
+      { id: "ORG-20260401-0003", name: "Zenith Wellness Sdn Bhd" },
+    ];
+
+    return (
+      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500 max-w-3xl">
+        <DetailSection
+          title="Assign Employees"
+          icon={<Users size={18} weight="duotone" />}
+          description="Select which employees this policy applies to"
+          ghost
+        >
+          <div className="space-y-5">
+            {/* Global mode org picker */}
+            {!orgId && (
+              <div className="space-y-1.5">
+                <label className="text-label font-medium text-subtle">Organisation (optional)</label>
+                <select
+                  className="w-full max-w-sm px-4 py-2.5 bg-background border border-border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10"
+                  value={assignmentOrgId}
+                  onChange={(e) => {
+                    setAssignmentOrgId(e.target.value);
+                    setAssignedEmployeeIds([]);
+                  }}
+                >
+                  <option value="">Select organisation…</option>
+                  {MOCK_ORG_OPTIONS.map((o) => (
+                    <option key={o.id} value={o.id}>{o.name}</option>
+                  ))}
+                </select>
+                <p className="text-micro text-faint">Select an organisation to preview and assign eligible employees.</p>
+              </div>
+            )}
+
+            {activeOrgId ? (
+              eligibleEmployees.length === 0 ? (
+                <div className="flex flex-col items-center gap-2 py-10 text-center border border-dashed border-border rounded-lg">
+                  <Users size={28} className="text-faint" />
+                  <p className="text-body font-medium text-muted-foreground">No eligible employees found</p>
+                  <p className="text-label text-faint max-w-xs">
+                    No employees match the current eligibility filters (employment type, tier). You can assign employees later from the employee table.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  {assignedEmployeeIds.length > 0 && (
+                    <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-primary/5 border border-primary/15">
+                      <Check size={14} weight="bold" className="text-primary shrink-0" />
+                      <p className="text-label font-medium text-primary">
+                        {assignCount > 0 && `${assignCount} employee${assignCount !== 1 ? "s" : ""} will be assigned`}
+                        {assignCount > 0 && reassignCount > 0 && " · "}
+                        {reassignCount > 0 && `${reassignCount} reassigned from existing policy`}
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="border border-border rounded-lg overflow-hidden">
+                    <div className="flex items-center gap-3 px-4 py-2.5 bg-muted/30 border-b border-border">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const allIds = eligibleEmployees.map((e) => e.id);
+                          const allSelected = allIds.every((id) => assignedEmployeeIds.includes(id));
+                          setAssignedEmployeeIds(allSelected ? [] : allIds);
+                        }}
+                        className={cn(
+                          "w-4 h-4 rounded border flex items-center justify-center transition-all shrink-0",
+                          eligibleEmployees.every((e) => assignedEmployeeIds.includes(e.id))
+                            ? "bg-primary border-primary text-primary-foreground"
+                            : "border-border bg-background"
+                        )}
+                      >
+                        {eligibleEmployees.every((e) => assignedEmployeeIds.includes(e.id)) && <Check size={10} weight="bold" />}
+                      </button>
+                      <span className="text-label font-semibold text-muted-foreground">Employee</span>
+                      <span className="ml-auto text-label font-semibold text-muted-foreground">Current Policy</span>
+                    </div>
+                    <div className="divide-y divide-border/50">
+                      {eligibleEmployees.map((emp) => {
+                        const isSelected = assignedEmployeeIds.includes(emp.id);
+                        const hasPolicy = (emp.benefitPolicies?.length ?? 0) > 0;
+                        return (
+                          <div
+                            key={emp.id}
+                            className={cn(
+                              "flex items-center gap-3 px-4 py-3 transition-colors cursor-pointer hover:bg-muted/20",
+                              isSelected && "bg-primary/5"
+                            )}
+                            onClick={() =>
+                              setAssignedEmployeeIds((prev) =>
+                                isSelected ? prev.filter((id) => id !== emp.id) : [...prev, emp.id]
+                              )
+                            }
+                          >
+                            <button
+                              type="button"
+                              className={cn(
+                                "w-4 h-4 rounded border flex items-center justify-center transition-all shrink-0",
+                                isSelected ? "bg-primary border-primary text-primary-foreground" : "border-border bg-background"
+                              )}
+                            >
+                              {isSelected && <Check size={10} weight="bold" />}
+                            </button>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-body font-medium text-foreground truncate">{emp.name}</p>
+                              <p className="text-label text-faint font-medium">{emp.empCode} · {emp.department ?? "—"}</p>
+                            </div>
+                            <span className="text-label text-faint shrink-0">{emp.tier ?? "—"}</span>
+                            <div className="shrink-0">
+                              {hasPolicy ? (
+                                <span className="px-2 py-0.5 rounded-full text-micro font-semibold bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20">
+                                  {emp.benefitPolicies![0].policyName}
+                                </span>
+                              ) : (
+                                <span className="px-2 py-0.5 rounded-full text-micro font-semibold bg-muted text-faint border border-border/40">
+                                  None
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </>
+              )
+            ) : (
+              <div className="flex flex-col items-center gap-3 py-10 text-center border border-dashed border-border rounded-lg">
+                <Users size={28} className="text-faint" />
+                <p className="text-body font-medium text-muted-foreground">Select an organisation to preview eligible employees</p>
+                <p className="text-label text-faint">You can assign this policy to employees after creation.</p>
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={nextStep}
+              className="text-label text-faint hover:text-muted-foreground transition-colors"
+            >
+              Skip for now →
+            </button>
+          </div>
+        </DetailSection>
+      </div>
     );
   };
 
@@ -1110,7 +1416,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                 {mode === "create" && currentStep > 1 && (
                   <Button variant="ghost" onClick={prevStep} className="rounded-full px-6">Back</Button>
                 )}
-                {mode === "create" && currentStep < 4 ? (
+                {mode === "create" && currentStep < 5 ? (
                   <Button
                     onClick={nextStep}
                     className="rounded-full px-8 bg-primary text-primary-foreground shadow-none"
@@ -1213,7 +1519,8 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
             )}
             {currentStep === 2 && renderPoolStep()}
             {currentStep === 3 && renderGroupsStep()}
-            {currentStep === 4 && mode === "create" && renderReviewStep()}
+            {currentStep === 4 && mode === "create" && renderEmployeeAssignmentStep()}
+            {currentStep === 5 && mode === "create" && renderReviewStep()}
             {currentStep === 4 && isViewMode && (
               <DetailSection
                 title="Utilisation & Claims"
