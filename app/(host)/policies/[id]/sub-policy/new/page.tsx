@@ -1,0 +1,67 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { CaretLeft, TreeStructure } from "@phosphor-icons/react";
+import { SubPolicyWizard } from "@/components/host/policies/sub-policy-wizard";
+import { INITIAL_POLICIES, POLICY_DATA_MAP_INITIAL } from "@/features/policies/mock-data";
+
+export default function NewSubPolicyPage({ params }: { params: { id: string } }) {
+  const router = useRouter();
+  const parentId = params.id;
+
+  const parent = INITIAL_POLICIES.find(p => p.id === parentId);
+  const parentData = POLICY_DATA_MAP_INITIAL[parentId];
+
+  if (!parent || !parentData) {
+    return (
+      <div className="flex flex-col items-center justify-center py-32 text-center">
+        <p className="text-heading font-semibold text-foreground">Parent policy not found.</p>
+        <p className="text-body text-muted-foreground mt-1">The policy you&apos;re trying to extend doesn&apos;t exist.</p>
+        <button
+          onClick={() => router.back()}
+          className="mt-4 text-body font-medium text-primary hover:underline"
+        >
+          Go back
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="pb-24 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      {/* Header */}
+      <div className="flex flex-col gap-4 mb-8">
+        <button
+          onClick={() => router.back()}
+          className="inline-flex items-center gap-1.5 text-body font-medium text-subtle hover:text-foreground transition-colors w-fit"
+        >
+          <CaretLeft size={16} /> Back
+        </button>
+        <div className="flex items-start gap-4">
+          <div className="w-12 h-12 rounded-lg bg-violet-50 dark:bg-violet-500/10 border border-violet-200 dark:border-violet-500/20 flex items-center justify-center text-violet-600 dark:text-violet-400 shrink-0">
+            <TreeStructure size={24} weight="duotone" />
+          </div>
+          <div>
+            <h1 className="text-heading font-semibold text-foreground text-balance">
+              Create Sub-Policy
+            </h1>
+            <p className="text-body text-muted-foreground mt-0.5 font-normal">
+              Derived from{" "}
+              <span className="font-semibold text-foreground">{parent.name}</span>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <SubPolicyWizard
+        parentPolicy={parent}
+        parentGroups={parentData.groups}
+        parentBenefits={parentData.benefits}
+        onSuccess={() =>
+          router.push(`/policies?policyId=${parentId}&mode=view&wizard=open`)
+        }
+        onCancel={() => router.back()}
+      />
+    </div>
+  );
+}
