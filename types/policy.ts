@@ -39,6 +39,8 @@ export interface BenefitPolicy {
     gender?: "male" | "female" | "all";
     tierIds?: string[];
   };
+  parentPolicyId?: string;      // present = this is a sub-policy
+  targetEmployeeIds?: string[]; // individually pinned employees for this sub-policy
 }
 
 export interface PolicyTemplate {

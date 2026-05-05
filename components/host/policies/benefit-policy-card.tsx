@@ -15,6 +15,8 @@ interface BenefitPolicyCardItem {
   status: "draft" | "active" | "deactivated";
   groupCount?: number;
   orgName?: string;
+  parentPolicyId?: string;
+  parentPolicyName?: string;
 }
 
 interface BenefitPolicyCardProps {
@@ -98,11 +100,16 @@ export function BenefitPolicyCard({ policy, onView, onClone, onDeactivate, onDel
             <h4 className="font-semibold text-body text-foreground block leading-tight tracking-tight group-hover:text-primary transition-colors">
               {policy.name}
             </h4>
-            <div className="flex items-center gap-2">
-            <StatusBadge
-              status={policy.status}
-              variant={statusVariantMap[policy.status] || "zinc"}
-            />
+            <div className="flex items-center gap-2 flex-wrap">
+              <StatusBadge
+                status={policy.status}
+                variant={statusVariantMap[policy.status] || "zinc"}
+              />
+              {policy.parentPolicyId && (
+                <span className="inline-flex items-center text-micro font-medium bg-violet-50 dark:bg-violet-500/10 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-500/20 px-1.5 py-0.5 rounded-full">
+                  Sub-policy
+                </span>
+              )}
               <span className="text-micro text-faint font-mono bg-background/50 px-1.5 py-0.5 rounded border border-border/40 tracking-tight">
                 {policy.code}
               </span>
@@ -120,10 +127,17 @@ export function BenefitPolicyCard({ policy, onView, onClone, onDeactivate, onDel
         </p>
 
         <div className="mt-6 pt-5 border-t border-border/60 flex items-center justify-between">
-          <div className="flex items-center gap-3 text-faint">
-            <span className="text-label font-medium">{policy.groupCount ?? 0} groups</span>
-            <span className="w-1 h-1 rounded-full bg-muted" />
-            <span className="text-label font-medium">{policy.orgName || "Unassigned"}</span>
+          <div className="flex flex-col gap-1 text-faint min-w-0">
+            <div className="flex items-center gap-3">
+              <span className="text-label font-medium">{policy.groupCount ?? 0} groups</span>
+              <span className="w-1 h-1 rounded-full bg-muted" />
+              <span className="text-label font-medium">{policy.orgName || "Unassigned"}</span>
+            </div>
+            {policy.parentPolicyName && (
+              <span className="text-label text-faint flex items-center gap-1">
+                ↳ {policy.parentPolicyName}
+              </span>
+            )}
           </div>
           <div className="text-right">
             <p className="text-body font-semibold text-foreground">

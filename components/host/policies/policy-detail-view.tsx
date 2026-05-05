@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -21,9 +22,11 @@ import {
   ShieldCheck,
   CheckCircle,
   Warning,
+  Plus,
 } from "@phosphor-icons/react";
 import { BenefitPolicy, BenefitGroup, Benefit, TierVariant } from "@/types/policy";
 import { TierVariantsTab } from "./tier-variants-tab";
+import { type PolicyListItem } from "@/features/policies/mock-data";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -32,6 +35,8 @@ interface PolicyDetailViewProps {
   groups: BenefitGroup[];
   benefits: Benefit[];
   tiers: TierVariant[];
+  subPolicies?: PolicyListItem[];
+  parentPolicyName?: string;
   onEdit: () => void;
   onClone: () => void;
   onDeactivate: () => void;
@@ -43,6 +48,7 @@ interface PolicyDetailViewProps {
 const TABS = [
   { id: "overview", label: "Overview", icon: IdentificationCard },
   { id: "tiers", label: "Tier Variants", icon: Users },
+  { id: "sub-policies", label: "Sub-Policies", icon: TreeStructure },
   { id: "employees", label: "Assigned Employees", icon: Buildings },
   { id: "audit", label: "Audit Log", icon: ClockCounterClockwise },
 ] as const;
@@ -69,16 +75,20 @@ export function PolicyDetailView({
   groups,
   benefits,
   tiers,
+  subPolicies = [],
+  parentPolicyName,
   onEdit,
   onClone,
   onDeactivate,
   onDelete,
 }: PolicyDetailViewProps) {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabId>("overview");
 
   const statusVariant = policy.status === "active" ? "emerald" : policy.status === "draft" ? "amber" : "rose";
   const canEdit = policy.status !== "deactivated";
   const canDelete = policy.status === "draft" || policy.status === "deactivated";
+  const canCreateSubPolicy = policy.status === "active" && !policy.parentPolicyId;
 
   return (
     <div className="flex flex-col h-full bg-transparent">
@@ -104,10 +114,32 @@ export function PolicyDetailView({
                   <span className="text-faint">·</span>
                   <span>{formatCadence(policy)}</span>
                 </div>
+                {policy.parentPolicyId && (
+                  <div className="flex items-center gap-1.5 text-label text-faint mt-1">
+                    <TreeStructure size={12} />
+                    <span>
+                      Derived from{" "}
+                      <span className="font-semibold text-foreground">
+                        {parentPolicyName || policy.parentPolicyId}
+                      </span>
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
 
             <div className="flex items-center gap-2">
+              {canCreateSubPolicy && (
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={() => router.push(`/policies/${policy.id}/sub-policy/new`)}
+                  className="rounded-full text-body font-medium transition-all"
+                >
+                  <TreeStructure size={16} weight="bold" className="mr-1.5" />
+                  Create Sub-Policy
+                </Button>
+              )}
               {canEdit && (
                 <Button
                   variant="secondary"
@@ -168,6 +200,14 @@ export function PolicyDetailView({
                 tiers={tiers}
               />
             )}
+            {activeTab === "sub-policies" && (
+              <SubPoliciesTab
+                policy={policy}
+                subPolicies={subPolicies}
+                onCreateSubPolicy={() => router.push(`/policies/${policy.id}/sub-policy/new`)}
+                onViewSubPolicy={(id) => router.push(`/policies?policyId=${id}&mode=view&wizard=open`)}
+              />
+            )}
             {activeTab === "employees" && (
               <AssignedEmployeesTab policy={policy} />
             )}
@@ -177,6 +217,114 @@ export function PolicyDetailView({
           </motion.div>
         </AnimatePresence>
       </div>
+    </div>
+  );
+}
+
+// ─── Sub-Policies Tab ─────────────────────────────────────────────────────────
+
+function SubPoliciesTab({
+  policy,
+  subPolicies,
+  onCreateSubPolicy,
+  onViewSubPolicy,
+}: {
+  policy: BenefitPolicy;
+  subPolicies: PolicyListItem[];
+  onCreateSubPolicy: () => void;
+  onViewSubPolicy: (id: string) => void;
+}) {
+  const canCreateSubPolicy = policy.status === "active" && !policy.parentPolicyId;
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-heading font-semibold text-foreground">Sub-Policies</h3>
+          <p className="text-body text-muted-foreground mt-1">
+            {subPolicies.length > 0
+              ? `${subPolicies.length} sub-polic${subPolicies.length === 1 ? "y" : "ies"} derived from this policy`
+              : "Override benefit amounts for specific employee groups"}
+          </p>
+        </div>
+        {canCreateSubPolicy && (
+          <Button variant="secondary" size="sm" onClick={onCreateSubPolicy} className="flex h-8 items-center gap-2 text-label font-medium">
+            <Plus size={14} weight="bold" />
+            Create Sub-Policy
+          </Button>
+        )}
+      </div>
+
+      {subPolicies.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20 bg-muted/10 rounded-lg border border-dashed border-border/60 text-center">
+          <div className="w-14 h-14 rounded-lg bg-violet-50 dark:bg-violet-500/10 border border-violet-200 dark:border-violet-500/20 flex items-center justify-center text-violet-500 mb-4">
+            <TreeStructure size={28} weight="duotone" />
+          </div>
+          <p className="text-body font-semibold text-foreground">No sub-policies yet</p>
+          <p className="text-label text-faint mt-1 max-w-xs">
+            Create a sub-policy to override benefit amounts for a specific employee group or individual.
+          </p>
+          {canCreateSubPolicy && (
+            <Button onClick={onCreateSubPolicy} size="sm" className="mt-5 text-label font-medium">
+              <Plus size={14} weight="bold" className="mr-1.5" />
+              Create Sub-Policy
+            </Button>
+          )}
+        </div>
+      ) : (
+        <div className="rounded-lg border border-border bg-card overflow-hidden">
+          <div className="px-5 py-3 border-b border-border bg-muted/30">
+            <div className="grid grid-cols-12 text-label font-semibold text-muted-foreground">
+              <span className="col-span-4">Sub-Policy</span>
+              <span className="col-span-2">Status</span>
+              <span className="col-span-2 text-center">Pinned</span>
+              <span className="col-span-2 text-center">Overrides</span>
+              <span className="col-span-2 text-right">Actions</span>
+            </div>
+          </div>
+          <div className="divide-y divide-border/50">
+            {subPolicies.map(sub => {
+              const overrideCount = 1; // placeholder — real diff requires comparing benefits
+              const pinnedCount = sub.targetEmployeeIds?.length ?? 0;
+              return (
+                <div key={sub.id} className="grid grid-cols-12 items-center px-5 py-4 hover:bg-muted/20 transition-colors">
+                  <div className="col-span-4">
+                    <p className="text-body font-semibold text-foreground">{sub.name}</p>
+                    <p className="text-label font-mono text-faint mt-0.5">{sub.code}</p>
+                  </div>
+                  <div className="col-span-2">
+                    <StatusBadge
+                      status={sub.status}
+                      variant={sub.status === "active" ? "emerald" : sub.status === "draft" ? "amber" : "rose"}
+                      dot
+                    />
+                  </div>
+                  <div className="col-span-2 text-center">
+                    <span className="px-2 py-0.5 rounded-full bg-violet-50 dark:bg-violet-500/10 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-500/20 text-label font-medium">
+                      {pinnedCount} emp{pinnedCount !== 1 ? "s" : ""}
+                    </span>
+                  </div>
+                  <div className="col-span-2 text-center">
+                    <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-label font-medium">
+                      {overrideCount} override{overrideCount !== 1 ? "s" : ""}
+                    </span>
+                  </div>
+                  <div className="col-span-2 text-right">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 px-2 text-label text-primary hover:bg-primary/5"
+                      onClick={() => onViewSubPolicy(sub.id)}
+                    >
+                      View
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
