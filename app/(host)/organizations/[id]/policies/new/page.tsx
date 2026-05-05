@@ -9,16 +9,6 @@ import { SuccessModal } from "@/components/shared/success-modal";
 import { toast } from "sonner";
 import { PolicyWizardContent } from "@/components/host/policies/policy-wizard-content";
 import { BenefitPolicy, BenefitGroup, Benefit } from "@/types/policy";
-import { OrgTier } from "@/features/organizations/types";
-
-const MOCK_ORG_TIERS: Record<string, OrgTier[]> = {
-  "ORG-20260115-0001": [
-    { id: "t1", orgId: "ORG-20260115-0001", label: "Director Level", code: "T1", level: 1 },
-    { id: "t2", orgId: "ORG-20260115-0001", label: "Manager Level", code: "T2", level: 2 },
-    { id: "t3", orgId: "ORG-20260115-0001", label: "Executive Level", code: "T3", level: 3 },
-  ],
-};
-
 const ANCHOR_ITEMS = [
   { id: "policy-details", label: "Policy Details" },
   { id: "pool-cycle", label: "Pool & Cycle" },
@@ -78,7 +68,6 @@ export default function NewOrgPolicyPage() {
 
             <PolicyWizardContent
               mode="create"
-              orgTiers={MOCK_ORG_TIERS[orgId] ?? []}
               initialData={{
                 policy: {
                   organizationId: orgId,
@@ -141,7 +130,7 @@ export default function NewOrgPolicyPage() {
         title="Policy Created"
         message={`${createdPolicyName} has been saved as a draft.`}
         primaryAction={{
-          label: "Configure Tiers",
+          label: "View Policy",
           onClick: () => {
             setShowSuccess(false);
             if (createdPolicyId) {

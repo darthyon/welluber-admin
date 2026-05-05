@@ -444,19 +444,9 @@ function OrganizationDetailContent() {
   const orgName =
     orgId === "org_2" ? "Global Tech Solutions" : "Acme Corporation Sdn Bhd"
 
-  const MOCK_ORG_TIERS_MAP: Record<string, import("@/features/organizations/types").OrgTier[]> = {
-    "ORG-20260115-0001": [
-      { id: "t1", orgId: "ORG-20260115-0001", label: "Director Level", code: "T1", level: 1 },
-      { id: "t2", orgId: "ORG-20260115-0001", label: "Manager Level", code: "T2", level: 2 },
-      { id: "t3", orgId: "ORG-20260115-0001", label: "Executive Level", code: "T3", level: 3 },
-    ],
-  };
-  const orgTiers = MOCK_ORG_TIERS_MAP[orgId] ?? [];
-
   const orgForSetup = {
     id: orgId,
     name: orgName,
-    tiers: orgTiers,
     policies: assignedPolicies.map((p) => p.name),
     employeeCount: 0,
     employeesWithoutPolicy: 0,
@@ -1943,7 +1933,6 @@ function OrganizationDetailContent() {
               <BenefitPolicyWizard
                 mode={editingPolicyId ? "edit" : "create"}
                 orgId={orgId}
-                orgTiers={orgTiers}
                 initialData={
                   editingPolicyId
                     ? {

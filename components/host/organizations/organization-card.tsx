@@ -194,7 +194,7 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
           </div>
 
           {/* Setup health — only when incomplete */}
-          {((org.tiers?.length ?? 0) === 0 || org.policies.length === 0 || org.employeeCount === 0) && (
+          {(org.policies.length === 0 || org.employeeCount === 0 || (org.employeesWithoutPolicy ?? 0) > 0) && (
             <div
               className="pt-3 mt-1 border-t border-border/50 flex items-center justify-between"
               onClick={(e) => e.stopPropagation()}
