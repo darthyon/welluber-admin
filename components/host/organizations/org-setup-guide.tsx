@@ -26,28 +26,39 @@ export function OrgSetupGuide({ organization: org, className, compact = false }:
   const steps: SetupStep[] = [
     {
       n: 1,
-      title: "Add employees",
+      title: "Define employee tiers",
       description: compact
-        ? "Upload your roster. Tier is a field on each employee."
-        : "Upload your roster. Tier is a field on each employee — no separate setup needed.",
-      complete: org.employeeCount > 0,
+        ? "Set position levels so policies can target the right people."
+        : "Set position levels (Director, Manager, Executive) so policies can target the right people.",
+      complete: (org.tiers?.length ?? 0) > 0,
       locked: false,
-      href: `/organizations/${org.id}?tab=employees`,
-      cta: "Add employees",
+      href: `/organizations/${org.id}?tab=settings`,
+      cta: "Set up tiers",
     },
     {
       n: 2,
       title: "Create a benefit policy",
       description: compact
-        ? "Build a policy with benefit groups and amounts."
-        : "Build at least one policy with benefit groups and amounts.",
+        ? "Build a policy with benefit groups and amounts for your tiers."
+        : "Build at least one policy with benefit groups and amounts for your tiers.",
       complete: org.policies.length > 0,
-      locked: false,
+      locked: (org.tiers?.length ?? 0) === 0,
       href: `/organizations/${org.id}?tab=policies&addPolicy=true`,
       cta: "Create policy",
     },
     {
       n: 3,
+      title: "Add employees",
+      description: compact
+        ? "Upload your employee roster with tier assignments."
+        : "Upload your employee roster with tier assignments.",
+      complete: org.employeeCount > 0,
+      locked: org.policies.length === 0,
+      href: `/organizations/${org.id}?tab=employees`,
+      cta: "Add employees",
+    },
+    {
+      n: 4,
       title: "Assign policies to employees",
       description: compact
         ? "Ensure every employee has benefit coverage."

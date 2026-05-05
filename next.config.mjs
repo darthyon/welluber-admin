@@ -6,10 +6,14 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const nextConfig = {
-  turbopack: {
-    root: path.resolve(__dirname),
-  },
   serverExternalPackages: ['lightningcss'],
+  webpack: (config) => {
+    config.watchOptions = {
+      ...config.watchOptions,
+      ignored: ['**/.claude/**', '**/node_modules/**'],
+    };
+    return config;
+  },
 };
 
 export default nextConfig;
