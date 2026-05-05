@@ -22,16 +22,30 @@ const ORGANIZATION_OPTIONS = [
   ),
 ]
 
+const POLICY_STATUS_OPTIONS = [
+  { label: "All", value: "all" },
+  { label: "Has policy", value: "has_policy" },
+  { label: "Missing policy", value: "missing_policy" },
+]
+
 export default function EmployeesPage() {
   const router = useRouter()
   const [viewMode, setViewMode] = useState<ViewMode>("list")
   const [searchQuery, setSearchQuery] = useState("")
   const [orgFilter, setOrgFilter] = useState("all")
+  const [policyFilter, setPolicyFilter] = useState<"all" | "has_policy" | "missing_policy">("all")
 
   const filteredData = useMemo(() => {
     let result = MOCK_EMPLOYEES
     if (orgFilter !== "all") {
       result = result.filter((emp) => emp.organization === orgFilter)
+    }
+    if (policyFilter !== "all") {
+      result = result.filter((emp) =>
+        policyFilter === "has_policy"
+          ? emp.benefitPolicies.length > 0
+          : emp.benefitPolicies.length === 0
+      )
     }
     if (searchQuery) {
       const q = searchQuery.toLowerCase()
@@ -46,7 +60,7 @@ export default function EmployeesPage() {
       )
     }
     return result
-  }, [searchQuery, orgFilter])
+  }, [searchQuery, orgFilter, policyFilter])
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -72,12 +86,20 @@ export default function EmployeesPage() {
         onSearchChange={setSearchQuery}
         searchPlaceholder="Search employees..."
         filters={
-          <FilterItem
-            label="Organization"
-            value={orgFilter}
-            onChange={setOrgFilter}
-            options={ORGANIZATION_OPTIONS}
-          />
+          <>
+            <FilterItem
+              label="Organization"
+              value={orgFilter}
+              onChange={setOrgFilter}
+              options={ORGANIZATION_OPTIONS}
+            />
+            <FilterItem
+              label="Policy Status"
+              value={policyFilter}
+              onChange={(v) => setPolicyFilter(v as typeof policyFilter)}
+              options={POLICY_STATUS_OPTIONS}
+            />
+          </>
         }
       />
 

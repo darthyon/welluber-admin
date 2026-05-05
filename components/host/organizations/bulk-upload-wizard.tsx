@@ -28,6 +28,66 @@ interface BulkUploadWizardProps {
   onSuccess?: () => void
 }
 
+const KNOWN_POLICIES: { name: string; code: string; tiers: string[] }[] = [
+  { name: "Standard Health", code: "POL-001", tiers: ["T3", "T4"] },
+  { name: "Executive Wellness", code: "POL-002", tiers: ["T2"] },
+  { name: "Flexi Care", code: "POL-003", tiers: ["T1"] },
+  { name: "Director Suite", code: "POL-004", tiers: ["T1", "T2"] },
+]
+
+type BulkRecord = {
+  id: string
+  code: string
+  name: string
+  email: string
+  dob: string
+  gender: string
+  mobile: string
+  department: string
+  role: string
+  date: string
+  policies: string
+  status: string
+  issue?: string
+  policyIssue?: boolean
+  autoAssigned?: boolean
+  branch: string
+  tier: string
+  residency: string
+  taxable: boolean
+  employmentType: string
+  employeeStatus: string
+  isProbation: boolean
+  isNewDept?: boolean
+}
+
+function applyPolicyAutoAssign(rows: BulkRecord[]): BulkRecord[] {
+  return rows.map((r) => {
+    if (r.policies) {
+      const known = KNOWN_POLICIES.find((p) => p.name === r.policies)
+      if (!known) {
+        return { ...r, status: "Issue", issue: `Unknown policy: ${r.policies}`, policyIssue: true }
+      }
+      return r
+    }
+    if (r.tier) {
+      const matches = KNOWN_POLICIES.filter((p) => p.tiers.includes(r.tier))
+      if (matches.length === 1) {
+        return { ...r, policies: matches[0].name, autoAssigned: true }
+      }
+      if (matches.length > 1) {
+        return {
+          ...r,
+          status: "Issue",
+          issue: "Needs policy assignment — multiple policies match tier",
+          policyIssue: true,
+        }
+      }
+    }
+    return r
+  })
+}
+
 type UploadStep = "upload" | "processing" | "preview" | "success"
 
 const MOCK_RECORDS = [
@@ -161,7 +221,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
     }, 2500)
   }
 
-  const MOCK_RECORDS = [
+  const MOCK_RECORDS: BulkRecord[] = [
     {
       id: "rec_0",
       code: "E001",
@@ -173,7 +233,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
       department: "Engineering",
       role: "Staff",
       date: "2026-04-10",
-      policies: "Standard Health",
+      policies: "", // T3 — auto-assigns to Standard Health
       status: "Valid",
       branch: "ACME HQ",
       tier: "T3",
@@ -194,10 +254,10 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
       department: "Product",
       role: "Management",
       date: "2026-05-15",
-      policies: "Executive Wellness",
+      policies: "", // T1 — ambiguous: Flexi Care + Director Suite → Needs policy assignment
       status: "Valid",
       branch: "ACME Subang Jaya",
-      tier: "T2",
+      tier: "T1",
       residency: "Local",
       taxable: true,
       employmentType: "full-time",
@@ -215,7 +275,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
       department: "Growth",
       role: "Staff",
       date: "2026-04-01",
-      policies: "Standard Health",
+      policies: "Phantom Plan", // unknown policy name → issue
       status: "Valid",
       branch: "ACME HQ",
       tier: "T4",
@@ -259,11 +319,11 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
       department: "Sales",
       role: "Executive",
       date: "Invalid Date",
-      policies: "Standard Health",
+      policies: "Executive Wellness",
       status: "Issue",
       issue: "Invalid DOB, Join Date & ID",
       branch: "ACME HQ",
-      tier: "T3",
+      tier: "T2",
       residency: "Local",
       taxable: true,
       employmentType: "contract",
@@ -273,8 +333,8 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
   ]
 
   const [isEditing, setIsEditing] = useState(false)
-  const [records, setRecords] = useState(
-    MOCK_RECORDS.map((r, i) => ({ ...r, id: `rec_${i}` }))
+  const [records, setRecords] = useState<BulkRecord[]>(() =>
+    applyPolicyAutoAssign(MOCK_RECORDS)
   )
 
   const filteredRecords = records.filter((r) => {
@@ -603,12 +663,30 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
     },
     {
       header: "Policy",
-      render: (row) => (
-        <div className="flex items-center gap-2 text-primary/80">
-          <Shield size={16} weight="fill" />
-          <span className="text-body font-semibold">{row.policies}</span>
-        </div>
-      ),
+      render: (row: BulkRecord) => {
+        if (row.policyIssue) {
+          return (
+            <span className="inline-flex items-center gap-1 text-label font-medium text-amber-600 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full">
+              <WarningCircle size={12} weight="fill" />
+              Needs policy
+            </span>
+          )
+        }
+        if (row.policies) {
+          return (
+            <div className="flex items-center gap-2 text-primary/80">
+              <Shield size={16} weight="fill" />
+              <span className="text-body font-semibold">{row.policies}</span>
+              {row.autoAssigned && (
+                <span className="text-label font-medium text-emerald-600 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded-full">
+                  Auto
+                </span>
+              )}
+            </div>
+          )
+        }
+        return <span className="text-muted-foreground">—</span>
+      },
     },
     {
       header: "Status",

@@ -44,6 +44,8 @@ const EMPLOYMENT_TYPES = [
 
 const DEPARTMENTS = ["Engineering", "Product", "Design", "Marketing", "Sales", "HR", "Finance", "Operations"];
 
+const ROLES = ["C-Suite", "Director", "VP", "Senior Manager", "Manager", "Executive", "Associate"];
+
 // ─── TierNav Component ───────────────────────────────────────────────────────
 
 function TierNav({
@@ -204,6 +206,7 @@ export function TierVariantsTab({ policy, groups, benefits, tiers: initialTiers 
       status: "incomplete",
       eligibleEmploymentTypes: [],
       departmentIds: [],
+      roleIds: [],
       overrides: [],
     };
     setTiers((prev) => [...prev, newTier]);
@@ -467,6 +470,14 @@ function TierPanel({
     onUpdate(tier.id, { departmentIds: next });
   };
 
+  const toggleRole = (role: string) => {
+    const current = tier.roleIds || [];
+    const next = current.includes(role)
+      ? current.filter((r) => r !== role)
+      : [...current, role];
+    onUpdate(tier.id, { roleIds: next });
+  };
+
   const getBaseAmount = (benefitId: string): number => {
     const b = benefits.find((b) => b.id === benefitId);
     return b?.amount || 0;
@@ -658,6 +669,50 @@ function TierPanel({
                 ))
               ) : (
                 <span className="text-body text-faint italic">All departments</span>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="text-label font-medium text-subtle">Roles</label>
+          {mode === "edit" ? (
+            <>
+              <div className="flex flex-wrap gap-2">
+                {ROLES.map((role) => {
+                  const selected = (tier.roleIds || []).includes(role);
+                  return (
+                    <button
+                      key={role}
+                      onClick={() => toggleRole(role)}
+                      className={cn(
+                        "px-3 py-1.5 rounded-full text-body font-semibold border transition-all",
+                        selected
+                          ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                          : "bg-background text-muted-foreground border-border hover:border-primary/30"
+                      )}
+                    >
+                      {selected && <Check size={12} weight="bold" className="inline mr-1.5" />}
+                      {role}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-micro text-faint">Leave empty to include all roles.</p>
+            </>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {tier.roleIds && tier.roleIds.length > 0 ? (
+                tier.roleIds.map((role) => (
+                  <span
+                    key={role}
+                    className="px-3 py-1.5 rounded-full text-body font-semibold border bg-primary/10 text-primary border-primary/20"
+                  >
+                    {role}
+                  </span>
+                ))
+              ) : (
+                <span className="text-body text-faint italic">All roles</span>
               )}
             </div>
           )}

@@ -1,5 +1,6 @@
 "use client"
 
+import { WarningCircle } from "@phosphor-icons/react"
 import { SharedDataTable } from "@/components/shared/data-table"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { ActionPopover } from "@/components/shared/action-popover"
@@ -220,8 +221,9 @@ export function EmployeeDirectoryTable({
                     )}
                   </>
                 ) : (
-                  <span className="text-label font-medium text-faint italic">
-                    None
+                  <span className="inline-flex items-center gap-1 text-label font-medium text-amber-600 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full">
+                    <WarningCircle size={12} weight="fill" />
+                    No policy
                   </span>
                 )}
               </div>
@@ -367,5 +369,21 @@ export const MOCK_EMPLOYEES: EmployeeDirectoryItem[] = [
       { policyName: "WFH Allowance", benefitGroups: [], utilisation: 0 },
       { policyName: "Wellness Extras", benefitGroups: [], utilisation: 0 },
     ],
+  },
+  {
+    id: "emp_5",
+    orgId: "ORG-20260115-0001",
+    name: "Jason Teh",
+    email: "jason.t@acme.com",
+    organization: "ACME Corporation",
+    branch: "ACME HQ",
+    joinDate: "01 May 2026",
+    lastActive: "01 May 2026, 09:00",
+    status: "Pending",
+    empCode: "ACM-212",
+    department: "Finance",
+    tier: "T3",
+    employmentType: "full-time",
+    benefitPolicies: [],
   },
 ]
