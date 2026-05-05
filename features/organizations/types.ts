@@ -79,7 +79,6 @@ export interface Organization {
   policies: string[];
   branches: string[];
   documents: string[];
-  tiers?: OrgTier[];
   employeesWithoutPolicy?: number;
   createdAt: ISODate;
   updatedAt: ISODate;
@@ -93,14 +92,6 @@ export interface OrganizationAdmin {
   role: "org_admin";
   status: "active" | "pending_activation" | "suspended";
   invitedAt: ISODate;
-}
-
-export interface OrgTier {
-  id: string;
-  orgId: string;
-  label: string;  // "Director Level"
-  code: string;   // "T1"
-  level: number;  // sort order: 1, 2, 3
 }
 
 export type EmploymentType = "full_time" | "part_time" | "contract" | "internship";

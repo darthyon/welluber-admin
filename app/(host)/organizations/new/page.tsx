@@ -77,7 +77,6 @@ export default function NewOrganizationPage() {
         setCreatedOrg({
           ...res.data,
           id,
-          tiers: [],
           policies: [],
           branches: [],
           employeeCount: 0,

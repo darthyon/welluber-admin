@@ -37,7 +37,6 @@ import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { BenefitPolicy, BenefitGroup, Benefit, PolicyStatus, DistributionType, PoolType, DependentsPoolType, UtilisationMode, ProrateUnit, RefreshCycle, RefreshStartReference, ActivationMode } from "@/types/policy";
 import { UtilisationClaimsTable, type EmployeeUtilisationRow } from "@/components/shared/utilisation-claims-table";
-import { OrgTier } from "@/features/organizations/types";
 import { MOCK_EMPLOYEES, type EmployeeDirectoryItem } from "@/components/host/employees/employee-directory-table";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -181,7 +180,6 @@ interface BenefitPolicyWizardProps {
   onEdit?: () => void;
   mode?: "create" | "edit" | "view";
   orgId?: string;
-  orgTiers?: OrgTier[];
   initialData?: {
     policy: Partial<BenefitPolicy>;
     groups: BenefitGroup[];
@@ -189,7 +187,7 @@ interface BenefitPolicyWizardProps {
   };
 }
 
-export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, mode = "create", orgId, orgTiers, initialData }: BenefitPolicyWizardProps) {
+export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, mode = "create", orgId, initialData }: BenefitPolicyWizardProps) {
   const isViewMode = mode === "view";
 
   const [currentStep, setCurrentStep] = useState(1);
@@ -486,37 +484,41 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
             </div>
 
             {/* Tier eligibility */}
-            {orgTiers && orgTiers.length > 0 && (
-              <div className="space-y-3">
-                <label className="text-label font-medium text-subtle">Eligible Tiers</label>
-                <div className="flex flex-wrap gap-2">
-                  {orgTiers.map((tier) => {
-                    const selected = policyData.eligibility?.tierIds?.includes(tier.id) ?? false;
-                    return (
-                      <button
-                        key={tier.id}
-                        type="button"
-                        disabled={isViewMode}
-                        onClick={() => {
-                          const current = policyData.eligibility?.tierIds ?? [];
-                          const updated = selected
-                            ? current.filter((id) => id !== tier.id)
-                            : [...current, tier.id];
-                          setPolicyData({ ...policyData, eligibility: { ...policyData.eligibility, tierIds: updated } });
-                        }}
-                        className={cn(
-                          "px-3 py-1.5 rounded-lg border text-label font-medium transition-all",
-                          selected ? "bg-primary/5 border-primary text-primary" : "bg-background border-border text-muted-foreground hover:border-primary/30"
-                        )}
-                      >
-                        {tier.code} — {tier.label}
-                      </button>
-                    );
-                  })}
+            {(() => {
+              const availableTiers = [...new Set(MOCK_EMPLOYEES.map((e) => e.tier).filter(Boolean))] as string[];
+              if (availableTiers.length === 0) return null;
+              return (
+                <div className="space-y-3">
+                  <label className="text-label font-medium text-subtle">Eligible Tiers</label>
+                  <div className="flex flex-wrap gap-2">
+                    {availableTiers.map((tier) => {
+                      const selected = policyData.eligibility?.tierIds?.includes(tier) ?? false;
+                      return (
+                        <button
+                          key={tier}
+                          type="button"
+                          disabled={isViewMode}
+                          onClick={() => {
+                            const current = policyData.eligibility?.tierIds ?? [];
+                            const updated = selected
+                              ? current.filter((id) => id !== tier)
+                              : [...current, tier];
+                            setPolicyData({ ...policyData, eligibility: { ...policyData.eligibility, tierIds: updated } });
+                          }}
+                          className={cn(
+                            "px-3 py-1.5 rounded-lg border text-label font-medium transition-all",
+                            selected ? "bg-primary/5 border-primary text-primary" : "bg-background border-border text-muted-foreground hover:border-primary/30"
+                          )}
+                        >
+                          {tier}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p className="text-micro text-faint">Leave all unchecked to apply to all tiers.</p>
                 </div>
-                <p className="text-micro text-faint">Leave all unchecked to apply to all tiers.</p>
-              </div>
-            )}
+              );
+            })()}
           </div>
         </DetailSection>
       </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { User, Shield, Users, Rows } from "@phosphor-icons/react";
+import { Shield, Users, CheckCircle } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { Organization } from "@/features/organizations/types";
 
@@ -10,13 +10,8 @@ interface SetupChecklistProps {
 }
 
 export function SetupChecklist({ organization, className }: SetupChecklistProps) {
+  const hasCoverage = organization.employeeCount > 0 && (organization.employeesWithoutPolicy ?? 1) === 0;
   const items = [
-    {
-      label: "T",
-      isComplete: (organization.tiers?.length ?? 0) > 0,
-      icon: Rows,
-      tooltip: (organization.tiers?.length ?? 0) > 0 ? "Tiers defined" : "Missing tiers",
-    },
     {
       label: "POL",
       isComplete: organization.policies.length > 0,
@@ -30,10 +25,10 @@ export function SetupChecklist({ organization, className }: SetupChecklistProps)
       tooltip: organization.employeeCount > 0 ? "Employees added" : "No employees",
     },
     {
-      label: "PIC",
-      isComplete: !!organization.picId,
-      icon: User,
-      tooltip: organization.picId ? "PIC assigned" : "Missing PIC",
+      label: "COV",
+      isComplete: hasCoverage,
+      icon: CheckCircle,
+      tooltip: hasCoverage ? "All employees covered" : "Employees without policy",
     },
   ];
 
