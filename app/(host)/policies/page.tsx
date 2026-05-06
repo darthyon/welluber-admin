@@ -23,10 +23,11 @@ import { FilterItem } from "@/components/shared/filter-item";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { SharedDataTable, Column } from "@/components/shared/data-table";
 import { ActionPopover, type ActionItem } from "@/components/shared/action-popover";
-import { BenefitGroup, Benefit, TierVariant } from "@/types/policy";
+import { BenefitGroup, Benefit } from "@/types/policy";
 import { PolicyDetailView } from "@/components/host/policies/policy-detail-view";
 import { usePolicyTemplates } from "@/hooks/use-policy-templates";
 import { INITIAL_POLICIES, POLICY_DATA_MAP_INITIAL, type PolicyListItem } from "@/features/policies/mock-data";
+import { MOCK_EMPLOYEES } from "@/components/host/employees/employee-directory-table";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -248,8 +249,8 @@ function PoliciesContent() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [orgFilter, setOrgFilter] = useState<string>("all");
 
-  // Mock groups/benefits/tiers per policy
-  const [policyDataMap, setPolicyDataMap] = useState<Record<string, { groups: BenefitGroup[]; benefits: Benefit[]; tiers: TierVariant[] }>>(POLICY_DATA_MAP_INITIAL);
+  // Mock groups/benefits per policy
+  const [policyDataMap, setPolicyDataMap] = useState<Record<string, { groups: BenefitGroup[]; benefits: Benefit[] }>>(POLICY_DATA_MAP_INITIAL);
 
   // Dialogs
   const [showTemplateModal, setShowTemplateModal] = useState(false);
@@ -336,34 +337,20 @@ function PoliciesContent() {
       createdAt: new Date().toISOString(),
       clonedFrom: cloneTarget.name,
     };
-    // Deep clone groups, benefits, and tiers for the new policy
+    // Deep clone groups and benefits for the new policy
     if (sourceData) {
       const newGroups = sourceData.groups.map(g => ({
         ...g,
         id: `${g.id}-clone-${newId}`,
         policyId: newId,
       }));
-      const benefitIdMap = new Map<string, string>();
       const newBenefits = sourceData.benefits.map(b => {
-        const newBenefitId = `${b.id}-clone-${newId}`;
-        benefitIdMap.set(b.id, newBenefitId);
         const newGroupId = newGroups.find(g => g.name === sourceData.groups.find(sg => sg.id === b.groupId)?.name)?.id || b.groupId;
-        return { ...b, id: newBenefitId, groupId: newGroupId };
+        return { ...b, id: `${b.id}-clone-${newId}`, groupId: newGroupId };
       });
-      const newTiers = sourceData.tiers.map(t => ({
-        ...t,
-        id: `${t.id}-clone-${newId}`,
-        policyId: newId,
-        overrides: t.overrides.map(o => ({
-          ...o,
-          id: `${o.id}-clone-${newId}`,
-          tierId: `${t.id}-clone-${newId}`,
-          benefitId: benefitIdMap.get(o.benefitId) || o.benefitId,
-        })),
-      }));
       setPolicyDataMap(prev => ({
         ...prev,
-        [newId]: { groups: newGroups, benefits: newBenefits, tiers: newTiers },
+        [newId]: { groups: newGroups, benefits: newBenefits },
       }));
     }
     setPolicies(prev => [...prev, newPolicy]);
@@ -551,14 +538,25 @@ function PoliciesContent() {
       const parentPolicyName = policy.parentPolicyId
         ? policies.find(p => p.id === policy.parentPolicyId)?.name
         : undefined;
+      const subPolicyOverrideCounts: Record<string, number> = {};
+      subPolicies.forEach(sp => {
+        const subData = policyDataMap[sp.id];
+        if (subData && data) {
+          subPolicyOverrideCounts[sp.id] = subData.benefits.filter(sb => {
+            const parent = data.benefits.find(pb => pb.serviceId === sb.serviceId);
+            return parent && parent.amount !== sb.amount;
+          }).length;
+        }
+      });
       return (
         <div className="flex flex-col flex-1">
           <PolicyDetailView
             policy={policy}
             groups={data.groups}
             benefits={data.benefits}
-            tiers={data.tiers}
             subPolicies={subPolicies}
+            subPolicyOverrideCounts={subPolicyOverrideCounts}
+            employees={MOCK_EMPLOYEES.filter(e => e.orgId === policy.organizationId)}
             parentPolicyName={parentPolicyName}
             onEdit={() => router.push(`/policies/${policy.id}/edit`)}
             onClone={() => handleClone(policy)}

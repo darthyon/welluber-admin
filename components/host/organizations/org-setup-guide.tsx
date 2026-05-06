@@ -28,41 +28,41 @@ export function OrgSetupGuide({ organization: org, className, compact = false }:
       n: 1,
       title: "Define employee tiers",
       description: compact
-        ? "Set position levels so policies can target the right people."
-        : "Set position levels (Director, Manager, Executive) so policies can target the right people.",
-      complete: (org.tiers?.length ?? 0) > 0,
+        ? "Set position levels like Executive, Manager, Associate."
+        : "Set position levels (like Executive, Manager, Associate) used for benefit policy targeting.",
+      complete: (org.tierConfigs?.length ?? 0) > 0,
       locked: false,
-      href: `/organizations/${org.id}?tab=settings`,
+      href: `/organizations/${org.id}?tab=employees&subTab=tiers`,
       cta: "Set up tiers",
     },
     {
       n: 2,
-      title: "Create a benefit policy",
+      title: "Add employees",
       description: compact
-        ? "Build a policy with benefit groups and amounts for your tiers."
-        : "Build at least one policy with benefit groups and amounts for your tiers.",
-      complete: org.policies.length > 0,
-      locked: (org.tiers?.length ?? 0) === 0,
-      href: `/organizations/${org.id}?tab=policies&addPolicy=true`,
-      cta: "Create policy",
+        ? "Upload your roster and assign tiers to each person."
+        : "Upload your employee roster and assign a tier level to each person.",
+      complete: org.employeeCount > 0,
+      locked: false,
+      href: `/organizations/${org.id}?tab=employees`,
+      cta: "Add employees",
     },
     {
       n: 3,
-      title: "Add employees",
+      title: "Create a benefit policy",
       description: compact
-        ? "Upload your employee roster with tier assignments."
-        : "Upload your employee roster with tier assignments.",
-      complete: org.employeeCount > 0,
-      locked: org.policies.length === 0,
-      href: `/organizations/${org.id}?tab=employees`,
-      cta: "Add employees",
+        ? "Build a policy with service groups and benefit amounts."
+        : "Build at least one policy with benefit groups, services, and coverage amounts.",
+      complete: org.policies.length > 0,
+      locked: false,
+      href: `/organizations/${org.id}?tab=policies&addPolicy=true`,
+      cta: "Create policy",
     },
     {
       n: 4,
       title: "Assign policies to employees",
       description: compact
-        ? "Ensure every employee has benefit coverage."
-        : "Ensure every employee has benefit coverage. No one falls through.",
+        ? "Match employees to their benefit policy."
+        : "Ensure every employee has a policy based on their tier. Use sub-policies to override amounts for specific groups.",
       complete: org.employeeCount > 0 && (org.employeesWithoutPolicy ?? 1) === 0,
       locked: org.employeeCount === 0,
       href: `/organizations/${org.id}?tab=employees&filter=missing-policy`,
@@ -124,7 +124,7 @@ export function OrgSetupGuide({ organization: org, className, compact = false }:
                   </div>
                 ) : (
                   <div className="w-[22px] h-[22px] flex items-center justify-center rounded-full bg-primary text-primary-foreground">
-                    <span className="text-micro font-bold leading-none">{step.n}</span>
+                    <span className="text-micro font-semibold leading-none">{step.n}</span>
                   </div>
                 )}
               </div>

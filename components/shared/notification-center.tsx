@@ -62,7 +62,7 @@ const DEFAULT_NOTIFICATIONS: NotificationItem[] = [
     priority: "normal",
     title: "TechCorp Global onboarded 150 employees",
     time: "5 hours ago",
-    context: "Wallet provisioned successfully.",
+    context: "Account provisioned successfully.",
     icon: CheckCircle,
     color: "text-emerald-600 dark:text-emerald-400",
     bg: "bg-emerald-500/10 dark:bg-emerald-500/20",

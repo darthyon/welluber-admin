@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { BenefitPolicy, BenefitGroup, Benefit } from "@/types/policy";
 import { SERVICES } from "@/features/policies/mock-data";
-import { MOCK_EMPLOYEES } from "@/components/host/employees/employee-directory-table";
+import type { EmployeeDirectoryItem } from "@/components/host/employees/employee-directory-table";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -40,13 +40,11 @@ export interface SubPolicyWizardProps {
   parentPolicy: BenefitPolicy;
   parentGroups: BenefitGroup[];
   parentBenefits: Benefit[];
+  employees: EmployeeDirectoryItem[];
+  orgTierConfigs?: { id: string; name: string; code?: string }[];
   onSuccess: (data: SubPolicyResult) => void;
   onCancel: () => void;
 }
-
-// ─── Constants ────────────────────────────────────────────────────────────────
-
-const DEPARTMENTS = ["Engineering", "Product", "Design", "Marketing", "Finance", "Operations", "HR", "Legal"];
 
 const WIZARD_STEPS = [
   { id: 1, label: "Override Amounts" },
@@ -77,7 +75,7 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
             <div className="flex items-center gap-2">
               <div
                 className={cn(
-                  "w-7 h-7 rounded-full flex items-center justify-center text-label font-bold transition-all",
+                  "w-7 h-7 rounded-full flex items-center justify-center text-label font-semibold transition-all",
                   isDone && "bg-primary text-primary-foreground",
                   isActive && "bg-primary text-primary-foreground ring-4 ring-primary/20",
                   !isDone && !isActive && "bg-muted text-muted-foreground border border-border"
@@ -110,6 +108,8 @@ export function SubPolicyWizard({
   parentPolicy,
   parentGroups,
   parentBenefits,
+  employees,
+  orgTierConfigs = [],
   onSuccess,
   onCancel,
 }: SubPolicyWizardProps) {
@@ -133,25 +133,40 @@ export function SubPolicyWizard({
   // Step 3 state
   const [confirmedEmployeeIds, setConfirmedEmployeeIds] = useState<string[]>([]);
 
-  // ── Computed ────────────────────────────────────────────────────────────────
+  // ── Derived ──────────────────────────────────────────────────────────────────
+
+  const departments = useMemo(() => {
+    const set = new Set<string>();
+    employees.forEach(e => { if (e.department) set.add(e.department); });
+    return Array.from(set).sort();
+  }, [employees]);
+
+  const tierOptions = useMemo(() => {
+    if (orgTierConfigs.length > 0) {
+      return orgTierConfigs.map(tc => tc.code || tc.name);
+    }
+    const set = new Set<string>();
+    employees.forEach(e => { if (e.tier) set.add(e.tier); });
+    return Array.from(set).sort();
+  }, [orgTierConfigs, employees]);
 
   const targetedEmployees = useMemo(() => {
-    const filtered = MOCK_EMPLOYEES.filter(emp => {
+    const filtered = employees.filter(emp => {
       const matchesTier = tierFilter.length === 0 || tierFilter.includes(emp.tier ?? "");
       const matchesDept = departmentFilter.length === 0 || departmentFilter.includes(emp.department ?? "");
       return matchesTier && matchesDept;
     });
-    const pinnedEmps = MOCK_EMPLOYEES.filter(e => pinnedEmployeeIds.includes(e.id) && !filtered.find(f => f.id === e.id));
+    const pinnedEmps = employees.filter(e => pinnedEmployeeIds.includes(e.id) && !filtered.find(f => f.id === e.id));
     return [...filtered, ...pinnedEmps];
-  }, [tierFilter, departmentFilter, pinnedEmployeeIds]);
+  }, [employees, tierFilter, departmentFilter, pinnedEmployeeIds]);
 
   const empSearchResults = useMemo(() => {
     if (!empSearch.trim()) return [];
     const q = empSearch.toLowerCase();
-    return MOCK_EMPLOYEES
+    return employees
       .filter(e => !pinnedEmployeeIds.includes(e.id) && (e.name.toLowerCase().includes(q) || e.empCode.toLowerCase().includes(q)))
       .slice(0, 6);
-  }, [empSearch, pinnedEmployeeIds]);
+  }, [employees, empSearch, pinnedEmployeeIds]);
 
   const overriddenBenefits = useMemo(() => {
     return parentBenefits.filter(b => overrides[b.id]?.amount !== undefined || overrides[b.id]?.employeeAmount !== undefined);
@@ -349,15 +364,19 @@ export function SubPolicyWizard({
   const renderStep2 = () => (
     <div className="space-y-6">
       {/* Tier filter */}
-      {(parentPolicy.eligibility?.tierIds?.length ?? 0) > 0 && (
+      {tierOptions.length > 0 && (
         <div className="glass-card rounded-xl p-5">
           <div className="flex items-center gap-2 mb-1">
             <Users size={16} className="text-primary" weight="duotone" />
             <p className="text-label font-semibold text-foreground">Tier Filter</p>
           </div>
-          <p className="text-label text-faint mb-4">Narrowing from parent policy&apos;s eligibility.</p>
+          <p className="text-label text-faint mb-4">
+            {orgTierConfigs.length > 0
+              ? "Filter by organisation tier configuration."
+              : "Filter by employee tier labels."}
+          </p>
           <div className="flex flex-wrap gap-2">
-            {(parentPolicy.eligibility?.tierIds ?? []).map(tier => (
+            {tierOptions.map(tier => (
               <button
                 key={tier}
                 onClick={() => toggleTier(tier)}
@@ -383,7 +402,7 @@ export function SubPolicyWizard({
         </div>
         <p className="text-label text-faint mb-4">Leave empty to include all departments.</p>
         <div className="flex flex-wrap gap-2">
-          {DEPARTMENTS.map(dept => (
+          {departments.map(dept => (
             <button
               key={dept}
               onClick={() => toggleDept(dept)}
@@ -427,7 +446,7 @@ export function SubPolicyWizard({
                   onClick={() => pinEmployee(emp.id)}
                   className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-muted transition-colors text-left"
                 >
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-label font-bold shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-label font-semibold shrink-0">
                     {emp.name.charAt(0)}
                   </div>
                   <div className="min-w-0">
@@ -450,12 +469,12 @@ export function SubPolicyWizard({
         {pinnedEmployeeIds.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-2">
             {pinnedEmployeeIds.map(id => {
-              const emp = MOCK_EMPLOYEES.find(e => e.id === id);
+              const emp = employees.find(e => e.id === id);
               if (!emp) return null;
               return (
                 <span key={id} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-label font-medium">
                   {emp.name}
-                  <button onClick={() => unpinEmployee(id)} className="hover:text-rose-500 transition-colors">
+                  <button onClick={() => unpinEmployee(id)} className="hover:text-destructive transition-colors">
                     <X size={12} weight="bold" />
                   </button>
                 </span>
@@ -467,7 +486,7 @@ export function SubPolicyWizard({
 
       {/* Summary */}
       <div className="rounded-lg border border-border bg-muted/30 px-5 py-3 text-body font-medium text-foreground">
-        Targeting <span className="font-bold text-primary">{targetedEmployees.length}</span> employee{targetedEmployees.length !== 1 ? "s" : ""}
+        Targeting <span className="font-semibold text-primary">{targetedEmployees.length}</span> employee{targetedEmployees.length !== 1 ? "s" : ""}
         {pinnedEmployeeIds.length > 0 && (
           <span className="text-muted-foreground text-label ml-1">
             ({pinnedEmployeeIds.length} pinned)

@@ -18,7 +18,7 @@ export const routes = {
     providers: "/providers",
     users: "/users",
     policies: "/policies",
-    wallets: "/wallets",
+    accounts: "/accounts",
     transactions: "/transactions",
     settings: "/settings",
   },

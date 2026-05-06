@@ -76,16 +76,7 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
             </div>
           );
         }
-        return (
-          <div className="space-y-2">
-            <div className="flex flex-wrap gap-1">
-              {org.needsAction.map((action, i) => (
-                <StatusBadge key={i} status={action} variant="rose" className="h-5" />
-              ))}
-            </div>
-            <SetupChecklist organization={org} />
-          </div>
-        );
+        return <SetupChecklist organization={org} failingOnly />;
       }
     },
     {

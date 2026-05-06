@@ -69,7 +69,7 @@ function useOrgRows(wallets: Wallet[]): OrgRow[] {
   }, [wallets])
 }
 
-export default function WalletsPage() {
+export default function AccountsPage() {
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false)
   const [expandedOrgIds, setExpandedOrgIds] = useState<Set<string>>(new Set())
   const [updateBalanceWallet, setUpdateBalanceWallet] = useState<Wallet | null>(null)
@@ -97,7 +97,7 @@ export default function WalletsPage() {
       <div className="rounded-lg border border-border/60 bg-card overflow-hidden">
         {/* Nested Header */}
         <div className="grid grid-cols-12 gap-4 px-4 py-2.5 bg-muted/30 border-b border-border/60 text-label font-semibold text-faint">
-          <div className="col-span-3">Wallet Name</div>
+          <div className="col-span-3">Account Name</div>
           <div className="col-span-2">Branch</div>
           <div className="col-span-2 text-right">Balance</div>
           <div className="col-span-2 text-right">Pending</div>
@@ -105,12 +105,12 @@ export default function WalletsPage() {
           <div className="col-span-2 text-right">Actions</div>
         </div>
 
-        {/* Wallet Rows */}
+        {/* Account Rows */}
         {row.wallets.map((wallet) => (
           <div
             key={wallet.id}
             className="grid grid-cols-12 gap-4 px-4 py-3 items-center border-b border-border/40 last:border-b-0 hover:bg-muted/20 transition-colors cursor-pointer"
-            onClick={() => router.push(`/wallets/${wallet.id}`)}
+            onClick={() => router.push(`/accounts/${wallet.id}`)}
           >
             <div className="col-span-3">
               <span className="block text-body font-medium text-foreground">
@@ -134,8 +134,7 @@ export default function WalletsPage() {
                   wallet.balance < 0 ? "text-destructive" : "text-foreground"
                 )}
               >
-                {wallet.balance < 0 ? "-" : ""}RM{" "}
-                {Math.abs(wallet.balance).toLocaleString()}
+                {wallet.balance < 0 ? "-" : ""}{Math.abs(wallet.balance).toLocaleString()} pts
               </span>
             </div>
 
@@ -143,7 +142,7 @@ export default function WalletsPage() {
               {wallet.pendingDeductions > 0 ? (
                 <div className="inline-flex items-center gap-1 rounded-md border border-amber-500/20 dark:border-amber-500/30 bg-amber-500/10 dark:bg-amber-500/20 px-1.5 py-0.5 text-label font-medium text-amber-600 dark:text-amber-400">
                   <Ticket size={10} weight="fill" />
-                  RM {wallet.pendingDeductions.toLocaleString()}
+                  {wallet.pendingDeductions.toLocaleString()} pts
                 </div>
               ) : (
                 <span className="text-micro text-faint">—</span>
@@ -165,8 +164,8 @@ export default function WalletsPage() {
               <ActionPopover
                 actions={[
                   {
-                    label: "View wallet detail",
-                    onClick: () => router.push(`/wallets/${wallet.id}`),
+                    label: "View account detail",
+                    onClick: () => router.push(`/accounts/${wallet.id}`),
                   },
                   {
                     label: "Update balance",
@@ -179,8 +178,8 @@ export default function WalletsPage() {
                   {
                     label:
                       wallet.status === "suspended"
-                        ? "Resume wallet"
-                        : "Suspend wallet",
+                        ? "Resume account"
+                        : "Suspend account",
                     onClick: () => console.log("Toggle status", wallet.id),
                     className:
                       wallet.status === "suspended"
@@ -202,10 +201,10 @@ export default function WalletsPage() {
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <h1 className="text-heading font-semibold text-foreground text-balance">
-            Wallets
+            Accounts
           </h1>
           <p className="mt-1 text-body font-normal text-muted-foreground">
-            Monitor and manage organisation/branch fiscal balances.
+            Monitor and manage organisation/branch accounts.
           </p>
         </div>
 
@@ -223,7 +222,7 @@ export default function WalletsPage() {
 
           <Button className="h-9 text-body font-medium shadow-sm">
             <Plus size={16} weight="bold" className="mr-1.5" />
-            Create Wallet
+            Create Account
           </Button>
         </div>
       </div>
@@ -231,23 +230,18 @@ export default function WalletsPage() {
       {/* Summary Metrics */}
       <BentoGrid className="gap-3">
         <BentoCard
-          title="Total Balance"
-          value={`RM ${summary.totalBalance.toLocaleString()}`}
-          icon={WalletIcon}
-        />
-        <BentoCard
-          title="Active Wallets"
+          title="Active Accounts"
           value={summary.activeCount.toString()}
           icon={CheckCircle}
         />
         <BentoCard
-          title="Suspended Wallets"
+          title="Suspended Accounts"
           value={summary.suspendedCount.toString()}
           icon={WalletIcon}
           className={summary.suspendedCount > 0 ? "border-destructive/30" : ""}
         />
         <BentoCard
-          title="Total Wallets"
+          title="Total Accounts"
           value={summary.totalWallets.toString()}
           icon={Buildings}
         />
@@ -257,7 +251,7 @@ export default function WalletsPage() {
       <DataFilterBar
         searchQuery={filters.search}
         onSearchChange={(v) => setFilters({ ...filters, search: v })}
-        searchPlaceholder="Search organisations or wallet names..."
+        searchPlaceholder="Search organisations or account names..."
         filters={
           <>
             <FilterItem
@@ -308,7 +302,7 @@ export default function WalletsPage() {
                 ),
               },
               {
-                header: "Wallets",
+                header: "Accounts",
                 accessorKey: "walletCount",
                 sortable: true,
                 align: "right",
@@ -318,23 +312,7 @@ export default function WalletsPage() {
                   </span>
                 ),
               },
-              {
-                header: "Total Balance",
-                accessorKey: "totalBalance",
-                sortable: true,
-                align: "right",
-                render: (row: OrgRow) => (
-                  <span
-                    className={cn(
-                      "text-body font-semibold tabular-nums",
-                      row.totalBalance < 0 ? "text-destructive" : "text-foreground"
-                    )}
-                  >
-                    {row.totalBalance < 0 ? "-" : ""}RM{" "}
-                    {Math.abs(row.totalBalance).toLocaleString()}
-                  </span>
-                ),
-              },
+
               {
                 header: "Status",
                 accessorKey: "suspendedCount",
@@ -372,9 +350,9 @@ export default function WalletsPage() {
                           router.push(`/organizations/${row.orgId}`),
                       },
                       {
-                        label: "Create wallet",
+                        label: "Create account",
                         onClick: () =>
-                          console.log("Create wallet", row.orgId),
+                          console.log("Create account", row.orgId),
                       },
                     ]}
                   />
@@ -385,7 +363,7 @@ export default function WalletsPage() {
         ) : (
           <EmptyState
             icon={<MagnifyingGlass size={32} weight="light" />}
-            title="No wallets found"
+            title="No accounts found"
             description="Adjust your search or filters to find what you're looking for."
             action={
               <Button
@@ -415,7 +393,7 @@ export default function WalletsPage() {
         showWorkforce={false}
         showIndustry={false}
         showWalletModel={false}
-        description="Filter wallets by utilisation levels and specific billing models."
+        description="Filter accounts by utilisation levels and specific billing models."
       />
 
       {/* Modals */}

@@ -94,25 +94,4 @@ export interface BenefitCategory {
   color: string;
 }
 
-// Tier Variants (Org-scoped)
-export type TierStatus = "incomplete" | "complete";
 
-export interface TierVariant {
-  id: string;
-  policyId: string;
-  organizationId: string;
-  name: string;
-  status: TierStatus;
-  eligibleEmploymentTypes: string[];
-  departmentIds?: string[];
-  roleIds?: string[]; // role-based eligibility, optional
-  overrides: TierOverride[];
-}
-
-export interface TierOverride {
-  id: string;
-  tierId: string;
-  benefitId: string;
-  amount?: number;
-  maxUsagePerCycle?: number;
-}

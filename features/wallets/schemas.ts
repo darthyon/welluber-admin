@@ -4,7 +4,7 @@ export const WalletStatusEnum = z.enum(["active", "suspended", "closed"]);
 export const WalletTypeEnum = z.enum(["new", "existing"]);
 
 export const createWalletSchema = z.object({
-  name: z.string().min(1, "Wallet name is required"),
+  name: z.string().min(1, "Account name is required"),
   orgId: z.string().min(1, "Organization is required"),
   branchId: z.string().min(1, "Branch is required"),
   initialAmount: z.number().min(0, "Initial amount cannot be negative"),
@@ -12,13 +12,13 @@ export const createWalletSchema = z.object({
 });
 
 export const adjustWalletSchema = z.object({
-  walletId: z.string().min(1, "Wallet ID is required"),
+  walletId: z.string().min(1, "Account ID is required"),
   amount: z.number().min(0, "Amount cannot be negative"),
   reason: z.string().min(1, "Reason is required"),
 });
 
 export const updateCreditLimitSchema = z.object({
-  walletId: z.string().min(1, "Wallet ID is required"),
+  walletId: z.string().min(1, "Account ID is required"),
   creditLimit: z.number().min(0, "Credit limit cannot be negative"),
 });
 

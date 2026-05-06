@@ -88,7 +88,7 @@ export function UpdateBalanceModal({
             <div className="px-6 py-5 space-y-5">
               <div className="space-y-1.5">
                 <label className="text-body font-medium text-foreground">
-                  Adjustment Amount (RM)
+                  Adjustment Amount (pts)
                 </label>
                 <input
                   type="number"
@@ -138,7 +138,7 @@ export function UpdateBalanceModal({
                     <span>Recording...</span>
                   </div>
                 ) : (
-                  "Record Adjustment"
+                  "Record Balance Update"
                 )}
               </Button>
             </div>

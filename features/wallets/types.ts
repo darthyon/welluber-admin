@@ -22,7 +22,8 @@ export interface Wallet {
 export type TransactionType =
   | "topup"
   | "deduction"
-  | "adjustment"
+  | "pre-auth"
+  | "cancelled"
   | "reversal"
   | "settlement";
 

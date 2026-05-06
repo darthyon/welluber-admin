@@ -80,8 +80,15 @@ export interface Organization {
   branches: string[];
   documents: string[];
   employeesWithoutPolicy?: number;
+  tierConfigs?: OrgTierConfig[];
   createdAt: ISODate;
   updatedAt: ISODate;
+}
+
+export interface OrgTierConfig {
+  id: string;
+  name: string;
+  code?: string;
 }
 
 export interface OrganizationAdmin {

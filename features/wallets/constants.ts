@@ -10,7 +10,8 @@ export const WALLET_STATUS_OPTIONS = [
 export const TRANSACTION_TYPE_LABELS: Record<string, string> = {
   topup: "Top-Up",
   deduction: "Deduction",
-  adjustment: "Adjustment",
+  "pre-auth": "Pre-Authorised",
+  cancelled: "Cancelled",
   reversal: "Reversal",
   settlement: "Settlement",
 };

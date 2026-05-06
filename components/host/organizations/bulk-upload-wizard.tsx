@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import {
   CloudArrowUp,
   FileCsv,
@@ -26,14 +26,9 @@ import { Badge } from "@/components/ui/badge"
 interface BulkUploadWizardProps {
   onBack: () => void
   onSuccess?: () => void
+  orgTierConfigs?: { id: string; name: string; code?: string }[]
+  availablePolicies?: { name: string; tiers: string[] }[]
 }
-
-const KNOWN_POLICIES: { name: string; code: string; tiers: string[] }[] = [
-  { name: "Standard Health", code: "POL-001", tiers: ["T3", "T4"] },
-  { name: "Executive Wellness", code: "POL-002", tiers: ["T2"] },
-  { name: "Flexi Care", code: "POL-003", tiers: ["T1"] },
-  { name: "Director Suite", code: "POL-004", tiers: ["T1", "T2"] },
-]
 
 type BulkRecord = {
   id: string
@@ -61,17 +56,17 @@ type BulkRecord = {
   isNewDept?: boolean
 }
 
-function applyPolicyAutoAssign(rows: BulkRecord[]): BulkRecord[] {
+function applyPolicyAutoAssign(rows: BulkRecord[], policies: { name: string; tiers: string[] }[]): BulkRecord[] {
   return rows.map((r) => {
     if (r.policies) {
-      const known = KNOWN_POLICIES.find((p) => p.name === r.policies)
+      const known = policies.find((p) => p.name === r.policies)
       if (!known) {
         return { ...r, status: "Issue", issue: `Unknown policy: ${r.policies}`, policyIssue: true }
       }
       return r
     }
     if (r.tier) {
-      const matches = KNOWN_POLICIES.filter((p) => p.tiers.includes(r.tier))
+      const matches = policies.filter((p) => p.tiers.includes(r.tier))
       if (matches.length === 1) {
         return { ...r, policies: matches[0].name, autoAssigned: true }
       }
@@ -90,103 +85,7 @@ function applyPolicyAutoAssign(rows: BulkRecord[]): BulkRecord[] {
 
 type UploadStep = "upload" | "processing" | "preview" | "success"
 
-const MOCK_RECORDS = [
-  {
-    code: "E001",
-    name: "Robert Fox",
-    email: "robert.f@acme.com",
-    dob: "1990-05-12",
-    gender: "male",
-    mobile: "012-3456789",
-    department: "Engineering",
-    role: "Staff",
-    date: "2026-04-10",
-    policies: "Wellness Allocation",
-    status: "Valid",
-    branch: "ACME HQ",
-    tier: "T3",
-    residency: "Local",
-    taxable: true,
-    employmentStatus: "Active",
-  },
-  {
-    code: "E002",
-    name: "Jenny Wilson",
-    email: "jenny.w@acme.com",
-    dob: "1988-11-24",
-    gender: "female",
-    mobile: "012-9876543",
-    department: "Product",
-    role: "Management",
-    date: "2026-05-15",
-    policies: "Lifestyle Pocket",
-    status: "Valid",
-    branch: "ACME Subang Jaya",
-    tier: "T2",
-    residency: "Local",
-    taxable: true,
-    employmentStatus: "Active",
-  },
-  {
-    code: "E003",
-    name: "Dianne Russell",
-    email: "dianne.r@acme.com",
-    dob: "1995-02-14",
-    gender: "female",
-    mobile: "017-1112223",
-    department: "Growth",
-    role: "Staff",
-    date: "2026-04-01",
-    policies: "Wellness Allocation",
-    status: "Valid",
-    branch: "ACME HQ",
-    tier: "T4",
-    residency: "Foreigner",
-    taxable: false,
-    employmentStatus: "Probation",
-    isNewDept: true,
-  },
-  {
-    code: "",
-    name: "Unknown User",
-    email: "",
-    dob: "1992-08-30",
-    gender: "other",
-    mobile: "",
-    department: "HR",
-    role: "Staff",
-    date: "2026-04-20",
-    policies: "Wellness Allocation",
-    status: "Issue",
-    issue: "Missing code & email",
-    branch: "ACME HQ",
-    tier: "T4",
-    residency: "Local",
-    taxable: true,
-    employmentStatus: "Active",
-  },
-  {
-    code: "E005",
-    name: "Guy Hawkins",
-    email: "guy.h@acme.com",
-    dob: "Invalid",
-    gender: "male",
-    mobile: "013-4445556",
-    department: "Sales",
-    role: "Executive",
-    date: "Invalid Date",
-    policies: "Wellness Allocation",
-    status: "Issue",
-    issue: "Invalid DOB, Join Date & ID",
-    branch: "ACME HQ",
-    tier: "T3",
-    residency: "Local",
-    taxable: true,
-    employmentStatus: "Active",
-  },
-]
-
-export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
+export function BulkUploadWizard({ onBack, onSuccess, orgTierConfigs = [], availablePolicies = [] }: BulkUploadWizardProps) {
   const [step, setStep] = useState<UploadStep>("upload")
   const [progress, setProgress] = useState(0)
   const [fileName, setFileName] = useState<string | null>(null)
@@ -221,6 +120,13 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
     }, 2500)
   }
 
+  const tierCodes = useMemo(() =>
+    orgTierConfigs.map(tc => tc.code || tc.name),
+    [orgTierConfigs]
+  )
+
+  const mockTier = (index: number) => tierCodes[index % tierCodes.length] || `T${index + 1}`
+
   const MOCK_RECORDS: BulkRecord[] = [
     {
       id: "rec_0",
@@ -233,10 +139,10 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
       department: "Engineering",
       role: "Staff",
       date: "2026-04-10",
-      policies: "", // T3 — auto-assigns to Standard Health
+      policies: "",
       status: "Valid",
       branch: "ACME HQ",
-      tier: "T3",
+      tier: mockTier(0),
       residency: "Local",
       taxable: true,
       employmentType: "full-time",
@@ -254,10 +160,10 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
       department: "Product",
       role: "Management",
       date: "2026-05-15",
-      policies: "", // T1 — ambiguous: Flexi Care + Director Suite → Needs policy assignment
+      policies: "",
       status: "Valid",
       branch: "ACME Subang Jaya",
-      tier: "T1",
+      tier: mockTier(1),
       residency: "Local",
       taxable: true,
       employmentType: "full-time",
@@ -275,10 +181,10 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
       department: "Growth",
       role: "Staff",
       date: "2026-04-01",
-      policies: "Phantom Plan", // unknown policy name → issue
+      policies: "Phantom Plan",
       status: "Valid",
       branch: "ACME HQ",
-      tier: "T4",
+      tier: mockTier(2),
       residency: "Foreigner",
       taxable: false,
       employmentType: "internship",
@@ -301,7 +207,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
       status: "Issue",
       issue: "Missing Code & Email",
       branch: "ACME HQ",
-      tier: "T4",
+      tier: mockTier(2),
       residency: "Local",
       taxable: true,
       employmentType: "part-time",
@@ -323,7 +229,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
       status: "Issue",
       issue: "Invalid DOB, Join Date & ID",
       branch: "ACME HQ",
-      tier: "T2",
+      tier: mockTier(1),
       residency: "Local",
       taxable: true,
       employmentType: "contract",
@@ -332,9 +238,15 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
     },
   ]
 
+  const policyTierMap = useMemo(() => {
+    if (availablePolicies.length > 0) return availablePolicies;
+    const tierCodes = orgTierConfigs.map(tc => tc.code || tc.name);
+    return [{ name: "General Policy", tiers: tierCodes }];
+  }, [availablePolicies, orgTierConfigs]);
+
   const [isEditing, setIsEditing] = useState(false)
   const [records, setRecords] = useState<BulkRecord[]>(() =>
-    applyPolicyAutoAssign(MOCK_RECORDS)
+    applyPolicyAutoAssign(MOCK_RECORDS, policyTierMap)
   )
 
   const filteredRecords = records.filter((r) => {
@@ -666,10 +578,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
       render: (row: BulkRecord) => {
         if (row.policyIssue) {
           return (
-            <span className="inline-flex items-center gap-1 text-label font-medium text-amber-600 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full">
-              <WarningCircle size={12} weight="fill" />
-              Needs policy
-            </span>
+            <StatusBadge status="Needs Policy" variant="amber" />
           )
         }
         if (row.policies) {
@@ -678,9 +587,7 @@ export function BulkUploadWizard({ onBack, onSuccess }: BulkUploadWizardProps) {
               <Shield size={16} weight="fill" />
               <span className="text-body font-semibold">{row.policies}</span>
               {row.autoAssigned && (
-                <span className="text-label font-medium text-emerald-600 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded-full">
-                  Auto
-                </span>
+                <StatusBadge status="Auto" variant="emerald" />
               )}
             </div>
           )

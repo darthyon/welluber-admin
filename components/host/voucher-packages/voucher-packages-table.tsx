@@ -16,6 +16,7 @@ interface VoucherPackagesTableProps {
   data: VoucherPackageItem[]
   onView?: (voucher: VoucherPackageItem) => void
   onEdit?: (voucher: VoucherPackageItem) => void
+  onViewGenerated?: (voucher: VoucherPackageItem) => void
 }
 
 const STATUS_VARIANT: Record<
@@ -33,6 +34,7 @@ export function VoucherPackagesTable({
   data,
   onView,
   onEdit,
+  onViewGenerated,
 }: VoucherPackagesTableProps) {
   return (
     <SharedDataTable
@@ -120,7 +122,7 @@ export function VoucherPackagesTable({
           ),
         },
         {
-          header: "Price (RM)",
+          header: "Amount",
           accessorKey: "finalPrice",
           sortable: true,
           render: (voucher) => (
@@ -175,6 +177,10 @@ export function VoucherPackagesTable({
                   {
                     label: "Edit Voucher",
                     onClick: () => onEdit?.(voucher),
+                  },
+                  {
+                    label: "View Generated Vouchers",
+                    onClick: () => onViewGenerated?.(voucher),
                   },
                   {
                     label: "Suspend Voucher",

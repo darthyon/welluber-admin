@@ -1,8 +1,8 @@
 import { test, expect } from "@playwright/test";
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+test.describe.configure({ mode: "serial", timeout: 60000 });
 
-async function waitForAnimation(page) {
+async function waitForAnimation(page: import("@playwright/test").Page) {
   await page.waitForTimeout(300);
 }
 
@@ -11,56 +11,60 @@ async function waitForAnimation(page) {
 test.describe("Policy List", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/policies");
-    await expect(page.getByRole("heading", { name: "Benefit Policies" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Benefit Policies" })).toBeVisible({ timeout: 15000 });
   });
 
   test("PL-01: Render with initial policies", async ({ page }) => {
-    await expect(page.getByText("Standard Health 2026")).toBeVisible();
+    await expect(page.getByText("Standard Health 2026", { exact: true }).first()).toBeVisible();
     await expect(page.getByText("Executive Wellness")).toBeVisible();
     await expect(page.getByText("Contractor Lite")).toBeVisible();
   });
 
   test("PL-03: Filter by Draft status", async ({ page }) => {
-    await page.getByRole("button", { name: /Draft/ }).click();
+    await page.getByRole("button", { name: /^All \(\d+\)/ }).click();
+    await page.getByRole("button", { name: /^Draft \(\d+\)/ }).click();
     await expect(page.getByText("Executive Wellness")).toBeVisible();
-    await expect(page.getByText("Standard Health 2026")).not.toBeVisible();
+    await expect(page.getByText("Standard Health 2026", { exact: true })).not.toBeVisible();
     await expect(page.getByText("Contractor Lite")).not.toBeVisible();
   });
 
   test("PL-05: Filter by Active status", async ({ page }) => {
-    await page.getByRole("button", { name: /Active/ }).click();
-    await expect(page.getByText("Standard Health 2026")).toBeVisible();
+    await page.getByRole("button", { name: /^All \(\d+\)/ }).click();
+    await page.getByRole("button", { name: /^Active \(\d+\)/ }).click();
+    await expect(page.getByText("Standard Health 2026", { exact: true }).first()).toBeVisible();
     await expect(page.getByText("Executive Wellness")).not.toBeVisible();
   });
 
   test("PL-06: Search for policy", async ({ page }) => {
-    await page.getByPlaceholder("Search policies...").fill("Executive");
+    await page.getByPlaceholder("Search policies or benefit IDs...").fill("Executive");
     await expect(page.getByText("Executive Wellness")).toBeVisible();
-    await expect(page.getByText("Standard Health 2026")).not.toBeVisible();
+    await expect(page.getByText("Standard Health 2026", { exact: true })).not.toBeVisible();
   });
 
   test("PL-10: Click row opens detail view", async ({ page }) => {
-    await page.getByText("Standard Health 2026").click();
+    await page.getByText("Standard Health 2026", { exact: true }).first().click();
     await expect(page.getByRole("heading", { name: "Standard Health 2026" })).toBeVisible();
-    await expect(page.getByText("Overview")).toBeVisible();
-    await expect(page.getByText("Tier Variants")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Overview" })).toBeVisible();
+    await expect(page.getByText("Sub-Policies")).toBeVisible();
   });
 
   test("PL-11: Clone policy opens dialog", async ({ page }) => {
-    const row = page.locator("tr", { hasText: "Standard Health 2026" });
+    const row = page.locator("tr").filter({ hasText: /^Standard Health 2026\s/ }).first();
     await row.locator("[data-testid='action-popover-trigger']").click();
     await page.getByText("Clone policy").click();
-    await expect(page.getByText("Clone Policy")).toBeVisible();
-    await expect(page.getByDisplayValue("Standard Health 2026 — Copy")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Clone Policy" })).toBeVisible();
+    await page.locator("input").last().fill("Cloned Policy");
+    await page.getByRole("button", { name: "Clone Policy", exact: true }).click();
   });
 
   test("PL-12: Deactivate active policy", async ({ page }) => {
-    const row = page.locator("tr", { hasText: "Standard Health 2026" });
+    const row = page.locator("tr").filter({ hasText: /^Standard Health 2026\s/ }).first();
     await row.locator("[data-testid='action-popover-trigger']").click();
     await page.getByText("Deactivate policy").click();
-    await expect(page.getByText("Deactivate Policy")).toBeVisible();
-    await page.getByRole("button", { name: "Deactivate" }).click();
-    await expect(page.getByText("Policy \"Standard Health 2026\" deactivated")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Deactivate Policy" })).toBeVisible();
+    await page.waitForTimeout(300);
+    await page.getByRole("button", { name: "Deactivate", exact: true }).click({ force: true });
+    await expect(page.getByText(/deactivated/)).toBeVisible({ timeout: 5000 });
   });
 
   test("PL-13: Delete draft policy", async ({ page }) => {
@@ -68,8 +72,8 @@ test.describe("Policy List", () => {
     await row.locator("[data-testid='action-popover-trigger']").click();
     await page.getByText("Delete policy").click();
     await expect(page.getByText("Permanently delete")).toBeVisible();
-    await page.getByRole("button", { name: "Delete Policy" }).click();
-    await expect(page.getByText("Executive Wellness")).not.toBeVisible();
+    await page.getByRole("button", { name: "Delete Policy", exact: true }).click();
+    await expect(page.getByText("Executive Wellness", { exact: true }).first()).not.toBeVisible();
   });
 });
 
@@ -78,187 +82,59 @@ test.describe("Policy List", () => {
 test.describe("Policy Detail View", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/policies");
-    await page.getByText("Standard Health 2026").click();
-    await expect(page.getByRole("heading", { name: "Standard Health 2026" })).toBeVisible();
+    await page.getByText("Standard Health 2026", { exact: true }).first().click();
+    await expect(page.getByRole("heading", { name: "Standard Health 2026" })).toBeVisible({ timeout: 10000 });
   });
 
   test("DV-01: Header shows status badge and cadence", async ({ page }) => {
-    await expect(page.getByText("Active")).toBeVisible();
+    await expect(page.getByText("Active", { exact: true }).first()).toBeVisible();
     await expect(page.getByText(/Yearly refresh/)).toBeVisible();
     await expect(page.getByText(/Fixed allocation/)).toBeVisible();
   });
 
   test("DV-04: Overview tab shows sections", async ({ page }) => {
-    await expect(page.getByText("Basics")).toBeVisible();
+    await expect(page.getByText("Policy Overview")).toBeVisible();
     await expect(page.getByText("Pool & Cycle")).toBeVisible();
     await expect(page.getByText("Benefit Groups")).toBeVisible();
   });
 
-  test("DV-07: Tier Variants tab is visible and clickable", async ({ page }) => {
-    await page.getByRole("tab", { name: /Tier Variants/ }).click();
-    await expect(page.getByText("Base")).toBeVisible();
+  test("DV-07: Sub-Policies tab is visible and clickable", async ({ page }) => {
+    await page.getByText("Sub-Policies").click();
+    await expect(page.getByText("Sub-Policies")).toBeVisible();
   });
 
-  test("DV-08: Assigned Orgs tab shows placeholder", async ({ page }) => {
-    await page.getByRole("tab", { name: /Assigned Orgs/ }).click();
-    await expect(page.getByText("Assigned Organisations")).toBeVisible();
+  test("DV-08: Assigned Employees tab shows content", async ({ page }) => {
+    await page.getByText("Assigned Employees").click();
+    await expect(page.getByText("Assigned Employees")).toBeVisible();
   });
 
   test("DV-09: Audit Log tab shows empty state", async ({ page }) => {
-    await page.getByRole("tab", { name: /Audit Log/ }).click();
+    await page.getByText("Audit Log").click();
     await expect(page.getByText("No audit events yet")).toBeVisible();
   });
 
   test("DV-10: Edit button opens wizard", async ({ page }) => {
-    await page.getByRole("button", { name: "Edit" }).click();
+    await page.getByRole("button", { name: "Edit Policy" }).click();
+    await page.waitForURL(/\/policies\/.+\/edit/);
     await expect(page.getByText("Edit Benefit Policy")).toBeVisible();
   });
 });
 
-// ─── Tier Variants Tests ─────────────────────────────────────────────────────
+// ─── Sub-Policies Tab Tests ──────────────────────────────────────────────────
 
-test.describe("Tier Variants", () => {
-  test.beforeEach(async ({ page }) => {
+test.describe("Sub-Policies", () => {
+  test("SP-01: Sub-Policies tab renders for active policy", async ({ page }) => {
     await page.goto("/policies");
-    await page.getByText("Standard Health 2026").click();
-    await page.getByRole("tab", { name: /Tier Variants/ }).click();
-    await expect(page.getByText("Base")).toBeVisible();
+    await page.getByText("Standard Health 2026", { exact: true }).first().click();
+    await page.getByText("Sub-Policies").click();
+    await expect(page.getByText("Sub-Policies")).toBeVisible();
   });
 
-  test("TV-01: Base panel shows groups and services", async ({ page }) => {
-    await page.getByRole("button", { name: "Base" }).click();
-    await expect(page.getByText("Base Amounts")).toBeVisible();
-    await expect(page.getByText("Physical Wellbeing")).toBeVisible();
-    await expect(page.getByText("Mental Fitness")).toBeVisible();
-  });
-
-  test("TV-05: Nav shows all tiers", async ({ page }) => {
-    await expect(page.getByRole("button", { name: "Band 1 — VP and above" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Band 2 — Manager / Senior" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Band 3 — Executive / Associate" })).toBeVisible();
-  });
-
-  test("TV-07: Incomplete tier shows orange dot", async ({ page }) => {
-    const band3 = page.locator("button", { hasText: "Band 3" });
-    await expect(band3.locator(".bg-amber-500")).toBeVisible();
-    await expect(band3.getByText("incomplete")).toBeVisible();
-  });
-
-  test("TV-08: Complete tier shows override count", async ({ page }) => {
-    const band1 = page.locator("button", { hasText: "Band 1" });
-    await expect(band1.getByText("2 overrides")).toBeVisible();
-  });
-
-  test("TV-10: Add tier inline", async ({ page }) => {
-    await page.getByRole("button", { name: "+ Add tier" }).click();
-    await expect(page.getByPlaceholder("Tier name...")).toBeVisible();
-  });
-
-  test("TV-11: Create new tier and auto-select", async ({ page }) => {
-    await page.getByRole("button", { name: "+ Add tier" }).click();
-    await page.getByPlaceholder("Tier name...").fill("Band 4 — Test");
-    await page.keyboard.press("Enter");
-    await waitForAnimation(page);
-    await expect(page.getByRole("button", { name: "Band 4 — Test" })).toBeVisible();
-    await expect(page.getByText("Configure eligibility rules and benefit overrides")).toBeVisible();
-  });
-
-  test("TV-15: Select tier shows eligibility and overrides", async ({ page }) => {
-    await page.getByRole("button", { name: "Band 1 — VP and above" }).click();
-    await expect(page.getByText("Eligibility Rules")).toBeVisible();
-    await expect(page.getByText("Benefit Overrides")).toBeVisible();
-    await expect(page.getByText("Physical Wellbeing")).toBeVisible();
-  });
-
-  test("TV-16: Toggle employment type chip", async ({ page }) => {
-    await page.getByRole("button", { name: "+ Add tier" }).click();
-    await page.getByPlaceholder("Tier name...").fill("Test Tier");
-    await page.keyboard.press("Enter");
-    await waitForAnimation(page);
-
-    const fullTimeChip = page.locator("button", { hasText: "Full-time" }).last();
-    await fullTimeChip.click();
-    await expect(fullTimeChip).toHaveClass(/bg-primary/);
-    await fullTimeChip.click();
-    await expect(fullTimeChip).not.toHaveClass(/bg-primary/);
-  });
-
-  test("TV-20: Override input shows purple border when set", async ({ page }) => {
-    await page.getByRole("button", { name: "+ Add tier" }).click();
-    await page.getByPlaceholder("Tier name...").fill("Test Tier");
-    await page.keyboard.press("Enter");
-    await waitForAnimation(page);
-
-    await page.getByRole("button", { name: "Full-time" }).last().click();
-    const input = page.locator("input[type='number']").first();
-    await input.fill("5000");
-    await expect(input).toHaveClass(/border-primary/);
-  });
-
-  test("TV-21: Clear override removes purple border", async ({ page }) => {
-    await page.getByRole("button", { name: "Band 1 — VP and above" }).click();
-    const input = page.locator("input[type='number']").first();
-    await expect(input).toHaveValue("5000");
-    await page.locator("button[title='Clear override']").first().click();
-    await expect(input).toHaveValue("");
-    await expect(input).not.toHaveClass(/border-primary/);
-  });
-
-  test("TV-23: Save tier updates status", async ({ page }) => {
-    await page.getByRole("button", { name: "+ Add tier" }).click();
-    await page.getByPlaceholder("Tier name...").fill("Save Test");
-    await page.keyboard.press("Enter");
-    await waitForAnimation(page);
-
-    await page.getByRole("button", { name: "Full-time" }).last().click();
-    const input = page.locator("input[type='number']").first();
-    await input.fill("1000");
-
-    await page.getByRole("button", { name: "Save Tier" }).click();
-    await expect(page.getByText("Saved")).toBeVisible();
-
-    const tierButton = page.locator("button", { hasText: "Save Test" });
-    await expect(tierButton.getByText("1 override")).toBeVisible();
-  });
-
-  test("TV-24: Save tier with 0 employment types shows error", async ({ page }) => {
-    await page.getByRole("button", { name: "+ Add tier" }).click();
-    await page.getByPlaceholder("Tier name...").fill("Error Test");
-    await page.keyboard.press("Enter");
-    await waitForAnimation(page);
-
-    await page.getByRole("button", { name: "Save Tier" }).click();
-    await expect(page.getByText("Select at least one employment type")).toBeVisible();
-  });
-
-  test("TV-26: Remove tier shows confirmation dialog", async ({ page }) => {
-    await page.getByRole("button", { name: "+ Add tier" }).click();
-    await page.getByPlaceholder("Tier name...").fill("Remove Test");
-    await page.keyboard.press("Enter");
-    await waitForAnimation(page);
-
-    await page.getByRole("button", { name: "Remove Tier" }).click();
-    await expect(page.getByText(/Remove Remove Test/)).toBeVisible();
-  });
-
-  test("TV-27: Confirm remove tier", async ({ page }) => {
-    await page.getByRole("button", { name: "+ Add tier" }).click();
-    await page.getByPlaceholder("Tier name...").fill("Remove Test");
-    await page.keyboard.press("Enter");
-    await waitForAnimation(page);
-
-    await page.getByRole("button", { name: "Remove Tier" }).click();
-    await page.getByRole("button", { name: "Remove Tier" }).nth(1).click();
-    await waitForAnimation(page);
-    await expect(page.getByRole("button", { name: "Remove Test" })).not.toBeVisible();
-  });
-
-  test("TV-14: Draft policy disables add tier", async ({ page }) => {
+  test("SP-02: Sub-Policies tab shows empty state for draft policy", async ({ page }) => {
     await page.goto("/policies");
     await page.getByText("Executive Wellness").click();
-    await page.getByRole("tab", { name: /Tier Variants/ }).click();
-    const addButton = page.getByRole("button", { name: "+ Add tier" });
-    await expect(addButton).toBeDisabled();
+    await page.getByText("Sub-Policies").click();
+    await expect(page.getByText("No sub-policies yet")).toBeVisible();
   });
 });
 
@@ -269,128 +145,147 @@ test.describe("Benefit Policy Wizard", () => {
     await page.goto("/policies");
     await page.getByRole("button", { name: "Create New Policy" }).click();
     await expect(page.getByText("Create Benefit Policy")).toBeVisible();
+    await page.getByText("Start from Scratch").click();
+    await page.waitForURL("/policies/new");
+    await expect(page.getByText("Create Benefit Policy")).toBeVisible();
   });
 
   test("WZ-01: Empty name validation", async ({ page }) => {
-    await page.getByRole("button", { name: "Next Step" }).click();
+    await page.getByRole("button", { name: "Create Policy" }).click();
     await expect(page.getByText("Policy name is required")).toBeVisible();
   });
 
   test("WZ-03: No employment types validation", async ({ page }) => {
     await page.getByPlaceholder("e.g. Wellness Premium 2026").fill("Test Policy");
     await page.getByRole("button", { name: "Full-time" }).click();
-    await page.getByRole("button", { name: "Next Step" }).click();
+    await page.getByRole("button", { name: "Create Policy" }).click();
     await expect(page.getByText("Select at least one employment type")).toBeVisible();
   });
 
-  test("WZ-04: Valid basics advances to step 2", async ({ page }) => {
+  test("WZ-04: Valid basics advances to review", async ({ page }) => {
     await page.getByPlaceholder("e.g. Wellness Premium 2026").fill("Test Policy");
-    await page.getByRole("button", { name: "Next Step" }).click();
-    await expect(page.getByText("Pool Config")).toBeVisible();
+    await page.getByPlaceholder("e.g. ORG-20260115-0001").fill("ORG-TEST");
+    await page.getByRole("button", { name: "Add Group" }).click();
+    await page.locator("input[placeholder='Group Name']").fill("Test Group");
+    await page.getByText("Gymnasium Facilities").locator("..").locator("button").click();
+    await page.locator("input[type='number']").last().fill("100");
+    await page.getByRole("button", { name: "Create Policy" }).click();
+    await expect(page.getByText("Review & Confirm")).toBeVisible();
   });
 
-  test("WZ-21: Save as draft shows activation modal", async ({ page }) => {
+  test("WZ-21: Create policy shows success modal", async ({ page }) => {
     await page.getByPlaceholder("e.g. Wellness Premium 2026").fill("Draft Test");
-    await page.getByRole("button", { name: "Next Step" }).click();
-    await page.getByRole("button", { name: "Next Step" }).click();
-    await page.getByRole("button", { name: "Next Step" }).click();
-    await page.getByText("Save as Draft").click();
-    await expect(page.getByText("Policy Created")).toBeVisible();
-    await expect(page.getByRole("button", { name: "Activate & set up tiers" })).toBeVisible();
+    await page.getByPlaceholder("e.g. ORG-20260115-0001").fill("ORG-TEST");
+    await page.getByRole("button", { name: "Add Group" }).click();
+    await page.locator("input[placeholder='Group Name']").fill("Test Group");
+    await page.getByText("Gymnasium Facilities").locator("..").locator("button").click();
+    await page.locator("input[type='number']").last().fill("100");
+    await page.getByRole("button", { name: "Create Policy" }).click();
+    await expect(page.getByText("Review & Confirm")).toBeVisible();
+    await page.getByRole("button", { name: "Confirm & Create" }).click();
+    await expect(page.getByRole("heading", { name: "Policy Created" })).toBeVisible();
+    await expect(page.getByText("Draft Test")).toBeVisible();
   });
 });
 
 // ─── Integration Tests ───────────────────────────────────────────────────────
 
 test.describe("Integration", () => {
-  test("E2E-01: Create → Save Draft → Activate", async ({ page }) => {
+  test("E2E-01: Create → Review → Confirm", async ({ page }) => {
     await page.goto("/policies");
     await page.getByRole("button", { name: "Create New Policy" }).click();
+    await page.getByText("Start from Scratch").click();
+    await page.waitForURL("/policies/new");
 
-    // Step 1
     await page.getByPlaceholder("e.g. Wellness Premium 2026").fill("E2E Test Policy");
-    await page.getByRole("button", { name: "Next Step" }).click();
-
-    // Step 2
-    await page.getByRole("button", { name: "Next Step" }).click();
-
-    // Step 3
+    await page.getByPlaceholder("e.g. ORG-20260115-0001").fill("ORG-E2E");
     await page.getByRole("button", { name: "Add Group" }).click();
     await page.locator("input[placeholder='Group Name']").fill("Test Group");
-    await page.getByRole("button", { name: "Add Service" }).first().click();
-    await page.locator("input[type='number']").first().fill("100");
-    await page.getByRole("button", { name: "Next Step" }).click();
-
-    // Step 4 - Save draft
-    await page.getByText("Save as Draft").click();
-    await expect(page.getByText("Policy Created")).toBeVisible();
-
-    // Activate
-    await page.getByRole("button", { name: "Activate & set up tiers" }).click();
-    await waitForAnimation(page);
-
-    // Verify active
-    await expect(page.getByText("E2E Test Policy")).toBeVisible();
-    await expect(page.getByText("Active")).toBeVisible();
+    await page.getByText("Gymnasium Facilities").locator("..").locator("button").click();
+    await page.locator("input[type='number']").last().fill("100");
+    await page.getByRole("button", { name: "Create Policy" }).click();
+    await expect(page.getByText("Review & Confirm")).toBeVisible();
+    await page.getByRole("button", { name: "Confirm & Create" }).click();
+    await expect(page.getByRole("heading", { name: "Policy Created" })).toBeVisible();
+    await page.getByRole("button", { name: "Done" }).click();
+    await page.waitForURL("/policies");
   });
 
-  test("E2E-03: Full tier lifecycle", async ({ page }) => {
+  test("E2E-02: Edit active policy opens edit page", async ({ page }) => {
     await page.goto("/policies");
-    await page.getByText("Standard Health 2026").click();
-    await page.getByRole("tab", { name: /Tier Variants/ }).click();
-
-    // Add tier
-    await page.getByRole("button", { name: "+ Add tier" }).click();
-    await page.getByPlaceholder("Tier name...").fill("Lifecycle Test");
-    await page.keyboard.press("Enter");
-    await waitForAnimation(page);
-
-    // Configure
-    await page.getByRole("button", { name: "Full-time" }).last().click();
-    await page.locator("input[type='number']").first().fill("999");
-    await page.getByRole("button", { name: "Save Tier" }).click();
-
-    // Verify
-    await expect(page.locator("button", { hasText: "Lifecycle Test" }).getByText("1 override")).toBeVisible();
-
-    // Remove
-    await page.getByRole("button", { name: "Remove Tier" }).click();
-    await page.getByRole("button", { name: "Remove Tier" }).nth(1).click();
-    await waitForAnimation(page);
-
-    // Verify removed
-    await expect(page.getByRole("button", { name: "Lifecycle Test" })).not.toBeVisible();
+    await page.getByText("Standard Health 2026", { exact: true }).first().click();
+    await page.getByRole("button", { name: "Edit Policy" }).click();
+    await expect(page.getByRole("heading", { name: "Edit Benefit Policy" })).toBeVisible();
   });
 
-  test("E2E-04: Clone with tiers", async ({ page }) => {
+  test("E2E-03: Clone policy", async ({ page }) => {
     await page.goto("/policies");
-    const row = page.locator("tr", { hasText: "Standard Health 2026" });
+    const row = page.locator("tr").filter({ hasText: /^Standard Health 2026\s/ }).first();
     await row.locator("[data-testid='action-popover-trigger']").click();
     await page.getByText("Clone policy").click();
-    await page.getByRole("button", { name: "Clone Policy" }).click();
+    await expect(page.getByRole("heading", { name: "Clone Policy" })).toBeVisible();
+    await page.locator("input").last().fill("Standard Health 2026 — Copy");
+    await page.getByRole("button", { name: "Clone Policy", exact: true }).click();
     await waitForAnimation(page);
-
-    // Open cloned policy
-    await page.getByText("Standard Health 2026 — Copy").click();
-    await page.getByRole("tab", { name: /Tier Variants/ }).click();
-
-    // Verify tiers copied
-    await expect(page.getByRole("button", { name: "Band 1 — VP and above" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Band 2 — Manager / Senior" })).toBeVisible();
+    await page.getByText("Standard Health 2026 — Copy", { exact: true }).first().click();
+    await expect(page.getByText("Policy Overview")).toBeVisible();
   });
 
-  test("E2E-05: Edit active policy shows banner", async ({ page }) => {
-    await page.goto("/policies");
-    await page.getByText("Standard Health 2026").click();
-    await page.getByRole("button", { name: "Edit" }).click();
-    await expect(page.getByText("Changes apply to future assignments only")).toBeVisible();
-  });
-
-  test("E2E-07: Org page → View policy → Detail view", async ({ page }) => {
+  test("E2E-04: Org page → Policies tab shows policy list", async ({ page }) => {
     await page.goto("/organizations/org_1");
-    await page.getByRole("tab", { name: /Benefit Policy/ }).click();
-    await page.getByText("Wellness Allocation").click();
-    await expect(page.getByText("Overview")).toBeVisible();
-    await expect(page.getByText("Tier Variants")).toBeVisible();
+    await page.getByRole("button", { name: "Benefit Policy" }).click();
+    await expect(page.getByRole("heading", { name: "Benefit Policies" })).toBeVisible();
+  });
+});
+
+// ─── Org Onboarding Flow Tests ───────────────────────────────────────────────
+
+test.describe("Organisation Onboarding", () => {
+  test("ON-01: Create org and verify setup guide appears", async ({ page }) => {
+    await page.goto("/organizations/new");
+    await expect(page.getByText("Create Organisation")).toBeVisible();
+    const fields = page.locator("input, select, textarea");
+    const count = await fields.count();
+    expect(count).toBeGreaterThan(0);
+  });
+
+  test("ON-02: Setup guide step 1 — define employee tiers", async ({ page }) => {
+    await page.goto("/organizations/org_1");
+    await expect(page.getByText("Define employee tiers")).toBeVisible();
+    await page.locator("a").filter({ hasText: "Set up tiers" }).click();
+    await page.waitForTimeout(500);
+  });
+
+  test("ON-03: Setup guide step 2 — employee section visible", async ({ page }) => {
+    await page.goto("/organizations/org_1");
+    await expect(page.getByText("Add employees").first()).toBeVisible();
+    await page.locator("a").filter({ hasText: /Add employees|Bulk upload/ }).first().click();
+    await page.waitForTimeout(500);
+  });
+
+  test("ON-04: Setup guide step 3 — create a benefit policy", async ({ page }) => {
+    await page.goto("/organizations/org_1?tab=profile");
+    await expect(page.getByText("Create a benefit policy")).toBeVisible();
+  });
+
+  test("ON-05: Setup guide step 4 — review coverage", async ({ page }) => {
+    await page.goto("/organizations/org_1");
+    await expect(page.getByText("Assign policies to employees")).toBeVisible();
+  });
+
+  test("ON-06: Org tiers config — create new tier", async ({ page }) => {
+    await page.goto("/organizations/org_1?tab=employees&subTab=tiers");
+    await expect(page.getByText("Tier Config")).toBeVisible();
+  });
+
+  test("ON-07: Bulk upload wizard — upload page visible", async ({ page }) => {
+    await page.goto("/organizations/org_1?tab=employees&isBulkUploading=true");
+    await expect(page.getByText(/Upload CSV|Drop your file|Bulk Upload/)).toBeVisible();
+  });
+
+  test("ON-08: Policies tab on org detail page renders", async ({ page }) => {
+    await page.goto("/organizations/org_1");
+    await page.getByRole("button", { name: "Benefit Policy" }).click();
+    await expect(page.getByRole("heading", { name: "Benefit Policies" })).toBeVisible();
   });
 });

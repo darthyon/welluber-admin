@@ -1,17 +1,25 @@
 "use client";
 
-import { Shield, Users, CheckCircle } from "@phosphor-icons/react";
+import { Rows, Shield, Users, CheckCircle } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { Organization } from "@/features/organizations/types";
 
 interface SetupChecklistProps {
   organization: Organization;
   className?: string;
+  failingOnly?: boolean;
 }
 
-export function SetupChecklist({ organization, className }: SetupChecklistProps) {
+export function SetupChecklist({ organization, className, failingOnly = false }: SetupChecklistProps) {
   const hasCoverage = organization.employeeCount > 0 && (organization.employeesWithoutPolicy ?? 1) === 0;
-  const items = [
+  const hasTiers = (organization.tierConfigs?.length ?? 0) > 0;
+  const allItems = [
+    {
+      label: "TIR",
+      isComplete: hasTiers,
+      icon: Rows,
+      tooltip: hasTiers ? "Tiers configured" : "No tiers defined",
+    },
     {
       label: "POL",
       isComplete: organization.policies.length > 0,
@@ -32,6 +40,10 @@ export function SetupChecklist({ organization, className }: SetupChecklistProps)
     },
   ];
 
+  const items = failingOnly ? allItems.filter((i) => !i.isComplete) : allItems;
+
+  if (items.length === 0) return null;
+
   return (
     <div className={cn("flex items-center gap-1.5", className)}>
       {items.map((item) => {
@@ -51,7 +63,7 @@ export function SetupChecklist({ organization, className }: SetupChecklistProps)
             <div
               className={cn(
                 "absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full border-2 border-card",
-                item.isComplete ? "bg-emerald-500" : "bg-rose-500"
+                item.isComplete ? "bg-" + "emerald-500" : "bg-destructive"
               )}
             />
           </div>

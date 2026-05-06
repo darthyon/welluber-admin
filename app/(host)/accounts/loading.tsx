@@ -1,4 +1,4 @@
-export default function WalletsLoading() {
+export default function AccountsLoading() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">

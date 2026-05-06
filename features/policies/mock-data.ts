@@ -1,4 +1,4 @@
-import { BenefitPolicy, BenefitGroup, Benefit, TierVariant } from "@/types/policy";
+import { BenefitPolicy, BenefitGroup, Benefit } from "@/types/policy";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -12,7 +12,6 @@ export interface PolicyListItem extends BenefitPolicy {
 export interface PolicyData {
   groups: BenefitGroup[];
   benefits: Benefit[];
-  tiers: TierVariant[];
 }
 
 // ─── Services ─────────────────────────────────────────────────────────────────
@@ -141,43 +140,7 @@ export const POLICY_DATA_MAP_INITIAL: Record<string, PolicyData> = {
       { id: "b3", groupId: "g2", serviceId: "s3", amount: 300, coPayment: { required: true, type: "Percentage", value: 10 } },
       { id: "b4", groupId: "g3", serviceId: "s5", amount: 100, coPayment: { required: false, type: "Percentage", value: 0 } },
     ],
-    tiers: [
-      {
-        id: "t1",
-        policyId: "1",
-        organizationId: "ORG-20260115-0001",
-        name: "Band 1 — VP and above",
-        status: "complete",
-        eligibleEmploymentTypes: ["full-time"],
-        departmentIds: [],
-        overrides: [
-          { id: "o1", tierId: "t1", benefitId: "b1", amount: 5000 },
-          { id: "o2", tierId: "t1", benefitId: "b3", amount: 1000 },
-        ],
-      },
-      {
-        id: "t2",
-        policyId: "1",
-        organizationId: "ORG-20260115-0001",
-        name: "Band 2 — Manager / Senior",
-        status: "complete",
-        eligibleEmploymentTypes: ["full-time", "part-time"],
-        departmentIds: [],
-        overrides: [
-          { id: "o3", tierId: "t2", benefitId: "b1", amount: 2500 },
-        ],
-      },
-      {
-        id: "t3",
-        policyId: "1",
-        organizationId: "ORG-20260115-0001",
-        name: "Band 3 — Executive / Associate",
-        status: "incomplete",
-        eligibleEmploymentTypes: ["full-time"],
-        departmentIds: [],
-        overrides: [],
-      },
-    ],
+
   },
   "2": {
     groups: [
@@ -188,7 +151,6 @@ export const POLICY_DATA_MAP_INITIAL: Record<string, PolicyData> = {
       { id: "b5", groupId: "g4", serviceId: "s1", amount: 500, coPayment: { required: false, type: "Percentage", value: 0 } },
       { id: "b6", groupId: "g5", serviceId: "s3", amount: 800, coPayment: { required: false, type: "Percentage", value: 0 } },
     ],
-    tiers: [],
   },
   "3": {
     groups: [
@@ -197,7 +159,6 @@ export const POLICY_DATA_MAP_INITIAL: Record<string, PolicyData> = {
     benefits: [
       { id: "b7", groupId: "g6", serviceId: "s1", amount: 50, coPayment: { required: false, type: "Percentage", value: 0 } },
     ],
-    tiers: [],
   },
   "4": {
     groups: [
@@ -211,7 +172,6 @@ export const POLICY_DATA_MAP_INITIAL: Record<string, PolicyData> = {
       { id: "b3-4", groupId: "g2-4", serviceId: "s3", amount: 300, coPayment: { required: true, type: "Percentage", value: 10 } },
       { id: "b4-4", groupId: "g3-4", serviceId: "s5", amount: 100, coPayment: { required: false, type: "Percentage", value: 0 } },
     ],
-    tiers: [],
   },
   "5": {
     groups: [
@@ -225,6 +185,5 @@ export const POLICY_DATA_MAP_INITIAL: Record<string, PolicyData> = {
       { id: "b3-5", groupId: "g2-5", serviceId: "s3", amount: 500, coPayment: { required: true, type: "Percentage", value: 10 } },
       { id: "b4-5", groupId: "g3-5", serviceId: "s5", amount: 100, coPayment: { required: false, type: "Percentage", value: 0 } },
     ],
-    tiers: [],
   },
 };

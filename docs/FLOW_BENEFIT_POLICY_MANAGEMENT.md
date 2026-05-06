@@ -131,64 +131,7 @@
 \
 **9.** SYSTEM: toast "Policy updated" → navigate to Overview tab [NAVIGATE]
 
-***
 
-### F4: Configure tier variants [Phase 4]
-
-**Entry guard:** policy must be active. If draft → show locked state + "Activate to configure tiers".
-
-**4a. Add tier**\
-\
-**1.** HOST: click [+ Add tier] in left nav\
-\
-**2.** SYSTEM: append inline name input in nav list\
-\
-**3.** HOST: type name → Enter to confirm | Escape to cancel\
-\
-**4.** SYSTEM: create TierVariant (status=incomplete) [API][PERSIST]\
-\
-**5.** SYSTEM: auto-select new tier → render Tier panel on right\
-\
-**6.** HOST: set eligibility rules (employment type chips + dept select)\
-\
-**7.** HOST: set benefit overrides in group cards (empty = inherit base)\
-\
-**8.** HOST: click [Save tier]\
-\
-**9.** SYSTEM: persist tier + overrides [API][PERSIST]\
-\
-**10.** SYSTEM: update nav override count [NAVIGATE]\
-\
-**11.** SYSTEM: toast "Tier saved"
-
-**4b. Base panel (read-only)**
-
-- Shows all groups + services + base amounts
-- [Edit base amounts →] links to F3 (Edit policy), not in-panel edit
-
-**4c. Override input behaviour**
-
-- Empty field = inherit → placeholder shows base amount greyed out
-- Value set = override → input shows purple border
-- Override count in nav: null overrides = "inherits all" | N overrides = "N override(s)" | tier has no services = "incomplete" (orange dot)
-
-***
-
-### F5: Remove tier [Phase 4]
-
-**1.** HOST: click [Remove tier] on Tier panel\
-\
-**2.** SYSTEM: AlertDialog "Remove [name]? Employees on this tier revert to base at next assignment refresh."\
-\
-**3.** HOST: confirm\
-\
-**4.** SYSTEM: soft-delete tier + overrides [API][PERSIST]\
-\
-**5.** SYSTEM: nav removes item, panel defaults to Base [NAVIGATE]\
-\
-**6.** SYSTEM: log [AUDIT]
-
-***
 
 ### F6: Clone policy [Phase 3]
 
@@ -200,7 +143,7 @@
 \
 **4.** SYSTEM: validate name unique [VALIDATE]\
 \
-**5.** SYSTEM: deep copy policy + groups + benefits + tiers + overrides, status=draft, cloned_from=original.policy_id [API][PERSIST]\
+**5.** SYSTEM: deep copy policy + groups + benefits, status=draft, cloned_from=original.policy_id [API][PERSIST]\
 \
 **6.** SYSTEM: navigate to new policy SCR-POL-04 [NAVIGATE]\
 \
@@ -393,8 +336,7 @@ All actions log: actor email, timestamp, entity id, action type, diff where appl
 
 | ID    | Question                                                                               | Owner           |
 | ----- | -------------------------------------------------------------------------------------- | --------------- |
-| OQ-01 | HR Org Admin — can they configure tier variants post-v1, or Host-only at launch?       | Product         |
+| OQ-01 | HR Org Admin — can they create sub-policies post-v1, or Host-only at launch? [resolved: sub-policies are Host-only]       | Product         |
 | OQ-02 | Service removed from active policy — existing Active vouchers honoured or invalidated? | Product + Legal |
-| OQ-03 | Tier sort order in nav = display order in HR assignment wizard? Confirm.               | Design          |
+| OQ-03 | Sub-policy sort order in assignment wizard? Confirm.                                   | Design          |
 | OQ-04 | max_usage_per_cycle — hard cap (block claim) or soft cap (warn only)?                  | Engineering     |
-| OQ-05 | [Phase 2] Dependent benefit config — policy level or tier level?                       | Product         |

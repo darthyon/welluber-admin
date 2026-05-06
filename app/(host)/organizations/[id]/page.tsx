@@ -31,6 +31,7 @@ import {
   SealCheck,
   MapPin,
   Ticket,
+  Rows,
 } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { Breadcrumbs } from "@/components/shared/breadcrumbs"
@@ -59,10 +60,11 @@ import { EmployeeDetailView } from "@/components/host/organizations/employee-det
 import { BulkUploadWizard } from "@/components/host/organizations/bulk-upload-wizard"
 import { AssignedPolicyList } from "@/components/host/organizations/assigned-policy-list"
 import { OrgSetupGuide } from "@/components/host/organizations/org-setup-guide"
+import { OrgTiersConfig } from "@/components/host/organizations/org-tiers-config"
 import { LinkPolicyModal } from "@/components/host/organizations/link-policy-modal"
 import { BenefitPolicyWizard } from "@/components/host/policies/benefit-policy-wizard"
 import { PolicyDetailView } from "@/components/host/policies/policy-detail-view"
-import { BenefitPolicy, TierVariant } from "@/types/policy"
+import { BenefitPolicy } from "@/types/policy"
 import type { FlatClaimRow } from "@/types/claims"
 import { DetailSection } from "@/components/shared/detail-section"
 import { DetailField } from "@/components/shared/detail-field"
@@ -85,6 +87,8 @@ import {
   suspendOrganization,
 } from "@/features/organizations/actions"
 import { OrganizationStatus } from "@/features/organizations/types"
+import { MOCK_ORGS } from "@/features/organizations/mock-data"
+import { MOCK_EMPLOYEES } from "@/components/host/employees/employee-directory-table"
 import { UtilizationChart } from "@/components/host/organizations/utilization-chart"
 import { EntityAvatar } from "@/components/shared/entity-avatar"
 
@@ -323,33 +327,7 @@ function OrganizationDetailContent() {
       coPayment: { required: false, type: "Percentage" as const, value: 0 },
     },
   ])
-  const [mockTiers] = useState<TierVariant[]>([
-    {
-      id: "t1",
-      organizationId: "org-123",
-      policyId: "pol_1",
-      name: "Band 1 — VP and above",
-      status: "complete",
-      eligibleEmploymentTypes: ["full-time"],
-      departmentIds: [],
-      overrides: [
-        { id: "o1", tierId: "t1", benefitId: "b1", amount: 5000 },
-        { id: "o2", tierId: "t1", benefitId: "b2", amount: 1000 },
-      ],
-    },
-    {
-      id: "t2",
-      organizationId: "org-123",
-      policyId: "pol_1",
-      name: "Band 2 — Manager / Senior",
-      status: "complete",
-      eligibleEmploymentTypes: ["full-time", "part-time"],
-      departmentIds: [],
-      overrides: [
-        { id: "o3", tierId: "t2", benefitId: "b1", amount: 2500 },
-      ],
-    },
-  ])
+
 
   const handleLinkPolicy = (policyId: string) => {
     // Mock linking logic
@@ -441,16 +419,14 @@ function OrganizationDetailContent() {
     },
   } as const
 
-  const orgName =
-    orgId === "org_2" ? "Global Tech Solutions" : "Acme Corporation Sdn Bhd"
+  const mockOrg = MOCK_ORGS.find((o) => o.id === orgId)
+  const orgName = mockOrg?.name ?? orgId
+  const orgTierConfigs = mockOrg?.tierConfigs ?? []
 
   const orgForSetup = {
+    ...(mockOrg ?? {}),
     id: orgId,
-    name: orgName,
     policies: assignedPolicies.map((p) => p.name),
-    employeeCount: 0,
-    employeesWithoutPolicy: 0,
-    picId: null,
   } as import("@/features/organizations/types").Organization
 
   return (
@@ -832,7 +808,7 @@ function OrganizationDetailContent() {
                 <div className="flex items-center justify-between">
                   <div>
                     <h2 className="text-heading font-semibold text-foreground">Branches</h2>
-                    <p className="text-body text-subtle">Manage geographical locations and their specific wallet configurations</p>
+                    <p className="text-body text-subtle">Manage geographical locations and their specific account configurations</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <Button
@@ -899,7 +875,7 @@ function OrganizationDetailContent() {
                           name: "ACME HQ (Kuala Lumpur)",
                           type: "HQ",
                           walletModel: "New",
-                          walletName: "KL HQ Wallet",
+                          walletName: "KL HQ Account",
                           address: {
                             city: "Kuala Lumpur",
                             state: "Wilayah Persekutuan",
@@ -920,7 +896,7 @@ function OrganizationDetailContent() {
                           name: "ACME Subang Jaya",
                           type: "Branch Office",
                           walletModel: "Existing",
-                          walletName: "Acme Shared Wallet",
+                          walletName: "Acme Shared Account",
                           address: { city: "Subang Jaya", state: "Selangor" },
                           employeesCount: 450,
                           status: "Active",
@@ -979,7 +955,7 @@ function OrganizationDetailContent() {
                           ),
                         },
                         {
-                          header: "Wallet",
+                          header: "Account",
                           accessorKey: "walletModel",
                           sortable: true,
                           headerClassName: "min-w-[150px]",
@@ -1088,6 +1064,11 @@ function OrganizationDetailContent() {
               <BulkUploadWizard
                 onBack={() => setIsBulkUploading(null)}
                 onSuccess={() => setIsBulkUploading(null)}
+                orgTierConfigs={orgTierConfigs}
+                availablePolicies={assignedPolicies.map(p => ({
+                  name: p.name,
+                  tiers: orgTierConfigs.map(tc => tc.code || tc.name),
+                }))}
               />
             ) : (
               <div className="flex flex-col gap-8 lg:flex-row">
@@ -1886,6 +1867,12 @@ function OrganizationDetailContent() {
                       <UtilisationClaimsTable data={ORG_MOCK_UTILISATION} />
                     </div>
                   )}
+
+                  {activeEmployeeSubTab === "tiers" && (
+                    <div className="animate-in fade-in duration-300">
+                      <OrgTiersConfig orgId={orgId} initial={orgTierConfigs} />
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -1905,7 +1892,7 @@ function OrganizationDetailContent() {
                     (g) => g.id === b.groupId && g.policyId === viewingPolicyId
                   )
                 )}
-                tiers={mockTiers.filter((t) => t.policyId === viewingPolicyId)}
+                employees={MOCK_EMPLOYEES}
                 onEdit={() => setEditingPolicyId(viewingPolicyId)}
                 onClone={() => {
                   const p = assignedPolicies.find((p) => p.id === viewingPolicyId)
@@ -2489,6 +2476,7 @@ const EMPLOYEE_SUB_TABS = [
   { id: "dependents", label: "Dependent Directory", icon: IdentificationCard },
   { id: "entitlements", label: "Entitlements", icon: Scroll },
   { id: "claims", label: "Claims", icon: SealCheck },
+  { id: "tiers", label: "Tier Config", icon: Rows },
 ] as const
 
 const MOCK_DEPENDENTS = [

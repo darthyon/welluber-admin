@@ -136,6 +136,9 @@ export default function VoucherPackagesPage() {
               `/service-providers/${voucher.spId}?voucherView=form&voucherId=${voucher.id}&voucherReadOnly=false`
             )
           }
+          onViewGenerated={(voucher) =>
+            router.push(`/voucher-packages/${voucher.id}/vouchers`)
+          }
         />
       )}
     </div>

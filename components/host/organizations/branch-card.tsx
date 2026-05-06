@@ -79,10 +79,10 @@ export function BranchCard({ branch, onView, onEdit }: BranchCardProps) {
       <div className="mt-auto space-y-4 pt-6 relative z-10">
         <div className="flex items-center justify-between border-t border-border/40 pt-4">
           <div className="flex flex-col gap-1">
-            <span className="text-label font-semibold text-faint">Wallet</span>
+            <span className="text-label font-semibold text-faint">Account</span>
             <div className="flex items-center gap-1.5 text-label font-semibold text-foreground">
               <Wallet size={14} weight="bold" className="text-primary" />
-              <span className="truncate max-w-[120px]">{branch.walletName || "Unnamed Wallet"}</span>
+              <span className="truncate max-w-[120px]">{branch.walletName || "Unnamed Account"}</span>
               <span className="px-1 py-0 rounded bg-muted border border-border text-label font-medium text-muted-foreground">
                 {walletLabel}
               </span>

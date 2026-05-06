@@ -1,6 +1,6 @@
 "use client"
 
-import { WarningCircle } from "@phosphor-icons/react"
+
 import { SharedDataTable } from "@/components/shared/data-table"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { ActionPopover } from "@/components/shared/action-popover"
@@ -221,10 +221,7 @@ export function EmployeeDirectoryTable({
                     )}
                   </>
                 ) : (
-                  <span className="inline-flex items-center gap-1 text-label font-medium text-amber-600 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full">
-                    <WarningCircle size={12} weight="fill" />
-                    No policy
-                  </span>
+                  <StatusBadge status="No Policy" variant="amber" />
                 )}
               </div>
             ),

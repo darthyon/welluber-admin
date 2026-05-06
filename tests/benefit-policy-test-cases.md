@@ -43,52 +43,7 @@
 | DV-12 | Click "Deactivate" on active policy | Triggers deactivate callback |
 | DV-13 | Click "Delete" on draft policy | Triggers delete callback |
 
----
 
-### Tier Variants Tab (`tier-variants-tab.tsx`)
-
-#### Base Panel
-
-| ID | Test | Expected |
-|---|---|---|
-| TV-01 | Select "Base" in nav | Base panel shows all groups and services with base amounts |
-| TV-02 | Base panel: group with SharedAmount | Shows "Shared Pool" label and max usage |
-| TV-03 | Base panel: group with IndividualBenefitAmount | Shows "Individual" label |
-| TV-04 | Draft policy Base panel | Shows amber info banner "Activate this policy to configure tier variants" |
-
-#### TierNav
-
-| ID | Test | Expected |
-|---|---|---|
-| TV-05 | Render nav with tiers | Shows Base + 3 tiers (Band 1, Band 2, Band 3) |
-| TV-06 | Active tier styling | Selected tier has purple bg tint + purple left border |
-| TV-07 | Incomplete tier shows orange dot | Band 3 shows orange dot, subtitle "incomplete" |
-| TV-08 | Complete tier shows override count | Band 1 shows "2 overrides" |
-| TV-09 | Tier with 0 overrides shows "inherits all" | Band 2 (if cleared) shows "inherits all" |
-| TV-10 | Click "+ Add tier" | Inline name input appears, button hidden |
-| TV-11 | Inline add: type name + Enter | New tier created, auto-selected, input cleared |
-| TV-12 | Inline add: press Escape | Input cancelled, "+ Add tier" button reappears |
-| TV-13 | Inline add: empty name + Enter | Nothing happens (name required) |
-| TV-14 | Draft policy: "+ Add tier" disabled | Button shows tooltip "Activate this policy..." |
-
-#### Tier Panel
-
-| ID | Test | Expected |
-|---|---|---|
-| TV-15 | Select Band 1 tier | Shows eligibility chips + 2 override inputs |
-| TV-16 | Toggle employment type chip | Chip toggles selected/unselected state |
-| TV-17 | Employment type not in policy eligible types | Chip disabled with tooltip |
-| TV-18 | Toggle department chip | Chip toggles selected/unselected |
-| TV-19 | Override input empty | Placeholder shows base amount in muted color, border default |
-| TV-20 | Override input with value | Border turns purple, value shown |
-| TV-21 | Click clear override (×) | Input empties, border reverts, override removed |
-| TV-22 | Override amount ≤ 0 | Not accepted (or shows validation) |
-| TV-23 | Click "Save tier" with valid data | Status updates to "complete", nav subtitle updates |
-| TV-24 | Click "Save tier" with 0 employment types | Shows validation error "Select at least one employment type" |
-| TV-25 | Click "Save tier" with invalid employment type | Shows validation error "[type] is not eligible for this policy" |
-| TV-26 | Click "Remove tier" | AlertDialog appears with tier name |
-| TV-27 | Confirm remove tier | Tier removed from nav, panel defaults to Base |
-| TV-28 | Cancel remove tier | Dialog closes, tier remains |
 
 ---
 

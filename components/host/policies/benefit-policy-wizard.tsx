@@ -1583,7 +1583,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                   onClick={handleActivateFromModal}
                   className="w-full h-12 rounded-lg font-semibold shadow-lg shadow-primary/20"
                 >
-                  Activate & set up tiers →
+                  Activate policy →
                 </Button>
                 <Button
                   variant="ghost"

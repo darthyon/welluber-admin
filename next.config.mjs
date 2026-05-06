@@ -7,6 +7,7 @@ const __dirname = path.dirname(__filename);
 
 const nextConfig = {
   serverExternalPackages: ['lightningcss'],
+  turbopack: {},
   webpack: (config) => {
     config.watchOptions = {
       ...config.watchOptions,

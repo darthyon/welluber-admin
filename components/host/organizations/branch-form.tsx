@@ -204,7 +204,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
 
           {/* Financial Setup moved below Location Mapping */}
           <DetailSection
-            title="Wallet Configuration"
+            title="Account Configuration"
             icon={<Wallet size={18} weight="duotone" />}
             description="Define how this branch is funded"
           >
@@ -212,7 +212,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
             <div className="mb-4 flex items-center gap-3 px-3 py-2 rounded-lg border border-border/60 bg-muted/20 text-body text-subtle">
               <Info size={16} className="text-primary shrink-0" />
               <span className="font-medium">
-                Organization limits: Wallet RM {ORG_LIMITS.walletLimit.toLocaleString()} · Credit RM {ORG_LIMITS.creditLimit.toLocaleString()}
+                Organization limits: Account RM {ORG_LIMITS.walletLimit.toLocaleString()} · Credit RM {ORG_LIMITS.creditLimit.toLocaleString()}
               </span>
               <TooltipProvider>
                 <Tooltip>
@@ -220,7 +220,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
                     <Info size={14} className="text-faint cursor-help ml-auto" />
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p className="text-body max-w-[220px]">Wallet limit is the max prepaid funds. Credit limit is the max overdraft before hard block.</p>
+                    <p className="text-body max-w-[220px]">Account limit is the max prepaid funds. Credit limit is the max overdraft before hard block.</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -228,15 +228,15 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
 
             <div className="grid grid-cols-1 gap-4 p-1">
               <ChoiceCard
-                title="New Wallet"
-                description="Create a dedicated standalone wallet for this branch. Funds are isolated."
+                title="New Account"
+                description="Create a dedicated standalone account for this branch. Funds are isolated."
                 selected={walletType === "new"}
                 onSelect={() => setWalletType("new")}
                 icon={Wallet}
               />
               <ChoiceCard
-                title="Existing Wallet"
-                description="Link this branch to an existing wallet (e.g. Shared with HQ or another cluster)."
+                title="Existing Account"
+                description="Link this branch to an existing account (e.g. Shared with HQ or another cluster)."
                 selected={walletType === "existing"}
                 onSelect={() => setWalletType("existing")}
                 icon={IdentificationCard}
@@ -247,11 +247,11 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
               {walletType === "new" ? (
                 <div className="space-y-5 animate-in fade-in slide-in-from-top-2 duration-300">
                   <div className="space-y-1.5">
-                    <label className="text-body font-medium text-foreground">Wallet Name</label>
+                    <label className="text-body font-medium text-foreground">Account Name</label>
                     <input
                       value={walletName}
                       onChange={(e) => setWalletName(e.target.value)}
-                      placeholder="e.g. PJ Ops Wallet"
+                      placeholder="e.g. PJ Ops Account"
                       className="w-full px-3 py-2.5 bg-card border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-semibold text-foreground hover:border-border/80"
                     />
                   </div>
@@ -264,7 +264,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
                       placeholder="0.00"
                       className="w-full px-3 py-2.5 bg-card border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-semibold text-foreground hover:border-border/80"
                     />
-                    <p className="text-label text-faint font-medium">Top-up amount to seed this wallet.</p>
+                    <p className="text-label text-faint font-medium">Top-up amount to seed this account.</p>
                   </div>
 
                   {/* Attachment upload */}
@@ -306,13 +306,13 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
                 </div>
               ) : (
                 <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <label className="text-body font-medium text-foreground">Bridge to Existing Wallet</label>
+                  <label className="text-body font-medium text-foreground">Bridge to Existing Account</label>
                   <select
                     value={existingWalletId}
                     onChange={(e) => setExistingWalletId(e.target.value)}
                     className="w-full px-3 py-2.5 bg-card border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-semibold text-foreground hover:border-border/80 cursor-pointer"
                   >
-                    <option value="">Select a wallet...</option>
+                    <option value="">Select an account...</option>
                     {EXISTING_WALLETS.map((w) => (
                       <option key={w.id} value={w.id}>
                         {w.name} — RM {w.balance.toLocaleString()} MYR

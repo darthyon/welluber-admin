@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -16,17 +16,14 @@ import {
   Users,
   ClockCounterClockwise,
   NotePencil,
-  Copy,
-  XCircle,
-  Trash,
-  ShieldCheck,
-  CheckCircle,
-  Warning,
   Plus,
+  ArrowsDownUp,
+  CaretRight,
+  Target,
 } from "@phosphor-icons/react";
-import { BenefitPolicy, BenefitGroup, Benefit, TierVariant } from "@/types/policy";
-import { TierVariantsTab } from "./tier-variants-tab";
+import { BenefitPolicy, BenefitGroup, Benefit } from "@/types/policy";
 import { type PolicyListItem } from "@/features/policies/mock-data";
+import type { EmployeeDirectoryItem } from "@/components/host/employees/employee-directory-table";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -34,9 +31,10 @@ interface PolicyDetailViewProps {
   policy: BenefitPolicy;
   groups: BenefitGroup[];
   benefits: Benefit[];
-  tiers: TierVariant[];
   subPolicies?: PolicyListItem[];
+  subPolicyOverrideCounts?: Record<string, number>;
   parentPolicyName?: string;
+  employees?: EmployeeDirectoryItem[];
   onEdit: () => void;
   onClone: () => void;
   onDeactivate: () => void;
@@ -47,7 +45,6 @@ interface PolicyDetailViewProps {
 
 const TABS = [
   { id: "overview", label: "Overview", icon: IdentificationCard },
-  { id: "tiers", label: "Tier Variants", icon: Users },
   { id: "sub-policies", label: "Sub-Policies", icon: TreeStructure },
   { id: "employees", label: "Assigned Employees", icon: Buildings },
   { id: "audit", label: "Audit Log", icon: ClockCounterClockwise },
@@ -74,9 +71,10 @@ export function PolicyDetailView({
   policy,
   groups,
   benefits,
-  tiers,
   subPolicies = [],
+  subPolicyOverrideCounts = {},
   parentPolicyName,
+  employees,
   onEdit,
   onClone,
   onDeactivate,
@@ -192,24 +190,17 @@ export function PolicyDetailView({
             {activeTab === "overview" && (
               <OverviewTab policy={policy} groups={groups} benefits={benefits} onEdit={onEdit} />
             )}
-            {activeTab === "tiers" && (
-              <TierVariantsTab
-                policy={policy}
-                groups={groups}
-                benefits={benefits}
-                tiers={tiers}
-              />
-            )}
             {activeTab === "sub-policies" && (
               <SubPoliciesTab
                 policy={policy}
                 subPolicies={subPolicies}
+                overrideCounts={subPolicyOverrideCounts}
                 onCreateSubPolicy={() => router.push(`/policies/${policy.id}/sub-policy/new`)}
                 onViewSubPolicy={(id) => router.push(`/policies?policyId=${id}&mode=view&wizard=open`)}
               />
             )}
             {activeTab === "employees" && (
-              <AssignedEmployeesTab policy={policy} />
+              <AssignedEmployeesTab policy={policy} employees={employees} />
             )}
             {activeTab === "audit" && (
               <AuditLogTab />
@@ -226,34 +217,63 @@ export function PolicyDetailView({
 function SubPoliciesTab({
   policy,
   subPolicies,
+  overrideCounts = {},
   onCreateSubPolicy,
   onViewSubPolicy,
 }: {
   policy: BenefitPolicy;
   subPolicies: PolicyListItem[];
+  overrideCounts: Record<string, number>;
   onCreateSubPolicy: () => void;
   onViewSubPolicy: (id: string) => void;
 }) {
   const canCreateSubPolicy = policy.status === "active" && !policy.parentPolicyId;
 
+  const totalCovered = useMemo(
+    () => subPolicies.reduce((sum, sp) => sum + (sp.targetEmployeeIds?.length ?? 0), 0),
+    [subPolicies]
+  );
+
+  const totalOverrides = useMemo(
+    () => subPolicies.reduce((sum, sp) => sum + (overrideCounts[sp.id] ?? 0), 0),
+    [subPolicies, overrideCounts]
+  );
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-heading font-semibold text-foreground">Sub-Policies</h3>
+          <h3 className="text-heading font-semibold text-foreground">
+            {subPolicies.length > 0 ? `Sub-Policies (${subPolicies.length})` : "Sub-Policies"}
+          </h3>
           <p className="text-body text-muted-foreground mt-1">
-            {subPolicies.length > 0
-              ? `${subPolicies.length} sub-polic${subPolicies.length === 1 ? "y" : "ies"} derived from this policy`
-              : "Override benefit amounts for specific employee groups"}
+            Override benefit amounts for specific employee groups and individuals.
           </p>
         </div>
         {canCreateSubPolicy && (
-          <Button variant="secondary" size="sm" onClick={onCreateSubPolicy} className="flex h-8 items-center gap-2 text-label font-medium">
-            <Plus size={14} weight="bold" />
+          <Button onClick={onCreateSubPolicy} className="h-9 px-5 rounded-full text-body font-medium shadow-sm">
+            <Plus size={15} weight="bold" className="mr-1.5" />
             Create Sub-Policy
           </Button>
         )}
       </div>
+
+      {subPolicies.length > 0 && (
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-lg border border-border bg-card">
+            <Users size={16} className="text-primary" weight="duotone" />
+            <span className="text-body font-medium text-foreground">
+              {totalCovered} employee{totalCovered !== 1 ? "s" : ""} covered
+            </span>
+          </div>
+          <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-lg border border-border bg-card">
+            <ArrowsDownUp size={16} className="text-primary" weight="duotone" />
+            <span className="text-body font-medium text-foreground">
+              {totalOverrides} override{totalOverrides !== 1 ? "s" : ""} across {subPolicies.length} sub-polic{subPolicies.length !== 1 ? "ies" : "y"}
+            </span>
+          </div>
+        </div>
+      )}
 
       {subPolicies.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 bg-muted/10 rounded-lg border border-dashed border-border/60 text-center">
@@ -261,68 +281,75 @@ function SubPoliciesTab({
             <TreeStructure size={28} weight="duotone" />
           </div>
           <p className="text-body font-semibold text-foreground">No sub-policies yet</p>
-          <p className="text-label text-faint mt-1 max-w-xs">
-            Create a sub-policy to override benefit amounts for a specific employee group or individual.
+          <p className="text-label text-faint mt-1 max-w-sm">
+            Create a sub-policy to tailor benefit amounts for a specific tier, department, or individual employee without changing the base policy.
           </p>
           {canCreateSubPolicy && (
-            <Button onClick={onCreateSubPolicy} size="sm" className="mt-5 text-label font-medium">
+            <Button onClick={onCreateSubPolicy} size="sm" className="mt-6 text-label font-medium">
               <Plus size={14} weight="bold" className="mr-1.5" />
               Create Sub-Policy
             </Button>
           )}
+          {!canCreateSubPolicy && policy.parentPolicyId && (
+            <p className="text-label text-faint mt-4 italic">
+              Sub-policies can only be created from parent policies.
+            </p>
+          )}
         </div>
       ) : (
-        <div className="rounded-lg border border-border bg-card overflow-hidden">
-          <div className="px-5 py-3 border-b border-border bg-muted/30">
-            <div className="grid grid-cols-12 text-label font-semibold text-muted-foreground">
-              <span className="col-span-4">Sub-Policy</span>
-              <span className="col-span-2">Status</span>
-              <span className="col-span-2 text-center">Pinned</span>
-              <span className="col-span-2 text-center">Overrides</span>
-              <span className="col-span-2 text-right">Actions</span>
-            </div>
-          </div>
-          <div className="divide-y divide-border/50">
-            {subPolicies.map(sub => {
-              const overrideCount = 1; // placeholder — real diff requires comparing benefits
-              const pinnedCount = sub.targetEmployeeIds?.length ?? 0;
-              return (
-                <div key={sub.id} className="grid grid-cols-12 items-center px-5 py-4 hover:bg-muted/20 transition-colors">
-                  <div className="col-span-4">
-                    <p className="text-body font-semibold text-foreground">{sub.name}</p>
-                    <p className="text-label font-mono text-faint mt-0.5">{sub.code}</p>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          {subPolicies.map(sub => {
+            const pinnedCount = sub.targetEmployeeIds?.length ?? 0;
+            const oc = overrideCounts[sub.id] ?? 0;
+
+            return (
+              <button
+                key={sub.id}
+                onClick={() => onViewSubPolicy(sub.id)}
+                className="group relative text-left rounded-xl border border-border bg-card p-5 transition-all hover:border-primary/30 hover:shadow-sm hover:bg-muted/10"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <h4 className="text-body font-semibold text-foreground truncate">{sub.name}</h4>
+                      <StatusBadge
+                        status={sub.status}
+                        variant={sub.status === "active" ? "emerald" : sub.status === "draft" ? "amber" : "rose"}
+                        dot
+                      />
+                    </div>
+                    {sub.code && (
+                      <p className="text-label font-mono text-faint mt-1">{sub.code}</p>
+                    )}
+                    {sub.description && (
+                      <p className="text-label text-muted-foreground mt-2 line-clamp-2">{sub.description}</p>
+                    )}
                   </div>
-                  <div className="col-span-2">
-                    <StatusBadge
-                      status={sub.status}
-                      variant={sub.status === "active" ? "emerald" : sub.status === "draft" ? "amber" : "rose"}
-                      dot
-                    />
-                  </div>
-                  <div className="col-span-2 text-center">
-                    <span className="px-2 py-0.5 rounded-full bg-violet-50 dark:bg-violet-500/10 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-500/20 text-label font-medium">
-                      {pinnedCount} emp{pinnedCount !== 1 ? "s" : ""}
-                    </span>
-                  </div>
-                  <div className="col-span-2 text-center">
-                    <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-label font-medium">
-                      {overrideCount} override{overrideCount !== 1 ? "s" : ""}
-                    </span>
-                  </div>
-                  <div className="col-span-2 text-right">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 px-2 text-label text-primary hover:bg-primary/5"
-                      onClick={() => onViewSubPolicy(sub.id)}
-                    >
-                      View
-                    </Button>
-                  </div>
+                  <CaretRight size={16} className="text-faint group-hover:text-primary transition-colors shrink-0 mt-2" weight="bold" />
                 </div>
-              );
-            })}
-          </div>
+
+                <div className="flex items-center gap-3 mt-4 pt-3 border-t border-border/40">
+                  <div className="flex items-center gap-1.5">
+                    <Target size={12} className="text-faint" weight="bold" />
+                    <span className="text-label text-subtle font-medium">
+                      {pinnedCount > 0
+                        ? `${pinnedCount} pinned employee${pinnedCount !== 1 ? "s" : ""}`
+                        : "Policy-wide"}
+                    </span>
+                  </div>
+                  {oc > 0 && (
+                    <>
+                      <span className="text-faint text-label">·</span>
+                      <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-label font-medium">
+                        <ArrowsDownUp size={10} weight="bold" />
+                        {oc} override{oc !== 1 ? "s" : ""}
+                      </span>
+                    </>
+                  )}
+                </div>
+              </button>
+            );
+          })}
         </div>
       )}
     </div>
@@ -545,19 +572,8 @@ function OverviewTab({
 
 // ─── Assigned Employees Tab ──────────────────────────────────────────────────
 
-const MOCK_EMPLOYEES = [
-  { id: "emp_1", name: "Ahmad bin Ismail", empCode: "ACM-001", department: "Engineering", tier: "Band 2", status: "active", joinDate: "15 Jan 2023" },
-  { id: "emp_2", name: "Sarah Tan", empCode: "ACM-042", department: "Product", tier: "Band 1", status: "active", joinDate: "03 Mar 2022" },
-  { id: "emp_3", name: "Rajesh Kumar", empCode: "ACM-156", department: "Design", tier: "Band 3", status: "on-leave", joinDate: "20 Jun 2023" },
-  { id: "emp_4", name: "Lim Wei Ling", empCode: "ACM-089", department: "Marketing", tier: "Band 2", status: "active", joinDate: "12 Sep 2021" },
-];
-
-function AssignedEmployeesTab({ policy }: { policy: BenefitPolicy }) {
-  const eligibleTypes = policy.eligibleEmploymentTypes;
-  const filteredEmployees = MOCK_EMPLOYEES.filter((e) => {
-    // In reality this would check eligibility rules
-    return true;
-  });
+function AssignedEmployeesTab({ policy, employees }: { policy: BenefitPolicy; employees?: EmployeeDirectoryItem[] }) {
+  const employeeList = employees ?? [];
 
   return (
     <div className="space-y-6">
@@ -565,55 +581,65 @@ function AssignedEmployeesTab({ policy }: { policy: BenefitPolicy }) {
         <div>
           <h3 className="text-heading font-semibold text-foreground">Assigned Employees</h3>
           <p className="text-body text-muted-foreground mt-1">
-            {filteredEmployees.length} employee{filteredEmployees.length !== 1 ? "s" : ""} matched by policy criteria.
+            {employeeList.length} employee{employeeList.length !== 1 ? "s" : ""} currently assigned.
           </p>
         </div>
       </div>
 
-      <div className="rounded-lg border border-border bg-card overflow-hidden">
-        <div className="px-4 py-3 border-b border-border bg-muted/30">
-          <div className="grid grid-cols-12 text-label font-semibold text-muted-foreground">
-            <span className="col-span-3">Employee</span>
-            <span className="col-span-2">Department</span>
-            <span className="col-span-2">Tier</span>
-            <span className="col-span-2">Join Date</span>
-            <span className="col-span-2">Status</span>
-            <span className="col-span-1 text-right">Actions</span>
+      {employeeList.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20 bg-muted/10 rounded-lg border border-dashed border-border/60 text-center">
+          <Users size={36} weight="duotone" className="text-faint mb-3" />
+          <p className="text-body font-medium text-muted-foreground">No assigned employees</p>
+          <p className="text-label text-faint mt-1 max-w-xs">
+            Employees matching the policy eligibility criteria will appear here once assigned.
+          </p>
+        </div>
+      ) : (
+        <div className="rounded-lg border border-border bg-card overflow-hidden">
+          <div className="px-4 py-3 border-b border-border bg-muted/30">
+            <div className="grid grid-cols-12 text-label font-semibold text-muted-foreground">
+              <span className="col-span-3">Employee</span>
+              <span className="col-span-2">Department</span>
+              <span className="col-span-2">Tier</span>
+              <span className="col-span-2">Join Date</span>
+              <span className="col-span-2">Status</span>
+              <span className="col-span-1 text-right">Actions</span>
+            </div>
+          </div>
+          <div className="divide-y divide-border/50">
+            {employeeList.map((emp) => (
+              <div key={emp.id} className="grid grid-cols-12 items-center px-4 py-3 hover:bg-muted/20 transition-colors">
+                <div className="col-span-3">
+                  <p className="text-body font-semibold text-foreground">{emp.name}</p>
+                  <p className="text-label text-faint font-mono">{emp.empCode}</p>
+                </div>
+                <div className="col-span-2">
+                  <span className="text-body text-subtle">{emp.department}</span>
+                </div>
+                <div className="col-span-2">
+                  <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-label font-medium">
+                    {emp.tier}
+                  </span>
+                </div>
+                <div className="col-span-2">
+                  <span className="text-body text-subtle">{emp.joinDate}</span>
+                </div>
+                <div className="col-span-2">
+                  <StatusBadge
+                    status={emp.status === "active" ? "Active" : emp.status === "on-leave" ? "On Leave" : "Inactive"}
+                    variant={emp.status === "active" ? "emerald" : emp.status === "on-leave" ? "amber" : "zinc"}
+                  />
+                </div>
+                <div className="col-span-1 text-right">
+                  <Button variant="ghost" size="sm" className="h-7 px-2 text-label text-primary hover:bg-primary/5">
+                    View
+                  </Button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-        <div className="divide-y divide-border/50">
-          {filteredEmployees.map((emp) => (
-            <div key={emp.id} className="grid grid-cols-12 items-center px-4 py-3 hover:bg-muted/20 transition-colors">
-              <div className="col-span-3">
-                <p className="text-body font-semibold text-foreground">{emp.name}</p>
-                <p className="text-label text-faint font-mono">{emp.empCode}</p>
-              </div>
-              <div className="col-span-2">
-                <span className="text-body text-subtle">{emp.department}</span>
-              </div>
-              <div className="col-span-2">
-                <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-label font-medium">
-                  {emp.tier}
-                </span>
-              </div>
-              <div className="col-span-2">
-                <span className="text-body text-subtle">{emp.joinDate}</span>
-              </div>
-              <div className="col-span-2">
-                <StatusBadge
-                  status={emp.status === "active" ? "Active" : emp.status === "on-leave" ? "On Leave" : "Inactive"}
-                  variant={emp.status === "active" ? "emerald" : emp.status === "on-leave" ? "amber" : "zinc"}
-                />
-              </div>
-              <div className="col-span-1 text-right">
-                <Button variant="ghost" size="sm" className="h-7 px-2 text-label text-primary hover:bg-primary/5">
-                  View
-                </Button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      )}
     </div>
   );
 }

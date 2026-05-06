@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { CaretLeft, TreeStructure } from "@phosphor-icons/react";
 import { SubPolicyWizard } from "@/components/host/policies/sub-policy-wizard";
 import { INITIAL_POLICIES, POLICY_DATA_MAP_INITIAL } from "@/features/policies/mock-data";
+import { MOCK_ORGS } from "@/features/organizations/mock-data";
+import { MOCK_EMPLOYEES } from "@/components/host/employees/employee-directory-table";
 
 export default function NewSubPolicyPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -27,6 +29,10 @@ export default function NewSubPolicyPage({ params }: { params: { id: string } })
     );
   }
 
+  const org = MOCK_ORGS.find(o => o.id === parent.organizationId);
+  const orgEmployees = MOCK_EMPLOYEES.filter(e => e.orgId === parent.organizationId);
+  const orgTierConfigs = org?.tierConfigs ?? [];
+
   return (
     <div className="pb-24 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Header */}
@@ -48,6 +54,7 @@ export default function NewSubPolicyPage({ params }: { params: { id: string } })
             <p className="text-body text-muted-foreground mt-0.5 font-normal">
               Derived from{" "}
               <span className="font-semibold text-foreground">{parent.name}</span>
+              {org && <span> · {org.name}</span>}
             </p>
           </div>
         </div>
@@ -57,6 +64,8 @@ export default function NewSubPolicyPage({ params }: { params: { id: string } })
         parentPolicy={parent}
         parentGroups={parentData.groups}
         parentBenefits={parentData.benefits}
+        employees={orgEmployees}
+        orgTierConfigs={orgTierConfigs}
         onSuccess={() =>
           router.push(`/policies?policyId=${parentId}&mode=view&wizard=open`)
         }

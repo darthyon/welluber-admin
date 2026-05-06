@@ -33,7 +33,7 @@ export function BranchSheet({ isOpen, onClose, branchName }: BranchSheetProps) {
               {branchName || "Add New Branch"}
             </h2>
             <p className="text-body text-subtle mt-0.5">
-              Configure branch details, PICs, and wallet.
+              Configure branch details, PICs, and account.
             </p>
           </div>
           <button 
@@ -94,20 +94,20 @@ export function BranchSheet({ isOpen, onClose, branchName }: BranchSheetProps) {
               </div>
             </section>
 
-            {/* Wallet Section */}
+            {/* Account Section */}
             <section className="space-y-4">
               <div className="flex items-center gap-2 pb-2 border-b border-border">
                 <Wallet size={16} className="text-muted-foreground" />
-                <h3 className="text-body font-semibold text-foreground">Branch Wallet</h3>
+                <h3 className="text-body font-semibold text-foreground">Branch Account</h3>
               </div>
               
               <div className="bg-card border border-border rounded-lg p-5">
                 {branchName ? (
                    <div className="flex items-center justify-between">
                      <div>
-                       <p className="text-body text-subtle font-medium mb-1">Wallet Balance</p>
+                        <p className="text-body text-subtle font-medium mb-1">Account Balance</p>
                        <p className="text-display font-semibold tracking-tight text-foreground">RM 50,000.00</p>
-                       <p className="text-label text-faint mt-1">KL HQ Wallet · New</p>
+                        <p className="text-label text-faint mt-1">KL HQ Account · New</p>
                      </div>
                      <Button size="sm" className="text-body h-9">
                        Top Up Fund
@@ -115,10 +115,10 @@ export function BranchSheet({ isOpen, onClose, branchName }: BranchSheetProps) {
                    </div>
                 ) : (
                   <div className="space-y-3">
-                    <p className="text-body text-subtle">Select a wallet setup to activate funding for this branch.</p>
+                    <p className="text-body text-subtle">Select an account setup to activate funding for this branch.</p>
                     <select className="w-full px-3 py-2 bg-background border border-border rounded-md text-body outline-none">
-                      <option>New Wallet</option>
-                      <option>Existing Wallet</option>
+                      <option>New Account</option>
+                      <option>Existing Account</option>
                     </select>
                   </div>
                 )}

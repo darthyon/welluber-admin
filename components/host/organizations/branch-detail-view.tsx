@@ -261,9 +261,9 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
             </div>
           </DetailSection>
 
-          {/* Section 2: Wallet Details */}
+          {/* Section 2: Account Details */}
           <DetailSection 
-            title="Wallet Details" 
+            title="Account Details" 
             icon={<Wallet size={18} weight="duotone" />}
             description="Active configuration of the branch's financial resource pool"
           >
@@ -280,7 +280,7 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
                     </div>
                     <div>
                       <h4 className="font-semibold text-lead text-foreground tracking-tight">
-                        KL HQ Wallet
+                        KL HQ Account
                       </h4>
                       <div className="flex items-center gap-2 mt-1">
                         <span className="text-label text-muted-foreground">Active Configuration</span>
@@ -292,7 +292,7 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
                   </div>
                   
                   <div className="text-right">
-                    <p className="text-label font-semibold text-faint mb-1">Wallet Balance</p>
+                    <p className="text-label font-semibold text-faint mb-1">Account Balance</p>
                     <p className="text-display font-semibold text-foreground tracking-tight tabular-nums">RM 45,000.00</p>
                     
                     <div className="flex items-center justify-end gap-2 mt-3">
@@ -320,7 +320,7 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
 
                 <div className="pt-6 border-t border-border/40 grid grid-cols-2 lg:grid-cols-3 gap-6">
                   <DetailField 
-                    label="Wallet ID" 
+                    label="Account ID" 
                     value={<span className="font-mono text-label bg-background px-1.5 py-0.5 rounded border border-border/60 tracking-tight text-subtle">WAL-BR01-2026</span>} 
                   />
                   <DetailField 

@@ -119,7 +119,7 @@ const navFinance: NavMainItem[] = [
   { title: "Claims", url: "/claims", icon: Receipt },
   { title: "Invoices", url: "/invoices", icon: List },
   { title: "Settlements", url: "/settlements", icon: CurrencyCircleDollar },
-  { title: "Wallets", url: "/wallets", icon: Wallet },
+  { title: "Accounts", url: "/accounts", icon: Wallet },
   { title: "Reports", url: "/reports", icon: ChartBar },
 ]
 

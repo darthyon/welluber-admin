@@ -90,7 +90,7 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
     ],
     auditTrail: [
       { action: "Profile Updated", user: "Admin Sarah", date: "Today, 10:45 AM" },
-      { action: "Wallet Topped Up", user: "System", date: "01 Apr 2024, 09:00 AM" },
+      { action: "Account Topped Up", user: "System", date: "01 Apr 2024, 09:00 AM" },
       { action: "Employee Linked", user: "Host Admin", date: "12 Oct 2023, 02:30 PM" }
     ]
   };
@@ -270,7 +270,7 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
             </div>
           </DetailSection>
 
-          {/* Wallets & Policies */}
+          {/* Accounts & Policies */}
           <DetailSection 
             title="Benefit Allocations" 
             icon={<CreditCard size={18} weight="bold" className="text-primary" />}

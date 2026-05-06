@@ -5,7 +5,8 @@ import {
   ArrowDownRight,
   CaretDown,
   Info,
-  Ticket,
+  LockKey,
+  Prohibit,
   CalendarBlank,
   Gear,
   Wallet,
@@ -35,7 +36,7 @@ import Link from "next/link";
 import { UpdateBalanceModal } from "@/components/host/wallets/update-balance-modal";
 import { RecordTopupModal } from "@/components/host/wallets/record-topup-modal";
 
-function WalletDetailContent() {
+function AccountDetailContent() {
   const params = useParams();
   const router = useRouter();
   const walletId = params.id as string;
@@ -60,9 +61,9 @@ function WalletDetailContent() {
   if (!wallet) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
-        <h2 className="text-heading font-semibold tracking-tight">Wallet Not Found</h2>
-        <Button variant="ghost" onClick={() => router.push("/wallets")} className="rounded-lg px-6">
-          Back to Wallets
+        <h2 className="text-heading font-semibold tracking-tight">Account Not Found</h2>
+        <Button variant="ghost" onClick={() => router.push("/accounts")} className="rounded-lg px-6">
+          Back to Accounts
         </Button>
       </div>
     );
@@ -75,12 +76,18 @@ function WalletDetailContent() {
 
   // Mock org credit data (in real app, fetch from org)
   const orgCreditLimit = 10000;
+  const totalDeductions = transactions.filter(t => t.type === "deduction").reduce((sum, t) => sum + t.amount, 0);
+  const totalPreAuths = transactions.filter(t => t.type === "pre-auth").reduce((sum, t) => sum + t.amount, 0);
+  const totalCancelled = transactions.filter(t => t.type === "cancelled").reduce((sum, t) => sum + t.amount, 0);
+  const totalTopupAmount = transactions.filter(t => t.type === "topup").reduce((sum, t) => sum + t.amount, 0);
+  const activePreAuths = totalPreAuths - totalCancelled;
+  const totalPtsUsed = totalDeductions + activePreAuths;
   const orgCreditUsed = Math.abs(Math.min(0, wallet.balance));
   const orgCreditRemaining = orgCreditLimit - orgCreditUsed;
 
   const OTHER_WALLETS = wallets
     .filter(w => w.id !== walletId)
-    .map(w => ({ label: `${w.name} (${w.orgName})`, href: `/wallets/${w.id}` }));
+    .map(w => ({ label: `${w.name} (${w.orgName})`, href: `/accounts/${w.id}` }));
 
   const openDangerAction = (action: "suspend" | "terminate") => {
     setDangerAction(action);
@@ -89,33 +96,33 @@ function WalletDetailContent() {
 
   const dangerActionConfig = {
     suspend: {
-      title: "Suspend Wallet",
-      confirmLabel: "Suspend Wallet",
-      description: "Temporarily pause all claim deductions and top-up activities for this wallet.",
+      title: "Suspend Account",
+      confirmLabel: "Suspend Account",
+      description: "Temporarily pause all claim deductions and top-up activities for this account.",
       impactPoints: [
         "Organization will not be able to perform manual top-ups.",
         "Internal claims will be queued but not deducted until reactivation.",
-        "You can reactivate the wallet at any time from this dashboard.",
+        "You can reactivate the account at any time from this dashboard.",
       ],
       run: async () => {
         // Mock suspension
-        return { success: true, message: "Wallet suspended successfully" };
+        return { success: true, message: "Account suspended successfully" };
       }
     },
     terminate: {
-      title: "Terminate Wallet",
-      confirmLabel: "Terminate Wallet Permanently",
-      description: "Shut down this wallet permanently. This action is destructive and cannot be undone.",
+      title: "Terminate Account",
+      confirmLabel: "Terminate Account Permanently",
+      description: "Shut down this account permanently. This action is destructive and cannot be undone.",
       impactPoints: [
-        "The organization will lose its line of credit or remaining cash balance immediately.",
+        "The organization will lose its line of credit or remaining balance immediately.",
         "All historical transaction records will be archived and read-only.",
-        "Active benefit policies linked to this wallet's credit will be invalidated.",
-        "A new wallet must be created to restore fiscal operations for this branch.",
+        "Active benefit policies linked to this account's credit will be invalidated.",
+        "A new account must be created to restore fiscal operations for this branch.",
       ],
       run: async () => {
         // Mock termination
-        router.push("/wallets");
-        return { success: true, message: "Wallet terminated permanently" };
+        router.push("/accounts");
+        return { success: true, message: "Account terminated permanently" };
       }
     }
   };
@@ -126,7 +133,7 @@ function WalletDetailContent() {
         <div className="py-6 lg:px-2">
           <Breadcrumbs
             items={[
-              { label: "Wallets", href: "/wallets" },
+              { label: "Accounts", href: "/accounts" },
               {
                 label: `${wallet.name}`,
                 options: OTHER_WALLETS
@@ -166,7 +173,7 @@ function WalletDetailContent() {
                 activeTab === "transactions" ? "border-primary text-primary" : "border-transparent text-faint hover:text-foreground"
               )}
             >
-              Transactions
+               History
             </button>
             <button
               onClick={() => setActiveTab("details")}
@@ -175,7 +182,7 @@ function WalletDetailContent() {
                 activeTab === "details" ? "border-primary text-primary" : "border-transparent text-faint hover:text-foreground"
               )}
             >
-              Wallet Details
+               Account Details
             </button>
             <button
               onClick={() => setActiveTab("settings")}
@@ -194,7 +201,7 @@ function WalletDetailContent() {
         {activeTab === "transactions" && (
            <>
              <div className="bg-primary rounded-xl relative p-8 text-primary-foreground">
-                {/* Wallet illustration — anchored bottom right, overflows card */}
+                {/* Account illustration — anchored bottom right, overflows card */}
                 <img loading="lazy"
                   src="/img-wallet.webp"
                   alt=""
@@ -204,12 +211,29 @@ function WalletDetailContent() {
                 <div className="relative z-10">
                   {/* Single row with all sections */}
                   <div className="flex flex-col xl:flex-row xl:items-center gap-4 xl:gap-0">
-                    {/* 1. Available Balance */}
+                    {/* 1. Available Limit (combined with credit) */}
                     <div className="space-y-1 shrink-0">
-                      <p className="text-label font-semibold text-primary-foreground/60">Available Balance</p>
+                      <p className="text-label font-semibold text-primary-foreground/60">Available Limit</p>
                       <h2 className="text-4xl font-semibold tracking-tight text-primary-foreground tabular-nums">
-                        RM {(wallet.balance - wallet.pendingDeductions).toLocaleString()}
+                        {(wallet.balance - wallet.pendingDeductions).toLocaleString()} pts
                       </h2>
+                      <div className="flex items-center gap-2 text-label text-primary-foreground/70">
+                        <span>Credit Remaining: {orgCreditRemaining.toLocaleString()} pts</span>
+                        <span className="opacity-30">·</span>
+                        <span>Overall Used: {totalPtsUsed.toLocaleString()} pts</span>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Info size={12} className="text-primary-foreground/30 cursor-help shrink-0" />
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">
+                              <p className="text-body max-w-[220px]">
+                                Credit remaining is the unused portion of your credit limit. Overall pts represents total points consumed or committed.
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
                       <p className="text-label text-faint">
                         Last updated {new Date(wallet.updatedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}, {new Date(wallet.updatedAt).toLocaleTimeString('en-MY', { hour: '2-digit', minute: '2-digit' })}
                       </p>
@@ -218,31 +242,16 @@ function WalletDetailContent() {
                     {/* Divider 1 */}
                     <div className="hidden xl:block w-px h-16 bg-primary-foreground/15 mx-6" />
 
-                    {/* 2. Credit Remaining */}
-                    <div className="space-y-1.5 shrink-0">
-                      <div className="flex items-center gap-1.5 text-label font-semibold text-primary-foreground/60">
-                        Credit Remaining
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Info size={12} className="text-primary-foreground/30 cursor-help" />
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p className="text-body max-w-[200px]">How much more this company can spend before we block new purchases.</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      </div>
-                      <div className="text-2xl font-semibold text-primary-foreground">
-                        RM {orgCreditRemaining.toLocaleString()}
-                      </div>
-                      <div className="w-32 h-1 bg-primary-foreground/15 rounded-full overflow-hidden">
+                    {/* 2. Credit Usage Bar */}
+                    <div className="space-y-1.5 shrink-0 min-w-[160px]">
+                      <p className="text-label font-semibold text-primary-foreground/60">Credit Limit Usage</p>
+                      <div className="w-full h-1.5 bg-primary-foreground/15 rounded-full overflow-hidden">
                         <div
                           className="h-full bg-primary-foreground/80 rounded-full transition-all"
                           style={{ width: `${Math.min((orgCreditUsed / orgCreditLimit) * 100, 100)}%` }}
                         />
                       </div>
-                      <p className="text-label text-faint">Limit: RM {orgCreditLimit.toLocaleString()}</p>
+                      <p className="text-label text-faint">Limit: {orgCreditLimit.toLocaleString()} pts</p>
                     </div>
 
                     {/* Divider 2 */}
@@ -251,13 +260,13 @@ function WalletDetailContent() {
                     {/* 3. Usage Stats */}
                     <div className="flex items-center gap-3 shrink-0">
                       {[
-                        { label: "Top-ups", amount: transactions.filter(t => t.type === "topup").reduce((sum, t) => sum + t.amount, 0), trend: "+12%" },
-                        { label: "Settled", amount: transactions.filter(t => t.type === "deduction").reduce((sum, t) => sum + t.amount, 0), trend: "+5%" },
-                        { label: "Adjusted", amount: transactions.filter(t => t.type === "adjustment").reduce((sum, t) => sum + t.amount, 0), trend: "—" },
+                        { label: "Top-ups", amount: totalTopupAmount, trend: "+12%", showRM: true },
+                        { label: "Settled", amount: totalDeductions, trend: "+5%", showRM: false },
+                        { label: "Pre-Auth", amount: activePreAuths, trend: `${activePreAuths > 0 ? activePreAuths.toLocaleString() : "0"} pts locked`, showRM: false },
                       ].map((stat) => (
                         <div key={stat.label} className="space-y-0.5">
                           <p className="text-label font-medium text-primary-foreground/50">{stat.label}</p>
-                          <p className="text-body font-semibold text-primary-foreground">RM {stat.amount.toLocaleString()}</p>
+                          <p className="text-body font-semibold text-primary-foreground">{stat.showRM ? `RM ${stat.amount.toLocaleString()}` : `${stat.amount.toLocaleString()} pts`}</p>
                           <p className="text-label text-faint">{stat.trend}</p>
                         </div>
                       ))}
@@ -317,7 +326,7 @@ function WalletDetailContent() {
                               className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-body font-medium text-left text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors"
                             >
                               <WarningCircle size={14} />
-                              {wallet.status === "suspended" ? "Resume Wallet" : "Suspend Wallet"}
+                              {wallet.status === "suspended" ? "Resume Account" : "Suspend Account"}
                             </button>
                           </div>
                         </PopoverContent>
@@ -390,45 +399,64 @@ function WalletDetailContent() {
                      header: "Description",
                      accessorKey: "description",
                      sortable: true,
-                     render: (trx: any) => (
-                       <div className="flex items-center gap-4 py-1">
-                         <div className={cn(
-                           "h-9 w-9 rounded-lg flex items-center justify-center shrink-0 shadow-sm",
-                            trx.type === "topup" ? "bg-primary/20 text-primary" : "bg-rose-500/10 text-rose-600 dark:text-rose-400 dark:bg-rose-500/20"
-                         )}>
-                           {trx.type === "topup" ? <ArrowUpRight size={15} weight="bold" /> : <ArrowDownRight size={15} weight="bold" />}
-                         </div>
+                      render: (trx: any) => {
+                        const iconBg = trx.type === "topup" ? "bg-primary/20 text-primary" :
+                          trx.type === "pre-auth" ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 dark:bg-amber-500/20" :
+                          trx.type === "cancelled" ? "bg-rose-500/10 text-rose-600 dark:text-rose-400 dark:bg-rose-500/20" :
+                          "bg-rose-500/10 text-rose-600 dark:text-rose-400 dark:bg-rose-500/20"
+                        const icon = trx.type === "topup" ? <ArrowUpRight size={15} weight="bold" /> :
+                          trx.type === "pre-auth" ? <LockKey size={15} weight="bold" /> :
+                          trx.type === "cancelled" ? <Prohibit size={15} weight="bold" /> :
+                          <ArrowDownRight size={15} weight="bold" />
+                         return (
+                        <div className="flex items-center gap-4 py-1">
+                          <div className={cn("h-9 w-9 rounded-lg flex items-center justify-center shrink-0 shadow-sm", iconBg)}>
+                            {icon}
+                          </div>
                          <div className="space-y-0.5">
                            <p className="text-body font-semibold text-foreground">{trx.description}</p>
                            <p className="text-label font-semibold text-faint font-mono">ID: {trx.id}</p>
                          </div>
                        </div>
-                     )
-                   },
-                    {
-                      header: "Amount",
+                      )
+                      }
+                    },
+                     {
+                       header: "Amount",
                       accessorKey: "amount",
                       sortable: true,
                       align: "right",
-                      render: (trx: any) => (
+                      render: (trx: any) => {
+                        const isTopup = trx.type === "topup"
+                        const unit = isTopup ? "RM" : "pts"
+                        const amountClass = trx.type === "cancelled"
+                          ? "text-lead font-semibold tracking-tight tabular-nums line-through text-rose-500 dark:text-rose-400"
+                          : trx.type === "pre-auth"
+                          ? "text-lead font-semibold tracking-tight tabular-nums text-amber-600 dark:text-amber-400"
+                          : trx.type === "topup"
+                          ? "text-lead font-semibold tracking-tight tabular-nums text-primary"
+                          : "text-lead font-semibold tracking-tight tabular-nums text-foreground"
+                        const prefix = isTopup ? "+" : "-"
+                        return (
                         <div className="text-right">
-                          <p className={cn(
-                            "text-lead font-semibold tracking-tight tabular-nums",
-                            trx.amount > 0 && trx.type === "topup" ? "text-primary" : "text-foreground"
-                          )}>
-                            {trx.type === "topup" ? "+" : "-"} RM {Math.abs(trx.amount).toLocaleString()}
+                          <p className={amountClass}>
+                            {prefix} {unit} {Math.abs(trx.amount).toLocaleString()}
                           </p>
-                          <p className="text-label font-medium text-faint text-nowrap tabular-nums">Balance after: RM {trx.balanceAfter.toLocaleString()}</p>
+                          <p className="text-label font-medium text-faint text-nowrap tabular-nums">Balance after: {trx.balanceAfter.toLocaleString()} pts</p>
                         </div>
-                      )
+                      )},
                     },
                     {
                       header: "Type",
                       accessorKey: "type",
                       sortable: true,
-                      render: (trx: any) => (
-                        <StatusBadge status={TRANSACTION_TYPE_LABELS[trx.type as keyof typeof TRANSACTION_TYPE_LABELS] || trx.type} variant="zinc" />
-                      )
+                      render: (trx: any) => {
+                        const variant = trx.type === "pre-auth" ? "amber" as const :
+                          trx.type === "cancelled" ? "rose" as const : "zinc" as const
+                        return (
+                          <StatusBadge status={TRANSACTION_TYPE_LABELS[trx.type as keyof typeof TRANSACTION_TYPE_LABELS] || trx.type} variant={variant} />
+                        )
+                      },
                     },
                     {
                       header: "Reference",
@@ -484,9 +512,9 @@ function WalletDetailContent() {
 
         {activeTab === "details" && (
           <div className="space-y-8 animate-in fade-in transition-all duration-300">
-            <DetailSection title="Wallet configuration" icon={<Wallet size={18} />}>
+            <DetailSection title="Account configuration" icon={<Wallet size={18} />}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-7">
-                <DetailField label="Wallet name" value={wallet.name} />
+                <DetailField label="Account name" value={wallet.name} />
                 <DetailField
                   label="Status"
                   value={
@@ -511,13 +539,13 @@ function WalletDetailContent() {
             <DetailSection
               title="Danger Zone"
               icon={<Gear size={18} weight="duotone" />}
-              description="Confirm how you want to change the wallet lifecycle."
+              description="Confirm how you want to change the account lifecycle."
             >
               <div className="space-y-4">
                 <div className="rounded-lg border border-border bg-muted/20 p-4">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="space-y-1">
-                      <p className="text-body font-medium text-foreground">Suspend Wallet</p>
+                      <p className="text-body font-medium text-foreground">Suspend Account</p>
                       <p className="text-label text-muted-foreground">
                         Pause all deductions and activities temporarily.
                       </p>
@@ -531,7 +559,7 @@ function WalletDetailContent() {
                 <div className="rounded-lg border border-rose-200 dark:border-rose-500/20 bg-rose-50/60 dark:bg-rose-500/10 p-4">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="space-y-1">
-                      <p className="text-body font-medium text-foreground">Terminate Wallet Permanently</p>
+                      <p className="text-body font-medium text-foreground">Terminate Account Permanently</p>
                       <p className="text-label text-muted-foreground">
                         Instantly shutdown fiscal operations for this branch.
                       </p>
@@ -591,10 +619,10 @@ function WalletDetailContent() {
   );
 }
 
-export default function WalletDetailPage() {
+export default function AccountDetailPage() {
   return (
-    <Suspense fallback={<div className="h-[400px] flex items-center justify-center text-muted-foreground animate-pulse">Loading wallet details...</div>}>
-      <WalletDetailContent />
+    <Suspense fallback={<div className="h-[400px] flex items-center justify-center text-muted-foreground animate-pulse">Loading account details...</div>}>
+      <AccountDetailContent />
     </Suspense>
   );
 }

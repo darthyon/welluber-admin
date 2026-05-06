@@ -75,7 +75,7 @@ export function TopUpHistoryModal({ isOpen, onClose, branchId, branchName }: Top
             <div>
               <h3 className="font-semibold text-foreground tracking-tight leading-tight">Top-Up History</h3>
               <p className="text-label text-muted-foreground font-medium tracking-wider mt-0.5">
-                {branchName} Wallet Transactions
+                {branchName} Account Transactions
               </p>
             </div>
           </div>

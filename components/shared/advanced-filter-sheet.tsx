@@ -125,7 +125,7 @@ export function AdvancedFilterSheet({
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 text-faint">
                     <Wallet size={14} weight="bold" />
-                    <label className="text-label font-semibold">Wallet model</label>
+                    <label className="text-label font-semibold">Account model</label>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     {["Cash Balance", "Credit Limit"].map((model) => (
