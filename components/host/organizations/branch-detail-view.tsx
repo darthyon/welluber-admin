@@ -38,7 +38,7 @@ interface BranchDetailViewProps {
 }
 
 export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewProps) {
-  const [walletType, setWalletType] = useState<"new" | "existing">("new");
+  const [accountType, setAccountType] = useState<"new" | "existing">("new");
 
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isTopUpModalOpen, setIsTopUpModalOpen] = useState(false);
@@ -268,9 +268,9 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
             description="Active configuration of the branch's financial resource pool"
           >
             {/* View Mode: Active Configuration Card */}
-            <div className="relative group/wallet bg-muted/20 border border-border/60 rounded-lg p-6 overflow-hidden transition-all hover:border-primary/30">
+            <div className="relative group/account bg-muted/20 border border-border/60 rounded-lg p-6 overflow-hidden transition-all hover:border-primary/30">
               {/* Decorative Accent */}
-              <div className="absolute -right-8 -top-8 w-32 h-32 bg-primary/5 rounded-full blur-3xl group-hover/wallet:scale-110 transition-transform duration-700" />
+              <div className="absolute -right-8 -top-8 w-32 h-32 bg-primary/5 rounded-full blur-3xl group-hover/account:scale-110 transition-transform duration-700" />
               
               <div className="relative z-10 space-y-6">
                 <div className="flex items-start justify-between">
@@ -285,7 +285,7 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
                       <div className="flex items-center gap-2 mt-1">
                         <span className="text-label text-muted-foreground">Active Configuration</span>
                         <span className="px-1.5 py-0.5 rounded-md bg-muted border border-border text-label font-medium text-muted-foreground">
-                          {walletType === "new" ? "New" : "Existing"}
+                          {accountType === "new" ? "New" : "Existing"}
                         </span>
                       </div>
                     </div>
@@ -321,7 +321,7 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
                 <div className="pt-6 border-t border-border/40 grid grid-cols-2 lg:grid-cols-3 gap-6">
                   <DetailField 
                     label="Account ID" 
-                    value={<span className="font-mono text-label bg-background px-1.5 py-0.5 rounded border border-border/60 tracking-tight text-subtle">WAL-BR01-2026</span>} 
+                    value={<span className="font-mono text-label bg-background px-1.5 py-0.5 rounded border border-border/60 tracking-tight text-subtle">ACC-20260115-0001</span>}
                   />
                   <DetailField 
                     label="Credit Remaining" 
@@ -348,7 +348,7 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
         onClose={() => setIsTopUpModalOpen(false)}
         orgName="Acme Corporation Sdn Bhd"
         branchName={branchData.name}
-        walletId="WAL-BR01-2026"
+        accountId="ACC-20260115-0001"
       />
 
       {/* Top-Up History Modal */}

@@ -4,7 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { BrandDetailView } from "@/components/host/brands/brand-detail-view";
 import { ConfirmationModal } from "@/components/shared/confirmation-modal";
-import { MOCK_BRANDS } from "@/features/brands/mock-data";
+import { MOCK_BRANDS } from "@/lib/mock-data";
 import { Brand } from "@/types/brand";
 
 export default function BrandDetailPage() {

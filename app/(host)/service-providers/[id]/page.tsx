@@ -37,7 +37,7 @@ import { TaxProfileForm } from "@/components/host/service-providers/tax-profile-
 import { SpInviteAdminModal } from "@/components/host/service-providers/sp-invite-admin-modal";
 import { SpBranchesTab } from "@/components/host/service-providers/sp-branches-tab";
 import { SpVouchersTab } from "@/components/host/service-providers/sp-vouchers-tab";
-import { MOCK_SPS } from "@/features/providers/mock-data";
+import { MOCK_SPS } from "@/lib/mock-data";
 import { suspendSp, activateSp, removeSp, resendSpAdminInvite } from "@/features/providers/actions";
 import { ActionPopover } from "@/components/shared/action-popover";
 import { SharedDataTable } from "@/components/shared/data-table";

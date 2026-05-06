@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { BrandDataTable } from "@/components/host/brands/brand-data-table";
-import { MOCK_BRANDS } from "@/features/brands/mock-data";
+import { MOCK_BRANDS } from "@/lib/mock-data";
 import { ConfirmationModal } from "@/components/shared/confirmation-modal";
 import { Brand } from "@/types/brand";
 

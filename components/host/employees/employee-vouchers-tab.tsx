@@ -18,102 +18,8 @@ import { FilterItem } from "@/components/shared/filter-item";
 import { ActionPopover } from "@/components/shared/action-popover";
 import { ViewToggle, type ViewMode } from "@/components/shared/view-toggle";
 import type { ClaimStatus } from "@/types/claims";
-
-// ─── Mock voucher redemption data ─────────────────────────────────────────────
-
-interface VoucherRedemption {
-  id: string;
-  voucherCode: string;
-  voucherName: string;
-  category: string;
-  benefitType: string;
-  date: string;
-  redeemedBy: string;
-  redeemedByType: "Employee" | "Dependent";
-  amount: number;
-  provider: string;
-  branch: string;
-  city: string;
-  status: ClaimStatus;
-}
-
-const MOCK_VOUCHERS: VoucherRedemption[] = [
-  {
-    id: "v1",
-    voucherCode: "VCH-2024-0081",
-    voucherName: "Gym Membership Pass",
-    category: "Wellness Allocation",
-    benefitType: "Gym & Fitness",
-    date: "12 Mar 2024",
-    redeemedBy: "Robert Fox",
-    redeemedByType: "Employee",
-    amount: 180,
-    provider: "Celebrity Fitness KLCC",
-    branch: "ACME HQ",
-    city: "Kuala Lumpur",
-    status: "confirmed",
-  },
-  {
-    id: "v2",
-    voucherCode: "VCH-2024-0114",
-    voucherName: "Mental Health Consultation",
-    category: "Wellness Allocation",
-    benefitType: "Mental Health",
-    date: "20 Mar 2024",
-    redeemedBy: "Robert Fox",
-    redeemedByType: "Employee",
-    amount: 320,
-    provider: "Mind & Soul Clinic",
-    branch: "ACME HQ",
-    city: "Mont Kiara",
-    status: "confirmed",
-  },
-  {
-    id: "v3",
-    voucherCode: "VCH-2024-0198",
-    voucherName: "Group Yoga Class",
-    category: "Wellness Allocation",
-    benefitType: "Yoga & Meditation",
-    date: "01 Apr 2024",
-    redeemedBy: "Sarah Fox",
-    redeemedByType: "Dependent",
-    amount: 95,
-    provider: "Ritual Yoga Studio",
-    branch: "ACME HQ",
-    city: "Bangsar",
-    status: "pre-auth",
-  },
-  {
-    id: "v4",
-    voucherCode: "VCH-2024-0211",
-    voucherName: "Nutrition Counseling Session",
-    category: "Wellness Allocation",
-    benefitType: "Nutrition & Diet",
-    date: "05 Apr 2024",
-    redeemedBy: "Robert Fox",
-    redeemedByType: "Employee",
-    amount: 605,
-    provider: "NutriCare Clinic",
-    branch: "ACME HQ",
-    city: "Damansara",
-    status: "confirmed",
-  },
-  {
-    id: "v5",
-    voucherCode: "VCH-2024-0256",
-    voucherName: "Food & Dining Voucher",
-    category: "Lifestyle Pocket",
-    benefitType: "Food & Beverage",
-    date: "18 Apr 2024",
-    redeemedBy: "Robert Fox",
-    redeemedByType: "Employee",
-    amount: 120,
-    provider: "GrabFood",
-    branch: "ACME HQ",
-    city: "Kuala Lumpur",
-    status: "confirmed",
-  },
-];
+import type { VoucherRedemption } from "@/features/employees/types";
+import { MOCK_EMPLOYEE_VOUCHERS } from "@/lib/mock-data";
 
 // ─── Status badge ─────────────────────────────────────────────────────────────
 
@@ -408,7 +314,7 @@ export function EmployeeVouchersTab({ employeeId: _employeeId }: EmployeeVoucher
   const [viewMode, setViewMode] = useState<ViewMode>("list");
 
   const filtered = useMemo(() => {
-    return MOCK_VOUCHERS.filter((v) => {
+    return MOCK_EMPLOYEE_VOUCHERS.filter((v) => {
       const matchesSearch =
         !searchQuery ||
         [

@@ -9,15 +9,15 @@ import { cn } from "@/lib/utils"
 interface RecordTopupModalProps {
   isOpen: boolean
   onClose: () => void
-  walletId: string
-  walletName: string
+  accountId: string
+  accountName: string
 }
 
 export function RecordTopupModal({
   isOpen,
   onClose,
-  walletId,
-  walletName,
+  accountId,
+  accountName,
 }: RecordTopupModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
@@ -68,7 +68,7 @@ export function RecordTopupModal({
           <div className="p-8">
             <SuccessCelebration
               title="Top-up Recorded"
-              message={`Manual top-up logged for ${walletName}.`}
+              message={`Manual top-up logged for ${accountName}.`}
             />
           </div>
         ) : (
@@ -84,7 +84,7 @@ export function RecordTopupModal({
                     Record Manual Top-up
                   </h3>
                   <p className="text-label text-muted-foreground">
-                    {walletName}
+                    {accountName}
                   </p>
                 </div>
               </div>

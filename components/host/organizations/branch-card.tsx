@@ -11,8 +11,8 @@ interface BranchCardProps {
     id: string;
     name: string;
     type: string;
-    walletModel: string;
-    walletName?: string;
+    accountModel: string;
+    accountName?: string;
     address?: {
       city: string;
       state: string;
@@ -30,9 +30,9 @@ interface BranchCardProps {
 
 export function BranchCard({ branch, onView, onEdit }: BranchCardProps) {
   // Map internal wallet models to user-friendly labels
-  const walletLabel = branch.walletModel === "New" ? "New" :
-                    branch.walletModel === "Existing" ? "Existing" :
-                    branch.walletModel;
+  const accountLabel = branch.accountModel === "New" ? "New" :
+                    branch.accountModel === "Existing" ? "Existing" :
+                    branch.accountModel;
 
   return (
     <div 
@@ -82,9 +82,9 @@ export function BranchCard({ branch, onView, onEdit }: BranchCardProps) {
             <span className="text-label font-semibold text-faint">Account</span>
             <div className="flex items-center gap-1.5 text-label font-semibold text-foreground">
               <Wallet size={14} weight="bold" className="text-primary" />
-              <span className="truncate max-w-[120px]">{branch.walletName || "Unnamed Account"}</span>
+              <span className="truncate max-w-[120px]">{branch.accountName || "Unnamed Account"}</span>
               <span className="px-1 py-0 rounded bg-muted border border-border text-label font-medium text-muted-foreground">
-                {walletLabel}
+                {accountLabel}
               </span>
             </div>
             {branch.balance && (

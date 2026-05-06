@@ -10,6 +10,7 @@ import { SharedDataTable, type Column } from "@/components/shared/data-table";
 import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { FilterItem } from "@/components/shared/filter-item";
 import type { ClaimStatus, EmployeeClaim } from "@/types/claims";
+import { MOCK_EMPLOYEE_CLAIMS } from "@/lib/mock-data";
 
 // ─── Status badge ─────────────────────────────────────────────────────────────
 
@@ -27,17 +28,6 @@ function StatusBadge({ status }: { status: ClaimStatus }) {
   );
 }
 
-// ─── Mock data ────────────────────────────────────────────────────────────────
-
-const MOCK_CLAIMS: EmployeeClaim[] = [
-  { id: "c1", voucherCode: "VCH-2024-0081", voucherName: "Wellness Allocation Voucher", transactionType: "redemption", service: "Gymnasium Facilities", provider: "Celebrity Fitness KLCC", location: "Kuala Lumpur", date: "12 Mar 2024", amount: 180, status: "confirmed", benefitGroup: "Gym Membership" },
-  { id: "c2", voucherCode: "VCH-2024-0114", voucherName: "Wellness Allocation Voucher", transactionType: "redemption", service: "Clinical Therapy", provider: "Mind & Soul Clinic", location: "Mont Kiara", date: "20 Mar 2024", amount: 320, status: "confirmed", benefitGroup: "Mental Health" },
-  { id: "c3", voucherCode: "VCH-2024-0198", voucherName: "Wellness Allocation Voucher", transactionType: "redemption", service: "Group Fitness", provider: "Ritual Yoga Studio", location: "Bangsar", date: "01 Apr 2024", amount: 95, status: "pre-auth", benefitGroup: "Gym Membership" },
-  { id: "c4", voucherCode: "VCH-2024-0211", voucherName: "Wellness Allocation Voucher", transactionType: "reimbursement", service: "Dietary Counseling", provider: "NutriCare Clinic", location: "Damansara", date: "05 Apr 2024", amount: 605, status: "confirmed", benefitGroup: "Mental Health" },
-  { id: "c5", voucherCode: "VCH-2024-0033", voucherName: "Lifestyle Pocket Voucher", transactionType: "redemption", service: "Grab Food Voucher", provider: "Grab Malaysia", location: "Online", date: "03 Jan 2024", amount: 200, status: "confirmed", benefitGroup: "Food & Beverage" },
-  { id: "c6", voucherCode: "VCH-2024-0102", voucherName: "Lifestyle Pocket Voucher", transactionType: "redemption", service: "Flight Subsidy", provider: "AirAsia", location: "KLIA2", date: "15 Feb 2024", amount: 450, status: "confirmed", benefitGroup: "Travel" },
-  { id: "c7", voucherCode: "VCH-2024-0189", voucherName: "Lifestyle Pocket Voucher", transactionType: "redemption", service: "Hotel Stay", provider: "Marriott Putrajaya", location: "Putrajaya", date: "20 Mar 2024", amount: 200, status: "pre-auth", benefitGroup: "Travel" },
-];
 
 // ─── Column definitions ───────────────────────────────────────────────────────
 
@@ -122,7 +112,7 @@ export function EmployeeClaimsTab({ employeeId: _employeeId }: EmployeeClaimsTab
   const [statusFilter, setStatusFilter] = useState<ClaimStatus | "all">("all");
 
   const filteredClaims = useMemo(() => {
-    return MOCK_CLAIMS.filter((claim) => {
+    return MOCK_EMPLOYEE_CLAIMS.filter((claim) => {
       const matchesSearch =
         searchQuery === "" ||
         claim.voucherCode.toLowerCase().includes(searchQuery.toLowerCase()) ||

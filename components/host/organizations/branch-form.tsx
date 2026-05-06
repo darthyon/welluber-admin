@@ -22,6 +22,7 @@ import { DetailSection } from "@/components/shared/detail-section";
 import { SuccessCelebration } from "@/components/shared/success-celebration";
 import { LocationPicker } from "@/components/shared/location-picker";
 import { cn } from "@/lib/utils";
+import { MOCK_ACCOUNTS } from "@/lib/mock-data";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface BranchFormProps {
@@ -30,27 +31,23 @@ interface BranchFormProps {
   onSubmit: (data: any) => void;
 }
 
-// Mock org limits and same-org wallets for the dropdown
+// Mock org limits and same-org accounts for the dropdown
 const ORG_LIMITS = {
-  walletLimit: 50000,
+  accountLimit: 50000,
   creditLimit: 10000,
 };
 
-const EXISTING_WALLETS = [
-  { id: "wal_1", name: "KL HQ Wallet", balance: 30000 },
-  { id: "wal_2", name: "PJ Ops Wallet", balance: 15000 },
-];
 
 export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
   const isEditing = !!branchId;
-  const [walletType, setWalletType] = useState<"new" | "existing">("new");
+  const [accountType, setAccountType] = useState<"new" | "existing">("new");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
   // Wallet fields
-  const [walletName, setWalletName] = useState("");
+  const [accountName, setAccountName] = useState("");
   const [initialAmount, setInitialAmount] = useState("");
-  const [existingWalletId, setExistingWalletId] = useState("");
+  const [existingAccountId, setExistingAccountId] = useState("");
   const [attachment, setAttachment] = useState<File | null>(null);
 
   // Mock initial data if editing
@@ -212,7 +209,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
             <div className="mb-4 flex items-center gap-3 px-3 py-2 rounded-lg border border-border/60 bg-muted/20 text-body text-subtle">
               <Info size={16} className="text-primary shrink-0" />
               <span className="font-medium">
-                Organization limits: Account RM {ORG_LIMITS.walletLimit.toLocaleString()} · Credit RM {ORG_LIMITS.creditLimit.toLocaleString()}
+                Organization limits: Account RM {ORG_LIMITS.accountLimit.toLocaleString()} · Credit RM {ORG_LIMITS.creditLimit.toLocaleString()}
               </span>
               <TooltipProvider>
                 <Tooltip>
@@ -230,27 +227,27 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
               <ChoiceCard
                 title="New Account"
                 description="Create a dedicated standalone account for this branch. Funds are isolated."
-                selected={walletType === "new"}
-                onSelect={() => setWalletType("new")}
+                selected={accountType === "new"}
+                onSelect={() => setAccountType("new")}
                 icon={Wallet}
               />
               <ChoiceCard
                 title="Existing Account"
                 description="Link this branch to an existing account (e.g. Shared with HQ or another cluster)."
-                selected={walletType === "existing"}
-                onSelect={() => setWalletType("existing")}
+                selected={accountType === "existing"}
+                onSelect={() => setAccountType("existing")}
                 icon={IdentificationCard}
               />
             </div>
 
             <div className="mt-6 space-y-6">
-              {walletType === "new" ? (
+              {accountType === "new" ? (
                 <div className="space-y-5 animate-in fade-in slide-in-from-top-2 duration-300">
                   <div className="space-y-1.5">
                     <label className="text-body font-medium text-foreground">Account Name</label>
                     <input
-                      value={walletName}
-                      onChange={(e) => setWalletName(e.target.value)}
+                      value={accountName}
+                      onChange={(e) => setAccountName(e.target.value)}
                       placeholder="e.g. PJ Ops Account"
                       className="w-full px-3 py-2.5 bg-card border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-semibold text-foreground hover:border-border/80"
                     />
@@ -308,14 +305,14 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
                 <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-300">
                   <label className="text-body font-medium text-foreground">Bridge to Existing Account</label>
                   <select
-                    value={existingWalletId}
-                    onChange={(e) => setExistingWalletId(e.target.value)}
+                    value={existingAccountId}
+                    onChange={(e) => setExistingAccountId(e.target.value)}
                     className="w-full px-3 py-2.5 bg-card border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-semibold text-foreground hover:border-border/80 cursor-pointer"
                   >
                     <option value="">Select an account...</option>
-                    {EXISTING_WALLETS.map((w) => (
-                      <option key={w.id} value={w.id}>
-                        {w.name} — RM {w.balance.toLocaleString()} MYR
+                    {MOCK_ACCOUNTS.map((acc) => (
+                      <option key={acc.id} value={acc.id}>
+                        {acc.name} — RM {acc.balance.toLocaleString()} MYR
                       </option>
                     ))}
                   </select>
@@ -330,10 +327,10 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
                   <CheckCircle size={18} weight="fill" className="text-primary mt-0.5 shrink-0" />
                   <span>Administrative fees are consolidated at the parent organization level for all linked accounts.</span>
                 </div>
-                {walletType === "new" && (
+                {accountType === "new" && (
                   <div className="flex items-start gap-3 text-body text-subtle animate-in fade-in duration-300">
                     <CheckCircle size={18} weight="fill" className="text-primary mt-0.5 shrink-0" />
-                    <span>A 1.5% administrative fee applies to all standalone wallets.</span>
+                    <span>A 1.5% administrative fee applies to all standalone accounts.</span>
                   </div>
                 )}
               </div>

@@ -36,8 +36,10 @@ import { SuccessCelebration } from "@/components/shared/success-celebration";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { BenefitPolicy, BenefitGroup, Benefit, PolicyStatus, DistributionType, PoolType, DependentsPoolType, UtilisationMode, ProrateUnit, RefreshCycle, RefreshStartReference, ActivationMode } from "@/types/policy";
-import { UtilisationClaimsTable, type EmployeeUtilisationRow } from "@/components/shared/utilisation-claims-table";
-import { MOCK_EMPLOYEES, type EmployeeDirectoryItem } from "@/components/host/employees/employee-directory-table";
+import { UtilisationClaimsTable } from "@/components/shared/utilisation-claims-table";
+import { MOCK_EMPLOYEES } from "@/lib/mock-data";
+import type { EmployeeDirectoryItem } from "@/features/employees/types";
+import { MOCK_EMPLOYEE_UTILISATION, SERVICES } from "@/lib/mock-data";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -90,14 +92,6 @@ function getAvailableRefreshCycles(
   return REFRESH_CYCLES.slice(unitIdx + 1);
 }
 
-const SERVICES = [
-  { id: "s1", category: "Physical Wellbeing", name: "Gymnasium Facilities", subServices: ["Standard Gym Access", "Boutique Studio Memberships"] },
-  { id: "s2", category: "Physical Wellbeing", name: "Group Fitness", subServices: ["Yoga", "Pilates", "Indoor Cycling", "Zumba"] },
-  { id: "s3", category: "Psychological Wellbeing", name: "Clinical Therapy", subServices: ["Psychotherapy", "CBT", "Psychiatric Care"] },
-  { id: "s4", category: "Psychological Wellbeing", name: "Mental Fitness", subServices: ["Meditation Apps", "Mindfulness Workshops"] },
-  { id: "s5", category: "Nutritional Support", name: "Dietary Counseling", subServices: ["Dietitian Consultations", "Diabetic Management"] },
-  { id: "s6", category: "Personal Care", name: "Therapeutic Spa Services", subServices: ["Relaxation Massage", "Hydrotherapy"] },
-];
 
 const STATUS_CONFIG: Record<PolicyStatus, { label: string; color: string; bg: string; icon: React.ElementType }> = {
   draft: { label: "Draft", color: "text-amber-600 dark:text-amber-400", bg: "bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/20", icon: NotePencil },
@@ -1530,7 +1524,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                 description="Benefit usage and claim history for all employees on this policy"
                 ghost
               >
-                <UtilisationClaimsTable data={MOCK_UTILISATION} />
+                <UtilisationClaimsTable data={MOCK_EMPLOYEE_UTILISATION} />
               </DetailSection>
             )}
           </motion.div>
@@ -1607,45 +1601,3 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
   );
 }
 
-// ─── Mock utilisation data (replace with API) ─────────────────────────────────
-
-const MOCK_UTILISATION: EmployeeUtilisationRow[] = [
-  {
-    id: "emp_1", name: "Robert Fox", empCode: "ACM-001", branch: "ACME HQ",
-    allocated: 2500, used: 1200,
-    claims: [
-      { id: "c1", voucherCode: "VCH-2024-0081", voucherName: "Wellness Allocation Voucher", transactionType: "redemption", service: "Gymnasium Facilities", provider: "Celebrity Fitness KLCC", location: "Kuala Lumpur", date: "12 Mar 2024", amount: 180, status: "confirmed" },
-      { id: "c2", voucherCode: "VCH-2024-0114", voucherName: "Wellness Allocation Voucher", transactionType: "redemption", service: "Clinical Therapy",     provider: "Mind & Soul Clinic",   location: "Mont Kiara",   date: "20 Mar 2024", amount: 320, status: "confirmed" },
-      { id: "c3", voucherCode: "VCH-2024-0198", voucherName: "Wellness Allocation Voucher", transactionType: "redemption", service: "Group Fitness",        provider: "Ritual Yoga Studio",   location: "Bangsar",       date: "01 Apr 2024", amount: 95,  status: "pre-auth"  },
-      { id: "c4", voucherCode: "VCH-2024-0211", voucherName: "Wellness Allocation Voucher", transactionType: "reimbursement", service: "Dietary Counseling",   provider: "NutriCare Clinic",     location: "Damansara",     date: "05 Apr 2024", amount: 605, status: "confirmed" },
-    ],
-  },
-  {
-    id: "emp_2", name: "Jenny Wilson", empCode: "ACM-042", branch: "ACME Subang Jaya",
-    allocated: 2500, used: 2125,
-    claims: [
-      { id: "c5", voucherCode: "VCH-2024-0033", voucherName: "Lifestyle Pocket Voucher", transactionType: "redemption", service: "Gymnasium Facilities", provider: "Fitness First Subang",   location: "Subang Jaya", date: "03 Jan 2024", amount: 200, status: "confirmed" },
-      { id: "c6", voucherCode: "VCH-2024-0057", voucherName: "Lifestyle Pocket Voucher", transactionType: "redemption", service: "Therapeutic Spa",      provider: "Hammam Spa & Wellness", location: "Shah Alam",   date: "18 Feb 2024", amount: 380, status: "confirmed" },
-      { id: "c7", voucherCode: "VCH-2024-0089", voucherName: "Lifestyle Pocket Voucher", transactionType: "redemption", service: "Mental Fitness",        provider: "Calm Studio KL",        location: "Subang Jaya", date: "10 Mar 2024", amount: 145, status: "confirmed" },
-      { id: "c8", voucherCode: "VCH-2024-0132", voucherName: "Lifestyle Pocket Voucher", transactionType: "redemption", service: "Group Fitness",         provider: "Barry's Bootcamp",      location: "TTDI",        date: "22 Mar 2024", amount: 200, status: "cancelled" },
-      { id: "c9", voucherCode: "VCH-2024-0201", voucherName: "Lifestyle Pocket Voucher", transactionType: "reimbursement", service: "Clinical Therapy",      provider: "Therapy Works PJ",      location: "Petaling Jaya", date: "08 Apr 2024", amount: 400, status: "confirmed" },
-      { id: "c10", voucherCode: "VCH-2024-0215", voucherName: "Lifestyle Pocket Voucher", transactionType: "redemption", service: "Dietary Counseling",   provider: "NutriCare Clinic",      location: "Subang Jaya", date: "10 Apr 2024", amount: 800, status: "pre-auth" },
-    ],
-  },
-  {
-    id: "emp_3", name: "Dianne Russell", empCode: "ACM-156", branch: "ACME HQ",
-    allocated: 2500, used: 375,
-    claims: [
-      { id: "c11", voucherCode: "VCH-2024-0177", voucherName: "Rejuvenation Fund Voucher", transactionType: "redemption", service: "Therapeutic Spa", provider: "Relaxe Spa KL", location: "KLCC", date: "15 Mar 2024", amount: 250, status: "confirmed" },
-      { id: "c12", voucherCode: "VCH-2024-0190", voucherName: "Rejuvenation Fund Voucher", transactionType: "redemption", service: "Group Fitness",   provider: "TRX Studio KL", location: "Bukit Bintang", date: "28 Mar 2024", amount: 125, status: "pre-auth" },
-    ],
-  },
-  {
-    id: "emp_4", name: "Marvin McKinney", empCode: "ACM-089", branch: "ACME Subang Jaya",
-    allocated: 2500, used: 300,
-    claims: [
-      { id: "c13", voucherCode: "VCH-2024-0144", voucherName: "Mental Health Support Voucher", transactionType: "redemption", service: "Mental Fitness", provider: "Headspace Partner KL", location: "Online", date: "01 Apr 2024", amount: 120, status: "confirmed" },
-      { id: "c14", voucherCode: "VCH-2024-0188", voucherName: "Mental Health Support Voucher", transactionType: "refund", service: "Clinical Therapy", provider: "Mind & Soul Clinic", location: "Mont Kiara", date: "09 Apr 2024", amount: 180, status: "confirmed" },
-    ],
-  },
-];

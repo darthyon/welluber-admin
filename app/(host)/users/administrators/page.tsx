@@ -5,7 +5,7 @@ import { Plus, Shield, Buildings, Storefront, MagnifyingGlass, Export, DownloadS
 import { Button } from "@/components/ui/button";
 import { SharedDataTable, Column } from "@/components/shared/data-table";
 import { StatusBadge } from "@/components/shared/status-badge";
-import { MOCK_ADMINS } from "@/features/users/mock-data";
+import { MOCK_ADMINS } from "@/lib/mock-data";
 import { Administrator } from "@/features/users/types";
 import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { FilterItem } from "@/components/shared/filter-item";

@@ -22,25 +22,22 @@ interface PolicyOption {
 
 const GLOBAL_POLICIES: PolicyOption[] = [
   {
-    id: "pol_1",
-    name: "Executive Health Plus",
-    code: "WP-EXE-2026",
-    description:
-      "Comprehensive wellness policy with full health screening and premium gym access.",
+    id: "POL-20260115-0001",
+    name: "Standard Health 2026",
+    code: "BEN-STD-01",
+    description: "Comprehensive wellness policy for all full-time staff.",
   },
   {
-    id: "pol_2",
-    name: "Standard Workforce Pool",
-    code: "WP-STD-2026",
-    description:
-      "Standard benefits for full-time employees including basic outpatient and dental.",
+    id: "POL-20260115-0002",
+    name: "Executive Wellness",
+    code: "BEN-EXC-02",
+    description: "Premium tier benefits including specialized clinical therapy.",
   },
   {
-    id: "pol_3",
-    name: "Remote Flex Benefits",
-    code: "WP-RMT-2026",
-    description:
-      "Tailored for remote workers with lifestyle co-working and equipment allowances.",
+    id: "POL-20260115-0003",
+    name: "Contractor Lite",
+    code: "BEN-CON-03",
+    description: "Stripped-down benefits for contract and intern staff.",
   },
 ]
 

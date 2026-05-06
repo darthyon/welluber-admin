@@ -17,7 +17,7 @@ import { createSp } from "@/features/providers/actions";
 import { Button } from "@/components/ui/button";
 import { MASTER_SERVICE_TAXONOMY } from "@/features/providers/service-taxonomy";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MOCK_BRANDS } from "@/features/brands/mock-data";
+import { MOCK_BRANDS } from "@/lib/mock-data";
 import { BrandSelectionModal } from "@/components/host/service-providers/brand-selection-modal";
 import { Brand } from "@/types/brand";
 import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav";

@@ -90,7 +90,7 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
           <div className="flex flex-col justify-center">
             <div className="flex items-center gap-1.5 leading-tight">
               <span className="text-label font-medium text-foreground">
-                {formatCurrency(org.totalWalletBalance)}
+                {formatCurrency(org.totalAccountBalance)}
               </span>
               {org.claimsCount !== undefined && (
                 <span className="text-label font-medium px-1.5 rounded-full bg-muted text-faint border border-border tabular-nums leading-none flex items-center">
@@ -99,7 +99,7 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
               )}
             </div>
             <span className="text-label text-faint font-medium tabular-nums mt-0.5">
-              / {formatCurrency(org.walletLimit)}
+              / {formatCurrency(org.accountLimit)}
             </span>
           </div>
         </div>

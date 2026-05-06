@@ -13,9 +13,9 @@ import { Button } from "@/components/ui/button"
 import { DataFilterBar } from "@/components/shared/data-filter-bar"
 import { FilterItem } from "@/components/shared/filter-item"
 import { EmptyState } from "@/components/shared/empty-state"
-import { useWallets } from "@/features/wallets/hooks"
-import { WALLET_STATUS_OPTIONS } from "@/features/wallets/constants"
-import type { Wallet } from "@/features/wallets/types"
+import { useAccounts } from "@/features/accounts/hooks"
+import { ACCOUNT_STATUS_OPTIONS } from "@/features/accounts/constants"
+import type { Account } from "@/features/accounts/types"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { BentoGrid, BentoCard } from "@/components/shared/bento-grid"
 import {
@@ -27,28 +27,28 @@ import { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { ActionPopover } from "@/components/shared/action-popover"
-import { UpdateBalanceModal } from "@/components/host/wallets/update-balance-modal"
-import { RecordTopupModal } from "@/components/host/wallets/record-topup-modal"
+import { UpdateBalanceModal } from "@/components/host/accounts/update-balance-modal"
+import { RecordTopupModal } from "@/components/host/accounts/record-topup-modal"
 
 interface OrgRow {
   id: string
   orgId: string
   orgName: string
-  walletCount: number
+  accountCount: number
   totalBalance: number
   activeCount: number
   suspendedCount: number
-  wallets: Wallet[]
+  accounts: Account[]
 }
 
-function useOrgRows(wallets: Wallet[]): OrgRow[] {
+function useOrgRows(accounts: Account[]): OrgRow[] {
   return useMemo(() => {
     const map = new Map<string, OrgRow>()
-    wallets.forEach((w) => {
+    accounts.forEach((w) => {
       const existing = map.get(w.orgId)
       if (existing) {
-        existing.wallets.push(w)
-        existing.walletCount += 1
+        existing.accounts.push(w)
+        existing.accountCount += 1
         existing.totalBalance += w.balance
         if (w.status === "active") existing.activeCount += 1
         else if (w.status === "suspended") existing.suspendedCount += 1
@@ -57,27 +57,27 @@ function useOrgRows(wallets: Wallet[]): OrgRow[] {
           id: w.orgId,
           orgId: w.orgId,
           orgName: w.orgName,
-          walletCount: 1,
+          accountCount: 1,
           totalBalance: w.balance,
           activeCount: w.status === "active" ? 1 : 0,
           suspendedCount: w.status === "suspended" ? 1 : 0,
-          wallets: [w],
+          accounts: [w],
         })
       }
     })
     return Array.from(map.values())
-  }, [wallets])
+  }, [accounts])
 }
 
 export default function AccountsPage() {
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false)
   const [expandedOrgIds, setExpandedOrgIds] = useState<Set<string>>(new Set())
-  const [updateBalanceWallet, setUpdateBalanceWallet] = useState<Wallet | null>(null)
-  const [recordTopupWallet, setRecordTopupWallet] = useState<Wallet | null>(null)
-  const { wallets, summary, filters, setFilters } = useWallets()
+  const [updateBalanceAccount, setUpdateBalanceAccount] = useState<Account | null>(null)
+  const [recordTopupAccount, setRecordTopupAccount] = useState<Account | null>(null)
+  const { accounts, summary, filters, setFilters } = useAccounts()
   const router = useRouter()
 
-  const orgRows = useOrgRows(wallets)
+  const orgRows = useOrgRows(accounts)
 
   const activeAdvancedCount = filters.utilization[1] < 100 ? 1 : 0
 
@@ -106,7 +106,7 @@ export default function AccountsPage() {
         </div>
 
         {/* Account Rows */}
-        {row.wallets.map((wallet) => (
+        {row.accounts.map((wallet) => (
           <div
             key={wallet.id}
             className="grid grid-cols-12 gap-4 px-4 py-3 items-center border-b border-border/40 last:border-b-0 hover:bg-muted/20 transition-colors cursor-pointer"
@@ -169,11 +169,11 @@ export default function AccountsPage() {
                   },
                   {
                     label: "Update balance",
-                    onClick: () => setUpdateBalanceWallet(wallet),
+                    onClick: () => setUpdateBalanceAccount(wallet),
                   },
                   {
                     label: "Record manual top-up",
-                    onClick: () => setRecordTopupWallet(wallet),
+                    onClick: () => setRecordTopupAccount(wallet),
                   },
                   {
                     label:
@@ -242,7 +242,7 @@ export default function AccountsPage() {
         />
         <BentoCard
           title="Total Accounts"
-          value={summary.totalWallets.toString()}
+          value={summary.totalAccounts.toString()}
           icon={Buildings}
         />
       </BentoGrid>
@@ -260,7 +260,7 @@ export default function AccountsPage() {
               onChange={(v) => setFilters({ ...filters, status: v as any })}
               options={[
                 { label: "All Status", value: "all" },
-                ...WALLET_STATUS_OPTIONS,
+                ...ACCOUNT_STATUS_OPTIONS,
               ]}
             />
           </>
@@ -303,12 +303,12 @@ export default function AccountsPage() {
               },
               {
                 header: "Accounts",
-                accessorKey: "walletCount",
+                accessorKey: "accountCount",
                 sortable: true,
                 align: "right",
                 render: (row: OrgRow) => (
                   <span className="text-body font-medium text-foreground">
-                    {row.walletCount}
+                    {row.accountCount}
                   </span>
                 ),
               },
@@ -392,25 +392,25 @@ export default function AccountsPage() {
         onApply={() => setIsFilterSheetOpen(false)}
         showWorkforce={false}
         showIndustry={false}
-        showWalletModel={false}
+        showAccountModel={false}
         description="Filter accounts by utilisation levels and specific billing models."
       />
 
       {/* Modals */}
-      {updateBalanceWallet && (
+      {updateBalanceAccount && (
         <UpdateBalanceModal
-          isOpen={!!updateBalanceWallet}
-          onClose={() => setUpdateBalanceWallet(null)}
-          walletId={updateBalanceWallet.id}
-          walletName={updateBalanceWallet.name}
+          isOpen={!!updateBalanceAccount}
+          onClose={() => setUpdateBalanceAccount(null)}
+          accountId={updateBalanceAccount.id}
+          accountName={updateBalanceAccount.name}
         />
       )}
-      {recordTopupWallet && (
+      {recordTopupAccount && (
         <RecordTopupModal
-          isOpen={!!recordTopupWallet}
-          onClose={() => setRecordTopupWallet(null)}
-          walletId={recordTopupWallet.id}
-          walletName={recordTopupWallet.name}
+          isOpen={!!recordTopupAccount}
+          onClose={() => setRecordTopupAccount(null)}
+          accountId={recordTopupAccount.id}
+          accountName={recordTopupAccount.name}
         />
       )}
     </div>

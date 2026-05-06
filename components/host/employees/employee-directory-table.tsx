@@ -1,6 +1,6 @@
 "use client"
 
-
+import type { EmployeeDirectoryItem } from "@/features/employees/types"
 import { SharedDataTable } from "@/components/shared/data-table"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { ActionPopover } from "@/components/shared/action-popover"
@@ -11,26 +11,6 @@ import {
   TooltipProvider,
 } from "@/components/ui/tooltip"
 
-export interface EmployeeDirectoryItem {
-  id: string
-  orgId?: string
-  name: string
-  email: string
-  organization: string
-  branch: string
-  joinDate: string
-  lastActive: string
-  status: string
-  empCode: string
-  department?: string
-  tier?: string
-  employmentType?: string
-  benefitPolicies: {
-    policyName: string
-    benefitGroups: string[]
-    utilisation: number
-  }[]
-}
 
 interface EmployeeDirectoryTableProps {
   data: EmployeeDirectoryItem[]
@@ -265,122 +245,3 @@ export function EmployeeDirectoryTable({
     </TooltipProvider>
   )
 }
-
-export const MOCK_EMPLOYEES: EmployeeDirectoryItem[] = [
-  {
-    id: "emp_1",
-    orgId: "ORG-20260115-0001",
-    name: "Robert Fox",
-    email: "robert.f@acme.com",
-    organization: "ACME Corporation",
-    branch: "ACME HQ",
-    joinDate: "12 Oct 2023",
-    lastActive: "09 Apr 2024, 17:15",
-    status: "Linked",
-    empCode: "ACM-001",
-    department: "Engineering",
-    tier: "T3",
-    employmentType: "full-time",
-    benefitPolicies: [
-      {
-        policyName: "Wellness Allocation",
-        benefitGroups: ["Gym", "Mental Health"],
-        utilisation: 48,
-      },
-      { policyName: "Corporate Perks", benefitGroups: [], utilisation: 0 },
-    ],
-  },
-  {
-    id: "emp_2",
-    orgId: "ORG-20260115-0001",
-    name: "Jenny Wilson",
-    email: "jenny.w@acme.com",
-    organization: "ACME Corporation",
-    branch: "ACME Subang Jaya",
-    joinDate: "05 Mar 2024",
-    lastActive: "09 Apr 2024, 16:45",
-    status: "Linked",
-    empCode: "ACM-042",
-    department: "Product",
-    tier: "T2",
-    employmentType: "full-time",
-    benefitPolicies: [
-      {
-        policyName: "Lifestyle Pocket",
-        benefitGroups: ["Food", "Travel"],
-        utilisation: 85,
-      },
-    ],
-  },
-  {
-    id: "emp_3",
-    orgId: "ORG-20260301-0002",
-    name: "Dianne Russell",
-    email: "dianne.r@acme.com",
-    organization: "Global Health Ltd",
-    branch: "ACME HQ",
-    joinDate: "20 May 2026",
-    lastActive: "09 Apr 2024, 10:20",
-    status: "Pending",
-    empCode: "ACM-156",
-    department: "Growth",
-    tier: "T4",
-    employmentType: "internship",
-    benefitPolicies: [
-      {
-        policyName: "Rejuvenation Fund",
-        benefitGroups: [
-          "Spa Sessions",
-          "Massages",
-          "Facials",
-          "Manicures",
-          "Pedicures",
-          "Aromatherapy",
-          "Hot Stone",
-        ],
-        utilisation: 15,
-      },
-    ],
-  },
-  {
-    id: "emp_4",
-    orgId: "ORG-20260401-0003",
-    name: "Marvin McKinney",
-    email: "marvin@acme.com",
-    organization: "Zenith Wellness",
-    branch: "ACME Subang Jaya",
-    joinDate: "12 Jan 2024",
-    lastActive: "08 Apr 2024, 14:30",
-    status: "Linked",
-    empCode: "ACM-089",
-    department: "Sales",
-    tier: "T3",
-    employmentType: "contract",
-    benefitPolicies: [
-      {
-        policyName: "Mental Health Support",
-        benefitGroups: ["Counseling", "Meditation Apps"],
-        utilisation: 12,
-      },
-      { policyName: "Development Fund", benefitGroups: [], utilisation: 0 },
-      { policyName: "WFH Allowance", benefitGroups: [], utilisation: 0 },
-      { policyName: "Wellness Extras", benefitGroups: [], utilisation: 0 },
-    ],
-  },
-  {
-    id: "emp_5",
-    orgId: "ORG-20260115-0001",
-    name: "Jason Teh",
-    email: "jason.t@acme.com",
-    organization: "ACME Corporation",
-    branch: "ACME HQ",
-    joinDate: "01 May 2026",
-    lastActive: "01 May 2026, 09:00",
-    status: "Pending",
-    empCode: "ACM-212",
-    department: "Finance",
-    tier: "T3",
-    employmentType: "full-time",
-    benefitPolicies: [],
-  },
-]

@@ -69,7 +69,7 @@ export async function assignPoliciesToOrganization(orgId: string, policyIds: str
   };
 }
 
-export async function sendWalletPaymentLink(orgId: string, amount: number, financeEmail: string) {
+export async function sendAccountPaymentLink(orgId: string, amount: number, financeEmail: string) {
   await new Promise((resolve) => setTimeout(resolve, 600));
   return {
     success: true,

@@ -11,22 +11,31 @@ import { DateRangePicker } from "@/components/shared/date-range-picker"
 import { Progress } from "@/components/ui/progress"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { type DateRange } from "react-day-picker"
+import { MOCK_ORGS, MOCK_SPS } from "@/lib/mock-data"
 
-const topOrgs = [
-  { id: "o1", rank: 1, name: "TechCorp Global", metric1: "12,402", metric2: "92%" },
-  { id: "o2", rank: 2, name: "RetailPlus Group", metric1: "8,921", metric2: "78%" },
-  { id: "o3", rank: 3, name: "Global Networks", metric1: "5,310", metric2: "64%" },
-  { id: "o4", rank: 4, name: "Alpha Logistics", metric1: "4,105", metric2: "81%" },
-  { id: "o5", rank: 5, name: "Swift Solutions", metric1: "3,890", metric2: "72%" },
-]
+const topOrgs = MOCK_ORGS
+  .slice()
+  .sort((a, b) => b.utilizationRate - a.utilizationRate)
+  .slice(0, 5)
+  .map((org, i) => ({
+    id: org.id,
+    rank: i + 1,
+    name: org.name,
+    metric1: (org.claimsCount ?? 0).toLocaleString(),
+    metric2: `${org.utilizationRate}%`,
+  }))
 
-const topSPs = [
-  { id: "s1", rank: 1, name: "Urban Wellness Centre", metric1: "12k", metric2: "4.9" },
-  { id: "s2", rank: 2, name: "Zenith Yoga Studio", metric1: "8.4k", metric2: "4.8" },
-  { id: "s3", rank: 3, name: "Apex Performance Lab", metric1: "7.1k", metric2: "5.0" },
-  { id: "s4", rank: 4, name: "Serenity Day Spa", metric1: "6.8k", metric2: "4.7" },
-  { id: "s5", rank: 5, name: "Core Strength Gym", metric1: "5.2k", metric2: "4.9" },
-]
+const topSPs = MOCK_SPS
+  .slice()
+  .sort((a, b) => b.activeVoucherCount - a.activeVoucherCount)
+  .slice(0, 5)
+  .map((sp, i) => ({
+    id: sp.id,
+    rank: i + 1,
+    name: sp.name,
+    metric1: sp.activeVoucherCount.toLocaleString(),
+    metric2: (4.9 - i * 0.1).toFixed(1),
+  }))
 
 export default function DashboardPage() {
   const [period, setPeriod] = useState<"By Month" | "By Quarter" | "By Year">("By Month")

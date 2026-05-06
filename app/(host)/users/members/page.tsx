@@ -5,7 +5,7 @@ import { Plus, Users, Buildings, TreeStructure, MagnifyingGlass, Export, Funnel,
 import { Button } from "@/components/ui/button";
 import { SharedDataTable, Column } from "@/components/shared/data-table";
 import { StatusBadge } from "@/components/shared/status-badge";
-import { MOCK_MEMBERS } from "@/features/users/mock-data";
+import { MOCK_MEMBERS } from "@/lib/mock-data";
 import { Member } from "@/features/users/types";
 import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { FilterItem } from "@/components/shared/filter-item";

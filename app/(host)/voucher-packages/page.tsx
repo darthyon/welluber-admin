@@ -10,7 +10,7 @@ import {
   VoucherPackagesTable,
   VoucherPackageItem,
 } from "@/components/host/voucher-packages/voucher-packages-table"
-import { MOCK_SPS } from "@/features/providers/mock-data"
+import { MOCK_SPS } from "@/lib/mock-data"
 import type { SpVoucherStatus } from "@/types/provider"
 
 const STATUS_FILTER_TABS: { label: string; value: SpVoucherStatus | "all" }[] = [

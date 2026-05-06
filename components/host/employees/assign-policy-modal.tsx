@@ -14,18 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-
-interface Policy {
-  id: string;
-  name: string;
-  description: string;
-  benefitGroups: string[];
-  totalAllocated: number;
-  eligibility: {
-    employeeTypes: string[];
-    roles: string[];
-  };
-}
+import { MOCK_ASSIGNABLE_POLICIES } from "@/lib/mock-data";
 
 interface AssignPolicyModalProps {
   open: boolean;
@@ -35,52 +24,6 @@ interface AssignPolicyModalProps {
   onAssign: (policyId: string) => void;
 }
 
-const MOCK_POLICIES: Policy[] = [
-  {
-    id: "policy_1",
-    name: "Wellness Allocation",
-    description: "Comprehensive wellness benefits covering gym memberships, mental health support, and optical care.",
-    benefitGroups: ["Gym Membership", "Mental Health", "Optical"],
-    totalAllocated: 2500,
-    eligibility: {
-      employeeTypes: ["Full-time", "Part-time"],
-      roles: ["All Roles"],
-    },
-  },
-  {
-    id: "policy_2",
-    name: "Lifestyle Pocket",
-    description: "Flexible lifestyle benefits for food & beverage, entertainment, and transportation.",
-    benefitGroups: ["Food & Beverage", "Entertainment", "Transportation"],
-    totalAllocated: 1000,
-    eligibility: {
-      employeeTypes: ["Full-time"],
-      roles: ["All Roles"],
-    },
-  },
-  {
-    id: "policy_3",
-    name: "Executive Wellness",
-    description: "Premium wellness package for executives with higher allocations and additional services.",
-    benefitGroups: ["Gym Membership", "Mental Health", "Optical", "Health Screening"],
-    totalAllocated: 5000,
-    eligibility: {
-      employeeTypes: ["Full-time"],
-      roles: ["Manager", "Director", "Executive"],
-    },
-  },
-  {
-    id: "policy_4",
-    name: "Basic Health Support",
-    description: "Essential health benefits for entry-level employees.",
-    benefitGroups: ["Mental Health", "Optical"],
-    totalAllocated: 1500,
-    eligibility: {
-      employeeTypes: ["Full-time", "Contract"],
-      roles: ["All Roles"],
-    },
-  },
-];
 
 export function AssignPolicyModal({
   open,
@@ -92,14 +35,14 @@ export function AssignPolicyModal({
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPolicyId, setSelectedPolicyId] = useState<string | null>(null);
 
-  const filteredPolicies = MOCK_POLICIES.filter(
+  const filteredPolicies = MOCK_ASSIGNABLE_POLICIES.filter(
     (policy) =>
       policy.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       policy.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const selectedPolicy = selectedPolicyId
-    ? MOCK_POLICIES.find((p) => p.id === selectedPolicyId)
+    ? MOCK_ASSIGNABLE_POLICIES.find((p) => p.id === selectedPolicyId)
     : null;
 
   const handleAssign = () => {

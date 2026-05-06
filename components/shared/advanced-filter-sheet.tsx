@@ -23,7 +23,7 @@ export interface AdvancedFilters {
   employees: [number, number];
   services: string[];
   industry: string;
-  walletModel: string;
+  accountModel: string;
 }
 
 export const DEFAULT_ADVANCED_FILTERS: AdvancedFilters = {
@@ -31,7 +31,7 @@ export const DEFAULT_ADVANCED_FILTERS: AdvancedFilters = {
   employees: [0, 5000] as [number, number],
   services: [],
   industry: "all",
-  walletModel: "all",
+  accountModel: "all",
 };
 
 interface AdvancedFilterSheetProps {
@@ -42,7 +42,7 @@ interface AdvancedFilterSheetProps {
   onApply: () => void;
   workforceRanges?: WorkforceRange[];
   industries?: string[];
-  showWalletModel?: boolean;
+  showAccountModel?: boolean;
   showWorkforce?: boolean;
   showUtilization?: boolean;
   showIndustry?: boolean;
@@ -57,7 +57,7 @@ export function AdvancedFilterSheet({
   onApply,
   workforceRanges = [],
   industries = [],
-  showWalletModel = true,
+  showAccountModel = true,
   showWorkforce = true,
   showUtilization = true,
   showIndustry = true,
@@ -121,7 +121,7 @@ export function AdvancedFilterSheet({
                 onChange={(v) => setFilters({ ...filters, utilization: [0, v] })}
               />
 
-              {showWalletModel && (
+              {showAccountModel && (
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 text-faint">
                     <Wallet size={14} weight="bold" />
@@ -131,10 +131,10 @@ export function AdvancedFilterSheet({
                     {["Cash Balance", "Credit Limit"].map((model) => (
                       <button
                         key={model}
-                        onClick={() => setFilters({ ...filters, walletModel: model === filters.walletModel ? "all" : model })}
+                        onClick={() => setFilters({ ...filters, accountModel: model === filters.accountModel ? "all" : model })}
                         className={cn(
                           "px-3 py-2.5 rounded-lg border text-label font-semibold transition-all capitalize",
-                          filters.walletModel === model
+                          filters.accountModel === model
                             ? "bg-primary/10 border-primary text-primary"
                             : "bg-card border-border text-muted-foreground hover:bg-muted/30"
                         )}

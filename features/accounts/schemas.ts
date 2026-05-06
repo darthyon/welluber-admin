@@ -1,9 +1,9 @@
 import { z } from "zod";
 
-export const WalletStatusEnum = z.enum(["active", "suspended", "closed"]);
-export const WalletTypeEnum = z.enum(["new", "existing"]);
+export const AccountStatusEnum = z.enum(["active", "suspended", "closed"]);
+export const AccountTypeEnum = z.enum(["new", "existing"]);
 
-export const createWalletSchema = z.object({
+export const createAccountSchema = z.object({
   name: z.string().min(1, "Account name is required"),
   orgId: z.string().min(1, "Organization is required"),
   branchId: z.string().min(1, "Branch is required"),
@@ -11,17 +11,17 @@ export const createWalletSchema = z.object({
   attachmentUrl: z.string().optional(),
 });
 
-export const adjustWalletSchema = z.object({
-  walletId: z.string().min(1, "Account ID is required"),
+export const adjustAccountSchema = z.object({
+  accountId: z.string().min(1, "Account ID is required"),
   amount: z.number().min(0, "Amount cannot be negative"),
   reason: z.string().min(1, "Reason is required"),
 });
 
 export const updateCreditLimitSchema = z.object({
-  walletId: z.string().min(1, "Account ID is required"),
+  accountId: z.string().min(1, "Account ID is required"),
   creditLimit: z.number().min(0, "Credit limit cannot be negative"),
 });
 
-export type CreateWalletInput = z.infer<typeof createWalletSchema>;
-export type AdjustWalletInput = z.infer<typeof adjustWalletSchema>;
+export type CreateAccountInput = z.infer<typeof createAccountSchema>;
+export type AdjustAccountInput = z.infer<typeof adjustAccountSchema>;
 export type UpdateCreditLimitInput = z.infer<typeof updateCreditLimitSchema>;

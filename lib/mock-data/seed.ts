@@ -1,0 +1,297 @@
+import type { EmployeeUtilisationRow, EmployeeClaim } from "@/types/claims"
+import type { EmployeeDirectoryItem, AssignablePolicy, FormPolicy, VoucherRedemption } from "@/features/employees/types"
+import type { PolicyTemplate } from "@/types/policy"
+import { Registry } from "./registry"
+import { createBrand } from "./factories/brand"
+import { createOrganization } from "./factories/organization"
+import { createServiceProvider } from "./factories/service-provider"
+import { createEmployee } from "./factories/employee"
+import { createMember, createAdmin } from "./factories/user"
+import { createPolicy } from "./factories/policy"
+import { createClaim } from "./factories/claim"
+import { createGeneratedVoucher, createTopupTransaction } from "./factories/voucher"
+import { createAccount } from "./factories/account"
+import { createAuditLog } from "./factories/audit-log"
+import { createDependent } from "./factories/dependent"
+import { createEntitlement } from "./factories/entitlement"
+
+function seedAll() {
+  // Dependency order: no-dep entities first, then dependents
+  const brands = Array.from({ length: 10 }, (_, i) => createBrand(i))
+  const organizations = Array.from({ length: 10 }, (_, i) => createOrganization(i))
+  const serviceProviders = Array.from({ length: 10 }, (_, i) => createServiceProvider(i))
+  const employees = Array.from({ length: 10 }, (_, i) => createEmployee(i))
+  const members = Array.from({ length: 10 }, (_, i) => createMember(i))
+  const admins = Array.from({ length: 10 }, (_, i) => createAdmin(i))
+  const policyBundles = Array.from({ length: 10 }, (_, i) => createPolicy(i))
+  const policies = policyBundles.map(b => b.policy)
+  const claims = Array.from({ length: 10 }, (_, i) => createClaim(i))
+  const generatedVouchers = Array.from({ length: 10 }, (_, i) => createGeneratedVoucher(i))
+  const accounts = Array.from({ length: 10 }, (_, i) => createAccount(i))
+  const topupHistory = Array.from({ length: 10 }, (_, i) => createTopupTransaction(i))
+  const auditLogs = Array.from({ length: 10 }, (_, i) => createAuditLog(i))
+  const dependents = Array.from({ length: 10 }, (_, i) => createDependent(i))
+  const entitlements = Array.from({ length: 8 }, (_, i) => createEntitlement(i))
+
+  // Populate registry (single source of truth for ID lookups)
+  brands.forEach(b => Registry.brands.set(b.id, b))
+  organizations.forEach(o => Registry.organizations.set(o.id, o))
+  serviceProviders.forEach(sp => Registry.serviceProviders.set(sp.id, sp))
+  employees.forEach(e => Registry.employees.set(e.id, e))
+  members.forEach(m => Registry.members.set(m.id, m))
+  admins.forEach(a => Registry.admins.set(a.id, a))
+  policyBundles.forEach(b => {
+    Registry.policies.set(b.policy.id, b.policy)
+    Registry.policyData.set(b.policy.id, b.data)
+  })
+  generatedVouchers.forEach(v => Registry.generatedVouchers.set(v.id, v))
+  accounts.forEach(a => Registry.accounts.set(a.id, a))
+  topupHistory.forEach(t => Registry.topupHistory.set(t.id, t))
+  auditLogs.forEach(a => Registry.auditLogs.set(a.id, a))
+  dependents.forEach(d => Registry.dependents.set(d.id, d))
+
+  return {
+    brands,
+    organizations,
+    serviceProviders,
+    employees,
+    members,
+    admins,
+    policies,
+    policyBundles,
+    claims,
+    generatedVouchers,
+    accounts,
+    topupHistory,
+    auditLogs,
+    dependents,
+    entitlements,
+  }
+}
+
+const SEED = seedAll()
+
+// Named exports matching existing MOCK_* naming conventions
+export const MOCK_BRANDS = SEED.brands
+export const MOCK_ORGS = SEED.organizations
+export const MOCK_SPS = SEED.serviceProviders
+export const MOCK_EMPLOYEE_ENTITIES = SEED.employees
+export const MOCK_MEMBERS = SEED.members
+export const MOCK_ADMINS = SEED.admins
+export const MOCK_POLICIES = SEED.policies
+export const MOCK_POLICY_BUNDLES = SEED.policyBundles
+export const MOCK_CLAIMS = SEED.claims
+export const MOCK_GENERATED_VOUCHERS = SEED.generatedVouchers
+export const MOCK_ACCOUNTS = SEED.accounts
+export const MOCK_TOPUP_HISTORY = SEED.topupHistory
+export const MOCK_AUDIT_LOGS = SEED.auditLogs
+export const MOCK_DEPENDENTS = SEED.dependents
+export const MOCK_ENTITLEMENTS = SEED.entitlements
+
+// Policy data map keyed by policy ID (replaces POLICY_DATA_MAP_INITIAL)
+export const MOCK_POLICY_DATA_MAP: Record<string, ReturnType<typeof import("./factories/policy").createPolicy>["data"]> = Object.fromEntries(
+  SEED.policyBundles.map(b => [b.policy.id, b.data])
+)
+
+// Dashboard-derived summaries (real IDs, computed from MOCK_ORGS / MOCK_SPS)
+export const MOCK_TOP_ORGS = MOCK_ORGS
+  .filter(o => o.status === "active")
+  .sort((a, b) => b.utilizationRate - a.utilizationRate)
+  .slice(0, 5)
+  .map((o, i) => ({
+    id: o.id,
+    rank: i + 1,
+    name: o.name,
+    utilizationRate: o.utilizationRate,
+    claimsCount: o.claimsCount ?? 0,
+  }))
+
+export const MOCK_TOP_SPS = MOCK_SPS
+  .filter(sp => sp.status === "active")
+  .sort((a, b) => (b.activeVoucherCount ?? 0) - (a.activeVoucherCount ?? 0))
+  .slice(0, 5)
+  .map((sp, i) => ({
+    id: sp.id,
+    rank: i + 1,
+    name: sp.name,
+    activeVoucherCount: sp.activeVoucherCount ?? 0,
+    serviceCategories: sp.serviceCategories,
+  }))
+
+// Employee utilisation drill-down (shared between org detail and policy wizard)
+export const MOCK_EMPLOYEE_UTILISATION: EmployeeUtilisationRow[] = [
+  {
+    id: "EMP-20260115-0001", name: "Robert Fox", empCode: "ACM-001", branch: "ACME HQ",
+    allocated: 2500, used: 1200,
+    claims: [
+      { id: "c1", voucherCode: "VCH-2026-0081", voucherName: "Wellness Allocation Voucher", transactionType: "redemption", service: "Gymnasium Facilities", provider: "Celebrity Fitness KLCC", location: "Kuala Lumpur", date: "12 Mar 2026", amount: 180, status: "confirmed" },
+      { id: "c2", voucherCode: "VCH-2026-0114", voucherName: "Wellness Allocation Voucher", transactionType: "redemption", service: "Clinical Therapy", provider: "Mind & Soul Clinic", location: "Mont Kiara", date: "20 Mar 2026", amount: 320, status: "confirmed" },
+      { id: "c3", voucherCode: "VCH-2026-0198", voucherName: "Wellness Allocation Voucher", transactionType: "redemption", service: "Group Fitness", provider: "Ritual Yoga Studio", location: "Bangsar", date: "01 Apr 2026", amount: 95, status: "pre-auth" },
+      { id: "c4", voucherCode: "VCH-2026-0211", voucherName: "Wellness Allocation Voucher", transactionType: "reimbursement", service: "Dietary Counseling", provider: "NutriCare Clinic", location: "Damansara", date: "05 Apr 2026", amount: 605, status: "confirmed" },
+    ],
+  },
+  {
+    id: "EMP-20260115-0002", name: "Jenny Wilson", empCode: "ACM-042", branch: "ACME Subang Jaya",
+    allocated: 2500, used: 2125,
+    claims: [
+      { id: "c5", voucherCode: "VCH-2026-0033", voucherName: "Lifestyle Pocket Voucher", transactionType: "redemption", service: "Gymnasium Facilities", provider: "Fitness First Subang", location: "Subang Jaya", date: "03 Jan 2026", amount: 200, status: "confirmed" },
+      { id: "c6", voucherCode: "VCH-2026-0057", voucherName: "Lifestyle Pocket Voucher", transactionType: "redemption", service: "Therapeutic Spa", provider: "Hammam Spa & Wellness", location: "Shah Alam", date: "18 Feb 2026", amount: 380, status: "confirmed" },
+      { id: "c7", voucherCode: "VCH-2026-0089", voucherName: "Lifestyle Pocket Voucher", transactionType: "redemption", service: "Mental Fitness", provider: "Calm Studio KL", location: "Subang Jaya", date: "10 Mar 2026", amount: 145, status: "confirmed" },
+      { id: "c8", voucherCode: "VCH-2026-0132", voucherName: "Lifestyle Pocket Voucher", transactionType: "redemption", service: "Group Fitness", provider: "Barry's Bootcamp", location: "TTDI", date: "22 Mar 2026", amount: 200, status: "cancelled" },
+      { id: "c9", voucherCode: "VCH-2026-0201", voucherName: "Lifestyle Pocket Voucher", transactionType: "reimbursement", service: "Clinical Therapy", provider: "Therapy Works PJ", location: "Petaling Jaya", date: "08 Apr 2026", amount: 400, status: "confirmed" },
+      { id: "c10", voucherCode: "VCH-2026-0215", voucherName: "Lifestyle Pocket Voucher", transactionType: "redemption", service: "Dietary Counseling", provider: "NutriCare Clinic", location: "Subang Jaya", date: "10 Apr 2026", amount: 800, status: "pre-auth" },
+    ],
+  },
+  {
+    id: "EMP-20260115-0003", name: "Dianne Russell", empCode: "GHL-156", branch: "Global Health HQ",
+    allocated: 2500, used: 375,
+    claims: [
+      { id: "c11", voucherCode: "VCH-2026-0177", voucherName: "Rejuvenation Fund Voucher", transactionType: "redemption", service: "Therapeutic Spa", provider: "Relaxe Spa KL", location: "KLCC", date: "15 Mar 2026", amount: 250, status: "confirmed" },
+      { id: "c12", voucherCode: "VCH-2026-0190", voucherName: "Rejuvenation Fund Voucher", transactionType: "redemption", service: "Group Fitness", provider: "TRX Studio KL", location: "Bukit Bintang", date: "28 Mar 2026", amount: 125, status: "pre-auth" },
+    ],
+  },
+  {
+    id: "EMP-20260115-0004", name: "Marvin McKinney", empCode: "ZNT-089", branch: "Zenith HQ",
+    allocated: 2500, used: 300,
+    claims: [
+      { id: "c13", voucherCode: "VCH-2026-0144", voucherName: "Mental Health Support Voucher", transactionType: "redemption", service: "Mental Fitness", provider: "Headspace Partner KL", location: "Online", date: "01 Apr 2026", amount: 120, status: "confirmed" },
+      { id: "c14", voucherCode: "VCH-2026-0188", voucherName: "Mental Health Support Voucher", transactionType: "refund", service: "Clinical Therapy", provider: "Mind & Soul Clinic", location: "Mont Kiara", date: "09 Apr 2026", amount: 180, status: "confirmed" },
+    ],
+  },
+]
+
+// Employee directory (presentation join type — org/branch names denormalised for table display)
+export const MOCK_EMPLOYEES: EmployeeDirectoryItem[] = [
+  { id: "EMP-20260115-0001", orgId: "ORG-20260115-0001", name: "Robert Fox", email: "robert.f@acme.com", organization: "ACME Corporation", branch: "ACME HQ", joinDate: "12 Oct 2023", lastActive: "09 Apr 2026, 17:15", status: "Linked", empCode: "ACM-001", department: "Engineering", tier: "T3", employmentType: "full-time", benefitPolicies: [{ policyName: "Wellness Allocation", benefitGroups: ["Gym", "Mental Health"], utilisation: 48 }, { policyName: "Corporate Perks", benefitGroups: [], utilisation: 0 }] },
+  { id: "EMP-20260115-0002", orgId: "ORG-20260115-0001", name: "Jenny Wilson", email: "jenny.w@acme.com", organization: "ACME Corporation", branch: "ACME Subang Jaya", joinDate: "05 Mar 2026", lastActive: "09 Apr 2026, 16:45", status: "Linked", empCode: "ACM-042", department: "Product", tier: "T2", employmentType: "full-time", benefitPolicies: [{ policyName: "Lifestyle Pocket", benefitGroups: ["Food", "Travel"], utilisation: 85 }] },
+  { id: "EMP-20260115-0003", orgId: "ORG-20260301-0002", name: "Dianne Russell", email: "dianne.r@globalhealth.com", organization: "Global Health Ltd", branch: "Global Health HQ", joinDate: "20 May 2026", lastActive: "09 Apr 2026, 10:20", status: "Pending", empCode: "GHL-156", department: "Growth", tier: "T4", employmentType: "internship", benefitPolicies: [{ policyName: "Rejuvenation Fund", benefitGroups: ["Spa Sessions", "Massages", "Facials", "Manicures", "Pedicures", "Aromatherapy", "Hot Stone"], utilisation: 15 }] },
+  { id: "EMP-20260115-0004", orgId: "ORG-20260310-0003", name: "Marvin McKinney", email: "marvin.m@zenithwellness.com", organization: "Zenith Wellness", branch: "Zenith HQ", joinDate: "12 Jan 2026", lastActive: "08 Apr 2026, 14:30", status: "Linked", empCode: "ZNT-089", department: "Sales", tier: "T3", employmentType: "contract", benefitPolicies: [{ policyName: "Mental Health Support", benefitGroups: ["Counseling", "Meditation Apps"], utilisation: 12 }, { policyName: "Development Fund", benefitGroups: [], utilisation: 0 }, { policyName: "WFH Allowance", benefitGroups: [], utilisation: 0 }, { policyName: "Wellness Extras", benefitGroups: [], utilisation: 0 }] },
+  { id: "EMP-20260115-0005", orgId: "ORG-20260115-0001", name: "Jason Teh", email: "jason.t@acme.com", organization: "ACME Corporation", branch: "ACME HQ", joinDate: "01 May 2026", lastActive: "01 May 2026, 09:00", status: "Pending", empCode: "ACM-212", department: "Finance", tier: "T3", employmentType: "full-time", benefitPolicies: [] },
+  { id: "EMP-20260115-0006", orgId: "ORG-20260115-0001", name: "Ahmad Faizal", email: "ahmad.f@acme.com", organization: "ACME Corporation", branch: "ACME Subang Jaya", joinDate: "15 Jan 2026", lastActive: "07 May 2026, 08:45", status: "Linked", empCode: "ACM-301", department: "Operations", tier: "T2", employmentType: "full-time", benefitPolicies: [{ policyName: "Standard Health 2026", benefitGroups: ["Physical Wellbeing", "Mental Fitness"], utilisation: 60 }] },
+  { id: "EMP-20260115-0007", orgId: "ORG-20260401-0004", name: "Nurul Huda", email: "nurul.h@techventures.com", organization: "Tech Ventures Sdn Bhd", branch: "Tech Ventures KL", joinDate: "01 Apr 2026", lastActive: "06 May 2026, 11:30", status: "Linked", empCode: "TVB-015", department: "HR", tier: "T2", employmentType: "full-time", benefitPolicies: [] },
+  { id: "EMP-20260115-0008", orgId: "ORG-20260401-0004", name: "Kevin Tan", email: "kevin.t@techventures.com", organization: "Tech Ventures Sdn Bhd", branch: "Tech Ventures KL", joinDate: "01 Apr 2026", lastActive: "05 May 2026, 15:00", status: "Linked", empCode: "TVB-016", department: "Engineering", tier: "T3", employmentType: "full-time", benefitPolicies: [] },
+  { id: "EMP-20260115-0009", orgId: "ORG-20260301-0002", name: "Priya Raj", email: "priya.r@globalhealth.com", organization: "Global Health Ltd", branch: "Global Health HQ", joinDate: "01 Apr 2026", lastActive: "07 May 2026, 09:15", status: "Linked", empCode: "GHL-201", department: "Legal", tier: "T1", employmentType: "full-time", benefitPolicies: [{ policyName: "Executive Wellness", benefitGroups: ["Premium Wellness", "Clinical Therapy"], utilisation: 30 }] },
+  { id: "EMP-20260115-0010", orgId: "ORG-20260401-0005", name: "David Lee", email: "david.l@medicarecorp.com", organization: "MediCare Corp", branch: "MediCare Main Office", joinDate: "15 Mar 2026", lastActive: "06 May 2026, 13:45", status: "Linked", empCode: "MCR-009", department: "Marketing", tier: "T3", employmentType: "part-time", benefitPolicies: [] },
+]
+
+// Employee claims (per-employee detail view)
+export const MOCK_EMPLOYEE_CLAIMS: EmployeeClaim[] = [
+  { id: "c1", voucherCode: "VCH-2026-0081", voucherName: "Wellness Allocation Voucher", transactionType: "redemption", service: "Gymnasium Facilities", provider: "Celebrity Fitness KLCC", location: "Kuala Lumpur", date: "12 Mar 2026", amount: 180, status: "confirmed", benefitGroup: "Gym Membership" },
+  { id: "c2", voucherCode: "VCH-2026-0114", voucherName: "Wellness Allocation Voucher", transactionType: "redemption", service: "Clinical Therapy", provider: "Mind & Soul Clinic", location: "Mont Kiara", date: "20 Mar 2026", amount: 320, status: "confirmed", benefitGroup: "Mental Health" },
+  { id: "c3", voucherCode: "VCH-2026-0198", voucherName: "Wellness Allocation Voucher", transactionType: "redemption", service: "Group Fitness", provider: "Ritual Yoga Studio", location: "Bangsar", date: "01 Apr 2026", amount: 95, status: "pre-auth", benefitGroup: "Gym Membership" },
+  { id: "c4", voucherCode: "VCH-2026-0211", voucherName: "Wellness Allocation Voucher", transactionType: "reimbursement", service: "Dietary Counseling", provider: "NutriCare Clinic", location: "Damansara", date: "05 Apr 2026", amount: 605, status: "confirmed", benefitGroup: "Mental Health" },
+  { id: "c5", voucherCode: "VCH-2026-0033", voucherName: "Lifestyle Pocket Voucher", transactionType: "redemption", service: "Grab Food Voucher", provider: "Grab Malaysia", location: "Online", date: "03 Jan 2026", amount: 200, status: "confirmed", benefitGroup: "Food & Beverage" },
+  { id: "c6", voucherCode: "VCH-2026-0102", voucherName: "Lifestyle Pocket Voucher", transactionType: "redemption", service: "Flight Subsidy", provider: "AirAsia", location: "KLIA2", date: "15 Feb 2026", amount: 450, status: "confirmed", benefitGroup: "Travel" },
+  { id: "c7", voucherCode: "VCH-2026-0189", voucherName: "Lifestyle Pocket Voucher", transactionType: "redemption", service: "Hotel Stay", provider: "Marriott Putrajaya", location: "Putrajaya", date: "20 Mar 2026", amount: 200, status: "pre-auth", benefitGroup: "Travel" },
+]
+
+// Employee voucher redemptions (per-employee voucher history view)
+export const MOCK_EMPLOYEE_VOUCHERS: VoucherRedemption[] = [
+  { id: "v1", voucherCode: "VCH-2026-0081", voucherName: "Gym Membership Pass", category: "Wellness Allocation", benefitType: "Gym & Fitness", date: "12 Mar 2026", redeemedBy: "Robert Fox", redeemedByType: "Employee", amount: 180, provider: "Celebrity Fitness KLCC", branch: "ACME HQ", city: "Kuala Lumpur", status: "confirmed" },
+  { id: "v2", voucherCode: "VCH-2026-0114", voucherName: "Mental Health Consultation", category: "Wellness Allocation", benefitType: "Mental Health", date: "20 Mar 2026", redeemedBy: "Robert Fox", redeemedByType: "Employee", amount: 320, provider: "Mind & Soul Clinic", branch: "ACME HQ", city: "Mont Kiara", status: "confirmed" },
+  { id: "v3", voucherCode: "VCH-2026-0198", voucherName: "Group Yoga Class", category: "Wellness Allocation", benefitType: "Yoga & Meditation", date: "01 Apr 2026", redeemedBy: "Sarah Fox", redeemedByType: "Dependent", amount: 95, provider: "Ritual Yoga Studio", branch: "ACME HQ", city: "Bangsar", status: "pre-auth" },
+  { id: "v4", voucherCode: "VCH-2026-0211", voucherName: "Nutrition Counseling Session", category: "Wellness Allocation", benefitType: "Nutrition & Diet", date: "05 Apr 2026", redeemedBy: "Robert Fox", redeemedByType: "Employee", amount: 605, provider: "NutriCare Clinic", branch: "ACME HQ", city: "Damansara", status: "confirmed" },
+  { id: "v5", voucherCode: "VCH-2026-0256", voucherName: "Food & Dining Voucher", category: "Lifestyle Pocket", benefitType: "Food & Beverage", date: "18 Apr 2026", redeemedBy: "Robert Fox", redeemedByType: "Employee", amount: 120, provider: "GrabFood", branch: "ACME HQ", city: "Kuala Lumpur", status: "confirmed" },
+]
+
+// Assignable policies (policy assign modal — richer shape with eligibility)
+export const MOCK_ASSIGNABLE_POLICIES: AssignablePolicy[] = [
+  { id: "POL-20260115-0001", name: "Wellness Allocation", description: "Comprehensive wellness benefits covering gym memberships, mental health support, and optical care.", benefitGroups: ["Gym Membership", "Mental Health", "Optical"], totalAllocated: 2500, eligibility: { employeeTypes: ["Full-time", "Part-time"], roles: ["All Roles"] } },
+  { id: "POL-20260115-0002", name: "Lifestyle Pocket", description: "Flexible lifestyle benefits for food & beverage, entertainment, and transportation.", benefitGroups: ["Food & Beverage", "Entertainment", "Transportation"], totalAllocated: 1000, eligibility: { employeeTypes: ["Full-time"], roles: ["All Roles"] } },
+  { id: "POL-20260115-0003", name: "Executive Wellness", description: "Premium wellness package for executives with higher allocations and additional services.", benefitGroups: ["Gym Membership", "Mental Health", "Optical", "Health Screening"], totalAllocated: 5000, eligibility: { employeeTypes: ["Full-time"], roles: ["Manager", "Director", "Executive"] } },
+  { id: "POL-20260115-0004", name: "Basic Health Support", description: "Essential health benefits for entry-level employees.", benefitGroups: ["Mental Health", "Optical"], totalAllocated: 1500, eligibility: { employeeTypes: ["Full-time", "Contract"], roles: ["All Roles"] } },
+]
+
+// Form policies (policy selector in employee create/edit form)
+export const MOCK_FORM_POLICIES: FormPolicy[] = [
+  { id: "POL-20260115-0001", name: "Wellness Allocation 2026", groups: [{ id: "POL-20260115-0001-G1", name: "Gym Membership" }, { id: "POL-20260115-0001-G2", name: "Mental Health" }] },
+  { id: "POL-20260115-0002", name: "Lifestyle Pocket 2026", groups: [{ id: "POL-20260115-0002-G1", name: "Travel" }, { id: "POL-20260115-0002-G2", name: "Food & Dining" }] },
+  { id: "POL-20260115-0003", name: "Rejuvenation Fund 2026", groups: [{ id: "POL-20260115-0003-G1", name: "Spa Sessions" }, { id: "POL-20260115-0003-G2", name: "Massages" }] },
+]
+
+// Policy wizard templates (prefills for new policy creation)
+export const MOCK_POLICY_TEMPLATES: PolicyTemplate[] = [
+  {
+    id: "active-living",
+    name: "Active Living",
+    tagline: "Gym access, fitness classes, and recovery services for active employees.",
+    icon: "Barbell",
+    prefill: {
+      name: "Active Living Plan",
+      description: "Gym access, fitness classes, and recovery services for active employees.",
+      eligibleEmploymentTypes: ["full-time"],
+      coversDependents: false,
+      benefitPoolType: "Individual",
+      utilisationMode: "Fixed",
+      refreshCycle: "Yearly",
+      refreshStartReference: "fy_start",
+      activationMode: "after_join",
+      groups: [
+        { id: "grp-active-wellbeing", policyId: "", name: "Physical Wellbeing", distributionType: "IndividualBenefitAmount" },
+        { id: "grp-active-recovery", policyId: "", name: "Personal Care", distributionType: "IndividualBenefitAmount" },
+      ],
+      benefits: [
+        { id: "ben-gym", groupId: "grp-active-wellbeing", serviceId: "s1", amount: 800, coPayment: { required: false, type: "Percentage", value: 0 } },
+        { id: "ben-fitness", groupId: "grp-active-wellbeing", serviceId: "s2", amount: 400, coPayment: { required: false, type: "Percentage", value: 0 } },
+        { id: "ben-spa", groupId: "grp-active-recovery", serviceId: "s6", amount: 600, coPayment: { required: false, type: "Percentage", value: 0 } },
+      ],
+    },
+  },
+  {
+    id: "mind-and-care",
+    name: "Mind & Care",
+    tagline: "Therapy, mindfulness, and nutrition support for holistic employee wellbeing.",
+    icon: "Brain",
+    prefill: {
+      name: "Mind & Care Essentials",
+      description: "Therapy, mindfulness, and nutrition support for holistic employee wellbeing.",
+      eligibleEmploymentTypes: ["full-time"],
+      coversDependents: false,
+      benefitPoolType: "Individual",
+      utilisationMode: "Fixed",
+      refreshCycle: "Yearly",
+      refreshStartReference: "fy_start",
+      activationMode: "after_join",
+      groups: [
+        { id: "grp-mind-psych", policyId: "", name: "Psychological Wellbeing", distributionType: "IndividualBenefitAmount" },
+        { id: "grp-mind-nutrition", policyId: "", name: "Nutritional Support", distributionType: "IndividualBenefitAmount" },
+      ],
+      benefits: [
+        { id: "ben-therapy", groupId: "grp-mind-psych", serviceId: "s3", amount: 1200, coPayment: { required: false, type: "Percentage", value: 0 } },
+        { id: "ben-mental", groupId: "grp-mind-psych", serviceId: "s4", amount: 600, coPayment: { required: false, type: "Percentage", value: 0 } },
+        { id: "ben-diet", groupId: "grp-mind-nutrition", serviceId: "s5", amount: 800, coPayment: { required: false, type: "Percentage", value: 0 } },
+      ],
+    },
+  },
+  {
+    id: "full-circle",
+    name: "Full Circle",
+    tagline: "Full-spectrum physical, mental, and nutritional coverage for every employee.",
+    icon: "Circle",
+    prefill: {
+      name: "Full Circle Wellness",
+      description: "Full-spectrum physical, mental, and nutritional coverage for every employee.",
+      eligibleEmploymentTypes: ["full-time"],
+      coversDependents: false,
+      benefitPoolType: "Individual",
+      utilisationMode: "Fixed",
+      refreshCycle: "Yearly",
+      refreshStartReference: "fy_start",
+      activationMode: "after_join",
+      groups: [
+        { id: "grp-full-physical", policyId: "", name: "Physical Wellbeing", distributionType: "IndividualBenefitAmount" },
+        { id: "grp-full-psych", policyId: "", name: "Psychological Wellbeing", distributionType: "IndividualBenefitAmount" },
+        { id: "grp-full-nutrition", policyId: "", name: "Nutritional Support", distributionType: "IndividualBenefitAmount" },
+        { id: "grp-full-care", policyId: "", name: "Personal Care", distributionType: "IndividualBenefitAmount" },
+      ],
+      benefits: [
+        { id: "ben-gym-fc", groupId: "grp-full-physical", serviceId: "s1", amount: 1000, coPayment: { required: false, type: "Percentage", value: 0 } },
+        { id: "ben-fitness-fc", groupId: "grp-full-physical", serviceId: "s2", amount: 600, coPayment: { required: false, type: "Percentage", value: 0 } },
+        { id: "ben-therapy-fc", groupId: "grp-full-psych", serviceId: "s3", amount: 1200, coPayment: { required: false, type: "Percentage", value: 0 } },
+        { id: "ben-mental-fc", groupId: "grp-full-psych", serviceId: "s4", amount: 600, coPayment: { required: false, type: "Percentage", value: 0 } },
+        { id: "ben-diet-fc", groupId: "grp-full-nutrition", serviceId: "s5", amount: 800, coPayment: { required: false, type: "Percentage", value: 0 } },
+        { id: "ben-spa-fc", groupId: "grp-full-care", serviceId: "s6", amount: 600, coPayment: { required: false, type: "Percentage", value: 0 } },
+      ],
+    },
+  },
+]

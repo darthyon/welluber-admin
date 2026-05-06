@@ -121,11 +121,11 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
                 <UtilizationChart value={org.utilizationRate} mode="ring" size={44} strokeWidth={4} />
                 <div className="flex flex-col justify-center">
                   <span className={cn("text-body font-semibold leading-tight", getUtilColor(org.utilizationRate))}>
-                    {formatCurrency(org.totalWalletBalance)}
+                    {formatCurrency(org.totalAccountBalance)}
                   </span>
                   <div className="flex items-center gap-2 mt-0.5">
                     <span className="text-micro text-faint font-medium tabular-nums">
-                      / {formatCurrency(org.walletLimit)}
+                      / {formatCurrency(org.accountLimit)}
                     </span>
                     {org.claimsCount !== undefined && (
                       <Badge variant="outline" className="h-5 px-2 text-label font-semibold bg-muted/40 border-border/50 text-subtle tabular-nums">

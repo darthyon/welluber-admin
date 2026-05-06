@@ -1,19 +1,19 @@
 import { ISODate } from "../organizations/types";
 
-export type WalletStatus = "active" | "suspended" | "closed";
-export type WalletType = "new" | "existing";
+export type AccountStatus = "active" | "suspended" | "closed";
+export type AccountType = "new" | "existing";
 
-export interface Wallet {
+export interface Account {
   id: string;
   name: string;
   orgId: string;
   orgName: string;
   branchId: string;
   branchName: string;
-  type: WalletType;
+  type: AccountType;
   balance: number;
   pendingDeductions: number;
-  status: WalletStatus;
+  status: AccountStatus;
   attachmentUrl?: string;
   createdAt: ISODate;
   updatedAt: ISODate;
@@ -27,9 +27,9 @@ export type TransactionType =
   | "reversal"
   | "settlement";
 
-export interface WalletTransaction {
+export interface AccountTransaction {
   id: string;
-  walletId: string;
+  accountId: string;
   type: TransactionType;
   amount: number;
   balanceBefore: number;
@@ -38,22 +38,22 @@ export interface WalletTransaction {
   voucherName?: string;
   claimId?: string;
   description: string;
-  performedBy: string; // Host Admin name/ID
+  performedBy: string;
   createdAt: ISODate;
 }
 
-export interface WalletSummary {
+export interface AccountSummary {
   totalBalance: number;
   activeCount: number;
   suspendedCount: number;
-  totalWallets: number;
+  totalAccounts: number;
 }
 
 import { AdvancedFilters } from "@/components/shared/advanced-filter-sheet";
 
-export interface WalletFilters extends AdvancedFilters {
+export interface AccountFilters extends AdvancedFilters {
   search: string;
   orgIds: string[];
   branchIds: string[];
-  status: WalletStatus | "all";
+  status: AccountStatus | "all";
 }

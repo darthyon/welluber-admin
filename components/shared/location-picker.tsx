@@ -12,12 +12,13 @@ import {
   MapTrifold
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
-import { 
-  Tooltip, 
-  TooltipContent, 
-  TooltipProvider, 
-  TooltipTrigger 
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
 } from "@/components/ui/tooltip";
+import { MOCK_LOCATION_SUGGESTIONS } from "@/lib/mock-data";
 
 export interface LocationData {
   line: string;
@@ -36,34 +37,12 @@ interface LocationPickerProps {
   className?: string;
 }
 
-const MOCK_SUGGESTIONS = [
-  { 
-    label: "Pavilion Kuala Lumpur", 
-    sub: "168, Jln Bukit Bintang, Kuala Lumpur",
-    data: { line: "168, Jln Bukit Bintang", city: "Kuala Lumpur", state: "Kuala Lumpur", postalCode: "55100", lat: "3.1488", lon: "101.7131" }
-  },
-  { 
-    label: "KLCC Park", 
-    sub: "Jalan Ampang, Kuala Lumpur City Centre",
-    data: { line: "Jalan Ampang", city: "Kuala Lumpur", state: "Kuala Lumpur", postalCode: "50450", lat: "3.1556", lon: "101.7147" }
-  },
-  { 
-    label: "Menara Zenith", 
-    sub: "9, Jalan Kerinchi, Bangsar South",
-    data: { line: "9, Jalan Kerinchi", city: "Kuala Lumpur", state: "Kuala Lumpur", postalCode: "59200", lat: "3.1105", lon: "101.6653" }
-  },
-  { 
-    label: "One Utama Shopping Centre", 
-    sub: "1, Lebuh Bandar Utama, Petaling Jaya",
-    data: { line: "1, Lebuh Bandar Utama", city: "Petaling Jaya", state: "Selangor", postalCode: "47800", lat: "3.1502", lon: "101.6152" }
-  }
-];
 
 export function LocationPicker({ value, onChange, errors, className }: LocationPickerProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [suggestions, setSuggestions] = useState(MOCK_SUGGESTIONS);
+  const [suggestions, setSuggestions] = useState(MOCK_LOCATION_SUGGESTIONS);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -83,9 +62,9 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
     if (query.length > 2) {
-      const filtered = MOCK_SUGGESTIONS.filter(s => 
-        s.label.toLowerCase().includes(query.toLowerCase()) || 
-        s.sub.toLowerCase().includes(query.toLowerCase())
+      const filtered = MOCK_LOCATION_SUGGESTIONS.filter(s =>
+        s.mainText.toLowerCase().includes(query.toLowerCase()) ||
+        s.secondaryText.toLowerCase().includes(query.toLowerCase())
       );
       setSuggestions(filtered);
       setShowSuggestions(true);
@@ -94,17 +73,18 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
     }
   };
 
-  const handleSelectSuggestion = (suggestion: typeof MOCK_SUGGESTIONS[0]) => {
+  const handleSelectSuggestion = (suggestion: typeof MOCK_LOCATION_SUGGESTIONS[0]) => {
     setIsSearching(true);
     setShowSuggestions(false);
-    setSearchQuery(suggestion.label);
+    setSearchQuery(suggestion.mainText);
 
-    // Simulate geocoding delay
     setTimeout(() => {
-      onChange({ 
-        ...value, 
-        ...suggestion.data,
-        country: "Malaysia"
+      onChange({
+        ...value,
+        line: suggestion.mainText,
+        lat: suggestion.lat,
+        lon: suggestion.lon,
+        country: "Malaysia",
       });
       setIsSearching(false);
       setSearchQuery("");
@@ -244,8 +224,8 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
                                 <MapTrifold size={16} />
                               </div>
                               <div>
-                                <p className="text-body font-medium text-foreground group-hover:text-primary transition-colors">{s.label}</p>
-                                <p className="text-label text-muted-foreground line-clamp-1">{s.sub}</p>
+                                <p className="text-body font-medium text-foreground group-hover:text-primary transition-colors">{s.mainText}</p>
+                                <p className="text-label text-muted-foreground line-clamp-1">{s.secondaryText}</p>
                               </div>
                             </div>
                             <CaretRight size={14} className="text-faint group-hover:text-primary transition-colors" />

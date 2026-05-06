@@ -26,7 +26,7 @@ interface ManualTopUpModalProps {
   onClose: () => void;
   orgName: string;
   branchName: string;
-  walletId: string;
+  accountId: string;
 }
 
 export function ManualTopUpModal({ 
@@ -34,7 +34,7 @@ export function ManualTopUpModal({
   onClose, 
   orgName, 
   branchName, 
-  walletId 
+  accountId
 }: ManualTopUpModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
@@ -79,7 +79,7 @@ export function ManualTopUpModal({
       formData.append("paidDate", data.paidDate.toISOString());
       formData.append("remarks", data.remarks || "");
       formData.append("attachment", data.attachment);
-      formData.append("walletId", walletId);
+      formData.append("accountId", accountId);
 
       const res = await submitManualTopup(formData);
       if (res.success) {

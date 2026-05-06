@@ -17,8 +17,8 @@ import {
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/shared/status-badge";
-import { useWallets, useWalletTransactions } from "@/features/wallets/hooks";
-import { TRANSACTION_TYPE_LABELS } from "@/features/wallets/constants";
+import { useAccounts, useAccountTransactions } from "@/features/accounts/hooks";
+import { TRANSACTION_TYPE_LABELS } from "@/features/accounts/constants";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { useQueryState } from "@/hooks/use-tab-persistence";
 import { DetailSection } from "@/components/shared/detail-section";
@@ -33,15 +33,15 @@ import { SharedDataTable } from "@/components/shared/data-table";
 import { useState, Suspense } from "react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { UpdateBalanceModal } from "@/components/host/wallets/update-balance-modal";
-import { RecordTopupModal } from "@/components/host/wallets/record-topup-modal";
+import { UpdateBalanceModal } from "@/components/host/accounts/update-balance-modal";
+import { RecordTopupModal } from "@/components/host/accounts/record-topup-modal";
 
 function AccountDetailContent() {
   const params = useParams();
   const router = useRouter();
-  const walletId = params.id as string;
-  const { wallets } = useWallets();
-  const { transactions } = useWalletTransactions(walletId);
+  const accountId = params.id as string;
+  const { accounts } = useAccounts();
+  const { transactions } = useAccountTransactions(accountId);
 
   const [activeTab, setActiveTab] = useQueryState("tab", "transactions");
   const [searchQuery, setSearchQuery] = useState("");
@@ -56,7 +56,7 @@ function AccountDetailContent() {
   const [isUpdateBalanceOpen, setIsUpdateBalanceOpen] = useState(false);
   const [isRecordTopupOpen, setIsRecordTopupOpen] = useState(false);
 
-  const wallet = wallets.find(w => w.id === walletId);
+  const wallet = accounts.find(w => w.id === accountId);
 
   if (!wallet) {
     return (
@@ -85,8 +85,8 @@ function AccountDetailContent() {
   const orgCreditUsed = Math.abs(Math.min(0, wallet.balance));
   const orgCreditRemaining = orgCreditLimit - orgCreditUsed;
 
-  const OTHER_WALLETS = wallets
-    .filter(w => w.id !== walletId)
+  const OTHER_ACCOUNTS = accounts
+    .filter(w => w.id !== accountId)
     .map(w => ({ label: `${w.name} (${w.orgName})`, href: `/accounts/${w.id}` }));
 
   const openDangerAction = (action: "suspend" | "terminate") => {
@@ -136,7 +136,7 @@ function AccountDetailContent() {
               { label: "Accounts", href: "/accounts" },
               {
                 label: `${wallet.name}`,
-                options: OTHER_WALLETS
+                options: OTHER_ACCOUNTS
               }
             ]}
             className="mb-4"
@@ -604,14 +604,14 @@ function AccountDetailContent() {
           <UpdateBalanceModal
             isOpen={isUpdateBalanceOpen}
             onClose={() => setIsUpdateBalanceOpen(false)}
-            walletId={wallet.id}
-            walletName={wallet.name}
+            accountId={wallet.id}
+            accountName={wallet.name}
           />
           <RecordTopupModal
             isOpen={isRecordTopupOpen}
             onClose={() => setIsRecordTopupOpen(false)}
-            walletId={wallet.id}
-            walletName={wallet.name}
+            accountId={wallet.id}
+            accountName={wallet.name}
           />
         </>
       )}

@@ -9,7 +9,7 @@ import { OrganizationCard } from "@/components/host/organizations/organization-c
 import { ViewToggle, ViewMode } from "@/components/shared/view-toggle";
 import { MultiSelectFilter } from "@/components/shared/multi-select-filter";
 import { ALL_SERVICES, SERVICE_TAXONOMY, WORKFORCE_RANGES, INDUSTRIES } from "@/features/organizations/constants";
-import { MOCK_ORGS } from "@/features/organizations/mock-data";
+import { MOCK_ORGS } from "@/lib/mock-data";
 import { motion, AnimatePresence } from "framer-motion";
 import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { FilterItem } from "@/components/shared/filter-item";
@@ -31,7 +31,7 @@ export default function OrganizationsPage() {
     (advancedFilters.utilization[1] < 100 ? 1 : 0) +
     (advancedFilters.employees[1] < 5000 ? 1 : 0) +
     (advancedFilters.industry !== "all" ? 1 : 0) +
-    (advancedFilters.walletModel !== "all" ? 1 : 0);
+    (advancedFilters.accountModel !== "all" ? 1 : 0);
 
   const filteredOrgs = MOCK_ORGS.filter(org => {
     // 1. Search

@@ -10,8 +10,8 @@ import { SharedDataTable } from "@/components/shared/data-table"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { EmptyState } from "@/components/shared/empty-state"
 import { Breadcrumbs } from "@/components/shared/breadcrumbs"
-import { MOCK_GENERATED_VOUCHERS } from "@/features/voucher-packages/mock-data"
-import { MOCK_SPS } from "@/features/providers/mock-data"
+import { MOCK_GENERATED_VOUCHERS } from "@/lib/mock-data"
+import { MOCK_SPS } from "@/lib/mock-data"
 import type { GeneratedVoucherStatus } from "@/features/voucher-packages/types"
 
 const STATUS_OPTIONS: { label: string; value: GeneratedVoucherStatus | "all" }[] = [

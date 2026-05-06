@@ -5,7 +5,7 @@ export interface TopupTransaction {
   id: string;
   orgId: string;
   branchId: string;
-  walletId: string;
+  accountId: string;
   amount: number;
   method: TopupMethod;
   paidDate: string; // ISO 8601

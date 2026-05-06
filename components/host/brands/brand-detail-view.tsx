@@ -27,7 +27,7 @@ import { useQueryState } from "@/hooks/use-tab-persistence";
 import { cn } from "@/lib/utils";
 import type { Brand } from "@/types/brand";
 import type { ServiceProvider } from "@/types/provider";
-import { MOCK_SPS } from "@/features/providers/mock-data";
+import { MOCK_SPS } from "@/lib/mock-data";
 
 interface BrandDetailViewProps {
   brand: Brand;

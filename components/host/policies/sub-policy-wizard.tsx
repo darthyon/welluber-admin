@@ -18,8 +18,8 @@ import { SuccessCelebration } from "@/components/shared/success-celebration";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { BenefitPolicy, BenefitGroup, Benefit } from "@/types/policy";
-import { SERVICES } from "@/features/policies/mock-data";
-import type { EmployeeDirectoryItem } from "@/components/host/employees/employee-directory-table";
+import { SERVICES } from "@/lib/mock-data";
+import type { EmployeeDirectoryItem } from "@/features/employees/types";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

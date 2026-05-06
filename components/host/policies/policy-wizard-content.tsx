@@ -34,7 +34,7 @@ import {
   DependentsPoolType,
   ActivationMode,
 } from "@/types/policy";
-import { MOCK_EMPLOYEES } from "@/components/host/employees/employee-directory-table";
+import { MOCK_EMPLOYEES, SERVICES } from "@/lib/mock-data";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -73,14 +73,6 @@ function getAvailableRefreshCycles(
   return REFRESH_CYCLES.slice(unitIdx + 1);
 }
 
-const SERVICES = [
-  { id: "s1", category: "Physical Wellbeing", name: "Gymnasium Facilities", subServices: ["Standard Gym Access", "Boutique Studio Memberships"] },
-  { id: "s2", category: "Physical Wellbeing", name: "Group Fitness", subServices: ["Yoga", "Pilates", "Indoor Cycling", "Zumba"] },
-  { id: "s3", category: "Psychological Wellbeing", name: "Clinical Therapy", subServices: ["Psychotherapy", "CBT", "Psychiatric Care"] },
-  { id: "s4", category: "Psychological Wellbeing", name: "Mental Fitness", subServices: ["Meditation Apps", "Mindfulness Workshops"] },
-  { id: "s5", category: "Nutritional Support", name: "Dietary Counseling", subServices: ["Dietitian Consultations", "Diabetic Management"] },
-  { id: "s6", category: "Personal Care", name: "Therapeutic Spa Services", subServices: ["Relaxation Massage", "Hydrotherapy"] },
-];
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 

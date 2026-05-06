@@ -4,7 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { BrandForm } from "@/components/host/brands/brand-form";
 import { CaretLeft } from "@phosphor-icons/react";
-import { MOCK_BRANDS } from "@/features/brands/mock-data";
+import { MOCK_BRANDS } from "@/lib/mock-data";
 import { Brand } from "@/types/brand";
 
 export default function EditBrandPage() {

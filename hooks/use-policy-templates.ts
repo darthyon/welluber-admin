@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { PolicyTemplate } from "@/types/policy";
-import { POLICY_TEMPLATES } from "@/components/host/policies/policy-template-data";
+import { MOCK_POLICY_TEMPLATES } from "@/lib/mock-data";
 
 interface UsePolicyTemplatesReturn {
   templates: PolicyTemplate[];
@@ -36,7 +36,7 @@ export function usePolicyTemplates(): UsePolicyTemplatesReturn {
         // const response = await fetch("/api/policy-templates");
         // const data = await response.json();
 
-        setTemplates(POLICY_TEMPLATES);
+        setTemplates(MOCK_POLICY_TEMPLATES);
       } catch (err) {
         if (!cancelled) {
           setError(err instanceof Error ? err.message : "Failed to load templates");

@@ -22,8 +22,8 @@ import {
   Target,
 } from "@phosphor-icons/react";
 import { BenefitPolicy, BenefitGroup, Benefit } from "@/types/policy";
-import { type PolicyListItem } from "@/features/policies/mock-data";
-import type { EmployeeDirectoryItem } from "@/components/host/employees/employee-directory-table";
+import type { PolicyListItem } from "@/features/policies/types";
+import type { EmployeeDirectoryItem } from "@/features/employees/types";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 

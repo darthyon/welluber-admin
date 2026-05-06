@@ -10,10 +10,8 @@ import { FilterItem } from "@/components/shared/filter-item"
 import { ViewToggle, ViewMode } from "@/components/shared/view-toggle"
 import { EmptyState } from "@/components/shared/empty-state"
 import { EmployeeCard } from "@/components/host/organizations/employee-card"
-import {
-  EmployeeDirectoryTable,
-  MOCK_EMPLOYEES,
-} from "@/components/host/employees/employee-directory-table"
+import { EmployeeDirectoryTable } from "@/components/host/employees/employee-directory-table"
+import { MOCK_EMPLOYEES } from "@/lib/mock-data"
 
 const ORGANIZATION_OPTIONS = [
   { label: "All", value: "all" },

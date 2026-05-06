@@ -9,15 +9,15 @@ import { cn } from "@/lib/utils"
 interface UpdateBalanceModalProps {
   isOpen: boolean
   onClose: () => void
-  walletId: string
-  walletName: string
+  accountId: string
+  accountName: string
 }
 
 export function UpdateBalanceModal({
   isOpen,
   onClose,
-  walletId,
-  walletName,
+  accountId,
+  accountName,
 }: UpdateBalanceModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
@@ -55,7 +55,7 @@ export function UpdateBalanceModal({
           <div className="p-8">
             <SuccessCelebration
               title="Balance Updated"
-              message={`Adjustment recorded for ${walletName}.`}
+              message={`Adjustment recorded for ${accountName}.`}
             />
           </div>
         ) : (
@@ -71,7 +71,7 @@ export function UpdateBalanceModal({
                     Update Balance
                   </h3>
                   <p className="text-label text-muted-foreground">
-                    {walletName}
+                    {accountName}
                   </p>
                 </div>
               </div>

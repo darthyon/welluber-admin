@@ -16,7 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQueryState } from "@/hooks/use-tab-persistence";
 import { cn } from "@/lib/utils";
-import { MOCK_SPS } from "@/features/providers/mock-data";
+import { MOCK_SPS } from "@/lib/mock-data";
 import { SP_STATUS_OPTIONS } from "@/features/providers/constants";
 import { SERVICE_TAXONOMY } from "@/features/organizations/constants";
 
@@ -166,7 +166,7 @@ function ServiceProvidersContent() {
         setFilters={setAdvancedFilters}
         onApply={() => setIsFilterSheetOpen(null)}
         showWorkforce={false}
-        showWalletModel={false}
+        showAccountModel={false}
         showIndustry={false}
         description="Filter service providers by service categories and utilisation."
       />

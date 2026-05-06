@@ -48,10 +48,7 @@ import { BranchDetailView } from "@/components/host/organizations/branch-detail-
 
 import { EmployeeCard } from "@/components/host/organizations/employee-card"
 import { DependentCard } from "@/components/host/organizations/dependent-card"
-import {
-  UtilisationClaimsTable,
-  type EmployeeUtilisationRow,
-} from "@/components/shared/utilisation-claims-table"
+import { UtilisationClaimsTable } from "@/components/shared/utilisation-claims-table"
 import { OrganizationClaimsTable } from "@/components/shared/organization-claims-table"
 import { VouchersTable } from "@/components/shared/vouchers-table"
 import { VoucherDetailSheet } from "@/components/shared/voucher-detail-sheet"
@@ -87,8 +84,7 @@ import {
   suspendOrganization,
 } from "@/features/organizations/actions"
 import { OrganizationStatus } from "@/features/organizations/types"
-import { MOCK_ORGS } from "@/features/organizations/mock-data"
-import { MOCK_EMPLOYEES } from "@/components/host/employees/employee-directory-table"
+import { MOCK_ORGS, MOCK_DEPENDENTS, MOCK_ENTITLEMENTS, MOCK_EMPLOYEE_UTILISATION, MOCK_EMPLOYEES } from "@/lib/mock-data"
 import { UtilizationChart } from "@/components/host/organizations/utilization-chart"
 import { EntityAvatar } from "@/components/shared/entity-avatar"
 
@@ -106,9 +102,9 @@ type TabId = (typeof TABS)[number]["id"]
 
 // Mock Data for Breadcrumb Dropdowns
 const OTHER_ORGS = [
-  { label: "Acme Corporation Sdn Bhd", href: "/organizations/org_1" },
-  { label: "Global Tech Solutions", href: "/organizations/org_2" },
-  { label: "Nexus Innovate", href: "/organizations/org_3" },
+  { label: "Acme Corporation Sdn Bhd", href: "/organizations/ORG-20260115-0001" },
+  { label: "Global Tech Solutions", href: "/organizations/ORG-20260301-0002" },
+  { label: "Nexus Innovations", href: "/organizations/ORG-20260310-0003" },
 ]
 
 function OrganizationDetailContent() {
@@ -874,8 +870,8 @@ function OrganizationDetailContent() {
                           id: "br_1",
                           name: "ACME HQ (Kuala Lumpur)",
                           type: "HQ",
-                          walletModel: "New",
-                          walletName: "KL HQ Account",
+                          accountModel: "New",
+                          accountName: "KL HQ Account",
                           address: {
                             city: "Kuala Lumpur",
                             state: "Wilayah Persekutuan",
@@ -895,8 +891,8 @@ function OrganizationDetailContent() {
                           id: "br_2",
                           name: "ACME Subang Jaya",
                           type: "Branch Office",
-                          walletModel: "Existing",
-                          walletName: "Acme Shared Account",
+                          accountModel: "Existing",
+                          accountName: "Acme Shared Account",
                           address: { city: "Subang Jaya", state: "Selangor" },
                           employeesCount: 450,
                           status: "Active",
@@ -956,13 +952,13 @@ function OrganizationDetailContent() {
                         },
                         {
                           header: "Account",
-                          accessorKey: "walletModel",
+                          accessorKey: "accountModel",
                           sortable: true,
                           headerClassName: "min-w-[150px]",
                           render: (branch: any) => (
                             <div className="flex flex-col">
                               <span className="text-body font-semibold text-foreground">
-                                {branch.walletModel}
+                                {branch.accountModel}
                               </span>
                               <span className="mt-0.5 text-label font-medium text-muted-foreground">
                                 {branch.balance}
@@ -1031,7 +1027,7 @@ function OrganizationDetailContent() {
                           type: "HQ",
                           status: "Active",
                           employees: 1240,
-                          walletModel: "New",
+                          accountModel: "New",
                           balance: "RM 45,000",
                           limit: "RM 60,000",
                           utilizationRate: 68,
@@ -1043,7 +1039,7 @@ function OrganizationDetailContent() {
                           type: "Branch office",
                           status: "Active",
                           employees: 450,
-                          walletModel: "Existing",
+                          accountModel: "Existing",
                           balance: "RM 12,500",
                           limit: "RM 30,000",
                           utilizationRate: 42,
@@ -1163,7 +1159,7 @@ function OrganizationDetailContent() {
                         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                           {[
                             {
-                              id: "emp_1",
+                              id: "EMP-20260115-0001",
                               name: "Robert Fox",
                               email: "robert.f@acme.com",
                               branch: "ACME HQ",
@@ -1194,7 +1190,7 @@ function OrganizationDetailContent() {
                               ],
                             },
                             {
-                              id: "emp_2",
+                              id: "EMP-20260115-0002",
                               name: "Jenny Wilson",
                               email: "jenny.w@acme.com",
                               branch: "ACME Subang Jaya",
@@ -1214,9 +1210,9 @@ function OrganizationDetailContent() {
                               ],
                             },
                             {
-                              id: "emp_3",
+                              id: "EMP-20260115-0003",
                               name: "Dianne Russell",
-                              email: "dianne.r@acme.com",
+                              email: "dianne.r@globalhealth.com",
                               branch: "ACME HQ",
                               status: "Pending Invite",
                               empCode: "ACM-156",
@@ -1509,12 +1505,12 @@ function OrganizationDetailContent() {
                             ]}
                             data={[
                               {
-                                id: "emp_1",
+                                id: "EMP-20260115-0001",
                                 name: "Robert Fox",
                                 email: "robert.f@acme.com",
                                 branch: "ACME HQ",
                                 joinDate: "12 Oct 2023",
-                                lastActive: "09 Apr 2024, 17:15",
+                                lastActive: "09 Apr 2026, 17:15",
                                 status: "Linked",
                                 empCode: "ACM-001",
                                 department: "Engineering",
@@ -1530,12 +1526,12 @@ function OrganizationDetailContent() {
                                 ],
                               },
                               {
-                                id: "emp_2",
+                                id: "EMP-20260115-0002",
                                 name: "Jenny Wilson",
                                 email: "jenny.w@acme.com",
                                 branch: "ACME Subang Jaya",
-                                joinDate: "05 Mar 2024",
-                                lastActive: "09 Apr 2024, 16:45",
+                                joinDate: "05 Mar 2026",
+                                lastActive: "09 Apr 2026, 16:45",
                                 status: "Linked",
                                 empCode: "ACM-042",
                                 department: "Product",
@@ -1550,12 +1546,12 @@ function OrganizationDetailContent() {
                                 ],
                               },
                               {
-                                id: "emp_3",
+                                id: "EMP-20260115-0003",
                                 name: "Dianne Russell",
-                                email: "dianne.r@acme.com",
-                                branch: "ACME HQ",
+                                email: "dianne.r@globalhealth.com",
+                                branch: "Global Health HQ",
                                 joinDate: "20 May 2026",
-                                lastActive: "09 Apr 2024, 10:20",
+                                lastActive: "09 Apr 2026, 10:20",
                                 status: "Pending",
                                 empCode: "ACM-156",
                                 department: "Growth",
@@ -1578,12 +1574,12 @@ function OrganizationDetailContent() {
                                 ],
                               },
                               {
-                                id: "emp_4",
+                                id: "EMP-20260115-0004",
                                 name: "Marvin McKinney",
-                                email: "marvin@acme.com",
-                                branch: "ACME Subang Jaya",
-                                joinDate: "12 Jan 2024",
-                                lastActive: "08 Apr 2024, 14:30",
+                                email: "marvin.m@zenithwellness.com",
+                                branch: "Zenith HQ",
+                                joinDate: "12 Jan 2026",
+                                lastActive: "08 Apr 2026, 14:30",
                                 status: "Linked",
                                 empCode: "ACM-089",
                                 department: "Sales",
@@ -1787,10 +1783,10 @@ function OrganizationDetailContent() {
                           },
                           {
                             header: "Branch",
-                            accessorKey: "branch",
+                            accessorKey: "branchName",
                             render: (ent) => (
                               <span className="text-label font-medium text-muted-foreground">
-                                {ent.branch}
+                                {ent.branchName}
                               </span>
                             ),
                           },
@@ -1809,17 +1805,17 @@ function OrganizationDetailContent() {
                               <div className="flex w-[140px] flex-col gap-1.5">
                                 <div className="flex justify-between text-label font-medium">
                                   <span className="text-muted-foreground">
-                                    {ent.used}
+                                    RM {ent.usedAmount.toLocaleString()}
                                   </span>
                                   <span className="text-foreground">
-                                    / {ent.allocated}
+                                    / RM {ent.allocatedAmount.toLocaleString()}
                                   </span>
                                 </div>
                                 <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
                                   <div
                                     className="h-full rounded-full bg-emerald-500 dark:bg-emerald-400"
                                     style={{
-                                      width: `${(parseFloat(ent.used.replace("RM ", "").replace(",", "")) / parseFloat(ent.allocated.replace("RM ", "").replace(",", ""))) * 100}%`,
+                                      width: `${ent.allocatedAmount > 0 ? (ent.usedAmount / ent.allocatedAmount) * 100 : 0}%`,
                                     }}
                                   />
                                 </div>
@@ -1864,7 +1860,7 @@ function OrganizationDetailContent() {
                         </div>
                       </div>
 
-                      <UtilisationClaimsTable data={ORG_MOCK_UTILISATION} />
+                      <UtilisationClaimsTable data={MOCK_EMPLOYEE_UTILISATION} />
                     </div>
                   )}
 
@@ -2081,7 +2077,7 @@ function OrganizationDetailContent() {
               <p className="text-body text-subtle">Claim history across all employees in this organisation</p>
             </div>
             <OrganizationClaimsTable
-              data={ORG_MOCK_UTILISATION}
+              data={MOCK_EMPLOYEE_UTILISATION}
               onViewVoucher={(claim) => setSelectedVoucherClaim(claim)}
               onViewDetails={(claim) => setSelectedVoucherClaim(claim)}
             />
@@ -2095,7 +2091,7 @@ function OrganizationDetailContent() {
               <p className="text-body text-subtle">Voucher redemption records across all employees in this organisation</p>
             </div>
             <VouchersTable
-              data={ORG_MOCK_UTILISATION}
+              data={MOCK_EMPLOYEE_UTILISATION}
               onViewVoucher={(voucher) => console.log("View voucher", voucher)}
             />
           </div>
@@ -2258,218 +2254,6 @@ export default function OrganizationDetailPage() {
   )
 }
 
-// ─── Mock org-level utilisation data (replace with API) ───────────────────────
-
-const ORG_MOCK_UTILISATION: EmployeeUtilisationRow[] = [
-  {
-    id: "emp_1",
-    name: "Robert Fox",
-    empCode: "ACM-001",
-    branch: "ACME HQ",
-    allocated: 2500,
-    used: 1200,
-    claims: [
-      {
-        id: "c1",
-        voucherCode: "VCH-2024-0081",
-        voucherName: "Wellness Allocation Voucher",
-        transactionType: "redemption",
-        service: "Gymnasium Facilities",
-        provider: "Celebrity Fitness KLCC",
-        location: "Kuala Lumpur",
-        date: "12 Mar 2024",
-        amount: 180,
-        status: "confirmed",
-      },
-      {
-        id: "c2",
-        voucherCode: "VCH-2024-0114",
-        voucherName: "Wellness Allocation Voucher",
-        transactionType: "redemption",
-        service: "Clinical Therapy",
-        provider: "Mind & Soul Clinic",
-        location: "Mont Kiara",
-        date: "20 Mar 2024",
-        amount: 320,
-        status: "confirmed",
-      },
-      {
-        id: "c3",
-        voucherCode: "VCH-2024-0198",
-        voucherName: "Wellness Allocation Voucher",
-        transactionType: "redemption",
-        service: "Group Fitness",
-        provider: "Ritual Yoga Studio",
-        location: "Bangsar",
-        date: "01 Apr 2024",
-        amount: 95,
-        status: "pre-auth",
-      },
-      {
-        id: "c4",
-        voucherCode: "VCH-2024-0211",
-        voucherName: "Wellness Allocation Voucher",
-        transactionType: "reimbursement",
-        service: "Dietary Counseling",
-        provider: "NutriCare Clinic",
-        location: "Damansara",
-        date: "05 Apr 2024",
-        amount: 605,
-        status: "confirmed",
-      },
-    ],
-  },
-  {
-    id: "emp_2",
-    name: "Jenny Wilson",
-    empCode: "ACM-042",
-    branch: "ACME Subang Jaya",
-    allocated: 2500,
-    used: 2125,
-    claims: [
-      {
-        id: "c5",
-        voucherCode: "VCH-2024-0033",
-        voucherName: "Lifestyle Pocket Voucher",
-        transactionType: "redemption",
-        service: "Gymnasium Facilities",
-        provider: "Fitness First Subang",
-        location: "Subang Jaya",
-        date: "03 Jan 2024",
-        amount: 200,
-        status: "confirmed",
-      },
-      {
-        id: "c6",
-        voucherCode: "VCH-2024-0057",
-        voucherName: "Lifestyle Pocket Voucher",
-        transactionType: "redemption",
-        service: "Therapeutic Spa",
-        provider: "Hammam Spa & Wellness",
-        location: "Shah Alam",
-        date: "18 Feb 2024",
-        amount: 380,
-        status: "confirmed",
-      },
-      {
-        id: "c7",
-        voucherCode: "VCH-2024-0089",
-        voucherName: "Lifestyle Pocket Voucher",
-        transactionType: "redemption",
-        service: "Mental Fitness",
-        provider: "Calm Studio KL",
-        location: "Subang Jaya",
-        date: "10 Mar 2024",
-        amount: 145,
-        status: "confirmed",
-      },
-      {
-        id: "c8",
-        voucherCode: "VCH-2024-0132",
-        voucherName: "Lifestyle Pocket Voucher",
-        transactionType: "redemption",
-        service: "Group Fitness",
-        provider: "Barry's Bootcamp",
-        location: "TTDI",
-        date: "22 Mar 2024",
-        amount: 200,
-        status: "cancelled",
-      },
-      {
-        id: "c9",
-        voucherCode: "VCH-2024-0201",
-        voucherName: "Lifestyle Pocket Voucher",
-        transactionType: "reimbursement",
-        service: "Clinical Therapy",
-        provider: "Therapy Works PJ",
-        location: "Petaling Jaya",
-        date: "08 Apr 2024",
-        amount: 400,
-        status: "confirmed",
-      },
-      {
-        id: "c10",
-        voucherCode: "VCH-2024-0215",
-        voucherName: "Lifestyle Pocket Voucher",
-        transactionType: "redemption",
-        service: "Dietary Counseling",
-        provider: "NutriCare Clinic",
-        location: "Subang Jaya",
-        date: "10 Apr 2024",
-        amount: 800,
-        status: "pre-auth",
-      },
-    ],
-  },
-  {
-    id: "emp_3",
-    name: "Dianne Russell",
-    empCode: "ACM-156",
-    branch: "ACME HQ",
-    allocated: 2500,
-    used: 375,
-    claims: [
-      {
-        id: "c11",
-        voucherCode: "VCH-2024-0177",
-        voucherName: "Rejuvenation Fund Voucher",
-        transactionType: "redemption",
-        service: "Therapeutic Spa",
-        provider: "Relaxe Spa KL",
-        location: "KLCC",
-        date: "15 Mar 2024",
-        amount: 250,
-        status: "confirmed",
-      },
-      {
-        id: "c12",
-        voucherCode: "VCH-2024-0190",
-        voucherName: "Rejuvenation Fund Voucher",
-        transactionType: "redemption",
-        service: "Group Fitness",
-        provider: "TRX Studio KL",
-        location: "Bukit Bintang",
-        date: "28 Mar 2024",
-        amount: 125,
-        status: "pre-auth",
-      },
-    ],
-  },
-  {
-    id: "emp_4",
-    name: "Marvin McKinney",
-    empCode: "ACM-089",
-    branch: "ACME Subang Jaya",
-    allocated: 2500,
-    used: 300,
-    claims: [
-      {
-        id: "c13",
-        voucherCode: "VCH-2024-0144",
-        voucherName: "Mental Health Support Voucher",
-        transactionType: "redemption",
-        service: "Mental Fitness",
-        provider: "Headspace Partner KL",
-        location: "Online",
-        date: "01 Apr 2024",
-        amount: 120,
-        status: "confirmed",
-      },
-      {
-        id: "c14",
-        voucherCode: "VCH-2024-0188",
-        voucherName: "Mental Health Support Voucher",
-        transactionType: "refund",
-        service: "Clinical Therapy",
-        provider: "Mind & Soul Clinic",
-        location: "Mont Kiara",
-        date: "09 Apr 2024",
-        amount: 180,
-        status: "confirmed",
-      },
-    ],
-  },
-]
 
 const EMPLOYEE_SUB_TABS = [
   { id: "directory", label: "Employee Directory", icon: Users },
@@ -2479,75 +2263,3 @@ const EMPLOYEE_SUB_TABS = [
   { id: "tiers", label: "Tier Config", icon: Rows },
 ] as const
 
-const MOCK_DEPENDENTS = [
-  {
-    id: "dep_1",
-    name: "Sarah Fox",
-    employeeName: "Robert Fox",
-    employeeId: "emp_1",
-    relationship: "Spouse",
-    status: "Active",
-    joinDate: "12 Oct 2023",
-  },
-  {
-    id: "dep_2",
-    name: "Leo Fox",
-    employeeName: "Robert Fox",
-    employeeId: "emp_1",
-    relationship: "Child",
-    status: "Active",
-    joinDate: "12 Oct 2023",
-  },
-  {
-    id: "dep_3",
-    name: "Russell Jr.",
-    employeeName: "Dianne Russell",
-    employeeId: "emp_3",
-    relationship: "Child",
-    status: "Active",
-    joinDate: "20 May 2026",
-  },
-]
-
-const MOCK_ENTITLEMENTS = [
-  {
-    id: "ent_1",
-    beneficiaryName: "Robert Fox",
-    type: "Employee",
-    branch: "ACME HQ",
-    policy: "Wellness Allocation",
-    status: "Active",
-    used: "RM 1,200",
-    allocated: "RM 2,500",
-  },
-  {
-    id: "ent_2",
-    beneficiaryName: "Sarah Fox",
-    type: "Dependent",
-    branch: "ACME HQ",
-    policy: "Wellness Allocation",
-    status: "Active",
-    used: "RM 450",
-    allocated: "RM 1,000",
-  },
-  {
-    id: "ent_3",
-    beneficiaryName: "Leo Fox",
-    type: "Dependent",
-    branch: "ACME HQ",
-    policy: "Wellness Allocation",
-    status: "Active",
-    used: "RM 120",
-    allocated: "RM 1,000",
-  },
-  {
-    id: "ent_4",
-    beneficiaryName: "Jenny Wilson",
-    type: "Employee",
-    branch: "ACME Subang Jaya",
-    policy: "Lifestyle Pocket",
-    status: "Active",
-    used: "RM 2,125",
-    allocated: "RM 2,500",
-  },
-]

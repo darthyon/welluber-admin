@@ -30,10 +30,10 @@ export interface OrganizationBranch {
   utilizationRate?: number;
   balance?: string;
   limit?: string;
-  walletModel?: "New" | "Existing";
+  accountModel?: "New" | "Existing";
 }
 
-export interface OrganizationWallet {
+export interface OrganizationAccount {
   id: string;
   name: string;
   orgId: string;
@@ -71,8 +71,8 @@ export interface Organization {
   picId: string | null;
   utilizationRate: number; // 0 to 100
   claimsCount?: number;
-  totalWalletBalance: number; // Sum of all wallet balances (can be negative)
-  walletLimit: number; // Max prepaid funds across all wallets
+  totalAccountBalance: number; // Sum of all account balances (can be negative)
+  accountLimit: number; // Max prepaid funds across all accounts
   creditLimit: number; // Max overdraft amount before hard block
   needsAction: string[]; // Triage status pills (e.g. "Missing PIC")
   services: string[]; // Tier 2 Service Names
@@ -128,7 +128,9 @@ export type DependentRelationship = "spouse" | "child" | "mother" | "father" | "
 export interface Dependent {
   id: string;
   employeeId: string;
+  employeeName: string;
   name: string;
   relationship: DependentRelationship;
   status: "active" | "inactive";
+  joinDate: string;
 }

@@ -24,6 +24,7 @@ import { DatePickerField } from "@/components/shared/date-picker-field";
 import { PhoneInput } from "@/components/shared/phone-input";
 import { IdentificationInput } from "@/components/shared/identification-input";
 import { cn } from "@/lib/utils";
+import { MOCK_FORM_POLICIES } from "@/lib/mock-data";
 
 interface Dependent {
   id: string;
@@ -51,11 +52,6 @@ const RELATIONSHIPS = [
   "Spouse", "Child", "Mother", "Father", "Brother", "Sister", "Mother-in-law", "Father-in-law"
 ];
 
-const MOCK_POLICIES = [
-  { id: "pol_1", name: "Wellness Allocation 2026", groups: [{ id: "g1", name: "Gym Membership" }, { id: "g2", name: "Mental Health" }] },
-  { id: "pol_2", name: "Lifestyle Pocket 2026", groups: [{ id: "g3", name: "Travel" }, { id: "g4", name: "Food & Dining" }] },
-  { id: "pol_3", name: "Rejuvenation Fund 2026", groups: [{ id: "g5", name: "Spa Sessions" }, { id: "g6", name: "Massages" }] },
-];
 
 interface EmployeeFormContentProps {
   mode: "create" | "edit";
@@ -112,10 +108,10 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
     setAssignedPolicies([
       ...assignedPolicies,
       {
-        policyId: MOCK_POLICIES[0].id,
-        policyName: MOCK_POLICIES[0].name,
-        benefitGroupId: MOCK_POLICIES[0].groups[0].id,
-        benefitGroupName: MOCK_POLICIES[0].groups[0].name,
+        policyId: MOCK_FORM_POLICIES[0].id,
+        policyName: MOCK_FORM_POLICIES[0].name,
+        benefitGroupId: MOCK_FORM_POLICIES[0].groups[0].id,
+        benefitGroupName: MOCK_FORM_POLICIES[0].groups[0].name,
       },
     ]);
   };
@@ -476,7 +472,7 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
                       className="w-full px-3 py-2 bg-background border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 transition-all"
                       value={assigned.policyId}
                       onChange={(e) => {
-                        const pol = MOCK_POLICIES.find((p) => p.id === e.target.value);
+                        const pol = MOCK_FORM_POLICIES.find((p) => p.id === e.target.value);
                         if (pol) {
                           const updated = [...assignedPolicies];
                           updated[idx] = { ...assigned, policyId: pol.id, policyName: pol.name };
@@ -484,7 +480,7 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
                         }
                       }}
                     >
-                      {MOCK_POLICIES.map((p) => (
+                      {MOCK_FORM_POLICIES.map((p) => (
                         <option key={p.id} value={p.id}>{p.name}</option>
                       ))}
                     </select>
@@ -500,7 +496,7 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
                         setAssignedPolicies(updated);
                       }}
                     >
-                      {MOCK_POLICIES.find((p) => p.id === assigned.policyId)?.groups.map((g) => (
+                      {MOCK_FORM_POLICIES.find((p) => p.id === assigned.policyId)?.groups.map((g) => (
                         <option key={g.id} value={g.id}>{g.name}</option>
                       ))}
                     </select>

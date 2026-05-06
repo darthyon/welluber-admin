@@ -17,7 +17,7 @@ import { Badge } from "@/components/ui/badge";
 
 // Mock data - will be replaced with API calls
 const mockEmployee = {
-  id: "emp_1",
+  id: "EMP-20260115-0001",
   name: "Robert Fox",
   email: "robert.fox@acme.com",
   status: "Linked",

@@ -50,10 +50,10 @@ export const inviteAdminSchema = z.object({
 export type InviteAdminData = z.infer<typeof inviteAdminSchema>;
 
 
-export const configureWalletSchema = z.object({
+export const configureAccountSchema = z.object({
   model: z.enum(["cash_balance", "credit_limit"] as const, {
-    message: "Please select a wallet model",
+    message: "Please select an account model",
   }),
 });
 
-export type ConfigureWalletData = z.infer<typeof configureWalletSchema>;
+export type ConfigureAccountData = z.infer<typeof configureAccountSchema>;

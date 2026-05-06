@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import { FileText, Download, Clock, Buildings, Shield, Storefront, HardDrive } from "@phosphor-icons/react";
-import { MOCK_AUDIT_LOGS } from "@/features/audit-log/mock-data";
+import { MOCK_AUDIT_LOGS } from "@/lib/mock-data";
 import { AuditLogEntry } from "@/features/audit-log/types";
 import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { FilterItem } from "@/components/shared/filter-item";

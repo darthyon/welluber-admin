@@ -23,11 +23,11 @@ import { FilterItem } from "@/components/shared/filter-item";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { SharedDataTable, Column } from "@/components/shared/data-table";
 import { ActionPopover, type ActionItem } from "@/components/shared/action-popover";
-import { BenefitGroup, Benefit } from "@/types/policy";
 import { PolicyDetailView } from "@/components/host/policies/policy-detail-view";
 import { usePolicyTemplates } from "@/hooks/use-policy-templates";
-import { INITIAL_POLICIES, POLICY_DATA_MAP_INITIAL, type PolicyListItem } from "@/features/policies/mock-data";
-import { MOCK_EMPLOYEES } from "@/components/host/employees/employee-directory-table";
+import { MOCK_POLICIES, MOCK_POLICY_DATA_MAP } from "@/lib/mock-data";
+import type { PolicyListItem, PolicyData } from "@/features/policies/types";
+import { MOCK_EMPLOYEES } from "@/lib/mock-data";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -244,13 +244,13 @@ function PoliciesContent() {
 
 
   // State
-  const [policies, setPolicies] = useState<PolicyListItem[]>(INITIAL_POLICIES);
+  const [policies, setPolicies] = useState<PolicyListItem[]>(MOCK_POLICIES);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [orgFilter, setOrgFilter] = useState<string>("all");
 
   // Mock groups/benefits per policy
-  const [policyDataMap, setPolicyDataMap] = useState<Record<string, { groups: BenefitGroup[]; benefits: Benefit[] }>>(POLICY_DATA_MAP_INITIAL);
+  const [policyDataMap, setPolicyDataMap] = useState<Record<string, PolicyData>>(MOCK_POLICY_DATA_MAP);
 
   // Dialogs
   const [showTemplateModal, setShowTemplateModal] = useState(false);

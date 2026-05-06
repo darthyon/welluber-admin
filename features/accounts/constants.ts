@@ -1,7 +1,7 @@
-import { WalletStatus, WalletFilters } from "./types";
+import { AccountStatus, AccountFilters } from "./types";
 import { DEFAULT_ADVANCED_FILTERS } from "@/components/shared/advanced-filter-sheet";
 
-export const WALLET_STATUS_OPTIONS = [
+export const ACCOUNT_STATUS_OPTIONS = [
   { label: "Active", value: "active" },
   { label: "Suspended", value: "suspended" },
   { label: "Closed", value: "closed" },
@@ -16,7 +16,7 @@ export const TRANSACTION_TYPE_LABELS: Record<string, string> = {
   settlement: "Settlement",
 };
 
-export const WALLET_FILTERS_DEFAULT: WalletFilters = {
+export const ACCOUNT_FILTERS_DEFAULT: AccountFilters = {
   search: "",
   orgIds: [],
   branchIds: [],

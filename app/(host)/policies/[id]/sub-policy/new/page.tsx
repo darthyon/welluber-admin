@@ -3,16 +3,16 @@
 import { useRouter } from "next/navigation";
 import { CaretLeft, TreeStructure } from "@phosphor-icons/react";
 import { SubPolicyWizard } from "@/components/host/policies/sub-policy-wizard";
-import { INITIAL_POLICIES, POLICY_DATA_MAP_INITIAL } from "@/features/policies/mock-data";
-import { MOCK_ORGS } from "@/features/organizations/mock-data";
-import { MOCK_EMPLOYEES } from "@/components/host/employees/employee-directory-table";
+import { MOCK_POLICIES, MOCK_POLICY_DATA_MAP } from "@/lib/mock-data";
+import { MOCK_ORGS } from "@/lib/mock-data";
+import { MOCK_EMPLOYEES } from "@/lib/mock-data";
 
 export default function NewSubPolicyPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const parentId = params.id;
 
-  const parent = INITIAL_POLICIES.find(p => p.id === parentId);
-  const parentData = POLICY_DATA_MAP_INITIAL[parentId];
+  const parent = MOCK_POLICIES.find(p => p.id === parentId);
+  const parentData = MOCK_POLICY_DATA_MAP[parentId];
 
   if (!parent || !parentData) {
     return (
