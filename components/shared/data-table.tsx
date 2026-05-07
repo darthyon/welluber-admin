@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { CaretUp, CaretDown, ArrowsDownUp } from "@phosphor-icons/react";
 
 export interface Column<T> {
-  header: string;
+  header: React.ReactNode;
   accessorKey?: keyof T;
   headerClassName?: string;
   cellClassName?: string;
