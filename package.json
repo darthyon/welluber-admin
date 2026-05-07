@@ -10,7 +10,8 @@
     "lint": "eslint",
     "lint:design": "node .agents/scripts/design-lint.js",
     "format": "prettier --write \"**/*.{ts,tsx}\"",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "check:policy": "tsx scripts/check-policy-integrity.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

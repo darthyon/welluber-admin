@@ -299,7 +299,7 @@ export function SubPolicyWizard({
                 <p className="text-label text-faint">
                   {group.distributionType === "SharedAmount"
                     ? `Shared pool · ${formatRM(group.maxUsagePerCycle ?? 0)}`
-                    : "Individual per service"}
+                    : "Individual per benefit"}
                 </p>
               </div>
             </div>

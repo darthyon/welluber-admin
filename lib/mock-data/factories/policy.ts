@@ -1,5 +1,6 @@
 import type { BenefitGroup, Benefit } from "@/types/policy"
 import type { PolicyListItem, PolicyData } from "@/features/policies/types"
+import { MAIN_SERVICE_IDS, type MainServiceId } from "@/lib/mock-data/service-catalog"
 
 export interface PolicyBundle {
   policy: PolicyListItem
@@ -112,7 +113,8 @@ export function createPolicy(index: number): PolicyBundle {
   const groupNames = ["Core Wellness", "Mental Health", "Physical Fitness", "Nutrition Care", "Holistic Health"]
   const gId1 = `${id}-G1`
   const groups: BenefitGroup[] = [{ id: gId1, policyId: id, name: groupNames[g]!, distributionType: "IndividualBenefitAmount" }]
-  const benefits: Benefit[] = [{ id: `${id}-B1`, groupId: gId1, serviceId: `s${(g % 6) + 1}`, amount: 200 + g * 50, coPayment: { required: false, type: "Percentage", value: 0 } }]
+  const serviceId: MainServiceId = MAIN_SERVICE_IDS[g % MAIN_SERVICE_IDS.length]!
+  const benefits: Benefit[] = [{ id: `${id}-B1`, groupId: gId1, serviceId, amount: 200 + g * 50, coPayment: { required: false, type: "Percentage", value: 0 } }]
   return {
     policy: { id, name: `Wellness Policy ${n}`, code: `BEN-GEN-0${n}`, description: `Generated policy for ${org.orgName}.`, organizationId: org.orgId, eligibleEmploymentTypes: ["full-time"], coversDependents: false, benefitPoolType: "Individual", utilisationMode: modeOpts[g]!, prorateUnit: modeOpts[g] === "Prorated" ? "Monthly" : undefined, refreshCycle: cycleOpts[g]!, refreshStartReference: "fy_start", activationMode: "after_join", status: statusOpts[g]!, groupCount: 1, orgName: org.orgName, createdAt: "2026-04-01T00:00:00Z" },
     data: { groups, benefits },

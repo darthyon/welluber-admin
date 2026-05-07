@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useRef } from "react"
 import {
   CloudArrowUp,
   FileCsv,
@@ -11,8 +11,9 @@ import {
   Shield,
   ArrowLeft,
   Calendar,
-  Funnel,
-  Globe
+  Globe,
+  X,
+  Sparkle,
 } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -20,8 +21,7 @@ import { SuccessCelebration } from "@/components/shared/success-celebration"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { SharedDataTable, Column } from "@/components/shared/data-table"
 import { DataFilterBar } from "@/components/shared/data-filter-bar"
-import { FilterItem } from "@/components/shared/filter-item"
-import { Badge } from "@/components/ui/badge"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 interface BulkUploadWizardProps {
   onBack: () => void
@@ -56,6 +56,15 @@ type BulkRecord = {
   isNewDept?: boolean
 }
 
+type UploadStep = "upload" | "processing" | "preview" | "success"
+type FilterChip = "all" | "valid" | "issues" | "auto" | "newDept"
+
+const COLUMN_ORDER = [
+  "select", "code", "name", "email", "dob", "gender", "mobile",
+  "department", "role", "branch", "employmentType", "joinDate",
+  "tier", "probation", "residency", "taxable", "policy", "issues",
+]
+
 function applyPolicyAutoAssign(rows: BulkRecord[], policies: { name: string; tiers: string[] }[]): BulkRecord[] {
   return rows.map((r) => {
     if (r.policies) {
@@ -83,14 +92,128 @@ function applyPolicyAutoAssign(rows: BulkRecord[], policies: { name: string; tie
   })
 }
 
-type UploadStep = "upload" | "processing" | "preview" | "success"
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+function formatDate(value: string): string {
+  if (!value) return ""
+  if (value === "Invalid" || value === "Invalid Date") return value
+  // Match YYYY-MM-DD
+  const m = value.match(/^(\d{4})-(\d{2})-(\d{2})$/)
+  if (m) {
+    const [, y, mo, d] = m
+    const monthIdx = parseInt(mo, 10) - 1
+    if (monthIdx >= 0 && monthIdx < 12) return `${parseInt(d, 10).toString().padStart(2, "0")} ${MONTHS[monthIdx]} ${y}`
+  }
+  // Try Date parse
+  const parsed = new Date(value)
+  if (!isNaN(parsed.getTime())) {
+    return `${parsed.getDate().toString().padStart(2, "0")} ${MONTHS[parsed.getMonth()]} ${parsed.getFullYear()}`
+  }
+  return value
+}
+
+interface EditableCellProps {
+  value: string
+  onChange: (v: string) => void
+  invalid?: boolean
+  placeholder?: string
+  mono?: boolean
+  maxWidth?: number
+  className?: string
+  displayFormatter?: (v: string) => string
+}
+
+function EditableCell({ value, onChange, invalid, placeholder, mono, maxWidth = 140, className, displayFormatter }: EditableCellProps) {
+  const [editing, setEditing] = useState(false)
+  const [draft, setDraft] = useState(value)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => { setDraft(value) }, [value])
+  useEffect(() => { if (editing) inputRef.current?.select() }, [editing])
+
+  const commit = () => {
+    setEditing(false)
+    if (draft !== value) onChange(draft)
+  }
+  const cancel = () => {
+    setEditing(false)
+    setDraft(value)
+  }
+
+  if (editing) {
+    return (
+      <input
+        ref={inputRef}
+        autoFocus
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={commit}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") commit()
+          if (e.key === "Escape") cancel()
+        }}
+        style={{ minWidth: maxWidth }}
+        className={cn(
+          "w-full rounded border border-primary/40 bg-background px-1.5 py-0.5 text-body outline-none ring-2 ring-primary/10",
+          mono && "font-mono text-label",
+          className
+        )}
+      />
+    )
+  }
+
+  const isMissing = !value
+  const display = value && displayFormatter ? displayFormatter(value) : value
+  const button = (
+    <button
+      type="button"
+      onClick={() => setEditing(true)}
+      style={{ maxWidth }}
+      className={cn(
+        "block w-full truncate rounded border border-transparent px-1.5 py-0.5 text-left text-body transition hover:border-border hover:bg-muted/40",
+        invalid && "border-rose-500/30 bg-rose-500/5 font-semibold text-rose-600 dark:text-rose-400",
+        isMissing && !invalid && "text-rose-600 italic dark:text-rose-400 border-rose-500/20 bg-rose-500/5",
+        mono && "font-mono text-label",
+        className
+      )}
+    >
+      {display || placeholder || "Add"}
+    </button>
+  )
+
+  if (!value) return button
+  return (
+    <Tooltip delayDuration={200}>
+      <TooltipTrigger asChild>{button}</TooltipTrigger>
+      <TooltipContent side="top" className="text-label font-medium">{value}</TooltipContent>
+    </Tooltip>
+  )
+}
+
+function TruncatedText({ text, maxWidth = 140, className }: { text: string; maxWidth?: number; className?: string }) {
+  if (!text) return <span className="text-faint">—</span>
+  return (
+    <Tooltip delayDuration={200}>
+      <TooltipTrigger asChild>
+        <span
+          style={{ maxWidth }}
+          className={cn("block truncate", className)}
+        >
+          {text}
+        </span>
+      </TooltipTrigger>
+      <TooltipContent side="top" className="text-label font-medium">{text}</TooltipContent>
+    </Tooltip>
+  )
+}
 
 export function BulkUploadWizard({ onBack, onSuccess, orgTierConfigs = [], availablePolicies = [] }: BulkUploadWizardProps) {
   const [step, setStep] = useState<UploadStep>("upload")
   const [progress, setProgress] = useState(0)
   const [fileName, setFileName] = useState<string | null>(null)
-  const [showIssuesOnly, setShowIssuesOnly] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
+  const [activeFilter, setActiveFilter] = useState<FilterChip>("all")
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     if (step === "processing") {
@@ -129,486 +252,485 @@ export function BulkUploadWizard({ onBack, onSuccess, orgTierConfigs = [], avail
 
   const MOCK_RECORDS: BulkRecord[] = [
     {
-      id: "rec_0",
-      code: "E001",
-      name: "Robert Fox",
-      email: "robert.f@acme.com",
-      dob: "1990-05-12",
-      gender: "male",
-      mobile: "012-3456789",
-      department: "Engineering",
-      role: "Staff",
-      date: "2026-04-10",
-      policies: "",
-      status: "Valid",
-      branch: "ACME HQ",
-      tier: mockTier(0),
-      residency: "Local",
-      taxable: true,
-      employmentType: "full-time",
-      employeeStatus: "active",
-      isProbation: false,
+      id: "rec_0", code: "E001", name: "Robert Fox", email: "robert.f@acme.com",
+      dob: "1990-05-12", gender: "male", mobile: "012-3456789", department: "Engineering",
+      role: "Staff", date: "2026-04-10", policies: "", status: "Valid",
+      branch: "ACME HQ", tier: mockTier(0), residency: "Local", taxable: true,
+      employmentType: "full-time", employeeStatus: "active", isProbation: false,
     },
     {
-      id: "rec_1",
-      code: "E002",
-      name: "Jenny Wilson",
-      email: "jenny.w@acme.com",
-      dob: "1988-11-24",
-      gender: "female",
-      mobile: "012-9876543",
-      department: "Product",
-      role: "Management",
-      date: "2026-05-15",
-      policies: "",
-      status: "Valid",
-      branch: "ACME Subang Jaya",
-      tier: mockTier(1),
-      residency: "Local",
-      taxable: true,
-      employmentType: "full-time",
-      employeeStatus: "active",
-      isProbation: false,
+      id: "rec_1", code: "E002", name: "Jenny Wilson", email: "jenny.w@acme.com",
+      dob: "1988-11-24", gender: "female", mobile: "012-9876543", department: "Product",
+      role: "Management", date: "2026-05-15", policies: "", status: "Valid",
+      branch: "ACME Subang Jaya", tier: mockTier(1), residency: "Local", taxable: true,
+      employmentType: "full-time", employeeStatus: "active", isProbation: false,
     },
     {
-      id: "rec_2",
-      code: "E003",
-      name: "Dianne Russell",
-      email: "dianne.r@acme.com",
-      dob: "1995-02-14",
-      gender: "female",
-      mobile: "017-1112223",
-      department: "Growth",
-      role: "Staff",
-      date: "2026-04-01",
-      policies: "Phantom Plan",
-      status: "Valid",
-      branch: "ACME HQ",
-      tier: mockTier(2),
-      residency: "Foreigner",
-      taxable: false,
-      employmentType: "internship",
-      employeeStatus: "active",
-      isProbation: true,
-      isNewDept: true,
+      id: "rec_2", code: "E003", name: "Dianne Russell", email: "dianne.r@acme.com",
+      dob: "1995-02-14", gender: "female", mobile: "017-1112223", department: "Growth",
+      role: "Staff", date: "2026-04-01", policies: "Phantom Plan", status: "Valid",
+      branch: "ACME HQ", tier: mockTier(2), residency: "Foreigner", taxable: false,
+      employmentType: "internship", employeeStatus: "active", isProbation: true, isNewDept: true,
     },
     {
-      id: "rec_3",
-      code: "",
-      name: "Unknown User",
-      email: "",
-      dob: "1992-08-30",
-      gender: "other",
-      mobile: "",
-      department: "HR",
-      role: "Staff",
-      date: "2026-04-20",
-      policies: "Standard Health",
-      status: "Issue",
-      issue: "Missing Code & Email",
-      branch: "ACME HQ",
-      tier: mockTier(2),
-      residency: "Local",
-      taxable: true,
-      employmentType: "part-time",
-      employeeStatus: "inactive",
-      isProbation: false,
+      id: "rec_3", code: "", name: "Unknown User", email: "",
+      dob: "1992-08-30", gender: "other", mobile: "", department: "HR",
+      role: "Staff", date: "2026-04-20", policies: "Standard Health", status: "Issue",
+      issue: "Missing Code & Email", branch: "ACME HQ", tier: mockTier(2),
+      residency: "Local", taxable: true, employmentType: "part-time",
+      employeeStatus: "inactive", isProbation: false,
     },
     {
-      id: "rec_4",
-      code: "E005",
-      name: "Guy Hawkins",
-      email: "guy.h@acme.com",
-      dob: "Invalid",
-      gender: "male",
-      mobile: "013-4445556",
-      department: "Sales",
-      role: "Executive",
-      date: "Invalid Date",
-      policies: "Executive Wellness",
-      status: "Issue",
-      issue: "Invalid DOB, Join Date & ID",
-      branch: "ACME HQ",
-      tier: mockTier(1),
-      residency: "Local",
-      taxable: true,
-      employmentType: "contract",
-      employeeStatus: "active",
-      isProbation: true,
+      id: "rec_4", code: "E005", name: "Guy Hawkins", email: "guy.h@acme.com",
+      dob: "Invalid", gender: "male", mobile: "013-4445556", department: "Sales",
+      role: "Executive", date: "Invalid Date", policies: "Executive Wellness", status: "Issue",
+      issue: "Invalid DOB & Join Date", branch: "ACME HQ", tier: mockTier(1),
+      residency: "Local", taxable: true, employmentType: "contract",
+      employeeStatus: "active", isProbation: true,
     },
   ]
 
   const policyTierMap = useMemo(() => {
-    if (availablePolicies.length > 0) return availablePolicies;
-    const tierCodes = orgTierConfigs.map(tc => tc.code || tc.name);
-    return [{ name: "General Policy", tiers: tierCodes }];
-  }, [availablePolicies, orgTierConfigs]);
+    if (availablePolicies.length > 0) return availablePolicies
+    const codes = orgTierConfigs.map(tc => tc.code || tc.name)
+    return [{ name: "General Policy", tiers: codes }]
+  }, [availablePolicies, orgTierConfigs])
 
-  const [isEditing, setIsEditing] = useState(false)
   const [records, setRecords] = useState<BulkRecord[]>(() =>
     applyPolicyAutoAssign(MOCK_RECORDS, policyTierMap)
   )
 
-  const filteredRecords = records.filter((r) => {
-    const matchesIssues = !showIssuesOnly || r.status === "Issue"
-    const matchesSearch =
-      !searchQuery ||
-      [r.name, r.email, r.code, r.department, r.role, r.tier, r.employmentType, r.employeeStatus].some((field) =>
-        String(field).toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    return matchesIssues && matchesSearch
-  })
-
-  const validCount = records.filter((r) => r.status === "Valid").length
-  const issueCount = records.filter((r) => r.status === "Issue").length
-
-  const handleRecordChange = (id: string, field: string, value: string) => {
+  const handleFieldChange = (id: string, field: keyof BulkRecord, value: string) => {
     setRecords((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, [field]: value } : r))
+      prev.map((r) => {
+        if (r.id !== id) return r
+        const next = { ...r, [field]: value }
+        // Re-validate after edits
+        if (field === "code" && value) next.issue = next.issue?.replace(/Code( & |, )?/, "").replace(/^Missing $/, "") || undefined
+        if (field === "email" && value) next.issue = next.issue?.replace(/Email( & |, )?/, "").replace(/^Missing $/, "") || undefined
+        if (field === "dob" && value !== "Invalid") next.issue = next.issue?.replace(/Invalid DOB( & |, )?/, "") || undefined
+        if (field === "date" && value !== "Invalid Date") next.issue = next.issue?.replace(/Invalid Join Date( & |, )?/, "").replace(/Join Date( & |, )?/, "") || undefined
+        const stillBad = !next.code || !next.email || next.dob === "Invalid" || next.date === "Invalid Date" || next.policyIssue
+        next.status = stillBad ? "Issue" : "Valid"
+        if (!stillBad) next.issue = undefined
+        return next
+      })
     )
   }
 
-  const columns: Column<any>[] = [
-    {
-      header: "Employee ID",
+  const resolvePolicy = (id: string, policyName: string) => {
+    setRecords((prev) =>
+      prev.map((r) => {
+        if (r.id !== id) return r
+        const stillBad = !r.code || !r.email || r.dob === "Invalid" || r.date === "Invalid Date"
+        return {
+          ...r,
+          policies: policyName,
+          policyIssue: false,
+          issue: stillBad ? r.issue : undefined,
+          status: stillBad ? "Issue" : "Valid",
+        }
+      })
+    )
+  }
+
+  const filteredRecords = useMemo(() => {
+    return records.filter((r) => {
+      const search = searchQuery.toLowerCase()
+      const matchesSearch =
+        !search ||
+        [r.name, r.email, r.code, r.department, r.role, r.tier, r.employmentType, r.policies].some((f) =>
+          String(f).toLowerCase().includes(search)
+        )
+      if (!matchesSearch) return false
+      switch (activeFilter) {
+        case "valid": return r.status === "Valid"
+        case "issues": return r.status === "Issue"
+        case "auto": return !!r.autoAssigned
+        case "newDept": return !!r.isNewDept
+        default: return true
+      }
+    })
+  }, [records, searchQuery, activeFilter])
+
+  const counts = useMemo(() => ({
+    total: records.length,
+    valid: records.filter((r) => r.status === "Valid").length,
+    issues: records.filter((r) => r.status === "Issue").length,
+    auto: records.filter((r) => r.autoAssigned).length,
+    newDept: records.filter((r) => r.isNewDept).length,
+  }), [records])
+
+  const allFilteredSelected = filteredRecords.length > 0 && filteredRecords.every((r) => selectedIds.has(r.id))
+
+  const toggleSelectAll = () => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (allFilteredSelected) filteredRecords.forEach((r) => next.delete(r.id))
+      else filteredRecords.forEach((r) => next.add(r.id))
+      return next
+    })
+  }
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const clearSelection = () => setSelectedIds(new Set())
+
+  const bulkAssignPolicy = (policyName: string) => {
+    setRecords((prev) =>
+      prev.map((r) => {
+        if (!selectedIds.has(r.id)) return r
+        return { ...r, policies: policyName, policyIssue: false, issue: undefined, status: !r.code || !r.email || r.dob === "Invalid" || r.date === "Invalid Date" ? "Issue" : "Valid" }
+      })
+    )
+    clearSelection()
+  }
+
+  const bulkSetTier = (tier: string) => {
+    setRecords((prev) => prev.map((r) => (selectedIds.has(r.id) ? { ...r, tier } : r)))
+    clearSelection()
+  }
+
+  const bulkRemove = () => {
+    setRecords((prev) => prev.filter((r) => !selectedIds.has(r.id)))
+    clearSelection()
+  }
+
+  // Build column map — 1 field per column
+  const SelectHeader = (
+    <input
+      type="checkbox"
+      checked={allFilteredSelected}
+      onChange={toggleSelectAll}
+      onClick={(e) => e.stopPropagation()}
+      className="h-4 w-4 cursor-pointer rounded border-border accent-primary"
+      aria-label="Select all"
+    />
+  )
+
+  const columnMap: Record<string, Column<BulkRecord>> = {
+    select: {
+      header: SelectHeader,
+      headerClassName: "w-10",
       render: (row) => (
-        <div className="flex flex-col">
-          {isEditing ? (
-            <input
-              value={row.code}
-              onChange={(e) =>
-                handleRecordChange(row.id, "code", e.target.value)
-              }
-              className={cn(
-                "w-20 rounded border border-border bg-background px-2 py-1 text-label font-semibold outline-none focus:border-primary/50",
-                !row.code && "border-rose-500/20 dark:border-rose-500/20 bg-rose-500/10 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400"
-              )}
-              placeholder="ID"
+        <input
+          type="checkbox"
+          checked={selectedIds.has(row.id)}
+          onChange={(e) => { e.stopPropagation(); toggleSelect(row.id) }}
+          onClick={(e) => e.stopPropagation()}
+          className="h-4 w-4 cursor-pointer rounded border-border accent-primary"
+        />
+      ),
+    },
+    code: {
+      header: "Code",
+      render: (row) => (
+        <EditableCell
+          value={row.code}
+          onChange={(v) => handleFieldChange(row.id, "code", v)}
+          placeholder="Missing"
+          invalid={!row.code}
+          mono
+        />
+      ),
+    },
+    name: {
+      header: "Name",
+      render: (row) => (
+        <EditableCell
+          value={row.name}
+          onChange={(v) => handleFieldChange(row.id, "name", v)}
+          placeholder="Missing"
+          className="font-semibold"
+        />
+      ),
+    },
+    email: {
+      header: "Email",
+      render: (row) => (
+        <EditableCell
+          value={row.email}
+          onChange={(v) => handleFieldChange(row.id, "email", v)}
+          placeholder="Missing email"
+          invalid={!row.email}
+          mono
+        />
+      ),
+    },
+    dob: {
+      header: "DOB",
+      render: (row) => (
+        <EditableCell
+          value={row.dob}
+          onChange={(v) => handleFieldChange(row.id, "dob", v)}
+          placeholder="DD MMM YYYY"
+          invalid={row.dob === "Invalid"}
+          displayFormatter={formatDate}
+        />
+      ),
+    },
+    gender: {
+      header: "Gender",
+      render: (row) => <span className="text-body capitalize text-muted-foreground">{row.gender}</span>,
+    },
+    mobile: {
+      header: "Mobile",
+      render: (row) => (
+        <EditableCell
+          value={row.mobile}
+          onChange={(v) => handleFieldChange(row.id, "mobile", v)}
+          placeholder="Missing"
+          invalid={!row.mobile}
+          mono
+        />
+      ),
+    },
+    department: {
+      header: "Department",
+      render: (row) => (
+        <div className="flex items-center gap-1.5">
+          <EditableCell
+            value={row.department}
+            onChange={(v) => handleFieldChange(row.id, "department", v)}
+            className="font-medium"
+          />
+          {row.isNewDept && (
+            <StatusBadge
+              status="New"
+              variant="amber"
+              className="text-micro h-4 px-1.5 uppercase tracking-tighter"
             />
-          ) : (
-            <span
-              className={cn(
-                "text-body font-semibold",
-                !row.code ? "text-rose-600 dark:text-rose-400 italic" : "text-foreground"
-              )}
-            >
-              {row.code || "Missing"}
-            </span>
           )}
         </div>
       ),
     },
-    {
-      header: "Personal Details",
+    role: {
+      header: "Role",
       render: (row) => (
-        <div className="flex flex-col gap-1">
-          {isEditing ? (
-            <div className="flex flex-col gap-1">
-              <input
-                value={row.dob}
-                onChange={(e) =>
-                  handleRecordChange(row.id, "dob", e.target.value)
-                }
-                className={cn(
-                  "w-full rounded border border-border bg-background px-2 py-0.5 text-label outline-none focus:border-primary/50",
-                  row.dob === "Invalid" &&
-                    "border-rose-500/20 dark:border-rose-500/20 bg-rose-500/10 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400"
-                )}
-                placeholder="DOB (YYYY-MM-DD)"
-              />
-              <select
-                value={row.gender}
-                onChange={(e) =>
-                  handleRecordChange(row.id, "gender", e.target.value)
-                }
-                className="w-full rounded border border-border bg-background px-1.5 py-0.5 text-label font-semibold"
-              >
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-          ) : (
-            <>
-              <div className="flex items-center gap-1.5">
-                <Calendar
-                  size={12}
-                  className="text-muted-foreground opacity-60"
-                />
-                <span
-                  className={cn(
-                    "text-label font-medium",
-                    row.dob === "Invalid"
-                      ? "text-rose-600 dark:text-rose-400 italic"
-                      : "text-foreground"
-                  )}
-                >
-                  {row.dob}
-                </span>
-              </div>
-              <span className="text-label leading-none font-semibold text-muted-foreground">
-                {" "}
-                {row.gender}
-              </span>
-            </>
-          )}
-        </div>
+        <EditableCell
+          value={row.role}
+          onChange={(v) => handleFieldChange(row.id, "role", v)}
+          className="text-muted-foreground"
+        />
       ),
     },
-    {
-      header: "Work Details",
+    branch: {
+      header: "Branch",
       render: (row) => (
-        <div className="flex flex-col gap-1">
-          {isEditing ? (
-            <div className="flex flex-col gap-1">
-              <input
-                value={row.department}
-                onChange={(e) =>
-                  handleRecordChange(row.id, "department", e.target.value)
-                }
-                className="w-full rounded border border-border bg-background px-1.5 py-0.5 text-label font-semibold outline-none focus:border-primary/50"
-                placeholder="Department"
-              />
-              <input
-                value={row.role}
-                onChange={(e) =>
-                  handleRecordChange(row.id, "role", e.target.value)
-                }
-                className="w-full rounded border border-border bg-background px-1.5 py-0.5 text-label font-semibold outline-none focus:border-primary/50"
-                placeholder="Role"
-              />
-              <select
-                value={row.employmentType}
-                onChange={(e) =>
-                  handleRecordChange(row.id, "employmentType", e.target.value)
-                }
-                className="w-full rounded border border-border bg-background px-1.5 py-0.5 text-label font-semibold outline-none focus:border-primary/50"
-              >
-                <option value="full-time">Full-time</option>
-                <option value="part-time">Part-time</option>
-                <option value="contract">Contract</option>
-                <option value="internship">Internship</option>
-              </select>
-            </div>
-          ) : (
-            <>
-              <div className="flex items-center gap-1.5">
-                <span className="text-label leading-none font-semibold text-foreground">
-                  {row.department}
-                </span>
-                {row.isNewDept && (
-                  <StatusBadge status="Auto-create" variant="amber" className="text-micro h-4 px-1.5 uppercase tracking-tighter" />
-                )}
-              </div>
-              <span className="text-label font-medium text-muted-foreground italic opacity-70">
-                {row.role}
-              </span>
-              <span className="text-label font-medium text-faint capitalize">
-                {row.employmentType?.replace("-", " ")}
-              </span>
-            </>
-          )}
-        </div>
+        <TruncatedText text={row.branch} maxWidth={140} className="text-body font-medium text-muted-foreground" />
       ),
     },
-    {
-      header: "Tier & Status",
+    employmentType: {
+      header: "Employment",
       render: (row) => (
-        <div className="flex flex-col gap-1">
-           <div className="flex items-center gap-1.5 flex-wrap">
-             <span className="text-label font-semibold text-primary bg-primary/5 px-1.5 py-0.5 rounded border border-primary/10">{row.tier}</span>
-              <StatusBadge status={row.employeeStatus} variant={row.employeeStatus === "active" ? "emerald" : "rose"} />
-              {row.isProbation && (
-                <StatusBadge status="Probation" variant="amber" />
-              )}
-           </div>
-           <div className="flex items-center gap-1.5 text-label font-medium text-muted-foreground flex-wrap">
-             <span className="font-semibold text-subtle capitalize">{row.employmentType?.replace("-", " ")}</span>
-             <span>•</span>
-             <Globe size={10} />
-             <span>{row.residency}</span>
-             <span>•</span>
-              <span className={row.taxable ? "text-emerald-600 dark:text-emerald-400 font-semibold" : "text-rose-600 dark:text-rose-400 font-semibold"}>{row.taxable ? "Taxable" : "Non-taxable"}</span>
-           </div>
-        </div>
-      )
-    },
-    {
-      header: "Contact",
-      render: (row) => (
-        <div className="flex flex-col">
-          {isEditing ? (
-            <input
-              value={row.mobile}
-              onChange={(e) =>
-                handleRecordChange(row.id, "mobile", e.target.value)
-              }
-              className="w-full rounded border border-border bg-background px-2 py-0.5 text-label outline-none focus:border-primary/50"
-              placeholder="Mobile Number"
-            />
-          ) : (
-            <span
-              className={cn(
-                "text-body font-medium",
-                !row.mobile ? "text-rose-600 dark:text-rose-400 italic" : "text-muted-foreground"
-              )}
-            >
-              {row.mobile || "Missing Mobile"}
-            </span>
-          )}
-        </div>
+        <span className="text-body capitalize text-muted-foreground">{row.employmentType.replace("-", " ")}</span>
       ),
     },
-    {
-      header: "Name / Email",
-      render: (row) => (
-        <div className="flex flex-col gap-0.5">
-          {isEditing ? (
-            <div className="space-y-1.5">
-              <input
-                value={row.name}
-                onChange={(e) =>
-                  handleRecordChange(row.id, "name", e.target.value)
-                }
-                className="w-full rounded border border-border bg-background px-2 py-1 text-body font-medium outline-none focus:border-primary/50"
-              />
-              <input
-                value={row.email}
-                onChange={(e) =>
-                  handleRecordChange(row.id, "email", e.target.value)
-                }
-                className="w-full rounded border border-border bg-background px-2 py-1 font-mono text-label outline-none focus:border-primary/50"
-              />
-            </div>
-          ) : (
-            <>
-              <span className="text-body leading-tight font-semibold text-foreground">
-                {row.name}
-              </span>
-              <span
-                className={cn(
-                  "text-label font-medium",
-                  row.email
-                    ? "text-muted-foreground"
-                    : "text-rose-600 dark:text-rose-400 italic"
-                )}
-              >
-                {row.email || "Missing email"}
-              </span>
-            </>
-          )}
-        </div>
-      ),
-    },
-    {
-      header: "Birth Date",
-      render: (row) => (
-        <div className="flex items-center gap-2">
-          {isEditing ? (
-            <input
-              value={row.dob}
-              onChange={(e) =>
-                handleRecordChange(row.id, "dob", e.target.value)
-              }
-              className={cn(
-                "w-full rounded border border-border bg-background px-2 py-1 font-mono text-label outline-none focus:border-primary/50",
-                row.dob === "Invalid" &&
-                  "border-rose-500/20 dark:border-rose-500/20 bg-rose-500/10 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400"
-              )}
-            />
-          ) : (
-            <span
-              className={cn(
-                "font-mono text-label",
-                row.dob === "Invalid" &&
-                  "font-semibold text-rose-600 dark:text-rose-400 underline decoration-wavy"
-              )}
-            >
-              {row.dob}
-            </span>
-          )}
-        </div>
-      ),
-    },
-    {
+    joinDate: {
       header: "Join Date",
       render: (row) => (
-        <div className="flex items-center gap-2">
-          <Calendar
-            size={14}
-            className={
-              row.date === "Invalid Date"
-                ? "text-rose-600 dark:text-rose-400"
-                : "text-faint"
-            }
+        <div className="flex items-center gap-1.5">
+          <Calendar size={12} className={row.date === "Invalid Date" ? "text-rose-500" : "text-faint"} />
+          <EditableCell
+            value={row.date}
+            onChange={(v) => handleFieldChange(row.id, "date", v)}
+            invalid={row.date === "Invalid Date"}
+            displayFormatter={formatDate}
+            placeholder="DD MMM YYYY"
           />
-          {isEditing ? (
-            <input
-              value={row.date}
-              onChange={(e) =>
-                handleRecordChange(row.id, "date", e.target.value)
-              }
-              className={cn(
-                "w-full rounded border border-border bg-background px-2 py-1 font-mono text-label outline-none focus:border-primary/50",
-                row.date === "Invalid Date" &&
-                  "border-rose-500/20 dark:border-rose-500/20 bg-rose-500/10 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400"
-              )}
-            />
-          ) : (
-            <span
-              className={cn(
-                "font-mono text-label",
-                row.date === "Invalid Date" &&
-                  "font-semibold text-rose-600 dark:text-rose-400 underline decoration-wavy"
-              )}
-            >
-              {row.date}
-            </span>
-          )}
         </div>
       ),
     },
-    {
-      header: "Branch",
-      accessorKey: "branch",
-      cellClassName: "text-muted-foreground font-medium",
+    tier: {
+      header: "Tier",
+      render: (row) => {
+        const tc = resolveTier(row.tier)
+        const displayName = tc?.name || row.tier
+        const code = tc?.code
+        const pill = (
+          <span className="rounded border border-primary/15 bg-primary/5 px-1.5 py-0.5 text-label font-semibold text-primary truncate max-w-[140px]">
+            {displayName}
+          </span>
+        )
+        return (
+          <div className="flex items-center gap-1.5">
+            {code ? (
+              <Tooltip delayDuration={200}>
+                <TooltipTrigger asChild>{pill}</TooltipTrigger>
+                <TooltipContent side="top" className="text-label font-medium">
+                  {displayName} <span className="text-faint">· {code}</span>
+                </TooltipContent>
+              </Tooltip>
+            ) : pill}
+            {row.isProbation && (
+              <span title="Probation" className="h-1.5 w-1.5 rounded-full bg-amber-500 shrink-0" />
+            )}
+          </div>
+        )
+      },
     },
-    {
+    probation: {
+      header: "Probation",
+      render: (row) => row.isProbation ? (
+        <StatusBadge status="Yes" variant="amber" />
+      ) : (
+        <span className="text-label text-faint">—</span>
+      ),
+    },
+    residency: {
+      header: "Residency",
+      render: (row) => (
+        <div className="flex items-center gap-1.5 text-label text-muted-foreground">
+          <Globe size={11} />
+          <span>{row.residency}</span>
+        </div>
+      ),
+    },
+    taxable: {
+      header: "Taxable",
+      render: (row) => (
+        <span className={cn(
+          "text-label font-semibold",
+          row.taxable ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
+        )}>
+          {row.taxable ? "Yes" : "No"}
+        </span>
+      ),
+    },
+    policy: {
       header: "Policy",
-      render: (row: BulkRecord) => {
-        if (row.policyIssue) {
+      render: (row) => {
+        if (row.policyIssue && row.tier) {
+          const matches = policyTierMap.filter((p) => p.tiers.includes(row.tier))
           return (
-            <StatusBadge status="Needs Policy" variant="amber" />
+            <select
+              value=""
+              onChange={(e) => e.target.value && resolvePolicy(row.id, e.target.value)}
+              className="rounded border border-amber-500/40 bg-amber-500/5 px-2 py-1 text-label font-semibold text-amber-700 dark:text-amber-400 outline-none focus:border-amber-500"
+            >
+              <option value="">Resolve…</option>
+              {matches.map((p) => (
+                <option key={p.name} value={p.name}>{p.name}</option>
+              ))}
+            </select>
           )
         }
         if (row.policies) {
           return (
-            <div className="flex items-center gap-2 text-primary/80">
-              <Shield size={16} weight="fill" />
-              <span className="text-body font-semibold">{row.policies}</span>
+            <div className="flex items-center gap-1.5 text-primary/80">
+              <Shield size={14} weight="fill" className="shrink-0" />
+              <TruncatedText text={row.policies} maxWidth={120} className="text-body font-semibold" />
               {row.autoAssigned && (
-                <StatusBadge status="Auto" variant="emerald" />
+                <span className="shrink-0 rounded bg-emerald-500/10 px-1.5 py-0.5 text-micro font-bold uppercase text-emerald-600 dark:text-emerald-400">
+                  Auto
+                </span>
               )}
             </div>
           )
         }
-        return <span className="text-muted-foreground">—</span>
+        return <span className="text-faint">—</span>
       },
     },
-    {
-      header: "Status",
-      render: (row) =>
-        row.status === "Valid" ? (
-          <div className="flex w-fit items-center gap-1.5 rounded-full border border-emerald-500/20 dark:border-emerald-500/20 bg-emerald-500/10 dark:bg-emerald-500/20 px-2 py-0.5 text-label leading-none font-semibold text-emerald-600 dark:text-emerald-400">
-            <CheckCircle size={12} weight="fill" /> Valid
+    issues: {
+      header: "",
+      headerClassName: "w-12 text-center",
+      render: (row) => {
+        const isValid = row.status === "Valid"
+        const message = isValid ? "All fields valid" : (row.issue || "Issue")
+        return (
+          <div className="flex justify-center">
+            <Tooltip delayDuration={150}>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  className={cn(
+                    "flex h-6 w-6 items-center justify-center rounded-full border transition-all",
+                    isValid
+                      ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/15"
+                      : "border-rose-500/30 bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500/20"
+                  )}
+                  aria-label={message}
+                >
+                  {isValid ? (
+                    <CheckCircle size={14} weight="fill" />
+                  ) : (
+                    <WarningCircle size={14} weight="fill" />
+                  )}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="left" className="max-w-[240px]">
+                <div className="flex items-start gap-2">
+                  {isValid ? (
+                    <CheckCircle size={14} weight="fill" className="mt-0.5 shrink-0 text-emerald-500" />
+                  ) : (
+                    <WarningCircle size={14} weight="fill" className="mt-0.5 shrink-0 text-rose-500" />
+                  )}
+                  <div className="flex flex-col gap-0.5">
+                    <span className={cn(
+                      "text-label font-bold uppercase tracking-wide",
+                      isValid ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
+                    )}>
+                      {isValid ? "Valid" : "Issue"}
+                    </span>
+                    <span className="text-label font-medium text-foreground">{message}</span>
+                  </div>
+                </div>
+              </TooltipContent>
+            </Tooltip>
           </div>
-        ) : (
-          <div className="flex w-fit items-center gap-1.5 rounded-full border border-rose-500/20 dark:border-rose-500/20 bg-rose-500/10 dark:bg-rose-500/20 px-2 py-0.5 text-label leading-none font-semibold text-rose-600 dark:text-rose-400">
-            <WarningCircle size={12} weight="fill" /> {row.issue || "Issue"}
-          </div>
-        ),
+        )
+      },
     },
+  }
+
+  const visibleColumns: Column<BulkRecord>[] = useMemo(
+    () => COLUMN_ORDER.map((key) => columnMap[key]),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [records, selectedIds, allFilteredSelected, policyTierMap]
+  )
+
+  const filterChips: { key: FilterChip; label: string; count: number; tone: string }[] = [
+    { key: "all", label: "All", count: counts.total, tone: "default" },
+    { key: "valid", label: "Valid", count: counts.valid, tone: "emerald" },
+    { key: "issues", label: "Issues", count: counts.issues, tone: "rose" },
+    { key: "auto", label: "Auto-assigned", count: counts.auto, tone: "primary" },
+    { key: "newDept", label: "New depts", count: counts.newDept, tone: "amber" },
   ]
+
+  const chipToneClasses = (tone: string, active: boolean) => {
+    if (active) {
+      switch (tone) {
+        case "emerald": return "bg-emerald-500/15 border-emerald-500/40 text-emerald-700 dark:text-emerald-300"
+        case "rose": return "bg-rose-500/15 border-rose-500/40 text-rose-700 dark:text-rose-300"
+        case "primary": return "bg-primary/15 border-primary/40 text-primary"
+        case "amber": return "bg-amber-500/15 border-amber-500/40 text-amber-700 dark:text-amber-300"
+        default: return "bg-foreground/10 border-foreground/30 text-foreground"
+      }
+    }
+    return "bg-background border-border/60 text-muted-foreground hover:border-border hover:text-foreground"
+  }
+
+  const uniqueTiers = useMemo(() => Array.from(new Set(records.map((r) => r.tier))), [records])
+
+  const tierLookup = useMemo(() => {
+    const map = new Map<string, { name: string; code?: string }>()
+    orgTierConfigs.forEach((tc) => {
+      const entry = { name: tc.name, code: tc.code }
+      map.set(tc.id, entry)
+      if (tc.code) map.set(tc.code, entry)
+      map.set(tc.name, entry)
+    })
+    return map
+  }, [orgTierConfigs])
+
+  const resolveTier = (value: string) => tierLookup.get(value)
 
   return (
     <div className="animate-in overflow-hidden rounded-lg border border-border bg-card duration-500 fade-in slide-in-from-bottom-4">
@@ -624,32 +746,12 @@ export function BulkUploadWizard({ onBack, onSuccess, orgTierConfigs = [], avail
             <ArrowLeft size={18} weight="bold" />
           </Button>
           <div>
-            <h3 className="font-semibold text-foreground">
-              Bulk Employee Enrollment
-            </h3>
+            <h3 className="font-semibold text-foreground">Bulk Employee Enrollment</h3>
             <p className="mt-0.5 text-label font-medium tracking-wider text-muted-foreground">
               CSV Import Wizard
             </p>
           </div>
         </div>
-
-        {step === "preview" && (
-          <div className="flex items-center gap-4 rounded-lg border border-border/50 bg-background px-4 py-2">
-            <div className="flex items-center gap-1.5">
-              <div className="h-2 w-2 rounded-full bg-emerald-500 dark:bg-emerald-400" />
-              <span className="text-label font-semibold text-emerald-600 dark:text-emerald-400">
-                {validCount} Valid
-              </span>
-            </div>
-            <div className="h-3 w-[1px] bg-border" />
-            <div className="flex items-center gap-1.5">
-              <div className="h-2 w-2 rounded-full bg-rose-500 dark:bg-rose-400" />
-              <span className="text-label font-semibold text-rose-600 dark:text-rose-400">
-                {issueCount} Issues
-              </span>
-            </div>
-          </div>
-        )}
       </div>
 
       <div className="min-h-[400px] p-8">
@@ -663,17 +765,12 @@ export function BulkUploadWizard({ onBack, onSuccess, orgTierConfigs = [], avail
                 <CloudArrowUp size={40} />
               </div>
               <div className="space-y-2">
-                <p className="text-body font-semibold text-foreground">
-                  Drop your CSV here
-                </p>
+                <p className="text-body font-semibold text-foreground">Drop your CSV here</p>
                 <p className="max-w-[280px] text-body text-subtle">
-                  Drag & drop or browse for .csv or .xlsx formats (max 10MB).
+                  Drag &amp; drop or browse for .csv or .xlsx formats (max 10MB).
                 </p>
               </div>
-              <Button
-                variant="secondary"
-                className="mt-2 h-10 rounded-4xl px-8 font-semibold shadow-sm"
-              >
+              <Button variant="secondary" className="mt-2 h-10 rounded-4xl px-8 font-semibold shadow-sm">
                 Select File
               </Button>
             </div>
@@ -684,19 +781,14 @@ export function BulkUploadWizard({ onBack, onSuccess, orgTierConfigs = [], avail
                   <Info size={24} weight="bold" />
                 </div>
                 <div className="space-y-1">
-                  <p className="text-label font-semibold text-primary">
-                    Required Columns
-                  </p>
+                  <p className="text-label font-semibold text-primary">Required Columns</p>
                   <p className="text-label leading-relaxed text-primary/80">
-                    Code, Email, Name, DOB, Gender, Mobile, Department, Role,
-                    Join Date, Branch, Tier, Employment Type, Status, Is Probation.
+                    Code, Email, Name, DOB, Gender, Mobile, Department, Role, Join Date, Branch, Tier, Employment Type, Status, Is Probation.
                   </p>
                 </div>
               </div>
               <div className="flex flex-col justify-center gap-2 rounded-lg border border-border bg-muted/10 p-4">
-                <p className="text-label font-semibold text-foreground">
-                  Need help formatting?
-                </p>
+                <p className="text-label font-semibold text-foreground">Need help formatting?</p>
                 <button className="text-left text-label font-semibold text-primary underline hover:text-primary/80">
                   Download Sample Template
                 </button>
@@ -728,109 +820,145 @@ export function BulkUploadWizard({ onBack, onSuccess, orgTierConfigs = [], avail
               </div>
             </div>
             <div className="space-y-2">
-              <h4 className="text-heading font-semibold text-foreground">
-                Analyzing Records
-              </h4>
-              <p className="text-body text-muted-foreground">
-                Validating record integrity for {fileName}...
-              </p>
+              <h4 className="text-heading font-semibold text-foreground">Analyzing Records</h4>
+              <p className="text-body text-muted-foreground">Validating record integrity for {fileName}...</p>
             </div>
           </div>
         )}
 
         {step === "preview" && (
-          <div className="animate-in space-y-6 duration-500 fade-in">
-            <div className="flex flex-col gap-4 border-b border-border/50 py-3">
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-emerald-100 dark:border-emerald-500/20 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shadow-sm shadow-emerald-500/5">
-                    <FileCsv size={28} weight="fill" />
-                  </div>
-                  <div>
-                    <p className="text-body font-semibold text-foreground">
-                      {fileName}
-                    </p>
-                    <p className="text-label font-medium text-muted-foreground">
-                      {records.length} total records identified
-                    </p>
-                  </div>
+          <TooltipProvider delayDuration={200}>
+          <div className="animate-in space-y-5 duration-500 fade-in">
+            {/* Summary header */}
+            <div className="flex items-center justify-between gap-4 border-b border-border/50 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-emerald-100 dark:border-emerald-500/20 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shadow-sm shadow-emerald-500/5">
+                  <FileCsv size={28} weight="fill" />
                 </div>
+                <div>
+                  <p className="text-body font-semibold text-foreground">{fileName}</p>
+                  <p className="text-label font-medium text-muted-foreground">
+                    {counts.total} records · {counts.valid} valid · {counts.issues} issues
+                    {counts.newDept > 0 && ` · ${counts.newDept} new ${counts.newDept === 1 ? "department" : "departments"} to create`}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="ghost"
+                  onClick={() => setStep("upload")}
+                  className="h-10 px-4 font-semibold text-muted-foreground transition-all hover:bg-muted"
+                >
+                  Restart
+                </Button>
+                <Button
+                  onClick={handleConfirmImport}
+                  disabled={counts.valid === 0}
+                  className="h-10 animate-in bg-primary px-10 font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-all fade-in rounded-4xl hover:bg-primary/90"
+                >
+                  Confirm Import ({counts.valid})
+                  <ArrowRight size={18} className="ml-2" weight="bold" />
+                </Button>
+              </div>
+            </div>
 
-                <div className="flex items-center gap-3">
+            {/* Filter chips + search */}
+            <DataFilterBar
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              searchPlaceholder="Search records..."
+              filters={
+                <div className="flex items-center gap-2 flex-wrap">
+                  {filterChips.map((chip) => {
+                    const active = activeFilter === chip.key
+                    return (
+                      <button
+                        key={chip.key}
+                        onClick={() => setActiveFilter(chip.key)}
+                        className={cn(
+                          "flex items-center gap-1.5 rounded-full border px-3 py-1 text-label font-semibold transition-all",
+                          chipToneClasses(chip.tone, active)
+                        )}
+                      >
+                        {chip.label}
+                        <span className={cn(
+                          "rounded-full px-1.5 text-micro font-bold",
+                          active ? "bg-background/40" : "bg-muted"
+                        )}>
+                          {chip.count}
+                        </span>
+                      </button>
+                    )
+                  })}
+                </div>
+              }
+            />
+
+            {/* Bulk actions bar */}
+            {selectedIds.size > 0 && (
+              <div className="flex animate-in items-center justify-between gap-4 rounded-lg border border-primary/30 bg-primary/5 px-4 py-2.5 fade-in slide-in-from-top-1">
+                <div className="flex items-center gap-2 text-label font-semibold text-primary">
+                  <Sparkle size={14} weight="fill" />
+                  {selectedIds.size} selected
+                </div>
+                <div className="flex items-center gap-2">
+                  <select
+                    onChange={(e) => { if (e.target.value) { bulkAssignPolicy(e.target.value); e.target.value = "" } }}
+                    className="rounded border border-border bg-background px-2 py-1 text-label font-semibold outline-none hover:border-primary/40"
+                  >
+                    <option value="">Assign Policy…</option>
+                    {policyTierMap.map((p) => (
+                      <option key={p.name} value={p.name}>{p.name}</option>
+                    ))}
+                  </select>
+                  <select
+                    onChange={(e) => { if (e.target.value) { bulkSetTier(e.target.value); e.target.value = "" } }}
+                    className="rounded border border-border bg-background px-2 py-1 text-label font-semibold outline-none hover:border-primary/40"
+                  >
+                    <option value="">Set Tier…</option>
+                    {uniqueTiers.map((t) => {
+                      const tc = resolveTier(t)
+                      const label = tc?.name ? (tc.code ? `${tc.name} (${tc.code})` : tc.name) : t
+                      return <option key={t} value={t}>{label}</option>
+                    })}
+                  </select>
                   <Button
                     variant="ghost"
-                    onClick={() => setStep("upload")}
-                    className="h-10 px-4 font-semibold text-muted-foreground transition-all hover:bg-muted"
+                    size="sm"
+                    onClick={bulkRemove}
+                    className="h-8 px-3 text-label font-semibold text-rose-600 hover:bg-rose-500/10 hover:text-rose-600"
                   >
-                    Restart
+                    Remove
                   </Button>
                   <Button
-                    onClick={handleConfirmImport}
-                    disabled={showIssuesOnly && issueCount === 0}
-                    className="h-10 animate-in bg-primary px-10 font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-all fade-in rounded-4xl hover:bg-primary/90"
+                    variant="ghost"
+                    size="sm"
+                    onClick={clearSelection}
+                    className="h-8 px-2 text-muted-foreground"
                   >
-                    Confirm Import{" "}
-                    <ArrowRight size={18} className="ml-2" weight="bold" />
+                    <X size={14} weight="bold" />
                   </Button>
                 </div>
               </div>
-
-              <DataFilterBar
-                searchQuery={searchQuery}
-                onSearchChange={setSearchQuery}
-                searchPlaceholder="Search identified records..."
-                filters={
-                  <div className="flex items-center gap-6">
-                    <FilterItem
-                      label="Issues"
-                      value={showIssuesOnly ? "issues" : "all"}
-                      onChange={(v) => setShowIssuesOnly(v === "issues")}
-                      options={[
-                        { label: "All Records", value: "all" },
-                        { label: "Issues Only", value: "issues" },
-                      ]}
-                    />
-                    <div className="flex items-center space-x-2">
-                      <div
-                        onClick={() => setIsEditing(!isEditing)}
-                        className={cn(
-                          "relative h-4 w-8 cursor-pointer rounded-full transition-all duration-300",
-                          isEditing ? "bg-primary" : "bg-muted"
-                        )}
-                      >
-                        <div
-                          className={cn(
-                            "absolute top-0.5 h-3 w-3 rounded-full bg-background shadow-sm transition-all duration-300",
-                            isEditing ? "left-[17px]" : "left-0.5"
-                          )}
-                        />
-                      </div>
-                      <label
-                        className="cursor-pointer text-label font-semibold text-muted-foreground select-none"
-                        onClick={() => setIsEditing(!isEditing)}
-                      >
-                        Quick Edit
-                      </label>
-                    </div>
-                  </div>
-                }
-              />
-            </div>
+            )}
 
             <SharedDataTable
               data={filteredRecords}
-              columns={columns}
-              rowsPerPage={5}
+              columns={visibleColumns}
+              rowsPerPage={10}
+              freezeFirst
+              freezeLast
               className="border-border/60"
             />
           </div>
+          </TooltipProvider>
         )}
 
         {step === "success" && (
           <div className="animate-in py-10 duration-500 zoom-in-95">
             <SuccessCelebration
               title="Import Successful"
-              message={`${validCount} new employee records have been successfully added to the organization directory.`}
+              message={`${counts.valid} new employee records have been successfully added to the organization directory.`}
             />
             <div className="mt-12 flex justify-center">
               <Button

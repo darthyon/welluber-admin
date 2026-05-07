@@ -40,6 +40,7 @@ import { UtilisationClaimsTable } from "@/components/shared/utilisation-claims-t
 import { MOCK_EMPLOYEES } from "@/lib/mock-data";
 import type { EmployeeDirectoryItem } from "@/features/employees/types";
 import { MOCK_EMPLOYEE_UTILISATION, SERVICES } from "@/lib/mock-data";
+import type { MainServiceId } from "@/lib/mock-data/service-catalog";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -53,7 +54,7 @@ const CONTENT_TABS = [
 const CREATE_STEPS = [
   { id: 1, title: "Basics" },
   { id: 2, title: "Pool Config" },
-  { id: 3, title: "Groups & Services" },
+  { id: 3, title: "Groups & Benefits" },
   { id: 4, title: "Assign Employees" },
   { id: 5, title: "Review" },
 ];
@@ -263,7 +264,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
       groups.forEach((group, idx) => {
         const groupBenefits = benefits.filter(b => b.groupId === group.id);
         if (groupBenefits.length === 0) {
-          errors[`group_${idx}`] = `Select at least one service for ${group.name || "this group"}`;
+          errors[`group_${idx}`] = `Select at least one benefit for ${group.name || "this group"}`;
         }
         groupBenefits.forEach((b, bIdx) => {
           if (b.amount <= 0) errors[`benefit_${group.id}_${bIdx}`] = "Amount must be greater than 0";
@@ -309,11 +310,11 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
     setGroups(groups.map(g => g.id === groupId ? { ...g, [field]: value } : g));
   };
 
-  const isServiceInGroup = (groupId: string, serviceId: string) => {
+  const isServiceInGroup = (groupId: string, serviceId: MainServiceId) => {
     return benefits.some(b => b.groupId === groupId && b.serviceId === serviceId);
   };
 
-  const toggleService = (groupId: string, serviceId: string) => {
+  const toggleService = (groupId: string, serviceId: MainServiceId) => {
     const exists = benefits.find(b => b.groupId === groupId && b.serviceId === serviceId);
     if (exists) {
       setBenefits(benefits.filter(b => !(b.groupId === groupId && b.serviceId === serviceId)));
@@ -811,9 +812,9 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
 
     return (
       <DetailSection
-        title="Benefit Groups & Services"
+        title="Benefit Groups"
         icon={<TreeStructure size={18} weight="duotone" />}
-        description="Organize services into logical groups with budget controls"
+        description="Organize benefits into logical groups with budget controls"
         ghost
         action={
           !isViewMode ? (
@@ -883,7 +884,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                       <div className="space-y-1.5">
                         <p className="text-label font-medium text-muted-foreground">Distribution</p>
                         {isViewMode ? (
-                          <p className="text-label font-semibold text-subtle">{group.distributionType === "SharedAmount" ? "Shared Pool" : "Individual Per Service"}</p>
+                          <p className="text-label font-semibold text-subtle">{group.distributionType === "SharedAmount" ? "Shared Pool" : "Individual Per Benefit"}</p>
                         ) : (
                           <div className="flex p-0.5 bg-muted rounded-lg">
                             {(["SharedAmount", "IndividualBenefitAmount"] as const).map((type) => (
@@ -911,10 +912,10 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                       </div>
                     </div>
 
-                    {/* Services checklist */}
+                    {/* Benefits checklist */}
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <p className="text-label font-medium text-muted-foreground">Services</p>
+                        <p className="text-label font-medium text-muted-foreground">Benefits</p>
                         {groupErrors[`group_${gIdx}`] && <p className="text-label text-rose-600 dark:text-rose-400 font-medium">{groupErrors[`group_${gIdx}`]}</p>}
                       </div>
                       <div className="divide-y divide-border/50 border border-border/60 rounded-lg overflow-hidden">
@@ -1312,7 +1313,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
         </DetailSection>
 
         {/* Groups Summary */}
-        <DetailSection title="Groups & Services" icon={<TreeStructure size={18} weight="duotone" />} className="lg:col-span-2" ghost>
+        <DetailSection title="Groups & Benefits" icon={<TreeStructure size={18} weight="duotone" />} className="lg:col-span-2" ghost>
           <div className="space-y-4">
             {groups.length === 0 ? (
               <p className="text-center py-6 text-body text-faint font-medium">No benefit groups configured.</p>
@@ -1326,7 +1327,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                     </div>
                     <div>
                       <p className="text-body font-medium text-foreground">{group.name}</p>
-                      <p className="text-label text-muted-foreground font-semibold">{groupBenefits.length} services · {group.distributionType === "SharedAmount" ? "Shared Pool" : "Individual"}</p>
+                      <p className="text-label text-muted-foreground font-semibold">{groupBenefits.length} benefits · {group.distributionType === "SharedAmount" ? "Shared Pool" : "Individual"}</p>
                     </div>
                   </div>
                   <div className="text-right">

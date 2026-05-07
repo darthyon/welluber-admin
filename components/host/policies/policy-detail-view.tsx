@@ -22,6 +22,7 @@ import {
   Target,
 } from "@phosphor-icons/react";
 import { BenefitPolicy, BenefitGroup, Benefit } from "@/types/policy";
+import { SERVICES } from "@/lib/mock-data/service-catalog";
 import type { PolicyListItem } from "@/features/policies/types";
 import type { EmployeeDirectoryItem } from "@/features/employees/types";
 
@@ -483,7 +484,7 @@ function OverviewTab({
       <DetailSection
         title="Benefit Groups"
         icon={<TreeStructure size={18} weight="duotone" />}
-        description="Services and amounts configured per group"
+        description="Benefits and amounts configured per group"
         action={
           <Button
             variant="secondary"
@@ -500,7 +501,7 @@ function OverviewTab({
           <div className="flex flex-col items-center justify-center py-16 bg-muted/10 rounded-lg border border-dashed border-border/60">
             <TreeStructure size={36} weight="duotone" className="text-faint mb-3" />
             <p className="text-body font-medium text-muted-foreground">No benefit groups configured.</p>
-            <p className="text-label text-faint mt-1">Add groups to define which services are available.</p>
+            <p className="text-label text-faint mt-1">Add groups to define which benefits are available.</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -527,7 +528,7 @@ function OverviewTab({
                           : "Individual"}
                       </p>
                       <p className="text-label text-faint font-medium">
-                        {group.distributionType === "SharedAmount" ? "Shared Pool" : "Per Service"}
+                        {group.distributionType === "SharedAmount" ? "Shared Pool" : "Per Benefit"}
                       </p>
                     </div>
                   </div>
@@ -540,7 +541,7 @@ function OverviewTab({
                         <div className="flex items-center gap-3">
                           <IdentificationCard size={16} className="text-faint" />
                           <span className="text-body font-medium text-foreground">
-                            Service {benefit.serviceId}
+                            {SERVICES.find((s) => s.id === benefit.serviceId)?.name || benefit.serviceId}
                           </span>
                           {benefit.coPayment.required && (
                             <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-label font-medium">
@@ -557,7 +558,7 @@ function OverviewTab({
                       </div>
                     ))}
                     {groupBenefits.length === 0 && (
-                      <p className="text-center py-4 text-label text-faint italic">No services configured for this group.</p>
+                      <p className="text-center py-4 text-label text-faint italic">No benefits configured for this group.</p>
                     )}
                   </div>
                 </div>

@@ -61,7 +61,7 @@ import { OrgTiersConfig } from "@/components/host/organizations/org-tiers-config
 import { LinkPolicyModal } from "@/components/host/organizations/link-policy-modal"
 import { BenefitPolicyWizard } from "@/components/host/policies/benefit-policy-wizard"
 import { PolicyDetailView } from "@/components/host/policies/policy-detail-view"
-import { BenefitPolicy } from "@/types/policy"
+import { BenefitPolicy, Benefit } from "@/types/policy"
 import type { FlatClaimRow } from "@/types/claims"
 import { DetailSection } from "@/components/shared/detail-section"
 import { DetailField } from "@/components/shared/detail-field"
@@ -293,34 +293,34 @@ function OrganizationDetailContent() {
       maxUsagePerCycle: 500,
     },
   ])
-  const [mockBenefits] = useState([
+  const [mockBenefits] = useState<Benefit[]>([
     {
       id: "b1",
       groupId: "g1",
       serviceId: "s1",
       amount: 200,
-      coPayment: { required: false, type: "Percentage" as const, value: 0 },
+      coPayment: { required: false, type: "Percentage", value: 0 },
     },
     {
       id: "b2",
       groupId: "g2",
       serviceId: "s4",
       amount: 150,
-      coPayment: { required: true, type: "Percentage" as const, value: 10 },
+      coPayment: { required: true, type: "Percentage", value: 10 },
     },
     {
       id: "b3",
       groupId: "g3",
       serviceId: "s5",
       amount: 100,
-      coPayment: { required: false, type: "Percentage" as const, value: 0 },
+      coPayment: { required: false, type: "Percentage", value: 0 },
     },
     {
       id: "b4",
       groupId: "g3",
       serviceId: "s6",
       amount: 100,
-      coPayment: { required: false, type: "Percentage" as const, value: 0 },
+      coPayment: { required: false, type: "Percentage", value: 0 },
     },
   ])
 
