@@ -35,6 +35,7 @@ import {
   ActivationMode,
 } from "@/types/policy";
 import { MOCK_EMPLOYEES, SERVICES } from "@/lib/mock-data";
+import type { MainServiceId } from "@/lib/mock-data/service-catalog";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -208,7 +209,7 @@ export function PolicyReviewCards({ policy, groups, benefits }: PolicyReviewCard
         <div className="bg-card border border-border rounded-lg p-5 space-y-4 md:col-span-2">
           <h4 className="text-body font-semibold text-foreground flex items-center gap-2">
             <TreeStructure size={16} weight="duotone" className="text-primary" />
-            Groups & Services
+            Groups & Benefits
           </h4>
           {groups.length === 0 ? (
             <p className="text-body text-faint font-medium">No benefit groups configured.</p>
@@ -225,7 +226,7 @@ export function PolicyReviewCards({ policy, groups, benefits }: PolicyReviewCard
                       <div>
                         <p className="text-body font-medium text-foreground">{group.name}</p>
                         <p className="text-label text-muted-foreground font-semibold">
-                          {groupBenefits.length} services · {group.distributionType === "SharedAmount" ? "Shared Pool" : "Individual"}
+                          {groupBenefits.length} benefits · {group.distributionType === "SharedAmount" ? "Shared Pool" : "Individual"}
                         </p>
                       </div>
                     </div>
@@ -327,7 +328,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
     groups.forEach((group, idx) => {
       const groupBenefits = benefits.filter((b) => b.groupId === group.id);
       if (groupBenefits.length === 0) {
-        errors[`group_${idx}`] = `Select at least one service for ${group.name || "this group"}`;
+        errors[`group_${idx}`] = `Select at least one benefit for ${group.name || "this group"}`;
       }
       groupBenefits.forEach((b, bIdx) => {
         if (b.amount <= 0) errors[`benefit_${group.id}_${bIdx}`] = "Amount must be greater than 0";
@@ -371,7 +372,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
     setGroups(groups.map((g) => (g.id === groupId ? { ...g, [field]: value } : g)));
   };
 
-  const toggleService = useCallback((groupId: string, serviceId: string) => {
+  const toggleService = useCallback((groupId: string, serviceId: MainServiceId) => {
     setBenefits((prev) => {
       const exists = prev.find((b) => b.groupId === groupId && b.serviceId === serviceId);
       if (exists) {
@@ -916,7 +917,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
   const renderGroupsSection = () => (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <SectionHeader icon={TreeStructure} title="Groups & Services" description="Organize services into logical groups with budget controls" />
+        <SectionHeader icon={TreeStructure} title="Groups & Benefits" description="Organize benefits into logical groups with budget controls" />
         <Button onClick={addGroup} size="sm" className="rounded-full flex items-center gap-2 text-label h-8 px-4">
           <Plus size={14} weight="bold" />
           Add Group
@@ -1010,10 +1011,10 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
                     </div>
                   </div>
 
-                  {/* Services checklist */}
+                  {/* Benefits checklist */}
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <p className="text-label font-medium text-muted-foreground">Services</p>
+                      <p className="text-label font-medium text-muted-foreground">Benefits</p>
                       {groupError && <ErrorText>{groupError}</ErrorText>}
                     </div>
                     <div className="divide-y divide-border/50 border border-border/60 rounded-lg overflow-hidden">

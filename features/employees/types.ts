@@ -15,7 +15,13 @@ export interface EmployeeDirectoryItem {
   tier?: string
   employmentType?: string
   benefitPolicies: {
+    /** FK — canonical reference to BenefitPolicy.id */
+    policyId: string
+    /** Denormalized for table display only. Truth = policyId. */
     policyName: string
+    /** FK list — canonical references to BenefitGroup.id */
+    assignedGroupIds: string[]
+    /** Denormalized group names for table display. Truth = assignedGroupIds. */
     benefitGroups: string[]
     utilisation: number
   }[]
@@ -25,6 +31,7 @@ export interface AssignablePolicy {
   id: string
   name: string
   description: string
+  /** Denormalized group names for assign modal display. Source of truth lives in BenefitGroup rows. */
   benefitGroups: string[]
   totalAllocated: number
   eligibility: {
