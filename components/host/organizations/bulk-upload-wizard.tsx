@@ -537,7 +537,7 @@ export function BulkUploadWizard({ onBack, onSuccess, orgTierConfigs = [], avail
       header: "Join Date",
       render: (row) => (
         <div className="flex items-center gap-1.5">
-          <Calendar size={12} className={row.date === "Invalid Date" ? "text-rose-500" : "text-faint"} />
+          <Calendar size={12} className={row.date === "Invalid Date" ? "text-destructive" : "text-faint"} />
           <EditableCell
             value={row.date}
             onChange={(v) => handleFieldChange(row.id, "date", v)}
@@ -569,9 +569,7 @@ export function BulkUploadWizard({ onBack, onSuccess, orgTierConfigs = [], avail
                 </TooltipContent>
               </Tooltip>
             ) : pill}
-            {row.isProbation && (
-              <span title="Probation" className="h-1.5 w-1.5 rounded-full bg-amber-500 shrink-0" />
-            )}
+            {row.isProbation && <StatusBadge status="Probation" variant="amber" className="h-4 px-1.5 text-micro" />}
           </div>
         )
       },
@@ -627,11 +625,7 @@ export function BulkUploadWizard({ onBack, onSuccess, orgTierConfigs = [], avail
             <div className="flex items-center gap-1.5 text-primary/80">
               <Shield size={14} weight="fill" className="shrink-0" />
               <TruncatedText text={row.policies} maxWidth={120} className="text-body font-semibold" />
-              {row.autoAssigned && (
-                <span className="shrink-0 rounded bg-emerald-500/10 px-1.5 py-0.5 text-micro font-bold uppercase text-emerald-600 dark:text-emerald-400">
-                  Auto
-                </span>
-              )}
+              {row.autoAssigned && <StatusBadge status="Auto" variant="emerald" className="h-4 px-1.5 text-micro" />}
             </div>
           )
         }
@@ -668,13 +662,13 @@ export function BulkUploadWizard({ onBack, onSuccess, orgTierConfigs = [], avail
               <TooltipContent side="left" className="max-w-[240px]">
                 <div className="flex items-start gap-2">
                   {isValid ? (
-                    <CheckCircle size={14} weight="fill" className="mt-0.5 shrink-0 text-emerald-500" />
+                    <CheckCircle size={14} weight="fill" className="mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400" />
                   ) : (
-                    <WarningCircle size={14} weight="fill" className="mt-0.5 shrink-0 text-rose-500" />
+                    <WarningCircle size={14} weight="fill" className="mt-0.5 shrink-0 text-destructive" />
                   )}
                   <div className="flex flex-col gap-0.5">
                     <span className={cn(
-                      "text-label font-bold uppercase tracking-wide",
+                      "text-label font-semibold uppercase tracking-wide",
                       isValid ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
                     )}>
                       {isValid ? "Valid" : "Issue"}
@@ -882,7 +876,7 @@ export function BulkUploadWizard({ onBack, onSuccess, orgTierConfigs = [], avail
                       >
                         {chip.label}
                         <span className={cn(
-                          "rounded-full px-1.5 text-micro font-bold",
+                          "rounded-full px-1.5 text-micro font-semibold",
                           active ? "bg-background/40" : "bg-muted"
                         )}>
                           {chip.count}
@@ -922,14 +916,14 @@ export function BulkUploadWizard({ onBack, onSuccess, orgTierConfigs = [], avail
                       return <option key={t} value={t}>{label}</option>
                     })}
                   </select>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={bulkRemove}
-                    className="h-8 px-3 text-label font-semibold text-rose-600 hover:bg-rose-500/10 hover:text-rose-600"
-                  >
-                    Remove
-                  </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={bulkRemove}
+                      className="h-8 px-3 text-label font-semibold"
+                    >
+                      Remove
+                    </Button>
                   <Button
                     variant="ghost"
                     size="sm"

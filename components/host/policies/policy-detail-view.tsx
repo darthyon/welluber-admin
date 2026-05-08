@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -19,6 +19,7 @@ import {
   Plus,
   ArrowsDownUp,
   CaretRight,
+  CaretLeft,
   Target,
 } from "@phosphor-icons/react";
 import { BenefitPolicy, BenefitGroup, Benefit } from "@/types/policy";
@@ -32,8 +33,8 @@ interface PolicyDetailViewProps {
   policy: BenefitPolicy;
   groups: BenefitGroup[];
   benefits: Benefit[];
-  subPolicies?: PolicyListItem[];
-  subPolicyOverrideCounts?: Record<string, number>;
+  versions?: PolicyListItem[];
+  versionOverrideCounts?: Record<string, number>;
   parentPolicyName?: string;
   employees?: EmployeeDirectoryItem[];
   onEdit: () => void;
@@ -46,7 +47,7 @@ interface PolicyDetailViewProps {
 
 const TABS = [
   { id: "overview", label: "Overview", icon: IdentificationCard },
-  { id: "sub-policies", label: "Sub-Policies", icon: TreeStructure },
+  { id: "versions", label: "Versions", icon: TreeStructure },
   { id: "employees", label: "Assigned Employees", icon: Buildings },
   { id: "audit", label: "Audit Log", icon: ClockCounterClockwise },
 ] as const;
@@ -72,8 +73,8 @@ export function PolicyDetailView({
   policy,
   groups,
   benefits,
-  subPolicies = [],
-  subPolicyOverrideCounts = {},
+  versions = [],
+  versionOverrideCounts = {},
   parentPolicyName,
   employees,
   onEdit,
@@ -82,12 +83,28 @@ export function PolicyDetailView({
   onDelete,
 }: PolicyDetailViewProps) {
   const router = useRouter();
+  const isVersion = Boolean(policy.parentPolicyId);
+  const availableTabs = useMemo(
+    () => (isVersion ? TABS.filter((tab) => tab.id !== "versions") : TABS),
+    [isVersion]
+  );
   const [activeTab, setActiveTab] = useState<TabId>("overview");
+
+  useEffect(() => {
+    const tabStillAvailable = availableTabs.some((tab) => tab.id === activeTab);
+    if (!tabStillAvailable) {
+      setActiveTab("overview");
+    }
+  }, [activeTab, availableTabs]);
+
+  useEffect(() => {
+    setActiveTab("overview");
+  }, [policy.id]);
 
   const statusVariant = policy.status === "active" ? "emerald" : policy.status === "draft" ? "amber" : "rose";
   const canEdit = policy.status !== "deactivated";
   const canDelete = policy.status === "draft" || policy.status === "deactivated";
-  const canCreateSubPolicy = policy.status === "active" && !policy.parentPolicyId;
+  const canCreateVersion = policy.status === "active" && !policy.parentPolicyId;
 
   return (
     <div className="flex flex-col h-full bg-transparent">
@@ -128,15 +145,28 @@ export function PolicyDetailView({
             </div>
 
             <div className="flex items-center gap-2">
-              {canCreateSubPolicy && (
+              {policy.parentPolicyId && (
                 <Button
                   variant="outline"
                   size="lg"
-                  onClick={() => router.push(`/policies/${policy.id}/sub-policy/new`)}
+                  onClick={() =>
+                    router.push(`/policies?policyId=${policy.parentPolicyId}&mode=view&wizard=open`)
+                  }
+                  className="rounded-full text-body font-medium transition-all"
+                >
+                  <CaretLeft size={16} weight="bold" className="mr-1.5" />
+                  Back to Parent Policy
+                </Button>
+              )}
+              {canCreateVersion && (
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={() => router.push(`/policies/${policy.id}/versions/new`)}
                   className="rounded-full text-body font-medium transition-all"
                 >
                   <TreeStructure size={16} weight="bold" className="mr-1.5" />
-                  Create Sub-Policy
+                  Create Version
                 </Button>
               )}
               {canEdit && (
@@ -155,7 +185,7 @@ export function PolicyDetailView({
 
           {/* Tabs - matches org page pattern */}
           <div className="mt-8 flex items-center gap-6 border-b border-border">
-            {TABS.map((tab) => {
+            {availableTabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
               return (
@@ -191,13 +221,13 @@ export function PolicyDetailView({
             {activeTab === "overview" && (
               <OverviewTab policy={policy} groups={groups} benefits={benefits} onEdit={onEdit} />
             )}
-            {activeTab === "sub-policies" && (
-              <SubPoliciesTab
+            {!isVersion && activeTab === "versions" && (
+              <VersionsTab
                 policy={policy}
-                subPolicies={subPolicies}
-                overrideCounts={subPolicyOverrideCounts}
-                onCreateSubPolicy={() => router.push(`/policies/${policy.id}/sub-policy/new`)}
-                onViewSubPolicy={(id) => router.push(`/policies?policyId=${id}&mode=view&wizard=open`)}
+                versions={versions}
+                overrideCounts={versionOverrideCounts}
+                onCreateVersion={() => router.push(`/policies/${policy.id}/versions/new`)}
+                onViewVersion={(id) => router.push(`/policies?policyId=${id}&mode=view&wizard=open`)}
               />
             )}
             {activeTab === "employees" && (
@@ -213,31 +243,31 @@ export function PolicyDetailView({
   );
 }
 
-// ─── Sub-Policies Tab ─────────────────────────────────────────────────────────
+// ─── Versions Tab ─────────────────────────────────────────────────────────
 
-function SubPoliciesTab({
+function VersionsTab({
   policy,
-  subPolicies,
+  versions,
   overrideCounts = {},
-  onCreateSubPolicy,
-  onViewSubPolicy,
+  onCreateVersion,
+  onViewVersion,
 }: {
   policy: BenefitPolicy;
-  subPolicies: PolicyListItem[];
+  versions: PolicyListItem[];
   overrideCounts: Record<string, number>;
-  onCreateSubPolicy: () => void;
-  onViewSubPolicy: (id: string) => void;
+  onCreateVersion: () => void;
+  onViewVersion: (id: string) => void;
 }) {
-  const canCreateSubPolicy = policy.status === "active" && !policy.parentPolicyId;
+  const canCreateVersion = policy.status === "active" && !policy.parentPolicyId;
 
   const totalCovered = useMemo(
-    () => subPolicies.reduce((sum, sp) => sum + (sp.targetEmployeeIds?.length ?? 0), 0),
-    [subPolicies]
+    () => versions.reduce((sum, sp) => sum + (sp.targetEmployeeIds?.length ?? 0), 0),
+    [versions]
   );
 
   const totalOverrides = useMemo(
-    () => subPolicies.reduce((sum, sp) => sum + (overrideCounts[sp.id] ?? 0), 0),
-    [subPolicies, overrideCounts]
+    () => versions.reduce((sum, sp) => sum + (overrideCounts[sp.id] ?? 0), 0),
+    [versions, overrideCounts]
   );
 
   return (
@@ -245,21 +275,21 @@ function SubPoliciesTab({
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-heading font-semibold text-foreground">
-            {subPolicies.length > 0 ? `Sub-Policies (${subPolicies.length})` : "Sub-Policies"}
+            {versions.length > 0 ? `Versions (${versions.length})` : "Versions"}
           </h3>
           <p className="text-body text-muted-foreground mt-1">
             Override benefit amounts for specific employee groups and individuals.
           </p>
         </div>
-        {canCreateSubPolicy && (
-          <Button onClick={onCreateSubPolicy} className="h-9 px-5 rounded-full text-body font-medium shadow-sm">
+        {canCreateVersion && (
+          <Button onClick={onCreateVersion} className="h-9 px-5 rounded-full text-body font-medium shadow-sm">
             <Plus size={15} weight="bold" className="mr-1.5" />
-            Create Sub-Policy
+            Create Version
           </Button>
         )}
       </div>
 
-      {subPolicies.length > 0 && (
+      {versions.length > 0 && (
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-lg border border-border bg-card">
             <Users size={16} className="text-primary" weight="duotone" />
@@ -270,43 +300,43 @@ function SubPoliciesTab({
           <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-lg border border-border bg-card">
             <ArrowsDownUp size={16} className="text-primary" weight="duotone" />
             <span className="text-body font-medium text-foreground">
-              {totalOverrides} override{totalOverrides !== 1 ? "s" : ""} across {subPolicies.length} sub-polic{subPolicies.length !== 1 ? "ies" : "y"}
+              {totalOverrides} override{totalOverrides !== 1 ? "s" : ""} across {versions.length} version{versions.length !== 1 ? "s" : ""}
             </span>
           </div>
         </div>
       )}
 
-      {subPolicies.length === 0 ? (
+      {versions.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 bg-muted/10 rounded-lg border border-dashed border-border/60 text-center">
           <div className="w-14 h-14 rounded-lg bg-violet-50 dark:bg-violet-500/10 border border-violet-200 dark:border-violet-500/20 flex items-center justify-center text-violet-500 mb-4">
             <TreeStructure size={28} weight="duotone" />
           </div>
-          <p className="text-body font-semibold text-foreground">No sub-policies yet</p>
+          <p className="text-body font-semibold text-foreground">No versions yet</p>
           <p className="text-label text-faint mt-1 max-w-sm">
-            Create a sub-policy to tailor benefit amounts for a specific tier, department, or individual employee without changing the base policy.
+            Create a version to tailor benefit amounts for a specific tier, department, or individual employee without changing the base policy.
           </p>
-          {canCreateSubPolicy && (
-            <Button onClick={onCreateSubPolicy} size="sm" className="mt-6 text-label font-medium">
+          {canCreateVersion && (
+            <Button onClick={onCreateVersion} size="sm" className="mt-6 text-label font-medium">
               <Plus size={14} weight="bold" className="mr-1.5" />
-              Create Sub-Policy
+              Create Version
             </Button>
           )}
-          {!canCreateSubPolicy && policy.parentPolicyId && (
+          {!canCreateVersion && policy.parentPolicyId && (
             <p className="text-label text-faint mt-4 italic">
-              Sub-policies can only be created from parent policies.
+              Versions can only be created from parent policies.
             </p>
           )}
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {subPolicies.map(sub => {
+          {versions.map(sub => {
             const pinnedCount = sub.targetEmployeeIds?.length ?? 0;
             const oc = overrideCounts[sub.id] ?? 0;
 
             return (
               <button
                 key={sub.id}
-                onClick={() => onViewSubPolicy(sub.id)}
+                onClick={() => onViewVersion(sub.id)}
                 className="group relative text-left rounded-xl border border-border bg-card p-5 transition-all hover:border-primary/30 hover:shadow-sm hover:bg-muted/10"
               >
                 <div className="flex items-start justify-between gap-3">
@@ -600,11 +630,10 @@ function AssignedEmployeesTab({ policy, employees }: { policy: BenefitPolicy; em
           <div className="px-4 py-3 border-b border-border bg-muted/30">
             <div className="grid grid-cols-12 text-label font-semibold text-muted-foreground">
               <span className="col-span-3">Employee</span>
-              <span className="col-span-2">Department</span>
+              <span className="col-span-3">Department</span>
               <span className="col-span-2">Tier</span>
               <span className="col-span-2">Join Date</span>
               <span className="col-span-2">Status</span>
-              <span className="col-span-1 text-right">Actions</span>
             </div>
           </div>
           <div className="divide-y divide-border/50">
@@ -614,7 +643,7 @@ function AssignedEmployeesTab({ policy, employees }: { policy: BenefitPolicy; em
                   <p className="text-body font-semibold text-foreground">{emp.name}</p>
                   <p className="text-label text-faint font-mono">{emp.empCode}</p>
                 </div>
-                <div className="col-span-2">
+                <div className="col-span-3">
                   <span className="text-body text-subtle">{emp.department}</span>
                 </div>
                 <div className="col-span-2">
@@ -630,11 +659,6 @@ function AssignedEmployeesTab({ policy, employees }: { policy: BenefitPolicy; em
                     status={emp.status === "active" ? "Active" : emp.status === "on-leave" ? "On Leave" : "Inactive"}
                     variant={emp.status === "active" ? "emerald" : emp.status === "on-leave" ? "amber" : "zinc"}
                   />
-                </div>
-                <div className="col-span-1 text-right">
-                  <Button variant="ghost" size="sm" className="h-7 px-2 text-label text-primary hover:bg-primary/5">
-                    View
-                  </Button>
                 </div>
               </div>
             ))}

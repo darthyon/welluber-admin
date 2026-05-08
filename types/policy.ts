@@ -28,7 +28,8 @@ export interface BenefitPolicy {
   activationMode: ActivationMode;
   activationCustomDate?: string; // ISO date string, only when activationMode === "custom_date"
   status: PolicyStatus;
-  totalCapAmount?: number; // policy-level spending ceiling (RM), optional
+  totalCapAmount?: number; // employee-level spending ceiling (RM), optional
+  dependentsCapAmount?: number; // dependents-level spending ceiling (RM), optional
   createdAt?: string;
   groupCount?: number;
   clonedFrom?: string; // original policy id
@@ -40,9 +41,10 @@ export interface BenefitPolicy {
     maxAge?: number;
     gender?: "male" | "female" | "all";
     tierIds?: string[];
+    departmentIds?: string[];
   };
-  parentPolicyId?: string;      // present = this is a sub-policy
-  targetEmployeeIds?: string[]; // individually pinned employees for this sub-policy
+  parentPolicyId?: string;      // present = this is a version of another policy
+  targetEmployeeIds?: string[]; // individually pinned employees for this version
 }
 
 export interface PolicyTemplate {
@@ -95,5 +97,4 @@ export interface BenefitCategory {
   icon: string;
   color: string;
 }
-
 

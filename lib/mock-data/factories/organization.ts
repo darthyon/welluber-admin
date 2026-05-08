@@ -44,6 +44,13 @@ export function createOrganization(index: number): Organization {
       { id: "TC-003", name: "Manager", code: "MGR" },
       { id: "TC-004", name: "Associate", code: "ASC" },
     ],
+    departmentConfigs: [
+      { id: "DC-001", name: "HR", code: "HR" },
+      { id: "DC-002", name: "Tech", code: "TECH" },
+      { id: "DC-003", name: "Marketing", code: "MKT" },
+      { id: "DC-004", name: "Finance", code: "FIN" },
+      { id: "DC-005", name: "Operations", code: "OPS" },
+    ],
     createdAt: "2026-01-15T10:00:00Z",
     updatedAt: "2026-03-20T10:00:00Z",
   }
@@ -76,6 +83,11 @@ export function createOrganization(index: number): Organization {
     tierConfigs: [
       { id: "TC-005", name: "Director", code: "DIR" },
       { id: "TC-006", name: "Associate", code: "ASC" },
+    ],
+    departmentConfigs: [
+      { id: "DC-101", name: "HR", code: "HR" },
+      { id: "DC-102", name: "Tech", code: "TECH" },
+      { id: "DC-103", name: "Marketing", code: "MKT" },
     ],
     createdAt: "2026-03-01T10:00:00Z",
     updatedAt: "2026-03-01T10:00:00Z",

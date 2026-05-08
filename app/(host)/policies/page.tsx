@@ -5,17 +5,12 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useQueryState, useUpdateQueryParams } from "@/hooks/use-tab-persistence";
 import {
-  Plus,
   TreeStructure,
   IdentificationCard,
   MagnifyingGlass,
   DownloadSimple,
   CheckCircle,
   Warning,
-  Barbell,
-  Brain,
-  Circle,
-  PencilSimpleLine,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -24,7 +19,7 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { SharedDataTable, Column } from "@/components/shared/data-table";
 import { ActionPopover, type ActionItem } from "@/components/shared/action-popover";
 import { PolicyDetailView } from "@/components/host/policies/policy-detail-view";
-import { usePolicyTemplates } from "@/hooks/use-policy-templates";
+import { PolicyCreationLauncher } from "@/components/host/policies/policy-creation-launcher";
 import { MOCK_POLICIES, MOCK_POLICY_DATA_MAP } from "@/lib/mock-data";
 import type { PolicyListItem, PolicyData } from "@/features/policies/types";
 import { MOCK_EMPLOYEES } from "@/lib/mock-data";
@@ -143,94 +138,6 @@ function ConfirmDialog({
   );
 }
 
-const ICON_MAP: Record<string, React.ElementType> = {
-  Barbell, Brain, Circle, PencilSimpleLine,
-};
-
-// ─── Template Selection Modal ────────────────────────────────────────────────
-
-function PolicyTemplateModal({
-  isOpen,
-  onClose,
-  onSelect,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  onSelect: (templateId: string | null) => void;
-}) {
-  const { templates: policyTemplates, isLoading: templatesLoading } = usePolicyTemplates();
-
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 z-[100] flex animate-in items-center justify-center bg-black/60 p-4 backdrop-blur-[2px] duration-300 fade-in">
-      <div className="w-full max-w-2xl animate-in overflow-hidden rounded-[24px] border border-border bg-card shadow-2xl duration-300 zoom-in-95">
-        <div className="p-8 pb-4">
-          <h3 className="text-heading font-semibold text-foreground text-balance">Create Benefit Policy</h3>
-          <p className="text-body font-medium text-subtle mt-1">
-            Choose a starting template or build from scratch. You can edit everything after selecting.
-          </p>
-        </div>
-
-        <div className="px-8 pb-2">
-          {templatesLoading ? (
-            <div className="flex items-center gap-3 py-12 text-muted-foreground">
-              <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
-              <span className="text-body font-medium">Loading templates...</span>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {policyTemplates.map((template) => {
-                const Icon = ICON_MAP[template.icon] || Circle;
-                return (
-                  <button
-                    type="button"
-                    key={template.id}
-                    onClick={() => onSelect(template.id)}
-                    className="relative text-left p-4 rounded-lg border border-border bg-card hover:border-primary/30 hover:bg-muted/30 transition-all duration-200 group"
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0 transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                        <Icon size={20} weight="duotone" />
-                      </div>
-                      <div className="space-y-0.5 min-w-0">
-                        <h4 className="text-body font-semibold text-foreground leading-tight">{template.name}</h4>
-                        <p className="text-label text-muted-foreground leading-relaxed">{template.tagline}</p>
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
-
-              <button
-                type="button"
-                onClick={() => onSelect(null)}
-                className="relative text-left p-4 rounded-lg border border-dashed border-border bg-card hover:border-primary/30 hover:bg-muted/30 transition-all duration-200 group"
-              >
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-muted text-muted-foreground flex items-center justify-center shrink-0 transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                    <PencilSimpleLine size={20} weight="duotone" />
-                  </div>
-                  <div className="space-y-0.5 min-w-0">
-                    <h4 className="text-body font-semibold text-foreground leading-tight">Start from Scratch</h4>
-                    <p className="text-label text-muted-foreground leading-relaxed">Build your own policy with custom services and amounts.</p>
-                  </div>
-                </div>
-              </button>
-            </div>
-          )}
-        </div>
-
-        <div className="flex items-center justify-end border-t border-border bg-muted/30 p-8 pt-4 mt-6">
-          <Button variant="ghost" className="h-12 px-6 rounded-lg font-semibold hover:bg-muted" onClick={onClose}>
-            Cancel
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // ─── Main Content ────────────────────────────────────────────────────────────
 
 function PoliciesContent() {
@@ -253,7 +160,6 @@ function PoliciesContent() {
   const [policyDataMap, setPolicyDataMap] = useState<Record<string, PolicyData>>(MOCK_POLICY_DATA_MAP);
 
   // Dialogs
-  const [showTemplateModal, setShowTemplateModal] = useState(false);
   const [cloneTarget, setCloneTarget] = useState<PolicyListItem | null>(null);
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean;
@@ -307,18 +213,8 @@ function PoliciesContent() {
 
   // ── Actions ───────────────────────────────────────────────────────────────
 
-  const handleCreateNew = () => {
-    setShowTemplateModal(true);
-  };
-
-  const handleSelectTemplate = (templateId: string | null) => {
-    setShowTemplateModal(false);
-    if (templateId) {
-      router.push(`/policies/new?template=${templateId}`);
-    } else {
-      router.push("/policies/new");
-    }
-  };
+  const handleCreateNew = () => router.push("/policies/new");
+  const handleCreateFromTemplate = (templateId: string) => router.push(`/policies/new?template=${templateId}`);
 
   const handleClone = (policy: PolicyListItem) => {
     setCloneTarget(policy);
@@ -532,19 +428,19 @@ function PoliciesContent() {
     const policy = policies.find(p => p.id === activePolicyId);
     const data = policy ? policyDataMap[policy.id] : undefined;
     if (policy && data) {
-      const subPolicies = policies
+      const versions = policies
         .filter(p => p.parentPolicyId === policy.id)
         .map(p => ({ ...p, parentPolicyName: policy.name }));
       const parentPolicyName = policy.parentPolicyId
         ? policies.find(p => p.id === policy.parentPolicyId)?.name
         : undefined;
-      const subPolicyOverrideCounts: Record<string, number> = {};
-      subPolicies.forEach(sp => {
-        const subData = policyDataMap[sp.id];
-        if (subData && data) {
-          subPolicyOverrideCounts[sp.id] = subData.benefits.filter(sb => {
-            const parent = data.benefits.find(pb => pb.serviceId === sb.serviceId);
-            return parent && parent.amount !== sb.amount;
+      const versionOverrideCounts: Record<string, number> = {};
+      versions.forEach(v => {
+        const versionData = policyDataMap[v.id];
+        if (versionData && data) {
+          versionOverrideCounts[v.id] = versionData.benefits.filter(vb => {
+            const parent = data.benefits.find(pb => pb.serviceId === vb.serviceId);
+            return parent && parent.amount !== vb.amount;
           }).length;
         }
       });
@@ -554,8 +450,8 @@ function PoliciesContent() {
             policy={policy}
             groups={data.groups}
             benefits={data.benefits}
-            subPolicies={subPolicies}
-            subPolicyOverrideCounts={subPolicyOverrideCounts}
+            versions={versions}
+            versionOverrideCounts={versionOverrideCounts}
             employees={MOCK_EMPLOYEES.filter(e => e.orgId === policy.organizationId)}
             parentPolicyName={parentPolicyName}
             onEdit={() => router.push(`/policies/${policy.id}/edit`)}
@@ -584,13 +480,10 @@ function PoliciesContent() {
             Export
           </Button>
           <div className="h-4 w-[1px] bg-border mx-1" />
-          <Button
-            onClick={handleCreateNew}
-            className="h-9 text-body font-medium shadow-sm"
-          >
-            <Plus size={16} weight="bold" className="mr-1.5" />
-            Create New Policy
-          </Button>
+          <PolicyCreationLauncher
+            onManual={handleCreateNew}
+            onTemplate={handleCreateFromTemplate}
+          />
         </div>
       </div>
 
@@ -640,10 +533,10 @@ function PoliciesContent() {
               onClick={handleCreateNew}
               className="mt-8 px-6 h-10 font-medium shadow-sm"
             >
-              Create New Policy
-            </Button>
-          }
-        />
+               Add Benefit Policy
+             </Button>
+           }
+         />
       ) : (
         <SharedDataTable
           data={filteredPolicies}
@@ -670,13 +563,6 @@ function PoliciesContent() {
         isDanger={confirmDialog.isDanger}
         onClose={() => setConfirmDialog(prev => ({ ...prev, open: false }))}
         onConfirm={confirmDialog.onConfirm}
-      />
-
-      {/* Template Selection Modal */}
-      <PolicyTemplateModal
-        isOpen={showTemplateModal}
-        onClose={() => setShowTemplateModal(false)}
-        onSelect={handleSelectTemplate}
       />
 
       {/* Toast */}

@@ -57,8 +57,9 @@ import { EmployeeDetailView } from "@/components/host/organizations/employee-det
 import { BulkUploadWizard } from "@/components/host/organizations/bulk-upload-wizard"
 import { AssignedPolicyList } from "@/components/host/organizations/assigned-policy-list"
 import { OrgSetupGuide } from "@/components/host/organizations/org-setup-guide"
+import { OrgSetupChecklist } from "@/components/host/organizations/org-setup-checklist"
 import { OrgTiersConfig } from "@/components/host/organizations/org-tiers-config"
-import { LinkPolicyModal } from "@/components/host/organizations/link-policy-modal"
+import { AssignPolicyModal } from "@/components/host/organizations/assign-policy-modal"
 import { BenefitPolicyWizard } from "@/components/host/policies/benefit-policy-wizard"
 import { PolicyDetailView } from "@/components/host/policies/policy-detail-view"
 import { BenefitPolicy, Benefit } from "@/types/policy"
@@ -99,6 +100,52 @@ const TABS = [
 ] as const
 
 type TabId = (typeof TABS)[number]["id"]
+
+function PostAssignPolicyModal({
+  isOpen,
+  policyName,
+  onAutoMatch,
+  onManual,
+  onLater,
+}: {
+  isOpen: boolean
+  policyName: string
+  onAutoMatch: () => void
+  onManual: () => void
+  onLater: () => void
+}) {
+  if (!isOpen) return null
+
+  return (
+    <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 p-4 backdrop-blur-[2px]">
+      <div className="w-full max-w-lg rounded-[24px] border border-border bg-card shadow-2xl">
+        <div className="p-8 pb-4">
+          <h3 className="text-heading font-semibold text-foreground">Policy Assigned</h3>
+          <p className="mt-1 text-body text-subtle">
+            <span className="font-medium text-foreground">{policyName}</span> is now assigned to this organisation.
+          </p>
+          <p className="mt-2 text-label text-muted-foreground">Do you want to assign it to employees now?</p>
+        </div>
+
+        <div className="space-y-2 px-8 pb-2">
+          <Button className="h-11 w-full rounded-4xl" onClick={onAutoMatch}>
+            Assign to Employees (Tier Auto-Match)
+          </Button>
+          <Button variant="outline" className="h-11 w-full rounded-4xl" onClick={onManual}>
+            Assign to Employees Manually
+          </Button>
+          <Button variant="ghost" className="h-11 w-full rounded-4xl" onClick={onLater}>
+            Later
+          </Button>
+        </div>
+
+        <div className="border-t border-border bg-muted/30 p-8 pt-4">
+          <p className="text-micro text-faint">You can manage employee assignment from Employees or Benefit Policy tabs anytime.</p>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 // Mock Data for Breadcrumb Dropdowns
 const OTHER_ORGS = [
@@ -171,8 +218,8 @@ function OrganizationDetailContent() {
   const updateQueryParams = useUpdateQueryParams()
 
   // Policies state
-  const [isLinkPolicyModalOpen, setIsLinkPolicyModalOpen] =
-    useQueryState("linkPolicy")
+  const [isAssignPolicyModalOpen, setIsAssignPolicyModalOpen] =
+    useQueryState("assignPolicy")
   const [isAddingPolicy, setIsAddingPolicy] = useQueryState("addPolicy")
   const [viewingPolicyId, setViewingPolicyId] = useQueryState("viewingPolicyId")
   const [editingPolicyId, setEditingPolicyId] = useQueryState("editingPolicyId")
@@ -188,8 +235,8 @@ function OrganizationDetailContent() {
     {
       id: "pol_1",
       organizationId: "org-123",
-      name: "Wellness Allocation",
-      code: "WELL-2026-HQ",
+      name: "Acme Employee Wellness Policy FY2026",
+      code: "BEN-STD-01",
       description:
         "Standard wellness benefits for HQ staff including gym and mental health support.",
       eligibleEmploymentTypes: ["full-time"],
@@ -209,8 +256,8 @@ function OrganizationDetailContent() {
     {
       id: "pol_2",
       organizationId: "org-123",
-      name: "Lifestyle Pocket",
-      code: "LIFE-2026-SUB",
+      name: "Acme Leadership Benefits Policy FY2026",
+      code: "BEN-EXC-02",
       description:
         "Flexible lifestyle benefits for travel, food, and personal development.",
       eligibleEmploymentTypes: ["full-time", "part-time"],
@@ -235,6 +282,8 @@ function OrganizationDetailContent() {
     mainService: "all",
     benefitGroup: "all",
   })
+  const [showPostAssignModal, setShowPostAssignModal] = useState(false)
+  const [lastAssignedPolicyName, setLastAssignedPolicyName] = useState("")
 
   const filteredPolicies = useMemo(() => {
     return assignedPolicies.filter((p) => {
@@ -325,12 +374,12 @@ function OrganizationDetailContent() {
   ])
 
 
-  const handleLinkPolicy = (policyId: string) => {
-    // Mock linking logic
+  const handleAssignPolicy = (policyId: string) => {
+    // Mock assignment logic
     const policyNames: Record<string, string> = {
-      pol_1: "Executive Health Plus",
-      pol_2: "Standard Workforce Pool",
-      pol_3: "Remote Flex Benefits",
+      "POL-20260115-0001": "Acme Employee Wellness Policy FY2026",
+      "POL-20260115-0002": "Acme Leadership Benefits Policy FY2026",
+      "POL-20260115-0003": "Global Tech Core Benefits Policy FY2026",
     }
 
     const newPolicy = {
@@ -338,7 +387,7 @@ function OrganizationDetailContent() {
       organizationId: "org-123",
       name: policyNames[policyId] || "Selected Policy",
       code: `WP-${policyId.split("_")[1].toUpperCase()}-2026`,
-      description: "Automatically linked benefit policy.",
+      description: "Automatically assigned benefit policy.",
       eligibleEmploymentTypes: ["full-time"],
       coversDependents: false,
       benefitPoolType: "Individual" as const,
@@ -357,12 +406,14 @@ function OrganizationDetailContent() {
     }
 
     setAssignedPolicies([...assignedPolicies, newPolicy])
-    setToastMessage("Policy linked successfully")
+    setToastMessage("Policy assigned successfully")
+    setLastAssignedPolicyName(newPolicy.name)
+    setShowPostAssignModal(true)
   }
 
-  const handleUnlinkPolicy = (id: string) => {
+  const handleUnassignPolicy = (id: string) => {
     setAssignedPolicies(assignedPolicies.filter((p) => p.id !== id))
-    setToastMessage("Policy unlinked from organisation")
+    setToastMessage("Policy unassigned from organisation")
   }
 
   const openDangerAction = (action: "deactivate" | "suspend" | "remove") => {
@@ -425,12 +476,42 @@ function OrganizationDetailContent() {
     policies: assignedPolicies.map((p) => p.name),
   } as import("@/features/organizations/types").Organization
 
+  const handleAddEmployee = () => {
+    setActiveTab("employees")
+    setActiveEmployeeSubTab("directory")
+    setIsBulkUploading("true")
+
+    if (orgForSetup.employeeCount > 0 && assignedPolicies.length > 0) {
+      setToastMessage("Opened bulk upload with tier auto-match policy assignment")
+      return
+    }
+
+    setToastMessage("Opened bulk upload")
+  }
+
   return (
     <div className="pb-12">
-      <LinkPolicyModal
-        isOpen={isLinkPolicyModalOpen === "true"}
-        onClose={() => setIsLinkPolicyModalOpen(null)}
-        onLink={handleLinkPolicy}
+      <AssignPolicyModal
+        isOpen={isAssignPolicyModalOpen === "true"}
+        onClose={() => setIsAssignPolicyModalOpen(null)}
+        onAssign={handleAssignPolicy}
+      />
+
+      <PostAssignPolicyModal
+        isOpen={showPostAssignModal}
+        policyName={lastAssignedPolicyName}
+        onAutoMatch={() => {
+          setShowPostAssignModal(false)
+          setActiveTab("employees")
+          setIsBulkUploading("true")
+          setToastMessage("Opened employee import with policy auto-match suggestion")
+        }}
+        onManual={() => {
+          setShowPostAssignModal(false)
+          setActiveTab("employees")
+          setToastMessage("Open Employees to assign this policy manually")
+        }}
+        onLater={() => setShowPostAssignModal(false)}
       />
 
       <BranchSheet
@@ -524,7 +605,7 @@ function OrganizationDetailContent() {
                       branchName: null,
                       employeeId: null,
                       bulkUpload: null,
-                      linkPolicy: null,
+                      assignPolicy: null,
                       addPolicy: null,
                       viewingPolicyId: null,
                       editingPolicyId: null,
@@ -564,7 +645,15 @@ function OrganizationDetailContent() {
       <div className="p-6 lg:p-8">
         {activeTab === "profile" && (
           <div className="animate-in space-y-6 fade-in">
-            <OrgSetupGuide organization={orgForSetup} />
+            <OrgSetupChecklist
+              orgId={orgId}
+              status={orgStatus}
+              tierCount={orgTierConfigs.length}
+              employeeCount={orgForSetup.employeeCount}
+              policyCount={assignedPolicies.length}
+              employeesWithoutPolicy={orgForSetup.employeesWithoutPolicy ?? 0}
+            />
+            {orgStatus !== "pending" && <OrgSetupGuide organization={orgForSetup} />}
             {/* Account Details */}
             <DetailSection
               title="Account Details"
@@ -1099,14 +1188,14 @@ function OrganizationDetailContent() {
                             <Upload size={14} weight="bold" /> Bulk Upload
                           </Button>
                           <Button
-                            asChild
                             variant="secondary"
                             size="sm"
                             className="h-8 gap-1.5 text-label font-medium"
+                            onClick={handleAddEmployee}
                           >
-                            <Link href={`/employees/new?org=${orgId}`}>
+                            <span className="inline-flex items-center gap-1.5">
                               <Plus size={14} weight="bold" /> Add Employee
-                            </Link>
+                            </span>
                           </Button>
                           <div className="mx-1 h-4 w-[1px] bg-border" />
                           <ViewToggle
@@ -1172,7 +1261,7 @@ function OrganizationDetailContent() {
                               dependentsCount: 2,
                               benefitPolicies: [
                                 {
-                                  policyName: "Wellness Allocation",
+                                  policyName: "Acme Employee Wellness Policy FY2026",
                                   benefitGroups: [
                                     "Gym Membership",
                                     "Mental Health",
@@ -1203,7 +1292,7 @@ function OrganizationDetailContent() {
                               dependentsCount: 0,
                               benefitPolicies: [
                                 {
-                                  policyName: "Lifestyle Pocket",
+                                  policyName: "Acme Leadership Benefits Policy FY2026",
                                   benefitGroups: ["Travel", "Food"],
                                   utilisation: 85,
                                 },
@@ -1518,7 +1607,7 @@ function OrganizationDetailContent() {
                                 employmentType: "full-time",
                                 benefitPolicies: [
                                   {
-                                    policyName: "Wellness Allocation",
+                                    policyName: "Acme Employee Wellness Policy FY2026",
                                     benefitGroups: ["Gym", "Mental Health"],
                                     utilisation: 48,
                                   },
@@ -1539,7 +1628,7 @@ function OrganizationDetailContent() {
                                 employmentType: "full-time",
                                 benefitPolicies: [
                                   {
-                                    policyName: "Lifestyle Pocket",
+                                    policyName: "Acme Leadership Benefits Policy FY2026",
                                     benefitGroups: ["Food", "Travel"],
                                     utilisation: 85,
                                   },
@@ -1908,7 +1997,7 @@ function OrganizationDetailContent() {
                 }}
                 onDelete={() => {
                   setAssignedPolicies((prev) => prev.filter((p) => p.id !== viewingPolicyId))
-                  setToastMessage("Policy unlinked from organisation")
+                  setToastMessage("Policy unassigned from organisation")
                   setViewingPolicyId(null)
                 }}
               />
@@ -1953,7 +2042,7 @@ function OrganizationDetailContent() {
                     )
                     setToastMessage("Policy updated successfully")
                   } else {
-                    handleLinkPolicy(data.policy.id || "new_pol")
+                    handleAssignPolicy(data.policy.id || "new_pol")
                   }
                   setIsAddingPolicy(null)
                   setEditingPolicyId(null)
@@ -1968,12 +2057,12 @@ function OrganizationDetailContent() {
                   </div>
                   <div className="flex items-center gap-2">
                     <Button
-                      onClick={() => setIsLinkPolicyModalOpen("true")}
+                      onClick={() => setIsAssignPolicyModalOpen("true")}
                       variant="secondary"
                       size="sm"
                       className="flex h-8 items-center gap-2 rounded-full px-4 text-label font-medium"
                     >
-                      <Plus size={14} weight="bold" /> Link Policy
+                      <Plus size={14} weight="bold" /> Assign Policy
                     </Button>
                     <Button
                       onClick={() => router.push(`/organizations/${orgId}/policies/new`)}
@@ -1981,7 +2070,7 @@ function OrganizationDetailContent() {
                       size="sm"
                       className="flex h-8 items-center gap-2 rounded-full px-4 text-label font-medium"
                     >
-                      <Plus size={14} weight="bold" /> Create New
+                      <Plus size={14} weight="bold" /> Add Benefit Policy
                     </Button>
                   </div>
                 </div>
@@ -1992,9 +2081,9 @@ function OrganizationDetailContent() {
                   filters={
                     <>
                       <FilterItem
-                        label="Main Service"
+                        label="Benefit"
                         options={[
-                          { label: "All Services", value: "all" },
+                          { label: "All Benefits", value: "all" },
                           {
                             label: "Physical Wellbeing",
                             value: "Physical Wellbeing",
@@ -2057,7 +2146,7 @@ function OrganizationDetailContent() {
                 />
                 <AssignedPolicyList
                   policies={filteredPolicies as any}
-                  onUnlink={handleUnlinkPolicy}
+                  onUnassign={handleUnassignPolicy}
                   onView={(id) => {
                     setViewingPolicyId(id)
                     setEditingPolicyId(null)
@@ -2262,4 +2351,3 @@ const EMPLOYEE_SUB_TABS = [
   { id: "claims", label: "Claims", icon: SealCheck },
   { id: "tiers", label: "Tier Config", icon: Rows },
 ] as const
-

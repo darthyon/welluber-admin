@@ -34,7 +34,7 @@ export function createPolicy(index: number): PolicyBundle {
       { id: `${id}-B4`, groupId: `${id}-G3`, serviceId: "s5", amount: 100, coPayment: { required: false, type: "Percentage", value: 0 } },
     ]
     return {
-      policy: { id, name: "Standard Health 2026", code: "BEN-STD-01", description: "Comprehensive wellness policy for all full-time staff.", organizationId: org.orgId, eligibleEmploymentTypes: ["full-time"], coversDependents: false, benefitPoolType: "Individual", utilisationMode: "Fixed", refreshCycle: "Yearly", refreshStartReference: "fy_start", activationMode: "after_join", status: "active", groupCount: groups.length, orgName: org.orgName, createdAt: "2026-01-15T10:00:00Z" },
+      policy: { id, name: "Acme Employee Wellness Policy FY2026", code: "BEN-STD-01", description: "Core employee wellness handbook policy for full-time staff coverage.", organizationId: org.orgId, eligibleEmploymentTypes: ["full-time"], coversDependents: false, benefitPoolType: "Individual", utilisationMode: "Fixed", refreshCycle: "Yearly", refreshStartReference: "fy_start", activationMode: "after_join", status: "active", groupCount: groups.length, orgName: org.orgName, createdAt: "2026-01-15T10:00:00Z" },
       data: { groups, benefits },
     }
   }
@@ -49,7 +49,7 @@ export function createPolicy(index: number): PolicyBundle {
       { id: `${id}-B2`, groupId: `${id}-G2`, serviceId: "s3", amount: 800, coPayment: { required: false, type: "Percentage", value: 0 } },
     ]
     return {
-      policy: { id, name: "Executive Wellness", code: "BEN-EXC-02", description: "Premium tier benefits including specialized clinical therapy.", organizationId: org.orgId, eligibleEmploymentTypes: ["full-time", "part-time"], coversDependents: false, benefitPoolType: "Individual", utilisationMode: "Prorated", prorateUnit: "Monthly", refreshCycle: "Quarterly", refreshStartReference: "join_date", activationMode: "after_join", status: "draft", groupCount: groups.length, orgName: org.orgName, createdAt: "2026-03-22T14:30:00Z" },
+      policy: { id, name: "Acme Leadership Benefits Policy FY2026", code: "BEN-EXC-02", description: "Leadership-tier benefits handbook policy with expanded clinical therapy coverage.", organizationId: org.orgId, eligibleEmploymentTypes: ["full-time", "part-time"], coversDependents: false, benefitPoolType: "Individual", utilisationMode: "Prorated", prorateUnit: "Monthly", refreshCycle: "Quarterly", refreshStartReference: "join_date", activationMode: "after_join", status: "draft", groupCount: groups.length, orgName: org.orgName, createdAt: "2026-03-22T14:30:00Z" },
       data: { groups, benefits },
     }
   }
@@ -62,7 +62,7 @@ export function createPolicy(index: number): PolicyBundle {
       { id: `${id}-B1`, groupId: `${id}-G1`, serviceId: "s1", amount: 50, coPayment: { required: false, type: "Percentage", value: 0 } },
     ]
     return {
-      policy: { id, name: "Contractor Lite", code: "BEN-CON-03", description: "Stripped-down benefits for contract and intern staff.", organizationId: org.orgId, eligibleEmploymentTypes: ["contract", "internship"], coversDependents: false, benefitPoolType: "Shared", utilisationMode: "Fixed", refreshCycle: "Yearly", refreshStartReference: "fy_start", activationMode: "after_join", status: "deactivated", groupCount: groups.length, orgName: org.orgName, createdAt: "2026-11-05T09:15:00Z" },
+      policy: { id, name: "Global Tech Core Benefits Policy FY2026", code: "BEN-CON-03", description: "Core logistics workforce handbook policy for contract and internship coverage.", organizationId: org.orgId, eligibleEmploymentTypes: ["contract", "internship"], coversDependents: false, benefitPoolType: "Shared", utilisationMode: "Fixed", refreshCycle: "Yearly", refreshStartReference: "fy_start", activationMode: "after_join", status: "deactivated", groupCount: groups.length, orgName: org.orgName, createdAt: "2026-11-05T09:15:00Z" },
       data: { groups, benefits },
     }
   }
@@ -81,7 +81,7 @@ export function createPolicy(index: number): PolicyBundle {
       { id: `${id}-B4`, groupId: `${id}-G3`, serviceId: "s5", amount: 100, coPayment: { required: false, type: "Percentage", value: 0 } },
     ]
     return {
-      policy: { id, name: "Standard Health 2026 — Engineering Override", code: "BEN-STD-01-ENG", description: "Engineering team variant with higher gym allocation.", parentPolicyId: parentId, organizationId: org.orgId, eligibleEmploymentTypes: ["full-time"], coversDependents: false, benefitPoolType: "Individual", utilisationMode: "Fixed", refreshCycle: "Yearly", refreshStartReference: "fy_start", activationMode: "after_join", status: "active", groupCount: groups.length, orgName: org.orgName, targetEmployeeIds: ["EMP-20260115-0001"], createdAt: "2026-02-01T00:00:00Z" },
+      policy: { id, name: "Acme Engineering Wellness Supplement FY2026", code: "BEN-STD-01-ENG", description: "Engineering supplement with higher gym allocation than base policy.", parentPolicyId: parentId, organizationId: org.orgId, eligibleEmploymentTypes: ["full-time"], coversDependents: false, benefitPoolType: "Individual", utilisationMode: "Fixed", refreshCycle: "Yearly", refreshStartReference: "fy_start", activationMode: "after_join", status: "active", groupCount: groups.length, orgName: org.orgName, targetEmployeeIds: ["EMP-20260115-0001"], createdAt: "2026-02-01T00:00:00Z" },
       data: { groups, benefits },
     }
   }
@@ -100,7 +100,7 @@ export function createPolicy(index: number): PolicyBundle {
       { id: `${id}-B4`, groupId: `${id}-G3`, serviceId: "s5", amount: 100, coPayment: { required: false, type: "Percentage", value: 0 } },
     ]
     return {
-      policy: { id, name: "Standard Health 2026 — Seniors", code: "BEN-STD-01-SNR", description: "Senior band variant with elevated therapy cap.", parentPolicyId: parentId, organizationId: org.orgId, eligibleEmploymentTypes: ["full-time"], coversDependents: false, benefitPoolType: "Individual", utilisationMode: "Fixed", refreshCycle: "Yearly", refreshStartReference: "fy_start", activationMode: "after_join", status: "active", groupCount: groups.length, orgName: org.orgName, targetEmployeeIds: ["EMP-20260115-0002", "EMP-20260115-0004"], createdAt: "2026-02-15T00:00:00Z" },
+      policy: { id, name: "Acme Senior Band Wellness Supplement FY2026", code: "BEN-STD-01-SNR", description: "Senior band supplement with elevated therapy cap versus base policy.", parentPolicyId: parentId, organizationId: org.orgId, eligibleEmploymentTypes: ["full-time"], coversDependents: false, benefitPoolType: "Individual", utilisationMode: "Fixed", refreshCycle: "Yearly", refreshStartReference: "fy_start", activationMode: "after_join", status: "active", groupCount: groups.length, orgName: org.orgName, targetEmployeeIds: ["EMP-20260115-0002", "EMP-20260115-0004"], createdAt: "2026-02-15T00:00:00Z" },
       data: { groups, benefits },
     }
   }

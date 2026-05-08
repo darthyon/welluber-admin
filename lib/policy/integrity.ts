@@ -1,9 +1,17 @@
 import { isMainServiceId } from "@/lib/mock-data/service-catalog"
 import { MOCK_POLICY_BUNDLES } from "@/lib/mock-data"
+import { MOCK_EMPLOYEES } from "@/lib/mock-data/seed"
 
 export interface IntegrityIssue {
   policyId: string
-  kind: "missing-group" | "missing-policy" | "unknown-service" | "duplicate-benefit" | "duplicate-group"
+  kind:
+    | "missing-group"
+    | "missing-policy"
+    | "unknown-service"
+    | "duplicate-benefit"
+    | "duplicate-group"
+    | "missing-employee-policy"
+    | "missing-employee-group"
   detail: string
 }
 
@@ -19,11 +27,15 @@ export interface IntegrityIssue {
  */
 export function verifyPolicyIntegrity(): IntegrityIssue[] {
   const issues: IntegrityIssue[] = []
+  const policyGroupIds = new Map<string, Set<string>>()
+  const validPolicyIds = new Set<string>()
 
   for (const bundle of MOCK_POLICY_BUNDLES) {
     const policyId = bundle.policy.id
+    validPolicyIds.add(policyId)
     const groups = bundle.data.groups
     const benefits = bundle.data.benefits
+    policyGroupIds.set(policyId, new Set(groups.map((g) => g.id)))
 
     // Group → policy linkage
     for (const g of groups) {
@@ -78,6 +90,33 @@ export function verifyPolicyIntegrity(): IntegrityIssue[] {
         })
       }
       benefitKeySeen.add(key)
+    }
+  }
+
+  // Employee policy refs -> policy + group FK integrity
+  for (const employee of MOCK_EMPLOYEES) {
+    for (const employeePolicy of employee.benefitPolicies) {
+      if (!validPolicyIds.has(employeePolicy.policyId)) {
+        issues.push({
+          policyId: employeePolicy.policyId,
+          kind: "missing-employee-policy",
+          detail: `Employee ${employee.id} references unknown policyId ${employeePolicy.policyId}`,
+        })
+        continue
+      }
+
+      const groupIds = policyGroupIds.get(employeePolicy.policyId)
+      if (!groupIds) continue
+
+      for (const groupId of employeePolicy.assignedGroupIds) {
+        if (!groupIds.has(groupId)) {
+          issues.push({
+            policyId: employeePolicy.policyId,
+            kind: "missing-employee-group",
+            detail: `Employee ${employee.id} has assignedGroupId ${groupId} outside policy ${employeePolicy.policyId}`,
+          })
+        }
+      }
     }
   }
 

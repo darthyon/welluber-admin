@@ -1,7 +1,7 @@
 import type { EmployeeUtilisationRow, EmployeeClaim } from "@/types/claims"
 import type { EmployeeDirectoryItem, AssignablePolicy, FormPolicy, VoucherRedemption } from "@/features/employees/types"
-import type { PolicyTemplate } from "@/types/policy"
 import { Registry } from "./registry"
+import { MOCK_POLICY_TEMPLATES } from "./policy-templates"
 import { createBrand } from "./factories/brand"
 import { createOrganization } from "./factories/organization"
 import { createServiceProvider } from "./factories/service-provider"
@@ -162,16 +162,16 @@ export const MOCK_EMPLOYEE_UTILISATION: EmployeeUtilisationRow[] = [
 
 // Employee directory (presentation join type — org/branch names denormalised for table display)
 export const MOCK_EMPLOYEES: EmployeeDirectoryItem[] = [
-  { id: "EMP-20260115-0001", orgId: "ORG-20260115-0001", name: "Robert Fox", email: "robert.f@acme.com", organization: "ACME Corporation", branch: "ACME HQ", joinDate: "12 Oct 2023", lastActive: "09 Apr 2026, 17:15", status: "Linked", empCode: "ACM-001", department: "Engineering", tier: "T3", employmentType: "full-time", benefitPolicies: [{ policyId: "POL-LEGACY", policyName: "Wellness Allocation", assignedGroupIds: [], benefitGroups: ["Gym", "Mental Health"], utilisation: 48 }, { policyId: "POL-LEGACY", policyName: "Corporate Perks", assignedGroupIds: [], benefitGroups: [], utilisation: 0 }] },
-  { id: "EMP-20260115-0002", orgId: "ORG-20260115-0001", name: "Jenny Wilson", email: "jenny.w@acme.com", organization: "ACME Corporation", branch: "ACME Subang Jaya", joinDate: "05 Mar 2026", lastActive: "09 Apr 2026, 16:45", status: "Linked", empCode: "ACM-042", department: "Product", tier: "T2", employmentType: "full-time", benefitPolicies: [{ policyId: "POL-LEGACY", policyName: "Lifestyle Pocket", assignedGroupIds: [], benefitGroups: ["Food", "Travel"], utilisation: 85 }] },
-  { id: "EMP-20260115-0003", orgId: "ORG-20260301-0002", name: "Dianne Russell", email: "dianne.r@globalhealth.com", organization: "Global Health Ltd", branch: "Global Health HQ", joinDate: "20 May 2026", lastActive: "09 Apr 2026, 10:20", status: "Pending", empCode: "GHL-156", department: "Growth", tier: "T4", employmentType: "internship", benefitPolicies: [{ policyId: "POL-LEGACY", policyName: "Rejuvenation Fund", assignedGroupIds: [], benefitGroups: ["Spa Sessions", "Massages", "Facials", "Manicures", "Pedicures", "Aromatherapy", "Hot Stone"], utilisation: 15 }] },
-  { id: "EMP-20260115-0004", orgId: "ORG-20260310-0003", name: "Marvin McKinney", email: "marvin.m@zenithwellness.com", organization: "Zenith Wellness", branch: "Zenith HQ", joinDate: "12 Jan 2026", lastActive: "08 Apr 2026, 14:30", status: "Linked", empCode: "ZNT-089", department: "Sales", tier: "T3", employmentType: "contract", benefitPolicies: [{ policyId: "POL-LEGACY", policyName: "Mental Health Support", assignedGroupIds: [], benefitGroups: ["Counseling", "Meditation Apps"], utilisation: 12 }, { policyId: "POL-LEGACY", policyName: "Development Fund", assignedGroupIds: [], benefitGroups: [], utilisation: 0 }, { policyId: "POL-LEGACY", policyName: "WFH Allowance", assignedGroupIds: [], benefitGroups: [], utilisation: 0 }, { policyId: "POL-LEGACY", policyName: "Wellness Extras", assignedGroupIds: [], benefitGroups: [], utilisation: 0 }] },
-  { id: "EMP-20260115-0005", orgId: "ORG-20260115-0001", name: "Jason Teh", email: "jason.t@acme.com", organization: "ACME Corporation", branch: "ACME HQ", joinDate: "01 May 2026", lastActive: "01 May 2026, 09:00", status: "Pending", empCode: "ACM-212", department: "Finance", tier: "T3", employmentType: "full-time", benefitPolicies: [] },
-  { id: "EMP-20260115-0006", orgId: "ORG-20260115-0001", name: "Ahmad Faizal", email: "ahmad.f@acme.com", organization: "ACME Corporation", branch: "ACME Subang Jaya", joinDate: "15 Jan 2026", lastActive: "07 May 2026, 08:45", status: "Linked", empCode: "ACM-301", department: "Operations", tier: "T2", employmentType: "full-time", benefitPolicies: [{ policyId: "POL-LEGACY", policyName: "Standard Health 2026", assignedGroupIds: [], benefitGroups: ["Physical Wellbeing", "Mental Fitness"], utilisation: 60 }] },
-  { id: "EMP-20260115-0007", orgId: "ORG-20260401-0004", name: "Nurul Huda", email: "nurul.h@techventures.com", organization: "Tech Ventures Sdn Bhd", branch: "Tech Ventures KL", joinDate: "01 Apr 2026", lastActive: "06 May 2026, 11:30", status: "Linked", empCode: "TVB-015", department: "HR", tier: "T2", employmentType: "full-time", benefitPolicies: [] },
-  { id: "EMP-20260115-0008", orgId: "ORG-20260401-0004", name: "Kevin Tan", email: "kevin.t@techventures.com", organization: "Tech Ventures Sdn Bhd", branch: "Tech Ventures KL", joinDate: "01 Apr 2026", lastActive: "05 May 2026, 15:00", status: "Linked", empCode: "TVB-016", department: "Engineering", tier: "T3", employmentType: "full-time", benefitPolicies: [] },
-  { id: "EMP-20260115-0009", orgId: "ORG-20260301-0002", name: "Priya Raj", email: "priya.r@globalhealth.com", organization: "Global Health Ltd", branch: "Global Health HQ", joinDate: "01 Apr 2026", lastActive: "07 May 2026, 09:15", status: "Linked", empCode: "GHL-201", department: "Legal", tier: "T1", employmentType: "full-time", benefitPolicies: [{ policyId: "POL-LEGACY", policyName: "Executive Wellness", assignedGroupIds: [], benefitGroups: ["Premium Wellness", "Clinical Therapy"], utilisation: 30 }] },
-  { id: "EMP-20260115-0010", orgId: "ORG-20260401-0005", name: "David Lee", email: "david.l@medicarecorp.com", organization: "MediCare Corp", branch: "MediCare Main Office", joinDate: "15 Mar 2026", lastActive: "06 May 2026, 13:45", status: "Linked", empCode: "MCR-009", department: "Marketing", tier: "T3", employmentType: "part-time", benefitPolicies: [] },
+  { id: "EMP-20260115-0001", orgId: "ORG-20260115-0001", name: "Robert Fox", email: "robert.f@acme.com", organization: "ACME Corporation", branch: "ACME HQ", joinDate: "12 Oct 2023", lastActive: "09 Apr 2026, 17:15", status: "Linked", empCode: "ACM-001", departmentId: "DC-002", department: "Tech", tierId: "TC-003", tier: "Manager", employmentType: "full-time", benefitPolicies: [{ policyId: "POL-20260115-0001", policyName: "Acme Employee Wellness Policy FY2026", assignedGroupIds: ["POL-20260115-0001-G1", "POL-20260115-0001-G2"], benefitGroups: ["Gym", "Mental Health"], utilisation: 48 }, { policyId: "POL-20260115-0002", policyName: "Acme Leadership Benefits Policy FY2026", assignedGroupIds: ["POL-20260115-0002-G1", "POL-20260115-0002-G2"], benefitGroups: [], utilisation: 0 }] },
+  { id: "EMP-20260115-0002", orgId: "ORG-20260115-0001", name: "Jenny Wilson", email: "jenny.w@acme.com", organization: "ACME Corporation", branch: "ACME Subang Jaya", joinDate: "05 Mar 2026", lastActive: "09 Apr 2026, 16:45", status: "Linked", empCode: "ACM-042", departmentId: "DC-003", department: "Marketing", tierId: "TC-002", tier: "Senior Manager", employmentType: "full-time", benefitPolicies: [{ policyId: "POL-20260115-0002", policyName: "Acme Leadership Benefits Policy FY2026", assignedGroupIds: ["POL-20260115-0002-G1", "POL-20260115-0002-G2"], benefitGroups: ["Food", "Travel"], utilisation: 85 }] },
+  { id: "EMP-20260115-0003", orgId: "ORG-20260301-0002", name: "Dianne Russell", email: "dianne.r@globalhealth.com", organization: "Global Health Ltd", branch: "Global Health HQ", joinDate: "20 May 2026", lastActive: "09 Apr 2026, 10:20", status: "Pending", empCode: "GHL-156", departmentId: "DC-103", department: "Marketing", tierId: "TC-006", tier: "Associate", employmentType: "internship", benefitPolicies: [{ policyId: "POL-20260115-0003", policyName: "Global Tech Core Benefits Policy FY2026", assignedGroupIds: ["POL-20260115-0003-G1"], benefitGroups: ["Spa Sessions", "Massages", "Facials", "Manicures", "Pedicures", "Aromatherapy", "Hot Stone"], utilisation: 15 }] },
+  { id: "EMP-20260115-0004", orgId: "ORG-20260115-0001", name: "Marvin McKinney", email: "marvin.m@acme.com", organization: "ACME Corporation", branch: "ACME HQ", joinDate: "12 Jan 2026", lastActive: "08 Apr 2026, 14:30", status: "Linked", empCode: "ACM-089", departmentId: "DC-005", department: "Operations", tierId: "TC-003", tier: "Manager", employmentType: "contract", benefitPolicies: [{ policyId: "POL-20260115-0001", policyName: "Acme Employee Wellness Policy FY2026", assignedGroupIds: ["POL-20260115-0001-G2"], benefitGroups: ["Counseling", "Meditation Apps"], utilisation: 12 }] },
+  { id: "EMP-20260115-0005", orgId: "ORG-20260115-0001", name: "Jason Teh", email: "jason.t@acme.com", organization: "ACME Corporation", branch: "ACME HQ", joinDate: "01 May 2026", lastActive: "01 May 2026, 09:00", status: "Pending", empCode: "ACM-212", departmentId: "DC-004", department: "Finance", tierId: "TC-001", tier: "Executive", employmentType: "full-time", benefitPolicies: [] },
+  { id: "EMP-20260115-0006", orgId: "ORG-20260115-0001", name: "Ahmad Faizal", email: "ahmad.f@acme.com", organization: "ACME Corporation", branch: "ACME Subang Jaya", joinDate: "15 Jan 2026", lastActive: "07 May 2026, 08:45", status: "Linked", empCode: "ACM-301", departmentId: "DC-005", department: "Operations", tierId: "TC-002", tier: "Senior Manager", employmentType: "full-time", benefitPolicies: [{ policyId: "POL-20260115-0001", policyName: "Acme Employee Wellness Policy FY2026", assignedGroupIds: ["POL-20260115-0001-G1", "POL-20260115-0001-G2"], benefitGroups: ["Physical Wellbeing", "Mental Fitness"], utilisation: 60 }] },
+  { id: "EMP-20260115-0007", orgId: "ORG-20260115-0001", name: "Nurul Huda", email: "nurul.h@acme.com", organization: "ACME Corporation", branch: "ACME HQ", joinDate: "01 Apr 2026", lastActive: "06 May 2026, 11:30", status: "Linked", empCode: "ACM-015", departmentId: "DC-001", department: "HR", tierId: "TC-003", tier: "Manager", employmentType: "full-time", benefitPolicies: [] },
+  { id: "EMP-20260115-0008", orgId: "ORG-20260115-0001", name: "Kevin Tan", email: "kevin.t@acme.com", organization: "ACME Corporation", branch: "ACME HQ", joinDate: "01 Apr 2026", lastActive: "05 May 2026, 15:00", status: "Linked", empCode: "ACM-016", departmentId: "DC-002", department: "Tech", tierId: "TC-004", tier: "Associate", employmentType: "full-time", benefitPolicies: [] },
+  { id: "EMP-20260115-0009", orgId: "ORG-20260301-0002", name: "Priya Raj", email: "priya.r@globalhealth.com", organization: "Global Health Ltd", branch: "Global Health HQ", joinDate: "01 Apr 2026", lastActive: "07 May 2026, 09:15", status: "Linked", empCode: "GHL-201", departmentId: "DC-101", department: "HR", tierId: "TC-005", tier: "Director", employmentType: "full-time", benefitPolicies: [{ policyId: "POL-20260115-0003", policyName: "Global Tech Core Benefits Policy FY2026", assignedGroupIds: ["POL-20260115-0003-G1"], benefitGroups: ["Premium Wellness", "Clinical Therapy"], utilisation: 30 }] },
+  { id: "EMP-20260115-0010", orgId: "ORG-20260115-0001", name: "David Lee", email: "david.l@acme.com", organization: "ACME Corporation", branch: "ACME HQ", joinDate: "15 Mar 2026", lastActive: "06 May 2026, 13:45", status: "Linked", empCode: "ACM-009", departmentId: "DC-003", department: "Marketing", tierId: "TC-004", tier: "Associate", employmentType: "part-time", benefitPolicies: [] },
 ]
 
 // Employee claims (per-employee detail view)
@@ -196,102 +196,17 @@ export const MOCK_EMPLOYEE_VOUCHERS: VoucherRedemption[] = [
 
 // Assignable policies (policy assign modal — richer shape with eligibility)
 export const MOCK_ASSIGNABLE_POLICIES: AssignablePolicy[] = [
-  { id: "POL-20260115-0001", name: "Wellness Allocation", description: "Comprehensive wellness benefits covering gym memberships, mental health support, and optical care.", benefitGroups: ["Gym Membership", "Mental Health", "Optical"], totalAllocated: 2500, eligibility: { employeeTypes: ["Full-time", "Part-time"], roles: ["All Roles"] } },
-  { id: "POL-20260115-0002", name: "Lifestyle Pocket", description: "Flexible lifestyle benefits for food & beverage, entertainment, and transportation.", benefitGroups: ["Food & Beverage", "Entertainment", "Transportation"], totalAllocated: 1000, eligibility: { employeeTypes: ["Full-time"], roles: ["All Roles"] } },
-  { id: "POL-20260115-0003", name: "Executive Wellness", description: "Premium wellness package for executives with higher allocations and additional services.", benefitGroups: ["Gym Membership", "Mental Health", "Optical", "Health Screening"], totalAllocated: 5000, eligibility: { employeeTypes: ["Full-time"], roles: ["Manager", "Director", "Executive"] } },
+  { id: "POL-20260115-0001", name: "Acme Employee Wellness Policy FY2026", description: "Core employee wellness handbook policy covering gym, mental health, and nutrition.", benefitGroups: ["Gym Membership", "Mental Health", "Optical"], totalAllocated: 2500, eligibility: { employeeTypes: ["Full-time", "Part-time"], roles: ["All Roles"] } },
+  { id: "POL-20260115-0002", name: "Acme Leadership Benefits Policy FY2026", description: "Leadership-tier handbook policy with expanded lifestyle and clinical coverage.", benefitGroups: ["Food & Beverage", "Entertainment", "Transportation"], totalAllocated: 1000, eligibility: { employeeTypes: ["Full-time"], roles: ["All Roles"] } },
+  { id: "POL-20260115-0003", name: "Global Tech Core Benefits Policy FY2026", description: "Core logistics workforce handbook policy with essential wellness coverage.", benefitGroups: ["Gym Membership", "Mental Health", "Optical", "Health Screening"], totalAllocated: 5000, eligibility: { employeeTypes: ["Full-time"], roles: ["Manager", "Director", "Executive"] } },
   { id: "POL-20260115-0004", name: "Basic Health Support", description: "Essential health benefits for entry-level employees.", benefitGroups: ["Mental Health", "Optical"], totalAllocated: 1500, eligibility: { employeeTypes: ["Full-time", "Contract"], roles: ["All Roles"] } },
 ]
 
 // Form policies (policy selector in employee create/edit form)
 export const MOCK_FORM_POLICIES: FormPolicy[] = [
-  { id: "POL-20260115-0001", name: "Wellness Allocation 2026", groups: [{ id: "POL-20260115-0001-G1", name: "Gym Membership" }, { id: "POL-20260115-0001-G2", name: "Mental Health" }] },
-  { id: "POL-20260115-0002", name: "Lifestyle Pocket 2026", groups: [{ id: "POL-20260115-0002-G1", name: "Travel" }, { id: "POL-20260115-0002-G2", name: "Food & Dining" }] },
-  { id: "POL-20260115-0003", name: "Rejuvenation Fund 2026", groups: [{ id: "POL-20260115-0003-G1", name: "Spa Sessions" }, { id: "POL-20260115-0003-G2", name: "Massages" }] },
+  { id: "POL-20260115-0001", name: "Acme Employee Wellness Policy FY2026", groups: [{ id: "POL-20260115-0001-G1", name: "Gym Membership" }, { id: "POL-20260115-0001-G2", name: "Mental Health" }] },
+  { id: "POL-20260115-0002", name: "Acme Leadership Benefits Policy FY2026", groups: [{ id: "POL-20260115-0002-G1", name: "Travel" }, { id: "POL-20260115-0002-G2", name: "Food & Dining" }] },
+  { id: "POL-20260115-0003", name: "Global Tech Core Benefits Policy FY2026", groups: [{ id: "POL-20260115-0003-G1", name: "Spa Sessions" }, { id: "POL-20260115-0003-G2", name: "Massages" }] },
 ]
 
-// Policy wizard templates (prefills for new policy creation)
-export const MOCK_POLICY_TEMPLATES: PolicyTemplate[] = [
-  {
-    id: "active-living",
-    name: "Active Living",
-    tagline: "Gym access, fitness classes, and recovery services for active employees.",
-    icon: "Barbell",
-    prefill: {
-      name: "Active Living Plan",
-      description: "Gym access, fitness classes, and recovery services for active employees.",
-      eligibleEmploymentTypes: ["full-time"],
-      coversDependents: false,
-      benefitPoolType: "Individual",
-      utilisationMode: "Fixed",
-      refreshCycle: "Yearly",
-      refreshStartReference: "fy_start",
-      activationMode: "after_join",
-      groups: [
-        { id: "grp-active-wellbeing", policyId: "", name: "Physical Wellbeing", distributionType: "IndividualBenefitAmount" },
-        { id: "grp-active-recovery", policyId: "", name: "Personal Care", distributionType: "IndividualBenefitAmount" },
-      ],
-      benefits: [
-        { id: "ben-gym", groupId: "grp-active-wellbeing", serviceId: "s1", amount: 800, coPayment: { required: false, type: "Percentage", value: 0 } },
-        { id: "ben-fitness", groupId: "grp-active-wellbeing", serviceId: "s2", amount: 400, coPayment: { required: false, type: "Percentage", value: 0 } },
-        { id: "ben-spa", groupId: "grp-active-recovery", serviceId: "s6", amount: 600, coPayment: { required: false, type: "Percentage", value: 0 } },
-      ],
-    },
-  },
-  {
-    id: "mind-and-care",
-    name: "Mind & Care",
-    tagline: "Therapy, mindfulness, and nutrition support for holistic employee wellbeing.",
-    icon: "Brain",
-    prefill: {
-      name: "Mind & Care Essentials",
-      description: "Therapy, mindfulness, and nutrition support for holistic employee wellbeing.",
-      eligibleEmploymentTypes: ["full-time"],
-      coversDependents: false,
-      benefitPoolType: "Individual",
-      utilisationMode: "Fixed",
-      refreshCycle: "Yearly",
-      refreshStartReference: "fy_start",
-      activationMode: "after_join",
-      groups: [
-        { id: "grp-mind-psych", policyId: "", name: "Psychological Wellbeing", distributionType: "IndividualBenefitAmount" },
-        { id: "grp-mind-nutrition", policyId: "", name: "Nutritional Support", distributionType: "IndividualBenefitAmount" },
-      ],
-      benefits: [
-        { id: "ben-therapy", groupId: "grp-mind-psych", serviceId: "s3", amount: 1200, coPayment: { required: false, type: "Percentage", value: 0 } },
-        { id: "ben-mental", groupId: "grp-mind-psych", serviceId: "s4", amount: 600, coPayment: { required: false, type: "Percentage", value: 0 } },
-        { id: "ben-diet", groupId: "grp-mind-nutrition", serviceId: "s5", amount: 800, coPayment: { required: false, type: "Percentage", value: 0 } },
-      ],
-    },
-  },
-  {
-    id: "full-circle",
-    name: "Full Circle",
-    tagline: "Full-spectrum physical, mental, and nutritional coverage for every employee.",
-    icon: "Circle",
-    prefill: {
-      name: "Full Circle Wellness",
-      description: "Full-spectrum physical, mental, and nutritional coverage for every employee.",
-      eligibleEmploymentTypes: ["full-time"],
-      coversDependents: false,
-      benefitPoolType: "Individual",
-      utilisationMode: "Fixed",
-      refreshCycle: "Yearly",
-      refreshStartReference: "fy_start",
-      activationMode: "after_join",
-      groups: [
-        { id: "grp-full-physical", policyId: "", name: "Physical Wellbeing", distributionType: "IndividualBenefitAmount" },
-        { id: "grp-full-psych", policyId: "", name: "Psychological Wellbeing", distributionType: "IndividualBenefitAmount" },
-        { id: "grp-full-nutrition", policyId: "", name: "Nutritional Support", distributionType: "IndividualBenefitAmount" },
-        { id: "grp-full-care", policyId: "", name: "Personal Care", distributionType: "IndividualBenefitAmount" },
-      ],
-      benefits: [
-        { id: "ben-gym-fc", groupId: "grp-full-physical", serviceId: "s1", amount: 1000, coPayment: { required: false, type: "Percentage", value: 0 } },
-        { id: "ben-fitness-fc", groupId: "grp-full-physical", serviceId: "s2", amount: 600, coPayment: { required: false, type: "Percentage", value: 0 } },
-        { id: "ben-therapy-fc", groupId: "grp-full-psych", serviceId: "s3", amount: 1200, coPayment: { required: false, type: "Percentage", value: 0 } },
-        { id: "ben-mental-fc", groupId: "grp-full-psych", serviceId: "s4", amount: 600, coPayment: { required: false, type: "Percentage", value: 0 } },
-        { id: "ben-diet-fc", groupId: "grp-full-nutrition", serviceId: "s5", amount: 800, coPayment: { required: false, type: "Percentage", value: 0 } },
-        { id: "ben-spa-fc", groupId: "grp-full-care", serviceId: "s6", amount: 600, coPayment: { required: false, type: "Percentage", value: 0 } },
-      ],
-    },
-  },
-]
+export { MOCK_POLICY_TEMPLATES }

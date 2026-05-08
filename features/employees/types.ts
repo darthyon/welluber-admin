@@ -11,7 +11,9 @@ export interface EmployeeDirectoryItem {
   lastActive: string
   status: string
   empCode: string
+  departmentId?: string
   department?: string
+  tierId?: string
   tier?: string
   employmentType?: string
   benefitPolicies: {
