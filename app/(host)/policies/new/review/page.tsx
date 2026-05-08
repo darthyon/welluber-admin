@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CaretLeft, NavigationArrow, Check, Users, CaretDown, PencilSimpleLine } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
@@ -82,7 +82,7 @@ const employeeColumns: Column<EmployeeDirectoryItem>[] = [
   },
 ];
 
-export default function NewPolicyReviewPage() {
+function NewPolicyReviewPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const simulateError = searchParams.get("simulate");
@@ -356,5 +356,13 @@ export default function NewPolicyReviewPage() {
         }}
       />
     </div>
+  );
+}
+
+export default function NewPolicyReviewPage() {
+  return (
+    <Suspense fallback={<div data-test="fallback">FALLBACK</div>}>
+      <NewPolicyReviewPageContent />
+    </Suspense>
   );
 }
