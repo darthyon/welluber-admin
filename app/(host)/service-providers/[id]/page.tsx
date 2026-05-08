@@ -457,6 +457,8 @@ export default function ServiceProviderDetailPage() {
                   </p>
                 ) : (
                   <SharedDataTable
+                    freezeFirst
+                    freezeLast
                     columns={[
                       {
                         header: "Name",

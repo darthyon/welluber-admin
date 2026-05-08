@@ -256,6 +256,8 @@ export function VouchersTable({ data, onViewVoucher }: Props) {
           data={filtered}
           columns={columns}
           rowsPerPage={10}
+          freezeFirst
+          freezeLast
           defaultSort={{ key: "date", direction: "desc" }}
         />
       )}

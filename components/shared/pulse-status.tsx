@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 
-export type StatusVariant = "active" | "pending" | "suspended" | "draft";
+export type StatusVariant = "active" | "inactive" | "draft" | "deactivated" | "suspended" | "pending";
 
 interface PulseStatusProps {
   status: StatusVariant;
@@ -26,12 +26,12 @@ const statusConfig = {
     text: "text-amber-600 dark:text-amber-400",
     border: "border-amber-500/20 dark:border-amber-500/30"
   },
-  suspended: {
-    dot: "bg-rose-500",
-    glow: "bg-rose-500/40",
-    bg: "bg-rose-500/10 dark:bg-rose-500/20",
-    text: "text-rose-600 dark:text-rose-400",
-    border: "border-rose-500/20 dark:border-rose-500/30"
+  inactive: {
+    dot: "bg-amber-500",
+    glow: "bg-amber-500/40",
+    bg: "bg-amber-500/10 dark:bg-amber-500/20",
+    text: "text-amber-600 dark:text-amber-400",
+    border: "border-amber-500/20 dark:border-amber-500/30"
   },
   draft: {
     dot: "bg-muted-foreground",
@@ -39,6 +39,20 @@ const statusConfig = {
     bg: "bg-muted/10 dark:bg-muted/20",
     text: "text-muted-foreground dark:text-faint",
     border: "border-border/20 dark:border-border/30"
+  },
+  deactivated: {
+    dot: "bg-muted-foreground",
+    glow: "bg-muted-foreground/40",
+    bg: "bg-muted/10 dark:bg-muted/20",
+    text: "text-muted-foreground dark:text-faint",
+    border: "border-border/20 dark:border-border/30"
+  },
+  suspended: {
+    dot: "bg-rose-500",
+    glow: "bg-rose-500/40",
+    bg: "bg-rose-500/10 dark:bg-rose-500/20",
+    text: "text-rose-600 dark:text-rose-400",
+    border: "border-rose-500/20 dark:border-rose-500/30"
   },
 };
 

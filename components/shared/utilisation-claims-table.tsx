@@ -47,7 +47,7 @@ export function UtilisationClaimsTable({ data }: Props) {
         <p className="text-body font-semibold text-muted-foreground whitespace-nowrap">Employee</p>
         <p className="text-body font-semibold text-muted-foreground whitespace-nowrap">Branch</p>
         <p className="text-body font-semibold text-muted-foreground whitespace-nowrap text-right pr-4">Allocated</p>
-        <p className="text-body font-semibold text-muted-foreground whitespace-nowrap pl-3 text-left">Utilisation & Claims</p>
+        <p className="text-body font-semibold text-muted-foreground whitespace-nowrap pl-3 text-left">Claims Usage</p>
         <p className="text-body font-semibold text-muted-foreground whitespace-nowrap text-center">Claims</p>
       </div>
 

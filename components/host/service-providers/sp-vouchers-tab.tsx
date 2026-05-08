@@ -149,6 +149,8 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
           ) : (
             <SharedDataTable
               data={filteredVouchers}
+              freezeFirst
+              freezeLast
               columns={[
                 {
                   header: "Voucher",

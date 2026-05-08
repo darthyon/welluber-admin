@@ -103,6 +103,8 @@ export function AssignedPolicyList({ policies, onUnassign, onView, onEdit }: Ass
     <SharedDataTable 
       data={policies}
       columns={columns}
+      freezeFirst
+      freezeLast
       onRowClick={(policy) => onView(policy.id)}
     />
   );

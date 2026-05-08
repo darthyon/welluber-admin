@@ -56,7 +56,7 @@ export default function NewOrganizationPage() {
       type: "sme",
       subscription: {
         plan: "standard",
-        status: "pending",
+        status: "inactive",
       },
       address: {
         country: "Malaysia"

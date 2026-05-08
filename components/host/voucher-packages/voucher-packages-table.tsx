@@ -39,6 +39,8 @@ export function VoucherPackagesTable({
   return (
     <SharedDataTable
       data={data}
+      freezeFirst
+      freezeLast
       columns={[
         {
           header: "Voucher",

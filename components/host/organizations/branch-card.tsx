@@ -107,7 +107,7 @@ export function BranchCard({ branch, onView, onEdit }: BranchCardProps) {
           <div className="space-y-2.5 pt-4 border-t border-border/40">
             <div className="flex items-center gap-1.5 text-faint">
               <ChartPieSlice size={14} weight="bold" />
-              <span className="text-label font-semibold text-faint leading-none">Utilisation & Claims</span>
+              <span className="text-label font-semibold text-faint leading-none">Claims Usage</span>
             </div>
             <div className="flex items-center gap-3">
               <UtilizationChart value={branch.utilizationRate} mode="ring" size={40} strokeWidth={4} />

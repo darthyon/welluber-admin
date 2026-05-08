@@ -123,6 +123,8 @@ export default function GeneratedVouchersPage() {
         />
       ) : (
         <SharedDataTable
+          freezeFirst
+          freezeLast
           data={filteredVouchers}
           defaultSort={{ key: "generatedAt", direction: "desc" }}
           columns={[

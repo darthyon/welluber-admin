@@ -541,6 +541,8 @@ function PoliciesContent() {
         <SharedDataTable
           data={filteredPolicies}
           columns={columns}
+          freezeFirst
+          freezeLast
           onRowClick={(row) => updateQueryParams({ policyId: row.id, mode: "view", wizard: "open" })}
         />
       )}

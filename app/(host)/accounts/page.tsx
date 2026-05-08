@@ -280,6 +280,8 @@ export default function AccountsPage() {
             isExpanded={isExpanded}
             onToggleExpand={onToggleExpand}
             renderExpanded={renderExpanded}
+            freezeFirst
+            freezeLast
             columns={[
               {
                 header: "Organisation",

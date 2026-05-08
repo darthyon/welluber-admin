@@ -81,7 +81,6 @@ import {
 } from "@/components/ui/tooltip"
 import {
   deactivateOrganization,
-  removeOrganization,
   suspendOrganization,
 } from "@/features/organizations/actions"
 import { OrganizationStatus } from "@/features/organizations/types"
@@ -169,7 +168,7 @@ function OrganizationDetailContent() {
   const [isDangerModalOpen, setIsDangerModalOpen] = useState(false)
   const [isDangerSubmitting, setIsDangerSubmitting] = useState(false)
   const [dangerAction, setDangerAction] = useState<
-    "deactivate" | "suspend" | "remove" | null
+    "deactivate" | "suspend" | null
   >(null)
 
   // Voucher detail sheet state
@@ -416,7 +415,7 @@ function OrganizationDetailContent() {
     setToastMessage("Policy unassigned from organisation")
   }
 
-  const openDangerAction = (action: "deactivate" | "suspend" | "remove") => {
+  const openDangerAction = (action: "deactivate" | "suspend") => {
     setDangerAction(action)
     setIsDangerModalOpen(true)
   }
@@ -445,24 +444,6 @@ function OrganizationDetailContent() {
         "Historical records remain available for audit and review.",
       ],
       run: () => suspendOrganization(orgId),
-    },
-    remove: {
-      title: "Remove Organisation",
-      confirmLabel: "Remove Organisation",
-      description:
-        "Permanently remove this organisation and all associated records.",
-      impactPoints: [
-        "Branches, employees, policies, and admins will be removed from the workspace.",
-        "This action cannot be undone.",
-        "Any dependent references in reporting will be severed.",
-      ],
-      run: async () => {
-        const res = await removeOrganization(orgId)
-        if (res.success) {
-          router.push("/organizations")
-        }
-        return res
-      },
     },
   } as const
 
@@ -553,11 +534,9 @@ function OrganizationDetailContent() {
                     variant={
                       orgStatus === "active"
                         ? "emerald"
-                        : orgStatus === "pending"
-                          ? "amber"
-                          : orgStatus === "removed"
-                            ? "zinc"
-                            : "rose"
+                        : orgStatus === "suspended"
+                          ? "rose"
+                          : "zinc"
                     }
                   />
                 </div>
@@ -653,7 +632,7 @@ function OrganizationDetailContent() {
               policyCount={assignedPolicies.length}
               employeesWithoutPolicy={orgForSetup.employeesWithoutPolicy ?? 0}
             />
-            {orgStatus !== "pending" && <OrgSetupGuide organization={orgForSetup} />}
+            {orgStatus !== "inactive" && <OrgSetupGuide organization={orgForSetup} />}
             {/* Account Details */}
             <DetailSection
               title="Account Details"
@@ -733,6 +712,8 @@ function OrganizationDetailContent() {
               }
             >
               <SharedDataTable
+                freezeFirst
+                freezeLast
                 columns={[
                   {
                     header: "Name",
@@ -996,6 +977,8 @@ function OrganizationDetailContent() {
                     </div>
                   ) : (
                     <SharedDataTable
+                      freezeFirst
+                      freezeLast
                       onRowClick={(branch) => setViewBranchId(branch.id)}
                       columns={[
                         {
@@ -1056,7 +1039,7 @@ function OrganizationDetailContent() {
                           ),
                         },
                         {
-                          header: "Utilisation / Claims",
+                          header: "Claims Usage",
                           accessorKey: "utilizationRate",
                           sortable: true,
                           headerClassName: "min-w-[180px]",
@@ -1338,6 +1321,8 @@ function OrganizationDetailContent() {
                       ) : (
                         <TooltipProvider>
                           <SharedDataTable
+                            freezeFirst
+                            freezeLast
                             onRowClick={(emp) => router.push(`/employees/${emp.id}`)}
                             columns={[
                               {
@@ -1370,9 +1355,9 @@ function OrganizationDetailContent() {
                                 accessorKey: "branch",
                                 sortable: true,
                                 render: (emp) => (
-                                  <span className="rounded-md border border-border bg-muted/80 px-2 py-0.5 text-label font-semibold text-muted-foreground">
-                                    {emp.branch}
-                                  </span>
+    <span className="rounded-md border border-border bg-muted/80 px-2 py-0.5 text-label font-semibold text-muted-foreground whitespace-nowrap">
+      {emp.branch}
+    </span>
                                 ),
                               },
                               {
@@ -1603,7 +1588,7 @@ function OrganizationDetailContent() {
                                 status: "Linked",
                                 empCode: "ACM-001",
                                 department: "Engineering",
-                                tier: "T3",
+                                tier: "Manager",
                                 employmentType: "full-time",
                                 benefitPolicies: [
                                   {
@@ -1624,7 +1609,7 @@ function OrganizationDetailContent() {
                                 status: "Linked",
                                 empCode: "ACM-042",
                                 department: "Product",
-                                tier: "T2",
+                                tier: "Senior Manager",
                                 employmentType: "full-time",
                                 benefitPolicies: [
                                   {
@@ -1644,7 +1629,7 @@ function OrganizationDetailContent() {
                                 status: "Pending",
                                 empCode: "ACM-156",
                                 department: "Growth",
-                                tier: "T4",
+                                tier: "Associate",
                                 employmentType: "internship",
                                 benefitPolicies: [
                                   {
@@ -1672,7 +1657,7 @@ function OrganizationDetailContent() {
                                 status: "Linked",
                                 empCode: "ACM-089",
                                 department: "Sales",
-                                tier: "T3",
+                                tier: "Manager",
                                 employmentType: "contract",
                                 benefitPolicies: [
                                   {
@@ -1735,6 +1720,8 @@ function OrganizationDetailContent() {
                         </div>
                       ) : (
                         <SharedDataTable
+                          freezeFirst
+                          freezeLast
                           columns={[
                             {
                               header: "Dependent Name",
@@ -1848,6 +1835,8 @@ function OrganizationDetailContent() {
                       />
 
                       <SharedDataTable
+                        freezeFirst
+                        freezeLast
                         columns={[
                           {
                             header: "Beneficiary",
@@ -1889,7 +1878,7 @@ function OrganizationDetailContent() {
                             ),
                           },
                           {
-                            header: "Utilisation",
+                            header: "Claims Usage",
                             render: (ent) => (
                               <div className="flex w-[140px] flex-col gap-1.5">
                                 <div className="flex justify-between text-label font-medium">
@@ -2235,26 +2224,6 @@ function OrganizationDetailContent() {
                   </div>
                 </div>
 
-                <div className="rounded-lg border border-rose-200 dark:border-rose-500/20 bg-rose-50/60 dark:bg-rose-500/10 p-4">
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="space-y-1">
-                      <p className="text-body font-medium text-foreground">
-                        Remove Organisation
-                      </p>
-                      <p className="text-label text-muted-foreground">
-                        Permanently delete the organisation and all linked
-                        records.
-                      </p>
-                    </div>
-                    <Button
-                      variant="destructive"
-                      className="h-9 text-label"
-                      onClick={() => openDangerAction("remove")}
-                    >
-                      Remove
-                    </Button>
-                  </div>
-                </div>
               </div>
             </DetailSection>
           </div>
@@ -2295,9 +2264,7 @@ function OrganizationDetailContent() {
               setOrgStatus(
                 dangerAction === "deactivate"
                   ? "deactivated"
-                  : dangerAction === "suspend"
-                    ? "suspended"
-                    : "removed"
+                  : "suspended"
               )
               setToastMessage(res.message)
               setIsDangerModalOpen(false)

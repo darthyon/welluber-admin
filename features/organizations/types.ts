@@ -1,4 +1,4 @@
-export type OrganizationStatus = "active" | "deactivated" | "suspended" | "removed" | "pending";
+export type OrganizationStatus = "active" | "inactive" | "draft" | "deactivated" | "suspended";
 export type OrganizationType = "sme" | "enterprise" | "ngo";
 export type OrganizationSubscription = "standard" | "premium" | "enterprise";
 

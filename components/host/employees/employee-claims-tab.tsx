@@ -207,6 +207,8 @@ export function EmployeeClaimsTab({ employeeId: _employeeId }: EmployeeClaimsTab
         data={filteredClaims}
         columns={columns}
         rowsPerPage={10}
+        freezeFirst
+        freezeLast
         defaultSort={{ key: "date", direction: "desc" }}
       />
     </div>

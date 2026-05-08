@@ -1,10 +1,9 @@
 "use client";
 
-import { Buildings, DotsThreeVertical, Users, Shield, ChartPieSlice } from "@phosphor-icons/react";
+import { Users, Shield, ChartPieSlice } from "@phosphor-icons/react";
 import { Organization } from "@/features/organizations/types";
 import { PulseStatus } from "@/components/shared/pulse-status";
 import Link from "next/link";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { cn } from "@/lib/utils";
@@ -13,9 +12,13 @@ import { Badge } from "@/components/ui/badge";
 import { ActionPopover } from "@/components/shared/action-popover";
 import { UtilizationChart } from "./utilization-chart";
 import { EntityAvatar } from "@/components/shared/entity-avatar";
-import { SetupChecklist } from "./setup-checklist";
+import { Registry } from "@/lib/mock-data/registry";
 
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
+
+function resolvePolicyName(id: string): string {
+  return Registry.policies.get(id)?.name ?? id
+}
 
 interface OrganizationCardProps {
   org: Organization;
@@ -115,7 +118,7 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
             <div className="space-y-2.5">
               <div className="flex items-center gap-1.5 text-faint">
                 <ChartPieSlice size={14} weight="bold" />
-                <span className="text-label font-semibold text-faint leading-none">Utilisation & Claims</span>
+                <span className="text-label font-semibold text-faint leading-none">Claims Usage</span>
               </div>
               <div className="flex items-center gap-3">
                 <UtilizationChart value={org.utilizationRate} mode="ring" size={44} strokeWidth={4} />
@@ -158,7 +161,7 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
                       variant="secondary"
                       className="bg-background/40 hover:bg-background/60 text-label font-medium px-2.5 py-0.5 border-border/60 h-6 transition-colors text-subtle"
                     >
-                      {policy}
+                      {resolvePolicyName(policy)}
                     </Badge>
                   ))}
                   {org.policies.length > 3 && (
@@ -176,11 +179,11 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
                         onClick={(e) => e.stopPropagation()}
                       >
                         <div className="flex flex-col gap-1.5">
-                          <label className="text-label font-medium text-subtle pl-1">Benefit ID</label>
+                          <label className="text-label font-medium text-subtle pl-1">Benefit policies</label>
                           <div className="max-h-[160px] overflow-y-auto px-1 space-y-1">
                             {org.policies.slice(3).map((policy, i) => (
                               <div key={i} className="text-label px-2 py-1.5 hover:bg-accent rounded-lg text-subtle transition-colors truncate font-medium">
-                                {policy}
+                                {resolvePolicyName(policy)}
                               </div>
                             ))}
                           </div>
@@ -193,16 +196,6 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
             </div>
           </div>
 
-          {/* Setup health — only when incomplete */}
-          {(org.policies.length === 0 || org.employeeCount === 0 || (org.employeesWithoutPolicy ?? 0) > 0) && (
-            <div
-              className="pt-3 mt-1 border-t border-border/50 flex items-center justify-between"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <span className="text-micro text-faint font-medium">Setup</span>
-              <SetupChecklist organization={org} />
-            </div>
-          )}
         </div>
       </motion.div>
     </TooltipProvider>

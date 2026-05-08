@@ -28,6 +28,8 @@ export function EmployeeDirectoryTable({
   return (
     <TooltipProvider>
       <SharedDataTable
+        freezeFirst
+        freezeLast
         onRowClick={onRowClick}
         columns={[
           {

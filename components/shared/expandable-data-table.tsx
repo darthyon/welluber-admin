@@ -34,6 +34,8 @@ export interface ExpandableDataTableProps<T extends { id: string | number }> {
     direction: SortDirection;
   };
   ghost?: boolean;
+  freezeFirst?: boolean;
+  freezeLast?: boolean;
 }
 
 export function ExpandableDataTable<T extends { id: string | number }>({
@@ -47,6 +49,8 @@ export function ExpandableDataTable<T extends { id: string | number }>({
   onRowClick,
   defaultSort,
   ghost = false,
+  freezeFirst = false,
+  freezeLast = false,
 }: ExpandableDataTableProps<T>) {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortConfig, setSortConfig] = useState<SortConfig<T>>(
@@ -122,6 +126,8 @@ export function ExpandableDataTable<T extends { id: string | number }>({
             <tr className="border-b border-border/60 bg-muted/30">
               {columns.map((col, i) => {
                 const isSorted = sortConfig.key === col.accessorKey;
+                const isFirst = i === 0 && freezeFirst;
+                const isLast = i === totalColumns - 1 && freezeLast;
                 return (
                   <th
                     key={i}
@@ -132,6 +138,8 @@ export function ExpandableDataTable<T extends { id: string | number }>({
                       col.sortable && "cursor-pointer hover:bg-primary/5 hover:text-primary",
                       getCellAlignment(col.align),
                       isSorted && "text-foreground",
+                      isFirst && "sticky left-0 z-30 bg-muted shadow-sm border-r border-border/40",
+                      isLast && "sticky right-0 z-30 bg-muted shadow-sm border-l border-border/40",
                       col.headerClassName
                     )}
                   >
@@ -174,12 +182,17 @@ export function ExpandableDataTable<T extends { id: string | number }>({
                       )}
                       onClick={() => onRowClick?.(row)}
                     >
-                      {columns.map((col, i) => (
+                      {columns.map((col, i) => {
+                        const isFirst = i === 0 && freezeFirst;
+                        const isLast = i === totalColumns - 1 && freezeLast;
+                        return (
                         <td
                           key={i}
                           className={cn(
                             "p-4 text-body transition-colors",
                             getCellAlignment(col.align),
+                            isFirst && "sticky left-0 bg-card z-10 group-hover:bg-muted shadow-sm border-r border-border/40",
+                            isLast && "sticky right-0 bg-card z-10 group-hover:bg-muted shadow-sm border-l border-border/40",
                             col.cellClassName
                           )}
                         >
@@ -206,7 +219,8 @@ export function ExpandableDataTable<T extends { id: string | number }>({
                             col.render ? col.render(row) : (row[col.accessorKey!] as any)
                           )}
                         </td>
-                      ))}
+                        );
+                      })}
                     </motion.tr>
                     {expanded && (
                       <tr className="bg-muted/10 border-b border-border/40">
