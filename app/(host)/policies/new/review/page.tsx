@@ -84,6 +84,7 @@ const employeeColumns: Column<EmployeeDirectoryItem>[] = [
 export default function NewPolicyReviewPage() {
   const router = useRouter();
   const [draft, setDraft] = useState<Draft | null>(() => {
+    if (typeof window === "undefined") return null;
     const stored = sessionStorage.getItem("policy-draft");
     if (!stored) return null;
     try { return JSON.parse(stored); } catch { return null; }
@@ -102,7 +103,9 @@ export default function NewPolicyReviewPage() {
 
   const updateDraft = (next: Draft) => {
     setDraft(next);
-    sessionStorage.setItem("policy-draft", JSON.stringify(next));
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("policy-draft", JSON.stringify(next));
+    }
   };
 
   const toggleEmpType = (id: string) => {
@@ -140,7 +143,9 @@ export default function NewPolicyReviewPage() {
     await new Promise((r) => setTimeout(r, 1200));
     setIsSubmitting(false);
     setCreatedPolicyName(draft.policy.name || "Benefit Policy");
-    sessionStorage.removeItem("policy-draft");
+    if (typeof window !== "undefined") {
+      sessionStorage.removeItem("policy-draft");
+    }
     toast.success("Policy created successfully");
     setShowSuccess(true);
   };

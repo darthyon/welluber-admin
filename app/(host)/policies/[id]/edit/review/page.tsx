@@ -86,6 +86,7 @@ export default function EditPolicyReviewPage({ params }: { params: Promise<{ id:
   const router = useRouter();
   const draftKey = `policy-draft-edit-${id}`;
   const [draft, setDraft] = useState<Draft | null>(() => {
+    if (typeof window === "undefined") return null;
     const stored = sessionStorage.getItem(draftKey);
     if (!stored) return null;
     try { return JSON.parse(stored); } catch { return null; }
@@ -104,7 +105,9 @@ export default function EditPolicyReviewPage({ params }: { params: Promise<{ id:
 
   const updateDraft = (next: Draft) => {
     setDraft(next);
-    sessionStorage.setItem(draftKey, JSON.stringify(next));
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem(draftKey, JSON.stringify(next));
+    }
   };
 
   const toggleEmpType = (etId: string) => {
@@ -142,7 +145,9 @@ export default function EditPolicyReviewPage({ params }: { params: Promise<{ id:
     await new Promise((r) => setTimeout(r, 1200));
     setIsSubmitting(false);
     setUpdatedPolicyName(draft.policy.name || "Policy");
-    sessionStorage.removeItem(draftKey);
+    if (typeof window !== "undefined") {
+      sessionStorage.removeItem(draftKey);
+    }
     toast.success("Policy updated successfully");
     setShowSuccess(true);
   };
