@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
-import { Plus, Users, Buildings, TreeStructure, MagnifyingGlass, Export, Funnel, DownloadSimple } from "@phosphor-icons/react";
+import React, { useState, useMemo } from "react";
+import { Buildings, TreeStructure, MagnifyingGlass, DownloadSimple } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { SharedDataTable, Column } from "@/components/shared/data-table";
 import { StatusBadge } from "@/components/shared/status-badge";
@@ -14,17 +14,14 @@ import { ViewToggle, ViewMode } from "@/components/shared/view-toggle";
 import { MemberCard } from "@/components/host/users/member-card";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
+import { useMounted } from "@/hooks/use-mounted";
 import { EmptyState } from "@/components/shared/empty-state";
 import { EntityAvatar } from "@/components/shared/entity-avatar";
 
 export default function MembersPage() {
-  const [mounted, setMounted] = useState(false);
+  const mounted = useMounted();
   const [viewMode, setViewMode] = useState<ViewMode>("list");
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");

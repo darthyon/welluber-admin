@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { Plus, Shield, Buildings, Storefront, MagnifyingGlass, Export, DownloadSimple, Clock, FadersHorizontal } from "@phosphor-icons/react";
+import { Plus, Shield, Buildings, Storefront, MagnifyingGlass, DownloadSimple, Clock } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { SharedDataTable, Column } from "@/components/shared/data-table";
 import { StatusBadge } from "@/components/shared/status-badge";
@@ -13,7 +13,6 @@ import { SearchableFilterItem } from "@/components/shared/searchable-filter-item
 import { ViewToggle, ViewMode } from "@/components/shared/view-toggle";
 import { AdminCard } from "@/components/host/users/admin-card";
 import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { EmptyState } from "@/components/shared/empty-state";
 
@@ -123,7 +122,7 @@ export default function AdministratorsPage() {
       header: "Actions",
       headerClassName: "text-right",
       align: "right",
-      render: (row) => (
+      render: () => (
         <Button variant="ghost" size="sm" className="h-8 text-label font-semibold text-faint hover:text-primary hover:bg-primary/5 transition-all">
           Manage Access
         </Button>
@@ -251,3 +250,4 @@ export default function AdministratorsPage() {
     </div>
   );
 }
+

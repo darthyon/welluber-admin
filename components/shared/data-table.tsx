@@ -70,8 +70,8 @@ export function SharedDataTable<T extends { id: string | number }>({
 
     return [...data].sort((a, b) => {
       const key = sortConfig.key!;
-      let aVal: any = a[key];
-      let bVal: any = b[key];
+      let aVal: unknown = a[key];
+      let bVal: unknown = b[key];
 
       // Extract comparison value (handle objects with name property)
       if (aVal && typeof aVal === "object" && "name" in aVal) aVal = aVal.name;
@@ -200,7 +200,7 @@ export function SharedDataTable<T extends { id: string | number }>({
                           col.cellClassName
                         )}
                       >
-                        {col.render ? col.render(row) : (row[col.accessorKey!] as any)}
+                        {col.render ? col.render(row) : String(row[col.accessorKey!] ?? "")}
                       </td>
                     );
                   })}

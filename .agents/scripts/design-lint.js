@@ -133,7 +133,6 @@ function isExempt(filePath, rule) {
   return false
 }
 
-let totalErrors = 0
 const violations = []
 
 for (const target of TARGET_DIRS) {
@@ -151,7 +150,6 @@ for (const target of TARGET_DIRS) {
         if (isExempt(filePath, rule)) continue
         if (rule.skipIf && rule.skipIf(line)) continue
         if (rule.pattern.test(line)) {
-          totalErrors++
           violations.push(`${relPath}:${i + 1}: ${rule.message}`)
           break
         }

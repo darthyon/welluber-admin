@@ -156,10 +156,10 @@ export default function DashboardPage() {
           {/* Custom Compound Period Selectors */}
           <div className="flex flex-wrap items-center gap-2 shrink-0">
             <div className="flex bg-muted/50 p-1 rounded-md border border-border">
-              {["By Month", "By Quarter", "By Year"].map((p) => (
+              {(["By Month", "By Quarter", "By Year"] as const).map((p) => (
                 <button 
                   key={p}
-                  onClick={() => setPeriod(p as any)}
+                  onClick={() => setPeriod(p)}
                   className={`px-3 py-1.5 text-label font-medium rounded transition-colors ${
                     period === p ? "bg-background shadow-sm text-foreground" : "text-subtle hover:text-foreground"
                   }`}

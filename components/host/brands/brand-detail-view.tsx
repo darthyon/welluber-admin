@@ -1,15 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { 
-  CaretLeft, 
-  Tag, 
-  Buildings, 
+import {
+  CaretLeft,
+  Tag,
   PencilSimpleLine,
-  Trash,
-  MagnifyingGlass,
   Plus,
-  Storefront,
+  Storefront
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { DetailSection } from "@/components/shared/detail-section";
@@ -21,10 +18,8 @@ import { FilterItem } from "@/components/shared/filter-item";
 import { SharedDataTable, Column } from "@/components/shared/data-table";
 import { EntityAvatar } from "@/components/shared/entity-avatar";
 import { Badge } from "@/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
-import { Switch } from "@/components/shared/switch";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { useQueryState } from "@/hooks/use-tab-persistence";
-import { cn } from "@/lib/utils";
 import type { Brand } from "@/types/brand";
 import type { ServiceProvider } from "@/types/provider";
 import { MOCK_SPS } from "@/lib/mock-data";
@@ -242,3 +237,4 @@ export function BrandDetailView({ brand, onBack, onEdit, onRemove }: BrandDetail
     </div>
   );
 }
+

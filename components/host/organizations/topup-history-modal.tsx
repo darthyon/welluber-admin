@@ -1,20 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { 
-  X, 
-  ClockCounterClockwise, 
-  DownloadSimple, 
-  CheckCircle, 
-  Clock, 
-  WarningCircle,
+import {
+  X,
+  ClockCounterClockwise,
+  DownloadSimple,
+  Clock,
   MagnifyingGlass,
-  Funnel,
-  ArrowRight
+  Funnel
 } from "@phosphor-icons/react";
 import { getTopupHistory } from "@/features/manual-topup/actions";
 import { TopupTransaction } from "@/features/manual-topup/types";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { format } from "date-fns";
@@ -27,16 +23,11 @@ interface TopUpHistoryModalProps {
 }
 
 export function TopUpHistoryModal({ isOpen, onClose, branchId, branchName }: TopUpHistoryModalProps) {
-  const [history, setHistory] = useState<TopupTransaction[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [history, setHistory] = useState<TopupTransaction[] | null>(null);
 
   useEffect(() => {
     if (isOpen) {
-      setIsLoading(true);
-      getTopupHistory(branchId).then((data) => {
-        setHistory(data);
-        setIsLoading(false);
-      });
+      getTopupHistory(branchId).then(setHistory);
     }
   }, [isOpen, branchId]);
 
@@ -103,7 +94,7 @@ export function TopUpHistoryModal({ isOpen, onClose, branchId, branchName }: Top
 
         {/* Table Content */}
         <div className="flex-1 overflow-auto">
-          {isLoading ? (
+          {history === null ? (
             <div className="h-full flex flex-col items-center justify-center text-muted-foreground gap-3">
               <div className="w-6 h-6 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
               <p className="text-body font-medium">Fetching history...</p>
@@ -160,7 +151,7 @@ export function TopUpHistoryModal({ isOpen, onClose, branchId, branchName }: Top
 
         {/* Footer */}
         <div className="p-3 border-t border-border flex items-center justify-between text-label text-muted-foreground bg-muted/10">
-          <div>Showing {history.length} records</div>
+          <div>Showing {history?.length ?? 0} records</div>
           <div className="flex items-center gap-1">
             Page 1 of 1
           </div>
@@ -169,3 +160,4 @@ export function TopUpHistoryModal({ isOpen, onClose, branchId, branchName }: Top
     </div>
   );
 }
+

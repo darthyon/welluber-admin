@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CaretLeft, NavigationArrow, Check, Users, CaretDown, PencilSimpleLine } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,33 @@ import type { EmployeeDirectoryItem } from "@/features/employees/types";
 type Draft = { policy: Partial<BenefitPolicy>; groups: BenefitGroup[]; benefits: Benefit[] };
 
 const normEmpType = (s?: string) => (s ?? "").replace(/-/g, "_");
+
+function getTierOptions(orgId: string | undefined) {
+  if (!orgId) return [] as { value: string; label: string }[];
+  const org = MOCK_ORGS.find((o) => o.id === orgId);
+  return (org?.tierConfigs ?? []).map((t) => ({ value: t.id, label: t.code ? `${t.code} - ${t.name}` : t.name }));
+}
+
+function getDepartmentOptions(orgId: string | undefined) {
+  if (!orgId) return [] as { value: string; label: string }[];
+  const org = MOCK_ORGS.find((o) => o.id === orgId);
+  return (org?.departmentConfigs ?? []).map((d) => ({ value: d.id, label: d.code ? `${d.code} - ${d.name}` : d.name }));
+}
+
+function getTargetedEmployees(draft: Draft | null) {
+  if (!draft) return [];
+  const orgId = draft.policy.organizationId;
+  const empTypes = (draft.policy.eligibleEmploymentTypes ?? []).map(normEmpType);
+  const tierIds = draft.policy.eligibility?.tierIds ?? [];
+  const deptIds = draft.policy.eligibility?.departmentIds ?? [];
+  return MOCK_EMPLOYEES.filter((e) => {
+    if (orgId && e.orgId !== orgId) return false;
+    if (empTypes.length > 0 && !empTypes.includes(normEmpType(e.employmentType))) return false;
+    if (tierIds.length > 0 && (!e.tierId || !tierIds.includes(e.tierId))) return false;
+    if (deptIds.length > 0 && (!e.departmentId || !deptIds.includes(e.departmentId))) return false;
+    return true;
+  });
+}
 
 const employeeColumns: Column<EmployeeDirectoryItem>[] = [
   {
@@ -56,47 +83,29 @@ const employeeColumns: Column<EmployeeDirectoryItem>[] = [
 
 export default function NewPolicyReviewPage() {
   const router = useRouter();
-  const [draft, setDraft] = useState<Draft | null>(null);
+  const [draft, setDraft] = useState<Draft | null>(() => {
+    if (typeof window === "undefined") return null;
+    const stored = sessionStorage.getItem("policy-draft");
+    if (!stored) return null;
+    try { return JSON.parse(stored); } catch { return null; }
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [createdPolicyName, setCreatedPolicyName] = useState("");
 
   useEffect(() => {
-    const stored = sessionStorage.getItem("policy-draft");
-    if (!stored) { router.replace("/policies/new"); return; }
-    try { setDraft(JSON.parse(stored)); } catch { router.replace("/policies/new"); }
-  }, [router]);
+    if (!draft) { router.replace("/policies/new"); return; }
+  }, [draft, router]);
 
-  const tierOptions = useMemo(() => {
-    if (!draft?.policy.organizationId) return [] as { value: string; label: string }[];
-    const org = MOCK_ORGS.find((o) => o.id === draft.policy.organizationId);
-    return (org?.tierConfigs ?? []).map((t) => ({ value: t.id, label: t.code ? `${t.code} - ${t.name}` : t.name }));
-  }, [draft?.policy.organizationId]);
-
-  const departmentOptions = useMemo(() => {
-    if (!draft?.policy.organizationId) return [] as { value: string; label: string }[];
-    const org = MOCK_ORGS.find((o) => o.id === draft.policy.organizationId);
-    return (org?.departmentConfigs ?? []).map((d) => ({ value: d.id, label: d.code ? `${d.code} - ${d.name}` : d.name }));
-  }, [draft?.policy.organizationId]);
-
-  const targetedEmployees = useMemo(() => {
-    if (!draft) return [];
-    const orgId = draft.policy.organizationId;
-    const empTypes = (draft.policy.eligibleEmploymentTypes ?? []).map(normEmpType);
-    const tierIds = draft.policy.eligibility?.tierIds ?? [];
-    const deptIds = draft.policy.eligibility?.departmentIds ?? [];
-    return MOCK_EMPLOYEES.filter((e) => {
-      if (orgId && e.orgId !== orgId) return false;
-      if (empTypes.length > 0 && !empTypes.includes(normEmpType(e.employmentType))) return false;
-      if (tierIds.length > 0 && (!e.tierId || !tierIds.includes(e.tierId))) return false;
-      if (deptIds.length > 0 && (!e.departmentId || !deptIds.includes(e.departmentId))) return false;
-      return true;
-    });
-  }, [draft]);
+  const tierOptions = getTierOptions(draft?.policy.organizationId);
+  const departmentOptions = getDepartmentOptions(draft?.policy.organizationId);
+  const targetedEmployees = getTargetedEmployees(draft);
 
   const updateDraft = (next: Draft) => {
     setDraft(next);
-    sessionStorage.setItem("policy-draft", JSON.stringify(next));
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("policy-draft", JSON.stringify(next));
+    }
   };
 
   const toggleEmpType = (id: string) => {
@@ -134,7 +143,9 @@ export default function NewPolicyReviewPage() {
     await new Promise((r) => setTimeout(r, 1200));
     setIsSubmitting(false);
     setCreatedPolicyName(draft.policy.name || "Benefit Policy");
-    sessionStorage.removeItem("policy-draft");
+    if (typeof window !== "undefined") {
+      sessionStorage.removeItem("policy-draft");
+    }
     toast.success("Policy created successfully");
     setShowSuccess(true);
   };

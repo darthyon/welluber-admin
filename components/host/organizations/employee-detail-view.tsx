@@ -1,17 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { 
-  CaretLeft, 
+import {
+  CaretLeft,
   User,
   Users,
-  Buildings, 
+  Buildings,
   Shield,
   IdentificationBadge,
   IdentificationCard,
   EnvelopeSimple,
   CalendarBlank,
-  DotsThreeVertical,
   PencilSimpleLine,
   DeviceMobile,
   Globe,
@@ -20,7 +19,7 @@ import {
   CaretDown,
   Storefront,
   MapPin,
-  Calendar,
+  Calendar
 } from "@phosphor-icons/react";
 import { type Claim } from "@/components/shared/utilisation-claims-table";
 
@@ -99,7 +98,11 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
   const togglePolicy = (idx: number) =>
     setExpandedPolicies(prev => {
       const next = new Set(prev);
-      next.has(idx) ? next.delete(idx) : next.add(idx);
+      if (next.has(idx)) {
+        next.delete(idx);
+      } else {
+        next.add(idx);
+      }
       return next;
     });
 
@@ -399,3 +402,4 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
     </div>
   );
 }
+

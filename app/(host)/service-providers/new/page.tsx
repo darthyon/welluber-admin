@@ -2,17 +2,17 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
   CaretLeft,
   Tag,
   Plus,
   NavigationArrow,
 } from "@phosphor-icons/react";
-import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { createSpSchema, CreateSpData } from "@/features/providers/schemas";
+import { createSpSchema } from "@/features/providers/schemas";
 import { createSp } from "@/features/providers/actions";
 import { Button } from "@/components/ui/button";
 import { MASTER_SERVICE_TAXONOMY } from "@/features/providers/service-taxonomy";
@@ -24,7 +24,6 @@ import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav";
 
 type Step = "selection" | "details";
 type BrandType = "new" | "existing";
-
 
 import { BrandIdentitySection } from "@/components/host/service-providers/form-sections/brand-identity-section";
 import { ProviderProfileSection } from "@/components/host/service-providers/form-sections/provider-profile-section";
@@ -51,11 +50,10 @@ export default function NewServiceProviderPage() {
     register,
     handleSubmit,
     setValue,
-    watch,
     control,
     formState: { errors },
-  } = useForm<CreateSpData & { brandName?: string; brandLogo?: any }>({
-    resolver: zodResolver(createSpSchema as any),
+  } = useForm<(z.input<typeof createSpSchema>) & { brandName?: string; brandLogo?: File | string | null }>({
+    resolver: zodResolver(createSpSchema),
     defaultValues: { 
         isActive: true, 
         mainServices: [], 
@@ -68,7 +66,7 @@ export default function NewServiceProviderPage() {
     },
   });
 
-  const businessType = watch("businessType");
+  const businessType = useWatch({ control, name: "businessType" });
 
   const ANCHOR_ITEMS = useMemo(() => {
     const items = [
@@ -84,7 +82,7 @@ export default function NewServiceProviderPage() {
     return items;
   }, [brandType]);
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: (z.input<typeof createSpSchema>) & { brandName?: string }) => {
     setIsSubmitting(true);
     try {
       const derivedCategories = Array.from(new Set(
@@ -94,23 +92,17 @@ export default function NewServiceProviderPage() {
         }).filter(Boolean) as string[]
       ));
 
-      const initialCommissionSchema = selectedMainServices.map(service => ({
-        mainService: service,
-        tiers: [{ limit: 0, rate: 0.10 }],
-        lastUpdated: new Date().toISOString()
-      }));
-
-      const res = await createSp({ 
-        ...data, 
-        brandId: selectedBrand?.id || "NEW-BRAND-ID",
+      const payload = createSpSchema.parse({
+        ...data,
         mainServices: selectedMainServices,
         serviceCategories: derivedCategories,
-        commissionSchema: initialCommissionSchema
       });
+
+      const res = await createSp(payload);
 
       if (res.success) {
         setCreatedSpId(res.data.id);
-        setCreatedSpName(data.name || data.brandName);
+        setCreatedSpName(data.name || data.brandName || "Service Provider");
         setIsSuccessModalOpen(true);
       }
     } catch (e) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -99,28 +99,21 @@ export function PolicyDetailView({
   onEditVersion,
   onRemoveVersion,
 }: PolicyDetailViewProps) {
+  void onClone;
+  void onDeactivate;
+  void onDelete;
   const router = useRouter();
   const isVersion = Boolean(policy.parentPolicyId);
   const availableTabs = useMemo(
     () => (isVersion ? TABS.filter((tab) => tab.id !== "versions") : TABS),
     [isVersion]
   );
-  const [activeTab, setActiveTab] = useState<TabId>("overview");
-
-  useEffect(() => {
-    const tabStillAvailable = availableTabs.some((tab) => tab.id === activeTab);
-    if (!tabStillAvailable) {
-      setActiveTab("overview");
-    }
-  }, [activeTab, availableTabs]);
-
-  useEffect(() => {
-    setActiveTab("overview");
-  }, [policy.id]);
+  const [selectedTab, setSelectedTab] = useState<TabId>("overview");
+  const activeTab = availableTabs.some((tab) => tab.id === selectedTab) ? selectedTab : "overview";
 
   const statusVariant = policy.status === "active" ? "emerald" : policy.status === "draft" ? "amber" : "rose";
   const canEdit = policy.status !== "deactivated";
-  const canDelete = policy.status === "draft" || policy.status === "deactivated";
+
   const canCreateVersion = policy.status === "active" && !policy.parentPolicyId;
 
   return (
@@ -208,7 +201,7 @@ export function PolicyDetailView({
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
+                  onClick={() => setSelectedTab(tab.id)}
                   className={cn(
                     "flex items-center gap-2 border-b-2 py-3 text-body font-medium transition-all duration-300",
                     isActive
@@ -911,7 +904,7 @@ function VersionOverviewTab({
 
 // ─── Assigned Employees Tab ──────────────────────────────────────────────────
 
-function AssignedEmployeesTab({ policy, employees }: { policy: BenefitPolicy; employees?: EmployeeDirectoryItem[] }) {
+function AssignedEmployeesTab({ employees }: { policy: BenefitPolicy; employees?: EmployeeDirectoryItem[] }) {
   const employeeList = employees ?? [];
 
   return (

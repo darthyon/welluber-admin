@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, Trash, WarningCircle, CheckCircle, Info } from "@phosphor-icons/react";
+import { Plus, Trash, WarningCircle, Info } from "@phosphor-icons/react";
 import { commissionSchemaSchema, CommissionSchemaData } from "@/features/providers/schemas";
 import { saveCommissionSchema } from "@/features/providers/actions";
 import { MASTER_SERVICE_TAXONOMY } from "@/features/providers/service-taxonomy";
@@ -16,7 +16,7 @@ interface CommissionSchemaSheetProps {
   onClose: () => void;
   spId: string;
   serviceCategories: string[];
-  initialRows: any[];
+  initialRows: CommissionSchemaData["rows"];
 }
 
 export function CommissionSchemaSheet({
@@ -119,7 +119,7 @@ export function CommissionSchemaSheet({
             </Button>
           </div>
           <p className="text-label text-muted-foreground">
-            Only services from the provider's assigned categories ({serviceCategories.join(", ")}) are available.
+            Only services from the provider&apos;s assigned categories ({serviceCategories.join(", ")}) are available.
           </p>
         </div>
 
@@ -163,10 +163,10 @@ function ServiceSchemaRow({
 }: {
   rowIndex: number;
   mainService: string;
-  control: any;
-  register: any;
-  errors: any;
-  watch: any;
+  control: ReturnType<typeof useForm<CommissionSchemaData>>["control"];
+  register: ReturnType<typeof useForm<CommissionSchemaData>>["register"];
+  errors: ReturnType<typeof useForm<CommissionSchemaData>>["formState"]["errors"];
+  watch: ReturnType<typeof useForm<CommissionSchemaData>>["watch"];
   onRemove: () => void;
 }) {
   const { fields: tiers, append, remove } = useFieldArray({
@@ -284,9 +284,9 @@ function ServiceSchemaRow({
         </div>
       </div>
       {/* Array-level validation error (e.g. non-sequential limits) */}
-      {errors.rows?.[rowIndex]?.tiers && "message" in (errors.rows[rowIndex].tiers as any) && (
+      {errors.rows?.[rowIndex]?.tiers && "message" in errors.rows[rowIndex].tiers && (
         <p className="text-label text-destructive flex items-center gap-1.5 mt-2 bg-destructive/5 px-2 py-1.5 rounded-lg border border-destructive/10">
-          <WarningCircle size={14} /> {(errors.rows[rowIndex].tiers as any).message}
+          <WarningCircle size={14} /> {String(errors.rows[rowIndex].tiers.message)}
         </p>
       )}
     </div>

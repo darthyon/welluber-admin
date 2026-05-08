@@ -3,12 +3,10 @@
 import { MapPin, Clock, Buildings } from "@phosphor-icons/react";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ActionPopover } from "@/components/shared/action-popover";
-import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import { OverflowTags } from "@/components/shared/overflow-tags";
 import type { SpBranch } from "@/types/provider";
 import { OPERATING_DAYS } from "@/features/providers/constants";
-import { cn } from "@/lib/utils";
 
 interface SpBranchCardProps {
   branch: SpBranch;

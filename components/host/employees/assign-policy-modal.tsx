@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { MagnifyingGlass, Check, X } from "@phosphor-icons/react";
+import { MagnifyingGlass, Check } from "@phosphor-icons/react";
 import {
   Dialog,
   DialogContent,
@@ -24,7 +24,6 @@ interface AssignPolicyModalProps {
   onAssign: (policyId: string) => void;
 }
 
-
 export function AssignPolicyModal({
   open,
   onOpenChange,
@@ -32,6 +31,7 @@ export function AssignPolicyModal({
   employeeName,
   onAssign,
 }: AssignPolicyModalProps) {
+  void employeeId;
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPolicyId, setSelectedPolicyId] = useState<string | null>(null);
 

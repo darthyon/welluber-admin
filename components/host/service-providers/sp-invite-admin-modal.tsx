@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { X, EnvelopeSimple, WarningCircle, Warning, GitBranch } from "@phosphor-icons/react";
+import { X, EnvelopeSimple, WarningCircle, Warning } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { inviteSpAdminSchema, InviteSpAdminData } from "@/features/providers/schemas";
 import { inviteSpAdmin } from "@/features/providers/actions";

@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, DownloadSimple, MagnifyingGlass, FadersHorizontal, WarningCircle } from "@phosphor-icons/react";
+import { Plus, DownloadSimple, MagnifyingGlass } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -8,15 +8,13 @@ import { OrganizationsDataTable } from "@/components/host/organizations/organiza
 import { OrganizationCard } from "@/components/host/organizations/organization-card";
 import { ViewToggle, ViewMode } from "@/components/shared/view-toggle";
 import { MultiSelectFilter } from "@/components/shared/multi-select-filter";
-import { ALL_SERVICES, SERVICE_TAXONOMY, WORKFORCE_RANGES, INDUSTRIES } from "@/features/organizations/constants";
+import { SERVICE_TAXONOMY, WORKFORCE_RANGES, INDUSTRIES } from "@/features/organizations/constants";
 import { MOCK_ORGS } from "@/lib/mock-data";
 import { motion, AnimatePresence } from "framer-motion";
 import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { FilterItem } from "@/components/shared/filter-item";
 import { EmptyState } from "@/components/shared/empty-state";
 import { AdvancedFilterSheet, DEFAULT_ADVANCED_FILTERS, AdvancedFilters } from "@/components/shared/advanced-filter-sheet";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 
 export default function OrganizationsPage() {
   const [viewMode, setViewMode] = useState<ViewMode>("list");

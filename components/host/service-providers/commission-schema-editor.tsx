@@ -11,13 +11,14 @@ interface CommissionSchemaEditorProps {
 }
 
 export function CommissionSchemaEditor({ spId, serviceCategories, initialRows }: CommissionSchemaEditorProps) {
+  void spId;
   const portfolioRows = useMemo(() => initialRows || [], [initialRows]);
 
   if (serviceCategories.length === 0) {
     return (
-      <p className="text-body text-subtle italic">
-        No service categories assigned to the brand. Contact support to update the brand's allowed categories.
-      </p>
+        <p className="text-body text-subtle italic">
+          No service categories assigned to the brand. Contact support to update the brand&apos;s allowed categories.
+        </p>
     );
   }
 
@@ -44,7 +45,7 @@ export function CommissionSchemaEditor({ spId, serviceCategories, initialRows }:
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-                  {row.tiers.map((tier: any, idx: number) => (
+                  {row.tiers.map((tier, idx: number) => (
                     <div key={idx} className="flex flex-col px-3 py-1.5 bg-muted/30 border border-border/50 rounded-lg min-w-[100px]">
                       <span className="text-label text-muted-foreground font-medium">
                         {idx === 0 ? "Base" : `Qty: ${tier.limit}+`}

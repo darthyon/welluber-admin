@@ -1,10 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { X, Wallet, CheckCircle } from "@phosphor-icons/react"
+import { X, Wallet } from "@phosphor-icons/react"
 import { Button } from "@/components/ui/button"
 import { SuccessCelebration } from "@/components/shared/success-celebration"
-import { cn } from "@/lib/utils"
 
 interface UpdateBalanceModalProps {
   isOpen: boolean
@@ -23,6 +22,7 @@ export function UpdateBalanceModal({
   const [isSuccess, setIsSuccess] = useState(false)
   const [amount, setAmount] = useState("")
   const [reason, setReason] = useState("")
+  void accountId
 
   if (!isOpen) return null
 

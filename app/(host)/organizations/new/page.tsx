@@ -2,19 +2,16 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { 
-  CaretLeft, 
-  Buildings, 
-  Article, 
-  NavigationArrow, 
+import {
+  CaretLeft,
+  Buildings,
+  NavigationArrow,
   WarningCircle,
   IdentificationCard,
   MapPin,
-  CreditCard,
-  Bank,
-  Globe
+  Bank
 } from "@phosphor-icons/react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -49,7 +46,7 @@ export default function NewOrganizationPage() {
   const [orgId, setOrgId] = useState<string | null>(null);
   const [createdOrg, setCreatedOrg] = useState<Organization | null>(null);
 
-  const { register, handleSubmit, control, watch, setValue, formState: { errors } } = useForm<CreateOrganizationData>({
+  const { register, handleSubmit, control, setValue, formState: { errors } } = useForm<CreateOrganizationData>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(createOrganizationSchema as any),
     defaultValues: {
@@ -65,7 +62,7 @@ export default function NewOrganizationPage() {
     }
   });
 
-  const orgType = watch("type");
+  const orgType = useWatch({ control, name: "type" });
 
   const onSubmit = async (data: CreateOrganizationData) => {
     setIsSubmitting(true);
@@ -237,7 +234,7 @@ export default function NewOrganizationPage() {
                           <button
                             key={type.id}
                             type="button"
-                            onClick={() => setValue("type", type.id as any)}
+                            onClick={() => setValue("type", type.id as "sme" | "enterprise" | "ngo")}
                             className={cn(
                               "flex flex-col p-3 border rounded-lg text-left transition-all duration-200",
                               orgType === type.id 
@@ -290,7 +287,7 @@ export default function NewOrganizationPage() {
                       name="address"
                       render={({ field }) => (
                         <LocationPicker 
-                          value={field.value as any}
+                          value={field.value ?? { line: "", city: "", state: "", country: "Malaysia", postalCode: "" }}
                           onChange={field.onChange}
                           errors={errors.address}
                         />

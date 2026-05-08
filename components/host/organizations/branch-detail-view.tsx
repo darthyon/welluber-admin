@@ -1,18 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { 
-  CaretLeft, 
-  Buildings, 
-  MapPin, 
-  Wallet, 
-  Users, 
-  Plus, 
-  TrendUp, 
+import {
+  Buildings,
+  MapPin,
+  Wallet,
+  Users,
+  Plus,
   Info,
   Clock,
   ClockCounterClockwise,
-  DotsThreeVertical,
   PencilSimpleLine
 } from "@phosphor-icons/react";
 
@@ -25,11 +22,9 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { BackButton } from "@/components/shared/back-button";
 import { EntityHeader } from "@/components/shared/entity-header";
 import { TwoColumnDetailLayout } from "@/components/shared/two-column-detail-layout";
-import { cn } from "@/lib/utils";
 import { ManualTopUpModal } from "./manual-topup-modal";
 import { TopUpHistoryModal } from "./topup-history-modal";
 import { EntityAvatar } from "@/components/shared/entity-avatar";
-import { Badge } from "@/components/ui/badge";
 
 interface BranchDetailViewProps {
   branchId: string;
@@ -38,7 +33,7 @@ interface BranchDetailViewProps {
 }
 
 export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewProps) {
-  const [accountType, setAccountType] = useState<"new" | "existing">("new");
+  const [accountType] = useState<"new" | "existing">("new");
 
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isTopUpModalOpen, setIsTopUpModalOpen] = useState(false);
@@ -84,7 +79,6 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
         targetId={branchId}
         title="Invite Org Admin"
       />
-
 
       <div className="flex flex-col gap-4">
         <BackButton 
@@ -361,3 +355,4 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
     </div>
   );
 }
+

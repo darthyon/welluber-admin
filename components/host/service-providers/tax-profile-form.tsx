@@ -35,7 +35,7 @@ export function TaxProfileForm({ spId, initial }: TaxProfileFormProps) {
     clearErrors,
     formState: { errors },
   } = useForm<TaxProfileData>({
-    resolver: zodResolver(taxProfileSchema as any),
+    resolver: zodResolver(taxProfileSchema),
     shouldUnregister: true,
     defaultValues: {
       isTaxRegistered: initial.isTaxRegistered,

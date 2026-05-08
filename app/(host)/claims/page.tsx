@@ -9,7 +9,6 @@ import {
   Eye,
   Download,
 } from "@phosphor-icons/react"
-import { cn } from "@/lib/utils"
 import { SharedDataTable, type Column } from "@/components/shared/data-table"
 import { DataFilterBar } from "@/components/shared/data-filter-bar"
 import { FilterItem } from "@/components/shared/filter-item"
@@ -18,12 +17,6 @@ import { StatusBadge } from "@/components/shared/status-badge"
 import type { ClaimStatus, TransactionType } from "@/types/claims"
 import { MOCK_CLAIMS } from "@/lib/mock-data"
 import type { GlobalClaimRow } from "@/lib/mock-data"
-
-const TXN_LABEL: Record<TransactionType, string> = {
-  redemption: "Voucher Redemption",
-  reimbursement: "Reimbursement",
-  refund: "Refund",
-}
 
 // ─── Component ────────────────────────────────────────────────────────────────
 

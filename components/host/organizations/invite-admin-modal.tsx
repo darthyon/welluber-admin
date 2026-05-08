@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X, PaperPlaneTilt, CheckCircle, WarningCircle } from "@phosphor-icons/react";
+import { X, PaperPlaneTilt, WarningCircle } from "@phosphor-icons/react";
 import { inviteAdminSchema, InviteAdminData } from "@/features/organizations/schemas";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";

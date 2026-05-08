@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { useState, useCallback, useMemo, useRef } from "react";
 import {
   ShieldCheck,
   CaretLeft,
   CaretRight,
   IdentificationCard,
-  Quotes,
   Users,
   User,
   UsersFour,
@@ -18,16 +17,14 @@ import {
   NotePencil,
   CheckCircle,
   XCircle,
-  EyeSlash,
   CaretDown,
   Receipt,
   Check,
-  MagnifyingGlass,
   Warning,
   CalendarCheck,
   RocketLaunch,
   ClockCountdown,
-  type IconProps,
+  type IconProps
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { ChoiceCard } from "@/components/shared/choice-card";
@@ -37,7 +34,7 @@ import { SuccessCelebration } from "@/components/shared/success-celebration";
 import { PolicyLaunchConfirmModal } from "@/components/host/policies/policy-launch-confirm-modal";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
-import { BenefitPolicy, BenefitGroup, Benefit, PolicyStatus, DistributionType, PoolType, DependentsPoolType, UtilisationMode, ProrateUnit, RefreshCycle, RefreshStartReference, ActivationMode } from "@/types/policy";
+import { BenefitPolicy, BenefitGroup, Benefit, PolicyStatus, DistributionType, PoolType, DependentsPoolType, ProrateUnit, RefreshCycle, ActivationMode } from "@/types/policy";
 import { UtilisationClaimsTable } from "@/components/shared/utilisation-claims-table";
 import { MOCK_EMPLOYEES, MOCK_ORGS } from "@/lib/mock-data";
 import type { EmployeeDirectoryItem } from "@/features/employees/types";
@@ -96,7 +93,6 @@ function getAvailableRefreshCycles(
   const unitIdx = PRORATE_UNITS.indexOf(prorateUnit);
   return REFRESH_CYCLES.slice(unitIdx + 1);
 }
-
 
 const STATUS_CONFIG: Record<PolicyStatus, { label: string; color: string; bg: string; icon: React.ElementType }> = {
   draft: { label: "Draft", color: "text-amber-600 dark:text-amber-400", bg: "bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/20", icon: NotePencil },
@@ -360,11 +356,6 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
   const updateGroup = (groupId: string, field: keyof BenefitGroup, value: string | number | DistributionType | undefined) => {
     setGroups(groups.map(g => g.id === groupId ? { ...g, [field]: value } : g));
   };
-
-  const isServiceInGroup = (groupId: string, serviceId: MainServiceId) => {
-    return benefits.some(b => b.groupId === groupId && b.serviceId === serviceId);
-  };
-
   const toggleService = (groupId: string, serviceId: MainServiceId) => {
     const exists = benefits.find(b => b.groupId === groupId && b.serviceId === serviceId);
     if (exists) {

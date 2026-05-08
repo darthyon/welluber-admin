@@ -23,7 +23,6 @@ for (const relPath of files) {
   if (!fs.existsSync(filePath)) continue
 
   let content = fs.readFileSync(filePath, "utf-8")
-  let original = content
   let changed = false
 
   // 1. bg-white → bg-background (conservative: not in welluber logo/mark)

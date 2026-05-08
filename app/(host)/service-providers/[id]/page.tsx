@@ -33,7 +33,6 @@ import { DetailField } from "@/components/shared/detail-field";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CommissionSchemaEditor } from "@/components/host/service-providers/commission-schema-editor";
-import { TaxProfileForm } from "@/components/host/service-providers/tax-profile-form";
 import { SpInviteAdminModal } from "@/components/host/service-providers/sp-invite-admin-modal";
 import { SpBranchesTab } from "@/components/host/service-providers/sp-branches-tab";
 import { SpVouchersTab } from "@/components/host/service-providers/sp-vouchers-tab";
@@ -107,7 +106,7 @@ export default function ServiceProviderDetailPage() {
     setIsDangerModalOpen(true);
   };
 
-  const adminBranchLabel = sp.branches.length > 1 ? "All Branches" : sp.branches[0]?.name ?? "All Branches";
+
 
   const dangerActionConfig = {
     status: {
@@ -441,8 +440,6 @@ export default function ServiceProviderDetailPage() {
               />
             </DetailSection>
 
-
-
             {/* Section 4: Administrators */}
               <DetailSection
                 title="Administrators"
@@ -472,7 +469,7 @@ export default function ServiceProviderDetailPage() {
                         header: "Name",
                         accessorKey: "name",
                         sortable: true,
-                        render: (admin: any) => (
+                        render: (admin: (typeof sp.admins)[number]) => (
                           <span className="text-body font-medium text-foreground">{admin.name}</span>
                         ),
                       },
@@ -480,7 +477,7 @@ export default function ServiceProviderDetailPage() {
                         header: "Email",
                         accessorKey: "email",
                         sortable: true,
-                        render: (admin: any) => (
+                        render: (admin: (typeof sp.admins)[number]) => (
                           <span className="text-body text-subtle">{admin.email}</span>
                         ),
                       },
@@ -490,7 +487,7 @@ export default function ServiceProviderDetailPage() {
                       },
                       {
                         header: "Branches",
-                        render: (admin: any) => {
+                        render: (admin: (typeof sp.admins)[number]) => {
                           if (admin.branchIds && admin.branchIds.length > 0) {
                             if (admin.branchIds.includes("all")) {
                               return <span className="text-body text-subtle">All Branches</span>;
@@ -521,7 +518,7 @@ export default function ServiceProviderDetailPage() {
                         header: "Status",
                         accessorKey: "status",
                         sortable: true,
-                        render: (admin: any) => (
+                        render: (admin: (typeof sp.admins)[number]) => (
                           <StatusBadge
                             status={admin.status === "active" ? "Active" : "Pending"}
                             variant={admin.status === "active" ? "emerald" : "amber"}
@@ -531,7 +528,7 @@ export default function ServiceProviderDetailPage() {
                       {
                         header: "Actions",
                         align: "right",
-                        render: (admin: any) => (
+                        render: (admin: (typeof sp.admins)[number]) => (
                           <div className="flex justify-end">
                             {admin.status === "pending_activation" ? (
                               <Button

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Plus, Trash, WarningCircle } from "@phosphor-icons/react";
+import { Plus, Trash } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/shared/switch";
 import { Button } from "@/components/ui/button";

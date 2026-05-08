@@ -4,10 +4,8 @@ import { Storefront, Ticket, Package, MapPin } from "@phosphor-icons/react";
 import type { ServiceProvider } from "@/types/provider";
 import { PulseStatus } from "@/components/shared/pulse-status";
 import { ActionPopover } from "@/components/shared/action-popover";
-import { OverflowTags } from "@/components/shared/overflow-tags";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { 
   Popover, 
@@ -67,7 +65,6 @@ export function SpCard({ sp }: SpCardProps) {
 
           <ActionPopover actions={actions} />
         </div>
-
 
         {/* Main Content: Standardized Field Grid */}
         <div className="relative z-10 space-y-6">

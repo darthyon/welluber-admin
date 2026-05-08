@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Shield, Users, CurrencyCircleDollar, Calendar, Warning, CheckCircle } from "@phosphor-icons/react";
+import { Shield, Users, CurrencyCircleDollar, Calendar, Warning } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -280,7 +280,7 @@ export function EmployeePolicyTab({ employeeId }: EmployeePolicyTabProps) {
             </div>
             <h3 className="text-heading font-semibold text-foreground mt-6">No Policy Assigned</h3>
             <p className="text-body text-muted-foreground mt-2 max-w-md mx-auto">
-              This employee doesn't have a benefit policy assigned yet. Assign a policy to provide benefits.
+              This employee doesn&apos;t have a benefit policy assigned yet. Assign a policy to provide benefits.
             </p>
             <Button className="mt-6 gap-2" onClick={handleAssignPolicy}>
               <Shield size={18} />

@@ -1,31 +1,20 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { BrandForm } from "@/components/host/brands/brand-form";
 import { CaretLeft } from "@phosphor-icons/react";
 import { MOCK_BRANDS } from "@/lib/mock-data";
-import { Brand } from "@/types/brand";
 
 export default function EditBrandPage() {
   const params = useParams();
   const router = useRouter();
-  const [brand, setBrand] = useState<Brand | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
   const brandId = params.id as string;
+  const brand = MOCK_BRANDS.find((b) => b.id === brandId) ?? null;
 
-  useEffect(() => {
-    // Simulate fetching data
-    const foundBrand = MOCK_BRANDS.find((b) => b.id === brandId);
-    if (foundBrand) {
-      setBrand(foundBrand);
-    }
-    setIsLoading(false);
-  }, [brandId]);
-
-  const handleSubmit = async (data: any) => {
+  const handleSubmit = async (data: unknown) => {
     setIsSubmitting(true);
     // Simulate API call
     console.log("Updating brand:", brandId, data);
@@ -33,14 +22,6 @@ export default function EditBrandPage() {
     setIsSubmitting(false);
     router.push(`/brands/${brandId}`);
   };
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
-      </div>
-    );
-  }
 
   if (!brand) {
     return (

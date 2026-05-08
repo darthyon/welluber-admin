@@ -31,6 +31,7 @@ export function UnassignPolicyModal({
   hasActiveClaims,
   onUnassign,
 }: UnassignPolicyModalProps) {
+  void employeeId;
 
   const handleUnassign = () => {
     onUnassign();

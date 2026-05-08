@@ -4,13 +4,9 @@ import { useRouter } from "next/navigation";
 import { SharedDataTable, Column } from "@/components/shared/data-table";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ActionPopover } from "@/components/shared/action-popover";
-import { DataFilterBar } from "@/components/shared/data-filter-bar";
-import { FilterItem } from "@/components/shared/filter-item";
-import { Badge } from "@/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { ServicePortfolioTags } from "./service-portfolio-tags";
 import type { ServiceProvider } from "@/types/provider";
-import React, { useMemo, useState } from "react";
 
 interface SpDataTableProps {
   data: ServiceProvider[];

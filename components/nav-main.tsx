@@ -18,7 +18,7 @@ import {
 export interface NavMainItem {
   title: string
   url: string
-  icon?: React.ComponentType<any>
+  icon?: React.ElementType<{ size?: number; weight?: "fill" | "regular" | "bold"; className?: string }>
   items?: { title: string; url: string }[]
 }
 

@@ -72,18 +72,21 @@ export async function updateVoucher(spId: string, voucherId: string, data: Creat
 }
 
 export async function publishVoucher(spId: string, voucherId: string) {
+  void voucherId;
   await new Promise((resolve) => setTimeout(resolve, 500));
   revalidatePath(`/service-providers/${spId}`);
   return { success: true, message: "Voucher published successfully." };
 }
 
 export async function pauseVoucher(spId: string, voucherId: string) {
+  void voucherId;
   await new Promise((resolve) => setTimeout(resolve, 500));
   revalidatePath(`/service-providers/${spId}`);
   return { success: true, message: "Voucher paused." };
 }
 
 export async function endVoucher(spId: string, voucherId: string) {
+  void voucherId;
   await new Promise((resolve) => setTimeout(resolve, 500));
   revalidatePath(`/service-providers/${spId}`);
   return { success: true, message: "Voucher ended." };
@@ -92,6 +95,7 @@ export async function endVoucher(spId: string, voucherId: string) {
 // ─── Commission Schema ────────────────────────────────────────────────────────
 
 export async function saveCommissionSchema(spId: string, data: CommissionSchemaData) {
+  void data;
   await new Promise((resolve) => setTimeout(resolve, 600));
   revalidatePath(`/service-providers/${spId}`);
   return { success: true, message: "Commission schema saved. New rates apply to future transactions." };
@@ -100,6 +104,7 @@ export async function saveCommissionSchema(spId: string, data: CommissionSchemaD
 // ─── Tax Profile ──────────────────────────────────────────────────────────────
 
 export async function saveTaxProfile(spId: string, data: TaxProfileData) {
+  void data;
   await new Promise((resolve) => setTimeout(resolve, 500));
   revalidatePath(`/service-providers/${spId}`);
   return { success: true, message: "Tax profile saved. SST de-calculation will apply to all transactions." };

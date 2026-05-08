@@ -450,6 +450,7 @@ function PoliciesContent() {
       return (
         <div className="flex flex-col flex-1">
           <PolicyDetailView
+            key={policy.id}
             policy={policy}
             groups={data.groups}
             benefits={data.benefits}

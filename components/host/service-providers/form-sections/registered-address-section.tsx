@@ -2,11 +2,16 @@
 
 import { MapPin } from "@phosphor-icons/react";
 import { Controller } from "react-hook-form";
+import type { Control, FieldErrors } from "react-hook-form";
 import { LocationPicker } from "@/components/shared/location-picker";
+import { z } from "zod";
+import { createSpSchema } from "@/features/providers/schemas";
+
+type SpFormData = z.input<typeof createSpSchema> & { brandName?: string; brandLogo?: File | string | null };
 
 interface RegisteredAddressSectionProps {
-  control: any;
-  errors: any;
+  control: Control<SpFormData>;
+  errors: FieldErrors<SpFormData>;
 }
 
 export function RegisteredAddressSection({
@@ -32,7 +37,7 @@ export function RegisteredAddressSection({
             name="address"
             render={({ field }) => (
               <LocationPicker
-                value={field.value as any}
+                value={field.value ?? { line: "", city: "", state: "", country: "Malaysia", postalCode: "" }}
                 onChange={(val) => field.onChange(val)}
                 errors={errors.address}
               />

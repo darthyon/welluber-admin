@@ -4,14 +4,12 @@ import { useState, useMemo } from "react";
 import {
   Ticket,
   Calendar,
-  User,
   Storefront,
   Buildings,
   MapPin,
   Eye,
-  Download,
+  Download
 } from "@phosphor-icons/react";
-import { cn } from "@/lib/utils";
 import { SharedDataTable, type Column } from "@/components/shared/data-table";
 import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { FilterItem } from "@/components/shared/filter-item";
@@ -264,3 +262,4 @@ export function VouchersTable({ data, onViewVoucher }: Props) {
     </div>
   );
 }
+

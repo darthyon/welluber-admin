@@ -4,7 +4,6 @@ import { IdentificationCard } from "@phosphor-icons/react";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ActionPopover, type ActionItem } from "@/components/shared/action-popover";
 import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
 
 interface BenefitPolicyCardItem {
   id: string;

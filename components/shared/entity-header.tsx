@@ -1,7 +1,6 @@
 "use client";
 
 import { ReactNode } from "react";
-import { IconProps } from "@phosphor-icons/react";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { cn } from "@/lib/utils";
 

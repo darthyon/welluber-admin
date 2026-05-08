@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { Organization } from "@/features/organizations/types";
 import { SharedDataTable, Column } from "@/components/shared/data-table";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 import { WarningCircle } from "@phosphor-icons/react";
 import { ActionPopover } from "@/components/shared/action-popover";
 import { UtilizationChart } from "./utilization-chart";

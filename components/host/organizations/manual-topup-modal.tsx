@@ -1,14 +1,13 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { 
-  X, 
-  Wallet, 
-  UploadSimple, 
-  FileText, 
-  WarningCircle, 
+import {
+  X,
+  Wallet,
+  UploadSimple,
+  FileText,
+  WarningCircle,
   CheckCircle,
-  ClockCounterClockwise,
   CurrencyDollar,
   CalendarBlank,
   Bank
@@ -41,7 +40,7 @@ export function ManualTopUpModal({
   const [filePreview, setFilePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { register, handleSubmit, control, formState: { errors }, reset, setValue, watch } = useForm<ManualTopupData>({
+  const { register, handleSubmit, control, formState: { errors }, reset, setValue, watch, resetField } = useForm<ManualTopupData>({
     resolver: zodResolver(manualTopupSchema),
     defaultValues: {
       method: "bank_transfer",
@@ -256,7 +255,7 @@ export function ManualTopUpModal({
                           className="h-7 text-label text-destructive hover:text-destructive hover:bg-destructive/10 mt-2 px-2"
                           onClick={(e) => {
                             e.stopPropagation();
-                            setValue("attachment", undefined as any, { shouldValidate: true });
+                            resetField("attachment");
                             setFilePreview(null);
                           }}
                         >
@@ -322,3 +321,4 @@ export function ManualTopUpModal({
     </div>
   );
 }
+

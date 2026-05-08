@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
   CaretLeft,
   Storefront,
@@ -13,33 +14,27 @@ import {
   IdentificationCard,
   MapPin,
   Bank,
-  Files,
   ShieldCheck,
   Globe,
   Article,
-  CreditCard,
-  Clock,
 } from "@phosphor-icons/react";
-import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { createSpSchema, CreateSpData } from "@/features/providers/schemas";
+import { createSpSchema } from "@/features/providers/schemas";
 import { updateSp } from "@/features/providers/actions";
 import { Button } from "@/components/ui/button";
 import { SearchableMultiSelect } from "@/components/shared/searchable-multi-select";
 import { MASTER_SERVICE_TAXONOMY } from "@/features/providers/service-taxonomy";
 import { MOCK_SPS } from "@/lib/mock-data";
 import { MOCK_BRANDS } from "@/lib/mock-data";
-import { Badge } from "@/components/ui/badge";
 import { DocumentUploadSection } from "@/components/shared/document-upload-section";
 import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav";
 import { Switch } from "@/components/shared/switch";
-import { LocationPicker, LocationData } from "@/components/shared/location-picker";
+import { LocationPicker } from "@/components/shared/location-picker";
 import {
   BUSINESS_TYPES,
   PAYMENT_CYCLES,
   CREDIT_TERMS,
 } from "@/features/providers/constants";
-
 
 import { toast } from "sonner";
 
@@ -59,11 +54,10 @@ export default function EditServiceProviderPage() {
     register,
     handleSubmit,
     setValue,
-    watch,
     control,
     formState: { errors },
-  } = useForm<CreateSpData>({
-    resolver: zodResolver(createSpSchema as any),
+  } = useForm<z.input<typeof createSpSchema>>({
+    resolver: zodResolver(createSpSchema),
     defaultValues: {
       name: sp.name,
       registrationNo: sp.registrationNo,
@@ -87,7 +81,7 @@ export default function EditServiceProviderPage() {
     },
   });
 
-  const businessType = watch("businessType");
+  const businessType = useWatch({ control, name: "businessType" });
 
   const ANCHOR_ITEMS = [
     { id: "provider-profile", label: "Provider Profile" },
@@ -97,7 +91,7 @@ export default function EditServiceProviderPage() {
     { id: "service-portfolio", label: "Service Portfolio" },
   ];
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: z.input<typeof createSpSchema>) => {
     setIsSubmitting(true);
     try {
       const derivedCategories = Array.from(new Set(
@@ -107,11 +101,12 @@ export default function EditServiceProviderPage() {
         }).filter(Boolean) as string[]
       ));
 
-      const res = await updateSp(spId, { 
-        ...data, 
+      const payload = createSpSchema.parse({
+        ...data,
         mainServices: selectedMainServices,
-        serviceCategories: derivedCategories 
+        serviceCategories: derivedCategories,
       });
+      const res = await updateSp(spId, payload);
       if (res.success) {
         toast.success("Provider profile updated successfully");
         router.push(`/service-providers/${spId}`);
@@ -246,7 +241,7 @@ export default function EditServiceProviderPage() {
                     <div className="space-y-1.5 sm:col-span-2">
                         <label className={labelCls}>SST Registration No. <span className="text-muted-foreground font-normal">(if applicable)</span></label>
                         <input
-                            {...register("taxProfile.taxRegNo" as any)}
+                            {...register("tinNumber")}
                             className={inputCls()}
                         />
                     </div>
@@ -259,7 +254,7 @@ export default function EditServiceProviderPage() {
                                     <button
                                         key={type.id}
                                         type="button"
-                                        onClick={() => setValue("businessType", type.id as any)}
+                                        onClick={() => setValue("businessType", type.id)}
                                         className={cn(
                                             "flex flex-col p-3 border rounded-lg text-left transition-all duration-200",
                                             businessType === type.id 
@@ -315,7 +310,7 @@ export default function EditServiceProviderPage() {
                     name="address"
                     render={({ field }) => (
                       <LocationPicker
-                        value={field.value as any}
+                        value={field.value ?? { line: "", city: "", state: "", country: "Malaysia", postalCode: "" }}
                         onChange={(val) => field.onChange(val)}
                         errors={errors.address}
                       />
@@ -481,7 +476,6 @@ export default function EditServiceProviderPage() {
                 </div>
             </div>
           </div>
-
 
           {/* Floating Action Bar */}
           <div className="fixed bottom-8 left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[calc(50%+104px)] z-50 flex items-center gap-4 p-2 px-6 bg-background/80 backdrop-blur-2xl border border-border shadow-lg rounded-full animate-in slide-in-from-bottom-10 duration-700 ease-out">

@@ -4,8 +4,6 @@ import { useState } from "react";
 import {
   MapPin,
   CaretLeft,
-  DeviceMobile,
-  MapPinLine,
   IdentificationCard,
   Building,
   CheckCircle,
@@ -14,13 +12,14 @@ import {
   Users,
   UploadSimple,
   X,
-  Info,
+  Info
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { ChoiceCard } from "@/components/shared/choice-card";
 import { DetailSection } from "@/components/shared/detail-section";
 import { SuccessCelebration } from "@/components/shared/success-celebration";
 import { LocationPicker } from "@/components/shared/location-picker";
+import type { LocationData } from "@/components/shared/location-picker";
 import { cn } from "@/lib/utils";
 import { MOCK_ACCOUNTS } from "@/lib/mock-data";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -28,7 +27,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 interface BranchFormProps {
   branchId?: string | null;
   onCancel: () => void;
-  onSubmit: (data: any) => void;
+  onSubmit: (data: unknown) => void;
 }
 
 // Mock org limits and same-org accounts for the dropdown
@@ -36,7 +35,6 @@ const ORG_LIMITS = {
   accountLimit: 50000,
   creditLimit: 10000,
 };
-
 
 export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
   const isEditing = !!branchId;
@@ -84,7 +82,6 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
       onSubmit(formData);
     }, 2500);
   };
-
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-400">
@@ -193,8 +190,15 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
           >
             <div className="p-1">
               <LocationPicker
-                value={formData.address as any}
-                onChange={(addr) => setFormData({ ...formData, address: addr as any })}
+                value={(formData.address as LocationData) ?? { line: "", city: "", state: "", country: "Malaysia", postalCode: "" }}
+                onChange={(addr) => setFormData({
+                  ...formData,
+                  address: {
+                    ...addr,
+                    lat: addr.lat !== undefined ? String(addr.lat) : "",
+                    lon: addr.lon !== undefined ? String(addr.lon) : "",
+                  },
+                })}
               />
             </div>
           </DetailSection>
@@ -386,6 +390,3 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
   </div>
 );
 }
-
-
-

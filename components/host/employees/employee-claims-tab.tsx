@@ -28,7 +28,6 @@ function StatusBadge({ status }: { status: ClaimStatus }) {
   );
 }
 
-
 // ─── Column definitions ───────────────────────────────────────────────────────
 
 const columns: Column<EmployeeClaim>[] = [
@@ -107,7 +106,8 @@ interface EmployeeClaimsTabProps {
   employeeId: string;
 }
 
-export function EmployeeClaimsTab({ employeeId: _employeeId }: EmployeeClaimsTabProps) {
+export function EmployeeClaimsTab({ employeeId }: EmployeeClaimsTabProps) {
+  void employeeId;
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<ClaimStatus | "all">("all");
 

@@ -308,7 +308,8 @@ interface EmployeeVouchersTabProps {
   employeeId: string;
 }
 
-export function EmployeeVouchersTab({ employeeId: _employeeId }: EmployeeVouchersTabProps) {
+export function EmployeeVouchersTab({ employeeId }: EmployeeVouchersTabProps) {
+  void employeeId;
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<ClaimStatus | "all">("all");
   const [viewMode, setViewMode] = useState<ViewMode>("list");

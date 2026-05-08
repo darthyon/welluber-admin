@@ -1,11 +1,16 @@
 "use client";
 
 import { Storefront, Globe, WarningCircle } from "@phosphor-icons/react";
+import type { FieldErrors, UseFormRegister } from "react-hook-form";
 import { cn } from "@/lib/utils";
+import { z } from "zod";
+import { createSpSchema } from "@/features/providers/schemas";
+
+type SpFormData = z.input<typeof createSpSchema> & { brandName?: string; brandLogo?: File | string | null };
 
 interface ProviderProfileSectionProps {
-  register: any;
-  errors: any;
+  register: UseFormRegister<SpFormData>;
+  errors: FieldErrors<SpFormData>;
   labelCls: string;
   inputCls: (hasError?: boolean) => string;
 }

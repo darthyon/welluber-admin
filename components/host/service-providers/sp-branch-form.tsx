@@ -1,23 +1,22 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useForm, useFieldArray, Controller } from "react-hook-form";
+import { useForm, useFieldArray, Controller, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { CaretLeft, Building, MapPin, Clock, Tag, Users, Plus, Trash, WarningCircle, CheckCircle, PaperPlaneTilt } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
-import { createBranchSchema, CreateBranchData } from "@/features/providers/schemas";
+import { createBranchSchema } from "@/features/providers/schemas";
 import { createBranch, updateBranch } from "@/features/providers/actions";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/shared/switch";
-import { DetailSection } from "@/components/shared/detail-section";
-import { TwoColumnDetailLayout } from "@/components/shared/two-column-detail-layout";
 import { BRANCH_CONTACT_TYPES, OPERATING_DAYS, DEFAULT_OPERATING_HOURS } from "@/features/providers/constants";
 import { buildBranchServiceCatalog } from "@/features/providers/service-taxonomy";
 import { SuccessModal } from "@/components/shared/success-modal";
 import { LocationPicker } from "@/components/shared/location-picker";
 import { ServiceToggleCard } from "@/components/shared/service-toggle-card";
 import { PhoneInput } from "@/components/shared/phone-input";
-import type { SpBranch, ServiceLine, CommissionSchemaRow } from "@/types/provider";
+import type { SpBranch, CommissionSchemaRow } from "@/types/provider";
 import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav";
 import { toast } from "sonner";
 
@@ -42,26 +41,29 @@ interface SpBranchFormProps {
 export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuccess, onCancel }: SpBranchFormProps) {
   const isEditing = !!branch;
   const [isSuccess, setIsSuccess] = useState(false);
-  const [benefits, setBenefits] = useState<string[]>(branch?.benefits ?? (branch as any)?.facilities ?? []);
+  const [benefits, setBenefits] = useState<string[]>(branch?.benefits ?? []);
   const [benefitInput, setBenefitInput] = useState("");
-  const [hasAdminChanges, setHasAdminChanges] = useState(false);
-  const [customServiceInputs, setCustomServiceInputs] = useState<Record<string, string>>({});
+  const [, setHasAdminChanges] = useState(false);
+  const [, setCustomServiceInputs] = useState<Record<string, string>>({});
 
-  const { register, handleSubmit, control, setValue, watch, reset, formState: { errors, dirtyFields, isSubmitting } } = useForm<CreateBranchData>({
-    resolver: zodResolver(createBranchSchema as any),
+  const { register, handleSubmit, control, setValue, reset, formState: { errors, dirtyFields, isSubmitting } } = useForm<z.input<typeof createBranchSchema>>({
+    resolver: zodResolver(createBranchSchema),
     defaultValues: {
       name: branch?.name ?? "",
-      services: (branch?.services as any) ?? [],
+      services: branch?.services ?? [],
       address: branch?.address ?? { line: "", city: "", state: "", country: "Malaysia", postalCode: "" },
       contacts: branch?.contacts ?? [{ name: "", email: "", type: "branch_manager", phone: "", isPublic: true }],
       administrators: branch?.administrators ?? [],
       isActive: branch?.isActive ?? true,
       operatingHours: branch?.operatingHours ?? DEFAULT_OPERATING_HOURS,
-      benefits: (branch as any)?.benefits ?? (branch as any)?.facilities ?? [],
+      benefits: branch?.benefits ?? [],
     },
   });
 
-  const selectedServices = watch("services") || [];
+  const selectedServices = useWatch({ control, name: "services" }) || [];
+  const operatingHours = useWatch({ control, name: "operatingHours" });
+  const isActiveValue = useWatch({ control, name: "isActive" });
+  const addressValue = useWatch({ control, name: "address" });
 
   const { fields: contactFields, append: appendContact, remove: removeContact } = useFieldArray({
     control,
@@ -90,8 +92,8 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
   };
 
   // Sync logic: When an administrator is designated as PIC, ensure they exist in the contacts list
-  const watchedAdmins = watch("administrators") || [];
-  const watchedContacts = watch("contacts") || [];
+  const watchedAdmins = useWatch({ control, name: "administrators" }) || [];
+  const watchedContacts = useWatch({ control, name: "contacts" }) || [];
 
   const handleAdminPicSync = (index: number, isPic: boolean) => {
     const admin = watchedAdmins[index];
@@ -120,16 +122,16 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
     })).filter(category => category.services.length > 0);
   }, [serviceCategories, portfolio]);
 
-  const onSubmit = async (data: CreateBranchData) => {
+  const onSubmit = async (data: z.input<typeof createBranchSchema>) => {
     // Determine if admins changed or were added
     const adminsChanged = !!dirtyFields.administrators;
     setHasAdminChanges(adminsChanged);
 
     try {
-      const payload = { ...data, benefits };
+      const payload = createBranchSchema.parse({ ...data, benefits });
       const res = isEditing
-        ? await updateBranch(spId, branch!.id, payload as any)
-        : await createBranch(spId, payload as any);
+        ? await updateBranch(spId, branch.id, payload)
+        : await createBranch(spId, payload);
       
       if (res.success) {
         if (isEditing) {
@@ -142,7 +144,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
           setIsSuccess(true);
         }
       } else {
-        toast.error((res as any).message || "Failed to save branch. Please try again.");
+        toast.error("Failed to save branch. Please try again.");
       }
     } catch (error) {
       console.error("Submission Error:", error);
@@ -155,6 +157,16 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
       "w-full px-3 py-2 bg-background border rounded-md text-body outline-none transition-colors",
       hasError ? "border-destructive ring-1 ring-destructive/20" : "border-border focus:border-foreground/30 focus:bg-muted/30"
     );
+
+  const normalizedAddress = {
+    line: addressValue?.line ?? "",
+    city: addressValue?.city ?? "",
+    state: addressValue?.state ?? "",
+    country: addressValue?.country ?? "Malaysia",
+    postalCode: addressValue?.postalCode ?? "",
+    lat: (typeof addressValue?.lat === "string" || typeof addressValue?.lat === "number") ? addressValue.lat : undefined,
+    lon: (typeof addressValue?.lon === "string" || typeof addressValue?.lon === "number") ? addressValue.lon : undefined,
+  };
 
   if (isSuccess && !isEditing) {
     const adminMsg = "Invitation emails have been dispatched to the local administrators.";
@@ -244,7 +256,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                       <p className="text-body font-medium text-foreground">Active</p>
                       <p className="text-label text-muted-foreground">Inactive branches are hidden from the marketplace.</p>
                     </div>
-                    <Switch checked={watch("isActive")} onCheckedChange={(v) => setValue("isActive", v)} />
+                    <Switch checked={Boolean(isActiveValue)} onCheckedChange={(v) => setValue("isActive", v)} />
                   </div>
                 </div>
               </div>
@@ -264,8 +276,8 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                 </div>
                 <div className="p-1">
                   <LocationPicker 
-                    value={watch("address")}
-                    onChange={(val) => setValue("address", val as any, { shouldValidate: true })}
+                    value={normalizedAddress}
+                    onChange={(val) => setValue("address", val, { shouldValidate: true })}
                     errors={errors.address}
                   />
                 </div>
@@ -287,17 +299,17 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
 
                 <div className="space-y-6">
                   <div className="space-y-8">
-                    {(serviceCatalog as any[]).map((group: any) => (
+                    {serviceCatalog.map((group) => (
                       <div key={group.category} className="space-y-3">
                         <div className="flex items-center justify-between px-1">
                           <h4 className="text-label font-semibold text-muted-foreground tracking-wider uppercase">{group.category}</h4>
                           <span className="text-micro font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                            {group.services.filter((s: any) => selectedServices.some(ls => ls.service === s.name)).length} Main Services
+                            {group.services.filter((s) => selectedServices.some(ls => ls.service === s.name)).length} Main Services
                           </span>
                         </div>
 
                         <div className="space-y-2 pt-1">
-                          {group.services.map((service: any) => {
+                          {group.services.map((service) => {
                             const line = selectedServices.find(ls => ls.service === service.name);
                             const isSelected = !!line;
 
@@ -400,22 +412,28 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-1.5">
                               <label className="text-label font-medium text-subtle">Name</label>
-                              <input {...register(`administrators.${i}.name`)} className={inputCls(!!(errors.administrators as any)?.[i]?.name)} placeholder="Full name" />
+                              <input {...register(`administrators.${i}.name`)} className={inputCls(!!errors.administrators?.[i]?.name)} placeholder="Full name" />
                             </div>
                             <div className="space-y-1.5">
                               <label className="text-label font-medium text-subtle">Corporate Email</label>
-                              <input type="email" {...register(`administrators.${i}.email`)} className={inputCls(!!(errors.administrators as any)?.[i]?.email)} placeholder="name@company.com" />
+                              <input type="email" {...register(`administrators.${i}.email`)} className={inputCls(!!errors.administrators?.[i]?.email)} placeholder="name@company.com" />
                             </div>
                           </div>
 
                           <div className="flex items-center justify-between pt-2 border-t border-border/40">
                             <div className="flex items-center gap-2">
-                              <Switch 
-                                checked={watch(`administrators.${i}.designateAsPic`)} 
-                                onCheckedChange={(v) => {
-                                  setValue(`administrators.${i}.designateAsPic`, v);
-                                  handleAdminPicSync(i, v);
-                                }} 
+                              <Controller
+                                control={control}
+                                name={`administrators.${i}.designateAsPic`}
+                                render={({ field }) => (
+                                  <Switch 
+                                    checked={field.value} 
+                                    onCheckedChange={(v) => {
+                                      field.onChange(v);
+                                      handleAdminPicSync(i, v);
+                                    }} 
+                                  />
+                                )}
                               />
                               <span className="text-label font-semibold text-foreground">Designate as PIC</span>
                             </div>
@@ -441,11 +459,11 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-1.5">
                               <label className="text-label font-medium text-subtle">Name <span className="text-destructive">*</span></label>
-                              <input {...register(`contacts.${i}.name`)} className={inputCls(!!(errors.contacts as any)?.[i]?.name)} placeholder="Full name" />
+                              <input {...register(`contacts.${i}.name`)} className={inputCls(!!errors.contacts?.[i]?.name)} placeholder="Full name" />
                             </div>
                             <div className="space-y-1.5">
                               <label className="text-label font-medium text-subtle">Corporate Email <span className="text-destructive">*</span></label>
-                              <input type="email" {...register(`contacts.${i}.email`)} className={inputCls(!!(errors.contacts as any)?.[i]?.email)} placeholder="name@company.com" />
+                              <input type="email" {...register(`contacts.${i}.email`)} className={inputCls(!!errors.contacts?.[i]?.email)} placeholder="name@company.com" />
                             </div>
                             <div className="space-y-1.5">
                               <label className="text-label font-medium text-subtle">Job Role</label>
@@ -464,7 +482,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                                   <PhoneInput
                                     value={field.value}
                                     onChange={field.onChange}
-                                    error={!!(errors.contacts as any)?.[i]?.phone}
+                                    error={!!errors.contacts?.[i]?.phone}
                                     placeholder="Enter mobile number"
                                   />
                                 )}
@@ -473,7 +491,13 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                           </div>
 
                           <div className="flex items-center gap-2 pt-2 border-t border-border/40">
-                            <Switch checked={watch(`contacts.${i}.isPublic`)} onCheckedChange={(v) => setValue(`contacts.${i}.isPublic`, v)} />
+                            <Controller
+                              control={control}
+                              name={`contacts.${i}.isPublic`}
+                              render={({ field }) => (
+                                <Switch checked={field.value} onCheckedChange={field.onChange} />
+                              )}
+                            />
                             <span className="text-label font-semibold text-foreground">Public profile visibility</span>
                           </div>
                         </div>
@@ -498,7 +522,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                 </div>
                 <div className="space-y-2">
                   {OPERATING_DAYS.map(({ key, label }) => {
-                    const isClosed = watch(`operatingHours.${key}.isClosed`);
+                    const isClosed = operatingHours?.[key]?.isClosed ?? false;
                     return (
                       <div key={key} className="grid grid-cols-[90px_1fr] md:grid-cols-[100px_1fr_120px_120px] gap-3 items-center py-1.5">
                         <span className="text-body font-medium text-foreground">{label.slice(0, 3)}</span>
