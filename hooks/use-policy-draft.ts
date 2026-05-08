@@ -7,12 +7,28 @@ interface DraftEnvelope<T> {
   data: T;
 }
 
+type DraftStatus = "idle" | "saving" | "saved";
+
 interface UsePolicyDraftResult<T> {
   hasDraft: boolean;
   savedAt?: string;
+  status: DraftStatus;
   restored: boolean;
   restore: () => T | null;
   clear: () => void;
+}
+
+function draftKey(orgId: string | undefined): string {
+  return `policy-draft-${orgId || "global"}`;
+}
+
+export function readPolicyDraft<T>(orgId: string | undefined): DraftEnvelope<T> | null {
+  return loadDraft<T>(draftKey(orgId));
+}
+
+export function clearPolicyDraft(orgId: string | undefined): void {
+  if (typeof window === "undefined") return;
+  window.localStorage.removeItem(draftKey(orgId));
 }
 
 function loadDraft<T>(key: string): DraftEnvelope<T> | null {
@@ -29,10 +45,12 @@ function loadDraft<T>(key: string): DraftEnvelope<T> | null {
 }
 
 export function usePolicyDraft<T>(orgId: string | undefined, state: T, enabled = true): UsePolicyDraftResult<T> {
-  const key = useMemo(() => `policy-draft-${orgId || "global"}`, [orgId]);
+  const key = useMemo(() => draftKey(orgId), [orgId]);
   const [draft, setDraft] = useState<DraftEnvelope<T> | null>(() => loadDraft<T>(key));
   const [restored, setRestored] = useState(false);
+  const [status, setStatus] = useState<DraftStatus>("idle");
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const firstRunRef = useRef(true);
 
   useEffect(() => {
     if (!enabled) return;
@@ -43,7 +61,12 @@ export function usePolicyDraft<T>(orgId: string | undefined, state: T, enabled =
 
   useEffect(() => {
     if (!enabled || typeof window === "undefined") return;
+    if (firstRunRef.current) {
+      firstRunRef.current = false;
+      return;
+    }
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    setStatus("saving");
 
     timeoutRef.current = setTimeout(() => {
       const payload: DraftEnvelope<T> = {
@@ -52,6 +75,7 @@ export function usePolicyDraft<T>(orgId: string | undefined, state: T, enabled =
       };
       window.localStorage.setItem(key, JSON.stringify(payload));
       setDraft(payload);
+      setStatus("saved");
     }, 1000);
 
     return () => {
@@ -76,6 +100,7 @@ export function usePolicyDraft<T>(orgId: string | undefined, state: T, enabled =
   return {
     hasDraft: Boolean(draft),
     savedAt: draft?.savedAt,
+    status,
     restored,
     restore,
     clear,

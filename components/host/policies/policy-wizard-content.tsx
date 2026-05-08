@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import {
   IdentificationCard,
   Gear,
@@ -37,6 +37,7 @@ import type { PolicyGlossaryKey } from "@/lib/policy-glossary";
 import { MOCK_ORGS, SERVICES } from "@/lib/mock-data";
 import type { MainServiceId } from "@/lib/mock-data/service-catalog";
 import { validateBenefit, validateGroupInsert } from "@/lib/policy/validation";
+import { usePolicyDraft } from "@/hooks/use-policy-draft";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -104,8 +105,8 @@ function FieldLabel({ children, required, helpKey }: { children: React.ReactNode
   );
 }
 
-function ErrorText({ children }: { children: React.ReactNode }) {
-  return <p className="text-label text-destructive font-medium mt-1">{children}</p>;
+function ErrorText({ children, id }: { children: React.ReactNode; id?: string }) {
+  return <p id={id} className="text-label text-destructive font-medium mt-1">{children}</p>;
 }
 
 function HelpText({ children }: { children: React.ReactNode }) {
@@ -255,9 +256,67 @@ interface PolicyWizardContentProps {
   };
   onSubmit: (data: { policy: Partial<BenefitPolicy>; groups: BenefitGroup[]; benefits: Benefit[] }) => void;
   onReview?: (data: { policy: Partial<BenefitPolicy>; groups: BenefitGroup[]; benefits: Benefit[] }) => void;
+  lockedOrganizationId?: string;
+  onValidationChange?: (sectionErrorCounts: Record<string, number>) => void;
+  onDirtyChange?: (dirty: boolean) => void;
+  onTargetingChange?: (targeting: {
+    organizationId?: string;
+    employmentTypes: string[];
+    tierIds: string[];
+    departmentIds: string[];
+  }) => void;
+  onIssuesChange?: (entries: Array<{ key: string; label: string; target: string }>) => void;
+  onSaveStatusChange?: (state: { status: "idle" | "saving" | "saved"; savedAt?: string }) => void;
 }
 
-export function PolicyWizardContent({ mode = "create", initialData, onSubmit, onReview }: PolicyWizardContentProps) {
+const SECTION_FOR_KEY: Array<{ test: (key: string) => boolean; section: string }> = [
+  { test: (k) => ["name", "organizationId", "eligibleEmploymentTypes"].includes(k), section: "policy-details" },
+  {
+    test: (k) =>
+      [
+        "prorateUnit",
+        "dependentsPoolType",
+        "dependentsCapAmount",
+        "refreshCustomDate",
+        "activationCustomDate",
+        "refreshCycle",
+      ].includes(k),
+    section: "pool-cycle",
+  },
+  {
+    test: (k) =>
+      k === "groups" ||
+      k.startsWith("group_") ||
+      k.startsWith("group_name_") ||
+      k.startsWith("group_cap_") ||
+      k.startsWith("benefit_") ||
+      k.startsWith("copay_"),
+    section: "groups-services",
+  },
+];
+
+function sectionForKey(key: string): string {
+  for (const rule of SECTION_FOR_KEY) {
+    if (rule.test(key)) return rule.section;
+  }
+  return "policy-details";
+}
+
+function targetIdForKey(key: string): string {
+  if (key.startsWith("group_name_") || key.startsWith("group_cap_")) {
+    return `group-${key.replace(/^group_(name|cap)_/, "")}`;
+  }
+  if (key.startsWith("benefit_") || key.startsWith("copay_")) {
+    const parts = key.split("_");
+    return parts.length >= 2 ? `group-${parts[1]}` : sectionForKey(key);
+  }
+  if (key.startsWith("group_")) {
+    return "groups-services";
+  }
+  return sectionForKey(key);
+}
+
+export function PolicyWizardContent({ mode = "create", initialData, onSubmit, onReview, lockedOrganizationId, onValidationChange, onDirtyChange, onTargetingChange, onIssuesChange, onSaveStatusChange }: PolicyWizardContentProps) {
   // ── Form state ────────────────────────────────────────────────────────────
   const [policyData, setPolicyData] = useState<Partial<BenefitPolicy>>(
     initialData?.policy || {
@@ -276,6 +335,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
 
   const [groups, setGroups] = useState<BenefitGroup[]>(initialData?.groups || []);
   const [benefits, setBenefits] = useState<Benefit[]>(initialData?.benefits || []);
+  const nameInputRef = useRef<HTMLInputElement | null>(null);
   const [splitBenefitIds, setSplitBenefitIds] = useState<Set<string>>(new Set());
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [groupCategories, setGroupCategories] = useState<Record<string, string[]>>({});
@@ -304,6 +364,193 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
       label: dept.code ? `${dept.code} - ${dept.name}` : dept.name,
     }));
   }, [policyData.organizationId]);
+
+  // ── Server-error injection (e.g. 409 duplicate name) ─────────────────────
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const raw = sessionStorage.getItem("policy-submit-error");
+    if (!raw) return;
+    try {
+      const err = JSON.parse(raw) as { field: string; message: string };
+      sessionStorage.removeItem("policy-submit-error");
+      setValidationErrors((prev) => ({ ...prev, [err.field]: err.message }));
+      if (err.field === "name") {
+        setTimeout(() => {
+          nameInputRef.current?.focus();
+          nameInputRef.current?.scrollIntoView({ block: "center", behavior: "smooth" });
+        }, 100);
+      }
+    } catch {
+      sessionStorage.removeItem("policy-submit-error");
+    }
+  }, []);
+
+  // ── Per-field validators (on-blur) ───────────────────────────────────────
+  const setFieldError = useCallback((key: string, msg: string | undefined) => {
+    setValidationErrors((prev) => {
+      const next = { ...prev };
+      if (msg) next[key] = msg;
+      else delete next[key];
+      return next;
+    });
+  }, []);
+
+  const blurName = useCallback(() => {
+    if (!policyData.name?.trim()) setFieldError("name", "Policy name is required");
+    else if (policyData.name.length > 100) setFieldError("name", "Max 100 characters");
+    else setFieldError("name", undefined);
+  }, [policyData.name, setFieldError]);
+
+  const blurRefreshCustomDate = useCallback(() => {
+    if (policyData.refreshStartReference === "custom_date" && !policyData.refreshCustomDate) {
+      setFieldError("refreshCustomDate", "Pick when this policy resets each cycle");
+    } else setFieldError("refreshCustomDate", undefined);
+  }, [policyData.refreshStartReference, policyData.refreshCustomDate, setFieldError]);
+
+  const blurActivationCustomDate = useCallback(() => {
+    if (policyData.activationMode === "custom_date" && !policyData.activationCustomDate) {
+      setFieldError("activationCustomDate", "Enter a custom activation date");
+    } else setFieldError("activationCustomDate", undefined);
+  }, [policyData.activationMode, policyData.activationCustomDate, setFieldError]);
+
+  const blurBenefitAmount = useCallback(
+    (groupId: string, serviceId: string, amount: number) => {
+      const key = `benefit_${groupId}_${serviceId}`;
+      if (!amount || amount <= 0) setFieldError(key, "Amount must be greater than 0");
+      else setFieldError(key, undefined);
+    },
+    [setFieldError]
+  );
+
+  const blurCopayValue = useCallback(
+    (groupId: string, serviceId: string, type: "Percentage" | "Fixed", value: number, benefitAmount: number) => {
+      const key = `copay_${groupId}_${serviceId}`;
+      if (type === "Percentage" && (value < 0 || value > 100)) {
+        setFieldError(key, "Percentage must be 0–100");
+      } else if (type === "Fixed" && value > benefitAmount) {
+        setFieldError(key, "Fixed co-pay cannot exceed benefit amount");
+      } else setFieldError(key, undefined);
+    },
+    [setFieldError]
+  );
+
+  // ── Realtime error clearing on valid input ──────────────────────────────
+  useEffect(() => {
+    if (validationErrors.name && policyData.name?.trim() && policyData.name.length <= 100) {
+      setFieldError("name", undefined);
+    }
+  }, [policyData.name, validationErrors.name, setFieldError]);
+
+  useEffect(() => {
+    if (
+      validationErrors.organizationId &&
+      policyData.organizationId
+    ) {
+      setFieldError("organizationId", undefined);
+    }
+  }, [policyData.organizationId, validationErrors.organizationId, setFieldError]);
+
+  useEffect(() => {
+    if (
+      validationErrors.eligibleEmploymentTypes &&
+      (policyData.eligibleEmploymentTypes?.length ?? 0) > 0
+    ) {
+      setFieldError("eligibleEmploymentTypes", undefined);
+    }
+  }, [policyData.eligibleEmploymentTypes, validationErrors.eligibleEmploymentTypes, setFieldError]);
+
+  useEffect(() => {
+    if (
+      validationErrors.refreshCustomDate &&
+      (policyData.refreshStartReference !== "custom_date" || policyData.refreshCustomDate)
+    ) {
+      setFieldError("refreshCustomDate", undefined);
+    }
+  }, [policyData.refreshStartReference, policyData.refreshCustomDate, validationErrors.refreshCustomDate, setFieldError]);
+
+  useEffect(() => {
+    if (
+      validationErrors.activationCustomDate &&
+      (policyData.activationMode !== "custom_date" || policyData.activationCustomDate)
+    ) {
+      setFieldError("activationCustomDate", undefined);
+    }
+  }, [policyData.activationMode, policyData.activationCustomDate, validationErrors.activationCustomDate, setFieldError]);
+
+  useEffect(() => {
+    if (
+      validationErrors.dependentsPoolType &&
+      (!policyData.coversDependents || policyData.dependentsPoolType)
+    ) {
+      setFieldError("dependentsPoolType", undefined);
+    }
+  }, [policyData.coversDependents, policyData.dependentsPoolType, validationErrors.dependentsPoolType, setFieldError]);
+
+  useEffect(() => {
+    if (
+      validationErrors.dependentsCapAmount &&
+      (!policyData.coversDependents ||
+        policyData.dependentsPoolType === "SharedWithEmployee" ||
+        (policyData.dependentsCapAmount && policyData.dependentsCapAmount > 0))
+    ) {
+      setFieldError("dependentsCapAmount", undefined);
+    }
+  }, [policyData.coversDependents, policyData.dependentsPoolType, policyData.dependentsCapAmount, validationErrors.dependentsCapAmount, setFieldError]);
+
+  useEffect(() => {
+    if (validationErrors.prorateUnit && (policyData.utilisationMode !== "Prorated" || policyData.prorateUnit)) {
+      setFieldError("prorateUnit", undefined);
+    }
+  }, [policyData.utilisationMode, policyData.prorateUnit, validationErrors.prorateUnit, setFieldError]);
+
+  useEffect(() => {
+    if (validationErrors.groups && groups.length > 0) {
+      setFieldError("groups", undefined);
+    }
+  }, [groups.length, validationErrors.groups, setFieldError]);
+
+  useEffect(() => {
+    setValidationErrors((prev) => {
+      let changed = false;
+      const next = { ...prev };
+      benefits.forEach((b) => {
+        const amountKey = `benefit_${b.groupId}_${b.serviceId}`;
+        if (next[amountKey] && b.amount > 0) {
+          delete next[amountKey];
+          changed = true;
+        }
+        const copayKey = `copay_${b.groupId}_${b.serviceId}`;
+        if (next[copayKey]) {
+          const v = b.coPayment.value || 0;
+          const ok =
+            !b.coPayment.required ||
+            (b.coPayment.type === "Percentage" && v >= 0 && v <= 100) ||
+            (b.coPayment.type === "Fixed" && v <= b.amount);
+          if (ok) {
+            delete next[copayKey];
+            changed = true;
+          }
+        }
+      });
+      groups.forEach((g) => {
+        const capKey = `group_cap_${g.id}`;
+        if (next[capKey] && g.distributionType === "SharedAmount" && (g.maxUsagePerCycle ?? 0) > 0) {
+          delete next[capKey];
+          changed = true;
+        }
+        if (next[capKey] && g.distributionType !== "SharedAmount") {
+          delete next[capKey];
+          changed = true;
+        }
+        const nameKey = `group_name_${g.id}`;
+        if (next[nameKey] && g.name?.trim()) {
+          delete next[nameKey];
+          changed = true;
+        }
+      });
+      return changed ? next : prev;
+    });
+  }, [benefits, groups]);
 
   // ── Validation ────────────────────────────────────────────────────────────
   const validate = (): boolean => {
@@ -466,17 +713,23 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
 
       <div className="space-y-1.5">
         <FieldLabel required>Policy Name</FieldLabel>
-        <div className="flex items-center w-full rounded-lg border bg-background focus-within:ring-2 focus-within:ring-primary/10 focus-within:border-primary/40 transition-all overflow-hidden">
+        <div className={cn(
+          "flex items-center w-full rounded-lg border bg-background focus-within:ring-2 focus-within:ring-primary/10 transition-all overflow-hidden",
+          validationErrors.name ? "border-destructive focus-within:border-destructive" : "focus-within:border-primary/40"
+        )}>
           <input
+            ref={nameInputRef}
             type="text"
+            maxLength={100}
             placeholder="e.g. Wellness Premium 2026"
-            className={cn(
-              "flex-1 min-w-0 px-4 py-3 border-0 outline-none text-body font-semibold text-foreground",
-              validationErrors.name ? "border-destructive" : ""
-            )}
+            aria-invalid={!!validationErrors.name}
+            aria-describedby={validationErrors.name ? "policy-name-error" : undefined}
+            className="flex-1 min-w-0 px-4 py-3 border-0 outline-none text-body font-semibold text-foreground"
             value={policyData.name || ""}
             onChange={(e) => setPolicyData({ ...policyData, name: e.target.value })}
+            onBlur={blurName}
           />
+          <span className="shrink-0 text-micro text-faint tabular-nums px-2">{(policyData.name || "").length}/100</span>
           <button
             type="button"
             onClick={() => {
@@ -489,30 +742,35 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
             Suggest
           </button>
         </div>
-        {validationErrors.name && <ErrorText>{validationErrors.name}</ErrorText>}
-        <HelpText>Max 100 characters. Must be unique in your account.</HelpText>
+        {validationErrors.name && <ErrorText id="policy-name-error">{validationErrors.name}</ErrorText>}
       </div>
 
       <div className="space-y-1.5">
         <FieldLabel>Description</FieldLabel>
-        <textarea
-          placeholder="Describe the purpose of this benefit policy..."
-          rows={3}
-          className="w-full px-4 py-3 bg-background border border-border rounded-lg text-body outline-none transition-all font-medium text-muted-foreground min-h-[80px] resize-none focus:ring-2 focus:ring-primary/10 focus:border-primary/40"
-          value={policyData.description || ""}
-          onChange={(e) => setPolicyData({ ...policyData, description: e.target.value })}
-        />
-        <HelpText>Optional. Max 300 characters.</HelpText>
+        <div className="relative w-full rounded-lg border border-border bg-background focus-within:ring-2 focus-within:ring-primary/10 focus-within:border-primary/40 transition-all">
+          <textarea
+            placeholder="Describe the purpose of this benefit policy..."
+            rows={3}
+            maxLength={300}
+            className="w-full px-4 py-3 pb-7 bg-transparent border-0 outline-none text-body font-medium text-muted-foreground min-h-[80px] resize-none"
+            value={policyData.description || ""}
+            onChange={(e) => setPolicyData({ ...policyData, description: e.target.value })}
+          />
+          <span className="absolute bottom-2 right-3 text-micro text-faint tabular-nums">{(policyData.description || "").length}/300</span>
+        </div>
       </div>
 
       <div className="space-y-1.5">
         <FieldLabel required>Organisation</FieldLabel>
         <select
+          aria-invalid={!!validationErrors.organizationId}
           className={cn(
-            "w-full px-4 pr-10 py-3 bg-background border rounded-lg text-body outline-none transition-all font-semibold text-foreground focus:ring-2 focus:ring-primary/10 focus:border-primary/40",
-            validationErrors.organizationId ? "border-destructive focus:border-destructive" : "border-border"
+            "w-full px-4 pr-10 py-3 bg-background border rounded-lg text-body outline-none transition-all font-semibold text-foreground focus:ring-2 focus:ring-primary/10",
+            validationErrors.organizationId ? "border-destructive focus:border-destructive" : "border-border focus:border-primary/40",
+            lockedOrganizationId ? "opacity-70 cursor-not-allowed" : ""
           )}
           value={policyData.organizationId || ""}
+          disabled={!!lockedOrganizationId}
           onChange={(e) => setPolicyData({ ...policyData, organizationId: e.target.value })}
         >
           <option value="">Select organisation...</option>
@@ -523,7 +781,6 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
           ))}
         </select>
         {validationErrors.organizationId && <ErrorText>{validationErrors.organizationId}</ErrorText>}
-        <HelpText>The organisation this policy belongs to. Cannot be changed after creation.</HelpText>
       </div>
 
       <div className="space-y-3">
@@ -791,7 +1048,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
 
       {/* ── Dependents Pool Type ── */}
       {policyData.coversDependents && (
-        <div className="space-y-3">
+        <div className="space-y-3 animate-in fade-in slide-in-from-top-1 duration-300">
           <FieldLabel required helpKey="dependentsPooling">Dependents Pool Type</FieldLabel>
           {validationErrors.dependentsPoolType && <ErrorText>{validationErrors.dependentsPoolType}</ErrorText>}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -817,7 +1074,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
       )}
 
       {policyData.coversDependents && policyData.dependentsPoolType !== "SharedWithEmployee" && (
-        <div className="space-y-1.5">
+        <div className="space-y-1.5 animate-in fade-in slide-in-from-top-1 duration-300">
           <FieldLabel required helpKey="spendingCap">Dependents Policy Spending Cap (RM)</FieldLabel>
           <input
             type="number"
@@ -871,7 +1128,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
       </div>
 
       {policyData.utilisationMode === "Prorated" && (
-        <div className="space-y-1.5">
+        <div className="space-y-1.5 animate-in fade-in slide-in-from-top-1 duration-300">
           <FieldLabel required helpKey="prorateUnit">Prorate Unit</FieldLabel>
             <select
               className={cn(
@@ -953,7 +1210,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
       </div>
 
       {policyData.refreshStartReference === "custom_date" && (
-        <div className="space-y-1.5">
+        <div className="space-y-1.5 animate-in fade-in slide-in-from-top-1 duration-300">
           <FieldLabel required>Custom Refresh Date</FieldLabel>
                 <input
                   type="date"
@@ -963,6 +1220,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
                   )}
             value={policyData.refreshCustomDate || ""}
             onChange={(e) => setPolicyData({ ...policyData, refreshCustomDate: e.target.value })}
+            onBlur={blurRefreshCustomDate}
           />
           {validationErrors.refreshCustomDate && <ErrorText>{validationErrors.refreshCustomDate}</ErrorText>}
         </div>
@@ -1018,7 +1276,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
         </div>
 
         {policyData.activationMode === "custom_date" && (
-          <div className="space-y-1.5 pt-2">
+          <div className="space-y-1.5 pt-2 animate-in fade-in slide-in-from-top-1 duration-300">
             <FieldLabel required>Custom Activation Date</FieldLabel>
                 <input
                   type="date"
@@ -1028,6 +1286,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
                   )}
               value={policyData.activationCustomDate || ""}
               onChange={(e) => setPolicyData({ ...policyData, activationCustomDate: e.target.value })}
+              onBlur={blurActivationCustomDate}
             />
             {validationErrors.activationCustomDate && <ErrorText>{validationErrors.activationCustomDate}</ErrorText>}
           </div>
@@ -1063,7 +1322,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
             const groupBenefits = benefits.filter((b) => b.groupId === group.id);
             const groupError = validationErrors[`group_${gIdx}`];
             return (
-              <div key={group.id} className="rounded-lg border border-border bg-card overflow-hidden">
+              <div key={group.id} id={`group-${group.id}`} className="rounded-lg border border-border bg-card overflow-hidden scroll-mt-32">
                 {/* Card header */}
                 <div className="flex items-start justify-between gap-3 p-4 border-b border-border">
                   <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -1286,6 +1545,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
                                       onChange={(e) =>
                                         updateBenefit(benefit!.id, "amount", e.target.value === "" ? 0 : parseFloat(e.target.value))
                                       }
+                                      onBlur={() => blurBenefitAmount(group.id, service.id, benefit!.amount || 0)}
                                     />
                                     {validationErrors[`benefit_${group.id}_${service.id}`] && (
                                       <ErrorText>{validationErrors[`benefit_${group.id}_${service.id}`]}</ErrorText>
@@ -1335,6 +1595,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
                                           onChange={(e) =>
                                             updateBenefit(benefit!.id, "coPayment.value", e.target.value === "" ? 0 : parseFloat(e.target.value))
                                           }
+                                          onBlur={() => blurCopayValue(group.id, service.id, benefit!.coPayment.type, benefit!.coPayment.value || 0, benefit!.amount || 0)}
                                         />
                                       </div>
                                     </div>
@@ -1359,6 +1620,87 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
       )}
     </div>
   );
+
+  // ── Autosave draft ────────────────────────────────────────────────────────
+  const draftState = useMemo(
+    () => ({ policy: policyData, groups, benefits }),
+    [policyData, groups, benefits]
+  );
+  const { status: draftStatus, savedAt } = usePolicyDraft(
+    policyData.organizationId,
+    draftState,
+    mode === "create"
+  );
+
+  useEffect(() => {
+    onDirtyChange?.(draftStatus !== "idle");
+  }, [draftStatus, onDirtyChange]);
+
+  useEffect(() => {
+    onSaveStatusChange?.({ status: draftStatus, savedAt });
+  }, [draftStatus, savedAt, onSaveStatusChange]);
+
+  useEffect(() => {
+    onTargetingChange?.({
+      organizationId: policyData.organizationId,
+      employmentTypes: policyData.eligibleEmploymentTypes ?? [],
+      tierIds: policyData.eligibility?.tierIds ?? [],
+      departmentIds: policyData.eligibility?.departmentIds ?? [],
+    });
+  }, [
+    policyData.organizationId,
+    policyData.eligibleEmploymentTypes,
+    policyData.eligibility?.tierIds,
+    policyData.eligibility?.departmentIds,
+    onTargetingChange,
+  ]);
+
+  // ── Section error counts ──────────────────────────────────────────────────
+  const sectionErrorCounts = useMemo(() => {
+    const counts: Record<string, number> = {
+      "policy-details": 0,
+      "pool-cycle": 0,
+      "groups-services": 0,
+    };
+    Object.keys(validationErrors).forEach((key) => {
+      const section = sectionForKey(key);
+      counts[section] = (counts[section] ?? 0) + 1;
+    });
+    return counts;
+  }, [validationErrors]);
+
+  useEffect(() => {
+    onValidationChange?.(sectionErrorCounts);
+  }, [sectionErrorCounts, onValidationChange]);
+
+  // ── Error summary helpers ─────────────────────────────────────────────────
+  const errorEntries = useMemo(() => {
+    return Object.entries(validationErrors).map(([key, message]) => {
+      let label = message;
+      if (key.startsWith("benefit_") || key.startsWith("copay_")) {
+        const [, gid, sid] = key.split("_");
+        const group = groups.find((g) => g.id === gid);
+        const groupLabel = group?.name || "Group";
+        const fieldLabel = key.startsWith("copay_") ? "Co-payment" : "Amount";
+        label = `${groupLabel} → ${sid} → ${fieldLabel}: ${message}`;
+      } else if (key.startsWith("group_name_")) {
+        const gid = key.replace("group_name_", "");
+        const group = groups.find((g) => g.id === gid);
+        label = `${group?.name || "Group"} → Name: ${message}`;
+      } else if (key.startsWith("group_cap_")) {
+        const gid = key.replace("group_cap_", "");
+        const group = groups.find((g) => g.id === gid);
+        label = `${group?.name || "Group"} → Cap: ${message}`;
+      } else if (key.startsWith("group_")) {
+        label = `Groups: ${message}`;
+      }
+      return { key, message, label, target: targetIdForKey(key) };
+    });
+  }, [validationErrors, groups]);
+
+  useEffect(() => {
+    onIssuesChange?.(errorEntries.map(({ key, label, target }) => ({ key, label, target })));
+  }, [errorEntries, onIssuesChange]);
 
   // ── Main render ───────────────────────────────────────────────────────────
   return (
