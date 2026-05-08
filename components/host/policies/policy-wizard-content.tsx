@@ -23,6 +23,7 @@ import {
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { ChoiceCard } from "@/components/shared/choice-card";
+import { FieldHelp } from "@/components/shared/field-help";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 import {
@@ -34,8 +35,10 @@ import {
   DependentsPoolType,
   ActivationMode,
 } from "@/types/policy";
+import type { PolicyGlossaryKey } from "@/lib/policy-glossary";
 import { MOCK_EMPLOYEES, SERVICES } from "@/lib/mock-data";
 import type { MainServiceId } from "@/lib/mock-data/service-catalog";
+import { validateBenefit, validateGroupInsert } from "@/lib/policy/validation";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -56,7 +59,7 @@ const DEPENDENTS_POOL_OPTIONS: { value: DependentsPoolType; title: string; descr
 ];
 
 const ACTIVATION_MODES: { value: ActivationMode; label: string; description: string; icon: React.ElementType<IconProps> }[] = [
-  { value: "after_join", label: "After Join Date", description: "Policy activates when the employee joins.", icon: RocketLaunch },
+  { value: "after_join", label: "After Join Date", description: "Immediately on join (most common).", icon: RocketLaunch },
   { value: "after_probation", label: "After Probation Ends", description: "Policy activates once probation is completed.", icon: ClockCountdown },
   { value: "custom_date", label: "Custom Date", description: "Set a specific activation date.", icon: CalendarCheck },
 ];
@@ -91,11 +94,14 @@ function SectionHeader({ icon: Icon, title, description }: { icon: React.Element
   );
 }
 
-function FieldLabel({ children, required }: { children: React.ReactNode; required?: boolean }) {
+function FieldLabel({ children, required, helpKey }: { children: React.ReactNode; required?: boolean; helpKey?: PolicyGlossaryKey }) {
   return (
-    <label className="text-label font-medium text-subtle block">
-      {children}
-      {required && <span className="text-destructive ml-0.5">*</span>}
+    <label className="text-label font-medium text-subtle flex items-center gap-1.5">
+      <span>
+        {children}
+        {required && <span className="text-destructive ml-0.5">*</span>}
+      </span>
+      {helpKey ? <FieldHelp termKey={helpKey} /> : null}
     </label>
   );
 }
@@ -273,7 +279,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
     initialData?.policy || {
       name: "",
       description: "",
-      eligibleEmploymentTypes: ["full-time"],
+      eligibleEmploymentTypes: ["full-time", "part-time", "contract", "internship"],
       coversDependents: false,
       benefitPoolType: "Individual",
       utilisationMode: "Fixed",
@@ -301,7 +307,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
     }
 
     if (policyData.utilisationMode === "Prorated" && !policyData.prorateUnit) {
-      errors.prorateUnit = "Select a prorate unit for Prorated mode";
+      errors.prorateUnit = "Pick a prorate unit (Monthly is most common)";
     }
 
     if (policyData.coversDependents && !policyData.dependentsPoolType) {
@@ -309,7 +315,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
     }
 
     if (policyData.refreshStartReference === "custom_date" && !policyData.refreshCustomDate) {
-      errors.refreshCustomDate = "Enter a custom refresh date";
+      errors.refreshCustomDate = "Pick when this policy resets each cycle";
     }
 
     if (policyData.activationMode === "custom_date" && !policyData.activationCustomDate) {
@@ -326,15 +332,32 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
     if (groups.length === 0) errors.groups = "Add at least one benefit group";
 
     groups.forEach((group, idx) => {
+      const groupIssue = validateGroupInsert(policyData.id || "temp", group.name, groups, group.id);
+      if (groupIssue) {
+        errors[`group_name_${group.id}`] = groupIssue.message;
+      }
+
+      if (group.distributionType === "SharedAmount" && (!group.maxUsagePerCycle || group.maxUsagePerCycle <= 0)) {
+        errors[`group_cap_${group.id}`] = "Shared pools need a cap (e.g. RM 1000)";
+      }
+
       const groupBenefits = benefits.filter((b) => b.groupId === group.id);
       if (groupBenefits.length === 0) {
         errors[`group_${idx}`] = `Select at least one benefit for ${group.name || "this group"}`;
       }
-      groupBenefits.forEach((b, bIdx) => {
-        if (b.amount <= 0) errors[`benefit_${group.id}_${bIdx}`] = "Amount must be greater than 0";
-        if (b.coPayment.required && b.coPayment.value <= 0) {
-          errors[`copay_${group.id}_${bIdx}`] = "Co-payment value must be greater than 0";
-        }
+      groupBenefits.forEach((benefit) => {
+        const issues = validateBenefit(benefit, benefits);
+        issues.forEach((issue) => {
+          if (issue.field === "amount") {
+            errors[`benefit_${group.id}_${benefit.serviceId}`] = issue.message;
+          }
+          if (issue.field === "coPayment.value") {
+            errors[`copay_${group.id}_${benefit.serviceId}`] = issue.message;
+          }
+          if (issue.field === "serviceId") {
+            errors[`group_${idx}`] = issue.message;
+          }
+        });
       });
     });
 
@@ -643,7 +666,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
 
       {/* ── Cover Dependents ── */}
       <div className="space-y-3">
-        <FieldLabel>Cover Dependents</FieldLabel>
+        <FieldLabel helpKey="dependentsPooling">Cover Dependents</FieldLabel>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <ChoiceCard
             title="Employee Only"
@@ -664,7 +687,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
 
       {/* ── Employee Pool Type ── */}
       <div className="space-y-3">
-        <FieldLabel>Employee Pool Type</FieldLabel>
+        <FieldLabel helpKey="poolType">Employee Pool Type</FieldLabel>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <ChoiceCard
             title="Individual"
@@ -686,7 +709,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
       {/* ── Dependents Pool Type ── */}
       {policyData.coversDependents && (
         <div className="space-y-3">
-          <FieldLabel required>Dependents Pool Type</FieldLabel>
+          <FieldLabel required helpKey="dependentsPooling">Dependents Pool Type</FieldLabel>
           {validationErrors.dependentsPoolType && <ErrorText>{validationErrors.dependentsPoolType}</ErrorText>}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {DEPENDENTS_POOL_OPTIONS.map((opt) => (
@@ -705,7 +728,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
 
       {/* ── Policy Spending Cap ── */}
       <div className="space-y-1.5">
-        <FieldLabel>Policy Spending Cap (RM)</FieldLabel>
+        <FieldLabel helpKey="spendingCap">Policy Spending Cap (RM)</FieldLabel>
         <input
           type="number"
           min={0}
@@ -727,7 +750,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
 
       {/* ── Utilisation Mode ── */}
       <div className="space-y-3">
-        <FieldLabel>Utilisation Mode</FieldLabel>
+        <FieldLabel helpKey="utilisationMode">Utilisation Mode</FieldLabel>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <ChoiceCard
             title="Fixed Allocation"
@@ -741,14 +764,20 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
             description="Benefit amounts are prorated based on time."
             icon={Gear}
             selected={policyData.utilisationMode === "Prorated"}
-            onSelect={() => setPolicyData({ ...policyData, utilisationMode: "Prorated" })}
+            onSelect={() =>
+              setPolicyData({
+                ...policyData,
+                utilisationMode: "Prorated",
+                prorateUnit: policyData.prorateUnit ?? "Monthly",
+              })
+            }
           />
         </div>
       </div>
 
       {policyData.utilisationMode === "Prorated" && (
         <div className="space-y-1.5">
-          <FieldLabel required>Prorate Unit</FieldLabel>
+          <FieldLabel required helpKey="prorateUnit">Prorate Unit</FieldLabel>
           <select
             className={cn(
               "w-full px-4 py-2.5 bg-background border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all",
@@ -777,7 +806,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div className="space-y-1.5">
-          <FieldLabel>Refresh Cycle</FieldLabel>
+          <FieldLabel helpKey="refreshCycle">Refresh Cycle</FieldLabel>
           <select
             className={cn(
               "w-full px-4 py-2.5 bg-background border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all",
@@ -796,7 +825,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
         </div>
 
         <div className="space-y-1.5">
-          <FieldLabel>Refresh Start Reference</FieldLabel>
+          <FieldLabel helpKey="refreshCycle">Refresh Start Reference</FieldLabel>
           <div className="space-y-2">
             {(["fy_start", "join_date", "custom_date"] as const).map((ref) => (
               <button
@@ -853,7 +882,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
             <RocketLaunch size={14} weight="duotone" />
           </div>
           <div>
-            <h4 className="text-body font-semibold text-foreground">Activation</h4>
+            <h4 className="text-body font-semibold text-foreground inline-flex items-center gap-1.5">Activation <FieldHelp termKey="activationMode" /></h4>
             <p className="text-label text-muted-foreground">When the policy takes effect for new members</p>
           </div>
         </div>
@@ -953,6 +982,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
                         onChange={(e) => updateGroup(group.id, "name", e.target.value)}
                         placeholder="Group Name"
                       />
+                      {validationErrors[`group_name_${group.id}`] && <ErrorText>{validationErrors[`group_name_${group.id}`]}</ErrorText>}
                       <input
                         className="text-label text-muted-foreground bg-transparent border border-border rounded-md px-2.5 py-1.5 outline-none focus:ring-2 focus:ring-primary/10 w-full"
                         value={group.description || ""}
@@ -994,20 +1024,21 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
                     </div>
                     <div className="space-y-1.5">
                       <p className="text-label font-medium text-muted-foreground">
-                        Group Cap (RM)
+                        <span className="inline-flex items-center gap-1.5">Group Cap (RM) <FieldHelp termKey="groupCap" /></span>
                         {group.distributionType !== "SharedAmount" && (
                           <span className="text-faint font-normal ml-1">(optional)</span>
                         )}
                       </p>
                       <input
                         type="number"
-                        className="w-28 px-2.5 py-1 border border-border bg-background rounded-lg text-label outline-none focus:ring-2 focus:ring-primary/10"
+                        className={cn("w-28 px-2.5 py-1 border bg-background rounded-lg text-label outline-none focus:ring-2 focus:ring-primary/10", validationErrors[`group_cap_${group.id}`] ? "border-destructive" : "border-border")}
                         value={group.maxUsagePerCycle || ""}
                         onChange={(e) =>
                           updateGroup(group.id, "maxUsagePerCycle", e.target.value === "" ? undefined : parseFloat(e.target.value))
                         }
                         placeholder="0.00"
                       />
+                      {validationErrors[`group_cap_${group.id}`] && <ErrorText>{validationErrors[`group_cap_${group.id}`]}</ErrorText>}
                     </div>
                   </div>
 
@@ -1132,7 +1163,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
                                   )}
 
                                   <div className="space-y-1.5">
-                                    <label className="text-micro font-medium text-faint">Co-payment</label>
+                                    <label className="text-micro font-medium text-faint inline-flex items-center gap-1.5">Co-payment <FieldHelp termKey="coPayment" /></label>
                                     <div className="flex items-center gap-2">
                                       <button
                                         type="button"

@@ -32,7 +32,7 @@ export default function NewOrgPolicyPage() {
     const newId = Math.random().toString(36).substr(2, 9);
     setIsSubmitting(false);
     setCreatedPolicyId(newId);
-    setCreatedPolicyName(data.policy.name || "New Policy");
+    setCreatedPolicyName(data.policy.name || "Add Benefit Policy");
     toast.success("Policy created successfully");
     setShowSuccess(true);
   };
@@ -58,7 +58,7 @@ export default function NewOrgPolicyPage() {
               </button>
               <div>
                 <h1 className="text-heading font-semibold text-foreground text-balance">
-                  Create Benefit Policy
+                  Add Benefit Policy
                 </h1>
                 <p className="text-subtle text-body mt-1">
                   Creating policy for organisation <span className="font-mono text-faint">{orgId}</span>.
@@ -111,7 +111,7 @@ export default function NewOrgPolicyPage() {
                   </>
                 ) : (
                   <>
-                    Create Policy
+                    Add Benefit Policy
                     <NavigationArrow size={14} weight="bold" className="rotate-90" />
                   </>
                 )}

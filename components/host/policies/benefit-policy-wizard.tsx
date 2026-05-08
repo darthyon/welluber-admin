@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import {
   ShieldCheck,
   CaretLeft,
@@ -31,8 +31,10 @@ import {
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { ChoiceCard } from "@/components/shared/choice-card";
+import { FieldHelp } from "@/components/shared/field-help";
 import { DetailSection } from "@/components/shared/detail-section";
 import { SuccessCelebration } from "@/components/shared/success-celebration";
+import { PolicyLaunchConfirmModal } from "@/components/host/policies/policy-launch-confirm-modal";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { BenefitPolicy, BenefitGroup, Benefit, PolicyStatus, DistributionType, PoolType, DependentsPoolType, UtilisationMode, ProrateUnit, RefreshCycle, RefreshStartReference, ActivationMode } from "@/types/policy";
@@ -41,6 +43,8 @@ import { MOCK_EMPLOYEES } from "@/lib/mock-data";
 import type { EmployeeDirectoryItem } from "@/features/employees/types";
 import { MOCK_EMPLOYEE_UTILISATION, SERVICES } from "@/lib/mock-data";
 import type { MainServiceId } from "@/lib/mock-data/service-catalog";
+import { validateBenefit, validateGroupInsert } from "@/lib/policy/validation";
+import { usePolicyDraft } from "@/hooks/use-policy-draft";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -76,7 +80,7 @@ const DEPENDENTS_POOL_OPTIONS: { value: DependentsPoolType; title: string; descr
 ];
 
 const ACTIVATION_MODES: { value: ActivationMode; label: string; description: string; icon: React.ElementType<IconProps> }[] = [
-  { value: "after_join", label: "After Join Date", description: "Policy activates when the employee joins.", icon: RocketLaunch },
+  { value: "after_join", label: "After Join Date", description: "Immediately on join (most common).", icon: RocketLaunch },
   { value: "after_probation", label: "After Probation Ends", description: "Policy activates once probation is completed.", icon: ClockCountdown },
   { value: "custom_date", label: "Custom Date", description: "Set a specific activation date.", icon: CalendarCheck },
 ];
@@ -192,7 +196,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
   const [policyData, setPolicyData] = useState<Partial<BenefitPolicy>>(initialData?.policy || {
     name: "",
     description: "",
-    eligibleEmploymentTypes: ["full-time"],
+    eligibleEmploymentTypes: ["full-time", "part-time", "contract", "internship"],
     coversDependents: false,
     benefitPoolType: "Individual",
     utilisationMode: "Fixed",
@@ -212,14 +216,34 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
 
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [showPostCreateModal, setShowPostCreateModal] = useState(false);
+  const [showLaunchConfirmModal, setShowLaunchConfirmModal] = useState(false);
+  const [showCustomizeAssignment, setShowCustomizeAssignment] = useState(false);
+  const groupIdRef = useRef(0);
+  const benefitIdRef = useRef(0);
 
-  useEffect(() => {
-    if (initialData) {
-      setPolicyData(initialData.policy);
-      setGroups(initialData.groups);
-      setBenefits(initialData.benefits);
-    }
-  }, [initialData]);
+  const draftState = useMemo(
+    () => ({
+      policyData,
+      groups,
+      benefits,
+      assignedEmployeeIds,
+      assignmentOrgId,
+      currentStep,
+    }),
+    [policyData, groups, benefits, assignedEmployeeIds, assignmentOrgId, currentStep]
+  );
+
+  const {
+    hasDraft,
+    savedAt: draftSavedAt,
+    restored: draftRestored,
+    restore: restoreDraft,
+    clear: clearDraft,
+  } = usePolicyDraft(
+    policyData.organizationId || orgId,
+    draftState,
+    mode === "create"
+  );
 
   // ── Validation helpers ────────────────────────────────────────────────────
 
@@ -236,7 +260,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
 
     if (step === 2) {
       if (policyData.utilisationMode === "Prorated" && !policyData.prorateUnit) {
-        errors.prorateUnit = "Select a prorate unit for Prorated mode";
+        errors.prorateUnit = "Pick a prorate unit (Monthly is most common)";
       }
 
       if (policyData.coversDependents && !policyData.dependentsPoolType) {
@@ -244,7 +268,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
       }
 
       if (policyData.refreshStartReference === "custom_date" && !policyData.refreshCustomDate) {
-        errors.refreshCustomDate = "Enter a custom refresh date";
+        errors.refreshCustomDate = "Pick when this policy resets each cycle";
       }
 
       if (policyData.activationMode === "custom_date" && !policyData.activationCustomDate) {
@@ -262,15 +286,32 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
     if (step === 3) {
       if (groups.length === 0) errors.groups = "Add at least one benefit group";
       groups.forEach((group, idx) => {
+        const groupIssue = validateGroupInsert(policyData.id || "temp", group.name, groups, group.id);
+        if (groupIssue) {
+          errors[`group_name_${group.id}`] = groupIssue.message;
+        }
+
+        if (group.distributionType === "SharedAmount" && (!group.maxUsagePerCycle || group.maxUsagePerCycle <= 0)) {
+          errors[`group_cap_${group.id}`] = "Shared pools need a cap (e.g. RM 1000)";
+        }
+
         const groupBenefits = benefits.filter(b => b.groupId === group.id);
         if (groupBenefits.length === 0) {
           errors[`group_${idx}`] = `Select at least one benefit for ${group.name || "this group"}`;
         }
-        groupBenefits.forEach((b, bIdx) => {
-          if (b.amount <= 0) errors[`benefit_${group.id}_${bIdx}`] = "Amount must be greater than 0";
-          if (b.coPayment.required && b.coPayment.value <= 0) {
-            errors[`copay_${group.id}_${bIdx}`] = "Co-payment value must be greater than 0";
-          }
+        groupBenefits.forEach((benefit) => {
+          const issues = validateBenefit(benefit, benefits);
+          issues.forEach((issue) => {
+            if (issue.field === "amount") {
+              errors[`benefit_${group.id}_${benefit.serviceId}`] = issue.message;
+            }
+            if (issue.field === "coPayment.value") {
+              errors[`copay_${group.id}_${benefit.serviceId}`] = issue.message;
+            }
+            if (issue.field === "serviceId") {
+              errors[`group_${idx}`] = issue.message;
+            }
+          });
         });
       });
     }
@@ -292,8 +333,9 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
   };
 
   const addGroup = useCallback(() => {
+    groupIdRef.current += 1;
     const newGroup: BenefitGroup = {
-      id: `grp-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      id: `grp-new-${groupIdRef.current}`,
       policyId: policyData.id || "temp",
       name: "New Benefit Group",
       distributionType: "IndividualBenefitAmount",
@@ -319,8 +361,9 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
     if (exists) {
       setBenefits(benefits.filter(b => !(b.groupId === groupId && b.serviceId === serviceId)));
     } else {
+      benefitIdRef.current += 1;
       setBenefits([...benefits, {
-        id: `ben-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+        id: `ben-new-${benefitIdRef.current}`,
         groupId,
         serviceId,
         amount: 0,
@@ -337,7 +380,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
         if (parent === "coPayment") {
           return { ...b, coPayment: { ...b.coPayment, [child]: value } } as Benefit;
         }
-        return { ...b, [parent]: { ...(b as any)[parent], [child]: value } };
+        return b;
       }
       return { ...b, [field]: value };
     }));
@@ -365,6 +408,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
     await new Promise(resolve => setTimeout(resolve, 1200));
     setIsSubmitting(false);
     setIsSuccess(true);
+    clearDraft();
     setTimeout(() => onSuccess({ policy: policyData, groups, benefits, assignedEmployeeIds }), 1800);
   };
 
@@ -383,7 +427,24 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
     await new Promise(resolve => setTimeout(resolve, 800));
     setIsSubmitting(false);
     setIsSuccess(true);
+    clearDraft();
     setTimeout(() => onSuccess({ policy: { ...policyData, status: "active" }, groups, benefits }), 1800);
+  };
+
+  const handleLaunchClick = () => {
+    if (!validateStep(currentStep)) return;
+    setShowLaunchConfirmModal(true);
+  };
+
+  const handleRestoreDraft = () => {
+    const restored = restoreDraft();
+    if (!restored) return;
+    setPolicyData(restored.policyData);
+    setGroups(restored.groups);
+    setBenefits(restored.benefits);
+    setAssignedEmployeeIds(restored.assignedEmployeeIds);
+    setAssignmentOrgId(restored.assignmentOrgId);
+    setCurrentStep(restored.currentStep);
   };
 
   const handleViewFromModal = () => {
@@ -567,7 +628,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
           <div className="space-y-6">
             {/* ── Cover Dependents ── */}
             <div className="space-y-3">
-              <label className="text-label font-medium text-subtle">Cover Dependents</label>
+              <label className="text-label font-medium text-subtle inline-flex items-center gap-1.5">Cover Dependents <FieldHelp termKey="dependentsPooling" /></label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <ChoiceCard
                   title="Employee Only"
@@ -588,7 +649,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
 
             {/* ── Employee Pool Type ── */}
             <div className="space-y-3">
-              <label className="text-label font-medium text-subtle">Employee Pool Type</label>
+              <label className="text-label font-medium text-subtle inline-flex items-center gap-1.5">Employee Pool Type <FieldHelp termKey="poolType" /></label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <ChoiceCard
                   title="Individual"
@@ -610,8 +671,9 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
             {/* ── Dependents Pool Type ── */}
             {policyData.coversDependents && (
               <div className="space-y-3">
-                <label className="text-label font-medium text-subtle">
+                <label className="text-label font-medium text-subtle inline-flex items-center gap-1.5">
                   Dependents Pool Type <span className="text-rose-600 dark:text-rose-400">*</span>
+                  <FieldHelp termKey="dependentsPooling" />
                 </label>
                 {validationErrors.dependentsPoolType && <p className="text-label text-rose-600 dark:text-rose-400 font-medium">{validationErrors.dependentsPoolType}</p>}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -631,7 +693,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
 
             {/* ── Policy Spending Cap ── */}
             <div className="space-y-1.5">
-              <label className="text-label font-medium text-subtle">Policy Spending Cap (RM)</label>
+              <label className="text-label font-medium text-subtle inline-flex items-center gap-1.5">Policy Spending Cap (RM) <FieldHelp termKey="spendingCap" /></label>
               <input
                 type="number"
                 min={0}
@@ -651,17 +713,18 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
 
             {/* ── Utilisation Mode ── */}
             <div className="space-y-3">
-              <label className="text-label font-medium text-subtle">Utilisation Mode</label>
+              <label className="text-label font-medium text-subtle inline-flex items-center gap-1.5">Utilisation Mode <FieldHelp termKey="utilisationMode" /></label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <ChoiceCard title="Fixed Allocation" description="Full benefit pool is granted upon assignment." icon={Gear} selected={policyData.utilisationMode === "Fixed"} onSelect={() => setPolicyData({ ...policyData, utilisationMode: "Fixed", prorateUnit: undefined })} />
-                <ChoiceCard title="Prorated Allocation" description="Benefit amounts are prorated based on time." icon={Gear} selected={policyData.utilisationMode === "Prorated"} onSelect={() => setPolicyData({ ...policyData, utilisationMode: "Prorated" })} />
+                <ChoiceCard title="Prorated Allocation" description="Benefit amounts are prorated based on time." icon={Gear} selected={policyData.utilisationMode === "Prorated"} onSelect={() => setPolicyData({ ...policyData, utilisationMode: "Prorated", prorateUnit: policyData.prorateUnit ?? "Monthly" })} />
               </div>
             </div>
 
             {policyData.utilisationMode === "Prorated" && (
               <div className="space-y-1.5">
-                <label className="text-label font-medium text-subtle">
+                <label className="text-label font-medium text-subtle inline-flex items-center gap-1.5">
                   Prorate Unit <span className="text-rose-600 dark:text-rose-400">*</span>
+                  <FieldHelp termKey="prorateUnit" />
                 </label>
                 <select
                   className={cn(
@@ -689,7 +752,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
         <DetailSection title="Cycle & Lifecycle" icon={<Gear size={18} weight="duotone" />} description="Refresh intervals and start reference" ghost>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="space-y-1.5">
-              <label className="text-label font-medium text-subtle">Refresh Cycle</label>
+              <label className="text-label font-medium text-subtle inline-flex items-center gap-1.5">Refresh Cycle <FieldHelp termKey="refreshCycle" /></label>
               <select
                 className={cn(
                   "w-full px-4 py-2.5 bg-background border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all",
@@ -704,7 +767,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-label font-medium text-subtle">Refresh Start Reference</label>
+              <label className="text-label font-medium text-subtle inline-flex items-center gap-1.5">Refresh Start Reference <FieldHelp termKey="refreshCycle" /></label>
               <div className="grid grid-cols-1 gap-2">
                 {(["fy_start", "join_date", "custom_date"] as const).map((ref) => (
                   <button
@@ -753,7 +816,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                 <RocketLaunch size={14} weight="duotone" />
               </div>
               <div>
-                <h4 className="text-body font-semibold text-foreground">Activation</h4>
+                <h4 className="text-body font-semibold text-foreground inline-flex items-center gap-1.5">Activation <FieldHelp termKey="activationMode" /></h4>
                 <p className="text-label text-muted-foreground">When the policy takes effect for new members</p>
               </div>
             </div>
@@ -861,6 +924,9 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                             onChange={(e) => updateGroup(group.id, "name", e.target.value)}
                             placeholder="Group Name"
                           />
+                          {groupErrors[`group_name_${group.id}`] && (
+                            <p className="text-micro text-rose-600 dark:text-rose-400">{groupErrors[`group_name_${group.id}`]}</p>
+                          )}
                           <input
                             className="text-label text-muted-foreground bg-transparent border border-border rounded-md px-2.5 py-1.5 outline-none focus:ring-2 focus:ring-primary/10 w-full"
                             value={group.description || ""}
@@ -899,7 +965,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                       </div>
                       <div className="space-y-1.5">
                         <p className="text-label font-medium text-muted-foreground">
-                          Group Cap (RM)
+                          <span className="inline-flex items-center gap-1.5">Group Cap (RM) <FieldHelp termKey="groupCap" /></span>
                           {group.distributionType !== "SharedAmount" && (
                             <span className="text-faint font-normal ml-1">(optional)</span>
                           )}
@@ -907,8 +973,9 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                         {isViewMode ? (
                           <p className="text-label font-semibold text-foreground">{group.maxUsagePerCycle ? `RM ${group.maxUsagePerCycle.toFixed(2)}` : "—"}</p>
                         ) : (
-                          <input type="number" className="w-28 px-2.5 py-1 border border-border bg-background rounded-lg text-label outline-none focus:ring-2 focus:ring-primary/10" value={group.maxUsagePerCycle || ""} onChange={(e) => updateGroup(group.id, "maxUsagePerCycle", e.target.value === "" ? undefined : parseFloat(e.target.value))} placeholder="0.00" />
+                          <input type="number" className={cn("w-28 px-2.5 py-1 border bg-background rounded-lg text-label outline-none focus:ring-2 focus:ring-primary/10", groupErrors[`group_cap_${group.id}`] ? "border-rose-300" : "border-border")} value={group.maxUsagePerCycle || ""} onChange={(e) => updateGroup(group.id, "maxUsagePerCycle", e.target.value === "" ? undefined : parseFloat(e.target.value))} placeholder="0.00" />
                         )}
+                        {groupErrors[`group_cap_${group.id}`] && <p className="text-micro text-rose-600 dark:text-rose-400">{groupErrors[`group_cap_${group.id}`]}</p>}
                       </div>
                     </div>
 
@@ -1032,7 +1099,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                                     )}
 
                                     <div className="space-y-1.5">
-                                      <label className="text-micro font-medium text-faint">Co-payment</label>
+                                      <label className="text-micro font-medium text-faint inline-flex items-center gap-1.5">Co-payment <FieldHelp termKey="coPayment" /></label>
                                       <div className="flex items-center gap-2">
                                         {isViewMode ? (
                                           <span className={cn("text-label font-medium px-2 py-0.5 rounded-full", benefit!.coPayment.required ? "bg-primary/10 text-primary" : "bg-muted text-faint")}>
@@ -1134,7 +1201,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
         <DetailSection
           title="Assign Employees"
           icon={<Users size={18} weight="duotone" />}
-          description="Select which employees this policy applies to"
+          description="Assign all eligible employees now, customize selection, or do it later"
           ghost
         >
           <div className="space-y-5">
@@ -1170,7 +1237,49 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                 </div>
               ) : (
                 <>
-                  {assignedEmployeeIds.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Button
+                      type="button"
+                      size="sm"
+                      className="rounded-4xl"
+                      onClick={() => {
+                        setShowCustomizeAssignment(false);
+                        setAssignedEmployeeIds(eligibleEmployees.map((employee) => employee.id));
+                        nextStep();
+                      }}
+                    >
+                      Assign All Eligible ({eligibleEmployees.length})
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant={showCustomizeAssignment ? "default" : "outline"}
+                      className="rounded-4xl"
+                      onClick={() => setShowCustomizeAssignment(true)}
+                    >
+                      Customize
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      className="rounded-4xl"
+                      onClick={() => {
+                        setShowCustomizeAssignment(false);
+                        nextStep();
+                      }}
+                    >
+                      Later
+                    </Button>
+                  </div>
+
+                  {!showCustomizeAssignment && (
+                    <p className="text-label text-faint">
+                      Pick Customize to choose a specific employee subset, or continue with Assign All Eligible / Later.
+                    </p>
+                  )}
+
+                  {showCustomizeAssignment && assignedEmployeeIds.length > 0 && (
                     <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-primary/5 border border-primary/15">
                       <Check size={14} weight="bold" className="text-primary shrink-0" />
                       <p className="text-label font-medium text-primary">
@@ -1181,7 +1290,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                     </div>
                   )}
 
-                  <div className="border border-border rounded-lg overflow-hidden">
+                  {showCustomizeAssignment && <div className="border border-border rounded-lg overflow-hidden">
                     <div className="flex items-center gap-3 px-4 py-2.5 bg-muted/30 border-b border-border">
                       <button
                         type="button"
@@ -1248,7 +1357,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                         );
                       })}
                     </div>
-                  </div>
+                  </div>}
                 </>
               )
             ) : (
@@ -1264,7 +1373,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
               onClick={nextStep}
               className="text-label text-faint hover:text-muted-foreground transition-colors"
             >
-              Skip for now →
+              Continue to Review →
             </button>
           </div>
         </DetailSection>
@@ -1274,6 +1383,49 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
 
   const renderReviewStep = () => (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      {(() => {
+        const activeOrgId = orgId ?? assignmentOrgId;
+        const eligibleEmployees = activeOrgId
+          ? MOCK_EMPLOYEES.filter((emp) => {
+              if (emp.orgId !== activeOrgId) return false;
+              if (
+                policyData.eligibleEmploymentTypes?.length &&
+                emp.employmentType &&
+                !policyData.eligibleEmploymentTypes.includes(emp.employmentType)
+              ) {
+                return false;
+              }
+              const tierIds = policyData.eligibility?.tierIds;
+              if (tierIds?.length && emp.tier && !tierIds.includes(emp.tier)) return false;
+              return true;
+            })
+          : [];
+
+        const isAssignAllSelection =
+          eligibleEmployees.length > 0 &&
+          assignedEmployeeIds.length === eligibleEmployees.length &&
+          eligibleEmployees.every((emp) => assignedEmployeeIds.includes(emp.id));
+
+        const assignmentSummary = !activeOrgId
+          ? "Later"
+          : showCustomizeAssignment
+            ? assignedEmployeeIds.length > 0
+              ? `Customized (${assignedEmployeeIds.length} selected)`
+              : "Customized (none selected yet)"
+            : isAssignAllSelection
+              ? `Assign All Eligible (${eligibleEmployees.length})`
+              : "Later";
+
+        return (
+          <DetailSection title="Assignment" icon={<Users size={18} weight="duotone" />} ghost>
+            <div className="space-y-4">
+              <ReadField label="Employee Assignment" value={assignmentSummary} />
+              <ReadField label="Eligible Employees" value={activeOrgId ? String(eligibleEmployees.length) : "—"} />
+            </div>
+          </DetailSection>
+        );
+      })()}
+
       <div className="mb-10">
         <div className="flex items-center gap-4">
           <div className="w-11 h-11 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
@@ -1386,7 +1538,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
               <CaretLeft size={20} weight="bold" />
             </button>
             <h2 className="text-heading font-semibold text-foreground text-balance">
-              {isViewMode ? "View Benefit Policy" : mode === "edit" ? "Edit Benefit Policy" : "Create Benefit Policy"}
+              {isViewMode ? "View Benefit Policy" : mode === "edit" ? "Edit Benefit Policy" : "Add Benefit Policy"}
             </h2>
           </div>
 
@@ -1423,7 +1575,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                   </Button>
                 ) : (
                   <Button
-                    onClick={handleSubmit}
+                    onClick={mode === "create" ? handleLaunchClick : handleSubmit}
                     disabled={isSubmitting}
                     className="rounded-full px-8 bg-primary text-primary-foreground shadow-none min-w-[140px]"
                   >
@@ -1500,6 +1652,18 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden px-6 pt-8 pb-12">
+        {mode === "create" && hasDraft && !draftRestored && (
+          <div className="mb-4 flex items-center justify-between rounded-lg border border-amber-200 bg-amber-50 px-4 py-2.5 dark:border-amber-500/20 dark:bg-amber-500/10">
+            <p className="text-label font-medium text-amber-700 dark:text-amber-300">
+              Draft available{draftSavedAt ? ` · saved ${new Date(draftSavedAt).toLocaleString()}` : ""}
+            </p>
+            <div className="flex items-center gap-2">
+              <Button size="sm" variant="ghost" onClick={clearDraft} className="rounded-4xl px-4">Discard</Button>
+              <Button size="sm" onClick={handleRestoreDraft} className="rounded-4xl px-4">Resume</Button>
+            </div>
+          </div>
+        )}
+
         <AnimatePresence mode="wait">
           <motion.div
             key={currentStep}
@@ -1531,6 +1695,20 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
           </motion.div>
         </AnimatePresence>
       </div>
+
+      {showLaunchConfirmModal && (
+        <PolicyLaunchConfirmModal
+          policy={policyData}
+          assignedEmployeeIds={assignedEmployeeIds}
+          groups={groups}
+          benefits={benefits}
+          onConfirm={() => {
+            setShowLaunchConfirmModal(false);
+            void handleSubmit();
+          }}
+          onCancel={() => setShowLaunchConfirmModal(false)}
+        />
+      )}
 
       {/* Post-creation activation modal (SCR-POL-03) */}
       <AnimatePresence>
@@ -1601,4 +1779,3 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
     </div>
   );
 }
-

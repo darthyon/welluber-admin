@@ -2,7 +2,7 @@
 
 import { useState, useMemo, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { CaretLeft, NavigationArrow, Barbell, Brain, Circle, PencilSimpleLine } from "@phosphor-icons/react";
+import { CaretLeft, NavigationArrow, Barbell, Brain, Circle, PencilSimpleLine, Copy } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav";
 import { SuccessModal } from "@/components/shared/success-modal";
@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { PolicyWizardContent, PolicyReviewCards } from "@/components/host/policies/policy-wizard-content";
 import { usePolicyTemplates } from "@/hooks/use-policy-templates";
 import { BenefitPolicy, BenefitGroup, Benefit } from "@/types/policy";
+import { MOCK_POLICIES, MOCK_POLICY_DATA_MAP } from "@/lib/mock-data";
 
 const ICON_MAP: Record<string, React.ElementType> = {
   Barbell, Brain, Circle, PencilSimpleLine,
@@ -27,7 +28,9 @@ function NewPolicyForm() {
   const { templates: policyTemplates, isLoading: templatesLoading } = usePolicyTemplates();
 
   const templateId = searchParams.get("template");
+  const cloneId = searchParams.get("clone");
   const selectedTemplate = policyTemplates.find((t) => t.id === templateId);
+  const cloneSource = MOCK_POLICIES.find((policy) => policy.id === cloneId);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -37,6 +40,36 @@ function NewPolicyForm() {
   const [reviewData, setReviewData] = useState<{ policy: Partial<BenefitPolicy>; groups: BenefitGroup[]; benefits: Benefit[] } | null>(null);
 
   const initialData = useMemo(() => {
+    if (cloneSource) {
+      const sourceData = MOCK_POLICY_DATA_MAP[cloneSource.id];
+      if (!sourceData) return undefined;
+
+      const idMap = new Map<string, string>();
+      const newGroups: BenefitGroup[] = sourceData.groups.map((group) => {
+        const newId = `${group.id}-new`;
+        idMap.set(group.id, newId);
+        return { ...group, id: newId, policyId: "temp" };
+      });
+
+      const newBenefits: Benefit[] = sourceData.benefits.map((benefit) => ({
+        ...benefit,
+        id: `${benefit.id}-new`,
+        groupId: idMap.get(benefit.groupId) || benefit.groupId,
+      }));
+
+      return {
+        policy: {
+          ...cloneSource,
+          id: undefined,
+          name: "",
+          status: "draft" as const,
+          clonedFrom: cloneSource.id,
+        },
+        groups: newGroups,
+        benefits: newBenefits,
+      };
+    }
+
     if (!selectedTemplate) return undefined;
     const prefill = selectedTemplate.prefill;
     const idMap = new Map<string, string>();
@@ -67,7 +100,7 @@ function NewPolicyForm() {
       groups: newGroups,
       benefits: newBenefits,
     };
-  }, [selectedTemplate]);
+  }, [cloneSource, selectedTemplate]);
 
   const handleReview = (data: { policy: Partial<BenefitPolicy>; groups: BenefitGroup[]; benefits: Benefit[] }) => {
     setReviewData(data);
@@ -81,7 +114,7 @@ function NewPolicyForm() {
     const newId = Math.random().toString(36).substr(2, 9);
     setIsSubmitting(false);
     setCreatedPolicyId(newId);
-    setCreatedPolicyName(reviewData.policy.name || "New Policy");
+    setCreatedPolicyName(reviewData.policy.name || "Add Benefit Policy");
     setShowReview(false);
     toast.success("Policy created successfully");
     setShowSuccess(true);
@@ -118,7 +151,7 @@ function NewPolicyForm() {
               </button>
               <div>
                 <h1 className="text-heading font-semibold text-foreground text-balance">
-                  Create Benefit Policy
+                  Add Benefit Policy
                 </h1>
                 <p className="text-subtle text-body mt-1">
                   Define eligibility rules, pool strategies, and service groups for your workforce.
@@ -127,7 +160,26 @@ function NewPolicyForm() {
             </div>
 
             {/* Selected template bar */}
-            {selectedTemplate ? (
+            {cloneSource ? (
+              <div className="flex items-center gap-3 p-3 rounded-lg border border-primary/20 bg-primary/[0.03]">
+                <div className="w-8 h-8 rounded-md bg-primary/10 text-primary flex items-center justify-center">
+                  <Copy size={16} weight="duotone" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-label font-semibold text-foreground">Cloned from {cloneSource.name}</p>
+                  <p className="text-micro text-muted-foreground">Policy settings copied. Name and assignments are reset.</p>
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => router.push("/policies")}
+                  className="text-label text-primary hover:bg-primary/5 shrink-0"
+                >
+                  Change
+                </Button>
+              </div>
+            ) : selectedTemplate ? (
               <div className="flex items-center gap-3 p-3 rounded-lg border border-primary/20 bg-primary/[0.03]">
                 <div className="w-8 h-8 rounded-md bg-primary/10 text-primary flex items-center justify-center">
                   {(() => {
@@ -155,7 +207,7 @@ function NewPolicyForm() {
                   <PencilSimpleLine size={16} weight="duotone" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-label font-semibold text-foreground">Start from Scratch</p>
+                  <p className="text-label font-semibold text-foreground">Manual Policy Setup</p>
                   <p className="text-micro text-muted-foreground">Build your own policy with custom services and amounts.</p>
                 </div>
                 <Button
@@ -203,7 +255,7 @@ function NewPolicyForm() {
                   </>
                 ) : (
                   <>
-                    Create Policy
+                    Add Benefit Policy
                     <NavigationArrow size={14} weight="bold" className="rotate-90" />
                   </>
                 )}

@@ -6,9 +6,7 @@ import {
   MagnifyingGlass,
   IdentificationCard,
   X,
-  Buildings,
   CheckCircle,
-  Plus,
 } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -23,35 +21,35 @@ interface PolicyOption {
 const GLOBAL_POLICIES: PolicyOption[] = [
   {
     id: "POL-20260115-0001",
-    name: "Standard Health 2026",
+    name: "Acme Employee Wellness Policy FY2026",
     code: "BEN-STD-01",
-    description: "Comprehensive wellness policy for all full-time staff.",
+    description: "Core employee wellness handbook policy for full-time staff coverage.",
   },
   {
     id: "POL-20260115-0002",
-    name: "Executive Wellness",
+    name: "Acme Leadership Benefits Policy FY2026",
     code: "BEN-EXC-02",
-    description: "Premium tier benefits including specialized clinical therapy.",
+    description: "Leadership-tier benefits handbook policy with expanded clinical therapy coverage.",
   },
   {
     id: "POL-20260115-0003",
-    name: "Contractor Lite",
+    name: "Global Tech Core Benefits Policy FY2026",
     code: "BEN-CON-03",
-    description: "Stripped-down benefits for contract and intern staff.",
+    description: "Core logistics workforce handbook policy for contract and internship coverage.",
   },
 ]
 
-interface LinkPolicyModalProps {
+interface AssignPolicyModalProps {
   isOpen: boolean
   onClose: () => void
-  onLink: (policyId: string) => void
+  onAssign: (policyId: string) => void
 }
 
-export function LinkPolicyModal({
+export function AssignPolicyModal({
   isOpen,
   onClose,
-  onLink,
-}: LinkPolicyModalProps) {
+  onAssign,
+}: AssignPolicyModalProps) {
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedId, setSelectedId] = useState<string | null>(null)
 
@@ -73,10 +71,10 @@ export function LinkPolicyModal({
             </div>
             <div>
               <h3 className="text-heading font-semibold text-foreground text-balance">
-                Link benefit policy
+                Assign Benefit Policy
               </h3>
               <p className="text-body font-medium text-subtle">
-                Assign a policy to this organisation
+                Assign an existing policy to this organisation
               </p>
             </div>
           </div>
@@ -187,7 +185,7 @@ export function LinkPolicyModal({
             disabled={!selectedId}
             onClick={() => {
               if (selectedId) {
-                onLink(selectedId)
+                onAssign(selectedId)
                 onClose()
               }
             }}

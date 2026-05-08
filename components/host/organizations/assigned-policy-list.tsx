@@ -18,12 +18,12 @@ interface AssignedPolicy {
 
 interface AssignedPolicyListProps {
   policies: AssignedPolicy[];
-  onUnlink: (policyId: string) => void;
+  onUnassign: (policyId: string) => void;
   onView: (policyId: string) => void;
   onEdit: (policyId: string) => void;
 }
 
-export function AssignedPolicyList({ policies, onUnlink, onView, onEdit }: AssignedPolicyListProps) {
+export function AssignedPolicyList({ policies, onUnassign, onView, onEdit }: AssignedPolicyListProps) {
   if (policies.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 bg-muted/10 rounded-lg border border-dashed border-border/60">
@@ -91,7 +91,7 @@ export function AssignedPolicyList({ policies, onUnlink, onView, onEdit }: Assig
             actions={[
               { label: "View Policy", onClick: () => onView(policy.id) },
               { label: "Edit Policy", onClick: () => onEdit(policy.id) },
-              { label: "Revoke / Unlink", isDanger: true, onClick: () => onUnlink(policy.id) }
+              { label: "Unassign Policy", isDanger: true, onClick: () => onUnassign(policy.id) }
             ]}
           />
         </div>
