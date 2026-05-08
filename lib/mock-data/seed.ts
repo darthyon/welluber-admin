@@ -1,7 +1,7 @@
 import type { EmployeeUtilisationRow, EmployeeClaim } from "@/types/claims"
 import type { EmployeeDirectoryItem, AssignablePolicy, FormPolicy, VoucherRedemption } from "@/features/employees/types"
-import type { PolicyTemplate } from "@/types/policy"
 import { Registry } from "./registry"
+import { MOCK_POLICY_TEMPLATES } from "./policy-templates"
 import { createBrand } from "./factories/brand"
 import { createOrganization } from "./factories/organization"
 import { createServiceProvider } from "./factories/service-provider"
@@ -209,89 +209,4 @@ export const MOCK_FORM_POLICIES: FormPolicy[] = [
   { id: "POL-20260115-0003", name: "Global Tech Core Benefits Policy FY2026", groups: [{ id: "POL-20260115-0003-G1", name: "Spa Sessions" }, { id: "POL-20260115-0003-G2", name: "Massages" }] },
 ]
 
-// Policy wizard templates (prefills for new policy creation)
-export const MOCK_POLICY_TEMPLATES: PolicyTemplate[] = [
-  {
-    id: "active-living",
-    name: "Active Living",
-    tagline: "Gym access, fitness classes, and recovery services for active employees.",
-    icon: "Barbell",
-    prefill: {
-      name: "Active Living Plan",
-      description: "Gym access, fitness classes, and recovery services for active employees.",
-      eligibleEmploymentTypes: ["full-time"],
-      coversDependents: false,
-      benefitPoolType: "Individual",
-      utilisationMode: "Fixed",
-      refreshCycle: "Yearly",
-      refreshStartReference: "fy_start",
-      activationMode: "after_join",
-      groups: [
-        { id: "grp-active-wellbeing", policyId: "", name: "Physical Wellbeing", distributionType: "IndividualBenefitAmount" },
-        { id: "grp-active-recovery", policyId: "", name: "Personal Care", distributionType: "IndividualBenefitAmount" },
-      ],
-      benefits: [
-        { id: "ben-gym", groupId: "grp-active-wellbeing", serviceId: "s1", amount: 800, coPayment: { required: false, type: "Percentage", value: 0 } },
-        { id: "ben-fitness", groupId: "grp-active-wellbeing", serviceId: "s2", amount: 400, coPayment: { required: false, type: "Percentage", value: 0 } },
-        { id: "ben-spa", groupId: "grp-active-recovery", serviceId: "s6", amount: 600, coPayment: { required: false, type: "Percentage", value: 0 } },
-      ],
-    },
-  },
-  {
-    id: "mind-and-care",
-    name: "Mind & Care",
-    tagline: "Therapy, mindfulness, and nutrition support for holistic employee wellbeing.",
-    icon: "Brain",
-    prefill: {
-      name: "Mind & Care Essentials",
-      description: "Therapy, mindfulness, and nutrition support for holistic employee wellbeing.",
-      eligibleEmploymentTypes: ["full-time"],
-      coversDependents: false,
-      benefitPoolType: "Individual",
-      utilisationMode: "Fixed",
-      refreshCycle: "Yearly",
-      refreshStartReference: "fy_start",
-      activationMode: "after_join",
-      groups: [
-        { id: "grp-mind-psych", policyId: "", name: "Psychological Wellbeing", distributionType: "IndividualBenefitAmount" },
-        { id: "grp-mind-nutrition", policyId: "", name: "Nutritional Support", distributionType: "IndividualBenefitAmount" },
-      ],
-      benefits: [
-        { id: "ben-therapy", groupId: "grp-mind-psych", serviceId: "s3", amount: 1200, coPayment: { required: false, type: "Percentage", value: 0 } },
-        { id: "ben-mental", groupId: "grp-mind-psych", serviceId: "s4", amount: 600, coPayment: { required: false, type: "Percentage", value: 0 } },
-        { id: "ben-diet", groupId: "grp-mind-nutrition", serviceId: "s5", amount: 800, coPayment: { required: false, type: "Percentage", value: 0 } },
-      ],
-    },
-  },
-  {
-    id: "full-circle",
-    name: "Full Circle",
-    tagline: "Full-spectrum physical, mental, and nutritional coverage for every employee.",
-    icon: "Circle",
-    prefill: {
-      name: "Full Circle Wellness",
-      description: "Full-spectrum physical, mental, and nutritional coverage for every employee.",
-      eligibleEmploymentTypes: ["full-time"],
-      coversDependents: false,
-      benefitPoolType: "Individual",
-      utilisationMode: "Fixed",
-      refreshCycle: "Yearly",
-      refreshStartReference: "fy_start",
-      activationMode: "after_join",
-      groups: [
-        { id: "grp-full-physical", policyId: "", name: "Physical Wellbeing", distributionType: "IndividualBenefitAmount" },
-        { id: "grp-full-psych", policyId: "", name: "Psychological Wellbeing", distributionType: "IndividualBenefitAmount" },
-        { id: "grp-full-nutrition", policyId: "", name: "Nutritional Support", distributionType: "IndividualBenefitAmount" },
-        { id: "grp-full-care", policyId: "", name: "Personal Care", distributionType: "IndividualBenefitAmount" },
-      ],
-      benefits: [
-        { id: "ben-gym-fc", groupId: "grp-full-physical", serviceId: "s1", amount: 1000, coPayment: { required: false, type: "Percentage", value: 0 } },
-        { id: "ben-fitness-fc", groupId: "grp-full-physical", serviceId: "s2", amount: 600, coPayment: { required: false, type: "Percentage", value: 0 } },
-        { id: "ben-therapy-fc", groupId: "grp-full-psych", serviceId: "s3", amount: 1200, coPayment: { required: false, type: "Percentage", value: 0 } },
-        { id: "ben-mental-fc", groupId: "grp-full-psych", serviceId: "s4", amount: 600, coPayment: { required: false, type: "Percentage", value: 0 } },
-        { id: "ben-diet-fc", groupId: "grp-full-nutrition", serviceId: "s5", amount: 800, coPayment: { required: false, type: "Percentage", value: 0 } },
-        { id: "ben-spa-fc", groupId: "grp-full-care", serviceId: "s6", amount: 600, coPayment: { required: false, type: "Percentage", value: 0 } },
-      ],
-    },
-  },
-]
+export { MOCK_POLICY_TEMPLATES }

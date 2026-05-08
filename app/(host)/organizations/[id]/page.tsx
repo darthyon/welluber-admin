@@ -57,6 +57,7 @@ import { EmployeeDetailView } from "@/components/host/organizations/employee-det
 import { BulkUploadWizard } from "@/components/host/organizations/bulk-upload-wizard"
 import { AssignedPolicyList } from "@/components/host/organizations/assigned-policy-list"
 import { OrgSetupGuide } from "@/components/host/organizations/org-setup-guide"
+import { OrgSetupChecklist } from "@/components/host/organizations/org-setup-checklist"
 import { OrgTiersConfig } from "@/components/host/organizations/org-tiers-config"
 import { AssignPolicyModal } from "@/components/host/organizations/assign-policy-modal"
 import { BenefitPolicyWizard } from "@/components/host/policies/benefit-policy-wizard"
@@ -475,6 +476,19 @@ function OrganizationDetailContent() {
     policies: assignedPolicies.map((p) => p.name),
   } as import("@/features/organizations/types").Organization
 
+  const handleAddEmployee = () => {
+    setActiveTab("employees")
+    setActiveEmployeeSubTab("directory")
+    setIsBulkUploading("true")
+
+    if (orgForSetup.employeeCount > 0 && assignedPolicies.length > 0) {
+      setToastMessage("Opened bulk upload with tier auto-match policy assignment")
+      return
+    }
+
+    setToastMessage("Opened bulk upload")
+  }
+
   return (
     <div className="pb-12">
       <AssignPolicyModal
@@ -631,7 +645,15 @@ function OrganizationDetailContent() {
       <div className="p-6 lg:p-8">
         {activeTab === "profile" && (
           <div className="animate-in space-y-6 fade-in">
-            <OrgSetupGuide organization={orgForSetup} />
+            <OrgSetupChecklist
+              orgId={orgId}
+              status={orgStatus}
+              tierCount={orgTierConfigs.length}
+              employeeCount={orgForSetup.employeeCount}
+              policyCount={assignedPolicies.length}
+              employeesWithoutPolicy={orgForSetup.employeesWithoutPolicy ?? 0}
+            />
+            {orgStatus !== "pending" && <OrgSetupGuide organization={orgForSetup} />}
             {/* Account Details */}
             <DetailSection
               title="Account Details"
@@ -1166,14 +1188,14 @@ function OrganizationDetailContent() {
                             <Upload size={14} weight="bold" /> Bulk Upload
                           </Button>
                           <Button
-                            asChild
                             variant="secondary"
                             size="sm"
                             className="h-8 gap-1.5 text-label font-medium"
+                            onClick={handleAddEmployee}
                           >
-                            <Link href={`/employees/new?org=${orgId}`}>
+                            <span className="inline-flex items-center gap-1.5">
                               <Plus size={14} weight="bold" /> Add Employee
-                            </Link>
+                            </span>
                           </Button>
                           <div className="mx-1 h-4 w-[1px] bg-border" />
                           <ViewToggle
@@ -2059,9 +2081,9 @@ function OrganizationDetailContent() {
                   filters={
                     <>
                       <FilterItem
-                        label="Main Service"
+                        label="Benefit"
                         options={[
-                          { label: "All Services", value: "all" },
+                          { label: "All Benefits", value: "all" },
                           {
                             label: "Physical Wellbeing",
                             value: "Physical Wellbeing",

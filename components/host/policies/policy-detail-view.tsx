@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -19,6 +19,7 @@ import {
   Plus,
   ArrowsDownUp,
   CaretRight,
+  CaretLeft,
   Target,
 } from "@phosphor-icons/react";
 import { BenefitPolicy, BenefitGroup, Benefit } from "@/types/policy";
@@ -82,7 +83,23 @@ export function PolicyDetailView({
   onDelete,
 }: PolicyDetailViewProps) {
   const router = useRouter();
+  const isSubPolicy = Boolean(policy.parentPolicyId);
+  const availableTabs = useMemo(
+    () => (isSubPolicy ? TABS.filter((tab) => tab.id !== "sub-policies") : TABS),
+    [isSubPolicy]
+  );
   const [activeTab, setActiveTab] = useState<TabId>("overview");
+
+  useEffect(() => {
+    const tabStillAvailable = availableTabs.some((tab) => tab.id === activeTab);
+    if (!tabStillAvailable) {
+      setActiveTab("overview");
+    }
+  }, [activeTab, availableTabs]);
+
+  useEffect(() => {
+    setActiveTab("overview");
+  }, [policy.id]);
 
   const statusVariant = policy.status === "active" ? "emerald" : policy.status === "draft" ? "amber" : "rose";
   const canEdit = policy.status !== "deactivated";
@@ -128,6 +145,19 @@ export function PolicyDetailView({
             </div>
 
             <div className="flex items-center gap-2">
+              {policy.parentPolicyId && (
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={() =>
+                    router.push(`/policies?policyId=${policy.parentPolicyId}&mode=view&wizard=open`)
+                  }
+                  className="rounded-full text-body font-medium transition-all"
+                >
+                  <CaretLeft size={16} weight="bold" className="mr-1.5" />
+                  Back to Parent Policy
+                </Button>
+              )}
               {canCreateSubPolicy && (
                 <Button
                   variant="outline"
@@ -155,7 +185,7 @@ export function PolicyDetailView({
 
           {/* Tabs - matches org page pattern */}
           <div className="mt-8 flex items-center gap-6 border-b border-border">
-            {TABS.map((tab) => {
+            {availableTabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
               return (
@@ -191,7 +221,7 @@ export function PolicyDetailView({
             {activeTab === "overview" && (
               <OverviewTab policy={policy} groups={groups} benefits={benefits} onEdit={onEdit} />
             )}
-            {activeTab === "sub-policies" && (
+            {!isSubPolicy && activeTab === "sub-policies" && (
               <SubPoliciesTab
                 policy={policy}
                 subPolicies={subPolicies}

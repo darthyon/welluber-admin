@@ -215,7 +215,6 @@ function PoliciesContent() {
 
   const handleCreateNew = () => router.push("/policies/new");
   const handleCreateFromTemplate = (templateId: string) => router.push(`/policies/new?template=${templateId}`);
-  const handleCreateFromClone = (policyId: string) => router.push(`/policies/new?clone=${policyId}`);
 
   const handleClone = (policy: PolicyListItem) => {
     setCloneTarget(policy);
@@ -482,9 +481,7 @@ function PoliciesContent() {
           </Button>
           <div className="h-4 w-[1px] bg-border mx-1" />
           <PolicyCreationLauncher
-            policies={policies}
             onManual={handleCreateNew}
-            onClone={handleCreateFromClone}
             onTemplate={handleCreateFromTemplate}
           />
         </div>

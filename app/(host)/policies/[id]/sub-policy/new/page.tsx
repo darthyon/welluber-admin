@@ -29,6 +29,23 @@ export default function NewSubPolicyPage({ params }: { params: { id: string } })
     );
   }
 
+  if (parent.parentPolicyId) {
+    return (
+      <div className="flex flex-col items-center justify-center py-32 text-center">
+        <p className="text-heading font-semibold text-foreground">Sub-policy nesting is not allowed.</p>
+        <p className="mt-1 text-body text-muted-foreground">
+          Create sub-policies from a parent policy only.
+        </p>
+        <button
+          onClick={() => router.push(`/policies?policyId=${parent.id}&mode=view&wizard=open`)}
+          className="mt-4 text-body font-medium text-primary hover:underline"
+        >
+          Return to policy
+        </button>
+      </div>
+    );
+  }
+
   const org = MOCK_ORGS.find(o => o.id === parent.organizationId);
   const orgEmployees = MOCK_EMPLOYEES.filter(e => e.orgId === parent.organizationId);
   const orgTierConfigs = org?.tierConfigs ?? [];

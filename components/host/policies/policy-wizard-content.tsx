@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import {
   IdentificationCard,
   Gear,
@@ -36,7 +36,7 @@ import {
   ActivationMode,
 } from "@/types/policy";
 import type { PolicyGlossaryKey } from "@/lib/policy-glossary";
-import { MOCK_EMPLOYEES, SERVICES } from "@/lib/mock-data";
+import { MOCK_ORGS, SERVICES } from "@/lib/mock-data";
 import type { MainServiceId } from "@/lib/mock-data/service-catalog";
 import { validateBenefit, validateGroupInsert } from "@/lib/policy/validation";
 
@@ -184,7 +184,14 @@ export function PolicyReviewCards({ policy, groups, benefits }: PolicyReviewCard
           </h4>
           <ReadField label="Dependents" value={policy.coversDependents ? "Covered" : "Employee Only"} />
           <ReadField label="Employee Pool Type" value={policy.benefitPoolType} />
+          <ReadField label="Employee Policy Spending Cap" value={policy.totalCapAmount ? `RM ${policy.totalCapAmount.toFixed(2)}` : "Not Set"} />
           {policy.coversDependents && <ReadField label="Dependents Pool Type" value={policy.dependentsPoolType === "SharedWithEmployee" ? "Shared with Employee" : policy.dependentsPoolType} />}
+          {policy.coversDependents && policy.dependentsPoolType !== "SharedWithEmployee" && (
+            <ReadField
+              label="Dependents Policy Spending Cap"
+              value={policy.dependentsCapAmount ? `RM ${policy.dependentsCapAmount.toFixed(2)}` : "Not Set"}
+            />
+          )}
           <ReadField label="Utilisation Mode" value={policy.utilisationMode === "Fixed" ? "Fixed Allocation" : "Prorated Allocation"} />
           {policy.utilisationMode === "Prorated" && <ReadField label="Prorate Unit" value={policy.prorateUnit} />}
           <ReadField label="Refresh Cycle" value={policy.refreshCycle} />
@@ -295,6 +302,16 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
   const [splitBenefitIds, setSplitBenefitIds] = useState<Set<string>>(new Set());
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
+  const tierOptions = useMemo(() => {
+    if (!policyData.organizationId) return [] as { value: string; label: string }[];
+    const org = MOCK_ORGS.find((item) => item.id === policyData.organizationId);
+    const configs = org?.tierConfigs ?? [];
+    return configs.map((tier) => ({
+      value: tier.id,
+      label: tier.code ? `${tier.code} - ${tier.name}` : tier.name,
+    }));
+  }, [policyData.organizationId]);
+
   // ── Validation ────────────────────────────────────────────────────────────
   const validate = (): boolean => {
     const errors: Record<string, string> = {};
@@ -312,6 +329,15 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
 
     if (policyData.coversDependents && !policyData.dependentsPoolType) {
       errors.dependentsPoolType = "Select a pool type for dependents";
+    }
+
+    if (
+      policyData.coversDependents &&
+      policyData.dependentsPoolType &&
+      policyData.dependentsPoolType !== "SharedWithEmployee" &&
+      (!policyData.dependentsCapAmount || policyData.dependentsCapAmount <= 0)
+    ) {
+      errors.dependentsCapAmount = "Enter a dependents spending cap greater than 0";
     }
 
     if (policyData.refreshStartReference === "custom_date" && !policyData.refreshCustomDate) {
@@ -442,18 +468,18 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
 
   // ── Policy Details section ────────────────────────────────────────────────
   const renderPolicyDetailsSection = () => (
-    <div className="space-y-5">
+    <div className="space-y-5 md:max-w-xl">
       <SectionHeader icon={IdentificationCard} title="Policy Details" description="Name your policy and define who is eligible" />
 
       <div className="space-y-1.5">
         <FieldLabel required>Policy Name</FieldLabel>
-        <div className="relative">
+        <div className="flex items-center w-full rounded-lg border bg-background focus-within:ring-2 focus-within:ring-primary/10 focus-within:border-primary/40 transition-all overflow-hidden">
           <input
             type="text"
             placeholder="e.g. Wellness Premium 2026"
             className={cn(
-              "w-full px-4 py-3 pr-24 bg-background border rounded-lg text-body outline-none transition-all font-semibold text-foreground focus:ring-2 focus:ring-primary/10 focus:border-primary/40",
-              validationErrors.name ? "border-destructive focus:border-destructive" : "border-border"
+              "flex-1 min-w-0 px-4 py-3 border-0 outline-none text-body font-semibold text-foreground",
+              validationErrors.name ? "border-destructive" : ""
             )}
             value={policyData.name || ""}
             onChange={(e) => setPolicyData({ ...policyData, name: e.target.value })}
@@ -464,7 +490,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
               const random = AI_POLICY_NAMES[Math.floor(Math.random() * AI_POLICY_NAMES.length)];
               setPolicyData({ ...policyData, name: random });
             }}
-            className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex items-center gap-1 text-label font-medium text-primary hover:text-primary/80 transition-colors px-2 py-1 rounded-md hover:bg-primary/5"
+            className="shrink-0 inline-flex items-center gap-1 text-label font-medium text-primary hover:text-primary/80 transition-colors px-3 py-3 hover:bg-primary/5"
           >
             <DiceFive size={14} weight="bold" />
             Suggest
@@ -488,16 +514,21 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
 
       <div className="space-y-1.5">
         <FieldLabel required>Organisation</FieldLabel>
-        <input
-          type="text"
-          placeholder="e.g. ORG-20260115-0001"
+        <select
           className={cn(
-            "w-full px-4 py-3 bg-background border rounded-lg text-body outline-none transition-all font-semibold text-foreground focus:ring-2 focus:ring-primary/10 focus:border-primary/40",
+            "w-full px-4 pr-10 py-3 bg-background border rounded-lg text-body outline-none transition-all font-semibold text-foreground focus:ring-2 focus:ring-primary/10 focus:border-primary/40",
             validationErrors.organizationId ? "border-destructive focus:border-destructive" : "border-border"
           )}
           value={policyData.organizationId || ""}
           onChange={(e) => setPolicyData({ ...policyData, organizationId: e.target.value })}
-        />
+        >
+          <option value="">Select organisation...</option>
+          {MOCK_ORGS.map((org) => (
+            <option key={org.id} value={org.id}>
+              {org.name}
+            </option>
+          ))}
+        </select>
         {validationErrors.organizationId && <ErrorText>{validationErrors.organizationId}</ErrorText>}
         <HelpText>The organisation this policy belongs to. Cannot be changed after creation.</HelpText>
       </div>
@@ -612,23 +643,25 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
             <div className="mt-5 space-y-1.5">
               <FieldLabel>Eligible Tiers</FieldLabel>
               {(() => {
-                const availableTiers = [...new Set(MOCK_EMPLOYEES.map((e) => e.tier).filter(Boolean))] as string[];
-                if (availableTiers.length === 0) return (
-                  <p className="text-label text-faint italic">No tier data available yet.</p>
+                if (!policyData.organizationId) return (
+                  <p className="text-label text-faint italic">Select an organisation to load tier options.</p>
+                );
+                if (tierOptions.length === 0) return (
+                  <p className="text-label text-faint italic">No tier configs found for this organisation yet.</p>
                 );
                 return (
                   <div className="flex flex-wrap gap-2">
-                    {availableTiers.map((tier) => {
-                      const selected = policyData.eligibility?.tierIds?.includes(tier) ?? false;
+                    {tierOptions.map((tier) => {
+                      const selected = policyData.eligibility?.tierIds?.includes(tier.value) ?? false;
                       return (
                         <button
                           type="button"
-                          key={tier}
+                          key={tier.value}
                           onClick={() => {
                             const current = policyData.eligibility?.tierIds ?? [];
                             const updated = selected
-                              ? current.filter((id) => id !== tier)
-                              : [...current, tier];
+                              ? current.filter((id) => id !== tier.value)
+                              : [...current, tier.value];
                             setPolicyData({
                               ...policyData,
                               eligibility: { ...policyData.eligibility, tierIds: updated },
@@ -641,7 +674,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
                               : "border-border bg-card text-muted-foreground hover:border-border/80"
                           )}
                         >
-                          {tier}
+                          {tier.label}
                         </button>
                       );
                     })}
@@ -661,34 +694,13 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
     const availableCycles = getAvailableRefreshCycles(policyData.utilisationMode ?? "Fixed", policyData.prorateUnit);
 
     return (
-    <div className="space-y-6">
+    <div className="space-y-6 md:max-w-xl">
       <SectionHeader icon={Gear} title="Pool & Cycle" description="Configure fund allocation, refresh intervals, and activation" />
-
-      {/* ── Cover Dependents ── */}
-      <div className="space-y-3">
-        <FieldLabel helpKey="dependentsPooling">Cover Dependents</FieldLabel>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <ChoiceCard
-            title="Employee Only"
-            description="This policy covers employees only."
-            icon={User}
-            selected={policyData.coversDependents !== true}
-            onSelect={() => setPolicyData({ ...policyData, coversDependents: false, dependentsPoolType: undefined })}
-          />
-          <ChoiceCard
-            title="Cover Dependents"
-            description="This policy also covers employee dependents."
-            icon={Users}
-            selected={policyData.coversDependents === true}
-            onSelect={() => setPolicyData({ ...policyData, coversDependents: true })}
-          />
-        </div>
-      </div>
 
       {/* ── Employee Pool Type ── */}
       <div className="space-y-3">
         <FieldLabel helpKey="poolType">Employee Pool Type</FieldLabel>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:max-w-xl">
           <ChoiceCard
             title="Individual"
             description="Each employee gets their own benefit pool."
@@ -706,34 +718,14 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
         </div>
       </div>
 
-      {/* ── Dependents Pool Type ── */}
-      {policyData.coversDependents && (
-        <div className="space-y-3">
-          <FieldLabel required helpKey="dependentsPooling">Dependents Pool Type</FieldLabel>
-          {validationErrors.dependentsPoolType && <ErrorText>{validationErrors.dependentsPoolType}</ErrorText>}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {DEPENDENTS_POOL_OPTIONS.map((opt) => (
-              <ChoiceCard
-                key={opt.value}
-                title={opt.title}
-                description={opt.description}
-                icon={opt.icon}
-                selected={policyData.dependentsPoolType === opt.value}
-                onSelect={() => setPolicyData({ ...policyData, dependentsPoolType: opt.value })}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* ── Policy Spending Cap ── */}
+      {/* ── Employee Spending Cap ── */}
       <div className="space-y-1.5">
-        <FieldLabel helpKey="spendingCap">Policy Spending Cap (RM)</FieldLabel>
+        <FieldLabel helpKey="spendingCap">Employee Policy Spending Cap (RM)</FieldLabel>
         <input
           type="number"
           min={0}
           placeholder="e.g. 3000"
-          className="w-full md:w-64 px-4 py-2.5 bg-background border border-border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all"
+          className="w-full px-4 py-2.5 bg-background border border-border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all"
           value={policyData.totalCapAmount ?? ""}
           onChange={(e) =>
             setPolicyData({
@@ -745,13 +737,85 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
         <HelpText>Optional. Maximum total an employee can claim under this policy per cycle.</HelpText>
       </div>
 
+      {/* ── Cover Dependents ── */}
+      <div className="space-y-2">
+        <FieldLabel helpKey="dependentsPooling">Cover Dependents</FieldLabel>
+        <label className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-body font-medium text-foreground">
+          <input
+            type="checkbox"
+            checked={policyData.coversDependents === true}
+            onChange={(e) =>
+              setPolicyData({
+                ...policyData,
+                coversDependents: e.target.checked,
+                dependentsPoolType: e.target.checked ? policyData.dependentsPoolType : undefined,
+                dependentsCapAmount: e.target.checked ? policyData.dependentsCapAmount : undefined,
+              })
+            }
+            className="h-4 w-4 rounded border-border text-primary focus:ring-ring"
+          />
+          Include dependents in this policy
+        </label>
+      </div>
+
+      {/* ── Dependents Pool Type ── */}
+      {policyData.coversDependents && (
+        <div className="space-y-3">
+          <FieldLabel required helpKey="dependentsPooling">Dependents Pool Type</FieldLabel>
+          {validationErrors.dependentsPoolType && <ErrorText>{validationErrors.dependentsPoolType}</ErrorText>}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:max-w-2xl">
+            {DEPENDENTS_POOL_OPTIONS.map((opt) => (
+              <ChoiceCard
+                key={opt.value}
+                title={opt.title}
+                description={opt.description}
+                icon={opt.icon}
+                selected={policyData.dependentsPoolType === opt.value}
+                onSelect={() =>
+                  setPolicyData({
+                    ...policyData,
+                    dependentsPoolType: opt.value,
+                    dependentsCapAmount:
+                      opt.value === "SharedWithEmployee" ? undefined : policyData.dependentsCapAmount,
+                  })
+                }
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {policyData.coversDependents && policyData.dependentsPoolType !== "SharedWithEmployee" && (
+        <div className="space-y-1.5">
+          <FieldLabel required helpKey="spendingCap">Dependents Policy Spending Cap (RM)</FieldLabel>
+          <input
+            type="number"
+            min={0}
+            placeholder="e.g. 1500"
+            className={cn(
+              "w-full px-4 py-2.5 bg-background border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all",
+              validationErrors.dependentsCapAmount ? "border-destructive" : "border-border"
+            )}
+            value={policyData.dependentsCapAmount ?? ""}
+            onChange={(e) =>
+              setPolicyData({
+                ...policyData,
+                dependentsCapAmount: e.target.value === "" ? undefined : parseFloat(e.target.value),
+              })
+            }
+          />
+          {validationErrors.dependentsCapAmount && <ErrorText>{validationErrors.dependentsCapAmount}</ErrorText>}
+          <HelpText>Maximum total dependents can claim per cycle for this policy.</HelpText>
+        </div>
+      )}
+
       {/* ── Separator ── */}
       <div className="border-t border-border/60 pt-6 space-y-6">
 
       {/* ── Utilisation Mode ── */}
       <div className="space-y-3">
         <FieldLabel helpKey="utilisationMode">Utilisation Mode</FieldLabel>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:max-w-xl">
           <ChoiceCard
             title="Fixed Allocation"
             description="Full benefit pool is granted upon assignment."
@@ -778,11 +842,11 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
       {policyData.utilisationMode === "Prorated" && (
         <div className="space-y-1.5">
           <FieldLabel required helpKey="prorateUnit">Prorate Unit</FieldLabel>
-          <select
-            className={cn(
-              "w-full px-4 py-2.5 bg-background border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all",
-              validationErrors.prorateUnit ? "border-destructive" : "border-border"
-            )}
+            <select
+              className={cn(
+                "w-full px-4 pr-10 py-2.5 bg-background border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all",
+                validationErrors.prorateUnit ? "border-destructive" : "border-border"
+              )}
             value={policyData.prorateUnit || ""}
             onChange={(e) => {
               const newUnit = e.target.value as ProrateUnit;
@@ -809,7 +873,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
           <FieldLabel helpKey="refreshCycle">Refresh Cycle</FieldLabel>
           <select
             className={cn(
-              "w-full px-4 py-2.5 bg-background border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all",
+              "w-full px-4 pr-10 py-2.5 bg-background border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all",
               validationErrors.refreshCycle ? "border-destructive" : "border-border"
             )}
             value={policyData.refreshCycle}
@@ -860,12 +924,12 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
       {policyData.refreshStartReference === "custom_date" && (
         <div className="space-y-1.5">
           <FieldLabel required>Custom Refresh Date</FieldLabel>
-          <input
-            type="date"
-            className={cn(
-              "w-full px-4 py-2.5 bg-background border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all",
-              validationErrors.refreshCustomDate ? "border-destructive" : "border-border"
-            )}
+                <input
+                  type="date"
+                  className={cn(
+                    "w-full px-4 py-2.5 bg-background border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all",
+                    validationErrors.refreshCustomDate ? "border-destructive" : "border-border"
+                  )}
             value={policyData.refreshCustomDate || ""}
             onChange={(e) => setPolicyData({ ...policyData, refreshCustomDate: e.target.value })}
           />
@@ -925,12 +989,12 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
         {policyData.activationMode === "custom_date" && (
           <div className="space-y-1.5 pt-2">
             <FieldLabel required>Custom Activation Date</FieldLabel>
-            <input
-              type="date"
-              className={cn(
-                "w-full px-4 py-2.5 bg-background border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all",
-                validationErrors.activationCustomDate ? "border-destructive" : "border-border"
-              )}
+                <input
+                  type="date"
+                  className={cn(
+                    "w-full px-4 py-2.5 bg-background border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all",
+                    validationErrors.activationCustomDate ? "border-destructive" : "border-border"
+                  )}
               value={policyData.activationCustomDate || ""}
               onChange={(e) => setPolicyData({ ...policyData, activationCustomDate: e.target.value })}
             />

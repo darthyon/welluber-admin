@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { PolicyTemplate } from "@/types/policy";
-import { MOCK_POLICY_TEMPLATES } from "@/lib/mock-data";
+import { MOCK_POLICY_TEMPLATES } from "@/lib/mock-data/policy-templates";
 
 interface UsePolicyTemplatesReturn {
   templates: PolicyTemplate[];
