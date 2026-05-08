@@ -128,12 +128,12 @@ export default function VoucherPackagesPage() {
           data={filteredData}
           onView={(voucher) =>
             router.push(
-              `/service-providers/${voucher.spId}?voucherView=form&voucherId=${voucher.id}&voucherReadOnly=true`
+              `/service-providers/${voucher.spId}?voucherView=detail&voucherId=${voucher.id}`
             )
           }
           onEdit={(voucher) =>
             router.push(
-              `/service-providers/${voucher.spId}?voucherView=form&voucherId=${voucher.id}&voucherReadOnly=false`
+              `/service-providers/${voucher.spId}?voucherView=edit&voucherId=${voucher.id}`
             )
           }
           onViewGenerated={(voucher) =>

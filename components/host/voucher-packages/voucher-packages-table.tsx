@@ -39,6 +39,8 @@ export function VoucherPackagesTable({
   return (
     <SharedDataTable
       data={data}
+      freezeFirst
+      freezeLast
       columns={[
         {
           header: "Voucher",
@@ -171,11 +173,11 @@ export function VoucherPackagesTable({
               <ActionPopover
                 actions={[
                   {
-                    label: "View Voucher",
+                    label: "View Voucher Package",
                     onClick: () => onView?.(voucher),
                   },
                   {
-                    label: "Edit Voucher",
+                    label: "Edit Voucher Package",
                     onClick: () => onEdit?.(voucher),
                   },
                   {

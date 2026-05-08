@@ -3,7 +3,7 @@ import type { Organization } from "@/features/organizations/types"
 const GENERATED_ORGS = [
   { name: "BrightPath Technologies Sdn Bhd", industry: "Technology", subIndustry: "Cybersecurity", type: "sme" as const, plan: "standard" as const, status: "active" as const, empCount: 85, util: 42 },
   { name: "Meridian Logistics Group", industry: "Logistics", subIndustry: "Freight & Distribution", type: "enterprise" as const, plan: "premium" as const, status: "active" as const, empCount: 320, util: 61 },
-  { name: "Solaris Energy Ventures", industry: "Energy", subIndustry: "Renewable Energy", type: "sme" as const, plan: "standard" as const, status: "pending" as const, empCount: 60, util: 22 },
+  { name: "Solaris Energy Ventures", industry: "Energy", subIndustry: "Renewable Energy", type: "sme" as const, plan: "standard" as const, status: "inactive" as const, empCount: 60, util: 22 },
   { name: "Pinnacle Medical Group", industry: "Healthcare", subIndustry: "Private Healthcare", type: "enterprise" as const, plan: "enterprise" as const, status: "active" as const, empCount: 910, util: 78 },
   { name: "Horizon Retail Holdings", industry: "Retail", subIndustry: "Fashion & Apparel", type: "enterprise" as const, plan: "premium" as const, status: "active" as const, empCount: 550, util: 55 },
   { name: "Apex Construction Sdn Bhd", industry: "Construction", subIndustry: "Civil Engineering", type: "sme" as const, plan: "standard" as const, status: "active" as const, empCount: 140, util: 38 },
@@ -64,7 +64,7 @@ export function createOrganization(index: number): Organization {
     type: "sme",
     financialYearStart: "2026-04-01T00:00:00Z",
     subscription: { plan: "standard", billingInformation: "GT Logistics Finance", paymentMethod: "credit_card", startDate: "2026-03-01T10:00:00Z", status: "active" },
-    status: "pending",
+    status: "inactive",
     tinNumber: "TR-993021-02",
     bankAccountDetails: { bankName: "CIMB Bank", accountNumber: "8001 2233 4455", accountName: "Global Tech Solutions" },
     employeeCount: 120,

@@ -122,8 +122,10 @@ export default function EmployeesPage() {
                 employeeId: emp.id,
                 empCode: emp.empCode,
                 joinDate: emp.joinDate,
+                lastActive: emp.lastActive,
                 department: emp.department,
                 tier: emp.tier,
+                employmentType: emp.employmentType,
                 benefitPolicies: emp.benefitPolicies,
                 dependentsCount: 0,
               }}

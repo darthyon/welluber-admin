@@ -394,6 +394,8 @@ function AccountDetailContent() {
 
                <SharedDataTable
                  defaultSort={{ key: "createdAt", direction: "desc" }}
+                 freezeFirst
+                 freezeLast
                  columns={[
                    {
                      header: "Description",

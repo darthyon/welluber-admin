@@ -120,6 +120,7 @@ export function VersionWizard({
   const [isSuccess, setIsSuccess] = useState(false);
 
   // Step 1 state
+  const [versionName, setVersionName] = useState<string>(parentPolicy.name);
   const [capOverride, setCapOverride] = useState<string>(
     parentPolicy.totalCapAmount ? String(parentPolicy.totalCapAmount) : ""
   );
@@ -254,6 +255,7 @@ export function VersionWizard({
         policy: {
           ...parentPolicy,
           id: undefined as unknown as string,
+          name: versionName || parentPolicy.name,
           parentPolicyId: parentPolicy.id,
           totalCapAmount: capNum,
           targetEmployeeIds: confirmedEmployeeIds,
@@ -269,6 +271,21 @@ export function VersionWizard({
 
   const renderStep1 = () => (
     <div className="space-y-6">
+      {/* Version name */}
+      <div className="glass-card rounded-xl p-5">
+        <p className="text-label font-semibold text-subtle mb-1">Version Name</p>
+        <p className="text-label text-faint mb-3">
+          Give this version a descriptive name to distinguish it from the parent policy.
+        </p>
+        <input
+          type="text"
+          placeholder="e.g. Engineering Supplement FY2026"
+          value={versionName}
+          onChange={e => setVersionName(e.target.value)}
+          className="w-full max-w-md px-4 py-2.5 bg-background border border-border rounded-lg text-body font-semibold text-foreground outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/40 transition-all"
+        />
+      </div>
+
       {/* Policy cap */}
       <div className="glass-card rounded-xl p-5">
         <p className="text-label font-semibold text-subtle mb-1">Override Spending Cap (RM)</p>

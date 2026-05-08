@@ -252,7 +252,7 @@ export default function MembersPage() {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
             >
-              <SharedDataTable 
+              <SharedDataTable freezeFirst freezeLast 
                 data={filteredMembers}
                 columns={columns}
               />

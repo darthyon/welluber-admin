@@ -173,6 +173,8 @@ export function SpBranchesTab({ sp }: SpBranchesTabProps) {
         ) : (
           <SharedDataTable
             data={filteredBranches}
+            freezeFirst
+            freezeLast
             onRowClick={handleView}
             columns={[
               {

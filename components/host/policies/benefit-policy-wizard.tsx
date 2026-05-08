@@ -52,7 +52,7 @@ const CONTENT_TABS = [
   { id: 1, title: "Overview" },
   { id: 2, title: "Pool & Cycle" },
   { id: 3, title: "Benefit Groups" },
-  { id: 4, title: "Utilisation & Claims", viewOnly: true },
+  { id: 4, title: "Claims Usage", viewOnly: true },
 ];
 
 const CREATE_STEPS = [
@@ -1749,7 +1749,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
             {currentStep === 5 && mode === "create" && renderReviewStep()}
             {currentStep === 4 && isViewMode && (
               <DetailSection
-                title="Utilisation & Claims"
+                title="Claims Usage"
                 icon={<Receipt size={18} weight="duotone" />}
                 description="Benefit usage and claim history for all employees on this policy"
                 ghost

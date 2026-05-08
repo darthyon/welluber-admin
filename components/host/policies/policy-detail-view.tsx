@@ -5,9 +5,12 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { DetailSection } from "@/components/shared/detail-section";
 import { DetailField } from "@/components/shared/detail-field";
+import { SharedDataTable } from "@/components/shared/data-table";
+import { ActionPopover, type ActionItem } from "@/components/shared/action-popover";
 import {
   IdentificationCard,
   Gear,
@@ -18,12 +21,13 @@ import {
   NotePencil,
   Plus,
   ArrowsDownUp,
-  CaretRight,
   CaretLeft,
-  Target,
+  Funnel,
+  CaretDown,
 } from "@phosphor-icons/react";
 import { BenefitPolicy, BenefitGroup, Benefit } from "@/types/policy";
 import { SERVICES } from "@/lib/mock-data/service-catalog";
+import { MOCK_ORGS } from "@/lib/mock-data";
 import type { PolicyListItem } from "@/features/policies/types";
 import type { EmployeeDirectoryItem } from "@/features/employees/types";
 
@@ -36,11 +40,14 @@ interface PolicyDetailViewProps {
   versions?: PolicyListItem[];
   versionOverrideCounts?: Record<string, number>;
   parentPolicyName?: string;
+  parentBenefits?: Benefit[];
   employees?: EmployeeDirectoryItem[];
   onEdit: () => void;
   onClone: () => void;
   onDeactivate: () => void;
   onDelete: () => void;
+  onEditVersion?: (id: string) => void;
+  onRemoveVersion?: (id: string) => void;
 }
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -51,6 +58,13 @@ const TABS = [
   { id: "employees", label: "Assigned Employees", icon: Buildings },
   { id: "audit", label: "Audit Log", icon: ClockCounterClockwise },
 ] as const;
+
+const EMPLOYMENT_TYPE_LABELS: Record<string, string> = {
+  "full-time": "Full-time",
+  "part-time": "Part-time",
+  "contract": "Contract",
+  "internship": "Internship",
+};
 
 type TabId = (typeof TABS)[number]["id"];
 
@@ -76,11 +90,14 @@ export function PolicyDetailView({
   versions = [],
   versionOverrideCounts = {},
   parentPolicyName,
+  parentBenefits,
   employees,
   onEdit,
   onClone,
   onDeactivate,
   onDelete,
+  onEditVersion,
+  onRemoveVersion,
 }: PolicyDetailViewProps) {
   const router = useRouter();
   const isVersion = Boolean(policy.parentPolicyId);
@@ -219,7 +236,17 @@ export function PolicyDetailView({
             transition={{ duration: 0.18, ease: "easeOut" }}
           >
             {activeTab === "overview" && (
-              <OverviewTab policy={policy} groups={groups} benefits={benefits} onEdit={onEdit} />
+              isVersion ? (
+                <VersionOverviewTab
+                  policy={policy}
+                  groups={groups}
+                  benefits={benefits}
+                  parentBenefits={parentBenefits}
+                  parentPolicyName={parentPolicyName}
+                />
+              ) : (
+                <OverviewTab policy={policy} groups={groups} benefits={benefits} onEdit={onEdit} />
+              )
             )}
             {!isVersion && activeTab === "versions" && (
               <VersionsTab
@@ -228,6 +255,8 @@ export function PolicyDetailView({
                 overrideCounts={versionOverrideCounts}
                 onCreateVersion={() => router.push(`/policies/${policy.id}/versions/new`)}
                 onViewVersion={(id) => router.push(`/policies?policyId=${id}&mode=view&wizard=open`)}
+                onEditVersion={onEditVersion ?? ((id) => router.push(`/policies/${id}/edit`))}
+                onRemoveVersion={onRemoveVersion ?? (() => {})}
               />
             )}
             {activeTab === "employees" && (
@@ -251,23 +280,22 @@ function VersionsTab({
   overrideCounts = {},
   onCreateVersion,
   onViewVersion,
+  onEditVersion,
+  onRemoveVersion,
 }: {
   policy: BenefitPolicy;
   versions: PolicyListItem[];
   overrideCounts: Record<string, number>;
   onCreateVersion: () => void;
   onViewVersion: (id: string) => void;
+  onEditVersion: (id: string) => void;
+  onRemoveVersion: (id: string) => void;
 }) {
   const canCreateVersion = policy.status === "active" && !policy.parentPolicyId;
 
-  const totalCovered = useMemo(
-    () => versions.reduce((sum, sp) => sum + (sp.targetEmployeeIds?.length ?? 0), 0),
+  const versionRows = useMemo(
+    () => versions.map((v, i) => ({ ...v, _versionLabel: `1.${i + 1}` })),
     [versions]
-  );
-
-  const totalOverrides = useMemo(
-    () => versions.reduce((sum, sp) => sum + (overrideCounts[sp.id] ?? 0), 0),
-    [versions, overrideCounts]
   );
 
   return (
@@ -288,23 +316,6 @@ function VersionsTab({
           </Button>
         )}
       </div>
-
-      {versions.length > 0 && (
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-lg border border-border bg-card">
-            <Users size={16} className="text-primary" weight="duotone" />
-            <span className="text-body font-medium text-foreground">
-              {totalCovered} employee{totalCovered !== 1 ? "s" : ""} covered
-            </span>
-          </div>
-          <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-lg border border-border bg-card">
-            <ArrowsDownUp size={16} className="text-primary" weight="duotone" />
-            <span className="text-body font-medium text-foreground">
-              {totalOverrides} override{totalOverrides !== 1 ? "s" : ""} across {versions.length} version{versions.length !== 1 ? "s" : ""}
-            </span>
-          </div>
-        </div>
-      )}
 
       {versions.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 bg-muted/10 rounded-lg border border-dashed border-border/60 text-center">
@@ -328,66 +339,113 @@ function VersionsTab({
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {versions.map(sub => {
-            const pinnedCount = sub.targetEmployeeIds?.length ?? 0;
-            const oc = overrideCounts[sub.id] ?? 0;
-
-            return (
-              <button
-                key={sub.id}
-                onClick={() => onViewVersion(sub.id)}
-                className="group relative text-left rounded-xl border border-border bg-card p-5 transition-all hover:border-primary/30 hover:shadow-sm hover:bg-muted/10"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <h4 className="text-body font-semibold text-foreground truncate">{sub.name}</h4>
-                      <StatusBadge
-                        status={sub.status}
-                        variant={sub.status === "active" ? "emerald" : sub.status === "draft" ? "amber" : "rose"}
-                        dot
-                      />
-                    </div>
-                    {sub.code && (
-                      <p className="text-label font-mono text-faint mt-1">{sub.code}</p>
-                    )}
-                    {sub.description && (
-                      <p className="text-label text-muted-foreground mt-2 line-clamp-2">{sub.description}</p>
-                    )}
-                  </div>
-                  <CaretRight size={16} className="text-faint group-hover:text-primary transition-colors shrink-0 mt-2" weight="bold" />
-                </div>
-
-                <div className="flex items-center gap-3 mt-4 pt-3 border-t border-border/40">
-                  <div className="flex items-center gap-1.5">
-                    <Target size={12} className="text-faint" weight="bold" />
-                    <span className="text-label text-subtle font-medium">
-                      {pinnedCount > 0
-                        ? `${pinnedCount} pinned employee${pinnedCount !== 1 ? "s" : ""}`
-                        : "Policy-wide"}
-                    </span>
-                  </div>
-                  {oc > 0 && (
-                    <>
-                      <span className="text-faint text-label">·</span>
-                      <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-label font-medium">
-                        <ArrowsDownUp size={10} weight="bold" />
-                        {oc} override{oc !== 1 ? "s" : ""}
-                      </span>
-                    </>
+        <SharedDataTable
+          data={versionRows}
+          columns={[
+            {
+              header: "Version",
+              align: "center",
+              render: (row) => (
+                <span className="text-body font-semibold text-foreground font-mono tabular-nums">
+                  {(row as typeof versionRows[number])._versionLabel}
+                </span>
+              ),
+            },
+            {
+              header: "Version Name",
+              accessorKey: "name",
+              render: (row) => (
+                <div>
+                  <p className="text-body font-semibold text-foreground">{row.name}</p>
+                  {row.code && (
+                    <p className="text-label font-mono text-faint mt-0.5">{row.code}</p>
                   )}
                 </div>
-              </button>
-            );
-          })}
-        </div>
+              ),
+            },
+            {
+              header: "Status",
+              accessorKey: "status",
+              render: (row) => (
+                <StatusBadge
+                  status={row.status}
+                  variant={row.status === "active" ? "emerald" : row.status === "draft" ? "amber" : "rose"}
+                  dot
+                />
+              ),
+            },
+            {
+              header: "Employees",
+              align: "center",
+              render: (row) => {
+                const count = row.targetEmployeeIds?.length ?? 0;
+                return (
+                  <span className="text-body tabular-nums text-subtle font-medium">
+                    {count > 0 ? count : "—"}
+                  </span>
+                );
+              },
+            },
+            {
+              header: "Overrides",
+              align: "center",
+              render: (row) => {
+                const oc = overrideCounts[row.id] ?? 0;
+                return oc > 0 ? (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-label font-medium">
+                    <ArrowsDownUp size={10} weight="bold" />
+                    {oc}
+                  </span>
+                ) : (
+                  <span className="text-label text-faint">—</span>
+                );
+              },
+            },
+            {
+              header: "Actions",
+              headerClassName: "text-right",
+              align: "right",
+              render: (row) => {
+                const actions: ActionItem[] = [
+                  {
+                    label: "View version details",
+                    onClick: (e: React.MouseEvent) => {
+                      e.stopPropagation();
+                      onViewVersion(row.id);
+                    },
+                  },
+                  {
+                    label: "Edit version",
+                    onClick: (e: React.MouseEvent) => {
+                      e.stopPropagation();
+                      onEditVersion(row.id);
+                    },
+                  },
+                  {
+                    label: "Remove version",
+                    onClick: (e: React.MouseEvent) => {
+                      e.stopPropagation();
+                      onRemoveVersion(row.id);
+                    },
+                    isDanger: true,
+                  },
+                ];
+                return (
+                  <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>
+                    <ActionPopover actions={actions} />
+                  </div>
+                );
+              },
+            },
+          ]}
+          onRowClick={(row) => onViewVersion(row.id)}
+          rowsPerPage={10}
+          ghost
+        />
       )}
     </div>
   );
 }
-
-// ─── Overview Tab ────────────────────────────────────────────────────────────
 
 function OverviewTab({
   policy,
@@ -597,6 +655,256 @@ function OverviewTab({
           </div>
         )}
       </DetailSection>
+    </div>
+  );
+}
+
+// ─── Version Overview Tab ─────────────────────────────────────────────────────
+
+function VersionOverviewTab({
+  policy,
+  groups,
+  benefits,
+  parentBenefits,
+  parentPolicyName,
+}: {
+  policy: BenefitPolicy;
+  groups: BenefitGroup[];
+  benefits: Benefit[];
+  parentBenefits?: Benefit[];
+  parentPolicyName?: string;
+}) {
+  const router = useRouter();
+
+  function formatRM(amount: number): string {
+    return `RM ${amount.toFixed(2)}`;
+  }
+
+  function getServiceName(serviceId: string): string {
+    return SERVICES.find(s => s.id === serviceId)?.name ?? serviceId;
+  }
+
+  const tierOptions = useMemo(() => {
+    const org = MOCK_ORGS.find(o => o.id === policy.organizationId);
+    return (org?.tierConfigs ?? []).map(t => ({ value: t.id, label: t.code ? `${t.code} - ${t.name}` : t.name }));
+  }, [policy.organizationId]);
+
+  const departmentOptions = useMemo(() => {
+    const org = MOCK_ORGS.find(o => o.id === policy.organizationId);
+    return (org?.departmentConfigs ?? []).map(d => ({ value: d.id, label: d.code ? `${d.code} - ${d.name}` : d.name }));
+  }, [policy.organizationId]);
+
+  const diffEntries = useMemo(() => {
+    if (!parentBenefits || parentBenefits.length === 0) return [];
+    return benefits
+      .filter(vb => {
+        const parent = parentBenefits.find(pb => pb.serviceId === vb.serviceId);
+        return parent && parent.amount !== vb.amount;
+      })
+      .map(vb => {
+        const parent = parentBenefits.find(pb => pb.serviceId === vb.serviceId)!;
+        const group = groups.find(g => g.id === vb.groupId);
+        return { benefit: vb, parentAmount: parent.amount, groupName: group?.name ?? "—" };
+      });
+  }, [benefits, parentBenefits, groups]);
+
+  const groupedDiffs = useMemo(() => {
+    const map = new Map<string, typeof diffEntries>();
+    diffEntries.forEach(entry => {
+      const existing = map.get(entry.groupName) ?? [];
+      existing.push(entry);
+      map.set(entry.groupName, existing);
+    });
+    return Array.from(map.entries());
+  }, [diffEntries]);
+
+  const hasOverrides = diffEntries.length > 0;
+
+  const eligibleEmpLabels = (policy.eligibleEmploymentTypes ?? []).map(et => EMPLOYMENT_TYPE_LABELS[et] ?? et);
+  const tierLabels = (policy.eligibility?.tierIds ?? []).map(id => tierOptions.find(t => t.value === id)?.label ?? id);
+  const deptLabels = (policy.eligibility?.departmentIds ?? []).map(id => departmentOptions.find(d => d.value === id)?.label ?? id);
+
+  return (
+    <div className="space-y-6">
+      {/* Version Summary */}
+      <div className="bg-card border border-border rounded-lg shadow-sm p-5">
+        <div className="flex items-start gap-4">
+          <div className="w-10 h-10 rounded-lg bg-violet-50 dark:bg-violet-500/10 border border-violet-200 dark:border-violet-500/20 flex items-center justify-center text-violet-600 dark:text-violet-400 shrink-0">
+            <TreeStructure size={20} weight="duotone" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2.5">
+              <h3 className="text-lead font-semibold text-foreground truncate">{policy.name}</h3>
+              <StatusBadge
+                status={policy.status}
+                variant={policy.status === "active" ? "emerald" : policy.status === "draft" ? "amber" : "rose"}
+                dot
+              />
+            </div>
+            {policy.code && (
+              <p className="text-label font-mono text-faint mt-0.5">{policy.code}</p>
+            )}
+            {policy.description && (
+              <p className="text-body text-subtle mt-2">{policy.description}</p>
+            )}
+            <div className="flex items-center gap-1.5 mt-3 text-label text-faint">
+              <TreeStructure size={12} />
+              <span>
+                Derived from{" "}
+                <button
+                  onClick={() => router.push(`/policies?policyId=${policy.parentPolicyId}&mode=view&wizard=open`)}
+                  className="font-semibold text-primary hover:underline"
+                >
+                  {parentPolicyName || policy.parentPolicyId}
+                </button>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Targeting - Collapsible accordion */}
+      <section className="bg-card border border-border rounded-lg shadow-sm">
+        <Collapsible defaultOpen={false}>
+          <CollapsibleTrigger className="w-full flex items-center gap-3 p-4 group">
+            <div className="w-8 h-8 rounded-md bg-primary/10 text-primary flex items-center justify-center border border-primary/20 shrink-0">
+              <Funnel size={14} weight="duotone" />
+            </div>
+            <div className="flex-1 min-w-0 text-left">
+              <p className="text-body font-semibold text-foreground">Targeting</p>
+              <p className="text-label text-muted-foreground truncate">
+                {eligibleEmpLabels.length} employment type{eligibleEmpLabels.length !== 1 ? "s" : ""}
+                {" · "}{tierLabels.length} tier{tierLabels.length !== 1 ? "s" : ""}
+                {" · "}{deptLabels.length} department{deptLabels.length !== 1 ? "s" : ""}
+              </p>
+            </div>
+            <CaretDown size={14} weight="bold" className="text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="px-4 pb-4 space-y-4">
+            {eligibleEmpLabels.length > 0 && (
+              <div className="space-y-2">
+                <label className="text-label font-medium text-subtle">Employment Types</label>
+                <div className="flex flex-wrap gap-1.5">
+                  {eligibleEmpLabels.map(label => (
+                    <span key={label} className="px-3 py-1 rounded-full bg-primary/10 text-primary text-label font-medium">
+                      {label}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {tierLabels.length > 0 && (
+              <div className="space-y-2">
+                <label className="text-label font-medium text-subtle">Tiers</label>
+                <div className="flex flex-wrap gap-1.5">
+                  {tierLabels.map(label => (
+                    <span key={label} className="px-3 py-1 rounded-full bg-primary/10 text-primary text-label font-medium">
+                      {label}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {deptLabels.length > 0 && (
+              <div className="space-y-2">
+                <label className="text-label font-medium text-subtle">Departments</label>
+                <div className="flex flex-wrap gap-1.5">
+                  {deptLabels.map(label => (
+                    <span key={label} className="px-3 py-1 rounded-full bg-primary/10 text-primary text-label font-medium">
+                      {label}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {eligibleEmpLabels.length === 0 && tierLabels.length === 0 && deptLabels.length === 0 && (
+              <p className="text-label text-faint italic">No targeting filters applied.</p>
+            )}
+          </CollapsibleContent>
+        </Collapsible>
+      </section>
+
+      {/* Benefit Amount Changes */}
+      {parentBenefits && parentBenefits.length > 0 ? (
+        <section className="bg-card border border-border rounded-lg shadow-sm p-6 md:p-8 space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center border border-primary/20 shrink-0">
+              <ArrowsDownUp size={18} weight="duotone" />
+            </div>
+            <div>
+              <h3 className="text-lead font-semibold text-foreground">Benefit Amount Changes</h3>
+              <p className="text-label text-muted-foreground mt-0.5">
+                {hasOverrides ? "Overridden amounts relative to the parent policy" : "All amounts match the parent policy"}
+              </p>
+            </div>
+          </div>
+          {hasOverrides ? (
+            <div className="space-y-3">
+              {groupedDiffs.map(([groupName, entries]) => (
+                <div key={groupName} className="rounded-lg border border-border bg-card/40 overflow-hidden">
+                  <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border bg-muted/30">
+                    <TreeStructure size={14} className="text-faint" />
+                    <span className="text-label font-semibold text-foreground">{groupName}</span>
+                  </div>
+                  <div className="divide-y divide-border/40">
+                    {entries.map(({ benefit, parentAmount }) => (
+                      <div key={benefit.id} className="flex items-center justify-between px-4 py-3">
+                        <span className="text-body font-medium text-foreground">{getServiceName(benefit.serviceId)}</span>
+                        <div className="flex items-center gap-3">
+                          <span className="text-body text-faint line-through font-mono tabular-nums">{formatRM(parentAmount)}</span>
+                          <span className="text-body font-semibold text-primary font-mono tabular-nums">{formatRM(benefit.amount)}</span>
+                          <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-label font-medium tabular-nums">
+                            +{formatRM(benefit.amount - parentAmount)}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-12 bg-muted/10 rounded-lg border border-dashed border-border/60 text-center">
+              <ArrowsDownUp size={32} weight="duotone" className="text-faint mb-3" />
+              <p className="text-body font-medium text-muted-foreground">No benefit changes detected.</p>
+              <p className="text-label text-faint mt-1">All benefit amounts in this version match the parent policy.</p>
+            </div>
+          )}
+        </section>
+      ) : (
+        <section className="bg-card border border-border rounded-lg shadow-sm p-6 md:p-8 space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center border border-primary/20 shrink-0">
+              <TreeStructure size={18} weight="duotone" />
+            </div>
+            <div>
+              <h3 className="text-lead font-semibold text-foreground">Benefit Amounts</h3>
+              <p className="text-label text-muted-foreground mt-0.5">Configured benefits for this version</p>
+            </div>
+          </div>
+          <div className="space-y-3">
+            {groups.map(group => {
+              const groupBenefits = benefits.filter(b => b.groupId === group.id);
+              return (
+                <div key={group.id} className="rounded-lg border border-border bg-card/40 overflow-hidden">
+                  <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border bg-muted/30">
+                    <TreeStructure size={14} className="text-faint" />
+                    <span className="text-label font-semibold text-foreground">{group.name}</span>
+                  </div>
+                  <div className="divide-y divide-border/40">
+                    {groupBenefits.map(benefit => (
+                      <div key={benefit.id} className="flex items-center justify-between px-4 py-3">
+                        <span className="text-body font-medium text-foreground">{getServiceName(benefit.serviceId)}</span>
+                        <span className="text-body font-semibold text-foreground font-mono tabular-nums">{formatRM(benefit.amount)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

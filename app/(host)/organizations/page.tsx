@@ -107,9 +107,10 @@ export default function OrganizationsPage() {
               options={[
                 { label: "All", value: "all" },
                 { label: "Active", value: "active" },
-                { label: "Pending", value: "pending" },
+                { label: "Inactive", value: "inactive" },
+                { label: "Draft", value: "draft" },
+                { label: "Deactivated", value: "deactivated" },
                 { label: "Suspended", value: "suspended" },
-                { label: "Removed", value: "removed" },
               ]}
             />
             <FilterItem 

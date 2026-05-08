@@ -240,7 +240,7 @@ export default function AdministratorsPage() {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
             >
-              <SharedDataTable 
+              <SharedDataTable freezeFirst freezeLast 
                 data={filteredAdmins}
                 columns={columns}
               />

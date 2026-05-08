@@ -12,9 +12,7 @@ import {
   Plus,
   Trash,
   Check,
-  ShieldCheck,
   DiceFive,
-  PencilSimpleLine,
   CaretDown,
   CalendarCheck,
   RocketLaunch,
@@ -144,127 +142,106 @@ interface PolicyReviewCardsProps {
 
 export function PolicyReviewCards({ policy, groups, benefits }: PolicyReviewCardsProps) {
   return (
-    <div className="space-y-6">
-      <SectionHeader icon={ShieldCheck} title="Review" description="Verify your configuration before saving" />
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div className="bg-card border border-border rounded-lg p-5 space-y-4">
+        <h4 className="text-body font-semibold text-foreground flex items-center gap-2">
+          <IdentificationCard size={16} weight="duotone" className="text-primary" />
+          Policy Details
+        </h4>
+        <ReadField label="Policy Name" value={policy.name || undefined} />
+        <ReadField label="Description" value={policy.description || undefined} />
+        <ReadField label="Eligible Employment Types" value={policy.eligibleEmploymentTypes?.join(", ")} />
+        <ReadField
+          label="Age Range"
+          value={
+            policy.eligibility?.minAge || policy.eligibility?.maxAge
+              ? `${policy.eligibility?.minAge || "Any"} — ${policy.eligibility?.maxAge || "Any"}`
+              : "Any age"
+          }
+        />
+        <ReadField
+          label="Gender"
+          value={policy.eligibility?.gender ? policy.eligibility.gender.charAt(0).toUpperCase() + policy.eligibility.gender.slice(1) : "All"}
+        />
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <div className="bg-card border border-border rounded-lg p-5 space-y-4">
-          <h4 className="text-body font-semibold text-foreground flex items-center gap-2">
-            <IdentificationCard size={16} weight="duotone" className="text-primary" />
-            Policy Details
-          </h4>
-          <ReadField label="Policy Name" value={policy.name || undefined} />
-          <ReadField label="Description" value={policy.description || undefined} />
-          <ReadField label="Eligible Employment Types" value={policy.eligibleEmploymentTypes?.join(", ")} />
-        </div>
+      <div className="bg-card border border-border rounded-lg p-5 space-y-4">
+        <h4 className="text-body font-semibold text-foreground flex items-center gap-2">
+          <Gear size={16} weight="duotone" className="text-primary" />
+          Pool & Cycle
+        </h4>
+        <ReadField label="Dependents" value={policy.coversDependents ? "Covered" : "Employee Only"} />
+        <ReadField label="Employee Pool Type" value={policy.benefitPoolType} />
+        <ReadField label="Employee Policy Spending Cap" value={policy.totalCapAmount ? `RM ${policy.totalCapAmount.toFixed(2)}` : "Not Set"} />
+        {policy.coversDependents && <ReadField label="Dependents Pool Type" value={policy.dependentsPoolType === "SharedWithEmployee" ? "Shared with Employee" : policy.dependentsPoolType} />}
+        {policy.coversDependents && policy.dependentsPoolType !== "SharedWithEmployee" && (
+          <ReadField
+            label="Dependents Policy Spending Cap"
+            value={policy.dependentsCapAmount ? `RM ${policy.dependentsCapAmount.toFixed(2)}` : "Not Set"}
+          />
+        )}
+        <ReadField label="Utilisation Mode" value={policy.utilisationMode === "Fixed" ? "Fixed Allocation" : "Prorated Allocation"} />
+        {policy.utilisationMode === "Prorated" && <ReadField label="Prorate Unit" value={policy.prorateUnit} />}
+        <ReadField label="Refresh Cycle" value={policy.refreshCycle} />
+        <ReadField
+          label="Start Reference"
+          value={
+            policy.refreshStartReference === "fy_start"
+              ? "Organisation Financial Year"
+              : policy.refreshStartReference === "join_date"
+              ? "Employee Join Date"
+              : "Custom Start Date"
+          }
+        />
+        {policy.refreshStartReference === "custom_date" && <ReadField label="Custom Date" value={policy.refreshCustomDate} />}
+        <ReadField
+          label="Activation"
+          value={
+            policy.activationMode === "after_join"
+              ? "After Join Date"
+              : policy.activationMode === "after_probation"
+              ? "After Probation Ends"
+              : "Custom Date"
+          }
+        />
+        {policy.activationMode === "custom_date" && <ReadField label="Activation Date" value={policy.activationCustomDate} />}
+      </div>
 
-        <div className="bg-card border border-border rounded-lg p-5 space-y-4">
-          <h4 className="text-body font-semibold text-foreground flex items-center gap-2">
-            <Users size={16} weight="duotone" className="text-primary" />
-            Employee Eligibility
-          </h4>
-          <ReadField
-            label="Age Range"
-            value={
-              policy.eligibility?.minAge || policy.eligibility?.maxAge
-                ? `${policy.eligibility?.minAge || "Any"} — ${policy.eligibility?.maxAge || "Any"}`
-                : "Any age"
-            }
-          />
-          <ReadField
-            label="Gender"
-            value={policy.eligibility?.gender ? policy.eligibility.gender.charAt(0).toUpperCase() + policy.eligibility.gender.slice(1) : "All"}
-          />
-        </div>
-
-        <div className="bg-card border border-border rounded-lg p-5 space-y-4">
-          <h4 className="text-body font-semibold text-foreground flex items-center gap-2">
-            <Gear size={16} weight="duotone" className="text-primary" />
-            Pool & Cycle
-          </h4>
-          <ReadField label="Dependents" value={policy.coversDependents ? "Covered" : "Employee Only"} />
-          <ReadField label="Employee Pool Type" value={policy.benefitPoolType} />
-          <ReadField label="Employee Policy Spending Cap" value={policy.totalCapAmount ? `RM ${policy.totalCapAmount.toFixed(2)}` : "Not Set"} />
-          {policy.coversDependents && <ReadField label="Dependents Pool Type" value={policy.dependentsPoolType === "SharedWithEmployee" ? "Shared with Employee" : policy.dependentsPoolType} />}
-          {policy.coversDependents && policy.dependentsPoolType !== "SharedWithEmployee" && (
-            <ReadField
-              label="Dependents Policy Spending Cap"
-              value={policy.dependentsCapAmount ? `RM ${policy.dependentsCapAmount.toFixed(2)}` : "Not Set"}
-            />
-          )}
-          <ReadField label="Utilisation Mode" value={policy.utilisationMode === "Fixed" ? "Fixed Allocation" : "Prorated Allocation"} />
-          {policy.utilisationMode === "Prorated" && <ReadField label="Prorate Unit" value={policy.prorateUnit} />}
-          <ReadField label="Refresh Cycle" value={policy.refreshCycle} />
-          <ReadField
-            label="Start Reference"
-            value={
-              policy.refreshStartReference === "fy_start"
-                ? "Organisation Financial Year"
-                : policy.refreshStartReference === "join_date"
-                ? "Employee Join Date"
-                : "Custom Start Date"
-            }
-          />
-          {policy.refreshStartReference === "custom_date" && <ReadField label="Custom Date" value={policy.refreshCustomDate} />}
-          <ReadField
-            label="Activation"
-            value={
-              policy.activationMode === "after_join"
-                ? "After Join Date"
-                : policy.activationMode === "after_probation"
-                ? "After Probation Ends"
-                : "Custom Date"
-            }
-          />
-          {policy.activationMode === "custom_date" && <ReadField label="Activation Date" value={policy.activationCustomDate} />}
-        </div>
-
-        <div className="bg-card border border-border rounded-lg p-5 space-y-4 md:col-span-2">
-          <h4 className="text-body font-semibold text-foreground flex items-center gap-2">
-            <TreeStructure size={16} weight="duotone" className="text-primary" />
-            Groups & Benefits
-          </h4>
-          {groups.length === 0 ? (
-            <p className="text-body text-faint font-medium">No benefit groups configured.</p>
-          ) : (
-            <div className="space-y-3">
-              {groups.map((group) => {
-                const groupBenefits = benefits.filter((b) => b.groupId === group.id);
-                return (
-                  <div key={group.id} className="flex items-center justify-between p-3 rounded-lg border border-border/60 bg-transparent">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center text-primary border border-border/60">
-                        <TreeStructure size={16} />
-                      </div>
-                      <div>
-                        <p className="text-body font-medium text-foreground">{group.name}</p>
-                        <p className="text-label text-muted-foreground font-semibold">
-                          {groupBenefits.length} benefits · {group.distributionType === "SharedAmount" ? "Shared Pool" : "Individual"}
-                        </p>
-                      </div>
+      <div className="bg-card border border-border rounded-lg p-5 space-y-4 md:col-span-2">
+        <h4 className="text-body font-semibold text-foreground flex items-center gap-2">
+          <TreeStructure size={16} weight="duotone" className="text-primary" />
+          Groups & Benefits
+        </h4>
+        {groups.length === 0 ? (
+          <p className="text-body text-faint font-medium">No benefit groups configured.</p>
+        ) : (
+          <div className="space-y-3">
+            {groups.map((group) => {
+              const groupBenefits = benefits.filter((b) => b.groupId === group.id);
+              return (
+                <div key={group.id} className="flex items-center justify-between p-3 rounded-lg border border-border/60 bg-transparent">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center text-primary border border-border/60">
+                      <TreeStructure size={16} />
                     </div>
-                    <div className="text-right">
-                      <p className="text-body font-semibold text-primary">
-                        {group.distributionType === "SharedAmount" ? `RM ${group.maxUsagePerCycle?.toFixed(2) || "0.00"}` : `${groupBenefits.length} benefits`}
+                    <div>
+                      <p className="text-body font-medium text-foreground">{group.name}</p>
+                      <p className="text-label text-muted-foreground font-semibold">
+                        {groupBenefits.length} benefits · {group.distributionType === "SharedAmount" ? "Shared Pool" : "Individual"}
                       </p>
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {policy.status !== "active" && (
-        <div className="flex items-start gap-3 p-4 rounded-lg bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20">
-          <PencilSimpleLine size={18} className="text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-          <div>
-            <p className="text-body font-semibold text-amber-700 dark:text-amber-300">Saved as Draft</p>
-            <p className="text-label text-amber-600 dark:text-amber-400 mt-0.5">Activate to make this policy visible to organisations.</p>
+                  <div className="text-right">
+                    <p className="text-body font-semibold text-primary">
+                      {group.distributionType === "SharedAmount" ? `RM ${group.maxUsagePerCycle?.toFixed(2) || "0.00"}` : `${groupBenefits.length} benefits`}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

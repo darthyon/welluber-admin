@@ -20,7 +20,7 @@ export const createOrganizationSchema = z.object({
     paymentMethod: z.string().optional(),
     startDate: z.date().optional(),
     endDate: z.date().optional(),
-    status: z.enum(["active", "pending", "suspended", "on_hold"]).default("pending"),
+    status: z.enum(["active", "inactive", "draft", "deactivated", "suspended"]).default("inactive"),
   }),
   tinNumber: z.string().min(4, "TIN Number is required"),
   creditLimit: z.number().min(0).default(0),

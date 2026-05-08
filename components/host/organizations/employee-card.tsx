@@ -1,19 +1,14 @@
 "use client";
 
 import { 
-  User, 
-  Users, 
-  DotsThreeVertical, 
   Buildings, 
   Shield, 
-  CaretLeft, 
-  CaretRight,
+  Calendar,
   Clock,
   UserCircle
 } from "@phosphor-icons/react";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { useState, useRef, useEffect } from "react";
-import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { ActionPopover } from "@/components/shared/action-popover";
 
@@ -34,6 +29,7 @@ interface EmployeeCardProps {
     employeeId: string;
     empCode: string;
     joinDate: string;
+    lastActive?: string;
     department?: string;
     tier?: string;
     employmentType?: string;
@@ -51,7 +47,6 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
   const [dragConstraints, setDragConstraints] = useState({ left: 0, right: 0 });
   
   const initials = employee.name.split(" ").map(n => n[0]).join("");
-  const hasMultipleItems = employee.benefitPolicies.length > 1;
   const currentItem = employee.benefitPolicies[policyIndex] || employee.benefitPolicies[0];
 
   useEffect(() => {
@@ -86,14 +81,6 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
       observer.disconnect();
     };
   }, [currentItem]);
-
-  const nextItem = () => {
-    setPolicyIndex((prev) => (prev + 1) % employee.benefitPolicies.length);
-  };
-
-  const prevItem = () => {
-    setPolicyIndex((prev) => (prev - 1 + employee.benefitPolicies.length) % employee.benefitPolicies.length);
-  };
 
   return (
     <div
@@ -147,6 +134,11 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
                   {employee.tier}
                 </span>
               )}
+              {employee.employmentType && (
+                <span className="text-micro font-semibold px-1.5 py-0.5 rounded bg-muted text-muted-foreground border border-border/40 capitalize">
+                  {employee.employmentType.replace("-", " ")}
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -162,7 +154,6 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
       </div>
 
       {/* Info Section */}
-      {/* Info Section: Standardized Grid */}
       <div className="flex-1 space-y-6 relative z-10">
         
         {/* Row 1: Branch & Email */}
@@ -229,45 +220,20 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
                 </div>
               </div>
 
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-label font-semibold">
-                  <span className="text-faint font-semibold">Utilisation</span>
-                  <StatusBadge
-                    status={`${currentItem.utilisation}%`}
-                    variant={currentItem.utilisation > 80 ? "rose" : "emerald"}
-                    className="shrink-0 font-semibold"
-                  />
-                </div>
-
-                <div className="relative h-2 w-full bg-muted/60 rounded-full overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${currentItem.utilisation}%` }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
-                    className={cn(
-                      "h-full rounded-full",
-                      currentItem.utilisation > 80
-                        ? "bg-rose-500/10 text-rose-600 dark:text-rose-400 dark:bg-rose-500/20"
-                        : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 dark:bg-emerald-500/20 shadow-[0_0_8px_rgba(var(--emerald-rgb),0.4)]"
-                    )}
-                  />
-                </div>
-              </div>
             </motion.div>
           </AnimatePresence>
-          {/* ... existing carousel controls ... */}
         </div>
       </div>
 
-      {/* Footer Metadata: Standardized Fields */}
+      {/* Footer Metadata */}
       <div className="mt-5 pt-4 border-t border-border/40 grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
           <div className="flex items-center gap-1.5 text-faint">
-            <Users size={14} weight="bold" />
-            <span className="text-label font-semibold text-faint">Workforce</span>
+            <Calendar size={14} weight="bold" />
+            <span className="text-label font-semibold text-faint">Joined Date</span>
           </div>
           <span className="text-label font-semibold text-subtle block">
-            {employee.dependentsCount} (Dependents)
+            {employee.joinDate}
           </span>
         </div>
         
@@ -277,7 +243,7 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
             <span className="text-label font-semibold text-faint">Last Active</span>
           </div>
           <span className="text-label font-semibold text-subtle block">
-            {employee.joinDate}
+            {employee.lastActive || "—"}
           </span>
         </div>
       </div>

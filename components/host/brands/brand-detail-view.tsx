@@ -232,6 +232,8 @@ export function BrandDetailView({ brand, onBack, onEdit, onRemove }: BrandDetail
                       data={filteredSps}
                       columns={spColumns}
                       rowsPerPage={5}
+                      freezeFirst
+                      freezeLast
                   />
               </TooltipProvider>
           </div>

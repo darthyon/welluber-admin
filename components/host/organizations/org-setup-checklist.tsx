@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils"
 
 interface OrgSetupChecklistProps {
   orgId: string
-  status: "active" | "deactivated" | "suspended" | "removed" | "pending"
+  status: "active" | "inactive" | "draft" | "deactivated" | "suspended"
   tierCount: number
   employeeCount: number
   policyCount: number
@@ -30,7 +30,7 @@ export function OrgSetupChecklist({
   employeesWithoutPolicy,
   className,
 }: OrgSetupChecklistProps) {
-  if (status !== "pending") return null
+  if (status !== "inactive") return null
 
   const steps: ChecklistStep[] = [
     { key: "details", label: "Organization Details", href: `/organizations/${orgId}?tab=profile`, completed: true },

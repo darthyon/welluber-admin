@@ -2,10 +2,8 @@
 
 import {
   User,
-  Heart,
   IdentificationCard,
   Clock,
-  LinkBreak,
 } from "@phosphor-icons/react"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { ActionPopover } from "@/components/shared/action-popover"
@@ -59,9 +57,6 @@ export function DependentCard({
                 variant="emerald"
                 className="rounded-md px-1.5 py-0.5 text-micro"
               />
-              <span className="rounded-md border border-border/40 bg-background/50 px-1.5 py-0.5 text-label font-medium text-faint">
-                {dependent.relationship}
-              </span>
             </div>
           </div>
         </div>
@@ -105,25 +100,14 @@ export function DependentCard({
                 Relationship
               </span>
             </div>
-            <span className="block text-body font-medium text-foreground">
+            <span className="block text-body font-medium capitalize text-foreground">
               {dependent.relationship}
             </span>
           </div>
         </div>
       </div>
 
-      <div className="mt-5 grid grid-cols-2 gap-4 border-t border-border/40 pt-4">
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-1.5 text-faint">
-            <Heart size={14} weight="bold" />
-            <span className="text-label font-semibold text-faint">
-              Status
-            </span>
-          </div>
-          <span className="block text-label font-semibold text-subtle">
-            {dependent.status}
-          </span>
-        </div>
+      <div className="mt-5 border-t border-border/40 pt-4">
         <div className="space-y-1.5">
           <div className="flex items-center gap-1.5 text-faint">
             <Clock size={14} weight="bold" />

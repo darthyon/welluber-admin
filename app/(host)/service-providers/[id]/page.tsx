@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useTabPersistence } from "@/hooks/use-tab-persistence";
 import {
   Storefront,
@@ -76,8 +76,16 @@ export default function ServiceProviderDetailPage() {
   const sp = MOCK_SPS.find((s) => s.id === spId) ?? MOCK_SPS[0];
 
   const [activeTab, setActiveTab] = useTabPersistence<TabId>("details");
+  const searchParams = useSearchParams();
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isTogglingStatus, setIsTogglingStatus] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.has("voucherView")) {
+      setActiveTab("vouchers");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [isRemoveSubmitting, setIsRemoveSubmitting] = useState(false);
   const [isDangerModalOpen, setIsDangerModalOpen] = useState(false);
   const [dangerAction, setDangerAction] = useState<"status" | "remove" | null>(null);
@@ -457,6 +465,8 @@ export default function ServiceProviderDetailPage() {
                   </p>
                 ) : (
                   <SharedDataTable
+                    freezeFirst
+                    freezeLast
                     columns={[
                       {
                         header: "Name",

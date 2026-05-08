@@ -28,6 +28,8 @@ export function EmployeeDirectoryTable({
   return (
     <TooltipProvider>
       <SharedDataTable
+        freezeFirst
+        freezeLast
         onRowClick={onRowClick}
         columns={[
           {
@@ -90,7 +92,7 @@ export function EmployeeDirectoryTable({
             accessorKey: "tier",
             sortable: true,
             render: (emp) => (
-              <span className="text-label font-semibold text-primary bg-primary/5 px-1.5 py-0.5 rounded border border-primary/10">
+              <span className="whitespace-nowrap text-label font-semibold text-primary bg-primary/5 px-1.5 py-0.5 rounded border border-primary/10">
                 {emp.tier || "—"}
               </span>
             ),
