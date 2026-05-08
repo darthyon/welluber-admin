@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { CaretLeft, NavigationArrow, Check, Users, CaretDown, PencilSimpleLine } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
@@ -10,6 +10,7 @@ import { SharedDataTable, type Column } from "@/components/shared/data-table";
 import { toast } from "sonner";
 import { PolicyReviewCards } from "@/components/host/policies/policy-wizard-content";
 import { TargetingFilterBar } from "@/components/host/policies/targeting-filter-bar";
+import { clearPolicyDraft } from "@/hooks/use-policy-draft";
 import { BenefitPolicy, BenefitGroup, Benefit } from "@/types/policy";
 import { MOCK_ORGS, MOCK_EMPLOYEES } from "@/lib/mock-data";
 import type { EmployeeDirectoryItem } from "@/features/employees/types";
@@ -81,8 +82,10 @@ const employeeColumns: Column<EmployeeDirectoryItem>[] = [
   },
 ];
 
-export default function NewPolicyReviewPage() {
+function NewPolicyReviewPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const simulateError = searchParams.get("simulate");
   const [draft, setDraft] = useState<Draft | null>(() => {
     if (typeof window === "undefined") return null;
     const stored = sessionStorage.getItem("policy-draft");
@@ -92,6 +95,11 @@ export default function NewPolicyReviewPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [createdPolicyName, setCreatedPolicyName] = useState("");
+  const [createdPolicyId, setCreatedPolicyId] = useState<string | null>(null);
+  const [orgContext] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    return sessionStorage.getItem("policy-org-context");
+  });
 
   useEffect(() => {
     if (!draft) { router.replace("/policies/new"); return; }
@@ -142,9 +150,41 @@ export default function NewPolicyReviewPage() {
     setIsSubmitting(true);
     await new Promise((r) => setTimeout(r, 1200));
     setIsSubmitting(false);
+
+    if (simulateError === "network") {
+      toast.error("Couldn't save policy", {
+        description: "Network error. Your draft is safe.",
+        action: {
+          label: "Retry",
+          onClick: () => {
+            void handleConfirm();
+          },
+        },
+        duration: 8000,
+      });
+      return;
+    }
+
+    if (simulateError === "409") {
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem(
+          "policy-submit-error",
+          JSON.stringify({ field: "name", message: `"${draft.policy.name}" is already in use. Pick another name.` })
+        );
+      }
+      toast.error("Name already in use", {
+        description: "Pick a different name and try again.",
+      });
+      router.push(orgContext ? `/policies/new?orgId=${orgContext}` : "/policies/new");
+      return;
+    }
+
     setCreatedPolicyName(draft.policy.name || "Benefit Policy");
+    setCreatedPolicyId(Math.random().toString(36).slice(2, 11));
     if (typeof window !== "undefined") {
       sessionStorage.removeItem("policy-draft");
+      sessionStorage.removeItem("policy-org-context");
+      clearPolicyDraft(draft.policy.organizationId);
     }
     toast.success("Policy created successfully");
     setShowSuccess(true);
@@ -166,7 +206,9 @@ export default function NewPolicyReviewPage() {
         <div className="flex flex-col gap-4">
           <button
             type="button"
-            onClick={() => router.push("/policies/new")}
+            onClick={() =>
+              router.push(orgContext ? `/policies/new?orgId=${orgContext}` : "/policies/new")
+            }
             className="inline-flex items-center gap-1.5 text-body font-medium text-subtle hover:text-foreground transition-colors w-fit"
           >
             <CaretLeft size={16} /> Back to Edit
@@ -248,7 +290,9 @@ export default function NewPolicyReviewPage() {
             variant="ghost"
             size="lg"
             className="text-body font-medium px-6 transition-colors"
-            onClick={() => router.push("/policies/new")}
+            onClick={() =>
+              router.push(orgContext ? `/policies/new?orgId=${orgContext}` : "/policies/new")
+            }
           >
             Back to Edit
           </Button>
@@ -293,14 +337,32 @@ export default function NewPolicyReviewPage() {
         title="Policy Created"
         message={`${createdPolicyName} has been saved as a draft.`}
         primaryAction={{
-          label: "View Policies",
-          onClick: () => { setShowSuccess(false); router.push("/policies"); },
+          label: "View Policy",
+          onClick: () => {
+            setShowSuccess(false);
+            if (createdPolicyId) {
+              router.push(`/policies/${createdPolicyId}`);
+            } else {
+              router.push("/policies");
+            }
+          },
         }}
         secondaryAction={{
-          label: "Done",
-          onClick: () => { setShowSuccess(false); router.push("/policies"); },
+          label: orgContext ? "Back to Organisation" : "Done",
+          onClick: () => {
+            setShowSuccess(false);
+            router.push(orgContext ? `/organizations/${orgContext}?tab=policies` : "/policies");
+          },
         }}
       />
     </div>
+  );
+}
+
+export default function NewPolicyReviewPage() {
+  return (
+    <Suspense fallback={<div data-test="fallback">FALLBACK</div>}>
+      <NewPolicyReviewPageContent />
+    </Suspense>
   );
 }
