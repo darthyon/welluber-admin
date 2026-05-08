@@ -434,6 +434,9 @@ function PoliciesContent() {
       const parentPolicyName = policy.parentPolicyId
         ? policies.find(p => p.id === policy.parentPolicyId)?.name
         : undefined;
+      const parentBenefits = policy.parentPolicyId
+        ? policyDataMap[policy.parentPolicyId]?.benefits
+        : undefined;
       const versionOverrideCounts: Record<string, number> = {};
       versions.forEach(v => {
         const versionData = policyDataMap[v.id];
@@ -454,10 +457,26 @@ function PoliciesContent() {
             versionOverrideCounts={versionOverrideCounts}
             employees={MOCK_EMPLOYEES.filter(e => e.orgId === policy.organizationId)}
             parentPolicyName={parentPolicyName}
+            parentBenefits={parentBenefits}
             onEdit={() => router.push(`/policies/${policy.id}/edit`)}
             onClone={() => handleClone(policy)}
             onDeactivate={() => handleDeactivate(policy)}
             onDelete={() => handleDelete(policy)}
+            onEditVersion={(versionId) => router.push(`/policies/${versionId}/edit`)}
+            onRemoveVersion={(versionId) => {
+              setConfirmDialog({
+                open: true,
+                title: "Remove Version",
+                description: "This version will be permanently removed. Assigned employees will revert to the parent policy.",
+                confirmLabel: "Remove Version",
+                isDanger: true,
+                onConfirm: () => {
+                  setPolicies(prev => prev.filter(p => p.id !== versionId));
+                  setConfirmDialog(prev => ({ ...prev, open: false }));
+                  showToast("Version removed");
+                },
+              });
+            }}
           />
         </div>
       );

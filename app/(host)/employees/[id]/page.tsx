@@ -214,7 +214,7 @@ export default function EmployeePage() {
                     {employee.dependents.map((dep) => (
                       <div key={dep.id} className="p-4 bg-muted/20 border border-border rounded-lg">
                         <div className="flex items-center gap-2 mb-3">
-                          <Badge variant="outline" className="text-label uppercase tracking-wider">{dep.relationship}</Badge>
+                          <Badge variant="outline" className="text-label capitalize">{dep.relationship}</Badge>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
                           <DetailField label="Full Name" value={dep.name} />

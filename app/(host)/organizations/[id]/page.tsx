@@ -1238,8 +1238,9 @@ function OrganizationDetailContent() {
                               status: "Linked",
                               empCode: "ACM-001",
                               joinDate: "12 Oct 2023",
+                              lastActive: "09 Apr 2026, 17:15",
                               department: "Engineering",
-                              tier: "T3",
+                              tier: "Manager",
                               employmentType: "full-time",
                               dependentsCount: 2,
                               benefitPolicies: [
@@ -1269,8 +1270,9 @@ function OrganizationDetailContent() {
                               status: "Linked",
                               empCode: "ACM-042",
                               joinDate: "05 Mar 2024",
+                              lastActive: "09 Apr 2026, 16:45",
                               department: "Product",
-                              tier: "T2",
+                              tier: "Senior Manager",
                               employmentType: "full-time",
                               dependentsCount: 0,
                               benefitPolicies: [
@@ -1289,8 +1291,9 @@ function OrganizationDetailContent() {
                               status: "Pending Invite",
                               empCode: "ACM-156",
                               joinDate: "20 May 2026",
+                              lastActive: "09 Apr 2026, 10:20",
                               department: "Growth",
-                              tier: "T4",
+                              tier: "Associate",
                               employmentType: "internship",
                               dependentsCount: 1,
                               benefitPolicies: [
@@ -1375,7 +1378,7 @@ function OrganizationDetailContent() {
                                 accessorKey: "tier",
                                 sortable: true,
                                 render: (emp) => (
-                                  <span className="text-label font-semibold text-primary bg-primary/5 px-1.5 py-0.5 rounded border border-primary/10">
+                                  <span className="whitespace-nowrap text-label font-semibold text-primary bg-primary/5 px-1.5 py-0.5 rounded border border-primary/10">
                                     {emp.tier || "—"}
                                   </span>
                                 ),
@@ -1751,7 +1754,7 @@ function OrganizationDetailContent() {
                               header: "Relationship",
                               accessorKey: "relationship",
                               render: (dep) => (
-                                <span className="rounded-md border border-border bg-muted px-2 py-0.5 text-label font-semibold text-muted-foreground">
+                                <span className="rounded-md border border-border bg-muted px-2 py-0.5 text-label font-semibold text-muted-foreground capitalize">
                                   {dep.relationship}
                                 </span>
                               ),
@@ -1847,12 +1850,7 @@ function OrganizationDetailContent() {
                                   {ent.beneficiaryName}
                                 </span>
                                 <span
-                                  className={cn(
-                                    "mt-1 w-fit rounded-full px-1.5 py-0.5 text-label font-medium tracking-wider uppercase",
-                                    ent.type === "Employee"
-                                      ? "border border-primary/10 bg-primary/5 text-primary"
-                                      : "border border-primary/10 bg-primary/5 text-primary"
-                                  )}
+                                  className="mt-1 w-fit rounded-full px-1.5 py-0.5 text-label font-medium text-primary border border-primary/10 bg-primary/5"
                                 >
                                   {ent.type}
                                 </span>
@@ -1879,26 +1877,29 @@ function OrganizationDetailContent() {
                           },
                           {
                             header: "Claims Usage",
-                            render: (ent) => (
-                              <div className="flex w-[140px] flex-col gap-1.5">
-                                <div className="flex justify-between text-label font-medium">
-                                  <span className="text-muted-foreground">
-                                    RM {ent.usedAmount.toLocaleString()}
-                                  </span>
-                                  <span className="text-foreground">
-                                    / RM {ent.allocatedAmount.toLocaleString()}
-                                  </span>
+                            render: (ent) => {
+                              const pct = ent.allocatedAmount > 0 ? Math.round((ent.usedAmount / ent.allocatedAmount) * 100) : 0
+                              const isHigh = pct > 80
+                              return (
+                                <div className="flex w-[160px] flex-col gap-1.5">
+                                  <div className="flex items-center justify-between text-label">
+                                    <span className="text-faint">
+                                      RM {ent.usedAmount.toLocaleString()}
+                                    </span>
+                                    <span className={isHigh ? "font-semibold text-rose-600 dark:text-rose-400" : "font-semibold text-primary"}>{pct}%</span>
+                                  </div>
+                                  <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                                    <div
+                                      className={isHigh
+                                        ? "h-full rounded-full bg-rose-500 dark:bg-rose-400 transition-all duration-700"
+                                        : "h-full rounded-full bg-primary transition-all duration-700"
+                                      }
+                                      style={{ width: `${Math.min(pct, 100)}%` }}
+                                    />
+                                  </div>
                                 </div>
-                                <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                                  <div
-                                    className="h-full rounded-full bg-emerald-500 dark:bg-emerald-400"
-                                    style={{
-                                      width: `${ent.allocatedAmount > 0 ? (ent.usedAmount / ent.allocatedAmount) * 100 : 0}%`,
-                                    }}
-                                  />
-                                </div>
-                              </div>
-                            ),
+                              )
+                            },
                           },
                           {
                             header: "Status",

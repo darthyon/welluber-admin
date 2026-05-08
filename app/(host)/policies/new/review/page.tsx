@@ -2,26 +2,57 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CaretLeft, NavigationArrow, Check, Users, Funnel, CaretDown } from "@phosphor-icons/react";
+import { CaretLeft, NavigationArrow, Check, Users, CaretDown, PencilSimpleLine } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import { SuccessModal } from "@/components/shared/success-modal";
+import { SharedDataTable, type Column } from "@/components/shared/data-table";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 import { PolicyReviewCards } from "@/components/host/policies/policy-wizard-content";
+import { TargetingFilterBar } from "@/components/host/policies/targeting-filter-bar";
 import { BenefitPolicy, BenefitGroup, Benefit } from "@/types/policy";
 import { MOCK_ORGS, MOCK_EMPLOYEES } from "@/lib/mock-data";
+import type { EmployeeDirectoryItem } from "@/features/employees/types";
 
 type Draft = { policy: Partial<BenefitPolicy>; groups: BenefitGroup[]; benefits: Benefit[] };
 
-const EMPLOYMENT_TYPES = [
-  { id: "full-time", normId: "full_time", label: "Full-time" },
-  { id: "part-time", normId: "part_time", label: "Part-time" },
-  { id: "contract", normId: "contract", label: "Contract" },
-  { id: "internship", normId: "internship", label: "Internship" },
-];
-
 const normEmpType = (s?: string) => (s ?? "").replace(/-/g, "_");
+
+const employeeColumns: Column<EmployeeDirectoryItem>[] = [
+  {
+    header: "Employee",
+    accessorKey: "name",
+    render: (e) => (
+      <div>
+        <p className="text-body font-semibold text-foreground">{e.name}</p>
+        <p className="text-label font-mono text-faint mt-0.5">{e.empCode}</p>
+      </div>
+    ),
+  },
+  {
+    header: "Employment Type",
+    render: (e) => (
+      <span className="text-body text-subtle capitalize">{(e.employmentType ?? "—").replace(/_/g, " ")}</span>
+    ),
+  },
+  {
+    header: "Tier",
+    render: (e) => {
+      if (!e.tier) return <span className="text-body text-faint">—</span>;
+      return (
+        <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-label font-medium">
+          {e.tier}
+        </span>
+      );
+    },
+  },
+  {
+    header: "Department",
+    render: (e) => (
+      <span className="text-body text-subtle">{e.department ?? "—"}</span>
+    ),
+  },
+];
 
 export default function NewPolicyReviewPage() {
   const router = useRouter();
@@ -89,6 +120,14 @@ export default function NewPolicyReviewPage() {
     updateDraft({ ...draft, policy: { ...draft.policy, eligibility: { ...draft.policy.eligibility, departmentIds: updated } } });
   };
 
+  const handleSaveDraft = async () => {
+    if (!draft) return;
+    setIsSubmitting(true);
+    await new Promise((r) => setTimeout(r, 800));
+    setIsSubmitting(false);
+    toast.success("Draft saved");
+  };
+
   const handleConfirm = async () => {
     if (!draft) return;
     setIsSubmitting(true);
@@ -131,135 +170,64 @@ export default function NewPolicyReviewPage() {
           </div>
         </div>
 
-        {/* Targeting compact */}
+        {/* Targeted Employees — compact filters + table */}
+        <section className="bg-card border border-border rounded-lg shadow-sm p-6 md:p-8 space-y-5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center border border-primary/20 shrink-0">
+                <Users size={18} weight="duotone" />
+              </div>
+              <div>
+                <h3 className="text-lead font-semibold text-foreground">Targeted Employees</h3>
+                <p className="text-label text-muted-foreground mt-0.5">
+                  {targetedEmployees.length} employee{targetedEmployees.length !== 1 ? "s" : ""} matching
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Filter bar — summary + sheet */}
+          <div className="rounded-lg border border-border/60 bg-muted/20 px-4 py-3">
+            <TargetingFilterBar
+              selectedEmpTypes={draft.policy.eligibleEmploymentTypes ?? []}
+              selectedTierIds={draft.policy.eligibility?.tierIds ?? []}
+              selectedDeptIds={draft.policy.eligibility?.departmentIds ?? []}
+              tierOptions={tierOptions}
+              departmentOptions={departmentOptions}
+              onToggleEmpType={toggleEmpType}
+              onToggleTier={toggleTier}
+              onToggleDept={toggleDept}
+            />
+          </div>
+
+          {/* Employee table */}
+          <div className="border-t border-border/60 pt-5">
+            <SharedDataTable
+              data={targetedEmployees}
+              columns={employeeColumns}
+              rowsPerPage={10}
+              ghost
+            />
+          </div>
+        </section>
+
+        {/* Review — collapsed by default */}
         <section className="bg-card border border-border rounded-lg shadow-sm">
           <Collapsible defaultOpen={false}>
             <CollapsibleTrigger className="w-full flex items-center gap-3 p-4 group">
               <div className="w-8 h-8 rounded-md bg-primary/10 text-primary flex items-center justify-center border border-primary/20 shrink-0">
-                <Funnel size={14} weight="duotone" />
+                <Check size={14} weight="duotone" />
               </div>
               <div className="flex-1 min-w-0 text-left">
-                <p className="text-body font-semibold text-foreground">Targeting</p>
-                <p className="text-label text-muted-foreground truncate">
-                  {(draft.policy.eligibleEmploymentTypes?.length ?? 0)} employment type(s)
-                  {" · "}{(draft.policy.eligibility?.tierIds?.length ?? 0)} tier(s)
-                  {" · "}{(draft.policy.eligibility?.departmentIds?.length ?? 0)} department(s)
-                </p>
+                <p className="text-body font-semibold text-foreground">Review</p>
+                <p className="text-label text-muted-foreground">Verify your configuration before saving</p>
               </div>
               <CaretDown size={14} weight="bold" className="text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
             </CollapsibleTrigger>
-            <CollapsibleContent className="px-4 pb-4 space-y-4">
-              <div className="space-y-2">
-                <label className="text-label font-medium text-subtle">Employment Types</label>
-                <div className="flex flex-wrap gap-1.5">
-                  {EMPLOYMENT_TYPES.map((t) => {
-                    const selected = draft.policy.eligibleEmploymentTypes?.includes(t.id) ?? false;
-                    return (
-                      <button type="button" key={t.id} onClick={() => toggleEmpType(t.id)}
-                        className={cn(
-                          "px-3 py-1 rounded-full text-label font-medium border transition-all",
-                          selected ? "bg-primary text-primary-foreground border-primary" : "bg-background text-muted-foreground border-border hover:border-primary/30"
-                        )}>
-                        {selected && <Check size={10} weight="bold" className="inline mr-1" />}
-                        {t.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="text-label font-medium text-subtle">Tiers</label>
-                {tierOptions.length === 0 ? (
-                  <p className="text-label text-faint italic">No tiers configured.</p>
-                ) : (
-                  <div className="flex flex-wrap gap-1.5">
-                    {tierOptions.map((tier) => {
-                      const selected = draft.policy.eligibility?.tierIds?.includes(tier.value) ?? false;
-                      return (
-                        <button type="button" key={tier.value} onClick={() => toggleTier(tier.value)}
-                          className={cn(
-                            "px-3 py-1 rounded-full text-label font-medium border transition-all",
-                            selected ? "bg-primary text-primary-foreground border-primary" : "bg-background text-muted-foreground border-border hover:border-primary/30"
-                          )}>
-                          {selected && <Check size={10} weight="bold" className="inline mr-1" />}
-                          {tier.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-              <div className="space-y-2">
-                <label className="text-label font-medium text-subtle">Departments</label>
-                {departmentOptions.length === 0 ? (
-                  <p className="text-label text-faint italic">No departments configured.</p>
-                ) : (
-                  <div className="flex flex-wrap gap-1.5">
-                    {departmentOptions.map((dept) => {
-                      const selected = draft.policy.eligibility?.departmentIds?.includes(dept.value) ?? false;
-                      return (
-                        <button type="button" key={dept.value} onClick={() => toggleDept(dept.value)}
-                          className={cn(
-                            "px-3 py-1 rounded-full text-label font-medium border transition-all",
-                            selected ? "bg-primary text-primary-foreground border-primary" : "bg-background text-muted-foreground border-border hover:border-primary/30"
-                          )}>
-                          {selected && <Check size={10} weight="bold" className="inline mr-1" />}
-                          {dept.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
+            <CollapsibleContent className="px-4 pb-4">
+              <PolicyReviewCards policy={draft.policy} groups={draft.groups} benefits={draft.benefits} />
             </CollapsibleContent>
           </Collapsible>
-        </section>
-
-        {/* Targeted employees */}
-        <section className="bg-card border border-border rounded-lg shadow-sm p-6 md:p-8 space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center border border-primary/20 shrink-0">
-              <Users size={18} weight="duotone" />
-            </div>
-            <div>
-              <h3 className="text-lead font-semibold text-foreground">Targeted Employees</h3>
-              <p className="text-label text-muted-foreground mt-0.5">{targetedEmployees.length} employee(s) match your filters.</p>
-            </div>
-          </div>
-
-          {targetedEmployees.length === 0 ? (
-            <p className="text-label text-faint italic px-4 py-6 text-center border border-dashed border-border/60 rounded-lg">
-              No employees match these filters. Adjust targeting above.
-            </p>
-          ) : (
-            <div className="border border-border/60 rounded-lg overflow-hidden">
-              <table className="w-full text-label">
-                <thead className="bg-muted/30 text-subtle">
-                  <tr>
-                    <th className="text-left font-medium px-4 py-2.5">Name</th>
-                    <th className="text-left font-medium px-4 py-2.5">Employment Type</th>
-                    <th className="text-left font-medium px-4 py-2.5">Tier</th>
-                    <th className="text-left font-medium px-4 py-2.5">Department</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/40">
-                  {targetedEmployees.map((e) => (
-                    <tr key={e.id} className="text-foreground">
-                      <td className="px-4 py-2.5 font-medium">{e.name}</td>
-                      <td className="px-4 py-2.5 text-muted-foreground capitalize">{(e.employmentType ?? "—").replace(/_/g, " ")}</td>
-                      <td className="px-4 py-2.5 text-muted-foreground">{e.tier ?? "—"}</td>
-                      <td className="px-4 py-2.5 text-muted-foreground">{e.department ?? "—"}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </section>
-
-        {/* Configuration recap */}
-        <section className="bg-card border border-border rounded-lg shadow-sm p-6 md:p-8">
-          <PolicyReviewCards policy={draft.policy} groups={draft.groups} benefits={draft.benefits} />
         </section>
 
         {/* Sticky Action Bar */}
@@ -276,6 +244,18 @@ export default function NewPolicyReviewPage() {
           <div className="w-px h-6 bg-border/40" />
           <Button
             type="button"
+            variant="ghost"
+            size="lg"
+            disabled={isSubmitting}
+            className="text-body font-medium px-6 transition-colors"
+            onClick={handleSaveDraft}
+          >
+            <PencilSimpleLine size={14} weight="bold" className="mr-1.5" />
+            Save as Draft
+          </Button>
+          <div className="w-px h-6 bg-border/40" />
+          <Button
+            type="button"
             size="lg"
             disabled={isSubmitting}
             onClick={handleConfirm}
@@ -284,7 +264,7 @@ export default function NewPolicyReviewPage() {
             {isSubmitting ? (
               <>
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Creating...
+                Saving...
               </>
             ) : (
               <>

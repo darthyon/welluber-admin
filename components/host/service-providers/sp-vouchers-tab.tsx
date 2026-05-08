@@ -5,21 +5,20 @@ import { Plus, Ticket } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
 import { StatusBadge } from "@/components/shared/status-badge";
-import { DetailSection } from "@/components/shared/detail-section";
 import { FilterItem } from "@/components/shared/filter-item";
 import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { SpVoucherForm } from "./sp-voucher-form";
+import { SpVoucherDetailView } from "./sp-voucher-detail-view";
 import type { ServiceProvider, SpVoucher, SpVoucherStatus } from "@/types/provider";
 import { ActionPopover } from "@/components/shared/action-popover";
 import { useQueryState, useUpdateQueryParams } from "@/hooks/use-tab-persistence";
 import { SharedDataTable } from "@/components/shared/data-table";
-import { cn } from "@/lib/utils";
 
 interface SpVouchersTabProps {
   sp: ServiceProvider;
 }
 
-type VoucherView = "list" | "form";
+type VoucherView = "list" | "detail" | "add" | "edit";
 
 const STATUS_FILTER_TABS: { label: string; value: SpVoucherStatus | "all" }[] = [
   { label: "All", value: "all" },
@@ -40,7 +39,6 @@ const STATUS_VARIANT: Record<SpVoucherStatus, "emerald" | "amber" | "zinc" | "ro
 
 export function SpVouchersTab({ sp }: SpVouchersTabProps) {
   const [view, setView] = useQueryState("voucherView", "list");
-  const [isReadOnly, setIsReadOnly] = useQueryState("voucherReadOnly", "false");
   const [selectedVoucherId, setSelectedVoucherId] = useQueryState("voucherId");
   const updateQueryParams = useUpdateQueryParams();
   
@@ -48,6 +46,7 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
   const [voucherSearch, setVoucherSearch] = useState("");
 
   const selectedVoucher = sp.vouchers.find((v) => v.id === selectedVoucherId);
+  const branchNames = sp.branches.map((b) => ({ id: b.id, name: b.name }));
 
   const filteredVouchers = sp.vouchers.filter(
     (v) =>
@@ -59,25 +58,25 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
 
   const handleView = (voucher: SpVoucher) => {
     updateQueryParams({
-      voucherView: "form",
+      voucherView: "detail",
       voucherId: voucher.id,
-      voucherReadOnly: "true"
+      voucherReadOnly: null,
     });
   };
 
   const handleEdit = (voucher: SpVoucher) => {
     updateQueryParams({
-      voucherView: "form",
+      voucherView: "edit",
       voucherId: voucher.id,
-      voucherReadOnly: "false"
+      voucherReadOnly: null,
     });
   };
 
   const handleAdd = () => {
     updateQueryParams({
-      voucherView: "form",
+      voucherView: "add",
       voucherId: null,
-      voucherReadOnly: "false"
+      voucherReadOnly: null,
     });
   };
 
@@ -85,20 +84,31 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
     updateQueryParams({
       voucherView: "list",
       voucherId: null,
-      voucherReadOnly: null
+      voucherReadOnly: null,
     });
   };
 
-  if (view === "form") {
+  if (view === "detail" && selectedVoucher) {
+    return (
+      <SpVoucherDetailView
+        voucher={selectedVoucher}
+        serviceCategories={sp.serviceCategories}
+        branchNames={branchNames}
+        onBack={handleBack}
+        onEdit={() => setView("edit")}
+      />
+    );
+  }
+
+  if ((view === "add" || view === "edit") && (view === "add" || selectedVoucher)) {
+    const isEditing = view === "edit" && !!selectedVoucher;
     return (
       <div className="animate-in fade-in slide-in-from-bottom-2 duration-400">
         <SpVoucherForm
           spId={sp.id}
           spServiceCategories={sp.serviceCategories}
-          spBranches={sp.branches.map((b) => ({ id: b.id, name: b.name }))}
-          voucher={selectedVoucher}
-          isReadOnly={isReadOnly === "true"}
-          onEdit={() => setIsReadOnly("false")}
+          spBranches={branchNames}
+          voucher={view === "edit" ? selectedVoucher : undefined}
           onSuccess={handleBack}
           onCancel={handleBack}
         />
@@ -224,8 +234,8 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
                     <div className="flex justify-end pr-1">
                       <ActionPopover
                         actions={[
-                          { label: "View Voucher", onClick: () => handleView(voucher) },
-                          { label: "Edit Voucher", onClick: () => handleEdit(voucher) },
+                          { label: "View Voucher Package", onClick: () => handleView(voucher) },
+                          { label: "Edit Voucher Package", onClick: () => handleEdit(voucher) },
                           { label: "Suspend Voucher", onClick: () => console.log("Suspend", voucher.id) },
                           { label: "Remove Voucher", isDanger: true, onClick: () => console.log("Remove", voucher.id) },
                         ]}
