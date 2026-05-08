@@ -1,4 +1,4 @@
-import type { AuditLogEntry, AuditLogType } from "@/features/audit-log/types"
+import type { AuditLogEntry } from "@/features/audit-log/types"
 
 const ADMINS = [
   { name: "Yon Yusuf", email: "yon@welluber.com" },

@@ -1,6 +1,6 @@
 "use server";
 
-import { Account, AccountTransaction, AccountStatus } from "./types";
+import { AccountStatus } from "./types";
 import { CreateAccountInput, AdjustAccountInput, UpdateCreditLimitInput } from "./schemas";
 import { revalidatePath } from "next/cache";
 

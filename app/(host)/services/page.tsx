@@ -1,14 +1,10 @@
 "use client";
 
 import { useState, useMemo, Suspense } from "react";
-import { 
-  TreeStructure, 
-  Plus, 
-  MagnifyingGlass, 
-  DotsThreeVertical,
-  PlusCircle,
-  PencilSimple,
-  Trash,
+import {
+  TreeStructure,
+  Plus,
+  MagnifyingGlass,
   Barbell,
   Stethoscope,
   Tooth,
@@ -24,29 +20,16 @@ import {
   Brain,
   HandHeart,
   MusicNotes,
-  BowlFood,
-  Check,
-  House
+  BowlFood
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { BentoGrid } from "@/components/shared/bento-grid";
 import { ActionPopover } from "@/components/shared/action-popover";
 import { CategoryDetailSheet } from "@/components/host/services/category-detail-sheet";
 import { OverflowTags } from "@/components/shared/overflow-tags";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
+  TooltipProvider
 } from "@/components/ui/tooltip";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { useQueryState, useUpdateQueryParams } from "@/hooks/use-tab-persistence";
 import {
   Dialog,
@@ -99,7 +82,7 @@ function ServicesContent() {
   
   // Sheet & Category Selection State (Refactored to Query State)
   const [selectedCategoryName, setSelectedCategoryName] = useQueryState("category");
-  const [isSheetOpen, setIsSheetOpen] = useQueryState("sheet", "false");
+  const [isSheetOpen] = useQueryState("sheet", "false");
   const updateQueryParams = useUpdateQueryParams();
 
   const selectedCategory = useMemo(() => {
@@ -411,3 +394,4 @@ export default function ServicesPage() {
     </Suspense>
   );
 }
+

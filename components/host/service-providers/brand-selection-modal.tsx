@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { MagnifyingGlass, Check, CaretRight } from "@phosphor-icons/react";
+import { MagnifyingGlass, CaretRight } from "@phosphor-icons/react";
 import { 
   Dialog, 
   DialogContent, 
@@ -12,7 +12,6 @@ import {
 import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Brand } from "@/types/brand";
-import { cn } from "@/lib/utils";
 
 interface BrandSelectionModalProps {
   isOpen: boolean;

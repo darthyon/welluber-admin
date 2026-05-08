@@ -5,7 +5,6 @@ import {
   User,
   Users,
   Envelope,
-  Phone,
   CalendarBlank,
   DiceFive,
   Briefcase,
@@ -15,11 +14,10 @@ import {
   Globe,
   CreditCard,
   Hourglass,
-  Clock,
+  Clock
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { ChoiceCard } from "@/components/shared/choice-card";
-import { DetailSection } from "@/components/shared/detail-section";
 import { DatePickerField } from "@/components/shared/date-picker-field";
 import { PhoneInput } from "@/components/shared/phone-input";
 import { IdentificationInput } from "@/components/shared/identification-input";
@@ -52,14 +50,15 @@ const RELATIONSHIPS = [
   "Spouse", "Child", "Mother", "Father", "Brother", "Sister", "Mother-in-law", "Father-in-law"
 ];
 
-
 interface EmployeeFormContentProps {
   mode: "create" | "edit";
-  onSubmit: (data: any) => void;
+  onSubmit: (data: unknown) => void;
   isSubmitting: boolean;
 }
 
 export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFormContentProps) {
+  void mode;
+  void isSubmitting;
   const [formData, setFormData] = useState({
     name: "",
     dateOfBirth: "",
@@ -184,7 +183,7 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
               <select
                 className="w-full px-3 py-2 bg-background border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all"
                 value={formData.gender}
-                onChange={(e) => setFormData({ ...formData, gender: e.target.value as any })}
+                onChange={(e) => setFormData({ ...formData, gender: e.target.value as "male" | "female" | "other" })}
               >
                 <option value="male">Male</option>
                 <option value="female">Female</option>
@@ -203,7 +202,7 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
                   <select
                     className="bg-background px-2 py-1 rounded text-label font-medium outline-none border border-border"
                     value={formData.residencyStatus}
-                    onChange={(e) => setFormData({ ...formData, residencyStatus: e.target.value as any })}
+                    onChange={(e) => setFormData({ ...formData, residencyStatus: e.target.value as "local" | "foreigner" })}
                   >
                     <option value="local">Local</option>
                     <option value="foreigner">Foreigner</option>

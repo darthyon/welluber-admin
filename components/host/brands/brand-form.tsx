@@ -3,11 +3,11 @@
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Tag, WarningCircle, CheckCircle } from "@phosphor-icons/react";
+import { Tag, WarningCircle } from "@phosphor-icons/react";
 import { Switch } from "@/components/shared/switch";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Brand, BrandStatus } from "@/types/brand";
+import { Brand } from "@/types/brand";
 import { LogoUpload } from "@/components/shared/logo-upload";
 import { MASTER_SERVICE_TAXONOMY } from "@/features/providers/service-taxonomy";
 import { SearchableMultiSelect } from "@/components/shared/searchable-multi-select";

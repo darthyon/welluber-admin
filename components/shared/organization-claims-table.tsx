@@ -4,15 +4,11 @@ import { useState } from "react";
 import {
   MapPin,
   Calendar,
-  Storefront,
   Receipt,
-  DotsThreeVertical,
-  FileText,
   Eye,
   Download,
-  Ticket,
+  Ticket
 } from "@phosphor-icons/react";
-import { cn } from "@/lib/utils";
 import { SharedDataTable, type Column } from "@/components/shared/data-table";
 import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { FilterItem } from "@/components/shared/filter-item";
@@ -265,3 +261,4 @@ export function OrganizationClaimsTable({
     </div>
   );
 }
+

@@ -1,11 +1,9 @@
 "use client";
 
-import { 
-  Users, 
-  Buildings, 
-  TreeStructure, 
-  DotsThreeVertical, 
-  EnvelopeSimple,
+import {
+  Users,
+  Buildings,
+  TreeStructure,
   Clock,
   UserCircle
 } from "@phosphor-icons/react";
@@ -112,3 +110,4 @@ export function MemberCard({ member }: MemberCardProps) {
     </motion.div>
   );
 }
+

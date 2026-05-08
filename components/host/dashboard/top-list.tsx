@@ -1,8 +1,6 @@
 "use client"
 
-import { Star } from "@phosphor-icons/react"
 import { useState } from "react"
-import { cn } from "@/lib/utils"
 
 interface TopListItem {
   id: string

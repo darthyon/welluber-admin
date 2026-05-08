@@ -1,6 +1,6 @@
 "use client";
 
-import { Shield, Buildings, Storefront, DotsThreeVertical, EnvelopeSimple, Clock } from "@phosphor-icons/react";
+import { Shield, Buildings, Storefront, EnvelopeSimple, Clock } from "@phosphor-icons/react";
 import { Administrator } from "@/features/users/types";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ActionPopover } from "@/components/shared/action-popover";

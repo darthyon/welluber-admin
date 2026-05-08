@@ -5,6 +5,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip,
 import { cn } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { CaretDown, MagnifyingGlass, Check, Info } from "@phosphor-icons/react"
+import { useMounted } from "@/hooks/use-mounted"
 
 // Dummy data for Month view with dual metrics (Issued vs Checked-in)
 const dataMonth = [
@@ -111,11 +112,7 @@ function SearchableSelect({
 export function ActivityChart() {
   const [metric, setMetric] = useState<"both" | "issued" | "checkedIn">("both")
   const [entityFilter, setEntityFilter] = useState("all")
-  const [isMounted, setIsMounted] = useState(false)
-
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
+  const isMounted = useMounted()
 
   if (!isMounted) {
     return (
@@ -157,7 +154,7 @@ export function ActivityChart() {
           {/* Default metric dropdown */}
           <select 
             value={metric}
-            onChange={(e) => setMetric(e.target.value as any)}
+            onChange={(e) => setMetric(e.target.value as "both" | "issued" | "checkedIn")}
             className="px-3 py-1.5 bg-card border border-border hover:bg-muted/50 rounded-md text-label font-medium text-foreground outline-none cursor-pointer transition-colors"
           >
             <option value="both">Compare Both</option>

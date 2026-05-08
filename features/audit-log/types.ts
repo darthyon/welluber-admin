@@ -1,4 +1,3 @@
-import { Icon } from "@phosphor-icons/react";
 
 export type AuditLogType = "Create" | "Update" | "Delete" | "Approval" | "Rejection" | "SettingChange" | "Login" | "Payout";
 

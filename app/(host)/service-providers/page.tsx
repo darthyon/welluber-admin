@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, DownloadSimple, MagnifyingGlass, FadersHorizontal } from "@phosphor-icons/react";
+import { Plus, DownloadSimple, MagnifyingGlass } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useState, Suspense } from "react";
 import { Button } from "@/components/ui/button";
@@ -12,10 +12,8 @@ import { FilterItem } from "@/components/shared/filter-item";
 import { MultiSelectFilter } from "@/components/shared/multi-select-filter";
 import { EmptyState } from "@/components/shared/empty-state";
 import { AdvancedFilterSheet, AdvancedFilters, DEFAULT_ADVANCED_FILTERS } from "@/components/shared/advanced-filter-sheet";
-import { Badge } from "@/components/ui/badge";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQueryState } from "@/hooks/use-tab-persistence";
-import { cn } from "@/lib/utils";
 import { MOCK_SPS } from "@/lib/mock-data";
 import { SP_STATUS_OPTIONS } from "@/features/providers/constants";
 import { SERVICE_TAXONOMY } from "@/features/organizations/constants";

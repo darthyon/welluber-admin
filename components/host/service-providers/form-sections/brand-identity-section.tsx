@@ -2,12 +2,17 @@
 
 import { Tag } from "@phosphor-icons/react";
 import { Controller } from "react-hook-form";
+import type { Control, FieldErrors, UseFormRegister } from "react-hook-form";
 import { LogoUpload } from "@/components/shared/logo-upload";
+import { z } from "zod";
+import { createSpSchema } from "@/features/providers/schemas";
+
+type SpFormData = z.input<typeof createSpSchema> & { brandName?: string; brandLogo?: File | string | null };
 
 interface BrandIdentitySectionProps {
-  register: any;
-  control: any;
-  errors: any;
+  register: UseFormRegister<SpFormData>;
+  control: Control<SpFormData>;
+  errors: FieldErrors<SpFormData>;
   labelCls: string;
   inputCls: (hasError?: boolean) => string;
 }

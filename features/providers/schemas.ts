@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { COMMISSION_RATE_MIN, COMMISSION_RATE_MAX } from "./constants";
 
 // ─── SP Account ───────────────────────────────────────────────────────────────
 

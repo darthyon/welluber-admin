@@ -4,19 +4,13 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   CaretLeft,
-  User,
-  Briefcase,
-  Shield,
-  Users,
-  NavigationArrow,
+  NavigationArrow
 } from "@phosphor-icons/react";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav";
 import { SuccessModal } from "@/components/shared/success-modal";
 import { toast } from "sonner";
 import { EmployeeFormContent } from "@/components/host/employees/employee-form-content";
-
 const ANCHOR_ITEMS = [
   { id: "personal-identity", label: "Personal Identity" },
   { id: "employment-configuration", label: "Employment Configuration" },
@@ -29,7 +23,7 @@ export default function NewEmployeePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const handleSubmit = async (data: any) => {
+  const handleSubmit = async () => {
     setIsSubmitting(true);
     await new Promise((resolve) => setTimeout(resolve, 1500));
     setIsSubmitting(false);

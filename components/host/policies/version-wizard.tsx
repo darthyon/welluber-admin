@@ -115,6 +115,7 @@ export function VersionWizard({
   onSuccess,
   onCancel,
 }: VersionWizardProps) {
+  void orgDepartmentConfigs;
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -170,11 +171,6 @@ export function VersionWizard({
       .filter(e => !pinnedEmployeeIds.includes(e.id) && (e.name.toLowerCase().includes(q) || e.empCode.toLowerCase().includes(q)))
       .slice(0, 6);
   }, [employees, empSearch, pinnedEmployeeIds]);
-
-  const overriddenBenefits = useMemo(() => {
-    return parentBenefits.filter(b => overrides[b.id]?.amount !== undefined || overrides[b.id]?.employeeAmount !== undefined);
-  }, [parentBenefits, overrides]);
-
   // ── Handlers ────────────────────────────────────────────────────────────────
 
   const setOverride = (benefitId: string, field: keyof BenefitOverride, value: number | undefined) => {

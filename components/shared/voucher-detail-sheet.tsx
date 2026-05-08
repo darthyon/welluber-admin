@@ -11,7 +11,6 @@ import {
   MapPin,
   CreditCard,
 } from "@phosphor-icons/react";
-import { cn } from "@/lib/utils";
 import type { FlatClaimRow } from "@/types/claims";
 
 interface VoucherDetailSheetProps {

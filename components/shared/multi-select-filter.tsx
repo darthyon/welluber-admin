@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Check, CaretDown, Heartbeat } from "@phosphor-icons/react";
+import { CaretDown, Heartbeat } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,6 +28,7 @@ export function MultiSelectFilter({
   singularLabel = "category",
   pluralLabel = "categories"
 }: MultiSelectFilterProps) {
+  void singularLabel;
   const [isOpen, setIsOpen] = React.useState(false);
 
   const labelText = selected.length === 0 

@@ -41,7 +41,7 @@ interface EmployeeCardProps {
 }
 
 export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
-  const [policyIndex, setPolicyIndex] = useState(0);
+  const [policyIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
   const [dragConstraints, setDragConstraints] = useState({ left: 0, right: 0 });

@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useMemo, Suspense } from "react"
+import { useState, useMemo, Suspense, type ComponentProps } from "react"
 import Link from "next/link"
-import { useParams, useRouter, useSearchParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import {
   useTabPersistence,
   useQueryState,
@@ -10,7 +10,6 @@ import {
 } from "@/hooks/use-tab-persistence"
 import {
   Buildings,
-  GitBranch,
   Users,
   Shield,
   Gear,
@@ -18,20 +17,13 @@ import {
   Plus,
   PencilSimpleLine,
   Upload,
-  ChartLineUp,
-  ClockCounterClockwise,
-  TrendUp,
-  Funnel,
-  DotsThreeVertical,
-  MagnifyingGlass,
   Article,
   IdentificationCard,
-  Suitcase,
   Scroll,
   SealCheck,
   MapPin,
   Ticket,
-  Rows,
+  Rows
 } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { Breadcrumbs } from "@/components/shared/breadcrumbs"
@@ -41,7 +33,6 @@ import { Button } from "@/components/ui/button"
 import { ViewToggle, ViewMode } from "@/components/shared/view-toggle"
 import {
   VerticalTabs,
-  type VerticalTabItem,
 } from "@/components/shared/vertical-tabs"
 import { BranchCard } from "@/components/host/organizations/branch-card"
 import { BranchDetailView } from "@/components/host/organizations/branch-detail-view"
@@ -52,7 +43,6 @@ import { UtilisationClaimsTable } from "@/components/shared/utilisation-claims-t
 import { OrganizationClaimsTable } from "@/components/shared/organization-claims-table"
 import { VouchersTable } from "@/components/shared/vouchers-table"
 import { VoucherDetailSheet } from "@/components/shared/voucher-detail-sheet"
-import { EmployeeDetailView } from "@/components/host/organizations/employee-detail-view"
 
 import { BulkUploadWizard } from "@/components/host/organizations/bulk-upload-wizard"
 import { AssignedPolicyList } from "@/components/host/organizations/assigned-policy-list"
@@ -66,13 +56,12 @@ import { BenefitPolicy, Benefit } from "@/types/policy"
 import type { FlatClaimRow } from "@/types/claims"
 import { DetailSection } from "@/components/shared/detail-section"
 import { DetailField } from "@/components/shared/detail-field"
-import { BentoGrid, BentoCard } from "@/components/shared/bento-grid"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { ConfirmationModal } from "@/components/shared/confirmation-modal"
 import { DataFilterBar } from "@/components/shared/data-filter-bar"
 import { FilterItem } from "@/components/shared/filter-item"
 import { ActionPopover } from "@/components/shared/action-popover"
-import { SharedDataTable, Column } from "@/components/shared/data-table"
+import { SharedDataTable } from "@/components/shared/data-table"
 import {
   Tooltip,
   TooltipTrigger,
@@ -161,7 +150,7 @@ function OrganizationDetailContent() {
   const [activeTab, setActiveTab] = useTabPersistence<TabId>("profile")
   const [isInviteModalOpen, setIsInviteModalOpen] = useQueryState("inviteAdmin")
   const [isBranchSheetOpen, setIsBranchSheetOpen] = useQueryState("branchSheet")
-  const [selectedBranchName, setSelectedBranchName] =
+  const [selectedBranchName] =
     useQueryState("branchName")
   const [toastMessage, setToastMessage] = useState<string | null>(null)
   const [orgStatus, setOrgStatus] = useState<OrganizationStatus>("active")
@@ -179,7 +168,7 @@ function OrganizationDetailContent() {
   const [employeesView, setEmployeesView] = useState<ViewMode>("list")
   const [dependentsView, setDependentsView] = useState<ViewMode>("list")
   const [adminsView, setAdminsView] = useState<ViewMode>("list")
-  const [policiesView, setPoliciesView] = useState<ViewMode>("list")
+  const [] = useState<ViewMode>("list")
 
   // Search states
   const [branchSearch, setBranchSearch] = useQueryState("branchSearch", "")
@@ -197,7 +186,7 @@ function OrganizationDetailContent() {
   const [viewBranchId, setViewBranchId] = useQueryState("branchId")
 
   // Sub-navigation state (Employees)
-  const [viewEmployeeId, setViewEmployeeId] = useQueryState("employeeId")
+  const [] = useQueryState("employeeId")
   const [isBulkUploading, setIsBulkUploading] = useQueryState("bulkUpload")
   const [activeEmployeeSubTab, setActiveEmployeeSubTab] = useQueryState(
     "subTab",
@@ -371,7 +360,6 @@ function OrganizationDetailContent() {
       coPayment: { required: false, type: "Percentage", value: 0 },
     },
   ])
-
 
   const handleAssignPolicy = (policyId: string) => {
     // Mock assignment logic
@@ -719,7 +707,7 @@ function OrganizationDetailContent() {
                     header: "Name",
                     accessorKey: "name",
                     sortable: true,
-                    render: (admin: any) => (
+                    render: (admin: { name: string }) => (
                       <span className="text-body font-medium text-foreground">
                         {admin.name}
                       </span>
@@ -729,7 +717,7 @@ function OrganizationDetailContent() {
                     header: "Email",
                     accessorKey: "email",
                     sortable: true,
-                    render: (admin: any) => (
+                    render: (admin: { email: string }) => (
                       <span className="text-body text-subtle">
                         {admin.email}
                       </span>
@@ -739,7 +727,7 @@ function OrganizationDetailContent() {
                     header: "Role",
                     accessorKey: "role",
                     sortable: true,
-                    render: (admin: any) => (
+                    render: (admin: { role: string }) => (
                       <span className="text-body text-subtle">
                         {admin.role}
                       </span>
@@ -749,7 +737,7 @@ function OrganizationDetailContent() {
                     header: "Joined Date",
                     accessorKey: "joinDate",
                     sortable: true,
-                    render: (admin: any) => (
+                    render: (admin: { joinDate: string }) => (
                       <span className="text-label font-medium text-subtle">
                         {admin.joinDate}
                       </span>
@@ -759,7 +747,7 @@ function OrganizationDetailContent() {
                     header: "Last Active",
                     accessorKey: "lastActive",
                     sortable: true,
-                    render: (admin: any) => (
+                    render: (admin: { lastActive: string }) => (
                       <span className="text-label font-medium text-subtle">
                         {admin.lastActive}
                       </span>
@@ -769,7 +757,7 @@ function OrganizationDetailContent() {
                     header: "Branch",
                     accessorKey: "branchName",
                     sortable: true,
-                    render: (admin: any) => (
+                    render: (admin: { branchId: string; branchName: string }) => (
                       <button
                         onClick={() => {
                           setActiveTab("branches")
@@ -785,14 +773,14 @@ function OrganizationDetailContent() {
                     header: "Status",
                     accessorKey: "status",
                     sortable: true,
-                    render: (admin: any) => (
+                    render: (admin: { status: string }) => (
                       <StatusBadge status={admin.status} variant="emerald" />
                     ),
                   },
                   {
                     header: "Actions",
                     align: "right",
-                    render: (admin: any) => (
+                    render: () => (
                       <ActionPopover
                         actions={[
                           {
@@ -985,7 +973,7 @@ function OrganizationDetailContent() {
                           header: "Branch name",
                           accessorKey: "name",
                           sortable: true,
-                          render: (branch: any) => (
+                          render: (branch: { name: string }) => (
                             <span className="text-body font-medium text-foreground transition-colors group-hover:text-primary">
                               {branch.name}
                             </span>
@@ -995,7 +983,7 @@ function OrganizationDetailContent() {
                           header: "Status",
                           accessorKey: "status",
                           sortable: true,
-                          render: (branch: any) => (
+                          render: (branch: { status: string }) => (
                             <StatusBadge
                               status={branch.status}
                               variant="emerald"
@@ -1006,7 +994,7 @@ function OrganizationDetailContent() {
                           header: "Type",
                           accessorKey: "type",
                           sortable: true,
-                          render: (branch: any) => (
+                          render: (branch: { type: string }) => (
                             <span className="text-body text-subtle">
                               {branch.type}
                             </span>
@@ -1016,7 +1004,7 @@ function OrganizationDetailContent() {
                           header: "Employees",
                           accessorKey: "employees",
                           sortable: true,
-                          render: (branch: any) => (
+                          render: (branch: { employees: number | string }) => (
                             <span className="text-body text-subtle">
                               {branch.employees}
                             </span>
@@ -1027,7 +1015,7 @@ function OrganizationDetailContent() {
                           accessorKey: "accountModel",
                           sortable: true,
                           headerClassName: "min-w-[150px]",
-                          render: (branch: any) => (
+                          render: (branch: { accountModel: string; balance: string }) => (
                             <div className="flex flex-col">
                               <span className="text-body font-semibold text-foreground">
                                 {branch.accountModel}
@@ -1043,7 +1031,7 @@ function OrganizationDetailContent() {
                           accessorKey: "utilizationRate",
                           sortable: true,
                           headerClassName: "min-w-[180px]",
-                          render: (branch: any) => (
+                          render: (branch: { utilizationRate: number; balance: string; claimsCount?: number; limit?: string }) => (
                             <div className="flex items-center gap-2.5">
                               <UtilizationChart
                                 value={branch.utilizationRate}
@@ -1072,7 +1060,7 @@ function OrganizationDetailContent() {
                         {
                           header: "Actions",
                           align: "right",
-                          render: (branch: any) => (
+                          render: (branch: { id: string }) => (
                             <div onClick={(e) => e.stopPropagation()}>
                               <ActionPopover
                                 actions={[
@@ -1315,7 +1303,7 @@ function OrganizationDetailContent() {
                           ].map((emp) => (
                             <EmployeeCard
                               key={emp.id}
-                              employee={emp as any}
+                              employee={emp as ComponentProps<typeof EmployeeCard>["employee"]}
                               onView={(id) => router.push(`/employees/${id}`)}
                               onEdit={(id) => router.push(`/employees/${id}/edit`)}
                             />
@@ -1422,7 +1410,7 @@ function OrganizationDetailContent() {
                                       <>
                                         {emp.benefitPolicies
                                           .slice(0, 2)
-                                          .map((policy: any, idx: number) => (
+                                          .map((policy: { policyName: string; benefitGroups?: string[]; utilisation?: number }, idx: number) => (
                                             <Tooltip key={idx}>
                                               <TooltipTrigger asChild>
                                                 <div className="flex cursor-help items-center rounded-md border border-primary/20 bg-primary/5 px-2 py-0.5 text-label font-semibold whitespace-nowrap text-primary transition-colors hover:bg-primary/10">
@@ -1495,8 +1483,8 @@ function OrganizationDetailContent() {
                                               </div>
                                               {emp.benefitPolicies
                                                 .slice(2)
-                                                .map(
-                                                  (policy: any, i: number) => (
+                                                  .map(
+                                                   (policy: { policyName: string; benefitGroups?: string[]; utilisation?: number }, i: number) => (
                                                     <div
                                                       key={i}
                                                       className="flex flex-col gap-1.5 border-b border-border/50 px-1 pb-2.5 last:border-0 last:pb-0"
@@ -1960,6 +1948,7 @@ function OrganizationDetailContent() {
           <div className="animate-in transition-all duration-300 fade-in">
             {viewingPolicyId ? (
               <PolicyDetailView
+                key={viewingPolicyId}
                 policy={assignedPolicies.find((p) => p.id === viewingPolicyId)!}
                 groups={mockGroups.filter((g) => g.policyId === viewingPolicyId)}
                 benefits={mockBenefits.filter((b) =>
@@ -2018,7 +2007,7 @@ function OrganizationDetailContent() {
                   setIsAddingPolicy(null)
                   setEditingPolicyId(null)
                 }}
-                onSaveDraft={(data) => {
+                onSaveDraft={() => {
                   setToastMessage("Policy saved as draft")
                   setIsAddingPolicy(null)
                   setEditingPolicyId(null)
@@ -2043,7 +2032,7 @@ function OrganizationDetailContent() {
                 <div className="flex items-center justify-between">
                   <div>
                     <h2 className="text-heading font-semibold text-foreground">Benefit Policies</h2>
-                    <p className="text-body text-subtle">Manage which benefit structures are assigned to this organisation's workforce</p>
+                    <p className="text-body text-subtle">Manage which benefit structures are assigned to this organisation&apos;s workforce</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <Button
@@ -2135,7 +2124,11 @@ function OrganizationDetailContent() {
                   }
                 />
                 <AssignedPolicyList
-                  policies={filteredPolicies as any}
+                  policies={filteredPolicies.map((policy) => ({
+                    ...policy,
+                    code: policy.code ?? policy.id,
+                    type: policy.benefitPoolType,
+                  }))}
                   onUnassign={handleUnassignPolicy}
                   onView={(id) => {
                     setViewingPolicyId(id)
@@ -2310,7 +2303,6 @@ export default function OrganizationDetailPage() {
     </Suspense>
   )
 }
-
 
 const EMPLOYEE_SUB_TABS = [
   { id: "directory", label: "Employee Directory", icon: Users },

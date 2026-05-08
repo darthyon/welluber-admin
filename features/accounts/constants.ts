@@ -1,4 +1,4 @@
-import { AccountStatus, AccountFilters } from "./types";
+import { AccountFilters } from "./types";
 import { DEFAULT_ADVANCED_FILTERS } from "@/components/shared/advanced-filter-sheet";
 
 export const ACCOUNT_STATUS_OPTIONS = [

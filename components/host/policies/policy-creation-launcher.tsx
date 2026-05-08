@@ -1,16 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Barbell, Brain, PencilSimpleLine, Sparkle, Circle, Plus } from "@phosphor-icons/react";
+import { Sparkle, Plus } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { usePolicyTemplates } from "@/hooks/use-policy-templates";
-
-const ICON_MAP: Record<string, React.ElementType> = {
-  Barbell,
-  Brain,
-  Circle,
-  PencilSimpleLine,
-};
 
 interface PolicyCreationLauncherProps {
   onManual: () => void;
@@ -93,7 +86,7 @@ export function PolicyCreationLauncher({ onManual, onTemplate }: PolicyCreationL
                       >
                         <option value="">Select a template</option>
                         {templates.map((template) => {
-                          const Icon = ICON_MAP[template.icon] || Circle;
+
                           return (
                             <option key={template.id} value={template.id}>
                               {template.name}

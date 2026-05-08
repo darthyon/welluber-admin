@@ -1,17 +1,16 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { FileText, Download, Clock, Buildings, Shield, Storefront, HardDrive } from "@phosphor-icons/react";
+import { FileText, Download } from "@phosphor-icons/react";
 import { MOCK_AUDIT_LOGS } from "@/lib/mock-data";
-import { AuditLogEntry } from "@/features/audit-log/types";
 import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { FilterItem } from "@/components/shared/filter-item";
 import { ActivityTimeline } from "@/components/shared/activity-timeline";
+import type { ActivityType } from "@/components/shared/activity-timeline";
 import { DateRangePicker } from "@/components/shared/date-range-picker";
 import { Button } from "@/components/ui/button";
 import { type DateRange } from "react-day-picker";
 import { format, isWithinInterval, parseISO } from "date-fns";
-import { cn } from "@/lib/utils";
 
 export default function AuditLogPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -133,7 +132,7 @@ export default function AuditLogPage() {
             description: log.desc,
             timestamp: log.timestamp,
             user: log.updatedBy.name,
-            type: log.type as any
+            type: log.type as ActivityType
           }))} 
         />
       </div>

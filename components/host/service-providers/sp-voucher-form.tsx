@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
   Plus,
   WarningCircle,
@@ -21,7 +22,7 @@ import {
 import { cn } from "@/lib/utils";
 import { inputCls } from "@/components/shared/styles";
 import { Switch } from "@/components/shared/switch";
-import { createVoucherSchema, CreateVoucherData } from "@/features/providers/schemas";
+import { createVoucherSchema } from "@/features/providers/schemas";
 import { createVoucher, updateVoucher, publishVoucher } from "@/features/providers/actions";
 import { Button } from "@/components/ui/button";
 import { ChoiceCard } from "@/components/shared/choice-card";
@@ -68,15 +69,15 @@ export function SpVoucherForm({
   const [isSuccess, setIsSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
-  const { register, handleSubmit, control, setValue, watch, formState: { errors, isSubmitting: formIsSubmitting } } = useForm<CreateVoucherData>({
-    resolver: zodResolver(createVoucherSchema as any),
+  const { register, handleSubmit, control, setValue, watch, formState: { errors, isSubmitting: formIsSubmitting } } = useForm<z.input<typeof createVoucherSchema>>({
+    resolver: zodResolver(createVoucherSchema),
     defaultValues: {
       name: voucher?.name || "",
       description: voucher?.description || "",
       bookingRequired: voucher?.bookingRequired || false,
       displayLocation: voucher?.displayLocation || { line: "" },
       photo: voucher?.photo || "",
-      serviceLines: (voucher?.serviceLines as any) || [
+      serviceLines: voucher?.serviceLines || [
         { service: "", subServices: [], description: "", descriptionList: "" },
       ],
       currency: voucher?.currency || "MYR",
@@ -100,12 +101,13 @@ export function SpVoucherForm({
   const redemptionMode = watch("redemptionPeriod.mode");
   const branchScope = watch("branchScope");
 
-  const onSave = async (data: CreateVoucherData) => {
+  const onSave = async (data: z.input<typeof createVoucherSchema>) => {
     setIsSubmitting(true);
     try {
+      const payload = createVoucherSchema.parse(data);
       const res = isEditing
-        ? await updateVoucher(spId, voucher!.id, data)
-        : await createVoucher(spId, data);
+        ? await updateVoucher(spId, voucher!.id, payload)
+        : await createVoucher(spId, payload);
       if (res.success) {
         setSuccessMessage(isEditing ? "Voucher updated successfully." : "A new voucher has been added to your draft.");
         setIsSuccess(true);
@@ -328,9 +330,9 @@ export function SpVoucherForm({
                 </div>
 
                 <div className="space-y-5">
-                  {(errors.serviceLines as any)?.message && (
+                  {errors.serviceLines && "message" in errors.serviceLines && (
                     <p className="text-label text-destructive flex items-center gap-1">
-                      <WarningCircle size={12} /> {(errors.serviceLines as any).message}
+                      <WarningCircle size={12} /> {String(errors.serviceLines.message)}
                     </p>
                   )}
 
@@ -559,7 +561,7 @@ export function SpVoucherForm({
                       <label className="text-label font-medium text-subtle">Select Branches</label>
                       <CustomMultiSelect
                         options={spBranches.map((b) => b.name)}
-                        selected={watch("branchIds").map(
+                        selected={(watch("branchIds") ?? []).map(
                           (id) => spBranches.find((b) => b.id === id)?.name || id
                         )}
                         onChange={(names) => {
@@ -570,9 +572,9 @@ export function SpVoucherForm({
                         }}
                         placeholder="Search branches..."
                       />
-                      {(errors as any).branchIds && (
+                      {errors.branchIds && (
                         <p className="text-label text-destructive flex items-center gap-1 mt-1">
-                          <WarningCircle size={12} /> {(errors as any).branchIds.message}
+                          <WarningCircle size={12} /> {errors.branchIds.message}
                         </p>
                       )}
                     </div>

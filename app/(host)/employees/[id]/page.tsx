@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, PencilSimpleLine, User, Briefcase, Shield, Users, Gift, Receipt, Ticket, Globe, CreditCard, ClockCounterClockwise, CalendarBlank, Buildings, IdentificationBadge, IdentificationCard, Calendar, DeviceMobile, EnvelopeSimple } from "@phosphor-icons/react";
+import { ArrowLeft, PencilSimpleLine, User, Briefcase, Shield, Users, Globe, CreditCard, ClockCounterClockwise, CalendarBlank, Buildings, IdentificationBadge, IdentificationCard, Calendar, DeviceMobile, EnvelopeSimple } from "@phosphor-icons/react";
 
 import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,6 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { DetailSection } from "@/components/shared/detail-section";
 import { DetailField } from "@/components/shared/detail-field";
 import { EmployeeEntitlementsTab } from "@/components/host/employees/employee-entitlements-tab";
-import { EmployeePolicyTab } from "@/components/host/employees/employee-policy-tab";
 import { EmployeeClaimsTab } from "@/components/host/employees/employee-claims-tab";
 import { EmployeeVouchersTab } from "@/components/host/employees/employee-vouchers-tab";
 import { Badge } from "@/components/ui/badge";

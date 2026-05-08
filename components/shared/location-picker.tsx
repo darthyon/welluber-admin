@@ -33,7 +33,7 @@ export interface LocationData {
 interface LocationPickerProps {
   value: LocationData;
   onChange: (value: LocationData) => void;
-  errors?: any;
+  errors?: Partial<Record<keyof LocationData, { message?: string }>>;
   className?: string;
 }
 
@@ -340,4 +340,3 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
     </div>
   );
 }
-

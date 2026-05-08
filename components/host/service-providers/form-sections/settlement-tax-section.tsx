@@ -2,14 +2,19 @@
 
 import { Bank, Article, ShieldCheck } from "@phosphor-icons/react";
 import { Controller } from "react-hook-form";
+import type { Control, FieldErrors, UseFormRegister } from "react-hook-form";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/shared/switch";
 import { PAYMENT_CYCLES, CREDIT_TERMS } from "@/features/providers/constants";
+import { z } from "zod";
+import { createSpSchema } from "@/features/providers/schemas";
+
+type SpFormData = z.input<typeof createSpSchema> & { brandName?: string; brandLogo?: File | string | null };
 
 interface SettlementTaxSectionProps {
-  register: any;
-  control: any;
-  errors: any;
+  register: UseFormRegister<SpFormData>;
+  control: Control<SpFormData>;
+  errors: FieldErrors<SpFormData>;
   labelCls: string;
   inputCls: (hasError?: boolean) => string;
 }

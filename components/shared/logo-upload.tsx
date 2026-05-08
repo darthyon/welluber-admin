@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import { UploadSimple, X, Image as ImageIcon, WarningCircle } from "@phosphor-icons/react";
+import { UploadSimple, X, WarningCircle } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 interface LogoUploadProps {
   value?: File | string | null;
@@ -77,7 +77,7 @@ export function LogoUpload({
 
         {preview ? (
           <div className="relative w-full h-full p-2">
-            <img src={preview} alt="Logo preview" className="w-full h-full object-contain rounded-lg" />
+            <Image src={preview} alt="Logo preview" fill unoptimized className="object-contain rounded-lg" sizes="200px" />
             {!disabled && (
               <button
                 onClick={handleClear}
@@ -109,3 +109,4 @@ export function LogoUpload({
     </div>
   );
 }
+

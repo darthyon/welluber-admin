@@ -1,12 +1,11 @@
 "use client"
 
 import * as React from "react"
-import { 
-  User, 
-  Gear, 
-  CreditCard, 
-  SignOut,
-  Sparkle
+import {
+  User,
+  Gear,
+  CreditCard,
+  SignOut
 } from "@phosphor-icons/react"
 import { useSession } from "@/lib/session"
 import {
@@ -18,7 +17,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { cn } from "@/lib/utils"
 
 interface UserNavProps {
   user?: {
@@ -85,3 +83,4 @@ export function UserNav({ user: userProp }: UserNavProps) {
     </DropdownMenu>
   )
 }
+

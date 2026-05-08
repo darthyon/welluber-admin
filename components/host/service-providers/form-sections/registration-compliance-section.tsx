@@ -2,15 +2,20 @@
 
 import { IdentificationCard } from "@phosphor-icons/react";
 import { Controller } from "react-hook-form";
+import type { Control, FieldErrors, UseFormRegister, UseFormSetValue } from "react-hook-form";
 import { cn } from "@/lib/utils";
 import { DocumentUploadSection } from "@/components/shared/document-upload-section";
 import { BUSINESS_TYPES } from "@/features/providers/constants";
+import { z } from "zod";
+import { createSpSchema } from "@/features/providers/schemas";
+
+type SpFormData = z.input<typeof createSpSchema> & { brandName?: string; brandLogo?: File | string | null };
 
 interface RegistrationComplianceSectionProps {
-  register: any;
-  control: any;
-  errors: any;
-  setValue: any;
+  register: UseFormRegister<SpFormData>;
+  control: Control<SpFormData>;
+  errors: FieldErrors<SpFormData>;
+  setValue: UseFormSetValue<SpFormData>;
   businessType?: string;
   labelCls: string;
   inputCls: (hasError?: boolean) => string;
@@ -60,7 +65,7 @@ export function RegistrationComplianceSection({
             <label htmlFor="taxRegNo" className={labelCls}>SST Registration No. <span className="text-muted-foreground font-normal">(if applicable)</span></label>
             <input
               id="taxRegNo"
-              {...register("taxProfile.taxRegNo")}
+              {...register("tinNumber")}
               className={inputCls()}
               placeholder="e.g. W10-1808-32000123"
             />
@@ -74,7 +79,7 @@ export function RegistrationComplianceSection({
                   <button
                     key={type.id}
                     type="button"
-                    onClick={() => setValue("businessType", type.id as any)}
+                    onClick={() => setValue("businessType", type.id)}
                     className={cn(
                       "flex flex-col p-3 border rounded-lg text-left transition-all duration-200",
                       businessType === type.id 

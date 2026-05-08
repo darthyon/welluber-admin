@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { ClockCounterClockwise, Plus, Check, Trash, Pencil, CurrencyCircleDollar, Gear, ShieldCheck, User, Users } from "@phosphor-icons/react";
+import { ClockCounterClockwise, User } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 
 export type ActivityType = "Create" | "Update" | "Delete" | "Approval" | "Payout" | "System" | "SettingChange" | "Link";
@@ -21,18 +21,6 @@ interface ActivityTimelineProps {
   icon?: React.ReactNode;
   className?: string;
 }
-
-const TYPE_ICONS: Record<ActivityType, React.ReactElement> = {
-  Create: <Plus size={12} weight="bold" />,
-  Update: <Pencil size={12} weight="bold" />,
-  Delete: <Trash size={12} weight="bold" />,
-  Approval: <Check size={12} weight="bold" />,
-  Payout: <CurrencyCircleDollar size={12} weight="bold" />,
-  System: <Gear size={12} weight="bold" />,
-  SettingChange: <ShieldCheck size={12} weight="bold" />,
-  Link: <Users size={12} weight="bold" />,
-};
-
 const TYPE_COLORS: Record<ActivityType, string> = {
   Create: "bg-primary",
   Update: "bg-amber-500 dark:bg-amber-400",

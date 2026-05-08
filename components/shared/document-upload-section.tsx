@@ -3,7 +3,6 @@
 import React, { useRef } from "react";
 import { UploadSimple, File as FileIcon, X, WarningCircle } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 
 interface DocumentUploadSectionProps {
   documents: string[]; // List of file names/URLs

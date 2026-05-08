@@ -1,16 +1,21 @@
 "use client";
 
 import { Tag, WarningCircle } from "@phosphor-icons/react";
+import type { FieldErrors } from "react-hook-form";
 import { Badge } from "@/components/ui/badge";
 import { SearchableMultiSelect } from "@/components/shared/searchable-multi-select";
-import { MASTER_SERVICE_TAXONOMY } from "@/features/providers/service-taxonomy";
+import { z } from "zod";
+import { createSpSchema } from "@/features/providers/schemas";
+
+type SpFormData = z.input<typeof createSpSchema> & { brandName?: string; brandLogo?: File | string | null };
+type TaxonomyCategory = { category: string; services: string[] };
 
 interface ServicePortfolioSectionProps {
   selectedMainServices: string[];
   brandCategories: string[];
   handleServicesChange: (services: string[]) => void;
-  errors: any;
-  servicePortfolioTaxonomy: any;
+  errors: FieldErrors<SpFormData>;
+  servicePortfolioTaxonomy: TaxonomyCategory[];
 }
 
 export function ServicePortfolioSection({

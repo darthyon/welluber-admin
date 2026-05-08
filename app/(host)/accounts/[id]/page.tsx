@@ -15,6 +15,7 @@ import {
   DotsThreeCircle,
 } from "@phosphor-icons/react";
 import { useParams, useRouter } from "next/navigation";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { useAccounts, useAccountTransactions } from "@/features/accounts/hooks";
@@ -32,7 +33,6 @@ import { ConfirmationModal } from "@/components/shared/confirmation-modal";
 import { SharedDataTable } from "@/components/shared/data-table";
 import { useState, Suspense } from "react";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
 import { UpdateBalanceModal } from "@/components/host/accounts/update-balance-modal";
 import { RecordTopupModal } from "@/components/host/accounts/record-topup-modal";
 
@@ -73,6 +73,7 @@ function AccountDetailContent() {
     t.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
     t.id.toLowerCase().includes(searchQuery.toLowerCase())
   );
+  type AccountTransactionRow = (typeof filteredTransactions)[number];
 
   // Mock org credit data (in real app, fetch from org)
   const orgCreditLimit = 10000;
@@ -162,7 +163,6 @@ function AccountDetailContent() {
               </div>
             </div>
 
-
           </div>
 
           <div className="flex items-center gap-8 mt-8 border-b border-border">
@@ -202,9 +202,12 @@ function AccountDetailContent() {
            <>
              <div className="bg-primary rounded-xl relative p-8 text-primary-foreground">
                 {/* Account illustration — anchored bottom right, overflows card */}
-                <img loading="lazy"
+                <Image
+                  loading="lazy"
                   src="/img-wallet.webp"
                   alt=""
+                  width={256}
+                  height={160}
                   className="absolute right-0 bottom-0 w-64 h-auto object-contain opacity-90 pointer-events-none hidden lg:block"
                 />
 
@@ -348,10 +351,10 @@ function AccountDetailContent() {
 
                  <div className="flex flex-wrap items-center gap-2 shrink-0">
                     <div className="flex bg-muted/50 p-0.5 rounded-lg border border-border">
-                      {["By Month", "By Quarter", "By Year"].map((p) => (
+                      {(["By Month", "By Quarter", "By Year"] as const).map((p) => (
                         <button
                           key={p}
-                          onClick={() => setPeriod(p as any)}
+                          onClick={() => setPeriod(p)}
                           className={`px-3 py-1 text-label font-semibold rounded-md transition-all ${
                             period === p ? "bg-background shadow-sm text-foreground" : "text-faint hover:text-foreground"
                           }`}
@@ -401,7 +404,7 @@ function AccountDetailContent() {
                      header: "Description",
                      accessorKey: "description",
                      sortable: true,
-                      render: (trx: any) => {
+                       render: (trx: AccountTransactionRow) => {
                         const iconBg = trx.type === "topup" ? "bg-primary/20 text-primary" :
                           trx.type === "pre-auth" ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 dark:bg-amber-500/20" :
                           trx.type === "cancelled" ? "bg-rose-500/10 text-rose-600 dark:text-rose-400 dark:bg-rose-500/20" :
@@ -428,7 +431,7 @@ function AccountDetailContent() {
                       accessorKey: "amount",
                       sortable: true,
                       align: "right",
-                      render: (trx: any) => {
+                      render: (trx: AccountTransactionRow) => {
                         const isTopup = trx.type === "topup"
                         const unit = isTopup ? "RM" : "pts"
                         const amountClass = trx.type === "cancelled"
@@ -452,7 +455,7 @@ function AccountDetailContent() {
                       header: "Type",
                       accessorKey: "type",
                       sortable: true,
-                      render: (trx: any) => {
+                      render: (trx: AccountTransactionRow) => {
                         const variant = trx.type === "pre-auth" ? "amber" as const :
                           trx.type === "cancelled" ? "rose" as const : "zinc" as const
                         return (
@@ -464,7 +467,7 @@ function AccountDetailContent() {
                       header: "Reference",
                       accessorKey: "voucherName",
                       sortable: true,
-                      render: (trx: any) => (
+                      render: (trx: AccountTransactionRow) => (
                         <div className="space-y-0.5">
                           {trx.voucherName ? (
                             <>
@@ -482,7 +485,7 @@ function AccountDetailContent() {
                       accessorKey: "createdAt",
                       sortable: true,
                       align: "center",
-                      render: (trx: any) => (
+                      render: (trx: AccountTransactionRow) => (
                         <div className="text-center">
                           <p className="text-body font-semibold text-subtle">
                             {new Date(trx.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
@@ -496,7 +499,7 @@ function AccountDetailContent() {
                     {
                       header: "Actions",
                       align: "right",
-                      render: (trx: any) => (
+                      render: () => (
                         <ActionPopover
                           actions={[
                             { label: "View detail record", onClick: () => {} },

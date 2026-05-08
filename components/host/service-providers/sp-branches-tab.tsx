@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { Plus, GitBranch } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
-import { DetailSection } from "@/components/shared/detail-section";
 import { useQueryState, useUpdateQueryParams } from "@/hooks/use-tab-persistence";
 import { FilterItem } from "@/components/shared/filter-item";
 import { DataFilterBar } from "@/components/shared/data-filter-bar";
@@ -16,18 +15,16 @@ import type { ServiceProvider, SpBranch } from "@/types/provider";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ActionPopover } from "@/components/shared/action-popover";
 import { SharedDataTable } from "@/components/shared/data-table";
-import { cn } from "@/lib/utils";
 
 interface SpBranchesTabProps {
   sp: ServiceProvider;
 }
 
-type BranchView = "list" | "detail" | "add" | "edit";
 type BranchStatusFilter = "all" | "active" | "inactive";
 
 export function SpBranchesTab({ sp }: SpBranchesTabProps) {
   const [view, setView] = useQueryState("branchView", "list");
-  const [selectedBranchId, setSelectedBranchId] = useQueryState("branchId");
+  const [selectedBranchId] = useQueryState("branchId");
   const updateQueryParams = useUpdateQueryParams();
   const [branchesView, setBranchesView] = useState<ViewMode>("list");
   const [branchSearch, setBranchSearch] = useState("");

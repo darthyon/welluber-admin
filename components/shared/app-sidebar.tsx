@@ -19,8 +19,7 @@ import {
   Users,
   Tag,
   ChartBar,
-  ShieldCheck,
-  List,
+  List
 } from "@phosphor-icons/react"
 
 import { cn } from "@/lib/utils"
@@ -302,3 +301,4 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     </Sidebar>
   )
 }
+

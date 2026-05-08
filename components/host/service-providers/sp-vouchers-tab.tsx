@@ -18,8 +18,6 @@ interface SpVouchersTabProps {
   sp: ServiceProvider;
 }
 
-type VoucherView = "list" | "detail" | "add" | "edit";
-
 const STATUS_FILTER_TABS: { label: string; value: SpVoucherStatus | "all" }[] = [
   { label: "All", value: "all" },
   { label: "Draft", value: "draft" },
@@ -39,7 +37,7 @@ const STATUS_VARIANT: Record<SpVoucherStatus, "emerald" | "amber" | "zinc" | "ro
 
 export function SpVouchersTab({ sp }: SpVouchersTabProps) {
   const [view, setView] = useQueryState("voucherView", "list");
-  const [selectedVoucherId, setSelectedVoucherId] = useQueryState("voucherId");
+  const [selectedVoucherId] = useQueryState("voucherId");
   const updateQueryParams = useUpdateQueryParams();
   
   const [statusTab, setStatusTab] = useState<SpVoucherStatus | "all">("all");
@@ -101,7 +99,7 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
   }
 
   if ((view === "add" || view === "edit") && (view === "add" || selectedVoucher)) {
-    const isEditing = view === "edit" && !!selectedVoucher;
+
     return (
       <div className="animate-in fade-in slide-in-from-bottom-2 duration-400">
         <SpVoucherForm

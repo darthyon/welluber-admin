@@ -1,20 +1,17 @@
 "use client";
 
-import { 
-  X, 
-  ShieldCheck, 
-  TreeStructure, 
-  IdentificationCard, 
-  Gear, 
-  Users, 
+import {
+  X,
+  ShieldCheck,
+  TreeStructure,
+  IdentificationCard,
+  Gear,
   CheckCircle,
   CurrencyCircleDollar,
   Clock,
   Briefcase
 } from "@phosphor-icons/react";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { BenefitPolicy, BenefitGroup, Benefit } from "@/types/policy";
 
@@ -155,7 +152,7 @@ export function PolicyDetailSheet({ isOpen, onClose, policy, groups, benefits, o
   );
 }
 
-function RuleItem({ icon: Icon, label, value }: { icon: any, label: string, value: string }) {
+function RuleItem({ icon: Icon, label, value }: { icon: React.ElementType, label: string, value: string }) {
   return (
     <div className="space-y-1.5 p-3 rounded-lg border border-border bg-card shadow-sm">
       <div className="flex items-center gap-2 text-faint">
@@ -166,3 +163,4 @@ function RuleItem({ icon: Icon, label, value }: { icon: any, label: string, valu
     </div>
   );
 }
+

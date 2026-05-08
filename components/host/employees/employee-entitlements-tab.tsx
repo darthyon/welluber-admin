@@ -11,6 +11,7 @@ interface EmployeeEntitlementsTabProps {
 }
 
 export function EmployeeEntitlementsTab({ employeeId }: EmployeeEntitlementsTabProps) {
+  void employeeId;
   // Mock entitlements data
   const entitlements = [
     {

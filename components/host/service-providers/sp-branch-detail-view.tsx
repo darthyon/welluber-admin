@@ -1,19 +1,16 @@
 "use client";
 
-import { CaretLeft, PencilSimpleLine, MapPin, Phone, Globe, Clock, Buildings, Users, TrendUp, CheckCircle } from "@phosphor-icons/react";
-import { DetailSection } from "@/components/shared/detail-section";
+import { PencilSimpleLine, MapPin, Phone, Globe, Clock, Buildings, Users, CheckCircle } from "@phosphor-icons/react";
 import { DetailField } from "@/components/shared/detail-field";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { BackButton } from "@/components/shared/back-button";
 import { EntityHeader } from "@/components/shared/entity-header";
-import { TwoColumnDetailLayout } from "@/components/shared/two-column-detail-layout";
 import { OPERATING_DAYS } from "@/features/providers/constants";
 import type { SpBranch } from "@/types/provider";
 import { resolveBranchServiceView } from "@/features/providers/service-taxonomy";
 import { EntityAvatar } from "@/components/shared/entity-avatar";
-import { ActionPopover } from "@/components/shared/action-popover";
 
 interface SpBranchDetailViewProps {
   branch: SpBranch;

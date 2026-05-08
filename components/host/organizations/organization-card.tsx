@@ -87,7 +87,7 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
                 {org.name}
               </Link>
               <div className="flex items-center gap-2">
-                <PulseStatus status={org.status as any} showLabel={true} className="px-1.5 py-0.5 rounded-md text-micro" />
+                <PulseStatus status={org.status as "active" | "pending" | "suspended" | "draft"} showLabel={true} className="px-1.5 py-0.5 rounded-md text-micro" />
                 <span className="text-micro text-faint font-mono bg-background/50 px-1.5 py-0.5 rounded border border-border/40 tracking-tight">{org.id}</span>
               </div>
             </div>

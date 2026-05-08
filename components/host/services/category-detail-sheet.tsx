@@ -1,6 +1,7 @@
 "use client";
 
 import { X, TreeStructure, DotsThreeVertical, PencilSimple, Trash, Plus } from "@phosphor-icons/react";
+import type { Icon } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,7 +17,7 @@ interface CategoryDetailSheetProps {
   category: { category: string; services: string[] } | null;
   specs: Record<string, string[]>;
   serviceIcons: Record<string, string>;
-  iconLibrary: { name: string; icon: any }[];
+  iconLibrary: { name: string; icon: Icon }[];
   onOpenDialog: (config: {
     type: "category" | "service" | "spec";
     mode: "add" | "edit";

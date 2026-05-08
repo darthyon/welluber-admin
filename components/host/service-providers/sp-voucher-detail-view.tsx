@@ -13,6 +13,7 @@ import { DetailField } from "@/components/shared/detail-field";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/shared/status-badge";
+import Image from "next/image";
 import { BackButton } from "@/components/shared/back-button";
 import { EntityHeader } from "@/components/shared/entity-header";
 import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav";
@@ -150,11 +151,13 @@ export function SpVoucherDetailView({
                     <p className="text-label font-medium text-subtle">
                       Display Image
                     </p>
-                    <div className="w-40 h-24 rounded-lg border border-border bg-muted/30 overflow-hidden">
-                      <img
+                    <div className="relative w-40 h-24 rounded-lg border border-border bg-muted/30 overflow-hidden">
+                      <Image
                         src={voucher.photo}
                         alt={voucher.name}
-                        className="w-full h-full object-cover"
+                        fill
+                        className="object-cover"
+                        sizes="160px"
                       />
                     </div>
                   </div>

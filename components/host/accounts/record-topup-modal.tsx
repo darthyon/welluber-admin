@@ -1,10 +1,9 @@
 "use client"
 
 import { useState, useRef } from "react"
-import { X, Wallet, UploadSimple, CheckCircle } from "@phosphor-icons/react"
+import { X, Wallet, UploadSimple } from "@phosphor-icons/react"
 import { Button } from "@/components/ui/button"
 import { SuccessCelebration } from "@/components/shared/success-celebration"
-import { cn } from "@/lib/utils"
 
 interface RecordTopupModalProps {
   isOpen: boolean
@@ -25,6 +24,7 @@ export function RecordTopupModal({
   const [reference, setReference] = useState("")
   const [attachment, setAttachment] = useState<File | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  void accountId
 
   if (!isOpen) return null
 

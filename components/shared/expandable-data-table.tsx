@@ -73,8 +73,8 @@ export function ExpandableDataTable<T extends { id: string | number }>({
 
     return [...data].sort((a, b) => {
       const key = sortConfig.key!;
-      let aVal: any = a[key];
-      let bVal: any = b[key];
+      let aVal: unknown = a[key];
+      let bVal: unknown = b[key];
 
       if (aVal && typeof aVal === "object" && "name" in aVal) aVal = aVal.name;
       if (bVal && typeof bVal === "object" && "name" in bVal) bVal = bVal.name;
@@ -212,11 +212,11 @@ export function ExpandableDataTable<T extends { id: string | number }>({
                                 )}
                               </button>
                               <div className="flex-1">
-                                {col.render ? col.render(row) : (row[col.accessorKey!] as any)}
+                                {col.render ? col.render(row) : String(row[col.accessorKey!] ?? "")}
                               </div>
                             </div>
                           ) : (
-                            col.render ? col.render(row) : (row[col.accessorKey!] as any)
+                            col.render ? col.render(row) : String(row[col.accessorKey!] ?? "")
                           )}
                         </td>
                         );

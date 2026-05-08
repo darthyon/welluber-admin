@@ -15,7 +15,7 @@ import { FilterItem } from "@/components/shared/filter-item"
 import { EmptyState } from "@/components/shared/empty-state"
 import { useAccounts } from "@/features/accounts/hooks"
 import { ACCOUNT_STATUS_OPTIONS } from "@/features/accounts/constants"
-import type { Account } from "@/features/accounts/types"
+import type { Account, AccountStatus } from "@/features/accounts/types"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { BentoGrid, BentoCard } from "@/components/shared/bento-grid"
 import {
@@ -257,7 +257,7 @@ export default function AccountsPage() {
             <FilterItem
               label="Status"
               value={filters.status}
-              onChange={(v) => setFilters({ ...filters, status: v as any })}
+              onChange={(v) => setFilters({ ...filters, status: v as "all" | AccountStatus })}
               options={[
                 { label: "All Status", value: "all" },
                 ...ACCOUNT_STATUS_OPTIONS,

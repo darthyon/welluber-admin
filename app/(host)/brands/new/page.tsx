@@ -12,7 +12,7 @@ export default function NewBrandPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const handleSubmit = async (data: any) => {
+  const handleSubmit = async (data: unknown) => {
     setIsSubmitting(true);
     // Simulate API call
     console.log("Creating brand:", data);

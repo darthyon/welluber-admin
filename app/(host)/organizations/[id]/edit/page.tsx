@@ -2,21 +2,17 @@
 
 import { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { 
-  CaretLeft, 
-  Buildings, 
-  Article, 
-  NavigationArrow, 
+import {
+  CaretLeft,
+  Buildings,
+  NavigationArrow,
   WarningCircle,
   IdentificationCard,
   MapPin,
-  CreditCard,
-  Bank,
-  Globe
+  Bank
 } from "@phosphor-icons/react";
-import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { createOrganizationSchema, CreateOrganizationData } from "@/features/organizations/schemas";
 import { Button } from "@/components/ui/button";
@@ -45,7 +41,7 @@ export default function EditOrganizationPage() {
   
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { register, handleSubmit, control, watch, setValue, formState: { errors } } = useForm<CreateOrganizationData>({
+  const { register, handleSubmit, control, setValue, formState: { errors } } = useForm<CreateOrganizationData>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(createOrganizationSchema as any),
     defaultValues: {
@@ -81,9 +77,9 @@ export default function EditOrganizationPage() {
     }
   });
 
-  const orgType = watch("type");
+  const orgType = useWatch({ control, name: "type" });
 
-  const onSubmit = async (data: CreateOrganizationData) => {
+  const onSubmit = async () => {
     setIsSubmitting(true);
     try {
       // Simulate update delay
@@ -234,7 +230,7 @@ export default function EditOrganizationPage() {
                           <button
                             key={type.id}
                             type="button"
-                            onClick={() => setValue("type", type.id as any)}
+                            onClick={() => setValue("type", type.id as "sme" | "enterprise" | "ngo")}
                             className={cn(
                               "flex flex-col p-3 border rounded-lg text-left transition-all duration-200",
                               orgType === type.id 
@@ -287,7 +283,7 @@ export default function EditOrganizationPage() {
                       name="address"
                       render={({ field }) => (
                         <LocationPicker 
-                          value={field.value as any}
+                          value={field.value ?? { line: "", city: "", state: "", country: "Malaysia", postalCode: "" }}
                           onChange={field.onChange}
                           errors={errors.address}
                         />

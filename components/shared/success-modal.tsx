@@ -1,8 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, ArrowRight, X } from "@phosphor-icons/react";
-import { cn } from "@/lib/utils";
+import { ArrowRight, X } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
