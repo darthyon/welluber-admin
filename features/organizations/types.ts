@@ -81,11 +81,18 @@ export interface Organization {
   documents: string[];
   employeesWithoutPolicy?: number;
   tierConfigs?: OrgTierConfig[];
+  departmentConfigs?: OrgDepartmentConfig[];
   createdAt: ISODate;
   updatedAt: ISODate;
 }
 
 export interface OrgTierConfig {
+  id: string;
+  name: string;
+  code?: string;
+}
+
+export interface OrgDepartmentConfig {
   id: string;
   name: string;
   code?: string;
@@ -110,8 +117,10 @@ export interface Employee {
   name: string;
   email: string;
   empCode: string;
+  departmentId?: string;
   department?: string;
   role?: string;
+  tierId?: string;
   tier?: string;
   dateOfBirth?: ISODate;
   gender?: "male" | "female" | "other";

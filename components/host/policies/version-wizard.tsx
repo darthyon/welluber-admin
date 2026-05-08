@@ -30,19 +30,20 @@ interface BenefitOverride {
   dependantAmount?: number;
 }
 
-interface SubPolicyResult {
+interface VersionResult {
   policy: Partial<BenefitPolicy>;
   benefitOverrides: BenefitOverride[];
   targetEmployeeIds: string[];
 }
 
-export interface SubPolicyWizardProps {
+export interface VersionWizardProps {
   parentPolicy: BenefitPolicy;
   parentGroups: BenefitGroup[];
   parentBenefits: Benefit[];
   employees: EmployeeDirectoryItem[];
   orgTierConfigs?: { id: string; name: string; code?: string }[];
-  onSuccess: (data: SubPolicyResult) => void;
+  orgDepartmentConfigs?: { id: string; name: string; code?: string }[];
+  onSuccess: (data: VersionResult) => void;
   onCancel: () => void;
 }
 
@@ -104,15 +105,16 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-export function SubPolicyWizard({
+export function VersionWizard({
   parentPolicy,
   parentGroups,
   parentBenefits,
   employees,
   orgTierConfigs = [],
+  orgDepartmentConfigs = [],
   onSuccess,
   onCancel,
-}: SubPolicyWizardProps) {
+}: VersionWizardProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -619,7 +621,7 @@ export function SubPolicyWizard({
   if (isSuccess) {
     return (
       <SuccessCelebration
-        title="Sub-Policy Created"
+        title="Version Created"
         message={`Sub-policy derived from ${parentPolicy.name} has been created and assigned to ${confirmedEmployeeIds.length} employee${confirmedEmployeeIds.length !== 1 ? "s" : ""}.`}
       />
     );
@@ -687,7 +689,7 @@ export function SubPolicyWizard({
                 Creating…
               </>
             ) : (
-              "Create Sub-Policy"
+              "Create Version"
             )}
           </Button>
         )}

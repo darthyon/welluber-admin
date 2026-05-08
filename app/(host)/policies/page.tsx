@@ -428,19 +428,19 @@ function PoliciesContent() {
     const policy = policies.find(p => p.id === activePolicyId);
     const data = policy ? policyDataMap[policy.id] : undefined;
     if (policy && data) {
-      const subPolicies = policies
+      const versions = policies
         .filter(p => p.parentPolicyId === policy.id)
         .map(p => ({ ...p, parentPolicyName: policy.name }));
       const parentPolicyName = policy.parentPolicyId
         ? policies.find(p => p.id === policy.parentPolicyId)?.name
         : undefined;
-      const subPolicyOverrideCounts: Record<string, number> = {};
-      subPolicies.forEach(sp => {
-        const subData = policyDataMap[sp.id];
-        if (subData && data) {
-          subPolicyOverrideCounts[sp.id] = subData.benefits.filter(sb => {
-            const parent = data.benefits.find(pb => pb.serviceId === sb.serviceId);
-            return parent && parent.amount !== sb.amount;
+      const versionOverrideCounts: Record<string, number> = {};
+      versions.forEach(v => {
+        const versionData = policyDataMap[v.id];
+        if (versionData && data) {
+          versionOverrideCounts[v.id] = versionData.benefits.filter(vb => {
+            const parent = data.benefits.find(pb => pb.serviceId === vb.serviceId);
+            return parent && parent.amount !== vb.amount;
           }).length;
         }
       });
@@ -450,8 +450,8 @@ function PoliciesContent() {
             policy={policy}
             groups={data.groups}
             benefits={data.benefits}
-            subPolicies={subPolicies}
-            subPolicyOverrideCounts={subPolicyOverrideCounts}
+            versions={versions}
+            versionOverrideCounts={versionOverrideCounts}
             employees={MOCK_EMPLOYEES.filter(e => e.orgId === policy.organizationId)}
             parentPolicyName={parentPolicyName}
             onEdit={() => router.push(`/policies/${policy.id}/edit`)}

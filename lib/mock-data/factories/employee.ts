@@ -5,7 +5,33 @@ const NAMES = [
   "Kevin Tan", "Priya Raj", "Robert Fox", "Jenny Wilson",
   "David Lee", "Aisha Karim",
 ]
-const DEPARTMENTS = ["Engineering", "Product", "Finance", "HR", "Operations", "Marketing", "Sales", "Legal"]
+// Department + tier configs mirror MOCK_ORGS — keep ids in sync with org factory.
+const DEPARTMENTS_BY_ORG: Record<string, { id: string; name: string }[]> = {
+  "ORG-20260115-0001": [
+    { id: "DC-001", name: "HR" },
+    { id: "DC-002", name: "Tech" },
+    { id: "DC-003", name: "Marketing" },
+    { id: "DC-004", name: "Finance" },
+    { id: "DC-005", name: "Operations" },
+  ],
+  "ORG-20260301-0002": [
+    { id: "DC-101", name: "HR" },
+    { id: "DC-102", name: "Tech" },
+    { id: "DC-103", name: "Marketing" },
+  ],
+}
+const TIERS_BY_ORG: Record<string, { id: string; name: string }[]> = {
+  "ORG-20260115-0001": [
+    { id: "TC-001", name: "Executive" },
+    { id: "TC-002", name: "Senior Manager" },
+    { id: "TC-003", name: "Manager" },
+    { id: "TC-004", name: "Associate" },
+  ],
+  "ORG-20260301-0002": [
+    { id: "TC-005", name: "Director" },
+    { id: "TC-006", name: "Associate" },
+  ],
+}
 const ORG_IDS = [
   "ORG-20260115-0001", "ORG-20260301-0002", "ORG-20260310-0003",
   "ORG-20260401-0004", "ORG-20260401-0005",
@@ -15,21 +41,27 @@ const BRANCH_IDS = [
   "BR-20260401-0004", "BR-20260401-0005",
 ]
 const EMP_TYPES: EmploymentType[] = ["full_time", "full_time", "full_time", "part_time", "contract", "internship", "full_time", "full_time", "contract", "full_time"]
-const TIERS = ["Executive", "Senior Manager", "Manager", "Associate", "Associate", "Executive", "Manager", "Senior Manager", "Associate", "Executive"]
 
 export function createEmployee(index: number): Employee {
   const n = index + 1
   const orgIdx = index % ORG_IDS.length
+  const orgId = ORG_IDS[orgIdx]!
+  const orgDepts = DEPARTMENTS_BY_ORG[orgId] ?? []
+  const orgTiers = TIERS_BY_ORG[orgId] ?? []
+  const dept = orgDepts.length > 0 ? orgDepts[index % orgDepts.length]! : undefined
+  const tier = orgTiers.length > 0 ? orgTiers[index % orgTiers.length]! : undefined
   return {
     id: `EMP-20260115-${String(n).padStart(4, "0")}`,
-    orgId: ORG_IDS[orgIdx]!,
+    orgId,
     branchId: BRANCH_IDS[orgIdx]!,
     name: NAMES[index] ?? `Employee ${n}`,
     email: `${(NAMES[index] ?? `employee${n}`).toLowerCase().replace(/\s+/g, ".")}@company.com`,
     empCode: `EMP-${String(n).padStart(3, "0")}`,
-    department: DEPARTMENTS[index % DEPARTMENTS.length],
-    role: TIERS[index],
-    tier: TIERS[index],
+    departmentId: dept?.id,
+    department: dept?.name,
+    role: tier?.name,
+    tierId: tier?.id,
+    tier: tier?.name,
     dateOfBirth: `${1985 + (index % 15)}-0${(index % 9) + 1}-15T00:00:00Z`,
     gender: index % 3 === 0 ? "female" : "male",
     mobileNumber: `+6011${10000000 + index * 1234567}`,

@@ -301,6 +301,12 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
   const [benefits, setBenefits] = useState<Benefit[]>(initialData?.benefits || []);
   const [splitBenefitIds, setSplitBenefitIds] = useState<Set<string>>(new Set());
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [groupCategories, setGroupCategories] = useState<Record<string, string[]>>({});
+
+  const SERVICE_CATEGORIES = useMemo(
+    () => Array.from(new Set(SERVICES.map((s) => s.category))),
+    []
+  );
 
   const tierOptions = useMemo(() => {
     if (!policyData.organizationId) return [] as { value: string; label: string }[];
@@ -309,6 +315,16 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
     return configs.map((tier) => ({
       value: tier.id,
       label: tier.code ? `${tier.code} - ${tier.name}` : tier.name,
+    }));
+  }, [policyData.organizationId]);
+
+  const departmentOptions = useMemo(() => {
+    if (!policyData.organizationId) return [] as { value: string; label: string }[];
+    const org = MOCK_ORGS.find((item) => item.id === policyData.organizationId);
+    const configs = org?.departmentConfigs ?? [];
+    return configs.map((dept) => ({
+      value: dept.id,
+      label: dept.code ? `${dept.code} - ${dept.name}` : dept.name,
     }));
   }, [policyData.organizationId]);
 
@@ -468,7 +484,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
 
   // ── Policy Details section ────────────────────────────────────────────────
   const renderPolicyDetailsSection = () => (
-    <div className="space-y-5 md:max-w-xl">
+    <div className="space-y-6">
       <SectionHeader icon={IdentificationCard} title="Policy Details" description="Name your policy and define who is eligible" />
 
       <div className="space-y-1.5">
@@ -531,6 +547,88 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
         </select>
         {validationErrors.organizationId && <ErrorText>{validationErrors.organizationId}</ErrorText>}
         <HelpText>The organisation this policy belongs to. Cannot be changed after creation.</HelpText>
+      </div>
+
+      <div className="space-y-3">
+        <FieldLabel>Eligible Tiers</FieldLabel>
+        {!policyData.organizationId ? (
+          <p className="text-label text-faint italic">Select an organisation to load tier options.</p>
+        ) : tierOptions.length === 0 ? (
+          <p className="text-label text-faint italic">No tiers configured for this organisation.</p>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {tierOptions.map((tier) => {
+              const selected = policyData.eligibility?.tierIds?.includes(tier.value) ?? false;
+              return (
+                <button
+                  type="button"
+                  key={tier.value}
+                  onClick={() => {
+                    const current = policyData.eligibility?.tierIds ?? [];
+                    const updated = selected
+                      ? current.filter((id) => id !== tier.value)
+                      : [...current, tier.value];
+                    setPolicyData({
+                      ...policyData,
+                      eligibility: { ...policyData.eligibility, tierIds: updated },
+                    });
+                  }}
+                  className={cn(
+                    "px-4 py-2 rounded-full text-body font-semibold border transition-all",
+                    selected
+                      ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                      : "bg-background text-muted-foreground border-border hover:border-primary/30"
+                  )}
+                >
+                  {selected && <Check size={12} weight="bold" className="inline mr-1.5" />}
+                  {tier.label}
+                </button>
+              );
+            })}
+          </div>
+        )}
+        <HelpText>Leave all unselected to apply to every tier.</HelpText>
+      </div>
+
+      <div className="space-y-3">
+        <FieldLabel>Eligible Departments</FieldLabel>
+        {!policyData.organizationId ? (
+          <p className="text-label text-faint italic">Select an organisation to load department options.</p>
+        ) : departmentOptions.length === 0 ? (
+          <p className="text-label text-faint italic">No departments configured for this organisation.</p>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {departmentOptions.map((dept) => {
+              const selected = policyData.eligibility?.departmentIds?.includes(dept.value) ?? false;
+              return (
+                <button
+                  type="button"
+                  key={dept.value}
+                  onClick={() => {
+                    const current = policyData.eligibility?.departmentIds ?? [];
+                    const updated = selected
+                      ? current.filter((id) => id !== dept.value)
+                      : [...current, dept.value];
+                    setPolicyData({
+                      ...policyData,
+                      eligibility: { ...policyData.eligibility, departmentIds: updated },
+                    });
+                  }}
+                  className={cn(
+                    "px-4 py-2 rounded-full text-body font-semibold border transition-all",
+                    selected
+                      ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                      : "bg-background text-muted-foreground border-border hover:border-primary/30"
+                  )}
+                >
+                  {selected && <Check size={12} weight="bold" className="inline mr-1.5" />}
+                  {dept.label}
+                </button>
+              );
+            })}
+          </div>
+        )}
+        <HelpText>Leave all unselected to apply to every department.</HelpText>
       </div>
 
       <div className="space-y-3">
@@ -639,50 +737,6 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
               </div>
             </div>
 
-            {/* Tier eligibility */}
-            <div className="mt-5 space-y-1.5">
-              <FieldLabel>Eligible Tiers</FieldLabel>
-              {(() => {
-                if (!policyData.organizationId) return (
-                  <p className="text-label text-faint italic">Select an organisation to load tier options.</p>
-                );
-                if (tierOptions.length === 0) return (
-                  <p className="text-label text-faint italic">No tier configs found for this organisation yet.</p>
-                );
-                return (
-                  <div className="flex flex-wrap gap-2">
-                    {tierOptions.map((tier) => {
-                      const selected = policyData.eligibility?.tierIds?.includes(tier.value) ?? false;
-                      return (
-                        <button
-                          type="button"
-                          key={tier.value}
-                          onClick={() => {
-                            const current = policyData.eligibility?.tierIds ?? [];
-                            const updated = selected
-                              ? current.filter((id) => id !== tier.value)
-                              : [...current, tier.value];
-                            setPolicyData({
-                              ...policyData,
-                              eligibility: { ...policyData.eligibility, tierIds: updated },
-                            });
-                          }}
-                          className={cn(
-                            "px-3 py-1.5 rounded-lg border text-label font-medium transition-all",
-                            selected
-                              ? "border-primary bg-primary/5 text-primary"
-                              : "border-border bg-card text-muted-foreground hover:border-border/80"
-                          )}
-                        >
-                          {tier.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                );
-              })()}
-              <HelpText>Leave all unchecked to apply to all tiers.</HelpText>
-            </div>
           </CollapsibleContent>
         </Collapsible>
       </div>
@@ -694,13 +748,13 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
     const availableCycles = getAvailableRefreshCycles(policyData.utilisationMode ?? "Fixed", policyData.prorateUnit);
 
     return (
-    <div className="space-y-6 md:max-w-xl">
+    <div className="space-y-6">
       <SectionHeader icon={Gear} title="Pool & Cycle" description="Configure fund allocation, refresh intervals, and activation" />
 
       {/* ── Employee Pool Type ── */}
       <div className="space-y-3">
         <FieldLabel helpKey="poolType">Employee Pool Type</FieldLabel>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:max-w-xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <ChoiceCard
             title="Individual"
             description="Each employee gets their own benefit pool."
@@ -725,7 +779,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
           type="number"
           min={0}
           placeholder="e.g. 3000"
-          className="w-full px-4 py-2.5 bg-background border border-border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all"
+          className="w-full max-w-[240px] px-4 py-2.5 bg-background border border-border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all"
           value={policyData.totalCapAmount ?? ""}
           onChange={(e) =>
             setPolicyData({
@@ -763,7 +817,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
         <div className="space-y-3">
           <FieldLabel required helpKey="dependentsPooling">Dependents Pool Type</FieldLabel>
           {validationErrors.dependentsPoolType && <ErrorText>{validationErrors.dependentsPoolType}</ErrorText>}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:max-w-2xl">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {DEPENDENTS_POOL_OPTIONS.map((opt) => (
               <ChoiceCard
                 key={opt.value}
@@ -793,7 +847,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
             min={0}
             placeholder="e.g. 1500"
             className={cn(
-              "w-full px-4 py-2.5 bg-background border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all",
+              "w-full max-w-[240px] px-4 py-2.5 bg-background border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all",
               validationErrors.dependentsCapAmount ? "border-destructive" : "border-border"
             )}
             value={policyData.dependentsCapAmount ?? ""}
@@ -815,7 +869,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
       {/* ── Utilisation Mode ── */}
       <div className="space-y-3">
         <FieldLabel helpKey="utilisationMode">Utilisation Mode</FieldLabel>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:max-w-xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <ChoiceCard
             title="Fixed Allocation"
             description="Full benefit pool is granted upon assignment."
@@ -844,7 +898,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
           <FieldLabel required helpKey="prorateUnit">Prorate Unit</FieldLabel>
             <select
               className={cn(
-                "w-full px-4 pr-10 py-2.5 bg-background border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all",
+                "w-full max-w-[240px] px-4 pr-10 py-2.5 bg-background border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all",
                 validationErrors.prorateUnit ? "border-destructive" : "border-border"
               )}
             value={policyData.prorateUnit || ""}
@@ -927,7 +981,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
                 <input
                   type="date"
                   className={cn(
-                    "w-full px-4 py-2.5 bg-background border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all",
+                    "w-full max-w-[240px] px-4 py-2.5 bg-background border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all",
                     validationErrors.refreshCustomDate ? "border-destructive" : "border-border"
                   )}
             value={policyData.refreshCustomDate || ""}
@@ -992,7 +1046,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
                 <input
                   type="date"
                   className={cn(
-                    "w-full px-4 py-2.5 bg-background border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all",
+                    "w-full max-w-[240px] px-4 py-2.5 bg-background border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all",
                     validationErrors.activationCustomDate ? "border-destructive" : "border-border"
                   )}
               value={policyData.activationCustomDate || ""}
@@ -1010,7 +1064,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
   const renderGroupsSection = () => (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <SectionHeader icon={TreeStructure} title="Groups & Benefits" description="Organize benefits into logical groups with budget controls" />
+        <SectionHeader icon={TreeStructure} title="Benefit Groups" description="Organise benefits into logical groups with budget controls" />
         <Button onClick={addGroup} size="sm" className="rounded-full flex items-center gap-2 text-label h-8 px-4">
           <Plus size={14} weight="bold" />
           Add Group
@@ -1106,14 +1160,50 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
                     </div>
                   </div>
 
+                  {/* Service category selector */}
+                  <div className="space-y-2">
+                    <p className="text-label font-medium text-muted-foreground">Service Categories <span className="text-faint font-normal">(multi-select)</span></p>
+                    <div className="flex flex-wrap gap-2">
+                      {SERVICE_CATEGORIES.map((cat) => {
+                        const current = groupCategories[group.id] ?? [];
+                        const selected = current.includes(cat);
+                        return (
+                          <button
+                            type="button"
+                            key={cat}
+                            onClick={() => setGroupCategories((prev) => {
+                              const cur = prev[group.id] ?? [];
+                              const next = cur.includes(cat) ? cur.filter((c) => c !== cat) : [...cur, cat];
+                              return { ...prev, [group.id]: next };
+                            })}
+                            className={cn(
+                              "px-3 py-1.5 rounded-full text-label font-medium border transition-all",
+                              selected
+                                ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                                : "bg-background text-muted-foreground border-border hover:border-primary/30"
+                            )}
+                          >
+                            {selected && <Check size={11} weight="bold" className="inline mr-1.5" />}
+                            {cat}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
                   {/* Benefits checklist */}
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <p className="text-label font-medium text-muted-foreground">Benefits</p>
                       {groupError && <ErrorText>{groupError}</ErrorText>}
                     </div>
+                    {(groupCategories[group.id]?.length ?? 0) === 0 ? (
+                      <p className="text-label text-faint italic px-4 py-6 text-center border border-dashed border-border/60 rounded-lg">
+                        Select one or more service categories to choose benefits.
+                      </p>
+                    ) : (
                     <div className="divide-y divide-border/50 border border-border/60 rounded-lg overflow-hidden">
-                      {SERVICES.map((service) => {
+                      {SERVICES.filter((s) => (groupCategories[group.id] ?? []).includes(s.category)).map((service) => {
                         const benefit = groupBenefits.find((b) => b.serviceId === service.id);
                         const isChecked = !!benefit;
                         return (
@@ -1173,10 +1263,10 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
                                   {splitBenefitIds.has(benefit!.id) ? (
                                     <>
                                       <div className="space-y-1.5">
-                                        <label className="text-micro font-medium text-faint">Employee (RM)</label>
+                                        <label className="block text-label font-medium text-subtle">Employee (RM)</label>
                                         <input
                                           type="number"
-                                          className="w-24 px-2 py-1.5 bg-background border border-border rounded-lg text-label font-mono outline-none text-right"
+                                          className="w-36 px-4 py-2.5 bg-background border border-border rounded-lg text-body font-mono outline-none text-right"
                                           value={benefit!.employeeAmount || ""}
                                           onChange={(e) => {
                                             const emp = e.target.value === "" ? 0 : parseFloat(e.target.value);
@@ -1187,10 +1277,10 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
                                         />
                                       </div>
                                       <div className="space-y-1.5">
-                                        <label className="text-micro font-medium text-faint">Dependant (RM)</label>
+                                        <label className="block text-label font-medium text-subtle">Dependant (RM)</label>
                                         <input
                                           type="number"
-                                          className="w-24 px-2 py-1.5 bg-background border border-border rounded-lg text-label font-mono outline-none text-right"
+                                          className="w-36 px-4 py-2.5 bg-background border border-border rounded-lg text-body font-mono outline-none text-right"
                                           value={benefit!.dependantAmount || ""}
                                           onChange={(e) => {
                                             const dep = e.target.value === "" ? 0 : parseFloat(e.target.value);
@@ -1208,11 +1298,11 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
                                     </>
                                   ) : (
                                   <div className="space-y-1.5">
-                                    <label className="text-micro font-medium text-faint">Amount (RM)</label>
+                                    <label className="block text-label font-medium text-subtle">Amount (RM)</label>
                                     <input
                                       type="number"
                                       className={cn(
-                                        "w-24 px-2 py-1.5 bg-background border rounded-lg text-label font-mono outline-none text-right",
+                                        "w-36 px-4 py-2.5 bg-background border rounded-lg text-body font-mono outline-none text-right",
                                         validationErrors[`benefit_${group.id}_${service.id}`] ? "border-destructive" : "border-border"
                                       )}
                                       value={benefit!.amount || ""}
@@ -1227,46 +1317,49 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
                                   )}
 
                                   <div className="space-y-1.5">
-                                    <label className="text-micro font-medium text-faint inline-flex items-center gap-1.5">Co-payment <FieldHelp termKey="coPayment" /></label>
+                                    <label className="text-label font-medium text-subtle inline-flex items-center gap-1.5">Co-payment <FieldHelp termKey="coPayment" /></label>
                                     <div className="flex items-center gap-2">
                                       <button
                                         type="button"
                                         onClick={() => updateBenefit(benefit!.id, "coPayment.required", !benefit!.coPayment.required)}
+                                        aria-pressed={benefit!.coPayment.required}
                                         className={cn(
-                                          "w-8 h-4 rounded-full transition-colors relative shrink-0",
-                                          benefit!.coPayment.required ? "bg-primary" : "bg-muted/50"
+                                          "w-11 h-6 rounded-full border transition-colors relative shrink-0",
+                                          benefit!.coPayment.required
+                                            ? "bg-primary border-primary"
+                                            : "bg-muted border-border"
                                         )}
                                       >
                                         <div
                                           className={cn(
-                                            "w-3 h-3 rounded-full bg-background absolute top-[2px] transition-all",
-                                            benefit!.coPayment.required ? "right-0.5" : "left-0.5"
+                                            "w-4 h-4 rounded-full bg-background shadow-sm absolute top-[3px] transition-all",
+                                            benefit!.coPayment.required ? "right-1" : "left-1"
                                           )}
                                         />
                                       </button>
-                                      {benefit!.coPayment.required && (
-                                        <div className="flex items-center gap-1.5">
-                                          <select
-                                            className="px-1.5 py-1.5 bg-background border border-border rounded text-label outline-none"
-                                            value={benefit!.coPayment.type}
-                                            onChange={(e) => updateBenefit(benefit!.id, "coPayment.type", e.target.value)}
-                                          >
-                                            <option value="Percentage">%</option>
-                                            <option value="Fixed">RM</option>
-                                          </select>
-                                          <input
-                                            type="number"
-                                            className={cn(
-                                              "w-16 px-2 py-1.5 bg-background border rounded-lg text-label font-mono outline-none text-right",
-                                              validationErrors[`copay_${group.id}_${service.id}`] ? "border-destructive" : "border-border"
-                                            )}
-                                            value={benefit!.coPayment.value || ""}
-                                            onChange={(e) =>
-                                              updateBenefit(benefit!.id, "coPayment.value", e.target.value === "" ? 0 : parseFloat(e.target.value))
-                                            }
-                                          />
-                                        </div>
-                                      )}
+                                      <div className={cn("flex items-center gap-1.5 transition-opacity", !benefit!.coPayment.required && "opacity-40 pointer-events-none")}>
+                                        <select
+                                          disabled={!benefit!.coPayment.required}
+                                          className="px-3 py-2 bg-background border border-border rounded-lg text-body outline-none"
+                                          value={benefit!.coPayment.type}
+                                          onChange={(e) => updateBenefit(benefit!.id, "coPayment.type", e.target.value)}
+                                        >
+                                          <option value="Percentage">%</option>
+                                          <option value="Fixed">RM</option>
+                                        </select>
+                                        <input
+                                          type="number"
+                                          disabled={!benefit!.coPayment.required}
+                                          className={cn(
+                                            "w-24 px-3 py-2 bg-background border rounded-lg text-body font-mono outline-none text-right",
+                                            validationErrors[`copay_${group.id}_${service.id}`] ? "border-destructive" : "border-border"
+                                          )}
+                                          value={benefit!.coPayment.value || ""}
+                                          onChange={(e) =>
+                                            updateBenefit(benefit!.id, "coPayment.value", e.target.value === "" ? 0 : parseFloat(e.target.value))
+                                          }
+                                        />
+                                      </div>
                                     </div>
                                     {validationErrors[`copay_${group.id}_${service.id}`] && (
                                       <ErrorText>{validationErrors[`copay_${group.id}_${service.id}`]}</ErrorText>
@@ -1279,6 +1372,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
                         );
                       })}
                     </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1302,21 +1396,21 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
       {/* Policy Details */}
       <section id="policy-details" className="scroll-mt-32">
         <div className="bg-card border border-border rounded-lg shadow-sm overflow-hidden">
-          <div className="p-6">{renderPolicyDetailsSection()}</div>
+          <div className="p-6 md:p-8">{renderPolicyDetailsSection()}</div>
         </div>
       </section>
 
       {/* Pool & Cycle */}
       <section id="pool-cycle" className="scroll-mt-32">
         <div className="bg-card border border-border rounded-lg shadow-sm overflow-hidden">
-          <div className="p-6">{renderPoolSection()}</div>
+          <div className="p-6 md:p-8">{renderPoolSection()}</div>
         </div>
       </section>
 
       {/* Groups & Services */}
       <section id="groups-services" className="scroll-mt-32">
         <div className="bg-card border border-border rounded-lg shadow-sm overflow-hidden">
-          <div className="p-6">{renderGroupsSection()}</div>
+          <div className="p-6 md:p-8">{renderGroupsSection()}</div>
         </div>
       </section>
 

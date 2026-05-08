@@ -1,15 +1,16 @@
 "use client";
 
+import { use } from "react";
 import { useRouter } from "next/navigation";
 import { CaretLeft, TreeStructure } from "@phosphor-icons/react";
-import { SubPolicyWizard } from "@/components/host/policies/sub-policy-wizard";
+import { VersionWizard } from "@/components/host/policies/version-wizard";
 import { MOCK_POLICIES, MOCK_POLICY_DATA_MAP } from "@/lib/mock-data";
 import { MOCK_ORGS } from "@/lib/mock-data";
 import { MOCK_EMPLOYEES } from "@/lib/mock-data";
 
-export default function NewSubPolicyPage({ params }: { params: { id: string } }) {
+export default function NewVersionPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id: parentId } = use(params);
   const router = useRouter();
-  const parentId = params.id;
 
   const parent = MOCK_POLICIES.find(p => p.id === parentId);
   const parentData = MOCK_POLICY_DATA_MAP[parentId];
@@ -32,9 +33,9 @@ export default function NewSubPolicyPage({ params }: { params: { id: string } })
   if (parent.parentPolicyId) {
     return (
       <div className="flex flex-col items-center justify-center py-32 text-center">
-        <p className="text-heading font-semibold text-foreground">Sub-policy nesting is not allowed.</p>
+        <p className="text-heading font-semibold text-foreground">Version nesting is not allowed.</p>
         <p className="mt-1 text-body text-muted-foreground">
-          Create sub-policies from a parent policy only.
+          Create versions from a parent policy only.
         </p>
         <button
           onClick={() => router.push(`/policies?policyId=${parent.id}&mode=view&wizard=open`)}
@@ -49,6 +50,7 @@ export default function NewSubPolicyPage({ params }: { params: { id: string } })
   const org = MOCK_ORGS.find(o => o.id === parent.organizationId);
   const orgEmployees = MOCK_EMPLOYEES.filter(e => e.orgId === parent.organizationId);
   const orgTierConfigs = org?.tierConfigs ?? [];
+  const orgDepartmentConfigs = org?.departmentConfigs ?? [];
 
   return (
     <div className="pb-24 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -66,7 +68,7 @@ export default function NewSubPolicyPage({ params }: { params: { id: string } })
           </div>
           <div>
             <h1 className="text-heading font-semibold text-foreground text-balance">
-              Create Sub-Policy
+              Create Version
             </h1>
             <p className="text-body text-muted-foreground mt-0.5 font-normal">
               Derived from{" "}
@@ -77,12 +79,13 @@ export default function NewSubPolicyPage({ params }: { params: { id: string } })
         </div>
       </div>
 
-      <SubPolicyWizard
+      <VersionWizard
         parentPolicy={parent}
         parentGroups={parentData.groups}
         parentBenefits={parentData.benefits}
         employees={orgEmployees}
         orgTierConfigs={orgTierConfigs}
+        orgDepartmentConfigs={orgDepartmentConfigs}
         onSuccess={() =>
           router.push(`/policies?policyId=${parentId}&mode=view&wizard=open`)
         }

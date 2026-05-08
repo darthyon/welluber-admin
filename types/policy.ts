@@ -41,9 +41,10 @@ export interface BenefitPolicy {
     maxAge?: number;
     gender?: "male" | "female" | "all";
     tierIds?: string[];
+    departmentIds?: string[];
   };
-  parentPolicyId?: string;      // present = this is a sub-policy
-  targetEmployeeIds?: string[]; // individually pinned employees for this sub-policy
+  parentPolicyId?: string;      // present = this is a version of another policy
+  targetEmployeeIds?: string[]; // individually pinned employees for this version
 }
 
 export interface PolicyTemplate {
