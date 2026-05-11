@@ -7,7 +7,7 @@ import {
   Users,
   User,
   UsersFour,
-  Briefcase,
+
   TreeStructure,
   Plus,
   Trash,
@@ -172,8 +172,7 @@ export function PolicyReviewCards({ policy, groups, benefits }: PolicyReviewCard
           Pool & Cycle
         </h4>
         <ReadField label="Dependents" value={policy.coversDependents ? "Covered" : "Employee Only"} />
-        <ReadField label="Employee Pool Type" value={policy.benefitPoolType} />
-        <ReadField label="Employee Policy Spending Cap" value={policy.totalCapAmount ? `RM ${policy.totalCapAmount.toFixed(2)}` : "Not Set"} />
+        <ReadField label="Benefit Policy Amount" value={policy.totalCapAmount ? `RM ${policy.totalCapAmount.toFixed(2)}` : "Not Set"} />
         {policy.coversDependents && <ReadField label="Dependents Pool Type" value={policy.dependentsPoolType === "SharedWithEmployee" ? "Shared with Employee" : policy.dependentsPoolType} />}
         {policy.coversDependents && policy.dependentsPoolType !== "SharedWithEmployee" && (
           <ReadField
@@ -234,7 +233,7 @@ export function PolicyReviewCards({ policy, groups, benefits }: PolicyReviewCard
                   </div>
                   <div className="text-right">
                     <p className="text-body font-semibold text-primary">
-                      {group.distributionType === "SharedAmount" ? `RM ${group.maxUsagePerCycle?.toFixed(2) || "0.00"}` : `${groupBenefits.length} benefits`}
+                      {group.distributionType === "SharedAmount" ? `${group.maxUsagePerCycle?.toFixed(2) || "0.00"}` : `${groupBenefits.length} benefits`}
                     </p>
                   </div>
                 </div>
@@ -373,7 +372,9 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
     try {
       const err = JSON.parse(raw) as { field: string; message: string };
       sessionStorage.removeItem("policy-submit-error");
-      setValidationErrors((prev) => ({ ...prev, [err.field]: err.message }));
+      setTimeout(() => {
+        setValidationErrors((prev) => ({ ...prev, [err.field]: err.message }));
+      }, 0);
       if (err.field === "name") {
         setTimeout(() => {
           nameInputRef.current?.focus();
@@ -437,7 +438,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
   // ── Realtime error clearing on valid input ──────────────────────────────
   useEffect(() => {
     if (validationErrors.name && policyData.name?.trim() && policyData.name.length <= 100) {
-      setFieldError("name", undefined);
+      setTimeout(() => setFieldError("name", undefined), 0);
     }
   }, [policyData.name, validationErrors.name, setFieldError]);
 
@@ -446,7 +447,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
       validationErrors.organizationId &&
       policyData.organizationId
     ) {
-      setFieldError("organizationId", undefined);
+      setTimeout(() => setFieldError("organizationId", undefined), 0);
     }
   }, [policyData.organizationId, validationErrors.organizationId, setFieldError]);
 
@@ -455,7 +456,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
       validationErrors.eligibleEmploymentTypes &&
       (policyData.eligibleEmploymentTypes?.length ?? 0) > 0
     ) {
-      setFieldError("eligibleEmploymentTypes", undefined);
+      setTimeout(() => setFieldError("eligibleEmploymentTypes", undefined), 0);
     }
   }, [policyData.eligibleEmploymentTypes, validationErrors.eligibleEmploymentTypes, setFieldError]);
 
@@ -464,7 +465,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
       validationErrors.refreshCustomDate &&
       (policyData.refreshStartReference !== "custom_date" || policyData.refreshCustomDate)
     ) {
-      setFieldError("refreshCustomDate", undefined);
+      setTimeout(() => setFieldError("refreshCustomDate", undefined), 0);
     }
   }, [policyData.refreshStartReference, policyData.refreshCustomDate, validationErrors.refreshCustomDate, setFieldError]);
 
@@ -473,7 +474,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
       validationErrors.activationCustomDate &&
       (policyData.activationMode !== "custom_date" || policyData.activationCustomDate)
     ) {
-      setFieldError("activationCustomDate", undefined);
+      setTimeout(() => setFieldError("activationCustomDate", undefined), 0);
     }
   }, [policyData.activationMode, policyData.activationCustomDate, validationErrors.activationCustomDate, setFieldError]);
 
@@ -482,7 +483,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
       validationErrors.dependentsPoolType &&
       (!policyData.coversDependents || policyData.dependentsPoolType)
     ) {
-      setFieldError("dependentsPoolType", undefined);
+      setTimeout(() => setFieldError("dependentsPoolType", undefined), 0);
     }
   }, [policyData.coversDependents, policyData.dependentsPoolType, validationErrors.dependentsPoolType, setFieldError]);
 
@@ -493,63 +494,65 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
         policyData.dependentsPoolType === "SharedWithEmployee" ||
         (policyData.dependentsCapAmount && policyData.dependentsCapAmount > 0))
     ) {
-      setFieldError("dependentsCapAmount", undefined);
+      setTimeout(() => setFieldError("dependentsCapAmount", undefined), 0);
     }
   }, [policyData.coversDependents, policyData.dependentsPoolType, policyData.dependentsCapAmount, validationErrors.dependentsCapAmount, setFieldError]);
 
   useEffect(() => {
     if (validationErrors.prorateUnit && (policyData.utilisationMode !== "Prorated" || policyData.prorateUnit)) {
-      setFieldError("prorateUnit", undefined);
+      setTimeout(() => setFieldError("prorateUnit", undefined), 0);
     }
   }, [policyData.utilisationMode, policyData.prorateUnit, validationErrors.prorateUnit, setFieldError]);
 
   useEffect(() => {
     if (validationErrors.groups && groups.length > 0) {
-      setFieldError("groups", undefined);
+      setTimeout(() => setFieldError("groups", undefined), 0);
     }
   }, [groups.length, validationErrors.groups, setFieldError]);
 
   useEffect(() => {
-    setValidationErrors((prev) => {
-      let changed = false;
-      const next = { ...prev };
-      benefits.forEach((b) => {
-        const amountKey = `benefit_${b.groupId}_${b.serviceId}`;
-        if (next[amountKey] && b.amount > 0) {
-          delete next[amountKey];
-          changed = true;
-        }
-        const copayKey = `copay_${b.groupId}_${b.serviceId}`;
-        if (next[copayKey]) {
-          const v = b.coPayment.value || 0;
-          const ok =
-            !b.coPayment.required ||
-            (b.coPayment.type === "Percentage" && v >= 0 && v <= 100) ||
-            (b.coPayment.type === "Fixed" && v <= b.amount);
-          if (ok) {
-            delete next[copayKey];
+    setTimeout(() => {
+      setValidationErrors((prev) => {
+        let changed = false;
+        const next = { ...prev };
+        benefits.forEach((b) => {
+          const amountKey = `benefit_${b.groupId}_${b.serviceId}`;
+          if (next[amountKey] && b.amount > 0) {
+            delete next[amountKey];
             changed = true;
           }
-        }
+          const copayKey = `copay_${b.groupId}_${b.serviceId}`;
+          if (next[copayKey]) {
+            const v = b.coPayment.value || 0;
+            const ok =
+              !b.coPayment.required ||
+              (b.coPayment.type === "Percentage" && v >= 0 && v <= 100) ||
+              (b.coPayment.type === "Fixed" && v <= b.amount);
+            if (ok) {
+              delete next[copayKey];
+              changed = true;
+            }
+          }
+        });
+        groups.forEach((g) => {
+          const capKey = `group_cap_${g.id}`;
+          if (next[capKey] && g.distributionType === "SharedAmount" && (g.maxUsagePerCycle ?? 0) > 0) {
+            delete next[capKey];
+            changed = true;
+          }
+          if (next[capKey] && g.distributionType !== "SharedAmount") {
+            delete next[capKey];
+            changed = true;
+          }
+          const nameKey = `group_name_${g.id}`;
+          if (next[nameKey] && g.name?.trim()) {
+            delete next[nameKey];
+            changed = true;
+          }
+        });
+        return changed ? next : prev;
       });
-      groups.forEach((g) => {
-        const capKey = `group_cap_${g.id}`;
-        if (next[capKey] && g.distributionType === "SharedAmount" && (g.maxUsagePerCycle ?? 0) > 0) {
-          delete next[capKey];
-          changed = true;
-        }
-        if (next[capKey] && g.distributionType !== "SharedAmount") {
-          delete next[capKey];
-          changed = true;
-        }
-        const nameKey = `group_name_${g.id}`;
-        if (next[nameKey] && g.name?.trim()) {
-          delete next[nameKey];
-          changed = true;
-        }
-      });
-      return changed ? next : prev;
-    });
+    }, 0);
   }, [benefits, groups]);
 
   // ── Validation ────────────────────────────────────────────────────────────
@@ -604,7 +607,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
       }
 
       if (group.distributionType === "SharedAmount" && (!group.maxUsagePerCycle || group.maxUsagePerCycle <= 0)) {
-        errors[`group_cap_${group.id}`] = "Shared pools need a cap (e.g. RM 1000)";
+        errors[`group_cap_${group.id}`] = "Shared pools need a cap (e.g. 1000)";
       }
 
       const groupBenefits = benefits.filter((b) => b.groupId === group.id);
@@ -985,30 +988,9 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
     <div className="space-y-6">
       <SectionHeader icon={Gear} title="Pool & Cycle" description="Configure fund allocation, refresh intervals, and activation" />
 
-      {/* ── Employee Pool Type ── */}
-      <div className="space-y-3">
-        <FieldLabel helpKey="poolType">Employee Pool Type</FieldLabel>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <ChoiceCard
-            title="Individual"
-            description="Each employee gets their own benefit pool."
-            icon={User}
-            selected={policyData.benefitPoolType === "Individual"}
-            onSelect={() => setPolicyData({ ...policyData, benefitPoolType: "Individual" })}
-          />
-          <ChoiceCard
-            title="Shared"
-            description="Employees share a common pool of funds."
-            icon={Briefcase}
-            selected={policyData.benefitPoolType === "Shared"}
-            onSelect={() => setPolicyData({ ...policyData, benefitPoolType: "Shared" })}
-          />
-        </div>
-      </div>
-
-      {/* ── Employee Spending Cap ── */}
+      {/* ── Benefit Policy Amount ── */}
       <div className="space-y-1.5">
-        <FieldLabel helpKey="spendingCap">Employee Policy Spending Cap (RM)</FieldLabel>
+        <FieldLabel helpKey="spendingCap">Benefit Policy Amount</FieldLabel>
         <input
           type="number"
           min={0}
@@ -1075,7 +1057,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
 
       {policyData.coversDependents && policyData.dependentsPoolType !== "SharedWithEmployee" && (
         <div className="space-y-1.5 animate-in fade-in slide-in-from-top-1 duration-300">
-          <FieldLabel required helpKey="spendingCap">Dependents Policy Spending Cap (RM)</FieldLabel>
+          <FieldLabel required helpKey="spendingCap">Dependents Policy Spending Cap</FieldLabel>
           <input
             type="number"
             min={0}
@@ -1378,7 +1360,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
                     </div>
                     <div className="space-y-1.5">
                       <p className="text-label font-medium text-muted-foreground">
-                        <span className="inline-flex items-center gap-1.5">Group Cap (RM) <FieldHelp termKey="groupCap" /></span>
+                        <span className="inline-flex items-center gap-1.5">Group Cap <FieldHelp termKey="groupCap" /></span>
                         {group.distributionType !== "SharedAmount" && (
                           <span className="text-faint font-normal ml-1">(optional)</span>
                         )}
@@ -1499,7 +1481,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
                                   {splitBenefitIds.has(benefit!.id) ? (
                                     <>
                                       <div className="space-y-1.5">
-                                        <label className="block text-label font-medium text-subtle">Employee (RM)</label>
+                                        <label className="block text-label font-medium text-subtle">Employee</label>
                                         <input
                                           type="number"
                                           className="w-36 px-4 py-2.5 bg-background border border-border rounded-lg text-body font-mono outline-none text-right"
@@ -1513,7 +1495,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
                                         />
                                       </div>
                                       <div className="space-y-1.5">
-                                        <label className="block text-label font-medium text-subtle">Dependant (RM)</label>
+                                        <label className="block text-label font-medium text-subtle">Dependant</label>
                                         <input
                                           type="number"
                                           className="w-36 px-4 py-2.5 bg-background border border-border rounded-lg text-body font-mono outline-none text-right"
@@ -1528,13 +1510,13 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
                                       </div>
                                       <div className="space-y-1.5 self-end pb-1.5">
                                         <span className="text-micro text-faint font-medium">
-                                          Total: RM {((benefit!.employeeAmount ?? 0) + (benefit!.dependantAmount ?? 0)).toLocaleString()}
+                                          Total: {((benefit!.employeeAmount ?? 0) + (benefit!.dependantAmount ?? 0)).toLocaleString()}
                                         </span>
                                       </div>
                                     </>
                                   ) : (
                                   <div className="space-y-1.5">
-                                    <label className="block text-label font-medium text-subtle">Amount (RM)</label>
+                                    <label className="block text-label font-medium text-subtle">Amount</label>
                                     <input
                                       type="number"
                                       className={cn(

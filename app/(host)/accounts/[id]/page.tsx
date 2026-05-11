@@ -4,7 +4,6 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   CaretDown,
-  Info,
   LockKey,
   Prohibit,
   CalendarBlank,
@@ -26,7 +25,6 @@ import { DetailSection } from "@/components/shared/detail-section";
 import { DetailField } from "@/components/shared/detail-field";
 import { ActionPopover } from "@/components/shared/action-popover";
 import { DataFilterBar } from "@/components/shared/data-filter-bar";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { ConfirmationModal } from "@/components/shared/confirmation-modal";
@@ -75,16 +73,7 @@ function AccountDetailContent() {
   );
   type AccountTransactionRow = (typeof filteredTransactions)[number];
 
-  // Mock org credit data (in real app, fetch from org)
-  const orgCreditLimit = 10000;
-  const totalDeductions = transactions.filter(t => t.type === "deduction").reduce((sum, t) => sum + t.amount, 0);
-  const totalPreAuths = transactions.filter(t => t.type === "pre-auth").reduce((sum, t) => sum + t.amount, 0);
-  const totalCancelled = transactions.filter(t => t.type === "cancelled").reduce((sum, t) => sum + t.amount, 0);
-  const totalTopupAmount = transactions.filter(t => t.type === "topup").reduce((sum, t) => sum + t.amount, 0);
-  const activePreAuths = totalPreAuths - totalCancelled;
-  const totalPtsUsed = totalDeductions + activePreAuths;
-  const orgCreditUsed = Math.abs(Math.min(0, wallet.balance));
-  const orgCreditRemaining = orgCreditLimit - orgCreditUsed;
+
 
   const OTHER_ACCOUNTS = accounts
     .filter(w => w.id !== accountId)
@@ -200,7 +189,7 @@ function AccountDetailContent() {
       <div className="p-6 lg:p-8 space-y-8">
         {activeTab === "transactions" && (
            <>
-             <div className="bg-primary rounded-xl relative p-8 text-primary-foreground">
+             <div className="bg-primary rounded-xl relative p-8 text-primary-foreground overflow-hidden">
                 {/* Account illustration — anchored bottom right, overflows card */}
                 <Image
                   loading="lazy"
@@ -208,133 +197,77 @@ function AccountDetailContent() {
                   alt=""
                   width={256}
                   height={160}
-                  className="absolute right-0 bottom-0 w-64 h-auto object-contain opacity-90 pointer-events-none hidden lg:block"
+                  className="absolute right-0 bottom-0 w-64 h-auto object-contain opacity-40 pointer-events-none hidden lg:block"
                 />
 
-                <div className="relative z-10">
-                  {/* Single row with all sections */}
-                  <div className="flex flex-col xl:flex-row xl:items-center gap-4 xl:gap-0">
-                    {/* 1. Available Limit (combined with credit) */}
-                    <div className="space-y-1 shrink-0">
-                      <p className="text-label font-semibold text-primary-foreground/60">Available Limit</p>
-                      <h2 className="text-4xl font-semibold tracking-tight text-primary-foreground tabular-nums">
-                        {(wallet.balance - wallet.pendingDeductions).toLocaleString()} pts
-                      </h2>
-                      <div className="flex items-center gap-2 text-label text-primary-foreground/70">
-                        <span>Credit Remaining: {orgCreditRemaining.toLocaleString()} pts</span>
-                        <span className="opacity-30">·</span>
-                        <span>Overall Used: {totalPtsUsed.toLocaleString()} pts</span>
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Info size={12} className="text-primary-foreground/30 cursor-help shrink-0" />
-                            </TooltipTrigger>
-                            <TooltipContent side="bottom">
-                              <p className="text-body max-w-[220px]">
-                                Credit remaining is the unused portion of your credit limit. Overall pts represents total points consumed or committed.
-                              </p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      </div>
-                      <p className="text-label text-faint">
-                        Last updated {new Date(wallet.updatedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}, {new Date(wallet.updatedAt).toLocaleTimeString('en-MY', { hour: '2-digit', minute: '2-digit' })}
-                      </p>
-                    </div>
+                <div className="relative z-10 flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+                  {/* Available Balance */}
+                  <div className="space-y-1">
+                    <p className="text-label font-semibold text-primary-foreground/80">Available Balance</p>
+                    <h2 className="text-display font-semibold tracking-tight text-primary-foreground tabular-nums">
+                      {(wallet.balance - wallet.pendingDeductions).toLocaleString()} pts
+                    </h2>
+                    <p className="text-label text-primary-foreground/70">
+                      Last updated {new Date(wallet.updatedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}, {new Date(wallet.updatedAt).toLocaleTimeString('en-MY', { hour: '2-digit', minute: '2-digit' })}
+                    </p>
+                  </div>
 
-                    {/* Divider 1 */}
-                    <div className="hidden xl:block w-px h-16 bg-primary-foreground/15 mx-6" />
-
-                    {/* 2. Credit Usage Bar */}
-                    <div className="space-y-1.5 shrink-0 min-w-[160px]">
-                      <p className="text-label font-semibold text-primary-foreground/60">Credit Limit Usage</p>
-                      <div className="w-full h-1.5 bg-primary-foreground/15 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-primary-foreground/80 rounded-full transition-all"
-                          style={{ width: `${Math.min((orgCreditUsed / orgCreditLimit) * 100, 100)}%` }}
-                        />
-                      </div>
-                      <p className="text-label text-faint">Limit: {orgCreditLimit.toLocaleString()} pts</p>
-                    </div>
-
-                    {/* Divider 2 */}
-                    <div className="hidden xl:block w-px h-16 bg-primary-foreground/15 mx-6" />
-
-                    {/* 3. Usage Stats */}
-                    <div className="flex items-center gap-3 shrink-0">
-                      {[
-                        { label: "Top-ups", amount: totalTopupAmount, trend: "+12%", showRM: true },
-                        { label: "Settled", amount: totalDeductions, trend: "+5%", showRM: false },
-                        { label: "Pre-Auth", amount: activePreAuths, trend: `${activePreAuths > 0 ? activePreAuths.toLocaleString() : "0"} pts locked`, showRM: false },
-                      ].map((stat) => (
-                        <div key={stat.label} className="space-y-0.5">
-                          <p className="text-label font-medium text-primary-foreground/50">{stat.label}</p>
-                          <p className="text-body font-semibold text-primary-foreground">{stat.showRM ? `RM ${stat.amount.toLocaleString()}` : `${stat.amount.toLocaleString()} pts`}</p>
-                          <p className="text-label text-faint">{stat.trend}</p>
+                  {/* Actions */}
+                  <div className="flex items-center gap-2 shrink-0">
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <button className="inline-flex items-center gap-1.5 px-4 py-2 rounded-4xl border border-primary-foreground/30 text-primary-foreground font-semibold text-label hover:bg-primary-foreground/10 transition-colors">
+                          <Wallet size={14} weight="fill" />
+                          Add Balance
+                          <CaretDown size={12} weight="bold" />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-44 p-1.5" align="end">
+                        <div className="flex flex-col gap-0.5">
+                          <button
+                            onClick={() => setIsRecordTopupOpen(true)}
+                            className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-body font-medium text-left text-subtle hover:bg-muted hover:text-foreground transition-colors"
+                          >
+                            <ArrowUpRight size={14} className="text-emerald-600 dark:text-emerald-400" />
+                            Manual Top-up
+                          </button>
+                          <button
+                            onClick={() => setIsUpdateBalanceOpen(true)}
+                            className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-body font-medium text-left text-subtle hover:bg-muted hover:text-foreground transition-colors"
+                          >
+                            <DotsThreeCircle size={14} className="text-primary" />
+                            Update Balance
+                          </button>
                         </div>
-                      ))}
-                    </div>
+                      </PopoverContent>
+                    </Popover>
 
-                    {/* Divider 3 */}
-                    <div className="hidden xl:block w-px h-16 bg-primary-foreground/15 mx-6" />
-
-                    {/* 4. Buttons */}
-                    <div className="flex items-center gap-2 shrink-0">
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <button className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary-foreground text-primary font-semibold text-label hover:bg-primary-foreground/90 transition-colors shadow-lg shadow-black/20">
-                            <Wallet size={14} weight="fill" />
-                            Add Balance
-                            <CaretDown size={12} weight="bold" />
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <button className="inline-flex items-center gap-1.5 px-4 py-2 rounded-4xl border border-primary-foreground/30 text-primary-foreground font-semibold text-label hover:bg-primary-foreground/10 transition-colors">
+                          More Actions
+                          <CaretDown size={12} weight="bold" />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-44 p-1.5" align="end">
+                        <div className="flex flex-col gap-0.5">
+                          <button
+                            onClick={() => {}}
+                            className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-body font-medium text-left text-subtle hover:bg-muted hover:text-foreground transition-colors"
+                          >
+                            <DownloadSimple size={14} className="text-faint" />
+                            View Statement
                           </button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-44 p-1.5" align="end">
-                          <div className="flex flex-col gap-0.5">
-                            <button
-                              onClick={() => setIsRecordTopupOpen(true)}
-                              className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-body font-medium text-left text-subtle hover:bg-muted hover:text-foreground transition-colors"
-                            >
-                              <ArrowUpRight size={14} className="text-emerald-600 dark:text-emerald-400" />
-                              Manual Top-up
-                            </button>
-                            <button
-                              onClick={() => setIsUpdateBalanceOpen(true)}
-                              className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-body font-medium text-left text-subtle hover:bg-muted hover:text-foreground transition-colors"
-                            >
-                              <DotsThreeCircle size={14} className="text-primary" />
-                              Update Balance
-                            </button>
-                          </div>
-                        </PopoverContent>
-                      </Popover>
-
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <button className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-primary-foreground/30 text-primary-foreground font-semibold text-label hover:bg-primary-foreground/10 transition-colors">
-                            More Actions
-                            <CaretDown size={12} weight="bold" />
+                          <button
+                            onClick={() => openDangerAction("suspend")}
+                            className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-body font-medium text-left text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors"
+                          >
+                            <WarningCircle size={14} />
+                            {wallet.status === "suspended" ? "Resume Account" : "Suspend Account"}
                           </button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-44 p-1.5" align="end">
-                          <div className="flex flex-col gap-0.5">
-                            <button
-                              onClick={() => {}}
-                              className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-body font-medium text-left text-subtle hover:bg-muted hover:text-foreground transition-colors"
-                            >
-                              <DownloadSimple size={14} className="text-faint" />
-                              View Statement
-                            </button>
-                            <button
-                              onClick={() => openDangerAction("suspend")}
-                              className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-body font-medium text-left text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors"
-                            >
-                              <WarningCircle size={14} />
-                              {wallet.status === "suspended" ? "Resume Account" : "Suspend Account"}
-                            </button>
-                          </div>
-                        </PopoverContent>
-                      </Popover>
-                    </div>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
                   </div>
                 </div>
               </div>

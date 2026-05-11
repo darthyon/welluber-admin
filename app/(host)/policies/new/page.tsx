@@ -6,6 +6,7 @@ import { CaretLeft, NavigationArrow, Barbell, Brain, Circle, PencilSimpleLine, C
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav";
+import { StatusBadge } from "@/components/shared/status-badge";
 import { PolicyWizardContent } from "@/components/host/policies/policy-wizard-content";
 import { TargetingPreviewCard } from "@/components/host/policies/targeting-preview-card";
 import { usePolicyTemplates } from "@/hooks/use-policy-templates";
@@ -26,9 +27,6 @@ const ANCHOR_ITEMS = [
 type DraftShape = { policy: Partial<BenefitPolicy>; groups: BenefitGroup[]; benefits: Benefit[] };
 
 function NewPolicyForm() {
-  if (typeof window !== "undefined") {
-    (window as unknown as { __pf?: number }).__pf = ((window as unknown as { __pf?: number }).__pf ?? 0) + 1;
-  }
   const router = useRouter();
   const searchParams = useSearchParams();
   const { templates: policyTemplates, isLoading: templatesLoading } = usePolicyTemplates();
@@ -99,21 +97,20 @@ function NewPolicyForm() {
   );
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      (window as unknown as { __dec?: string }).__dec = `enter:${resumeDecided}:${templateId}:${cloneId}`;
-    }
     if (resumeDecided || templateId || cloneId) return;
     const sessionDraft = typeof window !== "undefined" ? sessionStorage.getItem("policy-draft") : null;
     if (sessionDraft) {
-      setResumeDecided(true);
+      setTimeout(() => setResumeDecided(true), 0);
       return;
     }
     const draft = readPolicyDraft<DraftShape>(paramOrgId ?? undefined);
     if (draft) {
-      setPendingDraftMeta({ savedAt: draft.savedAt, data: draft.data });
-      setResumePromptOpen(true);
+      setTimeout(() => {
+        setPendingDraftMeta({ savedAt: draft.savedAt, data: draft.data });
+        setResumePromptOpen(true);
+      }, 0);
     } else {
-      setResumeDecided(true);
+      setTimeout(() => setResumeDecided(true), 0);
     }
   }, [paramOrgId, templateId, cloneId, resumeDecided]);
 
@@ -324,15 +321,9 @@ function NewPolicyForm() {
                 </div>
                 <div className="shrink-0 flex items-center gap-2 text-label text-muted-foreground pt-2" aria-live="polite">
                   {saveState.status === "saving" ? (
-                    <>
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                      <span>Saving…</span>
-                    </>
+                    <StatusBadge status="Saving…" variant="amber" dot className="animate-pulse" />
                   ) : saveState.status === "saved" && saveState.savedAt ? (
-                    <>
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                      <span>Saved {savedAgo}</span>
-                    </>
+                    <StatusBadge status={`Saved ${savedAgo}`} variant="emerald" dot />
                   ) : (
                     <>
                       <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40" />
@@ -475,9 +466,6 @@ function NewPolicyForm() {
 }
 
 export default function NewPolicyPage() {
-  if (typeof window !== "undefined") {
-    (window as unknown as { __np?: number }).__np = ((window as unknown as { __np?: number }).__np ?? 0) + 1;
-  }
   return (
     <Suspense fallback={<div data-test="fallback">FALLBACK</div>}>
       <NewPolicyForm />

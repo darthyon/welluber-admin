@@ -501,7 +501,6 @@ function OverviewTab({
       >
         <div className="grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-4">
           <DetailField label="Dependents" value={policy.coversDependents ? "Covered" : "Employee Only"} />
-          <DetailField label="Employee Pool Type" value={policy.benefitPoolType} />
           {policy.coversDependents && (
             <DetailField label="Dependents Pool Type" value={policy.dependentsPoolType === "SharedWithEmployee" ? "Shared with Employee" : policy.dependentsPoolType || "—"} />
           )}

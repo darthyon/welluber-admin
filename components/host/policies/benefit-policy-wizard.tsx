@@ -9,7 +9,7 @@ import {
   Users,
   User,
   UsersFour,
-  Briefcase,
+
   Gear,
   TreeStructure,
   Plus,
@@ -34,7 +34,7 @@ import { SuccessCelebration } from "@/components/shared/success-celebration";
 import { PolicyLaunchConfirmModal } from "@/components/host/policies/policy-launch-confirm-modal";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
-import { BenefitPolicy, BenefitGroup, Benefit, PolicyStatus, DistributionType, PoolType, DependentsPoolType, ProrateUnit, RefreshCycle, ActivationMode } from "@/types/policy";
+import { BenefitPolicy, BenefitGroup, Benefit, PolicyStatus, DistributionType, DependentsPoolType, ProrateUnit, RefreshCycle, ActivationMode } from "@/types/policy";
 import { UtilisationClaimsTable } from "@/components/shared/utilisation-claims-table";
 import { MOCK_EMPLOYEES, MOCK_ORGS } from "@/lib/mock-data";
 import type { EmployeeDirectoryItem } from "@/features/employees/types";
@@ -601,8 +601,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
           <DetailSection title="Benefit Pool Strategy" icon={<Gear size={18} weight="duotone" />} description="Fund allocation configuration" ghost>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <ReadField label="Dependents" value={policyData.coversDependents ? "Covered" : "Employee Only"} />
-              <ReadField label="Employee Pool Type" value={policyData.benefitPoolType} />
-              <ReadField label="Employee Policy Spending Cap" value={policyData.totalCapAmount ? `RM ${policyData.totalCapAmount.toFixed(2)}` : "Not Set"} />
+              <ReadField label="Benefit Policy Amount" value={policyData.totalCapAmount ? `RM ${policyData.totalCapAmount.toFixed(2)}` : "Not Set"} />
               {policyData.coversDependents && (
                 <ReadField label="Dependents Pool Type" value={policyData.dependentsPoolType === "SharedWithEmployee" ? "Shared with Employee" : policyData.dependentsPoolType} />
               )}
@@ -639,30 +638,9 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
       <div className="space-y-8 max-w-3xl">
         <DetailSection title="Benefit Pool Strategy" icon={<Gear size={18} weight="duotone" />} description="Choose how funds are allocated" ghost>
           <div className="space-y-6 md:max-w-xl">
-            {/* ── Employee Pool Type ── */}
-            <div className="space-y-3">
-              <label className="text-label font-medium text-subtle inline-flex items-center gap-1.5">Employee Pool Type <FieldHelp termKey="poolType" /></label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:max-w-xl">
-                <ChoiceCard
-                  title="Individual"
-                  description="Each employee gets their own benefit pool."
-                  icon={User}
-                  selected={policyData.benefitPoolType === "Individual"}
-                  onSelect={() => setPolicyData({ ...policyData, benefitPoolType: "Individual" as PoolType })}
-                />
-                <ChoiceCard
-                  title="Shared"
-                  description="Employees share a common pool of funds."
-                  icon={Briefcase}
-                  selected={policyData.benefitPoolType === "Shared"}
-                  onSelect={() => setPolicyData({ ...policyData, benefitPoolType: "Shared" as PoolType })}
-                />
-              </div>
-            </div>
-
-            {/* ── Employee Spending Cap ── */}
+            {/* ── Benefit Policy Amount ── */}
             <div className="space-y-1.5">
-              <label className="text-label font-medium text-subtle inline-flex items-center gap-1.5">Employee Policy Spending Cap (RM) <FieldHelp termKey="spendingCap" /></label>
+              <label className="text-label font-medium text-subtle inline-flex items-center gap-1.5">Benefit Policy Amount <FieldHelp termKey="spendingCap" /></label>
               <input
                 type="number"
                 min={0}
@@ -1501,8 +1479,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
         <DetailSection title="Pool & Cycle" icon={<Gear size={18} weight="duotone" />} ghost>
           <div className="space-y-4">
             <ReadField label="Dependents" value={policyData.coversDependents ? "Covered" : "Employee Only"} />
-            <ReadField label="Employee Pool Type" value={policyData.benefitPoolType} />
-            <ReadField label="Employee Policy Spending Cap" value={policyData.totalCapAmount ? `RM ${policyData.totalCapAmount.toFixed(2)}` : "Not Set"} />
+            <ReadField label="Benefit Policy Amount" value={policyData.totalCapAmount ? `RM ${policyData.totalCapAmount.toFixed(2)}` : "Not Set"} />
             {policyData.coversDependents && <ReadField label="Dependents Pool Type" value={policyData.dependentsPoolType === "SharedWithEmployee" ? "Shared with Employee" : policyData.dependentsPoolType} />}
             {policyData.coversDependents && policyData.dependentsPoolType !== "SharedWithEmployee" && (
               <ReadField

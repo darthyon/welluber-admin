@@ -66,9 +66,8 @@ export function usePolicyDraft<T>(orgId: string | undefined, state: T, enabled =
       return;
     }
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    setStatus("saving");
-
     timeoutRef.current = setTimeout(() => {
+      setStatus("saving");
       const payload: DraftEnvelope<T> = {
         savedAt: new Date().toISOString(),
         data: state,

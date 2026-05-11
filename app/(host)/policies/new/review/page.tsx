@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CaretLeft, NavigationArrow, Check, Users, CaretDown, PencilSimpleLine } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
@@ -96,6 +96,7 @@ function NewPolicyReviewPageContent() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [createdPolicyName, setCreatedPolicyName] = useState("");
   const [createdPolicyId, setCreatedPolicyId] = useState<string | null>(null);
+  const policyIdRef = useRef(0);
   const [orgContext] = useState<string | null>(() => {
     if (typeof window === "undefined") return null;
     return sessionStorage.getItem("policy-org-context");
@@ -180,7 +181,7 @@ function NewPolicyReviewPageContent() {
     }
 
     setCreatedPolicyName(draft.policy.name || "Benefit Policy");
-    setCreatedPolicyId(Math.random().toString(36).slice(2, 11));
+    setCreatedPolicyId(`pol-${++policyIdRef.current}`);
     if (typeof window !== "undefined") {
       sessionStorage.removeItem("policy-draft");
       sessionStorage.removeItem("policy-org-context");

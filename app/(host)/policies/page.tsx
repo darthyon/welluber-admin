@@ -213,8 +213,8 @@ function PoliciesContent() {
 
   // ── Actions ───────────────────────────────────────────────────────────────
 
-  const handleCreateNew = () => router.push("/policies/new");
-  const handleCreateFromTemplate = (templateId: string) => router.push(`/policies/new?template=${templateId}`);
+  const handleCreateNew = (orgId?: string) => router.push(orgId ? `/policies/new?orgId=${orgId}` : "/policies/new");
+  const handleCreateFromTemplate = (templateId: string, orgId?: string) => router.push(orgId ? `/policies/new?template=${templateId}&orgId=${orgId}` : `/policies/new?template=${templateId}`);
 
   const handleClone = (policy: PolicyListItem) => {
     setCloneTarget(policy);
@@ -550,7 +550,7 @@ function PoliciesContent() {
           action={
             <Button
               variant="default"
-              onClick={handleCreateNew}
+               onClick={() => handleCreateNew()}
               className="mt-8 px-6 h-10 font-medium shadow-sm"
             >
                Add Benefit Policy

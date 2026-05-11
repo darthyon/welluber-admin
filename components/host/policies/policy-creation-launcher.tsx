@@ -1,27 +1,37 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Sparkle, Plus } from "@phosphor-icons/react";
+import { Sparkle, Plus, Buildings } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { usePolicyTemplates } from "@/hooks/use-policy-templates";
+import { MOCK_ORGS } from "@/lib/mock-data";
 
 interface PolicyCreationLauncherProps {
-  onManual: () => void;
-  onTemplate: (templateId: string) => void;
+  onManual: (orgId?: string) => void;
+  onTemplate: (templateId: string, orgId?: string) => void;
 }
 
 export function PolicyCreationLauncher({ onManual, onTemplate }: PolicyCreationLauncherProps) {
   const [open, setOpen] = useState(false);
   const [selectedMode, setSelectedMode] = useState<"scratch" | "template" | null>(null);
   const [selectedTemplateId, setSelectedTemplateId] = useState("");
+  const [selectedOrgId, setSelectedOrgId] = useState("");
   const { templates, isLoading } = usePolicyTemplates();
 
   const hasTemplates = useMemo(() => templates.length > 0, [templates]);
+
+  // Orgs that have at least one employee
+  const orgOptions = useMemo(() => {
+    return MOCK_ORGS.map((o) => ({ value: o.id, label: o.name }));
+  }, []);
+
+  const canContinue = selectedOrgId !== "" && (selectedMode === "scratch" || (selectedMode === "template" && selectedTemplateId !== ""));
 
   const closeAll = () => {
     setOpen(false);
     setSelectedMode(null);
     setSelectedTemplateId("");
+    setSelectedOrgId("");
   };
 
   return (
@@ -39,79 +49,106 @@ export function PolicyCreationLauncher({ onManual, onTemplate }: PolicyCreationL
               <p className="text-body text-subtle mt-1">Choose how you want to start creating this policy.</p>
             </div>
 
-            <div className="grid grid-cols-1 gap-3 px-8 pb-2 sm:grid-cols-3">
-              <button
-                type="button"
-                onClick={() => setSelectedMode("scratch")}
-                className="text-left p-4 rounded-lg border border-border hover:border-primary/30 hover:bg-muted/30 transition-all"
-              >
-                <p className="text-body font-semibold text-foreground">From Scratch</p>
-                <p className="text-label text-muted-foreground mt-0.5">Start from a blank policy and configure each section.</p>
-              </button>
+            <div className="px-8 pb-2 space-y-4">
+              {/* Organisation — required first step */}
+              <div className="space-y-1.5">
+                <label className="text-label font-medium text-subtle flex items-center gap-1.5">
+                  <Buildings size={14} />
+                  Organisation
+                  <span className="text-destructive">*</span>
+                </label>
+                <select
+                  value={selectedOrgId}
+                  onChange={(e) => setSelectedOrgId(e.target.value)}
+                  className="w-full px-4 pr-10 py-2.5 bg-background border border-border rounded-lg text-body font-semibold text-foreground outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/40 transition-all"
+                >
+                  <option value="">Select organisation...</option>
+                  {orgOptions.map((org) => (
+                    <option key={org.value} value={org.value}>
+                      {org.label}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-micro text-faint">Tiers and departments will load automatically once an organisation is selected.</p>
+              </div>
 
-              <button
-                type="button"
-                onClick={() => setSelectedMode("template")}
-                className="text-left p-4 rounded-lg border border-border hover:border-primary/30 hover:bg-muted/30 transition-all"
-              >
-                <p className="text-body font-semibold text-foreground">From Template</p>
-                <p className="text-label text-muted-foreground mt-0.5">Use a curated starter and adjust details before launch.</p>
-              </button>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <button
+                  type="button"
+                  onClick={() => setSelectedMode("scratch")}
+                  disabled={!selectedOrgId}
+                  className="text-left p-4 rounded-lg border border-border hover:border-primary/30 hover:bg-muted/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                >
+                  <p className="text-body font-semibold text-foreground">From Scratch</p>
+                  <p className="text-label text-muted-foreground mt-0.5">Start from a blank policy and configure each section.</p>
+                </button>
 
-              <button
-                type="button"
-                disabled
-                className="text-left p-4 rounded-lg border border-border bg-muted/20 text-muted-foreground cursor-not-allowed"
-              >
-                <div className="inline-flex items-center gap-2">
-                  <Sparkle size={14} weight="duotone" />
-                  <p className="text-body font-semibold">AI Assist (Deferred)</p>
-                </div>
-                <p className="text-label mt-0.5">Deferred per rollout plan. Use scratch or template for now.</p>
-              </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedMode("template")}
+                  disabled={!selectedOrgId}
+                  className="text-left p-4 rounded-lg border border-border hover:border-primary/30 hover:bg-muted/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                >
+                  <p className="text-body font-semibold text-foreground">From Template</p>
+                  <p className="text-label text-muted-foreground mt-0.5">Use a curated starter and adjust details before launch.</p>
+                </button>
 
-              {selectedMode === "template" && (
-                <div className="sm:col-span-3 rounded-lg border border-border bg-muted/20 p-4">
-                  <p className="text-label font-semibold text-foreground">Choose Template</p>
-                  {isLoading ? (
-                    <p className="mt-2 text-label text-muted-foreground">Loading templates...</p>
-                  ) : !hasTemplates ? (
-                    <p className="mt-2 text-label text-muted-foreground">No templates available yet.</p>
-                  ) : (
-                    <>
-                      <select
-                        value={selectedTemplateId}
-                        onChange={(e) => setSelectedTemplateId(e.target.value)}
-                        className="mt-2 h-10 w-full rounded-lg border border-border bg-background px-3 text-body font-medium text-foreground outline-none focus:ring-1 focus:ring-ring"
-                      >
-                        <option value="">Select a template</option>
-                        {templates.map((template) => {
+                <button
+                  type="button"
+                  disabled
+                  className="text-left p-4 rounded-lg border border-border bg-muted/20 text-muted-foreground cursor-not-allowed"
+                >
+                  <div className="inline-flex items-center gap-2">
+                    <Sparkle size={14} weight="duotone" />
+                    <p className="text-body font-semibold">AI Assist (Deferred)</p>
+                  </div>
+                  <p className="text-label mt-0.5">Deferred per rollout plan. Use scratch or template for now.</p>
+                </button>
 
-                          return (
-                            <option key={template.id} value={template.id}>
-                              {template.name}
-                            </option>
-                          );
-                        })}
-                      </select>
-                      {selectedTemplateId && (
-                        <p className="mt-2 text-label text-muted-foreground">
-                          {templates.find((template) => template.id === selectedTemplateId)?.tagline}
-                        </p>
-                      )}
-                    </>
-                  )}
-                </div>
-              )}
+                {selectedMode === "template" && (
+                  <div className="sm:col-span-3 rounded-lg border border-border bg-muted/20 p-4">
+                    <p className="text-label font-semibold text-foreground">Choose Template</p>
+                    {isLoading ? (
+                      <p className="mt-2 text-label text-muted-foreground">Loading templates...</p>
+                    ) : !hasTemplates ? (
+                      <p className="mt-2 text-label text-muted-foreground">No templates available yet.</p>
+                    ) : (
+                      <>
+                        <select
+                          value={selectedTemplateId}
+                          onChange={(e) => setSelectedTemplateId(e.target.value)}
+                          className="mt-2 h-10 w-full rounded-lg border border-border bg-background px-3 text-body font-medium text-foreground outline-none focus:ring-1 focus:ring-ring"
+                        >
+                          <option value="">Select a template</option>
+                          {templates.map((template) => {
+
+                            return (
+                              <option key={template.id} value={template.id}>
+                                {template.name}
+                              </option>
+                            );
+                          })}
+                        </select>
+                        {selectedTemplateId && (
+                          <p className="mt-2 text-label text-muted-foreground">
+                            {templates.find((template) => template.id === selectedTemplateId)?.tagline}
+                          </p>
+                        )}
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="mt-6 flex items-center justify-between border-t border-border bg-muted/30 p-8 pt-4">
               {selectedMode === "scratch" ? (
                 <Button
                   className="h-11 rounded-4xl px-5 text-body font-medium"
+                  disabled={!canContinue}
                   onClick={() => {
                     closeAll();
-                    onManual();
+                    onManual(selectedOrgId);
                   }}
                 >
                   Continue From Scratch
@@ -119,11 +156,11 @@ export function PolicyCreationLauncher({ onManual, onTemplate }: PolicyCreationL
               ) : selectedMode === "template" ? (
                 <Button
                   className="h-11 rounded-4xl px-5 text-body font-medium"
-                  disabled={!selectedTemplateId}
+                  disabled={!canContinue}
                   onClick={() => {
                     if (!selectedTemplateId) return;
                     closeAll();
-                    onTemplate(selectedTemplateId);
+                    onTemplate(selectedTemplateId, selectedOrgId);
                   }}
                 >
                   Continue With Template
