@@ -8,14 +8,14 @@ import { cn } from "@/lib/utils"
 import { Toaster } from "sonner"
 
 const geist = localFont({
-  src: "../docs/Geist-VariableFont_wght.ttf",
+  src: "../public/fonts/Geist-VariableFont_wght.ttf",
   variable: "--font-geist",
   weight: "100 900",
   display: "swap",
 })
 
 const geistMono = localFont({
-  src: "../docs/GeistMono-VariableFont_wght.ttf",
+  src: "../public/fonts/GeistMono-VariableFont_wght.ttf",
   variable: "--font-mono",
   weight: "100 900",
   display: "swap",
