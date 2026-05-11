@@ -52,7 +52,7 @@ export function EmployeeDirectoryTable({
             accessorKey: "organization",
             sortable: true,
             render: (emp) => (
-              <span className="rounded-md border border-border bg-muted/80 px-2 py-0.5 text-label font-semibold text-muted-foreground">
+              <span className="inline-block whitespace-nowrap rounded-md border border-border bg-muted/80 px-2 py-0.5 text-label font-semibold text-muted-foreground">
                 {emp.organization}
               </span>
             ),
@@ -72,7 +72,7 @@ export function EmployeeDirectoryTable({
             accessorKey: "branch",
             sortable: true,
             render: (emp) => (
-              <span className="rounded-md border border-border bg-muted/80 px-2 py-0.5 text-label font-semibold text-muted-foreground">
+              <span className="inline-block whitespace-nowrap rounded-md border border-border bg-muted/80 px-2 py-0.5 text-label font-semibold text-muted-foreground">
                 {emp.branch}
               </span>
             ),
@@ -92,7 +92,7 @@ export function EmployeeDirectoryTable({
             accessorKey: "tier",
             sortable: true,
             render: (emp) => (
-              <span className="whitespace-nowrap text-label font-semibold text-primary bg-primary/5 px-1.5 py-0.5 rounded border border-primary/10">
+              <span className="inline-block whitespace-nowrap text-label font-semibold text-primary bg-primary/5 px-1.5 py-0.5 rounded border border-primary/10">
                 {emp.tier || "—"}
               </span>
             ),
