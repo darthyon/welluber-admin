@@ -3,9 +3,20 @@ import type { Employee, EmploymentType } from "@/features/organizations/types"
 const NAMES = [
   "Ahmad Faizal", "Sarah Lim", "Michael Tan", "Nurul Huda",
   "Kevin Tan", "Priya Raj", "Robert Fox", "Jenny Wilson",
-  "David Lee", "Aisha Karim",
+  "David Lee", "Aisha Karim", "Chen Wei", "Amir Hassan",
+  "Lisa Wong", "Rajesh Kumar", "Emily Chen", "Faisal Ibrahim",
+  "Siti Aminah", "Jason Ong", "Mei Ling", "Ravi Shankar",
+  "Hannah Park", "Imran Shah", "Yasmin Abdullah", "Daniel Lim",
+  "Natasha Singh", "Omar Hassan", "Chloe Tan", "Vikram Patel",
+  "Sofia Reyes", "Arif Rahman", "Zara Malik", "Benjamin Cho",
+  "Farah Nazri", "Kumar Selvaraj", "Isabella Goh", "Hafizuddin",
+  "Lina Kow", "Ramesh Nair", "Nadia Aziz", "Tariq Jamil",
+  "Grace Ho", "Syed Abbas", "Maya Krishnan", "Fong Wai",
+  "Diana Lee", "Anwar Mokhtar", "Jasmine Teoh", "Sanjay Menon",
+  "Alyssa Tan", "Irfan Yusof",
 ]
-// Department + tier configs mirror MOCK_ORGS — keep ids in sync with org factory.
+
+// Department + tier configs mirror all MOCK_ORGS
 const DEPARTMENTS_BY_ORG: Record<string, { id: string; name: string }[]> = {
   "ORG-20260115-0001": [
     { id: "DC-001", name: "HR" },
@@ -19,7 +30,51 @@ const DEPARTMENTS_BY_ORG: Record<string, { id: string; name: string }[]> = {
     { id: "DC-102", name: "Tech" },
     { id: "DC-103", name: "Marketing" },
   ],
+  "ORG-20260310-0003": [
+    { id: "DC-201", name: "Product" },
+    { id: "DC-202", name: "Engineering" },
+    { id: "DC-203", name: "Sales" },
+    { id: "DC-204", name: "Legal" },
+  ],
+  "ORG-20260401-0004": [
+    { id: "DC-301", name: "Clinical" },
+    { id: "DC-302", name: "Admin" },
+    { id: "DC-303", name: "Pharmacy" },
+    { id: "DC-304", name: "Nursing" },
+  ],
+  "ORG-20260401-0005": [
+    { id: "DC-401", name: "Merchandising" },
+    { id: "DC-402", name: "Store Ops" },
+    { id: "DC-403", name: "E-commerce" },
+    { id: "DC-404", name: "Warehouse" },
+  ],
+  "ORG-20260401-0006": [
+    { id: "DC-501", name: "Project Management" },
+    { id: "DC-502", name: "Site Engineering" },
+    { id: "DC-503", name: "QS" },
+  ],
+  "ORG-20260401-0007": [
+    { id: "DC-601", name: "Academics" },
+    { id: "DC-602", name: "Student Affairs" },
+    { id: "DC-603", name: "Admin" },
+  ],
+  "ORG-20260401-0008": [
+    { id: "DC-701", name: "R&D" },
+    { id: "DC-702", name: "Manufacturing" },
+    { id: "DC-703", name: "QA" },
+  ],
+  "ORG-20260401-0009": [
+    { id: "DC-801", name: "Front Office" },
+    { id: "DC-802", name: "Housekeeping" },
+    { id: "DC-803", name: "F&B" },
+  ],
+  "ORG-20260401-0010": [
+    { id: "DC-901", name: "Creative" },
+    { id: "DC-902", name: "Media" },
+    { id: "DC-903", name: "Strategy" },
+  ],
 }
+
 const TIERS_BY_ORG: Record<string, { id: string; name: string }[]> = {
   "ORG-20260115-0001": [
     { id: "TC-001", name: "Executive" },
@@ -31,16 +86,66 @@ const TIERS_BY_ORG: Record<string, { id: string; name: string }[]> = {
     { id: "TC-005", name: "Director" },
     { id: "TC-006", name: "Associate" },
   ],
+  "ORG-20260310-0003": [
+    { id: "TC-007", name: "VP" },
+    { id: "TC-008", name: "Senior" },
+    { id: "TC-009", name: "Analyst" },
+  ],
+  "ORG-20260401-0004": [
+    { id: "TC-010", name: "Consultant" },
+    { id: "TC-011", name: "Specialist" },
+    { id: "TC-012", name: "Resident" },
+  ],
+  "ORG-20260401-0005": [
+    { id: "TC-013", name: "Lead" },
+    { id: "TC-014", name: "Buyer" },
+    { id: "TC-015", name: "Coordinator" },
+  ],
+  "ORG-20260401-0006": [
+    { id: "TC-016", name: "Project Director" },
+    { id: "TC-017", name: "Engineer" },
+    { id: "TC-018", name: "Site Supervisor" },
+  ],
+  "ORG-20260401-0007": [
+    { id: "TC-019", name: "Principal" },
+    { id: "TC-020", name: "Senior Tutor" },
+    { id: "TC-021", name: "Tutor" },
+  ],
+  "ORG-20260401-0008": [
+    { id: "TC-022", name: "Head Scientist" },
+    { id: "TC-023", name: "Technician" },
+    { id: "TC-024", name: "Operator" },
+  ],
+  "ORG-20260401-0009": [
+    { id: "TC-025", name: "GM" },
+    { id: "TC-026", name: "Supervisor" },
+    { id: "TC-027", name: "Associate" },
+  ],
+  "ORG-20260401-0010": [
+    { id: "TC-028", name: "Creative Lead" },
+    { id: "TC-029", name: "Strategist" },
+    { id: "TC-030", name: "Executive" },
+  ],
 }
+
 const ORG_IDS = [
   "ORG-20260115-0001", "ORG-20260301-0002", "ORG-20260310-0003",
-  "ORG-20260401-0004", "ORG-20260401-0005",
+  "ORG-20260401-0004", "ORG-20260401-0005", "ORG-20260401-0006",
+  "ORG-20260401-0007", "ORG-20260401-0008", "ORG-20260401-0009",
+  "ORG-20260401-0010",
 ]
+
 const BRANCH_IDS = [
   "BR-20260115-0001", "BR-20260301-0001", "BR-20260310-0001",
-  "BR-20260401-0004", "BR-20260401-0005",
+  "BR-20260401-0004", "BR-20260401-0005", "BR-20260401-0006",
+  "BR-20260401-0007", "BR-20260401-0008", "BR-20260401-0009",
+  "BR-20260401-0010",
 ]
-const EMP_TYPES: EmploymentType[] = ["full_time", "full_time", "full_time", "part_time", "contract", "internship", "full_time", "full_time", "contract", "full_time"]
+
+const EMP_TYPES: EmploymentType[] = [
+  "full_time", "full_time", "full_time", "part_time", "contract",
+  "internship", "full_time", "full_time", "contract", "full_time",
+]
 
 export function createEmployee(index: number): Employee {
   const n = index + 1

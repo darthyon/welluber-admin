@@ -20,7 +20,7 @@ function seedAll() {
   const brands = Array.from({ length: 10 }, (_, i) => createBrand(i))
   const organizations = Array.from({ length: 10 }, (_, i) => createOrganization(i))
   const serviceProviders = Array.from({ length: 10 }, (_, i) => createServiceProvider(i))
-  const employees = Array.from({ length: 10 }, (_, i) => createEmployee(i))
+  const employees = Array.from({ length: 50 }, (_, i) => createEmployee(i))
   const members = Array.from({ length: 10 }, (_, i) => createMember(i))
   const admins = Array.from({ length: 10 }, (_, i) => createAdmin(i))
   const policyBundles = Array.from({ length: 10 }, (_, i) => createPolicy(i))

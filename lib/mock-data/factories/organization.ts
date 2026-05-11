@@ -126,6 +126,8 @@ export function createOrganization(index: number): Organization {
   const g = index - 3
   const d = GENERATED_ORGS[g]!
   const n = index + 1
+  const deptCodes = ["A", "B", "C", "D"]
+  const tierCodes = ["L1", "L2", "L3"]
   return {
     id: `ORG-20260401-00${String(n).padStart(2, "0")}`,
     name: d.name,
@@ -151,6 +153,16 @@ export function createOrganization(index: number): Organization {
     branches: [`BR-20260401-00${String(n).padStart(2, "0")}`],
     documents: [],
     employeesWithoutPolicy: g % 3 === 0 ? 8 : 0,
+    tierConfigs: Array.from({ length: 3 }, (_, t) => ({
+      id: `TC-G${g}-${tierCodes[t]}`,
+      name: `${["Senior", "Manager", "Associate"][t]}`,
+      code: tierCodes[t],
+    })),
+    departmentConfigs: Array.from({ length: 3 + (g % 2) }, (_, dIdx) => ({
+      id: `DC-G${g}-${deptCodes[dIdx]}`,
+      name: `${d.industry} ${["Ops", "Support", "Core", "Admin"][dIdx]}`,
+      code: deptCodes[dIdx],
+    })),
     createdAt: "2026-04-01T10:00:00Z",
     updatedAt: "2026-04-01T10:00:00Z",
   }
