@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import { EmployeeFormContent } from "@/components/host/employees/employee-form-content";
 const ANCHOR_ITEMS = [
   { id: "personal-identity", label: "Personal Identity" },
-  { id: "employment-configuration", label: "Employment Configuration" },
+  { id: "employment-details", label: "Employment Details" },
   { id: "benefit-policy-assignment", label: "Benefit Policy Assignment" },
   { id: "dependent-links", label: "Dependent Links" },
 ];

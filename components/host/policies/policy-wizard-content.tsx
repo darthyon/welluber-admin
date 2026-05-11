@@ -22,6 +22,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { ChoiceCard } from "@/components/shared/choice-card";
 import { FieldHelp } from "@/components/shared/field-help";
+import { FormSelect } from "@/components/shared/form-select";
+import { DatePickerField } from "@/components/shared/date-picker-field";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 import {
@@ -791,24 +793,14 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
 
       <div className="space-y-1.5">
         <FieldLabel required>Organisation</FieldLabel>
-        <select
-          aria-invalid={!!validationErrors.organizationId}
-          className={cn(
-            "w-full px-4 pr-10 py-3 bg-background border rounded-lg text-body outline-none transition-all font-semibold text-foreground focus:ring-2 focus:ring-primary/10",
-            validationErrors.organizationId ? "border-destructive focus:border-destructive" : "border-border focus:border-primary/40",
-            lockedOrganizationId ? "opacity-70 cursor-not-allowed" : ""
-          )}
+        <FormSelect
           value={policyData.organizationId || ""}
+          onChange={(v) => setPolicyData({ ...policyData, organizationId: v })}
+          options={MOCK_ORGS.map((org) => ({ label: org.name, value: org.id }))}
+          placeholder="Select organisation..."
           disabled={!!lockedOrganizationId}
-          onChange={(e) => setPolicyData({ ...policyData, organizationId: e.target.value })}
-        >
-          <option value="">Select organisation...</option>
-          {MOCK_ORGS.map((org) => (
-            <option key={org.id} value={org.id}>
-              {org.name}
-            </option>
-          ))}
-        </select>
+          error={!!validationErrors.organizationId}
+        />
         {validationErrors.organizationId && <ErrorText>{validationErrors.organizationId}</ErrorText>}
       </div>
 
@@ -1138,28 +1130,20 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
       {policyData.utilisationMode === "Prorated" && (
         <div className="space-y-1.5 animate-in fade-in slide-in-from-top-1 duration-300">
           <FieldLabel required helpKey="prorateUnit">Prorate Unit</FieldLabel>
-            <select
-              className={cn(
-                "w-full max-w-[240px] px-4 pr-10 py-2.5 bg-background border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all",
-                validationErrors.prorateUnit ? "border-destructive" : "border-border"
-              )}
+          <FormSelect
             value={policyData.prorateUnit || ""}
-            onChange={(e) => {
-              const newUnit = e.target.value as ProrateUnit;
-              // Reset refresh cycle if current selection becomes invalid
+            onChange={(v) => {
+              const newUnit = v as ProrateUnit;
               const newAvailable = newUnit ? getAvailableRefreshCycles("Prorated", newUnit) : REFRESH_CYCLES;
               const currentCycle = policyData.refreshCycle;
               const adjustedCycle = currentCycle && newAvailable.includes(currentCycle) ? currentCycle : newAvailable[0];
               setPolicyData({ ...policyData, prorateUnit: newUnit || undefined, refreshCycle: adjustedCycle });
             }}
-          >
-            <option value="">Select prorate unit...</option>
-            {PRORATE_UNITS.map((u) => (
-              <option key={u} value={u}>
-                {u}
-              </option>
-            ))}
-          </select>
+            options={PRORATE_UNITS.map((u) => ({ label: u, value: u }))}
+            placeholder="Select prorate unit..."
+            error={!!validationErrors.prorateUnit}
+            triggerClassName="max-w-[240px]"
+          />
           {validationErrors.prorateUnit && <ErrorText>{validationErrors.prorateUnit}</ErrorText>}
         </div>
       )}
@@ -1167,20 +1151,12 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div className="space-y-1.5">
           <FieldLabel helpKey="refreshCycle">Refresh Cycle</FieldLabel>
-          <select
-            className={cn(
-              "w-full px-4 pr-10 py-2.5 bg-background border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all",
-              validationErrors.refreshCycle ? "border-destructive" : "border-border"
-            )}
+          <FormSelect
             value={policyData.refreshCycle}
-            onChange={(e) => setPolicyData({ ...policyData, refreshCycle: e.target.value as RefreshCycle })}
-          >
-            {availableCycles.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
+            onChange={(v) => setPolicyData({ ...policyData, refreshCycle: v as RefreshCycle })}
+            options={availableCycles.map((c) => ({ label: c, value: c }))}
+            error={!!validationErrors.refreshCycle}
+          />
           {validationErrors.refreshCycle && <ErrorText>{validationErrors.refreshCycle}</ErrorText>}
         </div>
 
@@ -1188,51 +1164,48 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
           <FieldLabel helpKey="refreshCycle">Refresh Start Reference</FieldLabel>
           <div className="space-y-2">
             {(["fy_start", "join_date", "custom_date"] as const).map((ref) => (
-              <button
-                type="button"
-                key={ref}
-                onClick={() => setPolicyData({ ...policyData, refreshStartReference: ref })}
-                className={cn(
-                  "flex items-center gap-3 px-4 py-2.5 rounded-lg border text-body font-medium transition-all text-left w-full",
-                  policyData.refreshStartReference === ref
-                    ? "border-primary bg-primary/5 text-primary"
-                    : "border-border bg-card text-muted-foreground hover:border-border/80"
-                )}
-              >
-                <div
+              <div key={ref} className="space-y-2">
+                <button
+                  type="button"
+                  onClick={() => setPolicyData({ ...policyData, refreshStartReference: ref })}
                   className={cn(
-                    "w-4 h-4 rounded-full border flex items-center justify-center shrink-0",
-                    policyData.refreshStartReference === ref ? "border-primary" : "border-border"
+                    "flex items-center gap-3 px-4 py-2.5 rounded-lg border text-body font-medium transition-all text-left w-full",
+                    policyData.refreshStartReference === ref
+                      ? "border-primary bg-primary/5 text-primary"
+                      : "border-border bg-card text-muted-foreground hover:border-border/80"
                   )}
                 >
-                  {policyData.refreshStartReference === ref && <div className="w-2 h-2 rounded-full bg-primary" />}
-                </div>
-                <div className="flex flex-col">
-                  <span>{ref === "fy_start" ? "Organisation Financial Year" : ref === "join_date" ? "Employee Joining Date" : "Custom Date"}</span>
-                  <span className="text-label text-faint font-normal">{ref === "fy_start" ? "Follows the organisation's FY settings" : ref === "join_date" ? "Based on the employee's join date" : "Set a fixed start date"}</span>
-                </div>
-              </button>
+                  <div
+                    className={cn(
+                      "w-4 h-4 rounded-full border flex items-center justify-center shrink-0",
+                      policyData.refreshStartReference === ref ? "border-primary" : "border-border"
+                    )}
+                  >
+                    {policyData.refreshStartReference === ref && <div className="w-2 h-2 rounded-full bg-primary" />}
+                  </div>
+                  <div className="flex flex-col">
+                    <span>{ref === "fy_start" ? "Organisation Financial Year" : ref === "join_date" ? "Employee Joining Date" : "Custom Date"}</span>
+                    <span className="text-label text-faint font-normal">{ref === "fy_start" ? "Follows the organisation's FY settings" : ref === "join_date" ? "Based on the employee's join date" : "Set a fixed start date"}</span>
+                  </div>
+                </button>
+                {ref === "custom_date" && policyData.refreshStartReference === "custom_date" && (
+                  <div className="pl-11 space-y-1.5 animate-in fade-in slide-in-from-top-1 duration-300">
+                    <FieldLabel required>Custom Refresh Date</FieldLabel>
+                    <DatePickerField
+                      value={policyData.refreshCustomDate || ""}
+                      onChange={(v) => setPolicyData({ ...policyData, refreshCustomDate: v })}
+                      placeholder="Select refresh date"
+                      clearable={false}
+                      className={validationErrors.refreshCustomDate ? "[&>button]:border-destructive [&>button]:focus:border-destructive" : ""}
+                    />
+                    {validationErrors.refreshCustomDate && <ErrorText>{validationErrors.refreshCustomDate}</ErrorText>}
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         </div>
       </div>
-
-      {policyData.refreshStartReference === "custom_date" && (
-        <div className="space-y-1.5 animate-in fade-in slide-in-from-top-1 duration-300">
-          <FieldLabel required>Custom Refresh Date</FieldLabel>
-                <input
-                  type="date"
-                  className={cn(
-                    "w-full max-w-[240px] px-4 py-2.5 bg-background border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all",
-                    validationErrors.refreshCustomDate ? "border-destructive" : "border-border"
-                  )}
-            value={policyData.refreshCustomDate || ""}
-            onChange={(e) => setPolicyData({ ...policyData, refreshCustomDate: e.target.value })}
-            onBlur={blurRefreshCustomDate}
-          />
-          {validationErrors.refreshCustomDate && <ErrorText>{validationErrors.refreshCustomDate}</ErrorText>}
-        </div>
-      )}
 
       </div>
 
@@ -1252,53 +1225,50 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
           {ACTIVATION_MODES.map((mode) => {
             const Icon = mode.icon;
             return (
-              <button
-                type="button"
-                key={mode.value}
-                onClick={() => setPolicyData({ ...policyData, activationMode: mode.value, activationCustomDate: mode.value !== "custom_date" ? undefined : policyData.activationCustomDate })}
-                className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-lg border text-body font-medium transition-all text-left w-full",
-                  policyData.activationMode === mode.value
-                    ? "border-primary bg-primary/5 text-primary"
-                    : "border-border bg-card text-muted-foreground hover:border-border/80"
-                )}
-              >
-                <div
+              <div key={mode.value} className="space-y-2">
+                <button
+                  type="button"
+                  onClick={() => setPolicyData({ ...policyData, activationMode: mode.value, activationCustomDate: mode.value !== "custom_date" ? undefined : policyData.activationCustomDate })}
                   className={cn(
-                    "w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0",
-                    policyData.activationMode === mode.value ? "border-primary" : "border-border"
+                    "flex items-center gap-3 px-4 py-3 rounded-lg border text-body font-medium transition-all text-left w-full",
+                    policyData.activationMode === mode.value
+                      ? "border-primary bg-primary/5 text-primary"
+                      : "border-border bg-card text-muted-foreground hover:border-border/80"
                   )}
                 >
-                  {policyData.activationMode === mode.value && (
-                    <div className="w-2.5 h-2.5 rounded-full bg-primary" />
-                  )}
-                </div>
-                <Icon size={18} weight={policyData.activationMode === mode.value ? "fill" : "regular"} className="shrink-0" />
-                <div className="flex flex-col">
-                  <span>{mode.label}</span>
-                  <span className="text-label text-faint font-normal">{mode.description}</span>
-                </div>
-              </button>
+                  <div
+                    className={cn(
+                      "w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0",
+                      policyData.activationMode === mode.value ? "border-primary" : "border-border"
+                    )}
+                  >
+                    {policyData.activationMode === mode.value && (
+                      <div className="w-2.5 h-2.5 rounded-full bg-primary" />
+                    )}
+                  </div>
+                  <Icon size={18} weight={policyData.activationMode === mode.value ? "fill" : "regular"} className="shrink-0" />
+                  <div className="flex flex-col">
+                    <span>{mode.label}</span>
+                    <span className="text-label text-faint font-normal">{mode.description}</span>
+                  </div>
+                </button>
+                {mode.value === "custom_date" && policyData.activationMode === "custom_date" && (
+                  <div className="pl-12 space-y-1.5 animate-in fade-in slide-in-from-top-1 duration-300">
+                    <FieldLabel required>Custom Activation Date</FieldLabel>
+                    <DatePickerField
+                      value={policyData.activationCustomDate || ""}
+                      onChange={(v) => setPolicyData({ ...policyData, activationCustomDate: v })}
+                      placeholder="Select activation date"
+                      clearable={false}
+                      className={validationErrors.activationCustomDate ? "[&>button]:border-destructive [&>button]:focus:border-destructive" : ""}
+                    />
+                    {validationErrors.activationCustomDate && <ErrorText>{validationErrors.activationCustomDate}</ErrorText>}
+                  </div>
+                )}
+              </div>
             );
           })}
         </div>
-
-        {policyData.activationMode === "custom_date" && (
-          <div className="space-y-1.5 pt-2 animate-in fade-in slide-in-from-top-1 duration-300">
-            <FieldLabel required>Custom Activation Date</FieldLabel>
-                <input
-                  type="date"
-                  className={cn(
-                    "w-full max-w-[240px] px-4 py-2.5 bg-background border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all",
-                    validationErrors.activationCustomDate ? "border-destructive" : "border-border"
-                  )}
-              value={policyData.activationCustomDate || ""}
-              onChange={(e) => setPolicyData({ ...policyData, activationCustomDate: e.target.value })}
-              onBlur={blurActivationCustomDate}
-            />
-            {validationErrors.activationCustomDate && <ErrorText>{validationErrors.activationCustomDate}</ErrorText>}
-          </div>
-        )}
       </div>
     </div>
     );
@@ -1583,15 +1553,16 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
                                         />
                                       </button>
                                       <div className={cn("flex items-center gap-1.5 transition-opacity", !benefit!.coPayment.required && "opacity-40 pointer-events-none")}>
-                                        <select
+                                        <FormSelect
                                           disabled={!benefit!.coPayment.required}
-                                          className="px-3 py-2 bg-background border border-border rounded-lg text-body outline-none"
                                           value={benefit!.coPayment.type}
-                                          onChange={(e) => updateBenefit(benefit!.id, "coPayment.type", e.target.value)}
-                                        >
-                                          <option value="Percentage">%</option>
-                                          <option value="Fixed">RM</option>
-                                        </select>
+                                          onChange={(v) => updateBenefit(benefit!.id, "coPayment.type", v)}
+                                          options={[
+                                            { label: "%", value: "Percentage" },
+                                            { label: "RM", value: "Fixed" },
+                                          ]}
+                                          triggerClassName="w-20 h-9"
+                                        />
                                         <input
                                           type="number"
                                           disabled={!benefit!.coPayment.required}

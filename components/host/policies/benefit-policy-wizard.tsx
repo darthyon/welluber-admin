@@ -30,6 +30,8 @@ import { Button } from "@/components/ui/button";
 import { ChoiceCard } from "@/components/shared/choice-card";
 import { FieldHelp } from "@/components/shared/field-help";
 import { DetailSection } from "@/components/shared/detail-section";
+import { FormSelect } from "@/components/shared/form-select";
+import { DatePickerField } from "@/components/shared/date-picker-field";
 import { SuccessCelebration } from "@/components/shared/success-celebration";
 import { PolicyLaunchConfirmModal } from "@/components/host/policies/policy-launch-confirm-modal";
 import { cn } from "@/lib/utils";
@@ -753,23 +755,19 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                   Prorate Unit <span className="text-rose-600 dark:text-rose-400">*</span>
                   <FieldHelp termKey="prorateUnit" />
                 </label>
-                <select
-                  className={cn(
-                    "w-full px-4 pr-10 py-2.5 bg-background border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all",
-                    validationErrors.prorateUnit ? "border-rose-300" : "border-border"
-                  )}
+                <FormSelect
                   value={policyData.prorateUnit || ""}
-                  onChange={(e) => {
-                    const newUnit = e.target.value as ProrateUnit;
+                  onChange={(v) => {
+                    const newUnit = v as ProrateUnit;
                     const newAvailable = newUnit ? getAvailableRefreshCycles("Prorated", newUnit) : REFRESH_CYCLES;
                     const currentCycle = policyData.refreshCycle;
                     const adjustedCycle = currentCycle && newAvailable.includes(currentCycle) ? currentCycle : newAvailable[0];
                     setPolicyData({ ...policyData, prorateUnit: newUnit || undefined, refreshCycle: adjustedCycle });
                   }}
-                >
-                  <option value="">Select prorate unit...</option>
-                  {PRORATE_UNITS.map(u => <option key={u} value={u}>{u}</option>)}
-                </select>
+                  options={PRORATE_UNITS.map((u) => ({ label: u, value: u }))}
+                  placeholder="Select prorate unit..."
+                  error={!!validationErrors.prorateUnit}
+                />
                 {validationErrors.prorateUnit && <p className="text-label text-rose-600 dark:text-rose-400 font-medium">{validationErrors.prorateUnit}</p>}
               </div>
             )}
@@ -780,16 +778,12 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="space-y-1.5">
               <label className="text-label font-medium text-subtle inline-flex items-center gap-1.5">Refresh Cycle <FieldHelp termKey="refreshCycle" /></label>
-              <select
-                className={cn(
-                  "w-full px-4 pr-10 py-2.5 bg-background border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all",
-                  validationErrors.refreshCycle ? "border-rose-300" : "border-border"
-                )}
+              <FormSelect
                 value={policyData.refreshCycle}
-                onChange={(e) => setPolicyData({ ...policyData, refreshCycle: e.target.value as RefreshCycle })}
-              >
-                {availableCycles.map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
+                onChange={(v) => setPolicyData({ ...policyData, refreshCycle: v as RefreshCycle })}
+                options={availableCycles.map((c) => ({ label: c, value: c }))}
+                error={!!validationErrors.refreshCycle}
+              />
               {validationErrors.refreshCycle && <p className="text-label text-rose-600 dark:text-rose-400 font-medium">{validationErrors.refreshCycle}</p>}
             </div>
 
@@ -797,43 +791,42 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
               <label className="text-label font-medium text-subtle inline-flex items-center gap-1.5">Refresh Start Reference <FieldHelp termKey="refreshCycle" /></label>
               <div className="grid grid-cols-1 gap-2">
                 {(["fy_start", "join_date", "custom_date"] as const).map((ref) => (
-                  <button
-                    key={ref}
-                    onClick={() => setPolicyData({ ...policyData, refreshStartReference: ref })}
-                    className={cn(
-                      "flex items-center gap-3 px-4 py-2.5 rounded-lg border text-body font-medium transition-all text-left",
-                      policyData.refreshStartReference === ref ? "border-primary bg-primary/5 text-primary" : "border-border bg-card text-muted-foreground hover:border-border/80"
+                  <div key={ref} className="space-y-2">
+                    <button
+                      type="button"
+                      onClick={() => setPolicyData({ ...policyData, refreshStartReference: ref })}
+                      className={cn(
+                        "flex items-center gap-3 px-4 py-2.5 rounded-lg border text-body font-medium transition-all text-left w-full",
+                        policyData.refreshStartReference === ref ? "border-primary bg-primary/5 text-primary" : "border-border bg-card text-muted-foreground hover:border-border/80"
+                      )}
+                    >
+                      <div className={cn("w-4 h-4 rounded-full border flex items-center justify-center shrink-0", policyData.refreshStartReference === ref ? "border-primary" : "border-border")}>
+                        {policyData.refreshStartReference === ref && <div className="w-2 h-2 rounded-full bg-primary" />}
+                      </div>
+                      <div className="flex flex-col">
+                        <span>{ref === "fy_start" ? "Organisation Financial Year" : ref === "join_date" ? "Employee Joining Date" : "Custom Date"}</span>
+                        <span className="text-label text-faint font-normal">{ref === "fy_start" ? "Follows the organisation's FY settings" : ref === "join_date" ? "Based on the employee's join date" : "Set a fixed start date"}</span>
+                      </div>
+                    </button>
+                    {ref === "custom_date" && policyData.refreshStartReference === "custom_date" && (
+                      <div className="pl-11 space-y-1.5 animate-in fade-in slide-in-from-top-1 duration-300">
+                        <label className="text-label font-medium text-subtle">
+                          Custom Refresh Date <span className="text-rose-600 dark:text-rose-400">*</span>
+                        </label>
+                        <DatePickerField
+                          value={policyData.refreshCustomDate || ""}
+                          onChange={(v) => setPolicyData({ ...policyData, refreshCustomDate: v })}
+                          placeholder="Select refresh date"
+                          clearable={false}
+                          className={validationErrors.refreshCustomDate ? "[&>button]:border-rose-300 [&>button]:focus:border-rose-300" : ""}
+                        />
+                        {validationErrors.refreshCustomDate && <p className="text-label text-rose-600 dark:text-rose-400 font-medium">{validationErrors.refreshCustomDate}</p>}
+                      </div>
                     )}
-                  >
-                    <div className={cn("w-4 h-4 rounded-full border flex items-center justify-center shrink-0", policyData.refreshStartReference === ref ? "border-primary" : "border-border")}>
-                      {policyData.refreshStartReference === ref && <div className="w-2 h-2 rounded-full bg-primary" />}
-                    </div>
-                    <div className="flex flex-col">
-                      <span>{ref === "fy_start" ? "Organisation Financial Year" : ref === "join_date" ? "Employee Joining Date" : "Custom Date"}</span>
-                      <span className="text-label text-faint font-normal">{ref === "fy_start" ? "Follows the organisation's FY settings" : ref === "join_date" ? "Based on the employee's join date" : "Set a fixed start date"}</span>
-                    </div>
-                  </button>
+                  </div>
                 ))}
               </div>
             </div>
-
-            {policyData.refreshStartReference === "custom_date" && (
-              <div className="md:col-span-2 space-y-1.5">
-                <label className="text-label font-medium text-subtle">
-                  Custom Refresh Date <span className="text-rose-600 dark:text-rose-400">*</span>
-                </label>
-                <input
-                  type="date"
-                  className={cn(
-                    "w-full px-4 py-2.5 bg-background border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all",
-                    validationErrors.refreshCustomDate ? "border-rose-300" : "border-border"
-                  )}
-                  value={policyData.refreshCustomDate || ""}
-                  onChange={(e) => setPolicyData({ ...policyData, refreshCustomDate: e.target.value })}
-                />
-                {validationErrors.refreshCustomDate && <p className="text-label text-rose-600 dark:text-rose-400 font-medium">{validationErrors.refreshCustomDate}</p>}
-              </div>
-            )}
 
             {/* ── Activation ── */}
             <div className="mt-8 pt-6 border-t border-border space-y-4">
@@ -851,45 +844,43 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                 {ACTIVATION_MODES.map((mode) => {
                   const Icon = mode.icon;
                   return (
-                    <button
-                      type="button"
-                      key={mode.value}
-                      onClick={() => setPolicyData({ ...policyData, activationMode: mode.value, activationCustomDate: mode.value !== "custom_date" ? undefined : policyData.activationCustomDate })}
-                      className={cn(
-                        "flex items-center gap-3 px-4 py-3 rounded-lg border text-body font-medium transition-all text-left w-full",
-                        policyData.activationMode === mode.value ? "border-primary bg-primary/5 text-primary" : "border-border bg-card text-muted-foreground hover:border-border/80"
+                    <div key={mode.value} className="space-y-2">
+                      <button
+                        type="button"
+                        onClick={() => setPolicyData({ ...policyData, activationMode: mode.value, activationCustomDate: mode.value !== "custom_date" ? undefined : policyData.activationCustomDate })}
+                        className={cn(
+                          "flex items-center gap-3 px-4 py-3 rounded-lg border text-body font-medium transition-all text-left w-full",
+                          policyData.activationMode === mode.value ? "border-primary bg-primary/5 text-primary" : "border-border bg-card text-muted-foreground hover:border-border/80"
+                        )}
+                      >
+                        <div className={cn("w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0", policyData.activationMode === mode.value ? "border-primary" : "border-border")}>
+                          {policyData.activationMode === mode.value && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
+                        </div>
+                        <Icon size={18} weight={policyData.activationMode === mode.value ? "fill" : "regular"} className="shrink-0" />
+                        <div className="flex flex-col">
+                          <span>{mode.label}</span>
+                          <span className="text-label text-faint font-normal">{mode.description}</span>
+                        </div>
+                      </button>
+                      {mode.value === "custom_date" && policyData.activationMode === "custom_date" && (
+                        <div className="pl-12 space-y-1.5 animate-in fade-in slide-in-from-top-1 duration-300">
+                          <label className="text-label font-medium text-subtle">
+                            Custom Activation Date <span className="text-rose-600 dark:text-rose-400">*</span>
+                          </label>
+                          <DatePickerField
+                            value={policyData.activationCustomDate || ""}
+                            onChange={(v) => setPolicyData({ ...policyData, activationCustomDate: v })}
+                            placeholder="Select activation date"
+                            clearable={false}
+                            className={validationErrors.activationCustomDate ? "[&>button]:border-rose-300 [&>button]:focus:border-rose-300" : ""}
+                          />
+                          {validationErrors.activationCustomDate && <p className="text-label text-rose-600 dark:text-rose-400 font-medium">{validationErrors.activationCustomDate}</p>}
+                        </div>
                       )}
-                    >
-                      <div className={cn("w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0", policyData.activationMode === mode.value ? "border-primary" : "border-border")}>
-                        {policyData.activationMode === mode.value && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
-                      </div>
-                      <Icon size={18} weight={policyData.activationMode === mode.value ? "fill" : "regular"} className="shrink-0" />
-                      <div className="flex flex-col">
-                        <span>{mode.label}</span>
-                        <span className="text-label text-faint font-normal">{mode.description}</span>
-                      </div>
-                    </button>
+                    </div>
                   );
                 })}
               </div>
-
-              {policyData.activationMode === "custom_date" && (
-                <div className="space-y-1.5 pt-2">
-                  <label className="text-label font-medium text-subtle">
-                    Custom Activation Date <span className="text-rose-600 dark:text-rose-400">*</span>
-                  </label>
-                  <input
-                    type="date"
-                    className={cn(
-                      "w-full px-4 py-2.5 bg-background border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all",
-                      validationErrors.activationCustomDate ? "border-rose-300" : "border-border"
-                    )}
-                    value={policyData.activationCustomDate || ""}
-                    onChange={(e) => setPolicyData({ ...policyData, activationCustomDate: e.target.value })}
-                  />
-                  {validationErrors.activationCustomDate && <p className="text-label text-rose-600 dark:text-rose-400 font-medium">{validationErrors.activationCustomDate}</p>}
-                </div>
-              )}
             </div>
           </div>
         </DetailSection>
@@ -1148,14 +1139,15 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                                               </span>
                                             ) : (
                                               <div className="flex items-center gap-1.5">
-                                                <select
-                                                  className="px-1.5 py-1.5 bg-background border border-border rounded text-label outline-none"
+                                                <FormSelect
                                                   value={benefit!.coPayment.type}
-                                                  onChange={(e) => updateBenefit(benefit!.id, "coPayment.type", e.target.value)}
-                                                >
-                                                  <option value="Percentage">%</option>
-                                                  <option value="Fixed">RM</option>
-                                                </select>
+                                                  onChange={(v) => updateBenefit(benefit!.id, "coPayment.type", v)}
+                                                  options={[
+                                                    { label: "%", value: "Percentage" },
+                                                    { label: "RM", value: "Fixed" },
+                                                  ]}
+                                                  triggerClassName="w-20 h-9"
+                                                />
                                                 <input
                                                   type="number"
                                                   className={cn(
@@ -1233,23 +1225,19 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
         >
           <div className="space-y-5">
             {/* Global mode org picker */}
-            {!orgId && (
-              <div className="space-y-1.5">
-                <label className="text-label font-medium text-subtle">Organisation (optional)</label>
-                <select
-                  className="w-full md:w-80 px-4 pr-10 py-2.5 bg-background border border-border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10"
-                  value={assignmentOrgId}
-                  onChange={(e) => {
-                    setAssignmentOrgId(e.target.value);
-                    setAssignedEmployeeIds([]);
-                  }}
-                >
-                  <option value="">Select organisation…</option>
-                  {MOCK_ORG_OPTIONS.map((o) => (
-                    <option key={o.id} value={o.id}>{o.name}</option>
-                  ))}
-                </select>
-                <p className="text-micro text-faint">Select an organisation to preview and assign eligible employees.</p>
+              {!orgId && (
+                <div className="space-y-1.5">
+                  <label className="text-label font-medium text-subtle">Organisation (optional)</label>
+                  <FormSelect
+                    value={assignmentOrgId}
+                    onChange={(v) => {
+                      setAssignmentOrgId(v);
+                      setAssignedEmployeeIds([]);
+                    }}
+                    options={[{ label: "Select organisation…", value: "" }, ...MOCK_ORG_OPTIONS.map((o) => ({ label: o.name, value: o.id }))]}
+                    triggerClassName="md:w-80"
+                  />
+                  <p className="text-micro text-faint">Select an organisation to preview and assign eligible employees.</p>
               </div>
             )}
 

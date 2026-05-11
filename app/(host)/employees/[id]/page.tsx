@@ -52,7 +52,7 @@ const mockEmployee = {
 
 const ANCHOR_ITEMS = [
   { id: "personal-identity", label: "Personal Identity" },
-  { id: "employment-configuration", label: "Employment Configuration" },
+  { id: "employment-details", label: "Employment Details" },
   { id: "benefit-policy-assignment", label: "Benefit Policy Assignment" },
   { id: "dependent-links", label: "Dependent Links" },
   { id: "entitlements", label: "Entitlements" },
@@ -150,10 +150,10 @@ export default function EmployeePage() {
               </DetailSection>
             </section>
 
-            {/* Employment Configuration */}
-            <section id="employment-configuration" className="scroll-mt-24">
+            {/* Employment Details */}
+            <section id="employment-details" className="scroll-mt-24">
               <DetailSection
-                title="Employment Configuration"
+                title="Employment Details"
                 icon={<Briefcase size={18} weight="bold" className="text-primary" />}
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-y-8 gap-x-12">

@@ -21,6 +21,7 @@ import { ChoiceCard } from "@/components/shared/choice-card";
 import { DatePickerField } from "@/components/shared/date-picker-field";
 import { PhoneInput } from "@/components/shared/phone-input";
 import { IdentificationInput } from "@/components/shared/identification-input";
+import { FormSelect } from "@/components/shared/form-select";
 import { cn } from "@/lib/utils";
 import { MOCK_FORM_POLICIES } from "@/lib/mock-data";
 
@@ -181,34 +182,35 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
               <label className="text-label font-medium text-subtle">
                 Gender <span className="text-destructive">*</span>
               </label>
-              <select
-                className="w-full px-3 py-2 bg-background border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all"
+              <FormSelect
                 value={formData.gender}
-                onChange={(e) => setFormData({ ...formData, gender: e.target.value as "male" | "female" | "other" })}
-              >
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-              </select>
+                onChange={(v) => setFormData({ ...formData, gender: v as "male" | "female" | "other" })}
+                options={[
+                  { label: "Male", value: "male" },
+                  { label: "Female", value: "female" },
+                  { label: "Other", value: "other" },
+                ]}
+              />
             </div>
 
             <div className="space-y-1.5 col-span-2">
               <label className="text-label font-medium text-subtle">Residency & Taxable Status</label>
               <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center gap-3 p-3 rounded-lg border border-border bg-muted/20">
-                  <Globe size={18} className="text-faint" />
-                  <div className="flex-1">
-                    <p className="text-body font-medium text-foreground">Residency</p>
+                  <div className="flex items-center gap-3 p-3 rounded-lg border border-border bg-muted/20">
+                    <Globe size={18} className="text-faint" />
+                    <div className="flex-1">
+                      <p className="text-body font-medium text-foreground">Residency</p>
+                    </div>
+                    <FormSelect
+                      value={formData.residencyStatus}
+                      onChange={(v) => setFormData({ ...formData, residencyStatus: v as "local" | "foreigner" })}
+                      options={[
+                        { label: "Local", value: "local" },
+                        { label: "Foreigner", value: "foreigner" },
+                      ]}
+                      triggerClassName="w-32 h-8 text-label"
+                    />
                   </div>
-                  <select
-                    className="bg-background px-2 py-1 rounded text-label font-medium outline-none border border-border"
-                    value={formData.residencyStatus}
-                    onChange={(e) => setFormData({ ...formData, residencyStatus: e.target.value as "local" | "foreigner" })}
-                  >
-                    <option value="local">Local</option>
-                    <option value="foreigner">Foreigner</option>
-                  </select>
-                </div>
 
                 <div className="flex items-center gap-3 p-3 rounded-lg border border-border bg-muted/20">
                   <CreditCard size={18} className="text-faint" />
@@ -259,14 +261,14 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
         </div>
       </div>
 
-      {/* Section: Employment Configuration */}
-      <div id="employment-configuration" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
+      {/* Section: Employment Details */}
+      <div id="employment-details" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
         <div className="p-6 space-y-6">
           <div className="flex items-center gap-2 pb-2">
             <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
               <Briefcase size={16} weight="fill" />
             </div>
-            <h3 className="text-lead font-semibold text-foreground">Employment Configuration</h3>
+            <h3 className="text-lead font-semibold text-foreground">Employment Details</h3>
           </div>
 
           <div className="space-y-6">
@@ -324,29 +326,30 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
 
               <div className="space-y-1.5">
                 <label className="text-label font-medium text-subtle">Position Level (Tier)</label>
-                <select
-                  className="w-full px-3 py-2 bg-background border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all"
+                <FormSelect
                   value={formData.tier}
-                  onChange={(e) => setFormData({ ...formData, tier: e.target.value })}
-                >
-                  <option value="">Select Tier</option>
-                  <option value="T1">Tier 1 - Director / C-Level</option>
-                  <option value="T2">Tier 2 - Management</option>
-                  <option value="T3">Tier 3 - Executive</option>
-                  <option value="T4">Tier 4 - Support / Staff</option>
-                </select>
+                  onChange={(v) => setFormData({ ...formData, tier: v })}
+                  options={[
+                    { label: "Select Tier", value: "" },
+                    { label: "Tier 1 - Director / C-Level", value: "T1" },
+                    { label: "Tier 2 - Management", value: "T2" },
+                    { label: "Tier 3 - Executive", value: "T3" },
+                    { label: "Tier 4 - Support / Staff", value: "T4" },
+                  ]}
+                  placeholder="Select Tier"
+                />
               </div>
 
               <div className="space-y-1.5">
                 <label className="text-label font-medium text-subtle">Status</label>
-                <select
-                  className="w-full px-3 py-2 bg-background border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all"
+                <FormSelect
                   value={formData.status}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value as "active" | "inactive" })}
-                >
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                </select>
+                  onChange={(v) => setFormData({ ...formData, status: v as "active" | "inactive" })}
+                  options={[
+                    { label: "Active", value: "active" },
+                    { label: "Inactive", value: "inactive" },
+                  ]}
+                />
               </div>
 
               <div className="space-y-1.5">
@@ -473,38 +476,36 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
                         <span className="text-label font-mono text-muted-foreground">{assigned.version}</span>
                       )}
                     </div>
-                    <select
-                      className="w-full px-3 py-2 bg-background border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 transition-all"
+                    <FormSelect
                       value={assigned.policyId}
-                      onChange={(e) => {
-                        const pol = MOCK_FORM_POLICIES.find((p) => p.id === e.target.value);
+                      onChange={(v) => {
+                        const pol = MOCK_FORM_POLICIES.find((p) => p.id === v);
                         if (pol) {
                           const updated = [...assignedPolicies];
                           updated[idx] = { ...assigned, policyId: pol.id, policyName: pol.name, version: pol.version };
                           setAssignedPolicies(updated);
                         }
                       }}
-                    >
-                      {MOCK_FORM_POLICIES.map((p) => (
-                        <option key={p.id} value={p.id}>{p.name}{p.version ? ` · ${p.version}` : ""}</option>
-                      ))}
-                    </select>
+                      options={MOCK_FORM_POLICIES.map((p) => ({
+                        label: `${p.name}${p.version ? ` · ${p.version}` : ""}`,
+                        value: p.id,
+                      }))}
+                    />
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-label font-medium text-subtle">Select benefit group</label>
-                    <select
-                      className="w-full px-3 py-2 bg-background border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 transition-all"
+                    <FormSelect
                       value={assigned.benefitGroupId}
-                      onChange={(e) => {
+                      onChange={(v) => {
                         const updated = [...assignedPolicies];
-                        updated[idx].benefitGroupId = e.target.value;
+                        updated[idx].benefitGroupId = v;
                         setAssignedPolicies(updated);
                       }}
-                    >
-                      {MOCK_FORM_POLICIES.find((p) => p.id === assigned.policyId)?.groups.map((g) => (
-                        <option key={g.id} value={g.id}>{g.name}</option>
-                      ))}
-                    </select>
+                      options={MOCK_FORM_POLICIES.find((p) => p.id === assigned.policyId)?.groups.map((g) => ({
+                        label: g.name,
+                        value: g.id,
+                      })) ?? []}
+                    />
                   </div>
                 </div>
                 <button
@@ -556,15 +557,11 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
                 <div className="grid grid-cols-2 gap-5">
                   <div className="space-y-1.5 col-span-2 sm:col-span-1">
                     <label className="text-label font-medium text-subtle">Relationship</label>
-                    <select
+                    <FormSelect
                       value={dep.relationship}
-                      onChange={(e) => updateDependent(dep.id, "relationship", e.target.value)}
-                      className="w-full px-3 py-2 bg-background border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 transition-all"
-                    >
-                      {RELATIONSHIPS.map((r) => (
-                        <option key={r} value={r}>{r}</option>
-                      ))}
-                    </select>
+                      onChange={(v) => updateDependent(dep.id, "relationship", v)}
+                      options={RELATIONSHIPS.map((r) => ({ label: r, value: r }))}
+                    />
                   </div>
                   <div className="space-y-1.5 col-span-2 sm:col-span-1">
                     <label className="text-label font-medium text-subtle">Full name</label>
