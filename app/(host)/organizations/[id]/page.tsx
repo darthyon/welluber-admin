@@ -225,6 +225,7 @@ function OrganizationDetailContent() {
       organizationId: "org-123",
       name: "Acme Employee Wellness Policy FY2026",
       code: "BEN-STD-01",
+      version: "V1.1",
       description:
         "Standard wellness benefits for HQ staff including gym and mental health support.",
       eligibleEmploymentTypes: ["full-time"],
@@ -246,6 +247,7 @@ function OrganizationDetailContent() {
       organizationId: "org-123",
       name: "Acme Leadership Benefits Policy FY2026",
       code: "BEN-EXC-02",
+      version: "V2.0",
       description:
         "Flexible lifestyle benefits for travel, food, and personal development.",
       eligibleEmploymentTypes: ["full-time", "part-time"],
@@ -446,16 +448,7 @@ function OrganizationDetailContent() {
   } as import("@/features/organizations/types").Organization
 
   const handleAddEmployee = () => {
-    setActiveTab("employees")
-    setActiveEmployeeSubTab("directory")
-    setIsBulkUploading("true")
-
-    if (orgForSetup.employeeCount > 0 && assignedPolicies.length > 0) {
-      setToastMessage("Opened bulk upload with tier auto-match policy assignment")
-      return
-    }
-
-    setToastMessage("Opened bulk upload")
+    router.push(`/employees/new?org=${orgId}`)
   }
 
   return (
@@ -1123,6 +1116,7 @@ function OrganizationDetailContent() {
                 orgTierConfigs={orgTierConfigs}
                 availablePolicies={assignedPolicies.map(p => ({
                   name: p.name,
+                  version: p.version,
                   tiers: orgTierConfigs.map(tc => tc.code || tc.name),
                 }))}
               />
@@ -2127,6 +2121,7 @@ function OrganizationDetailContent() {
                   policies={filteredPolicies.map((policy) => ({
                     ...policy,
                     code: policy.code ?? policy.id,
+                    version: policy.version,
                     type: policy.benefitPoolType,
                   }))}
                   onUnassign={handleUnassignPolicy}

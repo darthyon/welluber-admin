@@ -3,12 +3,14 @@
 import { IdentificationCard, TreeStructure, ShieldCheck } from "@phosphor-icons/react";
 import { ActionPopover } from "@/components/shared/action-popover";
 import { StatusBadge } from "@/components/shared/status-badge";
+import { Badge } from "@/components/ui/badge";
 import { SharedDataTable, Column } from "@/components/shared/data-table";
 
 interface AssignedPolicy {
   id: string;
   name: string;
   code: string;
+  version?: string;
   type: string;
   assignedTo: string; // "All Branches" or specific branch names
   status: "draft" | "active" | "deactivated";
@@ -48,6 +50,19 @@ export function AssignedPolicyList({ policies, onUnassign, onView, onEdit }: Ass
             <p className="text-body font-semibold text-foreground group-hover:text-primary transition-colors leading-tight">{policy.name}</p>
             <p className="text-label font-mono text-faint tracking-tight leading-none mt-0.5">{policy.code}</p>
           </div>
+        </div>
+      )
+    },
+    {
+      header: "Version",
+      headerClassName: "text-center",
+      render: (policy) => (
+        <div className="text-center">
+          {policy.version ? (
+            <Badge variant="outline" className="text-label font-mono">{policy.version}</Badge>
+          ) : (
+            <span className="text-label text-faint">—</span>
+          )}
         </div>
       )
     },

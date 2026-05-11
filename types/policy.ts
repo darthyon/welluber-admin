@@ -41,6 +41,7 @@ export interface BenefitPolicy {
     tierIds?: string[];
     departmentIds?: string[];
   };
+  version?: string;             // e.g. V1.1
   parentPolicyId?: string;      // present = this is a version of another policy
   targetEmployeeIds?: string[]; // individually pinned employees for this version
 }

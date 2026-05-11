@@ -27,7 +27,7 @@ interface BulkUploadWizardProps {
   onBack: () => void
   onSuccess?: () => void
   orgTierConfigs?: { id: string; name: string; code?: string }[]
-  availablePolicies?: { name: string; tiers: string[] }[]
+  availablePolicies?: { name: string; version?: string; tiers: string[] }[]
 }
 
 type BulkRecord = {
@@ -624,10 +624,14 @@ export function BulkUploadWizard({ onBack, onSuccess, orgTierConfigs = [], avail
           )
         }
         if (row.policies) {
+          const policyMeta = policyTierMap.find((p) => p.name === row.policies)
           return (
             <div className="flex items-center gap-1.5 text-primary/80">
               <Shield size={14} weight="fill" className="shrink-0" />
               <TruncatedText text={row.policies} maxWidth={120} className="text-body font-semibold" />
+              {policyMeta?.version && (
+                <span className="text-label font-mono text-muted-foreground">{policyMeta.version}</span>
+              )}
               {row.autoAssigned && <StatusBadge status="Auto" variant="emerald" className="h-4 px-1.5 text-micro" />}
             </div>
           )
