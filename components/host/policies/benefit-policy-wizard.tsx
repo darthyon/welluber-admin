@@ -607,7 +607,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
               )}
               {policyData.coversDependents && policyData.dependentsPoolType !== "SharedWithEmployee" && (
                 <ReadField
-                  label="Dependents Policy Spending Cap"
+                  label="Dependents Policy Amount"
                   value={policyData.dependentsCapAmount ? `RM ${policyData.dependentsCapAmount.toFixed(2)}` : "Not Set"}
                 />
               )}
@@ -713,7 +713,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
             {policyData.coversDependents && policyData.dependentsPoolType !== "SharedWithEmployee" && (
               <div className="space-y-1.5">
                 <label className="text-label font-medium text-subtle inline-flex items-center gap-1.5">
-                  Dependents Policy Spending Cap (RM) <span className="text-rose-600 dark:text-rose-400">*</span>
+                  Dependents Policy Amount <span className="text-rose-600 dark:text-rose-400">*</span>
                   <FieldHelp termKey="spendingCap" />
                 </label>
                 <input
@@ -1483,7 +1483,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
             {policyData.coversDependents && <ReadField label="Dependents Pool Type" value={policyData.dependentsPoolType === "SharedWithEmployee" ? "Shared with Employee" : policyData.dependentsPoolType} />}
             {policyData.coversDependents && policyData.dependentsPoolType !== "SharedWithEmployee" && (
               <ReadField
-                label="Dependents Policy Spending Cap"
+                label="Dependents Policy Amount"
                 value={policyData.dependentsCapAmount ? `RM ${policyData.dependentsCapAmount.toFixed(2)}` : "Not Set"}
               />
             )}

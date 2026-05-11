@@ -176,7 +176,7 @@ export function PolicyReviewCards({ policy, groups, benefits }: PolicyReviewCard
         {policy.coversDependents && <ReadField label="Dependents Pool Type" value={policy.dependentsPoolType === "SharedWithEmployee" ? "Shared with Employee" : policy.dependentsPoolType} />}
         {policy.coversDependents && policy.dependentsPoolType !== "SharedWithEmployee" && (
           <ReadField
-            label="Dependents Policy Spending Cap"
+            label="Dependents Policy Amount"
             value={policy.dependentsCapAmount ? `RM ${policy.dependentsCapAmount.toFixed(2)}` : "Not Set"}
           />
         )}
@@ -1081,7 +1081,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
 
       {policyData.coversDependents && policyData.dependentsPoolType !== "SharedWithEmployee" && (
         <div className="space-y-1.5 animate-in fade-in slide-in-from-top-1 duration-300">
-          <FieldLabel required helpKey="spendingCap">Dependents Policy Spending Cap</FieldLabel>
+          <FieldLabel required helpKey="spendingCap">Dependents Policy Amount</FieldLabel>
           <input
             type="number"
             min={0}

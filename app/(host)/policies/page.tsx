@@ -322,22 +322,44 @@ function PoliciesContent() {
       ),
     },
     {
-      header: "Eligible Types",
+      header: "Employment Types",
       render: (row) => (
         <div className="flex flex-wrap gap-1">
           {row.eligibleEmploymentTypes.map(t => (
             <span key={t} className="px-2 py-0.5 rounded-full bg-muted text-label font-medium text-muted-foreground capitalize">
-              {t.replace("-", " ")}
+              {t.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")}
             </span>
           ))}
         </div>
       ),
     },
     {
-      header: "Groups",
+      header: "Benefit Groups",
       accessorKey: "groupCount",
       align: "center",
-      render: (row) => <span className="text-body font-medium text-subtle tabular-nums">{row.groupCount}</span>,
+      render: (row) => {
+        const data = MOCK_POLICY_DATA_MAP[row.id];
+        const groupNames = data?.groups.map(g => g.name) ?? [];
+        const visible = groupNames.slice(0, 2);
+        const overflow = groupNames.length - visible.length;
+        return (
+          <div className="flex flex-wrap items-center justify-center gap-1">
+            {visible.map(name => (
+              <span key={name} className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-label font-medium border border-primary/20">
+                {name}
+              </span>
+            ))}
+            {overflow > 0 && (
+              <span className="px-2 py-0.5 rounded-full bg-muted text-muted-foreground text-label font-medium">
+                +{overflow}
+              </span>
+            )}
+            {groupNames.length === 0 && (
+              <span className="text-label text-faint">—</span>
+            )}
+          </div>
+        );
+      },
     },
     {
       header: "Organisation",
