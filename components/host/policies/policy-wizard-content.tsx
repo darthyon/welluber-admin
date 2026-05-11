@@ -243,7 +243,9 @@ export function PolicyReviewCards({ policy, groups, benefits }: PolicyReviewCard
                       ) : (
                         groupBenefits.map((b) => (
                           <div key={b.id} className="flex items-center justify-between py-2 px-3 rounded-md bg-muted/20">
-                            <span className="text-body text-foreground">{b.serviceId}</span>
+                            <span className="text-body text-foreground">
+                              {SERVICES.find((s) => s.id === b.serviceId)?.name ?? b.serviceId}
+                            </span>
                             <span className="text-body font-semibold text-foreground tabular-nums">
                               {b.amount.toFixed(2)}
                             </span>

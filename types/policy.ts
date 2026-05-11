@@ -1,5 +1,3 @@
-import type { MainServiceId } from "@/lib/mock-data/service-catalog";
-
 export type PoolType = "Individual" | "Shared";
 export type DependentsPoolType = "Individual" | "Shared" | "SharedWithEmployee";
 export type UtilisationMode = "Fixed" | "Prorated";
@@ -80,7 +78,7 @@ export interface BenefitGroup {
 export interface Benefit {
   id: string;
   groupId: string;
-  serviceId: MainServiceId; // canonical taxonomy id (Tier 2)
+  serviceId: string; // MainServiceId from unified taxonomy
   amount: number;
   employeeAmount?: number; // employee portion when split (coversDependents)
   dependantAmount?: number; // dependant portion when split (coversDependents)

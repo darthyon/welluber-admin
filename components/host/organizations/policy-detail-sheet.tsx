@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { BenefitPolicy, BenefitGroup, Benefit } from "@/types/policy";
+import { getMainServiceName } from "@/lib/mock-data/service-catalog";
 
 interface PolicyDetailSheetProps {
   isOpen: boolean;
@@ -96,7 +97,7 @@ export function PolicyDetailSheet({ isOpen, onClose, policy, groups, benefits, o
                              <IdentificationCard size={16} weight="duotone" />
                            </div>
                            <div>
-                             <p className="text-body font-medium text-foreground">Benefit ID: {benefit.serviceId}</p>
+                              <p className="text-body font-medium text-foreground">{getMainServiceName(benefit.serviceId)}</p>
                              <div className="flex items-center gap-2 mt-0.5">
                                {benefit.coPayment.required && (
                                 <StatusBadge status="Co-pay active" variant="rose" className="text-label h-5 px-2" />

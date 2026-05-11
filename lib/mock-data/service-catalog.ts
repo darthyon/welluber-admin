@@ -4,30 +4,24 @@
  * - Service provider package authoring (Tier 2 + Tier 3 sub-services).
  *
  * `MainServiceId` is the canonical id type for benefits → use it on `Benefit.serviceId`.
+ *
+ * This file re-exports from the unified `features/providers/service-taxonomy.ts`
+ * so the policy domain and provider domain share the same taxonomy.
  */
-export const SERVICES = [
-  { id: "s1", category: "Physical Wellbeing", name: "Gymnasium Facilities", subServices: ["Standard Gym Access", "Boutique Studio Memberships"] },
-  { id: "s2", category: "Physical Wellbeing", name: "Group Fitness", subServices: ["Yoga", "Pilates", "Indoor Cycling", "Zumba"] },
-  { id: "s3", category: "Psychological Wellbeing", name: "Clinical Therapy", subServices: ["Psychotherapy", "CBT", "Psychiatric Care"] },
-  { id: "s4", category: "Psychological Wellbeing", name: "Mental Fitness", subServices: ["Meditation Apps", "Mindfulness Workshops"] },
-  { id: "s5", category: "Nutritional Support", name: "Dietary Counseling", subServices: ["Dietitian Consultations", "Diabetic Management"] },
-  { id: "s6", category: "Personal Care", name: "Therapeutic Spa Services", subServices: ["Relaxation Massage", "Hydrotherapy"] },
-  { id: "s7", category: "Physical Wellbeing", name: "Occupational Health", subServices: ["Health Screening", "Ergonomic Assessment"] },
-  { id: "s8", category: "Personal Care", name: "Beauty & Aesthetics", subServices: ["Facial Treatments", "Skincare Consultations"] },
-  { id: "s9", category: "Psychological Wellbeing", name: "Life & Executive Coaching", subServices: ["Career Coaching", "Executive Coaching"] },
-  { id: "s10", category: "Physical Wellbeing", name: "Physiotherapy & Recovery", subServices: ["Sports Rehab", "Manual Therapy"] },
-] as const
+import { POLICY_SERVICE_CATALOG } from "@/features/providers/service-taxonomy"
 
-export type MainServiceId = (typeof SERVICES)[number]["id"]
+export { POLICY_SERVICE_CATALOG as SERVICES }
+export type { MainServiceId } from "@/features/providers/service-taxonomy"
+
 /** @deprecated use MainServiceId */
-export type ServiceId = MainServiceId
+export type ServiceId = import("@/features/providers/service-taxonomy").MainServiceId
 
-export const MAIN_SERVICE_IDS: readonly MainServiceId[] = SERVICES.map((s) => s.id)
+export const MAIN_SERVICE_IDS: readonly string[] = POLICY_SERVICE_CATALOG.map((s) => s.id)
 
-export function isMainServiceId(value: string): value is MainServiceId {
-  return MAIN_SERVICE_IDS.includes(value as MainServiceId)
+export function isMainServiceId(value: string): value is import("@/features/providers/service-taxonomy").MainServiceId {
+  return MAIN_SERVICE_IDS.includes(value)
 }
 
-export function getMainServiceName(id: MainServiceId): string {
-  return SERVICES.find((s) => s.id === id)?.name ?? id
+export function getMainServiceName(id: string): string {
+  return POLICY_SERVICE_CATALOG.find((s) => s.id === id)?.name ?? id
 }
