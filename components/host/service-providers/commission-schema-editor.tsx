@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo } from "react";
-import { CheckCircle } from "@phosphor-icons/react";
 import type { CommissionSchemaRow } from "@/types/provider";
 
 interface CommissionSchemaEditorProps {
@@ -25,10 +24,12 @@ export function CommissionSchemaEditor({ spId, serviceCategories, initialRows }:
   return (
     <div className="space-y-4">
       <div className="border border-border rounded-lg overflow-hidden bg-background">
-        <div className="grid grid-cols-[200px_1fr_120px] gap-4 px-4 py-3 bg-muted/20 border-b border-border">
-          <p className="text-label font-semibold text-faint text-left">Starts From (Qty)</p>
-          <p className="text-label font-semibold text-faint text-left">Commission Rate (%)</p>
-          <p className="text-label font-semibold text-faint text-right">Delete</p>
+        <div className="grid grid-cols-[1fr_120px_120px_120px_120px] gap-4 px-4 py-3 bg-muted/20 border-b border-border">
+          <p className="text-label font-semibold text-faint text-left">Main Service</p>
+          <p className="text-label font-semibold text-faint text-right">First Level Qty</p>
+          <p className="text-label font-semibold text-faint text-right">First Level Rate</p>
+          <p className="text-label font-semibold text-faint text-right">Subsequent Level Qty</p>
+          <p className="text-label font-semibold text-faint text-right">Subsequent Level Rate</p>
         </div>
 
         <div className="divide-y divide-border/50">
@@ -38,37 +39,17 @@ export function CommissionSchemaEditor({ spId, serviceCategories, initialRows }:
             </div>
           ) : (
             portfolioRows.map((row: CommissionSchemaRow) => (
-              <div key={row.mainService} className="grid grid-cols-[200px_1fr_120px] gap-4 items-center px-4 py-4 hover:bg-muted/5 transition-colors">
-                <div className="space-y-1">
-                  <p className="text-body font-medium text-foreground">{row.mainService}</p>
-                  <p className="text-label text-muted-foreground">Tiered % Rate</p>
-                </div>
-
-                <div className="flex flex-wrap gap-2">
-                  {row.tiers.map((tier, idx: number) => (
-                    <div key={idx} className="flex flex-col px-3 py-1.5 bg-muted/30 border border-border/50 rounded-lg min-w-[100px]">
-                      <span className="text-label text-muted-foreground font-medium">
-                        {idx === 0 ? "Base" : `Qty: ${tier.limit}+`}
-                      </span>
-                      <span className="text-body font-medium text-foreground">
-                        {(tier.rate * 100).toFixed(1)}%
-                      </span>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="flex justify-end">
-                  <span className="inline-flex items-center gap-1.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 dark:bg-emerald-500/20 text-label font-medium px-2 py-0.5 rounded-full">
-                    <CheckCircle size={14} weight="fill" />
-                    Active
-                  </span>
-                </div>
+              <div key={row.mainService} className="grid grid-cols-[1fr_120px_120px_120px_120px] gap-4 items-center px-4 py-4 hover:bg-muted/5 transition-colors">
+                <p className="text-body font-medium text-foreground">{row.mainService}</p>
+                <p className="text-body font-medium text-foreground text-right font-mono">{row.firstLevelQty}</p>
+                <p className="text-body font-medium text-foreground text-right font-mono">{(row.firstLevelRate * 100).toFixed(1)}%</p>
+                <p className="text-body font-medium text-foreground text-right font-mono">{row.subsequentLevelQty}</p>
+                <p className="text-body font-medium text-foreground text-right font-mono">{(row.subsequentLevelRate * 100).toFixed(1)}%</p>
               </div>
             ))
           )}
         </div>
       </div>
-
     </div>
   );
 }

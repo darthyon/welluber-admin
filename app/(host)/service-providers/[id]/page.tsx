@@ -16,7 +16,6 @@ import {
   EnvelopeSimple,
   Article,
   Files,
-  Info,
   Bank,
   MapPin,
   CreditCard,
@@ -40,13 +39,7 @@ import { MOCK_SPS } from "@/lib/mock-data";
 import { suspendSp, activateSp, removeSp, resendSpAdminInvite } from "@/features/providers/actions";
 import { ActionPopover } from "@/components/shared/action-popover";
 import { SharedDataTable } from "@/components/shared/data-table";
-import { CommissionSchemaSheet } from "@/components/host/service-providers/commission-schema-sheet";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+
 
 const TABS = [
   { id: "details", label: "SP Details", icon: Storefront },
@@ -89,7 +82,6 @@ export default function ServiceProviderDetailPage() {
   const [isDangerModalOpen, setIsDangerModalOpen] = useState(false);
   const [dangerAction, setDangerAction] = useState<"status" | "remove" | null>(null);
   const [currentStatus, setCurrentStatus] = useState(sp.status);
-  const [isCommissionSheetOpen, setIsCommissionSheetOpen] = useState(false);
 
   const handleToggleStatus = async () => {
     setIsTogglingStatus(true);
@@ -348,29 +340,9 @@ export default function ServiceProviderDetailPage() {
 
                         {/* Billing & Tax Settings */}
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-6 border-t border-border/40">
-                            <div className="space-y-1">
-                                <div className="flex items-center gap-2 text-faint mb-1">
-                                    <Clock size={14} />
-                                    <span className="text-label font-medium uppercase tracking-wider">Payment Cycle</span>
-                                </div>
-                                <p className="text-body font-medium text-foreground">{sp.paymentCycle || "Not Set"}</p>
-                            </div>
-
-                            <div className="space-y-1">
-                                <div className="flex items-center gap-2 text-faint mb-1">
-                                    <CreditCard size={14} />
-                                    <span className="text-label font-medium uppercase tracking-wider">Credit Terms</span>
-                                </div>
-                                <p className="text-body font-medium text-foreground">{sp.creditTerms || "Not Set"}</p>
-                            </div>
-
-                            <div className="space-y-1">
-                                <div className="flex items-center gap-2 text-faint mb-1">
-                                    <Article size={14} />
-                                    <span className="text-label font-medium uppercase tracking-wider">Expired Commission Fee</span>
-                                </div>
-                                <p className="text-body font-medium text-foreground">{(sp.expiredCommissionFee ?? 0) * 100}%</p>
-                            </div>
+                            <DetailField label="Payment Cycle" value={sp.paymentCycle || "Not Set"} icon={<Clock size={14} />} />
+                            <DetailField label="Credit Terms" value={sp.creditTerms || "Not Set"} icon={<CreditCard size={14} />} />
+                            <DetailField label="Expired Commission Fee" value={`${(sp.expiredCommissionFee ?? 0) * 100}%`} icon={<Article size={14} />} />
                         </div>
 
                         {/* e-Invoice Settings */}
@@ -402,36 +374,11 @@ export default function ServiceProviderDetailPage() {
             </div>
 
  
-            {/* Section 2: Service Portfolio */}
+            {/* Section: Service Portfolio */}
             <DetailSection
               title="Service Portfolio"
               icon={<IdentificationCard size={16} weight="fill" />}
-              description="Manage your service catalogue and configure tiered commission rates."
-              action={
-                <div className="flex items-center gap-2">
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <span className="flex items-center cursor-default text-primary">
-                          <Info size={16} weight="fill" />
-                        </span>
-                      </TooltipTrigger>
-                      <TooltipContent side="left" className="max-w-[240px] text-label">
-                        Define your service portfolio and configure tiered commission rates.
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 px-3 text-label font-medium gap-1.5"
-                    onClick={() => setIsCommissionSheetOpen(true)}
-                  >
-                    <PencilSimpleLine size={13} />
-                    Edit
-                  </Button>
-                </div>
-              }
+              description="Services offered and commission rates configured per service."
             >
               <CommissionSchemaEditor
                 spId={spId}
@@ -668,15 +615,6 @@ export default function ServiceProviderDetailPage() {
           setIsDangerModalOpen(false);
           setDangerAction(null);
         }}
-      />
-
-      {/* Commission Schema Sheet */}
-      <CommissionSchemaSheet
-        isOpen={isCommissionSheetOpen}
-        onClose={() => setIsCommissionSheetOpen(false)}
-        spId={spId}
-        serviceCategories={sp.serviceCategories}
-        initialRows={sp.commissionSchema}
       />
 
       {/* Modals */}

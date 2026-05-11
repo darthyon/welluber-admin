@@ -22,14 +22,12 @@ export interface TaxProfile {
 
 // ─── Commission Schema ────────────────────────────────────────────────────────
 
-export interface CommissionTier {
-  limit: number;
-  rate: number;
-}
-
 export interface CommissionSchemaRow {
   mainService: string;
-  tiers: CommissionTier[];
+  firstLevelQty: number;
+  firstLevelRate: number;
+  subsequentLevelQty: number;
+  subsequentLevelRate: number;
   effectiveFrom?: ISODate;
   lastUpdated?: ISODate;
 }

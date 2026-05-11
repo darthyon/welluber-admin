@@ -62,6 +62,7 @@ export default function NewServiceProviderPage() {
         needsEInvoiceSubmission: false,
         appointedForEInvoice: false,
         expiredCommissionFee: 0,
+        commissionSchema: [],
         address: { country: "Malaysia" }
     },
   });
@@ -271,12 +272,13 @@ export default function NewServiceProviderPage() {
                 inputCls={inputCls} 
               />
 
-              <ServicePortfolioSection 
-                selectedMainServices={selectedMainServices} 
-                brandCategories={brandCategories} 
-                handleServicesChange={handleServicesChange} 
-                errors={errors} 
-                servicePortfolioTaxonomy={SERVICE_PORTFOLIO_TAXONOMY} 
+              <ServicePortfolioSection
+                control={control}
+                selectedMainServices={selectedMainServices}
+                brandCategories={brandCategories}
+                handleServicesChange={handleServicesChange}
+                errors={errors}
+                servicePortfolioTaxonomy={SERVICE_PORTFOLIO_TAXONOMY}
               />
 
               {/* Floating Action Bar */}

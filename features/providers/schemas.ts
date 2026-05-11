@@ -32,6 +32,16 @@ export const createSpSchema = z.object({
   expiredCommissionFee: z.number().min(0).default(0),
   paymentCycle: z.string().optional(),
   creditTerms: z.string().optional(),
+  commissionSchema: z.array(
+    z.object({
+      mainService: z.string(),
+      firstLevelQty: z.number().min(0, "Quantity must be 0 or more"),
+      firstLevelRate: z.number().min(0, "Rate must be 0 or more").max(1, "Rate cannot exceed 100%"),
+      subsequentLevelQty: z.number().min(0, "Quantity must be 0 or more"),
+      subsequentLevelRate: z.number().min(0, "Rate must be 0 or more").max(1, "Rate cannot exceed 100%"),
+      effectiveFrom: z.string().optional(),
+    })
+  ).default([]),
 });
 
 export type CreateSpData = z.infer<typeof createSpSchema>;
@@ -132,37 +142,19 @@ export const createVoucherSchema = z.object({
 
 export type CreateVoucherData = z.infer<typeof createVoucherSchema>;
 
-// ─── Commission Schema ────────────────────────────────────────────────────────
-
-export const commissionTierSchema = z.object({
-  limit: z.number().min(0, "Limit must be 0 or more"), // e.g. 100 redemptions
-  rate: z
-    .number()
-    .min(0, "Rate must be 0 or more")
-    .max(1, "Rate cannot exceed 100%"), // 0.10 = 10%
-});
-
-export const commissionSchemaRowSchema = z
-  .object({
-    mainService: z.string(),
-    tiers: z.array(commissionTierSchema).min(1, "Add at least one tier"),
-    effectiveFrom: z.string().optional(),
-  })
-  .refine(
-    (data) => {
-      for (let i = 1; i < data.tiers.length; i++) {
-        if (data.tiers[i].limit <= data.tiers[i - 1].limit) return false;
-      }
-      return true;
-    },
-    {
-      message: "Each tier limit must be greater than the previous",
-      path: ["tiers"],
-    }
-  );
+// ─── Commission Schema (legacy — kept for type compatibility during migration) ─
 
 export const commissionSchemaSchema = z.object({
-  rows: z.array(commissionSchemaRowSchema),
+  rows: z.array(
+    z.object({
+      mainService: z.string(),
+      firstLevelQty: z.number().min(0),
+      firstLevelRate: z.number().min(0).max(1),
+      subsequentLevelQty: z.number().min(0),
+      subsequentLevelRate: z.number().min(0).max(1),
+      effectiveFrom: z.string().optional(),
+    })
+  ),
 });
 
 export type CommissionSchemaData = z.infer<typeof commissionSchemaSchema>;

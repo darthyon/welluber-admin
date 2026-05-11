@@ -8,8 +8,6 @@ import { z } from "zod";
 import {
   CaretLeft,
   Storefront,
-  Tag,
-  WarningCircle,
   NavigationArrow,
   IdentificationCard,
   MapPin,
@@ -22,7 +20,6 @@ import { cn } from "@/lib/utils";
 import { createSpSchema } from "@/features/providers/schemas";
 import { updateSp } from "@/features/providers/actions";
 import { Button } from "@/components/ui/button";
-import { SearchableMultiSelect } from "@/components/shared/searchable-multi-select";
 import { MASTER_SERVICE_TAXONOMY } from "@/features/providers/service-taxonomy";
 import { MOCK_SPS } from "@/lib/mock-data";
 import { MOCK_BRANDS } from "@/lib/mock-data";
@@ -30,6 +27,7 @@ import { DocumentUploadSection } from "@/components/shared/document-upload-secti
 import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav";
 import { Switch } from "@/components/shared/switch";
 import { LocationPicker } from "@/components/shared/location-picker";
+import { ServicePortfolioSection } from "@/components/host/service-providers/form-sections/service-portfolio-section";
 import {
   BUSINESS_TYPES,
   PAYMENT_CYCLES,
@@ -78,6 +76,7 @@ export default function EditServiceProviderPage() {
       expiredCommissionFee: sp.expiredCommissionFee ?? 0,
       paymentCycle: sp.paymentCycle ?? "",
       creditTerms: sp.creditTerms ?? "",
+      commissionSchema: sp.commissionSchema ?? [],
     },
   });
 
@@ -452,30 +451,14 @@ export default function EditServiceProviderPage() {
           </div>
 
           {/* Section: Service Portfolio */}
-          <div id="service-portfolio" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-24">
-            <div className="p-6 space-y-6">
-                <div className="flex items-center gap-2 pb-2">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                        <Tag size={16} weight="fill" />
-                    </div>
-                    <h3 className="text-lead font-semibold text-foreground">Service Portfolio</h3>
-                </div>
-
-                <div className="space-y-4">
-                    <SearchableMultiSelect
-                        taxonomy={SERVICE_PORTFOLIO_TAXONOMY}
-                        selected={selectedMainServices}
-                        onChange={handleServicesChange}
-                        placeholder="Search services..."
-                    />
-                    {errors.mainServices && (
-                        <p className="text-label text-destructive flex items-center gap-1 font-medium">
-                            <WarningCircle size={12} weight="fill" /> {errors.mainServices.message}
-                        </p>
-                    )}
-                </div>
-            </div>
-          </div>
+          <ServicePortfolioSection
+            control={control}
+            selectedMainServices={selectedMainServices}
+            brandCategories={brandCategories}
+            handleServicesChange={handleServicesChange}
+            errors={errors}
+            servicePortfolioTaxonomy={SERVICE_PORTFOLIO_TAXONOMY}
+          />
 
           {/* Floating Action Bar */}
           <div className="fixed bottom-8 left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[calc(50%+104px)] z-50 flex items-center gap-4 p-2 px-6 bg-background/80 backdrop-blur-2xl border border-border shadow-lg rounded-full animate-in slide-in-from-bottom-10 duration-700 ease-out">

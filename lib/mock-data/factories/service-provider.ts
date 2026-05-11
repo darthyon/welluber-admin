@@ -33,8 +33,8 @@ export function createServiceProvider(index: number): ServiceProvider {
     status: "active",
     taxProfile: { isTaxRegistered: true, taxRegNo: "SST-2024-001234", taxRate: 0.08 },
     commissionSchema: [
-      { mainService: "Yoga", tiers: [{ limit: 0, rate: 0.12 }], lastUpdated: "2026-01-10T00:00:00Z" },
-      { mainService: "Therapy & Counselling", tiers: [{ limit: 0, rate: 0.25 }], lastUpdated: "2026-01-10T00:00:00Z" },
+      { mainService: "Yoga", firstLevelQty: 0, firstLevelRate: 0.12, subsequentLevelQty: 1, subsequentLevelRate: 0.10, lastUpdated: "2026-01-10T00:00:00Z" },
+      { mainService: "Therapy & Counselling", firstLevelQty: 0, firstLevelRate: 0.25, subsequentLevelQty: 1, subsequentLevelRate: 0.20, lastUpdated: "2026-01-10T00:00:00Z" },
     ],
     bankInfo: { bankName: "Maybank", accountNumber: "514011223344", accountName: "ZENITH YOGA STUDIO Sdn Bhd" },
     address: { line: "Lot 5, Suria KLCC", city: "Kuala Lumpur", state: "Wilayah Persekutuan", country: "Malaysia", postalCode: "50088" },
@@ -87,7 +87,7 @@ export function createServiceProvider(index: number): ServiceProvider {
     isActive: true, status: "active",
     taxProfile: { isTaxRegistered: false, taxRate: 0.08 },
     commissionSchema: [
-      { mainService: "Therapy & Counselling", tiers: [{ limit: 0, rate: 0.20 }], lastUpdated: "2026-01-20T00:00:00Z" },
+      { mainService: "Therapy & Counselling", firstLevelQty: 0, firstLevelRate: 0.20, subsequentLevelQty: 1, subsequentLevelRate: 0.15, lastUpdated: "2026-01-20T00:00:00Z" },
     ],
     admins: [{ id: "SPA-002", spId: "SP-20260115-0002", name: "Dr. James Wong", email: "james@agilemind.my", status: "active", invitedAt: "2026-01-12T00:00:00Z", branchIds: [] }],
     branches: [
@@ -149,7 +149,7 @@ export function createServiceProvider(index: number): ServiceProvider {
     isActive: false, status: "suspended",
     taxProfile: { isTaxRegistered: true, taxRegNo: "SST-2023-009012", taxRate: 0.08 },
     commissionSchema: [
-      { mainService: "Traditional / Relaxation Massage", tiers: [{ limit: 0, rate: 0.15 }], lastUpdated: "2026-02-15T00:00:00Z" },
+      { mainService: "Traditional / Relaxation Massage", firstLevelQty: 0, firstLevelRate: 0.15, subsequentLevelQty: 1, subsequentLevelRate: 0.12, lastUpdated: "2026-02-15T00:00:00Z" },
     ],
     admins: [{ id: "SPA-004", spId: "SP-20260210-0004", name: "Mei Ling Tan", email: "mei@serenityspa.my", status: "active", invitedAt: "2026-02-12T00:00:00Z", branchIds: [] }],
     branches: [
@@ -182,7 +182,7 @@ export function createServiceProvider(index: number): ServiceProvider {
     isActive: d.status === "active",
     status: d.status,
     taxProfile: { isTaxRegistered: false, taxRate: 0.08 },
-    commissionSchema: [{ mainService: d.services[0] ?? "General", tiers: [{ limit: 0, rate: 0.12 }], lastUpdated: "2026-04-01T00:00:00Z" }],
+    commissionSchema: [{ mainService: d.services[0] ?? "General", firstLevelQty: 0, firstLevelRate: 0.12, subsequentLevelQty: 1, subsequentLevelRate: 0.10, lastUpdated: "2026-04-01T00:00:00Z" }],
     admins: [],
     branches: [],
     vouchers: [],
