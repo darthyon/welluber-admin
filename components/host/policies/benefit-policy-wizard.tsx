@@ -55,7 +55,7 @@ const CONTENT_TABS = [
 const CREATE_STEPS = [
   { id: 1, title: "Basics" },
   { id: 2, title: "Pool Config" },
-  { id: 3, title: "Groups & Benefits" },
+  { id: 3, title: "Benefit Groups" },
   { id: 4, title: "Assign Employees" },
   { id: 5, title: "Review" },
 ];
@@ -511,7 +511,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
 
             <div className="space-y-3">
               <label className="text-label font-medium text-subtle">
-                Eligible Employment Types <span className="text-rose-600 dark:text-rose-400">*</span>
+                Employment Types <span className="text-rose-600 dark:text-rose-400">*</span>
               </label>
               {validationErrors.eligibleEmploymentTypes && (
                 <p className="text-label text-rose-600 dark:text-rose-400 font-medium">{validationErrors.eligibleEmploymentTypes}</p>
@@ -1471,7 +1471,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
           <div className="space-y-4">
             <ReadField label="Policy Name" value={policyData.name || undefined} />
             <ReadField label="Description" value={policyData.description || undefined} />
-            <ReadField label="Eligible Employment Types" value={policyData.eligibleEmploymentTypes?.join(", ")} />
+            <ReadField label="Employment Types" value={policyData.eligibleEmploymentTypes?.map(t => t.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")).join(", ")} />
           </div>
         </DetailSection>
 
@@ -1498,7 +1498,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
         </DetailSection>
 
         {/* Groups Summary */}
-        <DetailSection title="Groups & Benefits" icon={<TreeStructure size={18} weight="duotone" />} className="lg:col-span-2" ghost>
+        <DetailSection title="Benefit Groups" icon={<TreeStructure size={18} weight="duotone" />} className="lg:col-span-2" ghost>
           <div className="space-y-4">
             {groups.length === 0 ? (
               <p className="text-center py-6 text-body text-faint font-medium">No benefit groups configured.</p>

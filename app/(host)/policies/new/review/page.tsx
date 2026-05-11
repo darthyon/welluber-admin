@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { CaretLeft, NavigationArrow, Check, Users, CaretDown, PencilSimpleLine, MagnifyingGlass, X, Warning } from "@phosphor-icons/react";
+import { CaretLeft, NavigationArrow, Check, Users, CaretDown, PencilSimpleLine, MagnifyingGlass, X, Warning, ClipboardText } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import { SuccessModal } from "@/components/shared/success-modal";
@@ -456,8 +456,8 @@ function NewPolicyReviewPageContent() {
         <section className="bg-card border border-border rounded-lg shadow-sm">
           <Collapsible defaultOpen={false}>
             <CollapsibleTrigger className="w-full flex items-center gap-3 p-4 group">
-              <div className="w-8 h-8 rounded-md bg-primary/10 text-primary flex items-center justify-center border border-primary/20 shrink-0">
-                <Check size={14} weight="duotone" />
+              <div className="w-8 h-8 rounded-md bg-muted flex items-center justify-center border border-border/60 shrink-0">
+                <ClipboardText size={14} weight="duotone" className="text-primary" />
               </div>
               <div className="flex-1 min-w-0 text-left">
                 <p className="text-body font-semibold text-foreground">Review</p>

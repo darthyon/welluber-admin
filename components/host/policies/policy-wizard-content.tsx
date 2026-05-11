@@ -151,7 +151,7 @@ export function PolicyReviewCards({ policy, groups, benefits }: PolicyReviewCard
         </h4>
         <ReadField label="Policy Name" value={policy.name || undefined} />
         <ReadField label="Description" value={policy.description || undefined} />
-        <ReadField label="Eligible Employment Types" value={policy.eligibleEmploymentTypes?.join(", ")} />
+        <ReadField label="Employment Types" value={policy.eligibleEmploymentTypes?.map(t => t.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")).join(", ")} />
         <ReadField
           label="Age Range"
           value={
@@ -210,33 +210,57 @@ export function PolicyReviewCards({ policy, groups, benefits }: PolicyReviewCard
       <div className="bg-card border border-border rounded-lg p-5 space-y-4 md:col-span-2">
         <h4 className="text-body font-semibold text-foreground flex items-center gap-2">
           <TreeStructure size={16} weight="duotone" className="text-primary" />
-          Groups & Benefits
+          Benefit Groups
         </h4>
         {groups.length === 0 ? (
           <p className="text-body text-faint font-medium">No benefit groups configured.</p>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {groups.map((group) => {
               const groupBenefits = benefits.filter((b) => b.groupId === group.id);
               return (
-                <div key={group.id} className="flex items-center justify-between p-3 rounded-lg border border-border/60 bg-transparent">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center text-primary border border-border/60">
-                      <TreeStructure size={16} />
+                <Collapsible key={group.id}>
+                  <CollapsibleTrigger className="w-full group">
+                    <div className="flex items-center justify-between p-3 rounded-lg border border-border/60 bg-transparent hover:bg-muted/20 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center text-primary border border-border/60">
+                          <TreeStructure size={16} />
+                        </div>
+                        <div className="text-left">
+                          <p className="text-body font-medium text-foreground">{group.name}</p>
+                          <p className="text-label text-muted-foreground font-semibold">
+                            {groupBenefits.length} benefits · {group.distributionType === "SharedAmount" ? "Shared Pool" : "Individual"}
+                          </p>
+                        </div>
+                      </div>
+                      <CaretDown size={14} weight="bold" className="text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180 shrink-0 ml-3" />
                     </div>
-                    <div>
-                      <p className="text-body font-medium text-foreground">{group.name}</p>
-                      <p className="text-label text-muted-foreground font-semibold">
-                        {groupBenefits.length} benefits · {group.distributionType === "SharedAmount" ? "Shared Pool" : "Individual"}
-                      </p>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <div className="px-3 pb-3 pt-1 space-y-1">
+                      {groupBenefits.length === 0 ? (
+                        <p className="text-label text-faint py-2">No services configured.</p>
+                      ) : (
+                        groupBenefits.map((b) => (
+                          <div key={b.id} className="flex items-center justify-between py-2 px-3 rounded-md bg-muted/20">
+                            <span className="text-body text-foreground">{b.serviceId}</span>
+                            <span className="text-body font-semibold text-foreground tabular-nums">
+                              {b.amount.toFixed(2)}
+                            </span>
+                          </div>
+                        ))
+                      )}
+                      {group.distributionType === "SharedAmount" && (
+                        <div className="flex items-center justify-between py-2 px-3 rounded-md border-t border-border/40 mt-1 pt-2">
+                          <span className="text-label font-medium text-muted-foreground">Group Cap</span>
+                          <span className="text-body font-semibold text-foreground tabular-nums">
+                            {group.maxUsagePerCycle?.toFixed(2) || "0.00"}
+                          </span>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-body font-semibold text-primary">
-                      {group.distributionType === "SharedAmount" ? `${group.maxUsagePerCycle?.toFixed(2) || "0.00"}` : `${groupBenefits.length} benefits`}
-                    </p>
-                  </div>
-                </div>
+                  </CollapsibleContent>
+                </Collapsible>
               );
             })}
           </div>
@@ -869,7 +893,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
       </div>
 
       <div className="space-y-3">
-        <FieldLabel required>Eligible Employment Types</FieldLabel>
+        <FieldLabel required>Employment Types</FieldLabel>
         {validationErrors.eligibleEmploymentTypes && <ErrorText>{validationErrors.eligibleEmploymentTypes}</ErrorText>}
         <div className="flex flex-wrap gap-2">
           {EMPLOYMENT_TYPES.map((type) => {
