@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Plus, GitBranch } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/shared/empty-state";
 import { useQueryState, useUpdateQueryParams } from "@/hooks/use-tab-persistence";
 import { FilterItem } from "@/components/shared/filter-item";
@@ -203,14 +204,14 @@ export function SpBranchesTab({ sp }: SpBranchesTabProps) {
                 render: (branch) => (
                   <div className="flex flex-wrap gap-1.5">
                     {branch.services.slice(0, 2).map((service) => (
-                      <span key={service.service} className="inline-flex items-center px-2 py-0.5 rounded-full bg-muted text-label font-medium text-muted-foreground border border-border">
+                      <Badge key={service.service} variant="secondary">
                         {service.service}
-                      </span>
+                      </Badge>
                     ))}
                     {branch.services.length > 2 && (
-                      <span className="text-label font-medium text-faint">
+                      <Badge variant="outline" className="text-label font-medium">
                         +{branch.services.length - 2} more
-                      </span>
+                      </Badge>
                     )}
                   </div>
                 ),

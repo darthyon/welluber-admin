@@ -74,12 +74,14 @@ export function BrandDetailView({ brand, onBack, onEdit, onRemove }: BrandDetail
       render: (sp) => (
         <div className="flex items-center gap-1 overflow-hidden max-w-[200px]">
           {sp.serviceCategories.slice(0, 1).map((cat, i) => (
-            <Badge key={i} variant="secondary" className="bg-muted/50 font-medium text-micro px-1.5 py-0 h-4 border-border/40 whitespace-nowrap">
+            <Badge key={i} variant="secondary" className="font-medium text-micro px-1.5 py-0 h-4 whitespace-nowrap">
               {cat}
             </Badge>
           ))}
           {sp.serviceCategories.length > 1 && (
-            <span className="text-micro text-muted-foreground font-semibold px-1">+{sp.serviceCategories.length - 1}</span>
+            <Badge variant="outline" className="text-micro font-medium px-1.5">
+              +{sp.serviceCategories.length - 1}
+            </Badge>
           )}
         </div>
       ),
@@ -237,4 +239,3 @@ export function BrandDetailView({ brand, onBack, onEdit, onRemove }: BrandDetail
     </div>
   );
 }
-

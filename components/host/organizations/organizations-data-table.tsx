@@ -139,9 +139,9 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
                 {formatCurrency(org.totalAccountBalance)}
               </span>
               {org.claimsCount !== undefined && (
-                <span className="text-label font-medium px-1.5 rounded-full bg-muted text-faint border border-border tabular-nums leading-none flex items-center">
+                <Badge variant="outline" className="px-1.5 text-label font-medium tabular-nums leading-none">
                   {org.claimsCount}
-                </span>
+                </Badge>
               )}
             </div>
             <span className="text-label text-faint font-medium tabular-nums mt-0.5">
@@ -160,7 +160,7 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
           ) : (
             <>
               {org.services.slice(0, 1).map((service, i) => (
-                <Badge key={i} variant="secondary" className="bg-muted/50 font-medium text-label px-2 py-0 h-5 border-border/40 whitespace-nowrap">
+                <Badge key={i} variant="secondary" className="font-medium text-label px-2 py-0 h-5 whitespace-nowrap">
                   {service}
                 </Badge>
               ))}
@@ -201,7 +201,7 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
           ) : (
             <>
               {org.policies.slice(0, 1).map((policy, i) => (
-                <Badge key={i} variant="secondary" className="bg-primary/10 text-primary font-medium text-label px-1.5 py-0 h-5 border-primary/20 whitespace-nowrap">
+                <Badge key={i} variant="secondary" className="font-medium text-label px-1.5 py-0 h-5 whitespace-nowrap">
                   {resolvePolicyName(policy)}
                 </Badge>
               ))}
@@ -244,7 +244,7 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
           ) : (
             <>
               {org.branches.slice(0, 1).map((branch, i) => (
-                <Badge key={i} variant="secondary" className="bg-primary/10 text-primary font-medium text-label px-1.5 py-0 h-5 border-primary/20 whitespace-nowrap">
+                <Badge key={i} variant="outline" className="text-label font-medium whitespace-nowrap">
                   {resolveBranchName(branch)}
                 </Badge>
               ))}

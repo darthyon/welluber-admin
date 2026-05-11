@@ -4,6 +4,7 @@ import type { EmployeeDirectoryItem } from "@/features/employees/types"
 import { SharedDataTable } from "@/components/shared/data-table"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { ActionPopover } from "@/components/shared/action-popover"
+import { Badge } from "@/components/ui/badge"
 import {
   Tooltip,
   TooltipContent,
@@ -52,9 +53,9 @@ export function EmployeeDirectoryTable({
             accessorKey: "organization",
             sortable: true,
             render: (emp) => (
-              <span className="inline-block whitespace-nowrap rounded-md border border-border bg-muted/80 px-2 py-0.5 text-label font-semibold text-muted-foreground">
+              <Badge variant="outline" className="whitespace-nowrap text-label font-medium">
                 {emp.organization}
-              </span>
+              </Badge>
             ),
           },
           {
@@ -72,9 +73,9 @@ export function EmployeeDirectoryTable({
             accessorKey: "branch",
             sortable: true,
             render: (emp) => (
-              <span className="inline-block whitespace-nowrap rounded-md border border-border bg-muted/80 px-2 py-0.5 text-label font-semibold text-muted-foreground">
+              <Badge variant="outline" className="whitespace-nowrap text-label font-medium">
                 {emp.branch}
-              </span>
+              </Badge>
             ),
           },
           {
@@ -92,9 +93,9 @@ export function EmployeeDirectoryTable({
             accessorKey: "tier",
             sortable: true,
             render: (emp) => (
-              <span className="inline-block whitespace-nowrap text-label font-semibold text-primary bg-primary/5 px-1.5 py-0.5 rounded border border-primary/10">
+              <Badge variant="secondary" className="whitespace-nowrap text-label font-medium">
                 {emp.tier || "—"}
-              </span>
+              </Badge>
             ),
           },
           {
@@ -134,17 +135,19 @@ export function EmployeeDirectoryTable({
                 {emp.benefitPolicies && emp.benefitPolicies.length > 0 ? (
                   <>
                     {emp.benefitPolicies.slice(0, 2).map((policy, idx) => (
-                      <Tooltip key={idx}>
-                        <TooltipTrigger asChild>
-                          <div className="flex cursor-help items-center rounded-md border border-primary/20 bg-primary/5 px-2 py-0.5 text-label font-semibold whitespace-nowrap text-primary transition-colors hover:bg-primary/10">
+                        <Tooltip key={idx}>
+                          <TooltipTrigger asChild>
+                          <div className="flex cursor-help items-center">
+                            <Badge variant="secondary" className="whitespace-nowrap text-label font-medium transition-colors hover:bg-secondary/80">
                             {policy.policyName}
                             {policy.benefitGroups.length > 0 && (
                               <span className="ml-1 max-w-[80px] truncate font-medium text-subtle">
                                 ({policy.benefitGroups.length})
                               </span>
                             )}
+                            </Badge>
                           </div>
-                        </TooltipTrigger>
+                          </TooltipTrigger>
                         <TooltipContent side="top" className="z-[200] w-56 p-2">
                           <div className="flex flex-col gap-1.5">
                             <div className="text-label font-semibold text-foreground">

@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { SuccessCelebration } from "@/components/shared/success-celebration"
 import { StatusBadge } from "@/components/shared/status-badge"
+import { FormSelect } from "@/components/shared/form-select"
 import { SharedDataTable, Column } from "@/components/shared/data-table"
 import { DataFilterBar } from "@/components/shared/data-filter-bar"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
@@ -266,6 +267,8 @@ export function BulkUploadWizard({ onBack, onSuccess, orgTierConfigs = [], avail
   const [searchQuery, setSearchQuery] = useState("")
   const [activeFilter, setActiveFilter] = useState<FilterChip>("all")
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [bulkPolicyValue, setBulkPolicyValue] = useState("")
+  const [bulkTierValue, setBulkTierValue] = useState("")
 
   useEffect(() => {
     if (step === "processing") {
@@ -559,7 +562,7 @@ export function BulkUploadWizard({ onBack, onSuccess, orgTierConfigs = [], avail
           {row.isNewDept && (
             <StatusBadge
               status="New"
-              variant="amber"
+              variant="emerald"
               className="text-micro h-4 px-1.5"
             />
           )}
@@ -616,7 +619,7 @@ export function BulkUploadWizard({ onBack, onSuccess, orgTierConfigs = [], avail
               className={code ? "font-semibold text-primary" : "font-medium"}
             />
             {row.isNewTier && (
-              <StatusBadge status="New" variant="amber" className="text-micro h-4 px-1.5" />
+              <StatusBadge status="New" variant="emerald" className="text-micro h-4 px-1.5" />
             )}
           </div>
         )
@@ -662,7 +665,7 @@ export function BulkUploadWizard({ onBack, onSuccess, orgTierConfigs = [], avail
               className="font-medium"
             />
             {row.isNewPolicy && (
-              <StatusBadge status="New" variant="amber" className="text-micro h-4 px-1.5" />
+              <StatusBadge status="New" variant="emerald" className="text-micro h-4 px-1.5" />
             )}
             {row.autoAssigned && <StatusBadge status="Auto" variant="emerald" className="h-4 px-1.5 text-micro" />}
           </div>
@@ -732,9 +735,9 @@ export function BulkUploadWizard({ onBack, onSuccess, orgTierConfigs = [], avail
     { key: "valid", label: "Valid", count: counts.valid, tone: "emerald" },
     { key: "issues", label: "Issues", count: counts.issues, tone: "rose" },
     { key: "auto", label: "Auto-assigned", count: counts.auto, tone: "primary" },
-    { key: "newDept", label: "New Depts", count: counts.newDept, tone: "amber" },
-    { key: "newTier", label: "New Tiers", count: counts.newTier, tone: "amber" },
-    { key: "newPolicy", label: "New Policies", count: counts.newPolicy, tone: "amber" },
+    { key: "newDept", label: "New Depts", count: counts.newDept, tone: "emerald" },
+    { key: "newTier", label: "New Tiers", count: counts.newTier, tone: "emerald" },
+    { key: "newPolicy", label: "New Policies", count: counts.newPolicy, tone: "emerald" },
   ]
 
   const chipToneClasses = (tone: string, active: boolean) => {
@@ -946,26 +949,32 @@ export function BulkUploadWizard({ onBack, onSuccess, orgTierConfigs = [], avail
                   {selectedIds.size} selected
                 </div>
                 <div className="flex items-center gap-2">
-                  <select
-                    onChange={(e) => { if (e.target.value) { bulkAssignPolicy(e.target.value); e.target.value = "" } }}
-                    className="rounded border border-border bg-background px-2 py-1 text-label font-semibold outline-none hover:border-primary/40"
-                  >
-                    <option value="">Assign Policy…</option>
-                    {policyTierMap.map((p) => (
-                      <option key={p.name} value={p.name}>{p.name}</option>
-                    ))}
-                  </select>
-                  <select
-                    onChange={(e) => { if (e.target.value) { bulkSetTier(e.target.value); e.target.value = "" } }}
-                    className="rounded border border-border bg-background px-2 py-1 text-label font-semibold outline-none hover:border-primary/40"
-                  >
-                    <option value="">Set Tier…</option>
-                    {uniqueTiers.map((t) => {
+                  <FormSelect
+                    value={bulkPolicyValue}
+                    onChange={(v) => {
+                      if (v) {
+                        bulkAssignPolicy(v)
+                        setBulkPolicyValue("")
+                      }
+                    }}
+                    options={[{ label: "Assign Policy…", value: "" }, ...policyTierMap.map((p) => ({ label: p.name, value: p.name }))]}
+                    triggerClassName="h-8 text-label"
+                  />
+                  <FormSelect
+                    value={bulkTierValue}
+                    onChange={(v) => {
+                      if (v) {
+                        bulkSetTier(v)
+                        setBulkTierValue("")
+                      }
+                    }}
+                    options={[{ label: "Set Tier…", value: "" }, ...uniqueTiers.map((t) => {
                       const tc = resolveTier(t)
                       const label = tc?.name ? (tc.code ? `${tc.name} (${tc.code})` : tc.name) : t
-                      return <option key={t} value={t}>{label}</option>
-                    })}
-                  </select>
+                      return { label, value: t }
+                    })]}
+                    triggerClassName="h-8 text-label"
+                  />
                     <Button
                       variant="destructive"
                       size="sm"

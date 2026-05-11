@@ -13,6 +13,7 @@ import type { ServiceProvider, SpVoucher, SpVoucherStatus } from "@/types/provid
 import { ActionPopover } from "@/components/shared/action-popover";
 import { useQueryState, useUpdateQueryParams } from "@/hooks/use-tab-persistence";
 import { SharedDataTable } from "@/components/shared/data-table";
+import { Badge } from "@/components/ui/badge";
 
 interface SpVouchersTabProps {
   sp: ServiceProvider;
@@ -180,9 +181,9 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
                     <p className="text-label text-muted-foreground leading-relaxed line-clamp-2 max-w-[300px]">
                       {voucher.description || "—"}
                       {voucher.bookingRequired && (
-                        <span className="ml-2 inline-flex items-center gap-1 text-label font-medium text-primary/70 tracking-tighter bg-primary/5 px-1.5 py-0.5 rounded border border-primary/10">
+                        <Badge variant="secondary" className="ml-2 text-label font-medium">
                           Booking Required
-                        </span>
+                        </Badge>
                       )}
                     </p>
                   ),

@@ -68,6 +68,7 @@ import {
   TooltipContent,
   TooltipProvider,
 } from "@/components/ui/tooltip"
+import { Badge } from "@/components/ui/badge"
 import {
   deactivateOrganization,
   suspendOrganization,
@@ -859,19 +860,10 @@ function OrganizationDetailContent() {
                   </div>
                   <div className="flex items-center gap-2">
                     <Button
-                      onClick={() => setIsInviteModalOpen("true")}
+                      asChild
                       variant="secondary"
                       size="sm"
                       className="flex h-8 items-center gap-2 rounded-full px-4 text-label font-medium"
-                    >
-                      <Plus size={14} weight="bold" /> Invite Admin
-                    </Button>
-                    <div className="h-4 w-[1px] bg-border" />
-                    <Button
-                      asChild
-                      variant="ghost"
-                      size="sm"
-                      className="flex h-8 items-center gap-2 rounded-full px-4 text-label font-medium text-primary hover:bg-primary/5"
                     >
                       <Link href={`/organizations/${orgId}/branches/new`}>
                         <Plus size={14} weight="bold" /> Add Branch
@@ -1340,9 +1332,9 @@ function OrganizationDetailContent() {
                                 accessorKey: "branch",
                                 sortable: true,
                                 render: (emp) => (
-    <span className="inline-block rounded-md border border-border bg-muted/80 px-2 py-0.5 text-label font-semibold text-muted-foreground whitespace-nowrap">
-      {emp.branch}
-    </span>
+                                  <Badge variant="outline" className="whitespace-nowrap text-label font-medium">
+                                    {emp.branch}
+                                  </Badge>
                                 ),
                               },
                               {
@@ -1360,9 +1352,9 @@ function OrganizationDetailContent() {
                                 accessorKey: "tier",
                                 sortable: true,
                                 render: (emp) => (
-                                  <span className="inline-block whitespace-nowrap text-label font-semibold text-primary bg-primary/5 px-1.5 py-0.5 rounded border border-primary/10">
+                                  <Badge variant="secondary" className="whitespace-nowrap text-label font-medium">
                                     {emp.tier || "—"}
-                                  </span>
+                                  </Badge>
                                 ),
                               },
                               {
@@ -1405,24 +1397,20 @@ function OrganizationDetailContent() {
                                         {emp.benefitPolicies
                                           .slice(0, 2)
                                           .map((policy: { policyName: string; benefitGroups?: string[]; utilisation?: number }, idx: number) => (
-                                            <Tooltip key={idx}>
-                                              <TooltipTrigger asChild>
-                                                <div className="flex cursor-help items-center rounded-md border border-primary/20 bg-primary/5 px-2 py-0.5 text-label font-semibold whitespace-nowrap text-primary transition-colors hover:bg-primary/10">
-                                                  {policy.policyName}
-                                                  {policy.benefitGroups &&
-                                                    policy.benefitGroups
-                                                      .length > 0 && (
-                                                      <span className="ml-1 max-w-[80px] truncate font-medium text-subtle">
-                                                        (
-                                                        {
-                                                          policy.benefitGroups
-                                                            .length
-                                                        }
-                                                        )
-                                                      </span>
-                                                    )}
-                                                </div>
-                                              </TooltipTrigger>
+                                              <Tooltip key={idx}>
+                                                <TooltipTrigger asChild>
+                                                  <div className="flex cursor-help items-center">
+                                                    <Badge variant="secondary" className="whitespace-nowrap text-label font-medium transition-colors hover:bg-secondary/80">
+                                                      {policy.policyName}
+                                                      {policy.benefitGroups &&
+                                                        policy.benefitGroups.length > 0 && (
+                                                          <span className="ml-1 max-w-[80px] truncate font-medium text-subtle">
+                                                            ({policy.benefitGroups.length})
+                                                          </span>
+                                                        )}
+                                                    </Badge>
+                                                  </div>
+                                                </TooltipTrigger>
                                               <TooltipContent
                                                 side="top"
                                                 className="z-[200] w-56 p-2"
@@ -1444,12 +1432,8 @@ function OrganizationDetailContent() {
                                                       No specific groups.
                                                     </div>
                                                   )}
-                                                  {policy.utilisation !==
-                                                    undefined && (
-                                                    <div className="mt-0.5 text-label font-medium text-emerald-600 dark:text-emerald-400">
-                                                      {policy.utilisation}%
-                                                      Utilized
-                                                    </div>
+                                                  {policy.utilisation !== undefined && (
+                                                    <StatusBadge status={`${policy.utilisation}% Utilized`} variant="emerald" className="mt-0.5" />
                                                   )}
                                                 </div>
                                               </TooltipContent>
@@ -1499,12 +1483,8 @@ function OrganizationDetailContent() {
                                                           No specific groups.
                                                         </div>
                                                       )}
-                                                      {policy.utilisation !==
-                                                        undefined && (
-                                                        <div className="mt-0.5 text-label font-medium text-emerald-600 dark:text-emerald-400">
-                                                          {policy.utilisation}%
-                                                          Utilized
-                                                        </div>
+                                                      {policy.utilisation !== undefined && (
+                                                        <StatusBadge status={`${policy.utilisation}% Utilized`} variant="emerald" className="mt-0.5" />
                                                       )}
                                                     </div>
                                                   )
@@ -1514,9 +1494,7 @@ function OrganizationDetailContent() {
                                         )}
                                       </>
                                     ) : (
-                                      <span className="text-label font-medium text-faint italic">
-                                        None
-                                      </span>
+                                      <Badge variant="outline" className="text-label font-medium">None</Badge>
                                     )}
                                   </div>
                                 ),
@@ -1732,15 +1710,15 @@ function OrganizationDetailContent() {
                                 </button>
                               ),
                             },
-                            {
-                              header: "Relationship",
-                              accessorKey: "relationship",
-                              render: (dep) => (
-                                <span className="rounded-md border border-border bg-muted px-2 py-0.5 text-label font-semibold text-muted-foreground capitalize">
-                                  {dep.relationship}
-                                </span>
-                              ),
-                            },
+                              {
+                                header: "Relationship",
+                                accessorKey: "relationship",
+                                render: (dep) => (
+                                  <Badge variant="outline" className="text-label font-medium capitalize">
+                                    {dep.relationship}
+                                  </Badge>
+                                ),
+                              },
                             {
                               header: "Status",
                               accessorKey: "status",
