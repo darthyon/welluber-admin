@@ -14,12 +14,9 @@ import {
   Globe,
   IdentificationCard,
   EnvelopeSimple,
-  Article,
   Files,
   Bank,
   MapPin,
-  CreditCard,
-  Clock,
   ShieldCheck
 } from "@phosphor-icons/react";
 import Link from "next/link";
@@ -29,6 +26,7 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { ConfirmationModal } from "@/components/shared/confirmation-modal";
 import { DetailSection } from "@/components/shared/detail-section";
 import { DetailField } from "@/components/shared/detail-field";
+import { MapPlaceholder } from "@/components/shared/map-placeholder";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CommissionSchemaEditor } from "@/components/host/service-providers/commission-schema-editor";
@@ -312,15 +310,22 @@ export default function ServiceProviderDetailPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Section: Business Address */}
                 <DetailSection
-                    title="Registered Business Address"
+                    title="Business Address"
                     icon={<MapPin size={16} weight="fill" />}
                 >
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <DetailField label="Address" value={sp.address?.line || "N/A"} className="sm:col-span-2" />
-                        <DetailField label="Post Code" value={sp.address?.postalCode || "N/A"} />
-                        <DetailField label="City" value={sp.address?.city || "N/A"} />
-                        <DetailField label="State" value={sp.address?.state || "N/A"} />
-                        <DetailField label="Country" value={sp.address?.country || "Malaysia"} />
+                    <div className="space-y-4">
+                        <MapPlaceholder
+                            lat={sp.address?.lat}
+                            lon={sp.address?.lon}
+                            address={sp.address?.line}
+                        />
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <DetailField label="Address" value={sp.address?.line || "N/A"} className="sm:col-span-2" />
+                            <DetailField label="Post Code" value={sp.address?.postalCode || "N/A"} />
+                            <DetailField label="City" value={sp.address?.city || "N/A"} />
+                            <DetailField label="State" value={sp.address?.state || "N/A"} />
+                            <DetailField label="Country" value={sp.address?.country || "Malaysia"} />
+                        </div>
                     </div>
                 </DetailSection>
 
@@ -340,9 +345,9 @@ export default function ServiceProviderDetailPage() {
 
                         {/* Billing & Tax Settings */}
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-6 border-t border-border/40">
-                            <DetailField label="Payment Cycle" value={sp.paymentCycle || "Not Set"} icon={<Clock size={14} />} />
-                            <DetailField label="Credit Terms" value={sp.creditTerms || "Not Set"} icon={<CreditCard size={14} />} />
-                            <DetailField label="Expired Commission Fee" value={`${(sp.expiredCommissionFee ?? 0) * 100}%`} icon={<Article size={14} />} />
+                            <DetailField label="Payment Cycle" value={sp.paymentCycle || "Not Set"} />
+                            <DetailField label="Credit Terms" value={sp.creditTerms || "Not Set"} />
+                            <DetailField label="Expired Commission Fee" value={`${(sp.expiredCommissionFee ?? 0) * 100}%`} />
                         </div>
 
                         {/* e-Invoice Settings */}

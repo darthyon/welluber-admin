@@ -73,7 +73,7 @@ export default function NewServiceProviderPage() {
     const items = [
       { id: "provider-profile", label: "Provider Profile" },
       { id: "registration-compliance", label: "Registration & Compliance" },
-      { id: "registered-address", label: "Registered Address" },
+      { id: "business-address", label: "Business Address" },
       { id: "settlement-tax", label: "Settlement & Tax" },
       { id: "service-portfolio", label: "Service Portfolio" },
     ];

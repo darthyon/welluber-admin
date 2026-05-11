@@ -190,6 +190,8 @@ export interface ServiceProvider {
     state: string;
     country: string;
     postalCode: string;
+    lat?: number;
+    lon?: number;
   };
   needsEInvoiceSubmission?: boolean;
   appointedForEInvoice?: boolean;
