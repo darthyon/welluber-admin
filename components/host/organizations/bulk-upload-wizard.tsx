@@ -8,7 +8,6 @@ import {
   WarningCircle,
   Info,
   ArrowRight,
-  Shield,
   ArrowLeft,
   Calendar,
   Globe,
@@ -54,10 +53,12 @@ type BulkRecord = {
   employeeStatus: string
   isProbation: boolean
   isNewDept?: boolean
+  isNewTier?: boolean
+  isNewPolicy?: boolean
 }
 
 type UploadStep = "upload" | "processing" | "preview" | "success"
-type FilterChip = "all" | "valid" | "issues" | "auto" | "newDept"
+type FilterChip = "all" | "valid" | "issues" | "auto" | "newDept" | "newTier" | "newPolicy"
 
 const COLUMN_ORDER = [
   "select", "code", "name", "email", "dob", "gender", "mobile",
@@ -190,6 +191,57 @@ function EditableCell({ value, onChange, invalid, placeholder, mono, maxWidth = 
   )
 }
 
+function NewValuesConfirmation({
+  newDeptCount,
+  newTierCount,
+  newPolicyCount,
+}: {
+  newDeptCount: number
+  newTierCount: number
+  newPolicyCount: number
+}) {
+  const [confirmed, setConfirmed] = useState(false)
+
+  const items: string[] = []
+  if (newDeptCount > 0) items.push(`${newDeptCount} new ${newDeptCount === 1 ? "department" : "departments"}`)
+  if (newTierCount > 0) items.push(`${newTierCount} new ${newTierCount === 1 ? "tier" : "tiers"}`)
+  if (newPolicyCount > 0) items.push(`${newPolicyCount} new ${newPolicyCount === 1 ? "policy" : "policies"}`)
+
+  return (
+    <div className="rounded-lg border border-border bg-muted/10 px-4 py-3 transition-colors">
+      <div className="flex items-start gap-3">
+        <div className="mt-0.5 shrink-0">
+          {confirmed ? (
+            <StatusBadge status="Confirmed" variant="emerald" />
+          ) : (
+            <StatusBadge status="Review" variant="amber" />
+          )}
+        </div>
+        <div className="flex-1 space-y-2">
+          <div className="space-y-1">
+            <p className="text-body font-semibold text-foreground">
+              {confirmed ? "New values confirmed" : "New values detected"}
+            </p>
+            <p className="text-label text-muted-foreground">
+              This import contains {items.join(", ")} that do not exist in the system yet.
+              Please verify the spelling is correct to avoid duplicates from typos.
+            </p>
+          </div>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={confirmed}
+              onChange={(e) => setConfirmed(e.target.checked)}
+              className="rounded border-border text-primary focus:ring-primary"
+            />
+            <span className="text-label font-medium text-foreground">I confirm these new values are correct</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function TruncatedText({ text, maxWidth = 140, className }: { text: string; maxWidth?: number; className?: string }) {
   if (!text) return <span className="text-faint">—</span>
   return (
@@ -300,11 +352,26 @@ export function BulkUploadWizard({ onBack, onSuccess, orgTierConfigs = [], avail
     applyPolicyAutoAssign(MOCK_RECORDS, policyTierMap)
   )
 
+  const knownDepartments = useMemo(() => Array.from(new Set(records.map((r) => r.department).filter(Boolean))), [records])
+  const knownPolicies = useMemo(() => policyTierMap.map((p) => p.name), [policyTierMap])
+  const knownTiers = useMemo(() => orgTierConfigs.map((tc) => tc.code || tc.name), [orgTierConfigs])
+
   const handleFieldChange = (id: string, field: keyof BulkRecord, value: string) => {
     setRecords((prev) =>
       prev.map((r) => {
         if (r.id !== id) return r
         const next = { ...r, [field]: value }
+        // Track new values
+        if (field === "department" && value) {
+          next.isNewDept = !knownDepartments.includes(value) && !records.some((rec) => rec.id !== id && rec.department === value)
+        }
+        if (field === "tier" && value) {
+          next.isNewTier = !knownTiers.includes(value)
+        }
+        if (field === "policies" && value) {
+          next.isNewPolicy = !knownPolicies.includes(value)
+          next.policyIssue = false
+        }
         // Re-validate after edits
         if (field === "code" && value) next.issue = next.issue?.replace(/Code( & |, )?/, "").replace(/^Missing $/, "") || undefined
         if (field === "email" && value) next.issue = next.issue?.replace(/Email( & |, )?/, "").replace(/^Missing $/, "") || undefined
@@ -314,22 +381,6 @@ export function BulkUploadWizard({ onBack, onSuccess, orgTierConfigs = [], avail
         next.status = stillBad ? "Issue" : "Valid"
         if (!stillBad) next.issue = undefined
         return next
-      })
-    )
-  }
-
-  const resolvePolicy = (id: string, policyName: string) => {
-    setRecords((prev) =>
-      prev.map((r) => {
-        if (r.id !== id) return r
-        const stillBad = !r.code || !r.email || r.dob === "Invalid" || r.date === "Invalid Date"
-        return {
-          ...r,
-          policies: policyName,
-          policyIssue: false,
-          issue: stillBad ? r.issue : undefined,
-          status: stillBad ? "Issue" : "Valid",
-        }
       })
     )
   }
@@ -348,6 +399,8 @@ export function BulkUploadWizard({ onBack, onSuccess, orgTierConfigs = [], avail
         case "issues": return r.status === "Issue"
         case "auto": return !!r.autoAssigned
         case "newDept": return !!r.isNewDept
+        case "newTier": return !!r.isNewTier
+        case "newPolicy": return !!r.isNewPolicy
         default: return true
       }
     })
@@ -359,6 +412,8 @@ export function BulkUploadWizard({ onBack, onSuccess, orgTierConfigs = [], avail
     issues: records.filter((r) => r.status === "Issue").length,
     auto: records.filter((r) => r.autoAssigned).length,
     newDept: records.filter((r) => r.isNewDept).length,
+    newTier: records.filter((r) => r.isNewTier).length,
+    newPolicy: records.filter((r) => r.isNewPolicy).length,
   }), [records])
 
   const allFilteredSelected = filteredRecords.length > 0 && filteredRecords.every((r) => selectedIds.has(r.id))
@@ -552,25 +607,15 @@ export function BulkUploadWizard({ onBack, onSuccess, orgTierConfigs = [], avail
       header: "Tier",
       render: (row) => {
         const tc = resolveTier(row.tier)
-        const displayName = tc?.name || row.tier
         const code = tc?.code
-        const isNewTier = row.tier && !tc
-        const pill = (
-          <span className="rounded border border-primary/15 bg-primary/5 px-1.5 py-0.5 text-label font-semibold text-primary truncate max-w-[140px]">
-            {displayName}
-          </span>
-        )
         return (
           <div className="flex items-center gap-1.5">
-            {code ? (
-              <Tooltip delayDuration={200}>
-                <TooltipTrigger asChild>{pill}</TooltipTrigger>
-                <TooltipContent side="top" className="text-label font-medium">
-                  {displayName} <span className="text-faint">· {code}</span>
-                </TooltipContent>
-              </Tooltip>
-            ) : pill}
-            {isNewTier && (
+            <EditableCell
+              value={row.tier}
+              onChange={(v) => handleFieldChange(row.id, "tier", v)}
+              className={code ? "font-semibold text-primary" : "font-medium"}
+            />
+            {row.isNewTier && (
               <StatusBadge status="New" variant="amber" className="text-micro h-4 px-1.5" />
             )}
           </div>
@@ -608,35 +653,20 @@ export function BulkUploadWizard({ onBack, onSuccess, orgTierConfigs = [], avail
     policy: {
       header: "Policy",
       render: (row) => {
-        if (row.policyIssue && row.tier) {
-          const matches = policyTierMap.filter((p) => p.tiers.includes(row.tier))
-          return (
-            <select
-              value=""
-              onChange={(e) => e.target.value && resolvePolicy(row.id, e.target.value)}
-              className="rounded border border-amber-500/40 bg-amber-500/5 px-2 py-1 text-label font-semibold text-amber-700 dark:text-amber-400 outline-none focus:border-amber-500"
-            >
-              <option value="">Resolve…</option>
-              {matches.map((p) => (
-                <option key={p.name} value={p.name}>{p.name}</option>
-              ))}
-            </select>
-          )
-        }
-        if (row.policies) {
-          const policyMeta = policyTierMap.find((p) => p.name === row.policies)
-          return (
-            <div className="flex items-center gap-1.5 text-primary/80">
-              <Shield size={14} weight="fill" className="shrink-0" />
-              <TruncatedText text={row.policies} maxWidth={120} className="text-body font-semibold" />
-              {policyMeta?.version && (
-                <span className="text-label font-mono text-muted-foreground">{policyMeta.version}</span>
-              )}
-              {row.autoAssigned && <StatusBadge status="Auto" variant="emerald" className="h-4 px-1.5 text-micro" />}
-            </div>
-          )
-        }
-        return <span className="text-faint">—</span>
+        return (
+          <div className="flex items-center gap-1.5">
+            <EditableCell
+              value={row.policies}
+              onChange={(v) => handleFieldChange(row.id, "policies", v)}
+              placeholder="Add policy…"
+              className="font-medium"
+            />
+            {row.isNewPolicy && (
+              <StatusBadge status="New" variant="amber" className="text-micro h-4 px-1.5" />
+            )}
+            {row.autoAssigned && <StatusBadge status="Auto" variant="emerald" className="h-4 px-1.5 text-micro" />}
+          </div>
+        )
       },
     },
     issues: {
@@ -702,7 +732,9 @@ export function BulkUploadWizard({ onBack, onSuccess, orgTierConfigs = [], avail
     { key: "valid", label: "Valid", count: counts.valid, tone: "emerald" },
     { key: "issues", label: "Issues", count: counts.issues, tone: "rose" },
     { key: "auto", label: "Auto-assigned", count: counts.auto, tone: "primary" },
-    { key: "newDept", label: "New depts", count: counts.newDept, tone: "amber" },
+    { key: "newDept", label: "New Depts", count: counts.newDept, tone: "amber" },
+    { key: "newTier", label: "New Tiers", count: counts.newTier, tone: "amber" },
+    { key: "newPolicy", label: "New Policies", count: counts.newPolicy, tone: "amber" },
   ]
 
   const chipToneClasses = (tone: string, active: boolean) => {
@@ -840,7 +872,9 @@ export function BulkUploadWizard({ onBack, onSuccess, orgTierConfigs = [], avail
                   <p className="text-body font-semibold text-foreground">{fileName}</p>
                   <p className="text-label font-medium text-muted-foreground">
                     {counts.total} records · {counts.valid} valid · {counts.issues} issues
-                    {counts.newDept > 0 && ` · ${counts.newDept} new ${counts.newDept === 1 ? "department" : "departments"} to create`}
+                    {counts.newDept > 0 && ` · ${counts.newDept} new ${counts.newDept === 1 ? "department" : "departments"}`}
+                    {counts.newTier > 0 && ` · ${counts.newTier} new ${counts.newTier === 1 ? "tier" : "tiers"}`}
+                    {counts.newPolicy > 0 && ` · ${counts.newPolicy} new ${counts.newPolicy === 1 ? "policy" : "policies"}`}
                   </p>
                 </div>
               </div>
@@ -862,6 +896,15 @@ export function BulkUploadWizard({ onBack, onSuccess, orgTierConfigs = [], avail
                 </Button>
               </div>
             </div>
+
+            {/* New values confirmation banner */}
+            {(counts.newDept > 0 || counts.newTier > 0 || counts.newPolicy > 0) && (
+              <NewValuesConfirmation
+                newDeptCount={counts.newDept}
+                newTierCount={counts.newTier}
+                newPolicyCount={counts.newPolicy}
+              />
+            )}
 
             {/* Filter chips + search */}
             <DataFilterBar
