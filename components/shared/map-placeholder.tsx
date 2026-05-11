@@ -25,7 +25,7 @@ export function MapPlaceholder({ lat, lon, address, className }: MapPlaceholderP
   return (
     <div className={cn("relative rounded-lg border border-border overflow-hidden bg-muted/20", className)}>
       {mapUrl ? (
-        <div className="relative aspect-[2/1] w-full">
+        <div className="relative aspect-[3/1] w-full">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={mapUrl}
@@ -36,7 +36,7 @@ export function MapPlaceholder({ lat, lon, address, className }: MapPlaceholderP
           <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-background/40 to-transparent" />
         </div>
       ) : (
-        <div className="aspect-[2/1] w-full flex flex-col items-center justify-center gap-2 text-muted-foreground">
+        <div className="aspect-[3/1] w-full flex flex-col items-center justify-center gap-2 text-muted-foreground">
           <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
             <MapPin size={20} weight="fill" />
           </div>

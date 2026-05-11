@@ -307,19 +307,21 @@ export default function ServiceProviderDetailPage() {
               </div>
             </DetailSection>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
                 {/* Section: Business Address */}
                 <DetailSection
                     title="Business Address"
                     icon={<MapPin size={16} weight="fill" />}
+                    className="h-full flex flex-col"
                 >
-                    <div className="space-y-4">
+                    <div className="flex flex-col h-full">
                         <MapPlaceholder
                             lat={sp.address?.lat}
                             lon={sp.address?.lon}
                             address={sp.address?.line}
+                            className="shrink-0"
                         />
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 content-start">
                             <DetailField label="Address" value={sp.address?.line || "N/A"} className="sm:col-span-2" />
                             <DetailField label="Post Code" value={sp.address?.postalCode || "N/A"} />
                             <DetailField label="City" value={sp.address?.city || "N/A"} />
@@ -333,7 +335,7 @@ export default function ServiceProviderDetailPage() {
                 <DetailSection
                     title="Settlement & Tax Compliance"
                     icon={<Bank size={16} weight="fill" />}
-                    className="bg-muted/5 border-primary/10"
+                    className="bg-muted/5 border-primary/10 h-full"
                 >
                     <div className="space-y-8">
                         {/* Bank Details */}
