@@ -41,8 +41,8 @@ const mockEmployee = {
   probationMode: "3m" as const,
   probationEndDate: "12 Jan 2024",
   assignedPolicies: [
-    { policyId: "pol_1", policyName: "Wellness Allocation 2026", benefitGroupId: "g1", benefitGroupName: "Gym Membership" },
-    { policyId: "pol_2", policyName: "Lifestyle Pocket 2026", benefitGroupId: "g3", benefitGroupName: "Travel" },
+    { policyId: "pol_1", policyName: "Wellness Allocation 2026", version: "V1.1", benefitGroupId: "g1", benefitGroupName: "Gym Membership" },
+    { policyId: "pol_2", policyName: "Lifestyle Pocket 2026", version: "V2.0", benefitGroupId: "g3", benefitGroupName: "Travel" },
   ],
   dependents: [
     { id: "dep_1", relationship: "Spouse", name: "Jane Fox", email: "jane.fox@email.com", phone: "+60 12-345 6790" },
@@ -189,7 +189,12 @@ export default function EmployeePage() {
                           <Shield size={18} weight="duotone" />
                         </div>
                         <div className="flex-1">
-                          <p className="text-body font-medium text-foreground">{policy.policyName}</p>
+                          <div className="flex items-center gap-2">
+                            <p className="text-body font-medium text-foreground">{policy.policyName}</p>
+                            {policy.version && (
+                              <Badge variant="outline" className="text-label font-mono">{policy.version}</Badge>
+                            )}
+                          </div>
                           <p className="text-label text-subtle">{policy.benefitGroupName}</p>
                         </div>
                         <Badge variant="secondary" className="text-label">Active</Badge>

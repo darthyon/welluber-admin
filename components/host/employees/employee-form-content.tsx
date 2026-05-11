@@ -35,6 +35,7 @@ interface Dependent {
 interface AssignedPolicy {
   policyId: string;
   policyName: string;
+  version?: string;
   benefitGroupId: string;
   benefitGroupName: string;
 }
@@ -466,7 +467,12 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
               <div key={idx} className="p-4 rounded-lg border border-border bg-background shadow-sm flex items-start justify-between gap-4">
                 <div className="flex-1 grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-label font-medium text-subtle">Select benefit policy</label>
+                    <div className="flex items-center justify-between">
+                      <label className="text-label font-medium text-subtle">Select benefit policy</label>
+                      {assigned.version && (
+                        <span className="text-label font-mono text-muted-foreground">{assigned.version}</span>
+                      )}
+                    </div>
                     <select
                       className="w-full px-3 py-2 bg-background border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 transition-all"
                       value={assigned.policyId}
@@ -474,13 +480,13 @@ export function EmployeeFormContent({ mode, onSubmit, isSubmitting }: EmployeeFo
                         const pol = MOCK_FORM_POLICIES.find((p) => p.id === e.target.value);
                         if (pol) {
                           const updated = [...assignedPolicies];
-                          updated[idx] = { ...assigned, policyId: pol.id, policyName: pol.name };
+                          updated[idx] = { ...assigned, policyId: pol.id, policyName: pol.name, version: pol.version };
                           setAssignedPolicies(updated);
                         }
                       }}
                     >
                       {MOCK_FORM_POLICIES.map((p) => (
-                        <option key={p.id} value={p.id}>{p.name}</option>
+                        <option key={p.id} value={p.id}>{p.name}{p.version ? ` · ${p.version}` : ""}</option>
                       ))}
                     </select>
                   </div>

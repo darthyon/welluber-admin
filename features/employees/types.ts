@@ -45,6 +45,7 @@ export interface AssignablePolicy {
 export interface FormPolicy {
   id: string
   name: string
+  version?: string
   groups: { id: string; name: string }[]
 }
 

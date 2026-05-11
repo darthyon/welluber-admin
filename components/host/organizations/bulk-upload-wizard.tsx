@@ -505,7 +505,7 @@ export function BulkUploadWizard({ onBack, onSuccess, orgTierConfigs = [], avail
             <StatusBadge
               status="New"
               variant="amber"
-              className="text-micro h-4 px-1.5 uppercase tracking-tighter"
+              className="text-micro h-4 px-1.5"
             />
           )}
         </div>
@@ -554,6 +554,7 @@ export function BulkUploadWizard({ onBack, onSuccess, orgTierConfigs = [], avail
         const tc = resolveTier(row.tier)
         const displayName = tc?.name || row.tier
         const code = tc?.code
+        const isNewTier = row.tier && !tc
         const pill = (
           <span className="rounded border border-primary/15 bg-primary/5 px-1.5 py-0.5 text-label font-semibold text-primary truncate max-w-[140px]">
             {displayName}
@@ -569,7 +570,9 @@ export function BulkUploadWizard({ onBack, onSuccess, orgTierConfigs = [], avail
                 </TooltipContent>
               </Tooltip>
             ) : pill}
-            {row.isProbation && <StatusBadge status="Probation" variant="amber" className="h-4 px-1.5 text-micro" />}
+            {isNewTier && (
+              <StatusBadge status="New" variant="amber" className="text-micro h-4 px-1.5" />
+            )}
           </div>
         )
       },

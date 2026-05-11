@@ -206,9 +206,9 @@ export const MOCK_ASSIGNABLE_POLICIES: AssignablePolicy[] = [
 
 // Form policies (policy selector in employee create/edit form)
 export const MOCK_FORM_POLICIES: FormPolicy[] = [
-  { id: "POL-20260115-0001", name: "Acme Employee Wellness Policy FY2026", groups: [{ id: "POL-20260115-0001-G1", name: "Gym Membership" }, { id: "POL-20260115-0001-G2", name: "Mental Health" }] },
-  { id: "POL-20260115-0002", name: "Acme Leadership Benefits Policy FY2026", groups: [{ id: "POL-20260115-0002-G1", name: "Travel" }, { id: "POL-20260115-0002-G2", name: "Food & Dining" }] },
-  { id: "POL-20260115-0003", name: "Global Tech Core Benefits Policy FY2026", groups: [{ id: "POL-20260115-0003-G1", name: "Spa Sessions" }, { id: "POL-20260115-0003-G2", name: "Massages" }] },
+  { id: "POL-20260115-0001", name: "Acme Employee Wellness Policy FY2026", version: "V1.1", groups: [{ id: "POL-20260115-0001-G1", name: "Gym Membership" }, { id: "POL-20260115-0001-G2", name: "Mental Health" }] },
+  { id: "POL-20260115-0002", name: "Acme Leadership Benefits Policy FY2026", version: "V2.0", groups: [{ id: "POL-20260115-0002-G1", name: "Travel" }, { id: "POL-20260115-0002-G2", name: "Food & Dining" }] },
+  { id: "POL-20260115-0003", name: "Global Tech Core Benefits Policy FY2026", version: "V1.0", groups: [{ id: "POL-20260115-0003-G1", name: "Spa Sessions" }, { id: "POL-20260115-0003-G2", name: "Massages" }] },
 ]
 
 export { MOCK_POLICY_TEMPLATES }
