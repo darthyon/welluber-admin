@@ -4,16 +4,13 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { Organization } from "@/features/organizations/types";
 import { SharedDataTable, Column } from "@/components/shared/data-table";
-import { Badge } from "@/components/ui/badge";
-import { WarningCircle } from "@phosphor-icons/react";
+import { Button } from "@/components/ui/button";
 import { ActionPopover } from "@/components/shared/action-popover";
-import { UtilizationChart } from "./utilization-chart";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
-import { StatusBadge } from "@/components/shared/status-badge";
 import { EntityAvatar } from "@/components/shared/entity-avatar";
 import { Registry } from "@/lib/mock-data/registry";
+import { formatStateCountry } from "@/lib/utils/location-codes";
 
-// Branch ID → name resolution (sourced from account factory data)
 const BRANCH_NAME_MAP: Record<string, string> = {
   "BR-20260115-0001": "Kuala Lumpur HQ",
   "BR-20260115-0002": "Subang Jaya",
@@ -21,7 +18,6 @@ const BRANCH_NAME_MAP: Record<string, string> = {
   "BR-20260301-0001": "Petaling Jaya Branch",
   "BR-20260310-0001": "Singapore HQ",
   "BR-20260310-0002": "KL Office",
-  // Generated org branches
   "BR-20260401-0004": "Main Office",
   "BR-20260401-0005": "Logistics Hub",
   "BR-20260401-0006": "Energy Park",
@@ -39,19 +35,54 @@ function resolveBranchName(id: string): string {
   return BRANCH_NAME_MAP[id] ?? id
 }
 
-function getNeedsActionItems(org: Organization): string[] {
-  const items: string[] = []
-  if (!org.picId) items.push("Assign a Person-In-Charge")
-  if (org.policies.length === 0) items.push("Assign benefit policies")
-  if (org.branches.length === 0) items.push("Add branches")
-  if ((org.employeesWithoutPolicy ?? 0) > 0) items.push("Cover employees without policy")
-  // Include any additional items from needsAction that aren't already covered
-  for (const action of org.needsAction) {
-    if (!items.some(i => i.toLowerCase().includes(action.toLowerCase().replace(/\s/g, "").slice(0, 6)))) {
-      items.push(action)
-    }
+interface CountCellProps {
+  count: number;
+  label: string;
+  items: string[];
+  orgId: string;
+  tab: "branches" | "employees" | "policies";
+  router: ReturnType<typeof useRouter>;
+}
+
+function CountCell({ count, label, items, orgId, tab, router }: CountCellProps) {
+  if (count === 0) {
+    return <span className="text-label text-faint font-normal italic">0</span>
   }
-  return items
+  return (
+    <Tooltip delayDuration={0}>
+      <TooltipTrigger asChild>
+        <button
+          onClick={(e) => e.stopPropagation()}
+          className="text-body font-medium tabular-nums text-foreground hover:text-primary transition-colors"
+        >
+          {count.toLocaleString()}
+        </button>
+      </TooltipTrigger>
+      <TooltipContent className="w-56 bg-card rounded-lg border-border shadow-2xl z-[200] p-2">
+        <div className="flex flex-col gap-1">
+          <span className="text-label font-medium text-subtle mb-1 px-1">{label}</span>
+          {items.slice(0, 5).map((item, i) => (
+            <div key={i} className="text-label px-2 py-1.5 hover:bg-muted rounded text-foreground transition-colors font-medium">
+              {item}
+            </div>
+          ))}
+          {count > 5 && (
+            <Button
+              variant="link"
+              size="sm"
+              className="justify-start px-2 h-7 text-label"
+              onClick={(e) => {
+                e.stopPropagation();
+                router.push(`/organizations/${orgId}?tab=${tab}`);
+              }}
+            >
+              View all {count} →
+            </Button>
+          )}
+        </div>
+      </TooltipContent>
+    </Tooltip>
+  )
 }
 
 interface OrganizationsDataTableProps {
@@ -60,15 +91,6 @@ interface OrganizationsDataTableProps {
 
 export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
   const router = useRouter();
-
-  const formatCurrency = (val: number) => {
-    return new Intl.NumberFormat('en-MY', { 
-      style: 'currency', 
-      currency: 'MYR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(val);
-  };
 
   const columns: Column<Organization>[] = [
     {
@@ -87,192 +109,63 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
       )
     },
     {
-      header: "Status",
-      accessorKey: "status",
-      sortable: true,
+      header: "Location",
+      headerClassName: "min-w-[6rem]",
+      render: (org) => (
+        <Tooltip delayDuration={0}>
+          <TooltipTrigger asChild>
+            <button
+              onClick={(e) => e.stopPropagation()}
+              className="text-label font-mono font-medium tracking-tight text-foreground hover:text-primary transition-colors"
+            >
+              {formatStateCountry(org.state, org.country)}
+            </button>
+          </TooltipTrigger>
+          <TooltipContent className="w-52 bg-card rounded-lg border-border shadow-2xl z-[200] p-2">
+            <div className="flex flex-col gap-0.5">
+              <span className="text-label font-medium text-subtle px-1">State</span>
+              <span className="text-label text-foreground font-medium px-1 pb-1">{org.state}</span>
+              <span className="text-label font-medium text-subtle px-1">Country</span>
+              <span className="text-label text-foreground font-medium px-1">{org.country}</span>
+            </div>
+          </TooltipContent>
+        </Tooltip>
+      )
+    },
+    {
+      header: "Accounts",
+      align: "right",
+      headerClassName: "min-w-[6rem] text-right",
       render: (org) => {
-        const actionItems = getNeedsActionItems(org)
+        const accounts = [...Registry.accounts.values()].filter(a => a.orgId === org.id)
+        const items = accounts.map(a => `${a.branchName} • ${a.name}`)
         return (
-          <div className="flex items-center gap-1.5">
-            <StatusBadge 
-              status={org.status} 
-              variant={org.status === "active" ? "emerald" : org.status === "inactive" || org.status === "draft" ? "zinc" : org.status === "suspended" ? "rose" : org.status === "deactivated" ? "zinc" : "zinc"} 
-            />
-            {actionItems.length > 0 && (
-              <Tooltip delayDuration={0}>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={(e) => e.stopPropagation()}
-                    className="text-rose-500 dark:text-rose-400 hover:text-rose-600 dark:hover:text-rose-500 transition-colors shrink-0 flex items-center justify-center"
-                  >
-                    <WarningCircle size={16} weight="fill" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent className="w-56 bg-card rounded-lg border-border shadow-2xl z-[200] p-2">
-                  <div className="flex flex-col gap-1">
-                    <span className="text-label font-semibold text-foreground mb-0.5">Actions needed</span>
-                    {actionItems.map((item, i) => (
-                      <div key={i} className="text-label text-muted-foreground flex items-start gap-1.5">
-                        <span className="text-rose-500 dark:text-rose-400 mt-0.5 shrink-0">•</span>
-                        <span>{item}</span>
-                      </div>
-                    ))}
-                  </div>
-                </TooltipContent>
-              </Tooltip>
-            )}
-          </div>
+          <CountCell
+            count={accounts.length}
+            label="Accounts"
+            items={items}
+            orgId={org.id}
+            tab="branches"
+            router={router}
+          />
         )
       }
-    },
-    {
-      header: "Claims Usage",
-      accessorKey: "utilizationRate",
-      sortable: true,
-      headerClassName: "min-w-[11rem]",
-      render: (org) => (
-        <div className="flex items-center gap-2.5">
-          <UtilizationChart value={org.utilizationRate} mode="ring" size={32} strokeWidth={3} />
-          <div className="flex flex-col justify-center">
-            <div className="flex items-center gap-1.5 leading-tight">
-              <span className="text-label font-medium text-foreground">
-                {formatCurrency(org.totalAccountBalance)}
-              </span>
-              {org.claimsCount !== undefined && (
-                <Badge variant="outline" className="px-1.5 text-label font-medium tabular-nums leading-none">
-                  {org.claimsCount}
-                </Badge>
-              )}
-            </div>
-            <span className="text-label text-faint font-medium tabular-nums mt-0.5">
-              / {formatCurrency(org.accountLimit)}
-            </span>
-          </div>
-        </div>
-      )
-    },
-    {
-      header: "Service category",
-      render: (org) => (
-        <div className="flex items-center gap-1 overflow-hidden max-w-[12rem]">
-          {org.services.length === 0 ? (
-            <span className="text-label text-faint font-normal italic px-1">Unassigned</span>
-          ) : (
-            <>
-              {org.services.slice(0, 1).map((service, i) => (
-                <Badge key={i} variant="secondary" className="font-medium text-label px-2 py-0 h-5 whitespace-nowrap">
-                  {service}
-                </Badge>
-              ))}
-              {org.services.length > 1 && (
-                <Tooltip delayDuration={0}>
-                  <TooltipTrigger asChild>
-                    <button aria-label="View more services" 
-                      onClick={(e) => e.stopPropagation()}
-                      className="text-micro text-muted-foreground hover:text-primary font-semibold px-1.5 py-1 transition-colors min-h-[28px] min-w-[28px] flex items-center justify-center"
-                    >
-                      +{org.services.length - 1}
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent className="w-52 bg-card rounded-lg border-border shadow-2xl z-[200]">
-                    <div className="flex flex-col gap-1">
-                      <span className="text-label font-medium text-subtle mb-1 px-1">Service category</span>
-                      {org.services.slice(1).map((service, i) => (
-                        <div key={i} className="text-label px-2 py-1.5 hover:bg-muted rounded text-foreground transition-colors font-medium">
-                          {service}
-                        </div>
-                      ))}
-                    </div>
-                  </TooltipContent>
-                </Tooltip>
-              )}
-            </>
-          )}
-        </div>
-      )
-    },
-    {
-      header: "Benefit Policies",
-      headerClassName: "min-w-[8rem]",
-      render: (org) => (
-        <div className="flex items-center gap-1 overflow-hidden">
-          {org.policies.length === 0 ? (
-            <span className="text-label text-faint font-normal italic px-1">Unassigned</span>
-          ) : (
-            <>
-              {org.policies.slice(0, 1).map((policy, i) => (
-                <Badge key={i} variant="secondary" className="font-medium text-label px-1.5 py-0 h-5 whitespace-nowrap">
-                  {resolvePolicyName(policy)}
-                </Badge>
-              ))}
-              {org.policies.length > 1 && (
-                <Tooltip delayDuration={0}>
-                  <TooltipTrigger asChild>
-                    <button aria-label="View more services" 
-                      onClick={(e) => e.stopPropagation()}
-                      className="text-label text-subtle hover:text-primary font-medium px-1.5 py-1 transition-colors min-h-[28px] min-w-[28px] flex items-center justify-center"
-                    >
-                      +{org.policies.length - 1}
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent className="w-52 bg-card rounded-lg border-border shadow-2xl z-[200]">
-                    <div className="flex flex-col gap-1">
-                      <span className="text-label font-medium text-subtle mb-1 px-1">Benefit policies</span>
-                      {org.policies.slice(1).map((policy, i) => (
-                        <div key={i} className="text-label px-2 py-1.5 hover:bg-muted rounded text-foreground transition-colors font-medium">
-                          {resolvePolicyName(policy)}
-                        </div>
-                      ))}
-                    </div>
-                  </TooltipContent>
-                </Tooltip>
-              )}
-            </>
-          )}
-        </div>
-      )
     },
     {
       header: "Branches",
       accessorKey: "branches",
       sortable: true,
-      headerClassName: "min-w-[8rem]",
+      align: "right",
+      headerClassName: "min-w-[6rem] text-right",
       render: (org) => (
-        <div className="flex items-center gap-1 overflow-hidden">
-          {org.branches.length === 0 ? (
-            <span className="text-label text-faint font-normal italic px-1">Unassigned</span>
-          ) : (
-            <>
-              {org.branches.slice(0, 1).map((branch, i) => (
-                <Badge key={i} variant="outline" className="text-label font-medium whitespace-nowrap">
-                  {resolveBranchName(branch)}
-                </Badge>
-              ))}
-              {org.branches.length > 1 && (
-                <Tooltip delayDuration={0}>
-                  <TooltipTrigger asChild>
-                    <button aria-label="View more services" 
-                      onClick={(e) => e.stopPropagation()}
-                      className="text-label text-subtle hover:text-primary font-medium px-1.5 py-1 transition-colors min-h-[28px] min-w-[28px] flex items-center justify-center"
-                    >
-                      +{org.branches.length - 1}
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent className="w-52 bg-card rounded-lg border-border shadow-2xl z-[200]">
-                    <div className="flex flex-col gap-1">
-                      <span className="text-label font-medium text-subtle mb-1 px-1">Branches</span>
-                      {org.branches.slice(1).map((branch, i) => (
-                        <div key={i} className="text-label px-2 py-1.5 hover:bg-muted rounded text-foreground transition-colors font-medium">
-                          {resolveBranchName(branch)}
-                        </div>
-                      ))}
-                    </div>
-                  </TooltipContent>
-                </Tooltip>
-              )}
-            </>
-          )}
-        </div>
+        <CountCell
+          count={org.branches.length}
+          label="Branches"
+          items={org.branches.map(resolveBranchName)}
+          orgId={org.id}
+          tab="branches"
+          router={router}
+        />
       )
     },
     {
@@ -280,35 +173,48 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
       accessorKey: "employeeCount",
       sortable: true,
       align: "right",
-      render: (org) => <span className="text-body font-medium text-foreground">{org.employeeCount.toLocaleString()}</span>
+      headerClassName: "min-w-[6rem] text-right",
+      render: (org) => {
+        const employees = [...Registry.employees.values()].filter(e => e.orgId === org.id)
+        const items = employees.map(e => e.name)
+        return (
+          <CountCell
+            count={org.employeeCount}
+            label="Employees"
+            items={items}
+            orgId={org.id}
+            tab="employees"
+            router={router}
+          />
+        )
+      }
     },
     {
-      header: "Joined",
-      accessorKey: "createdAt",
-      sortable: true,
-      headerClassName: "text-right",
+      header: "Benefit Policies",
       align: "right",
+      headerClassName: "min-w-[7rem] text-right",
       render: (org) => (
-        <span className="text-label text-muted-foreground font-medium">
-          {new Date(org.createdAt).toLocaleDateString("en-GB", { 
-            day: "2-digit",
-            month: "short",
-            year: "numeric", 
-          })}
-        </span>
+        <CountCell
+          count={org.policies.length}
+          label="Benefit policies"
+          items={org.policies.map(resolvePolicyName)}
+          orgId={org.id}
+          tab="policies"
+          router={router}
+        />
       )
     },
     {
-      header: "", // Actions handle internally by SharedDataTable last column freeze
+      header: "",
       align: "right",
       render: (org) => (
-        <ActionPopover 
+        <ActionPopover
           actions={[
             { label: "Edit Organisation", href: `/organizations/${org.id}/edit` },
             { label: "Quick Invite Admin", onClick: () => console.log("Invite clicked") },
             { label: "Settings", isSectionTitle: true },
             { label: "Benefit Policies", href: `/organizations/${org.id}?tab=policies`, className: "text-primary font-semibold" }
-          ]} 
+          ]}
         />
       )
     }
@@ -317,10 +223,10 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
   return (
     <TooltipProvider>
       <div className="space-y-4">
-        <SharedDataTable 
-          data={data} 
-          columns={columns} 
-          freezeFirst={true} 
+        <SharedDataTable
+          data={data}
+          columns={columns}
+          freezeFirst={true}
           freezeLast={true}
           rowsPerPage={10}
           onRowClick={(org) => router.push(`/organizations/${org.id}`)}

@@ -1,13 +1,13 @@
 import type { Organization } from "@/features/organizations/types"
 
 const GENERATED_ORGS = [
-  { name: "BrightPath Technologies Sdn Bhd", industry: "Technology", subIndustry: "Cybersecurity", type: "sme" as const, plan: "standard" as const, status: "active" as const, empCount: 85, util: 42 },
-  { name: "Meridian Logistics Group", industry: "Logistics", subIndustry: "Freight & Distribution", type: "enterprise" as const, plan: "premium" as const, status: "active" as const, empCount: 320, util: 61 },
-  { name: "Solaris Energy Ventures", industry: "Energy", subIndustry: "Renewable Energy", type: "sme" as const, plan: "standard" as const, status: "inactive" as const, empCount: 60, util: 22 },
-  { name: "Pinnacle Medical Group", industry: "Healthcare", subIndustry: "Private Healthcare", type: "enterprise" as const, plan: "enterprise" as const, status: "active" as const, empCount: 910, util: 78 },
-  { name: "Horizon Retail Holdings", industry: "Retail", subIndustry: "Fashion & Apparel", type: "enterprise" as const, plan: "premium" as const, status: "active" as const, empCount: 550, util: 55 },
-  { name: "Apex Construction Sdn Bhd", industry: "Construction", subIndustry: "Civil Engineering", type: "sme" as const, plan: "standard" as const, status: "active" as const, empCount: 140, util: 38 },
-  { name: "Luminary Education Group", industry: "Education", subIndustry: "Private Tutoring", type: "ngo" as const, plan: "standard" as const, status: "deactivated" as const, empCount: 45, util: 12 },
+  { name: "BrightPath Technologies Sdn Bhd", industry: "Technology", subIndustry: "Cybersecurity", type: "sme" as const, plan: "standard" as const, status: "active" as const, empCount: 85, util: 42, state: "Selangor", country: "Malaysia" },
+  { name: "Meridian Logistics Group", industry: "Logistics", subIndustry: "Freight & Distribution", type: "enterprise" as const, plan: "premium" as const, status: "active" as const, empCount: 320, util: 61, state: "Johor", country: "Malaysia" },
+  { name: "Solaris Energy Ventures", industry: "Energy", subIndustry: "Renewable Energy", type: "sme" as const, plan: "standard" as const, status: "inactive" as const, empCount: 60, util: 22, state: "Sarawak", country: "Malaysia" },
+  { name: "Pinnacle Medical Group", industry: "Healthcare", subIndustry: "Private Healthcare", type: "enterprise" as const, plan: "enterprise" as const, status: "active" as const, empCount: 910, util: 78, state: "Wilayah Persekutuan", country: "Malaysia" },
+  { name: "Horizon Retail Holdings", industry: "Retail", subIndustry: "Fashion & Apparel", type: "enterprise" as const, plan: "premium" as const, status: "active" as const, empCount: 550, util: 55, state: "Penang", country: "Malaysia" },
+  { name: "Apex Construction Sdn Bhd", industry: "Construction", subIndustry: "Civil Engineering", type: "sme" as const, plan: "standard" as const, status: "active" as const, empCount: 140, util: 38, state: "Putrajaya", country: "Malaysia" },
+  { name: "Luminary Education Group", industry: "Education", subIndustry: "Private Tutoring", type: "ngo" as const, plan: "standard" as const, status: "deactivated" as const, empCount: 45, util: 12, state: "Sabah", country: "Malaysia" },
 ]
 
 const BANKS = ["Maybank Berhad", "CIMB Bank", "Public Bank", "RHB Bank", "Hong Leong Bank"]
@@ -24,6 +24,8 @@ export function createOrganization(index: number): Organization {
     subscription: { plan: "enterprise", billingInformation: "Acme Finance Dept", paymentMethod: "bank_transfer", startDate: "2026-01-15T10:00:00Z", status: "active" },
     status: "active",
     tinNumber: "TR-882910-01",
+    state: "Wilayah Persekutuan",
+    country: "Malaysia",
     bankAccountDetails: { bankName: "Maybank Berhad", accountNumber: "5140 1234 5678", accountName: "Acme Corporation Sdn Bhd" },
     employeeCount: 450,
     picId: "USR-20260101-0001",
@@ -66,6 +68,8 @@ export function createOrganization(index: number): Organization {
     subscription: { plan: "standard", billingInformation: "GT Logistics Finance", paymentMethod: "credit_card", startDate: "2026-03-01T10:00:00Z", status: "active" },
     status: "inactive",
     tinNumber: "TR-993021-02",
+    state: "Selangor",
+    country: "Malaysia",
     bankAccountDetails: { bankName: "CIMB Bank", accountNumber: "8001 2233 4455", accountName: "Global Tech Solutions" },
     employeeCount: 120,
     picId: null,
@@ -104,6 +108,8 @@ export function createOrganization(index: number): Organization {
     subscription: { plan: "premium", billingInformation: "Nexus Accounts", paymentMethod: "bank_transfer", startDate: "2026-02-10T10:00:00Z", status: "suspended" },
     status: "suspended",
     tinNumber: "TR-554433-03",
+    state: "Singapore",
+    country: "Singapore",
     bankAccountDetails: { bankName: "Public Bank", accountNumber: "3112 5544 3322", accountName: "Nexus Innovations" },
     employeeCount: 850,
     picId: "USR-20260115-0002",
@@ -139,6 +145,8 @@ export function createOrganization(index: number): Organization {
     subscription: { plan: d.plan, billingInformation: "Finance Dept", paymentMethod: "bank_transfer", startDate: "2026-04-01T10:00:00Z", status: d.status },
     status: d.status,
     tinNumber: `TR-${10000 + g * 111}-0${n}`,
+    state: d.state,
+    country: d.country,
     bankAccountDetails: { bankName: BANKS[g % BANKS.length]!, accountNumber: `5140 ${1000 + g} ${5678 + g}`, accountName: d.name },
     employeeCount: d.empCount,
     picId: "USR-20260101-0001",
