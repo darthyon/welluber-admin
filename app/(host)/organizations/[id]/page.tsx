@@ -23,7 +23,8 @@ import {
   SealCheck,
   MapPin,
   Ticket,
-  Rows
+  Rows,
+  Info
 } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { Breadcrumbs } from "@/components/shared/breadcrumbs"
@@ -75,7 +76,6 @@ import {
 } from "@/features/organizations/actions"
 import { OrganizationStatus } from "@/features/organizations/types"
 import { MOCK_ORGS, MOCK_DEPENDENTS, MOCK_ENTITLEMENTS, MOCK_EMPLOYEE_UTILISATION, MOCK_EMPLOYEES } from "@/lib/mock-data"
-import { UtilizationChart } from "@/components/host/organizations/utilization-chart"
 import { EntityAvatar } from "@/components/shared/entity-avatar"
 
 const TABS = [
@@ -995,49 +995,80 @@ function OrganizationDetailContent() {
                         },
                         {
                           header: "Account",
-                          accessorKey: "accountModel",
+                          accessorKey: "accountName",
                           sortable: true,
-                          headerClassName: "min-w-[150px]",
-                          render: (branch: { accountModel: string; balance: string }) => (
-                            <div className="flex flex-col">
-                              <span className="text-body font-semibold text-foreground">
-                                {branch.accountModel}
-                              </span>
-                              <span className="mt-0.5 text-label font-medium text-muted-foreground">
-                                {branch.balance}
-                              </span>
-                            </div>
-                          ),
+                          headerClassName: "min-w-[220px]",
+                          render: (branch: { accountName: string; accountId: string; cashBalance: number; creditBalance: number }) => {
+                            const total = branch.cashBalance + branch.creditBalance;
+                            return (
+                              <div className="flex items-center gap-3">
+                                <div className="flex flex-col min-w-0">
+                                  <span className="text-body font-semibold text-foreground truncate">
+                                    {branch.accountName}
+                                  </span>
+                                  <span className="mt-0.5 text-label font-mono text-subtle tracking-tight">
+                                    {branch.accountId}
+                                  </span>
+                                </div>
+                                <Tooltip delayDuration={0}>
+                                  <TooltipTrigger asChild>
+                                    <button
+                                      onClick={(e) => e.stopPropagation()}
+                                      className="ml-auto text-body font-semibold tabular-nums text-foreground hover:text-primary transition-colors"
+                                    >
+                                      RM {total.toLocaleString()}
+                                    </button>
+                                  </TooltipTrigger>
+                                  <TooltipContent className="w-56 bg-card rounded-lg border-border shadow-2xl z-[200] p-3">
+                                    <div className="flex flex-col gap-2">
+                                      <div className="flex items-center justify-between">
+                                        <span className="text-label font-medium text-subtle">Cash balance</span>
+                                        <span className="text-label font-semibold text-foreground tabular-nums">RM {branch.cashBalance.toLocaleString()}</span>
+                                      </div>
+                                      <div className="flex items-center justify-between">
+                                        <span className="text-label font-medium text-subtle">Credit available</span>
+                                        <span className="text-label font-semibold text-foreground tabular-nums">RM {branch.creditBalance.toLocaleString()}</span>
+                                      </div>
+                                      <div className="h-px bg-border/60 my-0.5" />
+                                      <div className="flex items-center justify-between">
+                                        <span className="text-label font-semibold text-subtle">Total</span>
+                                        <span className="text-label font-semibold text-primary tabular-nums">RM {total.toLocaleString()}</span>
+                                      </div>
+                                    </div>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </div>
+                            );
+                          },
                         },
                         {
-                          header: "Claims Usage",
-                          accessorKey: "utilizationRate",
+                          header: (
+                            <span className="inline-flex items-center gap-1">
+                              Claims
+                              <Tooltip delayDuration={0}>
+                                <TooltipTrigger asChild>
+                                  <button
+                                    type="button"
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="text-faint hover:text-foreground transition-colors"
+                                    aria-label="About claims"
+                                  >
+                                    <Info size={12} weight="regular" />
+                                  </button>
+                                </TooltipTrigger>
+                                <TooltipContent className="bg-card rounded-lg border-border shadow-2xl z-[200] px-2.5 py-1.5">
+                                  <span className="text-label font-medium text-foreground">Based on current month&apos;s claim</span>
+                                </TooltipContent>
+                              </Tooltip>
+                            </span>
+                          ),
+                          accessorKey: "claimsCount",
                           sortable: true,
-                          headerClassName: "min-w-[180px]",
-                          render: (branch: { utilizationRate: number; balance: string; claimsCount?: number; limit?: string }) => (
-                            <div className="flex items-center gap-2.5">
-                              <UtilizationChart
-                                value={branch.utilizationRate}
-                                mode="ring"
-                                size={32}
-                                strokeWidth={3}
-                              />
-                              <div className="flex flex-col justify-center">
-                                <div className="flex items-center gap-1.5 leading-tight">
-                                  <span className="text-label font-semibold text-foreground">
-                                    {branch.balance}
-                                  </span>
-                                  {branch.claimsCount !== undefined && (
-                                    <span className="rounded-full border border-border bg-muted px-1.5 text-label font-medium text-muted-foreground tabular-nums">
-                                      {branch.claimsCount}
-                                    </span>
-                                  )}
-                                </div>
-                                <span className="mt-0.5 text-label font-medium text-faint tabular-nums">
-                                  / {branch.limit || "RM 0.00"}
-                                </span>
-                              </div>
-                            </div>
+                          headerClassName: "min-w-[120px]",
+                          render: (branch: { claimsCount: number }) => (
+                            <span className="text-body font-medium tabular-nums text-foreground">
+                              {branch.claimsCount.toLocaleString()}
+                            </span>
                           ),
                         },
                         {
@@ -1070,10 +1101,10 @@ function OrganizationDetailContent() {
                           type: "HQ",
                           status: "Active",
                           employees: 1240,
-                          accountModel: "New",
-                          balance: "RM 45,000",
-                          limit: "RM 60,000",
-                          utilizationRate: 68,
+                          accountName: "KL HQ Account",
+                          accountId: "ACC-20260115-0001",
+                          cashBalance: 45000,
+                          creditBalance: 10000,
                           claimsCount: 12,
                         },
                         {
@@ -1082,10 +1113,10 @@ function OrganizationDetailContent() {
                           type: "Branch office",
                           status: "Active",
                           employees: 450,
-                          accountModel: "Existing",
-                          balance: "RM 12,500",
-                          limit: "RM 30,000",
-                          utilizationRate: 42,
+                          accountName: "Subang Shared Pool",
+                          accountId: "ACC-20260115-0002",
+                          cashBalance: 12500,
+                          creditBalance: 5000,
                           claimsCount: 5,
                         },
                       ]}
