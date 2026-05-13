@@ -34,8 +34,8 @@ export function AdminCard({ admin }: AdminCardProps) {
 
   const getRoleLabel = (role: string) => {
     switch (role) {
-      case "HostAdmin": return "Host admin";
-      case "OrgAdmin": return "Org admin";
+      case "HostAdmin": return "Superadmin";
+      case "OrgAdmin": return "Admin";
       case "SPAdmin": return "SP admin";
       default: return role;
     }

@@ -1,4 +1,5 @@
 import type { Organization } from "@/features/organizations/types"
+import { MALAYSIAN_BANKS } from "@/lib/constants/banks"
 
 const GENERATED_ORGS = [
   { name: "BrightPath Technologies Sdn Bhd", industry: "Technology", subIndustry: "Cybersecurity", type: "sme" as const, plan: "standard" as const, status: "active" as const, empCount: 85, util: 42, state: "Selangor", country: "Malaysia" },
@@ -10,7 +11,7 @@ const GENERATED_ORGS = [
   { name: "Luminary Education Group", industry: "Education", subIndustry: "Private Tutoring", type: "ngo" as const, plan: "standard" as const, status: "deactivated" as const, empCount: 45, util: 12, state: "Sabah", country: "Malaysia" },
 ]
 
-const BANKS = ["Maybank Berhad", "CIMB Bank", "Public Bank", "RHB Bank", "Hong Leong Bank"]
+const BANKS = MALAYSIAN_BANKS
 
 export function createOrganization(index: number): Organization {
   if (index === 0) return {

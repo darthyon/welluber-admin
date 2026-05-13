@@ -57,7 +57,7 @@ export default function AdministratorsPage() {
       sortable: true,
       render: (row) => (
         <StatusBadge
-          status={row.role === "HostAdmin" ? "Host admin" : row.role === "OrgAdmin" ? "Org admin" : "SP admin"}
+          status={row.role === "HostAdmin" ? "Superadmin" : row.role === "OrgAdmin" ? "Admin" : "SP admin"}
           variant={row.role === "HostAdmin" ? "primary" : row.role === "OrgAdmin" ? "emerald" : "amber"}
         />
       )
@@ -174,8 +174,8 @@ export default function AdministratorsPage() {
               onChange={setRoleFilter}
               options={[
                 { label: "All User Types", value: "all" },
-                { label: "Host Admin", value: "HostAdmin" },
-                { label: "Org Admin", value: "OrgAdmin" },
+                { label: "Superadmin", value: "HostAdmin" },
+                { label: "Admin", value: "OrgAdmin" },
                 { label: "SP Admin", value: "SPAdmin" },
               ]}
             />
