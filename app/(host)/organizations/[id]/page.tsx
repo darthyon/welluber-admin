@@ -905,7 +905,7 @@ function OrganizationDetailContent() {
                   />
 
                   {branchesView === "grid" ? (
-                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
                       <BranchCard
                         branch={{
                           id: "br_1",
@@ -913,15 +913,15 @@ function OrganizationDetailContent() {
                           type: "HQ",
                           accountModel: "New",
                           accountName: "KL HQ Account",
+                          accountId: "ACC-20260115-0001",
                           address: {
                             city: "Kuala Lumpur",
                             state: "Wilayah Persekutuan",
                           },
                           employeesCount: 1240,
                           status: "Active",
-                          balance: "RM 45,000.00",
-                          limit: "RM 60,000.00",
-                          utilizationRate: 68,
+                          cashBalance: 45000,
+                          creditBalance: 10000,
                           claimsCount: 12,
                         }}
                         onView={() => setViewBranchId("br_1")}
@@ -934,12 +934,12 @@ function OrganizationDetailContent() {
                           type: "Branch Office",
                           accountModel: "Existing",
                           accountName: "Acme Shared Account",
+                          accountId: "ACC-20260115-0002",
                           address: { city: "Subang Jaya", state: "Selangor" },
                           employeesCount: 450,
                           status: "Active",
-                          balance: "RM 12,500.00",
-                          limit: "RM 30,000.00",
-                          utilizationRate: 42,
+                          cashBalance: 12500,
+                          creditBalance: 5000,
                           claimsCount: 5,
                         }}
                         onView={() => setViewBranchId("br_2")}

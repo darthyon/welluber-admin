@@ -1,10 +1,9 @@
 "use client";
 
-import { Buildings, Wallet, Users, ChartPieSlice } from "@phosphor-icons/react";
+import { Buildings, Wallet, Users, Info } from "@phosphor-icons/react";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ActionPopover } from "@/components/shared/action-popover";
-import { UtilizationChart } from "./utilization-chart";
-import { cn } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 
 interface BranchCardProps {
   branch: {
@@ -13,15 +12,15 @@ interface BranchCardProps {
     type: string;
     accountModel: string;
     accountName?: string;
+    accountId?: string;
     address?: {
       city: string;
       state: string;
     };
     employeesCount?: number;
     status?: string;
-    balance?: string;
-    limit?: string;
-    utilizationRate?: number;
+    cashBalance?: number;
+    creditBalance?: number;
     claimsCount?: number;
   };
   onView?: (id: string) => void;
@@ -78,22 +77,56 @@ export function BranchCard({ branch, onView, onEdit }: BranchCardProps) {
 
       <div className="mt-auto space-y-4 pt-6 relative z-10">
         <div className="flex items-center justify-between border-t border-border/40 pt-4">
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1 min-w-0">
             <span className="text-label font-semibold text-faint">Account</span>
             <div className="flex items-center gap-1.5 text-label font-semibold text-foreground">
-              <Wallet size={14} weight="bold" className="text-primary" />
-              <span className="truncate max-w-[120px]">{branch.accountName || "Unnamed Account"}</span>
-              <span className="px-1 py-0 rounded bg-muted border border-border text-label font-medium text-muted-foreground">
+              <Wallet size={14} weight="bold" className="text-primary shrink-0" />
+              <span className="truncate">{branch.accountName || "Unnamed Account"}</span>
+              <span className="px-1 py-0 rounded bg-muted border border-border text-label font-medium text-muted-foreground shrink-0">
                 {accountLabel}
               </span>
             </div>
-            {branch.balance && (
-              <span className="text-label text-faint font-medium pl-5">{branch.balance}</span>
+            {branch.accountId && (
+              <span className="font-mono text-label text-subtle tracking-tight truncate">
+                {branch.accountId}
+              </span>
+            )}
+            {typeof branch.cashBalance === "number" && typeof branch.creditBalance === "number" && (
+              <TooltipProvider>
+                <Tooltip delayDuration={0}>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-label text-faint font-medium text-left hover:text-foreground transition-colors w-fit"
+                    >
+                      RM {(branch.cashBalance + branch.creditBalance).toLocaleString()}
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent className="w-52 bg-card rounded-lg border-border shadow-2xl z-[200] p-3">
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-label font-medium text-subtle">Cash balance</span>
+                        <span className="text-label font-semibold text-foreground tabular-nums">RM {branch.cashBalance.toLocaleString()}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-label font-medium text-subtle">Credit available</span>
+                        <span className="text-label font-semibold text-foreground tabular-nums">RM {branch.creditBalance.toLocaleString()}</span>
+                      </div>
+                      <div className="h-px bg-border/60 my-0.5" />
+                      <div className="flex items-center justify-between">
+                        <span className="text-label font-semibold text-subtle">Total</span>
+                        <span className="text-label font-semibold text-primary tabular-nums">RM {(branch.cashBalance + branch.creditBalance).toLocaleString()}</span>
+                      </div>
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             )}
           </div>
           
           {branch.employeesCount && (
-            <div className="flex flex-col items-end gap-1 text-right">
+            <div className="flex flex-col items-end gap-1 text-right shrink-0">
               <span className="text-label font-semibold text-faint">Workforce</span>
               <div className="flex items-center gap-1.5 text-label font-semibold text-foreground">
                 <Users size={14} weight="bold" className="text-primary" />
@@ -103,35 +136,31 @@ export function BranchCard({ branch, onView, onEdit }: BranchCardProps) {
           )}
         </div>
 
-        {branch.utilizationRate !== undefined && (
-          <div className="space-y-2.5 pt-4 border-t border-border/40">
-            <div className="flex items-center gap-1.5 text-faint">
-              <ChartPieSlice size={14} weight="bold" />
-              <span className="text-label font-semibold text-faint leading-none">Claims Usage</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <UtilizationChart value={branch.utilizationRate} mode="ring" size={40} strokeWidth={4} />
-              <div className="flex flex-col justify-center">
-                <div className="flex items-center gap-1.5 leading-tight">
-                  <span className={cn(
-                    "text-body font-medium text-foreground",
-                    branch.utilizationRate > 80 ? "text-rose-600 dark:text-rose-400" : branch.utilizationRate > 50 ? "text-amber-600 dark:text-amber-400" : "text-emerald-600 dark:text-emerald-400"
-                  )}>
-                    {branch.balance}
-                  </span>
-                  {branch.claimsCount !== undefined && (
-                    <span className="text-label font-medium px-1.5 rounded-full bg-muted text-faint border border-border tabular-nums leading-none flex items-center">
-                      {branch.claimsCount}
-                    </span>
-                  )}
-                </div>
-                {branch.limit && (
-                  <span className="text-label text-faint font-medium tabular-nums mt-0.5">
-                    / {branch.limit}
-                  </span>
-                )}
-              </div>
-            </div>
+        {branch.claimsCount !== undefined && (
+          <div className="flex items-center justify-between pt-4 border-t border-border/40">
+            <span className="inline-flex items-center gap-1.5 text-label font-semibold text-faint">
+              Claims
+              <TooltipProvider>
+                <Tooltip delayDuration={0}>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-faint hover:text-foreground transition-colors"
+                      aria-label="About claims"
+                    >
+                      <Info size={12} weight="regular" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent className="bg-card rounded-lg border-border shadow-2xl z-[200] px-2.5 py-1.5">
+                    <span className="text-label font-medium text-foreground">Based on current month&apos;s claim</span>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </span>
+            <span className="text-body font-medium tabular-nums text-foreground">
+              {branch.claimsCount.toLocaleString()}
+            </span>
           </div>
         )}
       </div>
