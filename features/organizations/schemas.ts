@@ -21,9 +21,9 @@ export const createOrganizationSchema = z.object({
     startDate: z.date().optional(),
     endDate: z.date().optional(),
     status: z.enum(["active", "inactive", "draft", "deactivated", "suspended"]).default("inactive"),
-  }),
+  }).optional(),
   tinNumber: z.string().min(4, "TIN Number is required"),
-  creditLimit: z.number().min(0).default(0),
+  creditLimit: z.number().min(0).optional(),
   address: z.object({
     line: z.string().min(5, "Address line is required"),
     city: z.string().min(2, "City is required"),

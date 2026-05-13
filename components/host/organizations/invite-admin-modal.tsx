@@ -75,7 +75,7 @@ export function InviteAdminModal({ targetId, isOpen, onClose, title = "Invite Ad
 
             <form id="inviteAdminForm" onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               <p className="text-body text-subtle mb-4">
-                Enter the details below to invite an administrator. They will receive an email with a secure link to join.
+                Enter the details below to invite an Admin. They will receive an email with a secure link to join.
               </p>
               
               <div className="space-y-1.5">

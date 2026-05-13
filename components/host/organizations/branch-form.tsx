@@ -46,6 +46,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
   // Wallet fields
   const [accountName, setAccountName] = useState("");
   const [initialAmount, setInitialAmount] = useState("");
+  const [creditLimit, setCreditLimit] = useState("");
   const [existingAccountId, setExistingAccountId] = useState("");
   const [attachment, setAttachment] = useState<File | null>(null);
 
@@ -269,6 +270,18 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
                     <p className="text-label text-faint font-medium">Top-up amount to seed this account.</p>
                   </div>
 
+                  <div className="space-y-1.5">
+                    <label className="text-body font-medium text-foreground">Credit Limit (RM)</label>
+                    <input
+                      type="number"
+                      value={creditLimit}
+                      onChange={(e) => setCreditLimit(e.target.value)}
+                      placeholder="0.00"
+                      className="w-full px-3 py-2.5 bg-card border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-semibold text-foreground hover:border-border/80"
+                    />
+                    <p className="text-label text-faint font-medium">Max overdraft this branch may use beyond its balance. Cannot exceed organization cap.</p>
+                  </div>
+
                   {/* Attachment upload */}
                   <div className="space-y-1.5">
                     <label className="text-body font-medium text-foreground">Payment Receipt</label>
@@ -353,7 +366,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
                     <PaperPlaneTilt size={20} />
                   </div>
                   <div>
-                    <p className="text-body font-semibold text-foreground leading-tight">Invite org admin</p>
+                    <p className="text-body font-semibold text-foreground leading-tight">Invite Admin</p>
                     <p className="text-label text-muted-foreground mt-1">Send an invitation to manage this branch.</p>
                   </div>
                   <Button variant="secondary" size="sm" className="text-label font-semibold rounded-full px-6 transition-all">

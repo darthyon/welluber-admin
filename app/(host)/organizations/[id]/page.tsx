@@ -13,7 +13,7 @@ import {
   Users,
   Shield,
   Gear,
-  CreditCard,
+  Bank,
   Plus,
   PencilSimpleLine,
   Upload,
@@ -615,29 +615,30 @@ function OrganizationDetailContent() {
               employeesWithoutPolicy={orgForSetup.employeesWithoutPolicy ?? 0}
             />
             {orgStatus !== "inactive" && <OrgSetupGuide organization={orgForSetup} />}
-            {/* Account Details */}
+            {/* Organisation Profile */}
             <DetailSection
-              title="Account Details"
+              title="Organisation Profile"
               icon={<Buildings size={18} weight="duotone" />}
               description="Basic information about the organisation"
             >
               <div className="grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-4">
+                <DetailField label="Name" value="Acme Corporation Sdn Bhd" />
+                <DetailField label="Industry" value="Technology" />
+                <DetailField label="Sub-industry" value="Software Development" />
+                <DetailField label="Financial Year Start" value="01 January" />
+              </div>
+            </DetailSection>
+
+            {/* Registration & Compliance */}
+            <DetailSection
+              title="Registration & Compliance"
+              icon={<IdentificationCard size={18} weight="duotone" />}
+              description="Statutory identifiers and entity classification"
+            >
+              <div className="grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-4">
                 <DetailField label="Registration No." value="1234567-T" />
                 <DetailField label="TIN No." value="TR-882910-01" />
-                <DetailField label="Industry" value="Technology" />
-                <DetailField
-                  label="Sub-industry"
-                  value="Software Development"
-                />
-                <DetailField
-                  label="Financial Year Start"
-                  value="01 January"
-                />
                 <DetailField label="Organisation Type" value="SME" />
-                <DetailField 
-                  label="Credit Limit" 
-                  value={<span className="font-mono font-semibold text-primary">RM 50,000.00</span>} 
-                />
               </div>
             </DetailSection>
 
@@ -650,27 +651,24 @@ function OrganizationDetailContent() {
               <div className="grid grid-cols-1 gap-x-6 gap-y-8 md:grid-cols-2">
                 <DetailField label="Address Line" value="Level 15, Menara Southpoint, Mid Valley City" />
                 <div className="grid grid-cols-2 gap-4">
+                  <DetailField label="Country" value="Malaysia" />
+                  <DetailField label="Postal Code" value="59200" />
                   <DetailField label="City" value="Kuala Lumpur" />
                   <DetailField label="State" value="W.P. Kuala Lumpur" />
-                  <DetailField label="Postal Code" value="59200" />
-                  <DetailField label="Country" value="Malaysia" />
                 </div>
               </div>
             </DetailSection>
 
-            {/* Tax & Banking Details */}
+            {/* Payment Details */}
             <DetailSection
-              title="Tax & Banking"
-              icon={<CreditCard size={18} weight="duotone" />}
-              description="Financial reporting and settlement identifiers"
+              title="Payment Details"
+              icon={<Bank size={18} weight="duotone" />}
+              description="Settlement bank account"
             >
               <div className="grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-4">
                 <DetailField label="Bank Name" value="Maybank Berhad" />
                 <DetailField label="Account Number" value="5140 1234 5678" />
-                <DetailField
-                  label="Account Name"
-                  value="Acme Corporation Sdn Bhd"
-                />
+                <DetailField label="Account Name" value="Acme Corporation Sdn Bhd" />
               </div>
             </DetailSection>
 

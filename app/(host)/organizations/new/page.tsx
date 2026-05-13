@@ -25,13 +25,14 @@ import { Organization } from "@/features/organizations/types";
 import { LocationPicker } from "@/components/shared/location-picker";
 import { DocumentUploadSection } from "@/components/shared/document-upload-section";
 import { FormSelect } from "@/components/shared/form-select";
+import { MALAYSIAN_BANKS } from "@/lib/constants/banks";
 import { toast } from "sonner";
 
 const ANCHOR_ITEMS = [
   { id: "org-profile", label: "Organisation Profile" },
   { id: "registration-compliance", label: "Registration & Compliance" },
-  { id: "registered-address", label: "Registered Address" },
-  { id: "settlement-platform", label: "Settlement & Platform" },
+  { id: "business-address", label: "Business Address" },
+  { id: "payment-details", label: "Payment Details" },
 ];
 
 const ORG_TYPES = [
@@ -52,15 +53,11 @@ export default function NewOrganizationPage() {
     resolver: zodResolver(createOrganizationSchema as any),
     defaultValues: {
       type: "sme",
-      subscription: {
-        plan: "standard",
-        status: "inactive",
-      },
     },
   });
 
   const industryValue = useWatch({ control, name: "industry" });
-  const subscriptionPlanValue = useWatch({ control, name: "subscription.plan" });
+  const bankNameValue = useWatch({ control, name: "bankAccountDetails.bankName" });
 
   const orgType = useWatch({ control, name: "type" });
 
@@ -82,7 +79,6 @@ export default function NewOrganizationPage() {
           utilizationRate: 0,
           totalAccountBalance: 0,
           accountLimit: 0,
-          creditLimit: 0,
           needsAction: [],
           services: [],
           documents: [],
@@ -270,15 +266,15 @@ export default function NewOrganizationPage() {
                 </div>
               </div>
 
-              {/* Section: Registered Address */}
-              <div id="registered-address" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
+              {/* Section: Business Address */}
+              <div id="business-address" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
                 <div className="p-6 space-y-6">
                   <div className="flex items-center gap-2 pb-2">
                     <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                       <MapPin size={16} weight="fill" />
                     </div>
                     <div className="space-y-0.5">
-                      <h3 className="text-lead font-semibold text-foreground">Registered Business Address</h3>
+                      <h3 className="text-lead font-semibold text-foreground">Business Address</h3>
                       <p className="text-label text-muted-foreground">Official business address as per SSM registration.</p>
                     </div>
                   </div>
@@ -299,30 +295,33 @@ export default function NewOrganizationPage() {
                 </div>
               </div>
 
-              {/* Section: Settlement & Platform */}
-              <div id="settlement-platform" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
+              {/* Section: Payment Details */}
+              <div id="payment-details" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
                 <div className="p-6 space-y-8">
                   <div className="flex items-center gap-2 pb-2 border-b border-border/40">
                     <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                       <Bank size={16} weight="fill" />
                     </div>
-                    <h3 className="text-lead font-semibold text-foreground">Settlement & Platform</h3>
+                    <h3 className="text-lead font-semibold text-foreground">Payment Details</h3>
                   </div>
 
-                  {/* Bank Information */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <div className="space-y-1.5 sm:col-span-2">
                       <label className={labelCls}>Bank Name</label>
-                      <input 
-                        {...register("bankAccountDetails.bankName")}
-                        className={inputCls(!!errors.bankAccountDetails?.bankName)}
-                        placeholder="e.g. Maybank Berhad"
+                      <FormSelect
+                        value={bankNameValue || ""}
+                        onChange={(v) => setValue("bankAccountDetails.bankName", v)}
+                        options={[
+                          { label: "Select bank", value: "" },
+                          ...MALAYSIAN_BANKS.map((b) => ({ label: b, value: b })),
+                        ]}
+                        error={!!errors.bankAccountDetails?.bankName}
                       />
                     </div>
 
                     <div className="space-y-1.5">
                       <label className={labelCls}>Account Number</label>
-                      <input 
+                      <input
                         {...register("bankAccountDetails.accountNumber")}
                         className={cn(inputCls(!!errors.bankAccountDetails?.accountNumber), "font-mono")}
                         placeholder="e.g. 5140 1234 5678"
@@ -331,40 +330,11 @@ export default function NewOrganizationPage() {
 
                     <div className="space-y-1.5">
                       <label className={labelCls}>Account Name</label>
-                      <input 
+                      <input
                         {...register("bankAccountDetails.accountName")}
                         className={inputCls(!!errors.bankAccountDetails?.accountName)}
                         placeholder="e.g. Acme Corporation Sdn Bhd"
                       />
-                    </div>
-                  </div>
-
-                  {/* Platform Settings */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-6 border-t border-border/40">
-                    <div className="space-y-1.5">
-                      <label className={labelCls}>Subscription Plan</label>
-                      <FormSelect
-                        value={subscriptionPlanValue}
-                        onChange={(v) => setValue("subscription.plan", v as "standard" | "premium" | "enterprise")}
-                        options={[
-                          { label: "Standard", value: "standard" },
-                          { label: "Premium", value: "premium" },
-                          { label: "Enterprise", value: "enterprise" },
-                        ]}
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className={labelCls}>Credit Limit</label>
-                      <div className="relative">
-                        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-faint font-semibold text-body">RM</div>
-                        <input 
-                          type="number"
-                          {...register("creditLimit", { valueAsNumber: true })}
-                          className={cn(inputCls(), "pl-11 font-mono text-right")}
-                          placeholder="0.00"
-                        />
-                      </div>
                     </div>
                   </div>
                 </div>
