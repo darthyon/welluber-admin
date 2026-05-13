@@ -1,10 +1,11 @@
 "use client";
 
 import { Bank, Article, ShieldCheck } from "@phosphor-icons/react";
-import { Controller } from "react-hook-form";
-import type { Control, FieldErrors, UseFormRegister } from "react-hook-form";
+import { Controller, useWatch } from "react-hook-form";
+import type { Control, FieldErrors, UseFormRegister, UseFormSetValue } from "react-hook-form";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/shared/switch";
+import { FormSelect } from "@/components/shared/form-select";
 import { PAYMENT_CYCLES, CREDIT_TERMS } from "@/features/providers/constants";
 import { z } from "zod";
 import { createSpSchema } from "@/features/providers/schemas";
@@ -14,6 +15,7 @@ type SpFormData = z.input<typeof createSpSchema> & { brandName?: string; brandLo
 interface SettlementTaxSectionProps {
   register: UseFormRegister<SpFormData>;
   control: Control<SpFormData>;
+  setValue: UseFormSetValue<SpFormData>;
   errors: FieldErrors<SpFormData>;
   labelCls: string;
   inputCls: (hasError?: boolean) => string;
@@ -22,10 +24,14 @@ interface SettlementTaxSectionProps {
 export function SettlementTaxSection({
   register,
   control,
+  setValue,
   errors,
   labelCls,
   inputCls,
 }: SettlementTaxSectionProps) {
+  const paymentCycle = useWatch({ control, name: "paymentCycle" });
+  const creditTerms = useWatch({ control, name: "creditTerms" });
+
   return (
     <div id="settlement-tax" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
       <div className="p-6 space-y-6">
@@ -72,21 +78,21 @@ export function SettlementTaxSection({
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 pt-6 border-t border-border/40">
             <div className="space-y-1.5">
               <label htmlFor="paymentCycle" className={labelCls}>Payment Cycle</label>
-              <select id="paymentCycle" {...register("paymentCycle")} className={inputCls()}>
-                <option value="">Select Cycle</option>
-                {PAYMENT_CYCLES.map(cycle => (
-                  <option key={cycle} value={cycle}>{cycle}</option>
-                ))}
-              </select>
+              <FormSelect
+                value={paymentCycle}
+                onChange={(v) => setValue("paymentCycle", v)}
+                options={[{ label: "Select Cycle", value: "" }, ...PAYMENT_CYCLES.map((cycle) => ({ label: cycle, value: cycle }))]}
+                placeholder="Select Cycle"
+              />
             </div>
             <div className="space-y-1.5">
               <label htmlFor="creditTerms" className={labelCls}>Credit Terms</label>
-              <select id="creditTerms" {...register("creditTerms")} className={inputCls()}>
-                <option value="">Select Terms</option>
-                {CREDIT_TERMS.map(term => (
-                  <option key={term} value={term}>{term}</option>
-                ))}
-              </select>
+              <FormSelect
+                value={creditTerms}
+                onChange={(v) => setValue("creditTerms", v)}
+                options={[{ label: "Select Terms", value: "" }, ...CREDIT_TERMS.map((term) => ({ label: term, value: term }))]}
+                placeholder="Select Terms"
+              />
             </div>
             <div className="space-y-1.5">
               <label htmlFor="expiredCommissionFee" className={labelCls}>Expired Commission Fee</label>

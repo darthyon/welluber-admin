@@ -243,7 +243,7 @@ export function SearchableMultiSelect({
           aria-controls={`${id}-listbox`}
         >
           {selected.map((s) => (
-            <Badge key={s} variant="secondary" className="bg-primary/10 text-primary border-primary/20 px-2 py-0.5 text-label font-medium gap-1 group whitespace-nowrap">
+            <Badge key={s} variant="secondary" className="px-2 py-0.5 text-label font-medium gap-1 group whitespace-nowrap">
               {s}
               <button 
                 onClick={() => removeOption(s)}

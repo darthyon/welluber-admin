@@ -20,6 +20,7 @@ import { DetailSection } from "@/components/shared/detail-section";
 import { SuccessCelebration } from "@/components/shared/success-celebration";
 import { LocationPicker } from "@/components/shared/location-picker";
 import type { LocationData } from "@/components/shared/location-picker";
+import { FormSelect } from "@/components/shared/form-select";
 import { cn } from "@/lib/utils";
 import { MOCK_ACCOUNTS } from "@/lib/mock-data";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -163,14 +164,14 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-label font-medium text-faint">Branch Type</label>
-                  <select
+                  <FormSelect
                     value={formData.type}
-                    onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                    className="w-full px-3 py-2 bg-muted/10 border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-medium text-foreground hover:border-border/80 cursor-pointer"
-                  >
-                    <option value="HQ">Headquarters (HQ)</option>
-                    <option value="Branch">Branch</option>
-                  </select>
+                    onChange={(v) => setFormData({ ...formData, type: v })}
+                    options={[
+                      { label: "Headquarters (HQ)", value: "HQ" },
+                      { label: "Branch", value: "Branch" },
+                    ]}
+                  />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-label font-medium text-faint">Status</label>
@@ -308,18 +309,15 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
               ) : (
                 <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-300">
                   <label className="text-body font-medium text-foreground">Bridge to Existing Account</label>
-                  <select
+                  <FormSelect
                     value={existingAccountId}
-                    onChange={(e) => setExistingAccountId(e.target.value)}
-                    className="w-full px-3 py-2.5 bg-card border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30 transition-all font-semibold text-foreground hover:border-border/80 cursor-pointer"
-                  >
-                    <option value="">Select an account...</option>
-                    {MOCK_ACCOUNTS.map((acc) => (
-                      <option key={acc.id} value={acc.id}>
-                        {acc.name} — RM {acc.balance.toLocaleString()} MYR
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(v) => setExistingAccountId(v)}
+                    options={[{ label: "Select an account...", value: "" }, ...MOCK_ACCOUNTS.map((acc) => ({
+                      label: `${acc.name} — RM ${acc.balance.toLocaleString()} MYR`,
+                      value: acc.id,
+                    }))]}
+                    placeholder="Select an account..."
+                  />
                   <p className="text-label text-faint mt-1.5 font-medium italic">
                     * This branch will consume funds from the selected centralized liquidity pool.
                   </p>
@@ -358,7 +356,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
                     <p className="text-body font-semibold text-foreground leading-tight">Invite org admin</p>
                     <p className="text-label text-muted-foreground mt-1">Send an invitation to manage this branch.</p>
                   </div>
-                  <Button variant="secondary" size="sm" className="text-label font-semibold rounded-full px-6 transition-all hover:bg-muted">
+                  <Button variant="secondary" size="sm" className="text-label font-semibold rounded-full px-6 transition-all">
                     Add Invitation
                   </Button>
                </div>

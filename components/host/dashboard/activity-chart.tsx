@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { CaretDown, MagnifyingGlass, Check, Info } from "@phosphor-icons/react"
 import { useMounted } from "@/hooks/use-mounted"
+import { FormSelect } from "@/components/shared/form-select"
 
 // Dummy data for Month view with dual metrics (Issued vs Checked-in)
 const dataMonth = [
@@ -152,15 +153,16 @@ export function ActivityChart() {
           />
           
           {/* Default metric dropdown */}
-          <select 
+          <FormSelect
             value={metric}
-            onChange={(e) => setMetric(e.target.value as "both" | "issued" | "checkedIn")}
-            className="px-3 py-1.5 bg-card border border-border hover:bg-muted/50 rounded-md text-label font-medium text-foreground outline-none cursor-pointer transition-colors"
-          >
-            <option value="both">Compare Both</option>
-            <option value="issued">Issued Volume</option>
-            <option value="checkedIn">Redemption Volume</option>
-          </select>
+            onChange={(v) => setMetric(v as "both" | "issued" | "checkedIn")}
+            options={[
+              { label: "Compare Both", value: "both" },
+              { label: "Issued Volume", value: "issued" },
+              { label: "Redemption Volume", value: "checkedIn" },
+            ]}
+            triggerClassName="h-8"
+          />
         </div>
       </div>
 

@@ -445,7 +445,7 @@ export function SpVoucherDetailView({
                             <Badge
                               key={name}
                               variant="secondary"
-                              className="text-label font-medium px-3 py-1 bg-muted border-border"
+                              className="text-label font-medium px-3 py-1"
                             >
                               {name}
                             </Badge>

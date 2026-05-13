@@ -267,6 +267,7 @@ export default function NewServiceProviderPage() {
               <SettlementTaxSection 
                 register={register} 
                 control={control} 
+                setValue={setValue}
                 errors={errors} 
                 labelCls={labelCls} 
                 inputCls={inputCls} 

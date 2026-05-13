@@ -30,7 +30,6 @@ interface SearchableSelectProps {
   placeholder?: string;
   searchPlaceholder?: string;
   disabled?: boolean;
-  className?: string;
   triggerClassName?: string;
   emptyText?: string;
 }
@@ -42,7 +41,6 @@ export function SearchableSelect({
   placeholder = "Select...",
   searchPlaceholder = "Search...",
   disabled,
-  className,
   triggerClassName,
   emptyText = "No results found.",
 }: SearchableSelectProps) {

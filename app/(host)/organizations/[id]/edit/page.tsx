@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav";
 import { LocationPicker } from "@/components/shared/location-picker";
 import { DocumentUploadSection } from "@/components/shared/document-upload-section";
+import { FormSelect } from "@/components/shared/form-select";
 import { toast } from "sonner";
 
 const ANCHOR_ITEMS = [
@@ -78,6 +79,8 @@ export default function EditOrganizationPage() {
   });
 
   const orgType = useWatch({ control, name: "type" });
+  const industryValue = useWatch({ control, name: "industry" });
+  const subscriptionPlanValue = useWatch({ control, name: "subscription.plan" });
 
   const onSubmit = async () => {
     setIsSubmitting(true);
@@ -168,18 +171,20 @@ export default function EditOrganizationPage() {
 
                     <div className="space-y-1.5">
                       <label className={labelCls}>Industry</label>
-                      <select 
-                        {...register("industry")}
-                        className={inputCls(!!errors.industry)}
-                      >
-                        <option value="">Select industry</option>
-                        <option value="Technology">Technology</option>
-                        <option value="Healthcare">Healthcare</option>
-                        <option value="Finance">Finance</option>
-                        <option value="Logistics">Logistics</option>
-                        <option value="Retail">Retail</option>
-                        <option value="Manufacturing">Manufacturing</option>
-                      </select>
+                      <FormSelect
+                        value={industryValue}
+                        onChange={(v) => setValue("industry", v)}
+                        options={[
+                          { label: "Select industry", value: "" },
+                          { label: "Technology", value: "Technology" },
+                          { label: "Healthcare", value: "Healthcare" },
+                          { label: "Finance", value: "Finance" },
+                          { label: "Logistics", value: "Logistics" },
+                          { label: "Retail", value: "Retail" },
+                          { label: "Manufacturing", value: "Manufacturing" },
+                        ]}
+                        error={!!errors.industry}
+                      />
                     </div>
 
                     <div className="space-y-1.5">
@@ -337,14 +342,15 @@ export default function EditOrganizationPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-6 border-t border-border/40">
                     <div className="space-y-1.5">
                       <label className={labelCls}>Subscription Plan</label>
-                      <select 
-                        {...register("subscription.plan")}
-                        className={inputCls()}
-                      >
-                        <option value="standard">Standard</option>
-                        <option value="premium">Premium</option>
-                        <option value="enterprise">Enterprise</option>
-                      </select>
+                      <FormSelect
+                        value={subscriptionPlanValue}
+                        onChange={(v) => setValue("subscription.plan", v as "standard" | "premium" | "enterprise")}
+                        options={[
+                          { label: "Standard", value: "standard" },
+                          { label: "Premium", value: "premium" },
+                          { label: "Enterprise", value: "enterprise" },
+                        ]}
+                      />
                     </div>
 
                     <div className="space-y-1.5">

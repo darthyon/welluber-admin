@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, Suspense, useState, useCallback, useEffect } from "react";
+import { useMemo, Suspense, useState, useCallback, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CaretLeft, NavigationArrow, Barbell, Brain, Circle, PencilSimpleLine, Copy } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ import { usePolicyTemplates } from "@/hooks/use-policy-templates";
 import { readPolicyDraft, clearPolicyDraft } from "@/hooks/use-policy-draft";
 import { BenefitPolicy, BenefitGroup, Benefit } from "@/types/policy";
 import { MOCK_POLICIES, MOCK_POLICY_DATA_MAP } from "@/lib/mock-data";
+import { UnsavedChangesDialog } from "@/components/shared/unsaved-changes-dialog";
 
 const ICON_MAP: Record<string, React.ElementType> = {
   Barbell, Brain, Circle, PencilSimpleLine,
@@ -50,6 +51,8 @@ function NewPolicyForm() {
   const [issues, setIssues] = useState<Array<{ key: string; label: string; target: string }>>([]);
   const [saveState, setSaveState] = useState<{ status: "idle" | "saving" | "saved"; savedAt?: string }>({ status: "idle" });
   const [savedAgo, setSavedAgo] = useState<string>("");
+  const [unsavedDialogOpen, setUnsavedDialogOpen] = useState(false);
+  const pendingLeaveRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     if (!saveState.savedAt) return;
@@ -79,13 +82,25 @@ function NewPolicyForm() {
         target();
         return;
       }
-      const ok = window.confirm("Discard unsaved changes? Your autosaved draft will be removed.");
-      if (!ok) return;
-      clearPolicyDraft(paramOrgId ?? undefined);
-      target();
+      pendingLeaveRef.current = () => {
+        clearPolicyDraft(paramOrgId ?? undefined);
+        target();
+      };
+      setUnsavedDialogOpen(true);
     },
     [dirty, paramOrgId]
   );
+
+  const handleConfirmLeave = useCallback(() => {
+    setUnsavedDialogOpen(false);
+    pendingLeaveRef.current?.();
+    pendingLeaveRef.current = null;
+  }, []);
+
+  const handleCancelLeave = useCallback(() => {
+    setUnsavedDialogOpen(false);
+    pendingLeaveRef.current = null;
+  }, []);
   const handleValidationChange = useCallback(
     (counts: Record<string, number>) => setSectionErrors(counts),
     []
@@ -461,6 +476,16 @@ function NewPolicyForm() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <UnsavedChangesDialog
+        open={unsavedDialogOpen}
+        onOpenChange={setUnsavedDialogOpen}
+        onConfirm={handleConfirmLeave}
+        onCancel={handleCancelLeave}
+        description="You have unsaved changes. If you leave now, your changes will be lost. Your autosaved draft will also be removed."
+        confirmLabel="Discard Changes"
+        cancelLabel="Keep Editing"
+      />
     </div>
   );
 }

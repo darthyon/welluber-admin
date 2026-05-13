@@ -350,7 +350,7 @@ export function SpBranchDetailView({ branch, serviceCategories, onBack, onEdit }
                 <div className="flex flex-wrap gap-2">
                   {(branch.benefits?.length ?? 0) > 0 ? (
                     branch.benefits?.map((benefit) => (
-                      <Badge key={benefit} variant="secondary" className="text-label px-3 py-1 font-medium bg-muted border-border">
+                      <Badge key={benefit} variant="secondary" className="text-label px-3 py-1 font-medium">
                         {benefit}
                       </Badge>
                     ))

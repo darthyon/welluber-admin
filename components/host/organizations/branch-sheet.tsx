@@ -1,6 +1,7 @@
 import { X, MapPin, Users, Wallet } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { FormSelect } from "@/components/shared/form-select";
 
 interface BranchSheetProps {
   isOpen: boolean;
@@ -61,17 +62,29 @@ export function BranchSheet({ isOpen, onClose, branchName }: BranchSheetProps) {
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-body font-medium text-foreground">Branch Type</label>
-                  <select className="w-full px-3 py-2 bg-background border border-border rounded-md text-body outline-none">
-                    <option>Headquarters (HQ)</option>
-                    <option>Branch Office</option>
-                  </select>
+                  <FormSelect
+                    value=""
+                    onChange={() => {}}
+                    options={[
+                      { label: "Headquarters (HQ)", value: "hq" },
+                      { label: "Branch Office", value: "branch" },
+                    ]}
+                    placeholder="Select type"
+                    disabled
+                  />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-body font-medium text-foreground">Timezone</label>
-                  <select className="w-full px-3 py-2 bg-background border border-border rounded-md text-body outline-none">
-                    <option>Asia/Kuala_Lumpur (GMT+8)</option>
-                    <option>Asia/Singapore (GMT+8)</option>
-                  </select>
+                  <FormSelect
+                    value=""
+                    onChange={() => {}}
+                    options={[
+                      { label: "Asia/Kuala_Lumpur (GMT+8)", value: "kl" },
+                      { label: "Asia/Singapore (GMT+8)", value: "sg" },
+                    ]}
+                    placeholder="Select timezone"
+                    disabled
+                  />
                 </div>
                 <div className="space-y-1.5 sm:col-span-2">
                   <label className="text-body font-medium text-foreground">Address Line</label>
@@ -116,10 +129,16 @@ export function BranchSheet({ isOpen, onClose, branchName }: BranchSheetProps) {
                 ) : (
                   <div className="space-y-3">
                     <p className="text-body text-subtle">Select an account setup to activate funding for this branch.</p>
-                    <select className="w-full px-3 py-2 bg-background border border-border rounded-md text-body outline-none">
-                      <option>New Account</option>
-                      <option>Existing Account</option>
-                    </select>
+                    <FormSelect
+                      value=""
+                      onChange={() => {}}
+                      options={[
+                        { label: "New Account", value: "new" },
+                        { label: "Existing Account", value: "existing" },
+                      ]}
+                      placeholder="Select account"
+                      disabled
+                    />
                   </div>
                 )}
               </div>

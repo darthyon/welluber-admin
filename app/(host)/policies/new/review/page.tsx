@@ -4,6 +4,7 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CaretLeft, NavigationArrow, Check, Users, CaretDown, PencilSimpleLine, MagnifyingGlass, X, Warning, ClipboardText } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import { SuccessModal } from "@/components/shared/success-modal";
 import { toast } from "sonner";
@@ -426,7 +427,7 @@ function NewPolicyReviewPageContent() {
                         </td>
                         <td className="p-3">
                           {emp.tier ? (
-                            <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-label font-medium">{emp.tier}</span>
+                            <Badge variant="secondary">{emp.tier}</Badge>
                           ) : (
                             <span className="text-body text-faint">—</span>
                           )}

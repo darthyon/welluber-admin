@@ -14,6 +14,7 @@ import {
   Square,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { SuccessCelebration } from "@/components/shared/success-celebration";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
@@ -487,12 +488,12 @@ export function VersionWizard({
               const emp = employees.find(e => e.id === id);
               if (!emp) return null;
               return (
-                <span key={id} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-label font-medium">
+                <Badge key={id} variant="secondary" className="inline-flex items-center gap-1.5 px-3 py-1">
                   {emp.name}
                   <button onClick={() => unpinEmployee(id)} className="hover:text-destructive transition-colors">
                     <X size={12} weight="bold" />
                   </button>
-                </span>
+                </Badge>
               );
             })}
           </div>
@@ -615,9 +616,9 @@ export function VersionWizard({
                       <span className="text-body text-subtle">{emp.department}</span>
                     </div>
                     <div className="col-span-3">
-                      <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-label font-medium">
+                      <Badge variant="secondary">
                         {emp.tier}
-                      </span>
+                      </Badge>
                     </div>
                   </button>
                 );

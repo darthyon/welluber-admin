@@ -20,6 +20,7 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { useAccounts, useAccountTransactions } from "@/features/accounts/hooks";
 import { TRANSACTION_TYPE_LABELS } from "@/features/accounts/constants";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
+import { FormSelect } from "@/components/shared/form-select";
 import { useQueryState } from "@/hooks/use-tab-persistence";
 import { DetailSection } from "@/components/shared/detail-section";
 import { DetailField } from "@/components/shared/detail-field";
@@ -297,22 +298,26 @@ function AccountDetailContent() {
                       ))}
                     </div>
 
-                    <select className="px-3 py-1 h-[32px] bg-background border border-border hover:bg-muted/30 rounded-lg text-label font-semibold text-foreground outline-none cursor-pointer transition-colors min-w-[120px]">
-                      {period === "By Month" && (
-                        <>
-                          <option>January 2026</option>
-                          <option>February 2026</option>
-                          <option defaultValue="true">March 2026</option>
-                        </>
-                      )}
-                      {period === "By Quarter" && (
-                        <>
-                          <option defaultValue="true">Q1 (Jan - Mar) 2026</option>
-                          <option>Q2 (Apr - Jun) 2026</option>
-                        </>
-                      )}
-                      {period === "By Year" && <option defaultValue="true">2026</option>}
-                    </select>
+                    <FormSelect
+                      value=""
+                      onChange={() => {}}
+                      options={
+                        period === "By Month"
+                          ? [
+                              { label: "January 2026", value: "jan" },
+                              { label: "February 2026", value: "feb" },
+                              { label: "March 2026", value: "mar" },
+                            ]
+                          : period === "By Quarter"
+                            ? [
+                                { label: "Q1 (Jan - Mar) 2026", value: "q1" },
+                                { label: "Q2 (Apr - Jun) 2026", value: "q2" },
+                              ]
+                            : [{ label: "2026", value: "2026" }]
+                      }
+                      triggerClassName="h-8 min-w-[120px]"
+                      disabled
+                    />
 
                     <Popover>
                       <PopoverTrigger asChild>

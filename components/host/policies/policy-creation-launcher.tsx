@@ -5,6 +5,7 @@ import { Sparkle, Plus, Buildings } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { usePolicyTemplates } from "@/hooks/use-policy-templates";
 import { MOCK_ORGS } from "@/lib/mock-data";
+import { FormSelect } from "@/components/shared/form-select";
 
 interface PolicyCreationLauncherProps {
   onManual: (orgId?: string) => void;
@@ -57,18 +58,12 @@ export function PolicyCreationLauncher({ onManual, onTemplate }: PolicyCreationL
                   Organisation
                   <span className="text-destructive">*</span>
                 </label>
-                <select
+                <FormSelect
                   value={selectedOrgId}
-                  onChange={(e) => setSelectedOrgId(e.target.value)}
-                  className="w-full px-4 pr-10 py-2.5 bg-background border border-border rounded-lg text-body font-semibold text-foreground outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/40 transition-all"
-                >
-                  <option value="">Select organisation...</option>
-                  {orgOptions.map((org) => (
-                    <option key={org.value} value={org.value}>
-                      {org.label}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(v) => setSelectedOrgId(v)}
+                  options={[{ label: "Select organisation...", value: "" }, ...orgOptions]}
+                  placeholder="Select organisation..."
+                />
                 <p className="text-micro text-faint">Tiers and departments will load automatically once an organisation is selected.</p>
               </div>
 
@@ -114,21 +109,12 @@ export function PolicyCreationLauncher({ onManual, onTemplate }: PolicyCreationL
                       <p className="mt-2 text-label text-muted-foreground">No templates available yet.</p>
                     ) : (
                       <>
-                        <select
+                        <FormSelect
                           value={selectedTemplateId}
-                          onChange={(e) => setSelectedTemplateId(e.target.value)}
-                          className="mt-2 h-10 w-full rounded-lg border border-border bg-background px-3 text-body font-medium text-foreground outline-none focus:ring-1 focus:ring-ring"
-                        >
-                          <option value="">Select a template</option>
-                          {templates.map((template) => {
-
-                            return (
-                              <option key={template.id} value={template.id}>
-                                {template.name}
-                              </option>
-                            );
-                          })}
-                        </select>
+                          onChange={(v) => setSelectedTemplateId(v)}
+                          options={[{ label: "Select a template", value: "" }, ...templates.map((template) => ({ label: template.name, value: template.id }))]}
+                          placeholder="Select a template"
+                        />
                         {selectedTemplateId && (
                           <p className="mt-2 text-label text-muted-foreground">
                             {templates.find((template) => template.id === selectedTemplateId)?.tagline}

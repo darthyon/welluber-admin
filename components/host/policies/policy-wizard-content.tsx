@@ -430,17 +430,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
     else setFieldError("name", undefined);
   }, [policyData.name, setFieldError]);
 
-  const blurRefreshCustomDate = useCallback(() => {
-    if (policyData.refreshStartReference === "custom_date" && !policyData.refreshCustomDate) {
-      setFieldError("refreshCustomDate", "Pick when this policy resets each cycle");
-    } else setFieldError("refreshCustomDate", undefined);
-  }, [policyData.refreshStartReference, policyData.refreshCustomDate, setFieldError]);
 
-  const blurActivationCustomDate = useCallback(() => {
-    if (policyData.activationMode === "custom_date" && !policyData.activationCustomDate) {
-      setFieldError("activationCustomDate", "Enter a custom activation date");
-    } else setFieldError("activationCustomDate", undefined);
-  }, [policyData.activationMode, policyData.activationCustomDate, setFieldError]);
 
   const blurBenefitAmount = useCallback(
     (groupId: string, serviceId: string, amount: number) => {

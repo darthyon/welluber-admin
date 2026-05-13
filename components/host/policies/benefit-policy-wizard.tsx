@@ -27,6 +27,7 @@ import {
   type IconProps
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { ChoiceCard } from "@/components/shared/choice-card";
 import { FieldHelp } from "@/components/shared/field-help";
 import { DetailSection } from "@/components/shared/detail-section";
@@ -1363,9 +1364,9 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                                   {emp.benefitPolicies![0].policyName}
                                 </span>
                               ) : (
-                                <span className="px-2 py-0.5 rounded-full text-micro font-semibold bg-muted text-faint border border-border/40">
+                                <Badge variant="outline" className="text-micro font-semibold">
                                   None
-                                </span>
+                                </Badge>
                               )}
                             </div>
                           </div>

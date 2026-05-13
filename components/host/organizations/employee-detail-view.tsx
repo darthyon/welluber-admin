@@ -24,6 +24,7 @@ import {
 import { type Claim } from "@/components/shared/utilisation-claims-table";
 
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { DetailSection } from "@/components/shared/detail-section";
 import { DetailField } from "@/components/shared/detail-field";
 import { ActionPopover } from "@/components/shared/action-popover";
@@ -147,9 +148,9 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
                 {employeeData.isProbation && (
                   <StatusBadge status="Probation" variant="amber" />
                 )}
-                <span className="text-label font-medium px-2 py-0.5 rounded-4xl bg-muted text-muted-foreground border border-border">
+                <Badge variant="outline">
                   {employeeData.residencyStatus}
-                </span>
+                </Badge>
                 <StatusBadge status={employeeData.isTaxable ? "Taxable" : "Non-taxable"} variant={employeeData.isTaxable ? "primary" : "rose"} />
               </div>
             </div>
@@ -296,7 +297,7 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
                           <h4 className="text-body font-semibold text-foreground">{policy.name}</h4>
                           <div className="flex items-center gap-1 mt-0.5 flex-wrap">
                             {policy.groups.map((g, i) => (
-                              <span key={i} className="text-micro bg-muted px-2 py-0.5 rounded-full text-muted-foreground font-semibold">{g}</span>
+                              <Badge key={i} variant="outline" className="text-micro font-semibold">{g}</Badge>
                             ))}
                           </div>
                         </div>
@@ -402,4 +403,3 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
     </div>
   );
 }
-

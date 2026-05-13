@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { DetailSection } from "@/components/shared/detail-section";
@@ -385,10 +386,10 @@ function VersionsTab({
               render: (row) => {
                 const oc = overrideCounts[row.id] ?? 0;
                 return oc > 0 ? (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-label font-medium">
+                  <Badge variant="secondary" className="inline-flex items-center gap-1">
                     <ArrowsDownUp size={10} weight="bold" />
                     {oc}
-                  </span>
+                  </Badge>
                 ) : (
                   <span className="text-label text-faint">—</span>
                 );
@@ -624,12 +625,12 @@ function OverviewTab({
                             {SERVICES.find((s) => s.id === benefit.serviceId)?.name || benefit.serviceId}
                           </span>
                           {benefit.coPayment.required && (
-                            <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-label font-medium">
+                            <Badge variant="secondary">
                               Co-pay{" "}
                               {benefit.coPayment.type === "Percentage"
                                 ? `${benefit.coPayment.value}%`
                                 : `RM ${benefit.coPayment.value}`}
-                            </span>
+                            </Badge>
                           )}
                         </div>
                         <span className="text-body font-semibold text-foreground font-mono tabular-nums">
@@ -778,9 +779,9 @@ function VersionOverviewTab({
                 <label className="text-label font-medium text-subtle">Employment Types</label>
                 <div className="flex flex-wrap gap-1.5">
                   {eligibleEmpLabels.map(label => (
-                    <span key={label} className="px-3 py-1 rounded-full bg-primary/10 text-primary text-label font-medium">
+                    <Badge key={label} variant="secondary" className="px-3 py-1">
                       {label}
-                    </span>
+                    </Badge>
                   ))}
                 </div>
               </div>
@@ -790,9 +791,9 @@ function VersionOverviewTab({
                 <label className="text-label font-medium text-subtle">Tiers</label>
                 <div className="flex flex-wrap gap-1.5">
                   {tierLabels.map(label => (
-                    <span key={label} className="px-3 py-1 rounded-full bg-primary/10 text-primary text-label font-medium">
+                    <Badge key={label} variant="secondary" className="px-3 py-1">
                       {label}
-                    </span>
+                    </Badge>
                   ))}
                 </div>
               </div>
@@ -802,9 +803,9 @@ function VersionOverviewTab({
                 <label className="text-label font-medium text-subtle">Departments</label>
                 <div className="flex flex-wrap gap-1.5">
                   {deptLabels.map(label => (
-                    <span key={label} className="px-3 py-1 rounded-full bg-primary/10 text-primary text-label font-medium">
+                    <Badge key={label} variant="secondary" className="px-3 py-1">
                       {label}
-                    </span>
+                    </Badge>
                   ))}
                 </div>
               </div>
@@ -845,9 +846,9 @@ function VersionOverviewTab({
                         <div className="flex items-center gap-3">
                           <span className="text-body text-faint line-through font-mono tabular-nums">{formatRM(parentAmount)}</span>
                           <span className="text-body font-semibold text-primary font-mono tabular-nums">{formatRM(benefit.amount)}</span>
-                          <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-label font-medium tabular-nums">
+                          <Badge variant="secondary" className="tabular-nums">
                             +{formatRM(benefit.amount - parentAmount)}
-                          </span>
+                          </Badge>
                         </div>
                       </div>
                     ))}
@@ -947,9 +948,9 @@ function AssignedEmployeesTab({ employees }: { policy: BenefitPolicy; employees?
                   <span className="text-body text-subtle">{emp.department}</span>
                 </div>
                 <div className="col-span-2">
-                  <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-label font-medium">
+                  <Badge variant="secondary">
                     {emp.tier}
-                  </span>
+                  </Badge>
                 </div>
                 <div className="col-span-2">
                   <span className="text-body text-subtle">{emp.joinDate}</span>

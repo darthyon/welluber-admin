@@ -9,8 +9,7 @@ import {
   WarningCircle,
   CheckCircle,
   CurrencyDollar,
-  CalendarBlank,
-  Bank
+  CalendarBlank
 } from "@phosphor-icons/react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,6 +18,7 @@ import { submitManualTopup } from "@/features/manual-topup/actions";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { SuccessCelebration } from "@/components/shared/success-celebration";
+import { FormSelect } from "@/components/shared/form-select";
 
 interface ManualTopUpModalProps {
   isOpen: boolean;
@@ -158,18 +158,16 @@ export function ManualTopUpModal({
 
                 <div className="space-y-1.5 col-span-2 sm:col-span-1">
                   <label className="text-label font-semibold text-subtle">Payment Method</label>
-                  <div className="relative">
-                    <Bank size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                    <select 
-                      {...register("method")}
-                      className="w-full pl-9 pr-3 py-2 bg-background border border-border rounded-md text-body outline-none focus:border-foreground/30 focus:bg-muted/30 transition-colors appearance-none"
-                    >
-                      <option value="bank_transfer">Bank Transfer</option>
-                      <option value="cheque">Cheque</option>
-                      <option value="cash">Cash</option>
-                      <option value="credit_card">Credit Card</option>
-                    </select>
-                  </div>
+                  <FormSelect
+                    value={watch("method")}
+                    onChange={(v) => setValue("method", v as "bank_transfer" | "cheque" | "cash" | "credit_card")}
+                    options={[
+                      { label: "Bank Transfer", value: "bank_transfer" },
+                      { label: "Cheque", value: "cheque" },
+                      { label: "Cash", value: "cash" },
+                      { label: "Credit Card", value: "credit_card" },
+                    ]}
+                  />
                 </div>
 
                 <div className="space-y-1.5 col-span-2">

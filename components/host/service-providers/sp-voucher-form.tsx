@@ -20,7 +20,6 @@ import {
   PaperPlaneTilt,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
-import { inputCls } from "@/components/shared/styles";
 import { Switch } from "@/components/shared/switch";
 import { createVoucherSchema } from "@/features/providers/schemas";
 import { createVoucher, updateVoucher, publishVoucher } from "@/features/providers/actions";
@@ -33,6 +32,8 @@ import { SectionedSearchSelect } from "@/components/shared/sectioned-search-sele
 import { CustomMultiSelect } from "@/components/shared/custom-multi-select";
 import { DatePickerField } from "@/components/shared/date-picker-field";
 import { LogoUpload } from "@/components/shared/logo-upload";
+import { FormSelect } from "@/components/shared/form-select";
+import { SearchableSelect } from "@/components/shared/searchable-select";
 import { ItemSection } from "@/components/shared/item-section";
 import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav";
 import type { SpVoucher } from "@/types/provider";
@@ -129,9 +130,6 @@ export function SpVoucherForm({
     }
     setIsPublishing(false);
   };
-
-  const selectCls = () =>
-    cn(inputCls(), "appearance-none cursor-pointer bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236b7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1.25rem_1.25rem] bg-[right_0.5rem_center] bg-no-repeat pr-10");
 
   if (isSuccess) {
     return (
@@ -272,11 +270,15 @@ export function SpVoucherForm({
                 <div className="space-y-5">
                   <div className="space-y-1.5">
                     <label className="text-body font-medium text-foreground">Currency</label>
-                    <select {...register("currency")} className={selectCls()}>
-                      {Object.entries(CURRENCIES).map(([code, name]) => (
-                        <option key={code} value={code}>{code} - {name}</option>
-                      ))}
-                    </select>
+                    <SearchableSelect
+                      value={watch("currency")}
+                      onChange={(v) => setValue("currency", v)}
+                      options={Object.entries(CURRENCIES).map(([code, name]) => ({
+                        label: `${code} - ${name}`,
+                        value: code,
+                      }))}
+                      searchPlaceholder="Search currency..."
+                    />
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
@@ -445,7 +447,7 @@ export function SpVoucherForm({
                       <p className="text-label text-muted-foreground mt-0.5">When can customers use this voucher?</p>
                     </div>
 
-                    <div className="flex flex-col gap-2">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <ChoiceCard
                         title="Relative"
                         description="Valid after purchase."
@@ -474,14 +476,16 @@ export function SpVoucherForm({
                               className="w-16 px-3 py-1.5 bg-background border border-border rounded-md text-body text-center font-semibold outline-none focus:ring-2 focus:ring-primary/10"
                               {...register("redemptionPeriod.value", { valueAsNumber: true })}
                             />
-                            <select
-                              className="flex-1 px-3 py-1.5 bg-background border border-border rounded-md text-body font-semibold text-foreground outline-none focus:ring-2 focus:ring-primary/10"
-                              {...register("redemptionPeriod.unit")}
-                            >
-                              <option value="hr">Hours</option>
-                              <option value="day">Days</option>
-                              <option value="month">Months</option>
-                            </select>
+                            <FormSelect
+                              value={watch("redemptionPeriod.unit")}
+                              onChange={(v) => setValue("redemptionPeriod.unit", v as "hr" | "day" | "month")}
+                              options={[
+                                { label: "Hours", value: "hr" },
+                                { label: "Days", value: "day" },
+                                { label: "Months", value: "month" },
+                              ]}
+                              triggerClassName="flex-1"
+                            />
                           </div>
                         </div>
                       </div>
@@ -507,14 +511,15 @@ export function SpVoucherForm({
                       <h4 className="text-body font-semibold text-foreground">Membership Start Day</h4>
                       <p className="text-label text-muted-foreground mt-0.5">When do membership periods begin?</p>
                     </div>
-                    <select
-                      {...register("membershipStartDay")}
-                      className={selectCls()}
-                    >
-                      <option value="none">None (immediate)</option>
-                      <option value="1st">1st of the month</option>
-                      <option value="15th">15th of the month</option>
-                    </select>
+                    <FormSelect
+                      value={watch("membershipStartDay")}
+                      onChange={(v) => setValue("membershipStartDay", v as "none" | "1st" | "15th")}
+                      options={[
+                        { label: "None (immediate)", value: "none" },
+                        { label: "1st of the month", value: "1st" },
+                        { label: "15th of the month", value: "15th" },
+                      ]}
+                    />
                   </div>
                 </div>
               </div>
@@ -534,7 +539,7 @@ export function SpVoucherForm({
                 </div>
 
                 <div className="space-y-5">
-                  <div className="grid grid-cols-1 gap-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <ChoiceCard
                       title="Global"
                       description="All branch locations"

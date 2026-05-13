@@ -16,6 +16,7 @@ import { SuccessModal } from "@/components/shared/success-modal";
 import { LocationPicker } from "@/components/shared/location-picker";
 import { ServiceToggleCard } from "@/components/shared/service-toggle-card";
 import { PhoneInput } from "@/components/shared/phone-input";
+import { FormSelect } from "@/components/shared/form-select";
 import type { SpBranch, CommissionSchemaRow } from "@/types/provider";
 import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav";
 import { toast } from "sonner";
@@ -467,11 +468,17 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
                             </div>
                             <div className="space-y-1.5">
                               <label className="text-label font-medium text-subtle">Job Role</label>
-                              <select {...register(`contacts.${i}.type`)} className={cn(inputCls(), "appearance-none cursor-pointer bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236b7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1.25rem_1.25rem] bg-[right_0.5rem_center] bg-no-repeat pr-10")}>
-                                {BRANCH_CONTACT_TYPES.map((t) => (
-                                  <option key={t.value} value={t.value}>{t.label}</option>
-                                ))}
-                              </select>
+                              <Controller
+                                control={control}
+                                name={`contacts.${i}.type`}
+                                render={({ field }) => (
+                                  <FormSelect
+                                    value={field.value}
+                                    onChange={(v) => field.onChange(v)}
+                                    options={BRANCH_CONTACT_TYPES.map((t) => ({ label: t.label, value: t.value }))}
+                                  />
+                                )}
+                              />
                             </div>
                             <div className="space-y-1.5">
                               <label className="text-label font-medium text-subtle">Phone <span className="text-destructive">*</span></label>

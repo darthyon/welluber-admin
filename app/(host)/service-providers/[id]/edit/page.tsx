@@ -17,6 +17,7 @@ import {
   Article,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
+import { FormSelect } from "@/components/shared/form-select";
 import { createSpSchema } from "@/features/providers/schemas";
 import { updateSp } from "@/features/providers/actions";
 import { Button } from "@/components/ui/button";
@@ -81,6 +82,8 @@ export default function EditServiceProviderPage() {
   });
 
   const businessType = useWatch({ control, name: "businessType" });
+  const paymentCycleValue = useWatch({ control, name: "paymentCycle" });
+  const creditTermsValue = useWatch({ control, name: "creditTerms" });
 
   const ANCHOR_ITEMS = [
     { id: "provider-profile", label: "Provider Profile" },
@@ -359,21 +362,21 @@ export default function EditServiceProviderPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 pt-6 border-t border-border/40">
                         <div className="space-y-1.5">
                             <label className={labelCls}>Payment Cycle</label>
-                            <select {...register("paymentCycle")} className={inputCls()}>
-                                <option value="">Select Cycle</option>
-                                {PAYMENT_CYCLES.map(cycle => (
-                                    <option key={cycle} value={cycle}>{cycle}</option>
-                                ))}
-                            </select>
+                            <FormSelect
+                                value={paymentCycleValue}
+                                onChange={(v) => setValue("paymentCycle", v)}
+                                options={[{ label: "Select Cycle", value: "" }, ...PAYMENT_CYCLES.map((cycle) => ({ label: cycle, value: cycle }))]}
+                                placeholder="Select Cycle"
+                            />
                         </div>
                         <div className="space-y-1.5">
                             <label className={labelCls}>Credit Terms</label>
-                            <select {...register("creditTerms")} className={inputCls()}>
-                                <option value="">Select Terms</option>
-                                {CREDIT_TERMS.map(term => (
-                                    <option key={term} value={term}>{term}</option>
-                                ))}
-                            </select>
+                            <FormSelect
+                                value={creditTermsValue}
+                                onChange={(v) => setValue("creditTerms", v)}
+                                options={[{ label: "Select Terms", value: "" }, ...CREDIT_TERMS.map((term) => ({ label: term, value: term }))]}
+                                placeholder="Select Terms"
+                            />
                         </div>
                         <div className="space-y-1.5">
                             <label className={labelCls}>Expired Commission Fee</label>

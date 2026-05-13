@@ -94,7 +94,7 @@ export function ServicePortfolioTags({ mainServices, className }: ServicePortfol
             <Badge
               key={i}
               variant="secondary"
-              className="text-label font-medium bg-muted/50 border-border/40 text-subtle px-1.5 py-0 h-4 shrink-0 whitespace-nowrap"
+              className="text-label font-medium px-1.5 py-0 h-4 shrink-0 whitespace-nowrap"
             >
               {item}
             </Badge>

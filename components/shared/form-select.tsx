@@ -21,7 +21,6 @@ interface FormSelectProps {
   options: SelectOption[];
   placeholder?: string;
   disabled?: boolean;
-  className?: string;
   triggerClassName?: string;
   error?: boolean;
 }
@@ -32,10 +31,13 @@ export function FormSelect({
   options,
   placeholder = "Select...",
   disabled,
-  className,
   triggerClassName,
   error,
 }: FormSelectProps) {
+  // Filter out placeholder options with empty string values — Radix SelectItem
+  // requires a non-empty value prop. Placeholder is handled by SelectValue.
+  const validOptions = options.filter((opt) => opt.value !== "");
+
   return (
     <Select value={value || ""} onValueChange={onChange} disabled={disabled}>
       <SelectTrigger
@@ -55,7 +57,7 @@ export function FormSelect({
         position="popper"
         align="start"
       >
-        {options.map((opt) => (
+        {validOptions.map((opt) => (
           <SelectItem
             key={opt.value}
             value={opt.value}

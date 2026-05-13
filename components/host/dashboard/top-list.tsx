@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { FormSelect } from "@/components/shared/form-select"
 
 interface TopListItem {
   id: string
@@ -27,25 +28,20 @@ export function TopList({ title, type, data }: TopListProps) {
     <div className="rounded-lg border border-border bg-card p-5 h-full flex flex-col">
       <div className="flex items-start justify-between mb-4 gap-2">
         <h2 className="text-body font-medium text-foreground tracking-tight">{title}</h2>
-        <select 
+        <FormSelect
           value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
-          className="px-2 py-1 bg-muted/50 border border-border hover:bg-muted/80 rounded text-label font-medium text-foreground outline-none cursor-pointer shrink-0 transition-colors"
-        >
-          {type === "org" ? (
-            <>
-              <option value="amount">Amount (RM)</option>
-              <option value="checkin">Check-ins</option>
-              <option value="members">Members</option>
-            </>
-          ) : (
-            <>
-              <option value="amount">Claims (RM)</option>
-              <option value="commission">Commission (RM)</option>
-              <option value="rating">Rating</option>
-            </>
-          )}
-        </select>
+          onChange={(v) => setSortBy(v)}
+          options={type === "org" ? [
+            { label: "Amount (RM)", value: "amount" },
+            { label: "Check-ins", value: "checkin" },
+            { label: "Members", value: "members" },
+          ] : [
+            { label: "Amount (RM)", value: "amount" },
+            { label: "Commission", value: "commission" },
+            { label: "Rating", value: "rating" },
+          ]}
+          triggerClassName="shrink-0 h-8"
+        />
       </div>
 
       <div className="flex-1 overflow-y-auto min-h-0 -mx-5 px-5">

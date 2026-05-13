@@ -245,7 +245,7 @@ export default function ServiceProviderDetailPage() {
                   value={
                     <div className="flex flex-wrap gap-1.5 mt-0.5">
                       {sp.mainServices?.map((service, i) => (
-                        <Badge key={i} variant="secondary" className="text-label font-medium bg-muted/40">{service}</Badge>
+                        <Badge key={i} variant="secondary" className="text-label font-medium">{service}</Badge>
                       ))}
                       {(!sp.mainServices || sp.mainServices.length === 0) && (
                         <span className="text-label text-muted-foreground italic">None selected</span>

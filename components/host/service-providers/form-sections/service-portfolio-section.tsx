@@ -79,7 +79,7 @@ export function ServicePortfolioSection({
             <div className="flex flex-wrap gap-1">
               <span className="text-label font-medium text-faint w-full mb-1 uppercase tracking-wider">Allowed Categories</span>
               {brandCategories.map((cat) => (
-                <Badge key={cat} variant="secondary" className="text-label font-medium bg-muted/40">
+                <Badge key={cat} variant="secondary" className="text-label font-medium">
                   {cat}
                 </Badge>
               ))}

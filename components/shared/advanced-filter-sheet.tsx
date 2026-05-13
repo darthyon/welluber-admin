@@ -11,6 +11,7 @@ import {
   Wallet
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
+import { FormSelect } from "@/components/shared/form-select";
 
 export interface WorkforceRange {
   label: string;
@@ -199,19 +200,14 @@ export function AdvancedFilterSheet({
                <h3 className="text-label font-semibold tracking-tight leading-none">Company details</h3>
             </div>
             <div className="space-y-4 pl-1">
-               <div className="space-y-2">
-                  <label className="text-label font-semibold text-faint block">Industry vertical</label>
-                 <select
-                   className="w-full h-11 px-4 rounded-lg border border-border bg-card text-body focus:ring-2 focus:ring-primary/20 outline-none appearance-none font-medium"
-                   value={filters.industry}
-                   onChange={(e) => setFilters({ ...filters, industry: e.target.value })}
-                 >
-                   <option value="all">All Industries</option>
-                   {industries.map(ind => (
-                     <option key={ind} value={ind}>{ind}</option>
-                   ))}
-                 </select>
-               </div>
+                <div className="space-y-2">
+                   <label className="text-label font-semibold text-faint block">Industry vertical</label>
+                  <FormSelect
+                    value={filters.industry}
+                    onChange={(v) => setFilters({ ...filters, industry: v })}
+                    options={[{ label: "All Industries", value: "all" }, ...industries.map((ind) => ({ label: ind, value: ind }))]}
+                  />
+                </div>
             </div>
           </section>
         )}

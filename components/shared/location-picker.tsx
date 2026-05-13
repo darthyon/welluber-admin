@@ -19,6 +19,7 @@ import {
   TooltipTrigger
 } from "@/components/ui/tooltip";
 import { MOCK_LOCATION_SUGGESTIONS } from "@/lib/mock-data";
+import { FormSelect } from "@/components/shared/form-select";
 
 export interface LocationData {
   line: string;
@@ -300,19 +301,19 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
 
           <div className="space-y-1.5">
             <label className="text-body font-medium text-foreground">State <span className="text-destructive">*</span></label>
-            <select
+            <FormSelect
               value={value.state}
-              onChange={(e) => handleChange("state", e.target.value)}
-              className={cn(inputCls(!!errors?.state), "cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236b7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1.25rem_1.25rem] bg-[right_0.5rem_center] bg-no-repeat pr-10")}
-            >
-              <option value="">Select State</option>
-              <option value="Kuala Lumpur">Kuala Lumpur</option>
-              <option value="Selangor">Selangor</option>
-              <option value="Johor">Johor</option>
-              <option value="Penang">Penang</option>
-              <option value="Sabah">Sabah</option>
-              <option value="Sarawak">Sarawak</option>
-            </select>
+              onChange={(v) => handleChange("state", v)}
+              options={[
+                { label: "Select State", value: "" },
+                { label: "Kuala Lumpur", value: "Kuala Lumpur" },
+                { label: "Selangor", value: "Selangor" },
+                { label: "Johor", value: "Johor" },
+                { label: "Penang", value: "Penang" },
+                { label: "Sabah", value: "Sabah" },
+                { label: "Sarawak", value: "Sarawak" },
+              ]}
+            />
           </div>
         </div>
 

@@ -224,7 +224,7 @@ export function EmployeePolicyTab({ employeeId }: EmployeePolicyTabProps) {
                       <p className="text-label font-medium text-subtle">Employee Types</p>
                       <div className="flex flex-wrap gap-2 mt-1">
                         {policy.eligibility.employeeTypes.map((type, idx) => (
-                          <Badge key={idx} variant="secondary" className="bg-primary/10 text-primary">
+                          <Badge key={idx} variant="secondary">
                             {type}
                           </Badge>
                         ))}
