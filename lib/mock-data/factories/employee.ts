@@ -168,12 +168,13 @@ export function createEmployee(index: number): Employee {
     tierId: tier?.id,
     tier: tier?.name,
     dateOfBirth: `${1985 + (index % 15)}-0${(index % 9) + 1}-15T00:00:00Z`,
-    gender: index % 3 === 0 ? "female" : "male",
+    gender: index % 2 === 0 ? "female" : "male",
     mobileNumber: `+6011${10000000 + index * 1234567}`,
     joinDate: index < 3 ? "2026-01-15T00:00:00Z" : "2026-04-01T00:00:00Z",
     probationEndDate: index % 5 === 0 ? "2026-07-01T00:00:00Z" : undefined,
     employmentType: EMP_TYPES[index]!,
-    status: index === 7 ? "inactive" : "active",
+    endDate: ["part_time", "contract", "internship"].includes(EMP_TYPES[index]!) ? "2026-12-31T00:00:00Z" : undefined,
+    status: index === 7 ? "deactivated" : "active",
     isProbation: index % 5 === 0,
   }
 }

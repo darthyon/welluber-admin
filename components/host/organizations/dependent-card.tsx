@@ -5,7 +5,6 @@ import {
   IdentificationCard,
   Clock,
 } from "@phosphor-icons/react"
-import { StatusBadge } from "@/components/shared/status-badge"
 import { ActionPopover } from "@/components/shared/action-popover"
 
 interface DependentCardProps {
@@ -51,13 +50,6 @@ export function DependentCard({
             <h4 className="max-w-[160px] truncate text-body font-semibold tracking-tight text-foreground transition-colors group-hover:text-primary">
               {dependent.name}
             </h4>
-            <div className="flex items-center gap-2">
-              <StatusBadge
-                status={dependent.status}
-                variant="emerald"
-                className="rounded-md px-1.5 py-0.5 text-micro"
-              />
-            </div>
           </div>
         </div>
 

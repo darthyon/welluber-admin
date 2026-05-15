@@ -1,5 +1,5 @@
 export type OrganizationStatus = "active" | "inactive" | "draft" | "deactivated" | "suspended";
-export type OrganizationType = "sme" | "enterprise" | "ngo";
+export type OrganizationType = "sole_proprietorship" | "partnership" | "sdn_bhd" | "llp" | "bhd" | "clbg";
 export type OrganizationSubscription = "standard" | "premium" | "enterprise";
 
 // ISO 8601 Date String
@@ -8,6 +8,7 @@ export type ISODate = string;
 export interface OrganizationBranch {
   id: string;
   orgId: string;
+  branchCode: string;
   name: string;
   type: "hq" | "branch";
   address: {
@@ -106,7 +107,7 @@ export interface OrganizationAdmin {
   name: string;
   email: string;
   role: "org_admin";
-  status: "active" | "pending_activation" | "suspended";
+  status: "active" | "pending_activation" | "deactivated";
   invitedAt: ISODate;
 }
 
@@ -125,12 +126,13 @@ export interface Employee {
   tierId?: string;
   tier?: string;
   dateOfBirth?: ISODate;
-  gender?: "male" | "female" | "other";
+  gender?: "male" | "female";
   mobileNumber?: string;
   joinDate: ISODate;
   probationEndDate?: ISODate;
   employmentType: EmploymentType;
-  status: "active" | "inactive";
+  endDate?: ISODate;
+  status: "active" | "deactivated";
   isProbation: boolean;
 }
 
@@ -142,6 +144,6 @@ export interface Dependent {
   employeeName: string;
   name: string;
   relationship: DependentRelationship;
-  status: "active" | "inactive";
+  status: "active" | "deactivated";
   joinDate: string;
 }

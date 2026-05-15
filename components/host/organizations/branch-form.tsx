@@ -7,9 +7,7 @@ import {
   IdentificationCard,
   Building,
   CheckCircle,
-  PaperPlaneTilt,
   Wallet,
-  Users
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { ChoiceCard } from "@/components/shared/choice-card";
@@ -18,7 +16,6 @@ import { LocationPicker } from "@/components/shared/location-picker";
 import type { LocationData } from "@/components/shared/location-picker";
 import { FormSelect } from "@/components/shared/form-select";
 import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav";
-import { InviteAdminModal } from "./invite-admin-modal";
 import { MOCK_ACCOUNTS } from "@/lib/mock-data";
 
 interface BranchFormProps {
@@ -31,7 +28,6 @@ const ANCHOR_ITEMS = [
   { id: "branch-identity", label: "Branch Identity" },
   { id: "location-mapping", label: "Location Mapping" },
   { id: "account-configuration", label: "Account Configuration" },
-  { id: "admin-governance", label: "Admin Governance" },
 ];
 
 export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
@@ -39,7 +35,6 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
   const [accountType, setAccountType] = useState<"new" | "existing">("new");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
   // Wallet fields
   const [accountName, setAccountName] = useState("");
@@ -49,7 +44,6 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
   // Mock initial data if editing
   const [formData, setFormData] = useState({
     name: branchId ? (branchId === "br_1" ? "ACME HQ (Kuala Lumpur)" : "ACME Subang Jaya") : "",
-    type: branchId ? (branchId === "br_1" ? "HQ" : "Branch") : "Branch",
     address: {
       line: branchId ? "Level 12, Menara South" : "",
       city: branchId ? "Kuala Lumpur" : "",
@@ -90,13 +84,6 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
 
   return (
     <div className="pb-24 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <InviteAdminModal
-        isOpen={isInviteModalOpen}
-        onClose={() => setIsInviteModalOpen(false)}
-        targetId={branchId ?? "new"}
-        title="Invite Branch Admin"
-      />
-
       <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start">
         {/* Left Column: Navigation */}
         <aside className="hidden xl:block w-52 shrink-0 sticky top-20 self-start">
@@ -149,17 +136,6 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
                       />
                     </div>
 
-                    <div className="space-y-1.5">
-                      <label className="text-body font-semibold text-subtle mb-1.5 block">Branch Type</label>
-                      <FormSelect
-                        value={formData.type}
-                        onChange={(v) => setFormData({ ...formData, type: v })}
-                        options={[
-                          { label: "Headquarters (HQ)", value: "HQ" },
-                          { label: "Branch", value: "Branch" },
-                        ]}
-                      />
-                    </div>
                   </div>
                 </div>
               </div>
@@ -288,38 +264,6 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
                       )}
                     </div>
                   </div>
-                </div>
-              </div>
-
-              {/* Section: Admin Governance */}
-              <div id="admin-governance" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
-                <div className="p-6 space-y-6">
-                  <div className="flex items-center gap-2 pb-2">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                      <Users size={16} weight="fill" />
-                    </div>
-                    <div className="space-y-0.5">
-                      <h3 className="text-lead font-semibold text-foreground">Admin Governance</h3>
-                      <p className="text-label text-muted-foreground">Invite admins with local management access for this branch.</p>
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => setIsInviteModalOpen(true)}
-                    className="w-full border-2 border-dashed border-border/60 rounded-lg p-8 flex flex-col items-center text-center space-y-3 hover:border-primary/30 hover:bg-muted/30 transition-all cursor-pointer group"
-                  >
-                    <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center text-faint group-hover:bg-primary/10 group-hover:text-primary transition-all duration-300">
-                      <PaperPlaneTilt size={20} />
-                    </div>
-                    <div>
-                      <p className="text-body font-semibold text-foreground leading-tight">Invite Admin</p>
-                      <p className="text-label text-muted-foreground mt-1">Send an invitation to manage this branch.</p>
-                    </div>
-                    <Button asChild variant="secondary" size="sm" className="text-label font-semibold rounded-full px-6 transition-all pointer-events-none">
-                      <span>Add Invitation</span>
-                    </Button>
-                  </button>
                 </div>
               </div>
 
