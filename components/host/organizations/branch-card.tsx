@@ -66,11 +66,11 @@ export function BranchCard({ branch, onView, onEdit }: BranchCardProps) {
           </div>
         </div>
 
-        <ActionPopover 
+        <ActionPopover
           actions={[
             { label: "View Details", onClick: () => onView?.(branch.id) },
             { label: "Edit Branch", onClick: () => onEdit?.(branch.id) },
-            { label: "Deactivate", isDanger: true }
+            ...(branch.type.toLowerCase() !== "hq" ? [{ label: "Deactivate", isDanger: true }] : []),
           ]}
         />
       </div>

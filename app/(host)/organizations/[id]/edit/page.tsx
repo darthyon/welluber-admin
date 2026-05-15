@@ -11,8 +11,15 @@ import {
   WarningCircle,
   IdentificationCard,
   MapPin,
-  Bank
+  Bank,
+  CalendarBlank,
+  CaretDown,
 } from "@phosphor-icons/react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { createOrganizationSchema, CreateOrganizationData } from "@/features/organizations/schemas";
 import { Button } from "@/components/ui/button";
@@ -31,10 +38,16 @@ const ANCHOR_ITEMS = [
 ];
 
 const ORG_TYPES = [
-  { id: "sme", label: "SME", docs: "Form D / SSM Cert" },
-  { id: "enterprise", label: "Enterprise", docs: "SSM Cert & Form Section 14" },
-  { id: "ngo", label: "NGO", docs: "Registration Papers" },
+  { id: "sole_proprietorship", label: "Sole Proprietorship", docs: "Form D / MyCoID" },
+  { id: "partnership", label: "Partnership", docs: "Form A / Partnership Deed" },
+  { id: "sdn_bhd", label: "Private Limited (Sdn. Bhd.)", docs: "SSM Section 14 & 17" },
+  { id: "llp", label: "LLP", docs: "LLP Registration Certificate" },
+  { id: "bhd", label: "Public Limited (Bhd.)", docs: "Prospectus & SSM Cert" },
+  { id: "clbg", label: "CLBG", docs: "Memorandum & Articles" },
 ];
+
+const MONTH_SHORT = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
 export default function EditOrganizationPage() {
   const router = useRouter();
@@ -42,6 +55,7 @@ export default function EditOrganizationPage() {
   const orgId = params.id as string;
   
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [fyPickerOpen, setFyPickerOpen] = useState(false);
 
   const { register, handleSubmit, control, setValue, formState: { errors } } = useForm<CreateOrganizationData>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -51,9 +65,9 @@ export default function EditOrganizationPage() {
       registrationNumber: "1234567-T",
       industry: "Technology",
       subIndustry: "Software Development",
-      type: "sme",
+      type: "bhd",
       tinNumber: "TR-882910-01",
-      financialYearStart: new Date("2026-01-01T00:00:00Z"),
+      financialYearMode: "calendar",
       address: {
         line: "Level 15, Menara Southpoint, Mid Valley City",
         city: "Kuala Lumpur",
@@ -71,6 +85,7 @@ export default function EditOrganizationPage() {
   });
 
   const orgType = useWatch({ control, name: "type" });
+  const fyMode = useWatch({ control, name: "financialYearMode" });
   const industryValue = useWatch({ control, name: "industry" });
   const bankNameValue = useWatch({ control, name: "bankAccountDetails.bankName" });
 
@@ -100,9 +115,12 @@ export default function EditOrganizationPage() {
 
   const getDocRequirements = (type: string) => {
     switch (type) {
-      case "enterprise": return "SSM Certificate and Form Section 14 required";
-      case "sme": return "Form D and SSM Certificate required";
-      case "ngo": return "Registration documents required";
+      case "sole_proprietorship": return "Form D / MyCoID registration required";
+      case "partnership": return "Form A and Partnership Deed required";
+      case "sdn_bhd": return "SSM Certificate, Section 14 & Section 17 required";
+      case "llp": return "LLP Registration Certificate required";
+      case "bhd": return "Prospectus and SSM Certificate required";
+      case "clbg": return "Memorandum and Articles of Association required";
       default: return "Supporting documents required";
     }
   };
@@ -179,13 +197,79 @@ export default function EditOrganizationPage() {
                       />
                     </div>
 
-                    <div className="space-y-1.5">
+                    <div className="space-y-2">
                       <label className={labelCls}>Financial Year Start</label>
-                      <input 
-                        type="date"
-                        {...register("financialYearStart", { valueAsDate: true })}
-                        className={inputCls(!!errors.financialYearStart)}
-                      />
+                      <div className="flex gap-2">
+                        {([
+                          { mode: "calendar" as const, label: "Calendar Year" },
+                          { mode: "follow_month" as const, label: "Organisation Financial Year" },
+                        ]).map(({ mode, label }) => (
+                          <button
+                            key={mode}
+                            type="button"
+                            onClick={() => setValue("financialYearMode", mode)}
+                            className={cn(
+                              "flex-1 py-2 px-3 border rounded-lg text-body font-medium transition-all",
+                              fyMode === mode
+                                ? "border-primary bg-primary/5 text-primary"
+                                : "border-border text-muted-foreground hover:border-border-hover"
+                            )}
+                          >
+                            {label}
+                          </button>
+                        ))}
+                      </div>
+                      {fyMode === "calendar" && (
+                        <p className="text-label text-muted-foreground">From January 1 – December 31.</p>
+                      )}
+                      {fyMode === "follow_month" && (
+                        <Controller
+                          control={control}
+                          name="financialYearMonth"
+                          render={({ field }) => (
+                            <div className="space-y-1.5">
+                              <Popover open={fyPickerOpen} onOpenChange={setFyPickerOpen}>
+                                <PopoverTrigger asChild>
+                                  <button
+                                    type="button"
+                                    className="w-full flex items-center gap-2 h-[38px] px-3 bg-background border border-border rounded-lg text-body transition-all hover:border-primary/30 focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30"
+                                  >
+                                    <CalendarBlank size={16} className="text-faint shrink-0" />
+                                    <span className={field.value ? "text-foreground font-medium" : "text-faint"}>
+                                      {field.value ? MONTH_NAMES[field.value - 1] : "Select FY start month"}
+                                    </span>
+                                    <CaretDown size={14} className={cn("text-faint ml-auto transition-transform", fyPickerOpen && "rotate-180")} />
+                                  </button>
+                                </PopoverTrigger>
+                                <PopoverContent align="start" className="w-[280px] p-3">
+                                  <div className="grid grid-cols-4 gap-1.5">
+                                    {MONTH_SHORT.map((m, i) => (
+                                      <button
+                                        key={m}
+                                        type="button"
+                                        onClick={() => { field.onChange(i + 1); setFyPickerOpen(false); }}
+                                        className={cn(
+                                          "py-2 rounded-lg text-label font-medium border transition-all",
+                                          field.value === i + 1
+                                            ? "border-primary bg-primary/5 text-primary ring-1 ring-primary/20"
+                                            : "border-border text-muted-foreground hover:border-primary/30 hover:text-foreground"
+                                        )}
+                                      >
+                                        {m}
+                                      </button>
+                                    ))}
+                                  </div>
+                                  {field.value && (
+                                    <p className="text-label text-muted-foreground mt-2 px-1">
+                                      FY runs {MONTH_NAMES[field.value - 1]} 1 – last day of {MONTH_NAMES[(field.value - 2 + 12) % 12]}.
+                                    </p>
+                                  )}
+                                </PopoverContent>
+                              </Popover>
+                            </div>
+                          )}
+                        />
+                      )}
                     </div>
                   </div>
                 </div>
@@ -220,26 +304,17 @@ export default function EditOrganizationPage() {
                       />
                     </div>
 
-                    <div className="space-y-3 sm:col-span-2 pt-4 border-t border-border/40">
+                    <div className="space-y-2 sm:col-span-2 pt-4 border-t border-border/40">
                       <label className={labelCls}>Organisation Type</label>
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        {ORG_TYPES.map(type => (
-                          <button
-                            key={type.id}
-                            type="button"
-                            onClick={() => setValue("type", type.id as "sme" | "enterprise" | "ngo")}
-                            className={cn(
-                              "flex flex-col p-3 border rounded-lg text-left transition-all duration-200",
-                              orgType === type.id 
-                                ? "border-primary bg-primary/[0.03] ring-1 ring-primary/20" 
-                                : "border-border hover:border-border-hover bg-muted/5"
-                            )}
-                          >
-                            <span className={cn("text-body font-semibold", orgType === type.id ? "text-primary" : "text-foreground")}>{type.label}</span>
-                            <span className="text-label text-subtle mt-0.5 leading-tight">{type.docs}</span>
-                          </button>
-                        ))}
-                      </div>
+                      <FormSelect
+                        value={orgType || ""}
+                        onChange={(v) => setValue("type", v as CreateOrganizationData["type"])}
+                        options={[
+                          { label: "Select type", value: "" },
+                          ...ORG_TYPES.map(t => ({ label: t.label, value: t.id })),
+                        ]}
+                        error={!!errors.type}
+                      />
                     </div>
 
                     <div className="sm:col-span-2 pt-4 border-t border-border/40">

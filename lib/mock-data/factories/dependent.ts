@@ -26,7 +26,7 @@ export function createDependent(index: number): Dependent {
     employeeName: EMP_NAMES[index] ?? `Employee ${index + 1}`,
     name: NAMES[index] ?? `Dependent ${n}`,
     relationship: RELATIONSHIPS[index]!,
-    status: index === 5 ? "inactive" : "active",
+    status: index === 5 ? "deactivated" : "active",
     joinDate: JOIN_DATES[index] ?? "01 Jan 2026",
   }
 }

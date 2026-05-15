@@ -12,10 +12,10 @@ import { SuccessModal } from "@/components/shared/success-modal";
 import { toast } from "sonner";
 import { EmployeeFormContent } from "@/components/host/employees/employee-form-content";
 const ANCHOR_ITEMS = [
-  { id: "personal-identity", label: "Personal Identity" },
+  { id: "personal-identity", label: "Personal Details" },
   { id: "employment-details", label: "Employment Details" },
   { id: "benefit-policy-assignment", label: "Benefit Policy Assignment" },
-  { id: "dependent-links", label: "Dependent Links" },
+  { id: "dependent-links", label: "Dependent Details" },
 ];
 
 export default function NewEmployeePage() {

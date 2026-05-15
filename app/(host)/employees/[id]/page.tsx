@@ -51,10 +51,10 @@ const mockEmployee = {
 };
 
 const ANCHOR_ITEMS = [
-  { id: "personal-identity", label: "Personal Identity" },
+  { id: "personal-identity", label: "Personal Details" },
   { id: "employment-details", label: "Employment Details" },
   { id: "benefit-policy-assignment", label: "Benefit Policy Assignment" },
-  { id: "dependent-links", label: "Dependent Links" },
+  { id: "dependent-links", label: "Dependent Details" },
   { id: "entitlements", label: "Entitlements" },
   { id: "claims", label: "Claims" },
   { id: "vouchers", label: "Vouchers" },
@@ -129,10 +129,10 @@ export default function EmployeePage() {
 
           {/* Content Area */}
           <div className="flex-1 min-w-0 space-y-16">
-            {/* Personal Identity */}
+            {/* Personal Details */}
             <section id="personal-identity" className="scroll-mt-24">
               <DetailSection
-                title="Personal Identity"
+                title="Personal Details"
                 icon={<User size={18} weight="bold" className="text-primary" />}
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-y-8 gap-x-12">
@@ -205,10 +205,10 @@ export default function EmployeePage() {
               </DetailSection>
             </section>
 
-            {/* Dependent Links */}
+            {/* Dependent Details */}
             <section id="dependent-links" className="scroll-mt-24">
               <DetailSection
-                title="Dependent Links"
+                title="Dependent Details"
                 icon={<Users size={18} weight="bold" className="text-primary" />}
               >
                 {employee.dependents.length === 0 ? (
