@@ -318,9 +318,22 @@ function NewPolicyReviewPageContent() {
               selectedDeptIds={draft.policy.eligibility?.departmentIds ?? []}
               tierOptions={tierOptions}
               departmentOptions={departmentOptions}
+              effectiveDate={draft.policy.effectiveDate ?? "immediate"}
+              scheduledDate={draft.policy.effectiveCustomDate}
               onToggleEmpType={toggleEmpType}
               onToggleTier={toggleTier}
               onToggleDept={toggleDept}
+              onEffectiveDateChange={({ effectiveDate, scheduledDate }) => {
+                if (!draft) return;
+                updateDraft({
+                  ...draft,
+                  policy: {
+                    ...draft.policy,
+                    effectiveDate,
+                    effectiveCustomDate: effectiveDate === "scheduled" ? scheduledDate : undefined,
+                  },
+                });
+              }}
             />
           </div>
 

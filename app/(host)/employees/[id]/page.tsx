@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, PencilSimpleLine, User, Briefcase, Shield, Users, Globe, CreditCard, ClockCounterClockwise, CalendarBlank, Buildings, IdentificationBadge, IdentificationCard, Calendar, DeviceMobile, EnvelopeSimple } from "@phosphor-icons/react";
+import { ArrowLeft, PencilSimpleLine, User, Briefcase, Shield, Users, Globe, ClockCounterClockwise, CalendarBlank, Buildings, IdentificationBadge, IdentificationCard, Calendar, DeviceMobile, EnvelopeSimple } from "@phosphor-icons/react";
 
 import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav";
 import { Button } from "@/components/ui/button";
@@ -36,7 +36,6 @@ const mockEmployee = {
   isProbation: false,
   gender: "Male",
   residencyStatus: "Local",
-  isTaxable: true,
   role: "Senior Software Engineer",
   probationMode: "3m" as const,
   probationEndDate: "12 Jan 2024",
@@ -145,7 +144,6 @@ export default function EmployeePage() {
                   <DetailField label="Mobile Number" value={employee.mobile} icon={<DeviceMobile size={16} />} />
                   <DetailField label="Gender" value={employee.gender} icon={<User size={16} />} />
                   <DetailField label="Residency Status" value={employee.residencyStatus} icon={<Globe size={16} />} />
-                  <DetailField label="Taxable" value={employee.isTaxable ? "Yes" : "No"} icon={<CreditCard size={16} />} />
                 </div>
               </DetailSection>
             </section>

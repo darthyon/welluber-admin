@@ -21,9 +21,6 @@ import {
   Receipt,
   Check,
   Warning,
-  CalendarCheck,
-  RocketLaunch,
-  ClockCountdown,
   type IconProps
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
@@ -37,7 +34,7 @@ import { SuccessCelebration } from "@/components/shared/success-celebration";
 import { PolicyLaunchConfirmModal } from "@/components/host/policies/policy-launch-confirm-modal";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
-import { BenefitPolicy, BenefitGroup, Benefit, PolicyStatus, DistributionType, DependentsPoolType, ProrateUnit, RefreshCycle, ActivationMode } from "@/types/policy";
+import { BenefitPolicy, BenefitGroup, Benefit, PolicyStatus, DistributionType, DependentsPoolType, ProrateUnit, RefreshCycle } from "@/types/policy";
 import { UtilisationClaimsTable } from "@/components/shared/utilisation-claims-table";
 import { MOCK_EMPLOYEES, MOCK_ORGS } from "@/lib/mock-data";
 import type { EmployeeDirectoryItem } from "@/features/employees/types";
@@ -77,12 +74,6 @@ const DEPENDENTS_POOL_OPTIONS: { value: DependentsPoolType; title: string; descr
   { value: "Individual", title: "Individual", description: "Each dependent has their own benefit pool.", icon: User },
   { value: "Shared", title: "Shared", description: "All dependents share the same pool.", icon: UsersFour },
   { value: "SharedWithEmployee", title: "Shared with Employee", description: "Dependents share the employee's pool.", icon: Users },
-];
-
-const ACTIVATION_MODES: { value: ActivationMode; label: string; description: string; icon: React.ElementType<IconProps> }[] = [
-  { value: "after_join", label: "After Join Date", description: "Immediately on join (most common).", icon: RocketLaunch },
-  { value: "after_probation", label: "After Probation Ends", description: "Policy activates once probation is completed.", icon: ClockCountdown },
-  { value: "custom_date", label: "Custom Date", description: "Set a specific activation date.", icon: CalendarCheck },
 ];
 
 function getAvailableRefreshCycles(
@@ -196,12 +187,11 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
     name: "",
     description: "",
     eligibleEmploymentTypes: ["full-time", "part-time", "contract", "internship"],
-    coversDependents: false,
+    dependentCoverages: [],
     benefitPoolType: "Individual",
     utilisationMode: "Fixed",
     refreshCycle: "Yearly",
     refreshStartReference: "fy_start",
-    activationMode: "after_join",
     status: "draft",
   });
 
@@ -217,6 +207,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
   const [showPostCreateModal, setShowPostCreateModal] = useState(false);
   const [showLaunchConfirmModal, setShowLaunchConfirmModal] = useState(false);
   const [showCustomizeAssignment, setShowCustomizeAssignment] = useState(false);
+  const policyIdRef = useRef(0);
   const groupIdRef = useRef(0);
   const benefitIdRef = useRef(0);
 
@@ -262,25 +253,14 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
         errors.prorateUnit = "Pick a prorate unit (Monthly is most common)";
       }
 
-      if (policyData.coversDependents && !policyData.dependentsPoolType) {
-        errors.dependentsPoolType = "Select a pool type for dependents";
-      }
+      const hasDependents = (policyData.dependentCoverages?.length ?? 0) > 0;
 
-      if (
-        policyData.coversDependents &&
-        policyData.dependentsPoolType &&
-        policyData.dependentsPoolType !== "SharedWithEmployee" &&
-        (!policyData.dependentsCapAmount || policyData.dependentsCapAmount <= 0)
-      ) {
-        errors.dependentsCapAmount = "Enter a dependents spending cap greater than 0";
+      if (hasDependents && !policyData.dependentsPoolType) {
+        errors.dependentsPoolType = "Select a pool type for dependents";
       }
 
       if (policyData.refreshStartReference === "custom_date" && !policyData.refreshCustomDate) {
         errors.refreshCustomDate = "Pick when this policy resets each cycle";
-      }
-
-      if (policyData.activationMode === "custom_date" && !policyData.activationCustomDate) {
-        errors.activationCustomDate = "Enter a custom activation date";
       }
 
       if (policyData.utilisationMode === "Prorated" && policyData.prorateUnit) {
@@ -389,8 +369,23 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
     }));
   };
 
-  const nextStep = () => {
+  const nextStep = async () => {
+    if (isSubmitting) return;
     if (!validateStep(currentStep)) return;
+    if (mode === "create" && currentStep === 1 && !policyData.id) {
+      setIsSubmitting(true);
+      await new Promise(resolve => setTimeout(resolve, 650));
+      policyIdRef.current += 1;
+      const id = `POL-new-${String(policyIdRef.current).padStart(4, "0")}`;
+      const shellPolicy: Partial<BenefitPolicy> = {
+        ...policyData,
+        id,
+        status: policyData.status ?? "draft",
+      };
+      setPolicyData(shellPolicy);
+      onSaveDraft?.({ policy: shellPolicy, groups, benefits });
+      setIsSubmitting(false);
+    }
     setCurrentStep(prev => Math.min(prev + 1, 5));
   };
 
@@ -603,16 +598,10 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
         <div className="space-y-8 animate-in fade-in duration-300">
           <DetailSection title="Benefit Pool Strategy" icon={<Gear size={18} weight="duotone" />} description="Fund allocation configuration" ghost>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <ReadField label="Dependents" value={policyData.coversDependents ? "Covered" : "Employee Only"} />
-              <ReadField label="Benefit Policy Amount" value={policyData.totalCapAmount ? `RM ${policyData.totalCapAmount.toFixed(2)}` : "Not Set"} />
-              {policyData.coversDependents && (
+              <ReadField label="Dependents" value={(policyData.dependentCoverages?.length ?? 0) > 0 ? "Covered" : "Employee Only"} />
+              <ReadField label="Employee Policy Amount" value={policyData.totalCapAmount ? `RM ${policyData.totalCapAmount.toFixed(2)}` : "Not Set"} />
+              {(policyData.dependentCoverages?.length ?? 0) > 0 && (
                 <ReadField label="Dependents Pool Type" value={policyData.dependentsPoolType === "SharedWithEmployee" ? "Shared with Employee" : policyData.dependentsPoolType} />
-              )}
-              {policyData.coversDependents && policyData.dependentsPoolType !== "SharedWithEmployee" && (
-                <ReadField
-                  label="Dependents Policy Amount"
-                  value={policyData.dependentsCapAmount ? `RM ${policyData.dependentsCapAmount.toFixed(2)}` : "Not Set"}
-                />
               )}
               <ReadField label="Utilisation Mode" value={policyData.utilisationMode === "Fixed" ? "Fixed Allocation" : "Prorated Allocation"} />
               {policyData.utilisationMode === "Prorated" && (
@@ -620,16 +609,12 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
               )}
             </div>
           </DetailSection>
-          <DetailSection title="Cycle & Lifecycle" icon={<Gear size={18} weight="duotone" />} description="Refresh intervals and activation" ghost>
+          <DetailSection title="Cycle & Lifecycle" icon={<Gear size={18} weight="duotone" />} description="Refresh intervals" ghost>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <ReadField label="Refresh Cycle" value={policyData.refreshCycle} />
               <ReadField label="Refresh Start Reference" value={refreshLabels[policyData.refreshStartReference || ""] || policyData.refreshStartReference} />
               {policyData.refreshStartReference === "custom_date" && (
                 <ReadField label="Custom Refresh Date" value={policyData.refreshCustomDate} />
-              )}
-              <ReadField label="Activation" value={policyData.activationMode === "after_join" ? "After Join Date" : policyData.activationMode === "after_probation" ? "After Probation Ends" : "Custom Date"} />
-              {policyData.activationMode === "custom_date" && (
-                <ReadField label="Custom Activation Date" value={policyData.activationCustomDate} />
               )}
             </div>
           </DetailSection>
@@ -641,9 +626,9 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
       <div className="space-y-8 max-w-3xl">
         <DetailSection title="Benefit Pool Strategy" icon={<Gear size={18} weight="duotone" />} description="Choose how funds are allocated" ghost>
           <div className="space-y-6 md:max-w-xl">
-            {/* ── Benefit Policy Amount ── */}
+            {/* ── Employee Policy Amount ── */}
             <div className="space-y-1.5">
-              <label className="text-label font-medium text-subtle inline-flex items-center gap-1.5">Benefit Policy Amount <FieldHelp termKey="spendingCap" /></label>
+              <label className="text-label font-medium text-subtle inline-flex items-center gap-1.5">Employee Policy Amount <FieldHelp termKey="spendingCap" /></label>
               <input
                 type="number"
                 min={0}
@@ -662,30 +647,29 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
             </div>
 
             {/* ── Cover Dependents ── */}
-            <div className="space-y-2">
-              <label className="text-label font-medium text-subtle inline-flex items-center gap-1.5">Cover Dependents <FieldHelp termKey="dependentsPooling" /></label>
-              <label className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-body font-medium text-foreground">
-                <input
-                  type="checkbox"
-                  checked={policyData.coversDependents === true}
-                  onChange={(e) =>
-                    setPolicyData({
-                      ...policyData,
-                      coversDependents: e.target.checked,
-                      dependentsPoolType: e.target.checked ? policyData.dependentsPoolType : undefined,
-                      dependentsCapAmount: e.target.checked ? policyData.dependentsCapAmount : undefined,
-                    })
-                  }
-                  className="h-4 w-4 rounded border-border text-primary focus:ring-ring"
-                  disabled={isViewMode}
-                />
-                Include dependents in this policy
-              </label>
-            </div>
+	            <div className="space-y-2">
+	              <label className="text-label font-medium text-subtle inline-flex items-center gap-1.5">Cover Dependents <FieldHelp termKey="dependentsPooling" /></label>
+	              <label className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-body font-medium text-foreground">
+	                <input
+	                  type="checkbox"
+	                  checked={(policyData.dependentCoverages?.length ?? 0) > 0}
+	                  onChange={(e) =>
+	                    setPolicyData({
+	                      ...policyData,
+	                      dependentCoverages: e.target.checked ? (policyData.dependentCoverages?.length ? policyData.dependentCoverages : [{ type: "spouse" }]) : [],
+	                      dependentsPoolType: e.target.checked ? (policyData.dependentsPoolType ?? "SharedWithEmployee") : undefined,
+	                    })
+	                  }
+	                  className="h-4 w-4 rounded border-border text-primary focus:ring-ring"
+	                  disabled={isViewMode}
+	                />
+	                Include dependents in this policy
+	              </label>
+	            </div>
 
             {/* ── Dependents Pool Type ── */}
-            {policyData.coversDependents && (
-              <div className="space-y-3">
+	            {(policyData.dependentCoverages?.length ?? 0) > 0 && (
+	              <div className="space-y-3">
                 <label className="text-label font-medium text-subtle inline-flex items-center gap-1.5">
                   Dependents Pool Type <span className="text-rose-600 dark:text-rose-400">*</span>
                   <FieldHelp termKey="dependentsPooling" />
@@ -698,48 +682,18 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                       title={opt.title}
                       description={opt.description}
                       icon={opt.icon}
-                      selected={policyData.dependentsPoolType === opt.value}
-                      onSelect={() =>
-                        setPolicyData({
-                          ...policyData,
-                          dependentsPoolType: opt.value,
-                          dependentsCapAmount:
-                            opt.value === "SharedWithEmployee" ? undefined : policyData.dependentsCapAmount,
-                        })
-                      }
+	                      selected={policyData.dependentsPoolType === opt.value}
+	                      onSelect={() =>
+	                        setPolicyData({
+	                          ...policyData,
+	                          dependentsPoolType: opt.value,
+	                        })
+	                      }
                     />
                   ))}
                 </div>
-              </div>
-            )}
-
-            {policyData.coversDependents && policyData.dependentsPoolType !== "SharedWithEmployee" && (
-              <div className="space-y-1.5">
-                <label className="text-label font-medium text-subtle inline-flex items-center gap-1.5">
-                  Dependents Policy Amount <span className="text-rose-600 dark:text-rose-400">*</span>
-                  <FieldHelp termKey="spendingCap" />
-                </label>
-                <input
-                  type="number"
-                  min={0}
-                  placeholder="e.g. 1500"
-                  className={cn(
-                    "w-full px-4 py-2.5 bg-background border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all",
-                    validationErrors.dependentsCapAmount ? "border-rose-300" : "border-border"
-                  )}
-                  value={policyData.dependentsCapAmount ?? ""}
-                  onChange={(e) =>
-                    setPolicyData({
-                      ...policyData,
-                      dependentsCapAmount: e.target.value === "" ? undefined : parseFloat(e.target.value),
-                    })
-                  }
-                  disabled={isViewMode}
-                />
-                {validationErrors.dependentsCapAmount && <p className="text-label text-rose-600 dark:text-rose-400 font-medium">{validationErrors.dependentsCapAmount}</p>}
-                <p className="text-micro text-faint">Maximum total dependents can claim per cycle for this policy.</p>
-              </div>
-            )}
+	              </div>
+	            )}
 
             {/* ── Utilisation Mode ── */}
             <div className="space-y-3">
@@ -829,60 +783,6 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
               </div>
             </div>
 
-            {/* ── Activation ── */}
-            <div className="mt-8 pt-6 border-t border-border space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="w-7 h-7 rounded-md bg-primary/10 text-primary flex items-center justify-center border border-primary/20 shrink-0">
-                  <RocketLaunch size={14} weight="duotone" />
-                </div>
-                <div>
-                  <h4 className="text-body font-semibold text-foreground inline-flex items-center gap-1.5">Activation <FieldHelp termKey="activationMode" /></h4>
-                  <p className="text-label text-muted-foreground">When the policy takes effect for new members</p>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                {ACTIVATION_MODES.map((mode) => {
-                  const Icon = mode.icon;
-                  return (
-                    <div key={mode.value} className="space-y-2">
-                      <button
-                        type="button"
-                        onClick={() => setPolicyData({ ...policyData, activationMode: mode.value, activationCustomDate: mode.value !== "custom_date" ? undefined : policyData.activationCustomDate })}
-                        className={cn(
-                          "flex items-center gap-3 px-4 py-3 rounded-lg border text-body font-medium transition-all text-left w-full",
-                          policyData.activationMode === mode.value ? "border-primary bg-primary/5 text-primary" : "border-border bg-card text-muted-foreground hover:border-border/80"
-                        )}
-                      >
-                        <div className={cn("w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0", policyData.activationMode === mode.value ? "border-primary" : "border-border")}>
-                          {policyData.activationMode === mode.value && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
-                        </div>
-                        <Icon size={18} weight={policyData.activationMode === mode.value ? "fill" : "regular"} className="shrink-0" />
-                        <div className="flex flex-col">
-                          <span>{mode.label}</span>
-                          <span className="text-label text-faint font-normal">{mode.description}</span>
-                        </div>
-                      </button>
-                      {mode.value === "custom_date" && policyData.activationMode === "custom_date" && (
-                        <div className="pl-12 space-y-1.5 animate-in fade-in slide-in-from-top-1 duration-300">
-                          <label className="text-label font-medium text-subtle">
-                            Custom Activation Date <span className="text-rose-600 dark:text-rose-400">*</span>
-                          </label>
-                          <DatePickerField
-                            value={policyData.activationCustomDate || ""}
-                            onChange={(v) => setPolicyData({ ...policyData, activationCustomDate: v })}
-                            placeholder="Select activation date"
-                            clearable={false}
-                            className={validationErrors.activationCustomDate ? "[&>button]:border-rose-300 [&>button]:focus:border-rose-300" : ""}
-                          />
-                          {validationErrors.activationCustomDate && <p className="text-label text-rose-600 dark:text-rose-400 font-medium">{validationErrors.activationCustomDate}</p>}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
           </div>
         </DetailSection>
       </div>
@@ -1035,7 +935,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                               {isChecked && (
                                 <div className="px-4 pb-4">
                                   <div className="flex items-start gap-4 flex-wrap pl-8">
-                                    {!isViewMode && policyData.coversDependents && (
+                                    {!isViewMode && (policyData.dependentCoverages?.length ?? 0) > 0 && (
                                       <div className="flex items-center gap-2 w-full mb-1">
                                         <button
                                           type="button"
@@ -1467,22 +1367,14 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
         {/* Pool & Cycle */}
         <DetailSection title="Pool & Cycle" icon={<Gear size={18} weight="duotone" />} ghost>
           <div className="space-y-4">
-            <ReadField label="Dependents" value={policyData.coversDependents ? "Covered" : "Employee Only"} />
-            <ReadField label="Benefit Policy Amount" value={policyData.totalCapAmount ? `RM ${policyData.totalCapAmount.toFixed(2)}` : "Not Set"} />
-            {policyData.coversDependents && <ReadField label="Dependents Pool Type" value={policyData.dependentsPoolType === "SharedWithEmployee" ? "Shared with Employee" : policyData.dependentsPoolType} />}
-            {policyData.coversDependents && policyData.dependentsPoolType !== "SharedWithEmployee" && (
-              <ReadField
-                label="Dependents Policy Amount"
-                value={policyData.dependentsCapAmount ? `RM ${policyData.dependentsCapAmount.toFixed(2)}` : "Not Set"}
-              />
-            )}
+            <ReadField label="Dependents" value={(policyData.dependentCoverages?.length ?? 0) > 0 ? "Covered" : "Employee Only"} />
+            <ReadField label="Employee Policy Amount" value={policyData.totalCapAmount ? `RM ${policyData.totalCapAmount.toFixed(2)}` : "Not Set"} />
+            {(policyData.dependentCoverages?.length ?? 0) > 0 && <ReadField label="Dependents Pool Type" value={policyData.dependentsPoolType === "SharedWithEmployee" ? "Shared with Employee" : policyData.dependentsPoolType} />}
             <ReadField label="Utilisation Mode" value={policyData.utilisationMode === "Fixed" ? "Fixed Allocation" : "Prorated Allocation"} />
             {policyData.utilisationMode === "Prorated" && <ReadField label="Prorate Unit" value={policyData.prorateUnit} />}
             <ReadField label="Refresh Cycle" value={policyData.refreshCycle} />
             <ReadField label="Start Reference" value={policyData.refreshStartReference === "fy_start" ? "Financial Year" : policyData.refreshStartReference === "join_date" ? "Join Date" : "Custom Date"} />
             {policyData.refreshStartReference === "custom_date" && <ReadField label="Custom Date" value={policyData.refreshCustomDate} />}
-            <ReadField label="Activation" value={policyData.activationMode === "after_join" ? "After Join Date" : policyData.activationMode === "after_probation" ? "After Probation Ends" : "Custom Date"} />
-            {policyData.activationMode === "custom_date" && <ReadField label="Activation Date" value={policyData.activationCustomDate} />}
           </div>
         </DetailSection>
 

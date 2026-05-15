@@ -57,7 +57,6 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
     mobile: "+60 12-345 6789",
     nationality: "Malaysian",
     residencyStatus: "Local",
-    isTaxable: true,
     tier: "Tier 3 - Executive",
     employeeStatus: "active",
     isProbation: false,
@@ -151,7 +150,6 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
                 <Badge variant="outline">
                   {employeeData.residencyStatus}
                 </Badge>
-                <StatusBadge status={employeeData.isTaxable ? "Taxable" : "Non-taxable"} variant={employeeData.isTaxable ? "primary" : "rose"} />
               </div>
             </div>
           </div>
@@ -260,11 +258,6 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
                 label="Nationality / Residency" 
                 value={`${employeeData.nationality} (${employeeData.residencyStatus})`} 
                 icon={<Globe size={16} />}
-              />
-              <DetailField 
-                label="Taxable Status" 
-                value={employeeData.isTaxable ? "Taxable (Income Tax Deduction)" : "Non-taxable"} 
-                icon={<CreditCard size={16} />}
               />
               <DetailField 
                 label="Position Tier" 

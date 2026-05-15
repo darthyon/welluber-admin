@@ -19,10 +19,6 @@ export const POLICY_GLOSSARY = {
     title: "Refresh Cycle",
     body: "Refresh cycle is when balances reset back to the policy amount. For example, Yearly means balances renew once a year.",
   },
-  activationMode: {
-    title: "Activation",
-    body: "Activation controls when coverage starts for eligible employees. Most teams use Immediately on join so new hires are covered from day one.",
-  },
   groupCap: {
     title: "Group Cap",
     body: "Group cap limits total spending for a shared group. Example: set RM 1000 for Mental Health so the whole group cannot exceed that amount per cycle.",

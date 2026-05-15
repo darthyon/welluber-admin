@@ -55,10 +55,10 @@ export function validateGroupInsert(
  * - Fixed: must not exceed benefit amount
  */
 export function validateCoPayment(
-  amount: number,
-  coPayment: Benefit["coPayment"]
+  amount: number | undefined,
+  coPayment: Benefit["coPayment"] | BenefitGroup["coPayment"] | undefined
 ): ValidationIssue | null {
-  if (!coPayment.required) return null
+  if (!coPayment || !coPayment.required) return null
   if (coPayment.value < 0) {
     return { field: "coPayment.value", message: "Co-payment cannot be negative" }
   }
@@ -70,7 +70,7 @@ export function validateCoPayment(
       }
     }
   } else if (coPayment.type === "Fixed") {
-    if (coPayment.value > amount) {
+    if (typeof amount === "number" && coPayment.value > amount) {
       return {
         field: "coPayment.value",
         message: `Fixed co-payment (RM ${coPayment.value}) cannot exceed benefit amount (RM ${amount})`,
