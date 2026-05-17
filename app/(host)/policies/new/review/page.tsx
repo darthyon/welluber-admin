@@ -555,11 +555,14 @@ function NewPolicyReviewPageContent() {
         title="Policy Created"
         message={`${createdPolicyName} has been saved as a draft.`}
         primaryAction={{
-          label: "View Policy",
+          label: "Add Benefit Groups",
           onClick: () => {
             setShowSuccess(false);
-            if (createdPolicyId) router.push(`/policies/${createdPolicyId}`);
-            else router.push("/policies");
+            if (createdPolicyId) {
+              router.push(`/policies?policyId=${createdPolicyId}&wizard=open&mode=view&tab=benefit-groups`);
+            } else {
+              router.push("/policies");
+            }
           },
         }}
         secondaryAction={{
