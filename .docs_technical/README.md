@@ -69,6 +69,26 @@
 
 ---
 
+## ERD Domain Map
+
+Six colour-coded domains in `erd/drawio/erd-combined.drawio`:
+
+| Domain | Colour | Position | Key Entities |
+|--------|--------|----------|-------------|
+| **Org** | Blue | Top-left | Organization, Branch, Employee, Dependent |
+| **Policy** | Purple | Top-centre | BenefitPolicy, BenefitGroup, Benefit, BenefitAssignment |
+| **SP** | Green | Top-right | Brand, ServiceProvider, SpBranch, SpVoucher, CommissionSchemaRow |
+| **Finance** | Amber | Bottom-left | Account, AccountTransaction, Claim, VoucherRedemption, UsageLogs |
+| **Platform** | Pink | Bottom-centre | ServiceCategory/MainService/SubService (taxonomy), AuditLogEntry |
+| **Member** | Teal | Bottom-right | MemberProfile, EmployeeAccount, DependentAccount |
+| **IAM** | Orange | Full-height right | Tenant, Role, Permission, RolePermission, AdminUser, AdminUserRole, UserAuditLog |
+
+> **Member is separate from Org** — a `MemberProfile` is a permanent personal identity. Public users can sign up without any employer. Corporate identity is added by linking an `EmployeeAccount` to the personal profile.
+>
+> **IAM is a standalone service** — all admin-portal users (host, org, SP) are `AdminUser` records with roles scoped to their `Tenant`. Replaces `Administrator`, `OrganizationAdmin`, and `SpAdmin`. `UserAuditLog` is the immutable record of every admin action.
+
+---
+
 ## Key Context
 
 - **Currency:** MYR only (MVP)

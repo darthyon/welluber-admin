@@ -1,14 +1,27 @@
-# Flow 5 — Member Activation
+# Flow 5 — Member Activation & Corporate Identity Linking
 
-**Actors:** Member (Employee), Org Admin
-**Platform:** Member App, Org Portal (HR side)
-**Precondition:** Employee record exists in org, org has active policy
+**Actors:** Member (public user), HR / Org Admin, System
+**Platforms:** Member App (sign-up + linkage), Org Portal (HR creates employee record)
+**Precondition:** Employee record exists in the org (created by HR)
 
 ---
 
 ## Overview
 
-A WellUber account is a permanent personal identity. Corporate identities (employment records) are linked to it via a secure two-inbox verification flow. The member creates a personal account using their personal email, then links their corporate identity using a magic link sent to their corporate email. Both inboxes must be involved — preventing impersonation.
+WellUber has two distinct identity layers:
+
+| Layer | Entity | Purpose |
+|-------|--------|---------|
+| **Personal identity** | `MemberProfile` | Permanent. Created on first app sign-up. Survives company changes. |
+| **Corporate identity** | `EmployeeAccount` | Per-employer. Bridges HR's `Employee` record with a `MemberProfile`. Deactivated when employment ends; history preserved. |
+
+A `MemberProfile` can be **public-only** (no linked employer — can browse, cannot use benefit wallet) or **linked** (one or more active `EmployeeAccount` connections — wallet unlocked per employer).
+
+**Security model — two-step verification:**
+1. Member enters `corporateEmail` + `empCode` → system sends confirmation to the corporate inbox
+2. Member clicks confirmation link from the corporate inbox → linkage confirmed
+
+Knowing the credentials alone is not enough — inbox access is the second factor.
 
 ---
 
@@ -16,38 +29,55 @@ A WellUber account is a permanent personal identity. Corporate identities (emplo
 
 ```mermaid
 sequenceDiagram
-    participant HR as Org Admin (HR)
-    participant API as WellUber API
-    participant CE as Corporate Email
-    participant MA as Member App
-    participant FB as Firebase Auth
+    participant HR as Org Admin (HR Portal)
+    participant SYS as WellUber System
+    participant CE as Corporate Inbox
+    participant APP as Member App
 
-    Note over HR: Step 1 — HR creates employee record
+    Note over HR,SYS: Part A — HR creates employee record
 
-    HR->>API: POST /employees (name, corpEmail, empCode, joinDate...)
-    API->>API: Create Employee record (status: inactive)
-    API->>FB: Create Firebase user in org-{orgId} tenant
-    API->>CE: Send magic link to corpEmail
-    API-->>HR: Employee record created
+    HR->>SYS: Add employee (name, corporateEmail, empCode, ...)
+    SYS->>SYS: Create Employee (HR record)
+    SYS->>SYS: Create EmployeeAccount\nlinkageStatus=unlinked\nmemberProfileId=null
+    SYS-->>HR: Employee created
 
-    Note over MA: Step 2 — Member creates personal account (independent)
+    Note over APP: Part B — Member creates personal account (independent)
 
-    MA->>FB: Sign up with personal email (Google SSO or email/pw)
-    FB-->>MA: Personal Firebase UID + ID token
-    MA-->>MA: Account created (no corporate identity yet)\nMarketplace browsable, checkout gated
+    APP->>SYS: Sign up with personalEmail / Google / Apple
+    SYS->>SYS: Create MemberProfile (isPublicOnly=true)
+    SYS-->>APP: Can browse marketplace — wallet gated
 
-    Note over MA,CE: Step 3 — Corporate identity linking
+    Note over APP,CE: Part C — Member initiates corporate linkage
 
-    MA->>MA: Member goes to "Link corporate identity" flow
-    MA->>MA: Enter corporate email (triggers magic link)
-    API->>CE: Send magic link (or use existing link from HR)
-    CE-->>MA: Member opens link from corporate email inbox
-    MA->>API: POST /identity/link (token from link)
-    API->>API: Verify token (expiry + single-use)
-    API->>FB: Link corporate identity to personal UID
-    API->>API: Employee status → active
-    API-->>MA: Benefits wallet now active
-    MA-->>MA: Show benefit balance + marketplace unlocked
+    APP->>SYS: POST /identity/link/initiate\n{ corporateEmail, empCode }
+    SYS->>SYS: Match EmployeeAccount by corporateEmail+empCode\nStatus must be "unlinked"
+
+    alt No match / already linked
+        SYS-->>APP: Error — check with HR team
+    else Match found
+        SYS->>SYS: Generate token, store hash\nlinkageStatus → pending_verification\nlinkageTokenExpiresAt = now + 60min
+        SYS->>CE: Email confirmation link to corporateEmail
+        SYS-->>APP: "Check your corporate inbox"
+    end
+
+    Note over CE,APP: Part D — Member confirms from corporate inbox
+
+    CE-->>APP: Opens welluber://confirm-linkage/[token]
+    APP->>SYS: POST /identity/link/confirm { token }
+    SYS->>SYS: Verify hash + expiry + status=pending_verification
+
+    alt Invalid / expired
+        SYS-->>APP: Error — request new link
+    else Valid
+        SYS->>SYS: Set memberProfileId\nlinkageStatus → active\nlinkedAt = now\nToken cleared (single-use)\nisPublicOnly → false
+        SYS-->>APP: Benefit wallet active
+    end
+
+    Note over HR,SYS: Part E — Offboarding
+
+    HR->>SYS: Deactivate employee
+    SYS->>SYS: EmployeeAccount → deactivated\nEmployee.status → inactive
+    SYS-->>APP: Benefits stop\nHistory preserved (read-only)\nMemberProfile untouched
 ```
 
 ---
@@ -56,81 +86,66 @@ sequenceDiagram
 
 ### Part A — HR Creates Employee Record
 
-1. **[Org Admin] Add employee**
-   - Navigate to Org Portal → Employees → Add Employee
-   - Required: name, corporate email, employee code (`empCode`), join date, employment type
-   - Optional: department, tier, date of birth (required for age-based eligibility), mobile number
-
-2. **[System] Create employee and send invitation**
-   - `Employee` record created with `status: inactive`
-   - Firebase user created in `org-{orgId}` tenant with corporate email
-   - Magic link sent to corporate email (60-min expiry)
-
-3. **[Org Admin] Alternative: CSV bulk upload**
-   - Upload CSV with employee data
-   - System validates all rows, reports errors
-   - All valid employees created and invited in batch
+1. HR adds employee in Org Portal: `name`, `corporateEmail`, `empCode`, `joinDate`, `employmentType`
+2. System creates `Employee` (HR record) and `EmployeeAccount` (`linkageStatus: "unlinked"`)
+3. HR communicates `corporateEmail` + `empCode` to the employee through onboarding
 
 ### Part B — Member Creates Personal Account
 
-4. **[Member] Download Member App**
-   - Sign up with personal email (Google SSO, Apple SSO, or email + password)
-   - Firebase account created (no tenant — personal identity)
+4. Member downloads app, signs up with personal email / Google / Apple
+5. `MemberProfile` created: `isPublicOnly: true` — marketplace browsable, wallet gated
 
-5. **[System] Personal account state**
-   - Marketplace is browsable
-   - Checkout and wallet features gated until corporate identity linked
+### Part C — Initiate Corporate Linkage
 
-### Part C — Corporate Identity Linking
+6. Member taps "Link Company Benefits" — enters `corporateEmail` + `empCode`
+7. System matches `EmployeeAccount` — rejects if not found, already linked, or deactivated
+8. System generates token (stores only the hash), emails confirmation link to `corporateEmail`
+9. `EmployeeAccount.linkageStatus` → `"pending_verification"`, 60-min expiry set
 
-6. **[Member] Initiate identity linking**
-   - In app: tap "Link your company benefits"
-   - Enter corporate email address
+### Part D — Confirm from Corporate Inbox
 
-7. **[System] Send / re-use magic link**
-   - If HR already sent a link and it's still valid: reuse it
-   - Otherwise: generate new magic link, send to corporate email
+10. Member opens confirmation link from corporate inbox: `welluber://confirm-linkage/[token]`
+11. System verifies: hash matches + not expired + status = `"pending_verification"`
+12. On success: `memberProfileId` set, `linkageStatus → "active"`, `linkedAt` = now, token cleared
+13. `MemberProfile.isPublicOnly` → `false` — benefit wallet now active
 
-8. **[Member] Open magic link from corporate email**
-   - Must open the link from a device with the Member App installed
-   - Universal link: `welluber://verify-identity/[token]`
-   - Browser shows redirect message — verification cannot happen in browser
+### Part E — Offboarding
 
-9. **[System] Validate and link**
-   - Check token: not expired (< 60 min), not yet used
-   - Link corporate Firebase identity to personal UID
-   - `Employee.status` → `active`
-   - Invalidate token (single-use)
-
-10. **[Member] Benefits activated**
-    - Wallet becomes visible with allocated benefit amounts
-    - Marketplace is fully unlocked (checkout enabled)
-    - Onboarding screen shows benefit summary
+14. HR deactivates: `EmployeeAccount.linkageStatus → "deactivated"`, `Employee.status → "inactive"`
+15. Benefits stop immediately; `MemberProfile` remains — history visible as read-only
+16. Member can link a new employer later (Part C again with new company credentials)
 
 ---
 
-## Two-Inbox Security
+## Multiple Employers
 
-The two-inbox model prevents impersonation:
+One `MemberProfile` can have multiple active `EmployeeAccounts`:
+- Each employer creates their own `EmployeeAccount` (separate HR record)
+- Member links each through Part C + D separately
+- Each company's wallet and benefit pools are fully isolated
+- Claims reference the specific `EmployeeAccount` + `Account` (wallet) of that employer
 
-| Check | Purpose |
-|-------|---------|
-| Magic link sent to **corporate email** | Proves the person controls the corporate address |
-| Personal account created with **personal email** | Proves the person controls a permanent identity |
-| Both must be involved | Prevents a bad actor from linking someone else's corporate benefits |
+---
 
-An employee who leaves the company has their corporate identity deactivated (by HR) but retains their personal WellUber account and access history.
+## Token Security
+
+| Property | Value |
+|----------|-------|
+| Storage | SHA-256 hash only — plaintext never stored |
+| Expiry | 60 minutes |
+| Reuse | Single-use — cleared on confirmation |
+| Delivery | Sent to `corporateEmail` only (never `personalEmail`) |
+| Brute force | Rate-limited per IP + per `employeeId` |
 
 ---
 
 ## Business Rules
 
-- One personal Welluber account can hold multiple corporate identities (employee at multiple companies)
-- Deactivation removes benefit access immediately — history is preserved
-- Magic link: 60-min expiry, single-use, invalidated on first successful use
-- If token expired: member must request a new link; HR can resend from Org Portal
-- Checkout is gated until at least one active corporate identity exists
-- Pre-link state: marketplace is browsable, wallet not shown
+- Both `corporateEmail` AND `empCode` must match — neither alone is sufficient
+- Confirmation requires corporate inbox access — the second factor
+- One `EmployeeAccount` links to one `MemberProfile` only
+- Deactivation is immediate — no grace period in v1
+- Dependent personal profiles (`DependentAccount`) follow a simplified version if the company enables dependent app access; otherwise dependents are managed through the employee's session
 
 ---
 
@@ -138,10 +153,11 @@ An employee who leaves the company has their corporate identity deactivated (by 
 
 | Error | Handling |
 |-------|---------|
-| Magic link expired | Member requests resend; HR receives notification |
-| Corporate email already linked to another personal account | Block linking; surface error — contact support |
-| Employee not found (empCode/email mismatch) | Validation error — contact HR |
-| Token already used | Show "already activated" message |
+| `corporateEmail` + `empCode` not found | "Credentials not recognised — check with your HR team." Do not reveal which field is wrong. |
+| Already linked to another profile | "This account is already connected. Contact your HR admin." |
+| EmployeeAccount deactivated | "This employment record is no longer active." |
+| Token expired | "Confirmation link expired — request a new one." |
+| Token already used | "This link has already been used." |
 
 ---
 
@@ -149,7 +165,8 @@ An employee who leaves the company has their corporate identity deactivated (by 
 
 | Entity | Action |
 |--------|--------|
-| Employee | Created (status: `inactive`) on HR upload; updated to `active` on link |
-| Member | Firebase user created with personal email |
-| CorporateIdentity | Created and linked to Member UID on magic link verification |
-| AuditLogEntry | Written for employee creation, magic link sent, identity linked |
+| `Employee` | Created by HR |
+| `EmployeeAccount` | Created (`unlinked`) → `pending_verification` → `active` → `deactivated` |
+| `MemberProfile` | Created on sign-up; `isPublicOnly` updated on confirmation |
+| `DependentAccount` | Created if dependent has own app access (optional) |
+| `AuditLogEntry` | Written at each status transition |

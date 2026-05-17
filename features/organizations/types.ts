@@ -39,8 +39,8 @@ export interface OrganizationAccount {
   orgId: string;
   branchId: string;
   balance: number;
-  pendingDeductions: number;
-  status: "active" | "suspended";
+  creditLimit: number;
+  isActive: boolean;
 }
 
 export interface Organization {

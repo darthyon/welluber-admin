@@ -1,68 +1,47 @@
-"use client";
+"use client"
 
-import { Gift, CurrencyCircleDollar, Calendar, ArrowClockwise, ChartLineUp } from "@phosphor-icons/react";
-import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { StatusBadge } from "@/components/shared/status-badge";
+import {
+  Gift, CurrencyCircleDollar, Calendar, ArrowClockwise, ChartLineUp,
+  Users, UserCircle, UsersThree,
+} from "@phosphor-icons/react"
+import { Progress } from "@/components/ui/progress"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { EmptyState } from "@/components/shared/empty-state"
+import { useEmployeePoolSummary, useBenefitAssignments } from "@/hooks/data-hooks"
+import { getAvailableAmount, getUtilisationPct } from "@/types/benefit-assignment"
+import type { BenefitAssignment, BenefitAssignmentSourceType } from "@/types/benefit-assignment"
+import { cn } from "@/lib/utils"
 
 interface EmployeeEntitlementsTabProps {
-  employeeId: string;
+  employeeId: string
 }
 
 export function EmployeeEntitlementsTab({ employeeId }: EmployeeEntitlementsTabProps) {
-  void employeeId;
-  // Mock entitlements data
-  const entitlements = [
-    {
-      id: "ent_1",
-      name: "Wellness Allocation",
-      benefitGroup: "Gym Membership",
-      allocatedAmount: 2500,
-      currentBalance: 1300,
-      utilization: 48,
-      refreshCycle: "Monthly",
-      lastRefreshed: "01 Apr 2024",
-      nextRefresh: "01 May 2024",
-    },
-    {
-      id: "ent_2",
-      name: "Lifestyle Pocket",
-      benefitGroup: "Food & Beverage",
-      allocatedAmount: 1000,
-      currentBalance: 150,
-      utilization: 85,
-      refreshCycle: "Quarterly",
-      lastRefreshed: "01 Jan 2024",
-      nextRefresh: "01 Apr 2024",
-    },
-    {
-      id: "ent_3",
-      name: "Mental Health Support",
-      benefitGroup: "Clinical Therapy",
-      allocatedAmount: 1500,
-      currentBalance: 1500,
-      utilization: 0,
-      refreshCycle: "Annual",
-      lastRefreshed: "01 Jan 2024",
-      nextRefresh: "01 Jan 2025",
-    },
-  ];
+  const summary = useEmployeePoolSummary(employeeId)
+  const { assignments } = useBenefitAssignments(employeeId)
 
-  const totalAllocated = entitlements.reduce((sum, ent) => sum + ent.allocatedAmount, 0);
-  const totalBalance = entitlements.reduce((sum, ent) => sum + ent.currentBalance, 0);
-  const totalUtilization = ((totalAllocated - totalBalance) / totalAllocated) * 100;
+  if (assignments.length === 0) {
+    return (
+      <EmptyState
+        title="No benefit pools assigned"
+        description="This employee doesn't have any benefit policy assignments yet. Assign a benefit policy to get started."
+        action={<Button variant="outline" size="sm"><Gift size={16} className="mr-2" />Assign Policy</Button>}
+      />
+    )
+  }
 
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-title font-semibold text-foreground">Entitlements</h2>
+        <h2 className="text-title font-semibold text-foreground">Benefit Pools</h2>
         <p className="text-body text-muted-foreground mt-2">
-          Benefit allocations, pool balances, and utilization history for this employee.
+          Allocated benefit pools, available balance, and utilisation for this employee and their dependents.
         </p>
       </div>
 
-      {/* Summary Cards */}
+      {/* Summary row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="border-border">
           <CardHeader className="pb-3">
@@ -73,11 +52,9 @@ export function EmployeeEntitlementsTab({ employeeId }: EmployeeEntitlementsTabP
           </CardHeader>
           <CardContent>
             <div className="text-display font-semibold text-foreground tabular-nums">
-              RM {totalAllocated.toLocaleString()}
+              RM {summary.totalAllocated.toLocaleString("en-MY", { minimumFractionDigits: 0 })}
             </div>
-            <p className="text-label text-muted-foreground mt-1">
-              Across all benefit pools
-            </p>
+            <p className="text-label text-muted-foreground mt-1">Across all pools this cycle</p>
           </CardContent>
         </Card>
 
@@ -85,16 +62,17 @@ export function EmployeeEntitlementsTab({ employeeId }: EmployeeEntitlementsTabP
           <CardHeader className="pb-3">
             <CardTitle className="text-body font-semibold text-muted-foreground flex items-center gap-2">
               <Gift size={18} />
-              Current Balance
+              Total Available
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-display font-semibold text-foreground tabular-nums">
-              RM {totalBalance.toLocaleString()}
+            <div className={cn(
+              "text-display font-semibold tabular-nums",
+              summary.totalAvailable === 0 ? "text-rose-600" : "text-foreground"
+            )}>
+              RM {summary.totalAvailable.toLocaleString("en-MY", { minimumFractionDigits: 0 })}
             </div>
-            <p className="text-label text-muted-foreground mt-1">
-              Available for use
-            </p>
+            <p className="text-label text-muted-foreground mt-1">Remaining to spend</p>
           </CardContent>
         </Card>
 
@@ -102,117 +80,201 @@ export function EmployeeEntitlementsTab({ employeeId }: EmployeeEntitlementsTabP
           <CardHeader className="pb-3">
             <CardTitle className="text-body font-semibold text-muted-foreground flex items-center gap-2">
               <ChartLineUp size={18} />
-              Overall Utilization
+              Overall Utilisation
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-display font-semibold text-foreground">
-              {totalUtilization.toFixed(1)}%
+              {summary.utilisationPct}%
             </div>
-            <div className="mt-2">
-              <Progress value={totalUtilization} className="h-2" />
-            </div>
+            <Progress
+              value={summary.utilisationPct}
+              className={cn("h-2 mt-2", summary.utilisationPct > 80 && "[&>div]:bg-rose-500")}
+            />
           </CardContent>
         </Card>
       </div>
 
-      {/* Entitlements List */}
-      <div className="space-y-6">
+      {/* Pool cards */}
+      <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-heading font-semibold text-foreground">Benefit Pools</h3>
+          <h3 className="text-heading font-semibold text-foreground">Pool Breakdown</h3>
           <Button variant="ghost" size="sm" className="gap-2">
             <ArrowClockwise size={16} />
             Refresh All
           </Button>
         </div>
 
-        {entitlements.map((entitlement) => (
-          <Card key={entitlement.id} className="border-border">
-            <CardContent className="p-6">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-                      <Gift size={20} weight="fill" />
-                    </div>
-                    <div>
-                      <h4 className="text-body font-semibold text-foreground">{entitlement.name}</h4>
-                      <p className="text-label text-muted-foreground">{entitlement.benefitGroup}</p>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-                    <div>
-                      <p className="text-label font-medium text-subtle">Allocated</p>
-                      <p className="text-body font-medium text-foreground">RM {entitlement.allocatedAmount.toLocaleString()}</p>
-                    </div>
-                    <div>
-                      <p className="text-label font-medium text-subtle">Balance</p>
-                      <p className="text-body font-medium text-foreground">RM {entitlement.currentBalance.toLocaleString()}</p>
-                    </div>
-                    <div>
-                      <p className="text-label font-medium text-subtle">Utilization</p>
-                      <div className="flex items-center gap-2">
-                        <Progress value={entitlement.utilization} className="h-2 w-24" />
-                        <span className="text-body font-medium text-foreground">{entitlement.utilization}%</span>
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-label font-medium text-subtle">Refresh Cycle</p>
-                      <p className="text-body font-medium text-foreground">{entitlement.refreshCycle}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <Button variant="ghost" size="sm" className="gap-2">
-                    <ArrowClockwise size={16} />
-                    Refresh Pool
-                  </Button>
-                  <div className="text-label text-muted-foreground text-center">
-                    <Calendar size={12} className="inline mr-1" />
-                    Next: {entitlement.nextRefresh}
-                  </div>
-                </div>
-              </div>
-
-              {/* Additional Details */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-border">
-                <div>
-                  <p className="text-label font-medium text-subtle">Last Refreshed</p>
-                  <p className="text-body text-foreground">{entitlement.lastRefreshed}</p>
-                </div>
-                <div>
-                  <p className="text-label font-medium text-subtle">Spent</p>
-                  <p className="text-body text-foreground">
-                    RM {(entitlement.allocatedAmount - entitlement.currentBalance).toLocaleString()}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-label font-medium text-subtle">Days Remaining</p>
-                  <p className="text-body text-foreground">15 days</p>
-                </div>
-                <div>
-                  <p className="text-label font-medium text-subtle">Status</p>
-                  <StatusBadge status="Active" variant="emerald" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        {assignments.map(a => (
+          <BenefitAssignmentCard key={a.id} assignment={a} />
         ))}
       </div>
-
-      {/* Empty State (commented out for reference)
-      {entitlements.length === 0 && (
-        <div className="text-center py-12 border-2 border-dashed border-border rounded-lg">
-          <Gift size={48} className="mx-auto text-faint" />
-          <h3 className="text-heading font-semibold text-foreground mt-4">No entitlements assigned</h3>
-          <p className="text-body text-muted-foreground mt-2 max-w-md mx-auto">
-            This employee doesn't have any benefit entitlements yet. Assign a benefit policy to get started.
-          </p>
-        </div>
-      )}
-      */}
     </div>
-  );
+  )
+}
+
+// ── Per-assignment card ───────────────────────────────────────────────────────
+
+function BenefitAssignmentCard({ assignment: a }: { assignment: BenefitAssignment }) {
+  const available     = getAvailableAmount(a)
+  const utilisationPct = getUtilisationPct(a)
+  const isExhausted   = a.status === "exhausted"
+  const isExpired     = a.status === "expired"
+
+  return (
+    <Card className="border-border">
+      <CardContent className="p-6 space-y-5">
+        {/* Header */}
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+              <PoolTypeIcon sourceType={a.sourceType} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h4 className="text-body font-semibold text-foreground">
+                  {groupDisplayName(a.benefitGroupId)}
+                </h4>
+                <PoolTypeBadge sourceType={a.sourceType} />
+                {isExhausted && (
+                  <Badge variant="outline" className="text-micro border-rose-300 text-rose-600 bg-rose-50">
+                    Exhausted
+                  </Badge>
+                )}
+                {isExpired && (
+                  <Badge variant="outline" className="text-micro border-zinc-300 text-zinc-500">
+                    Expired
+                  </Badge>
+                )}
+              </div>
+              <p className="text-label text-muted-foreground">{policyDisplayName(a.policyId)}</p>
+            </div>
+          </div>
+
+          <div className="text-right shrink-0">
+            <p className="text-label text-muted-foreground">Available</p>
+            <p className={cn(
+              "text-lead font-semibold tabular-nums",
+              isExhausted || isExpired ? "text-rose-600" : "text-foreground"
+            )}>
+              RM {available.toLocaleString("en-MY", { minimumFractionDigits: 2 })}
+            </p>
+          </div>
+        </div>
+
+        {/* Progress bar */}
+        <div className="space-y-1.5">
+          <Progress
+            value={utilisationPct}
+            className={cn(
+              "h-2",
+              utilisationPct >= 100 && "[&>div]:bg-rose-500",
+              utilisationPct > 80 && utilisationPct < 100 && "[&>div]:bg-amber-400",
+            )}
+          />
+          <div className="flex items-center justify-between">
+            <span className="text-micro text-muted-foreground">{utilisationPct}% used</span>
+            <span className="text-micro text-muted-foreground tabular-nums">
+              RM {a.usedAmount.toLocaleString("en-MY", { minimumFractionDigits: 2 })} used
+              {" / "}
+              RM {a.allocatedAmount.toLocaleString("en-MY", { minimumFractionDigits: 2 })} allocated
+            </span>
+          </div>
+        </div>
+
+        {/* Shared pool note */}
+        {a.sourceType === "shared" && (
+          <div className="rounded-md bg-muted/50 border border-border px-3 py-2 text-label text-muted-foreground flex items-center gap-2">
+            <UsersThree size={14} />
+            This is a shared pool — balance is split across all employees under this policy group.
+          </div>
+        )}
+
+        {/* Cycle info */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-border">
+          <InfoCell label="Cycle Start" value={formatDate(a.cycleStartDate)} />
+          <InfoCell label="Cycle End" value={a.cycleEndDate ? formatDate(a.cycleEndDate) : "Open-ended"} />
+          <InfoCell
+            label="Days Remaining"
+            value={a.cycleEndDate ? daysRemaining(a.cycleEndDate) : "—"}
+          />
+          <InfoCell label="Pool Type" value={sourceTypeLabel(a.sourceType)} />
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+// ── helpers ───────────────────────────────────────────────────────────────────
+
+function PoolTypeIcon({ sourceType }: { sourceType: BenefitAssignmentSourceType }) {
+  if (sourceType === "shared")    return <UsersThree size={20} weight="fill" />
+  if (sourceType === "dependent") return <Users size={20} weight="fill" />
+  return <UserCircle size={20} weight="fill" />
+}
+
+function PoolTypeBadge({ sourceType }: { sourceType: BenefitAssignmentSourceType }) {
+  const map: Record<BenefitAssignmentSourceType, { label: string; className: string }> = {
+    employee:  { label: "Individual",  className: "border-primary/30 text-primary bg-primary/5" },
+    dependent: { label: "Dependent",   className: "border-amber-300 text-amber-700 bg-amber-50" },
+    shared:    { label: "Shared Pool", className: "border-violet-300 text-violet-700 bg-violet-50" },
+  }
+  const { label, className } = map[sourceType]
+  return (
+    <Badge variant="outline" className={cn("text-micro", className)}>
+      {label}
+    </Badge>
+  )
+}
+
+function InfoCell({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-label text-muted-foreground">{label}</p>
+      <p className="text-body text-foreground">{value}</p>
+    </div>
+  )
+}
+
+function sourceTypeLabel(t: BenefitAssignmentSourceType) {
+  const map: Record<BenefitAssignmentSourceType, string> = {
+    employee:  "Individual",
+    dependent: "Dependent",
+    shared:    "Shared",
+  }
+  return map[t]
+}
+
+function groupDisplayName(groupId: string): string {
+  // In production this would come from the policy data map
+  const map: Record<string, string> = {
+    "POL-20260115-0001-G1": "Physical Wellbeing",
+    "POL-20260115-0001-G2": "Mental Fitness",
+    "POL-20260115-0001-G3": "Nutritional Support",
+    "POL-20260115-0002-G1": "Premium Wellness",
+    "POL-20260115-0003-G1": "Lite Benefits",
+    "POL-20260115-0004-G1": "Engineering Wellness",
+  }
+  return map[groupId] ?? groupId
+}
+
+function policyDisplayName(policyId: string): string {
+  const map: Record<string, string> = {
+    "POL-20260115-0001": "Acme Employee Wellness Policy FY2026",
+    "POL-20260115-0002": "Acme Leadership Benefits Policy FY2026",
+    "POL-20260115-0003": "Global Tech Lite Benefits Policy FY2026",
+    "POL-20260115-0004": "Acme Engineering Supplement FY2026",
+  }
+  return map[policyId] ?? policyId
+}
+
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString("en-MY", { day: "2-digit", month: "short", year: "numeric" })
+}
+
+function daysRemaining(cycleEnd: string): string {
+  const diff = Math.ceil((new Date(cycleEnd).getTime() - Date.now()) / 86_400_000)
+  if (diff < 0) return "Ended"
+  if (diff === 0) return "Ends today"
+  return `${diff} days`
 }

@@ -218,7 +218,7 @@ function AccountDetailContent() {
                     <div className="space-y-1 shrink-0">
                       <p className="text-label font-semibold text-primary-foreground/60">Available Limit</p>
                       <h2 className="text-4xl font-semibold tracking-tight text-primary-foreground tabular-nums">
-                        {(wallet.balance - wallet.pendingDeductions).toLocaleString()} pts
+                        {(wallet.balance + wallet.creditLimit).toLocaleString("en-MY", { minimumFractionDigits: 2 })}
                       </h2>
                       <div className="flex items-center gap-2 text-label text-primary-foreground/70">
                         <span>Credit Remaining: {orgCreditRemaining.toLocaleString()} pts</span>

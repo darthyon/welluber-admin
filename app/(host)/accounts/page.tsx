@@ -139,10 +139,10 @@ export default function AccountsPage() {
             </div>
 
             <div className="col-span-2 text-right">
-              {wallet.pendingDeductions > 0 ? (
+              {wallet.creditLimit > 0 && wallet.balance < 0 ? (
                 <div className="inline-flex items-center gap-1 rounded-md border border-amber-500/20 dark:border-amber-500/30 bg-amber-500/10 dark:bg-amber-500/20 px-1.5 py-0.5 text-label font-medium text-amber-600 dark:text-amber-400">
                   <Ticket size={10} weight="fill" />
-                  {wallet.pendingDeductions.toLocaleString()} pts
+                  Credit in use
                 </div>
               ) : (
                 <span className="text-micro text-faint">—</span>

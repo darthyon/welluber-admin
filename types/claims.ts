@@ -1,8 +1,25 @@
 export type ClaimStatus = "pre-auth" | "confirmed" | "cancelled";
 export type TransactionType = "redemption" | "reimbursement" | "refund";
+export type ClaimSourceType = "employee" | "dependent";
 
 export interface Claim {
   id: string;
+  /** FK → Employee — always the employee who holds the policy */
+  employeeId: string;
+  /** FK → BenefitAssignment — which pool is being consumed */
+  benefitAssignmentId: string;
+  /** FK → BenefitPolicy — denormalized for quick filtering */
+  policyId: string;
+  /** Who received the benefit */
+  sourceType: ClaimSourceType;
+  /** employeeId or dependentId depending on sourceType */
+  sourceId: string;
+  /** FK → Account — which org wallet is debited */
+  accountId: string;
+  /** FK → ServiceProvider (optional) */
+  spId?: string;
+  /** FK → SpBranch (optional) */
+  spBranchId?: string;
   voucherCode: string;
   voucherName?: string;
   transactionType: TransactionType;

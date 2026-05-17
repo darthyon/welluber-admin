@@ -73,7 +73,7 @@ import {
   suspendOrganization,
 } from "@/features/organizations/actions"
 import { OrganizationStatus } from "@/features/organizations/types"
-import { MOCK_ORGS, MOCK_DEPENDENTS, MOCK_ENTITLEMENTS, MOCK_EMPLOYEE_UTILISATION, MOCK_EMPLOYEES } from "@/lib/mock-data"
+import { MOCK_ORGS, MOCK_DEPENDENTS, MOCK_BENEFIT_ASSIGNMENTS, MOCK_EMPLOYEE_UTILISATION, MOCK_EMPLOYEES } from "@/lib/mock-data"
 import { UtilizationChart } from "@/components/host/organizations/utilization-chart"
 import { EntityAvatar } from "@/components/shared/entity-avatar"
 
@@ -1900,11 +1900,11 @@ function OrganizationDetailContent() {
                             ),
                           },
                         ]}
-                        data={MOCK_ENTITLEMENTS.filter(
+                        data={MOCK_BENEFIT_ASSIGNMENTS.filter(
                           (e) =>
                             (entitlementTypeFilter === "all" ||
-                              e.type === entitlementTypeFilter) &&
-                            e.beneficiaryName
+                              e.sourceType === entitlementTypeFilter) &&
+                            e.sourceId
                               .toLowerCase()
                               .includes(entitlementSearch.toLowerCase())
                         )}

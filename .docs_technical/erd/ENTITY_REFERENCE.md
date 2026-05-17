@@ -46,8 +46,7 @@ Source: `features/organizations/types.ts`
 | `employeeCount` | `number` | ✅ | Total registered employees |
 | `utilizationRate` | `number` | ✅ | % of benefit allocation used (0-100) |
 | `totalAccountBalance` | `number` | ✅ | Total wallet balance (RM) across all accounts |
-| `accountLimit` | `number` | ✅ | Max balance ceiling |
-| `creditLimit` | `number` | ✅ | Host-granted overdraft limit |
+| `accountLimit` | `number` | ✅ | Max balance ceiling (soft cap) |
 | `picId` | `string \| null` | — | Person in Charge (admin user ID) |
 | `logo` | `string` | — | Logo URL |
 | `needsAction` | `string[]` | — | Triage flags (e.g., "missing PIC", "no policies") |
@@ -249,12 +248,13 @@ Source: `features/accounts/types.ts`
 | `id` | `string` | ✅ | |
 | `orgId` | `string` | ✅ | FK → Organization |
 | `branchId` | `string` | ✅ | FK → OrganizationBranch |
+| `name` | `string` | ✅ | Human-readable wallet name (e.g. "Acme HQ Wallet") |
 | `orgName` | `string` | ✅ | Denormalized for query efficiency |
 | `branchName` | `string` | ✅ | Denormalized for query efficiency |
-| `type` | `"new" \| "existing"` | ✅ | Whether account was opened on WellUber or migrated |
-| `balance` | `number` | ✅ | Current wallet balance (RM) |
-| `pendingDeductions` | `number` | ✅ | Pre-authorized amounts not yet settled |
-| `status` | `"active" \| "suspended" \| "closed"` | ✅ | |
+| `balance` | `number` | ✅ | Funded cash balance (RM). Increased by approved TopupTransactions |
+| `creditLimit` | `number` | ✅ | Host-granted overdraft allowance (RM). 0 = no credit |
+| `reservedBalance` | `number` | ✅ | Sum of all open `pre-auth` claim amounts. Increments when a member purchases a voucher; decrements when the claim is confirmed or cancelled. **Available spending = balance + creditLimit − reservedBalance** |
+| `isActive` | `boolean` | ✅ | When false, all purchases are blocked and top-ups are paused |
 
 ### AccountTransaction
 Source: `features/accounts/types.ts`

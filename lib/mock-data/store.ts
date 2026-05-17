@@ -4,7 +4,11 @@ import {
   MOCK_BRANDS, MOCK_ORGS, MOCK_SPS, MOCK_EMPLOYEE_ENTITIES,
   MOCK_MEMBERS, MOCK_ADMINS, MOCK_CLAIMS,
   MOCK_GENERATED_VOUCHERS, MOCK_ACCOUNTS, MOCK_AUDIT_LOGS,
-  MOCK_POLICY_BUNDLES,
+  MOCK_POLICY_BUNDLES, MOCK_BENEFIT_ASSIGNMENTS,
+  MOCK_EMPLOYEE_USAGE_LOGS, MOCK_WALLET_USAGE_LOGS,
+  MOCK_MEMBER_PROFILES, MOCK_EMPLOYEE_ACCOUNTS, MOCK_DEPENDENT_ACCOUNTS,
+  MOCK_TENANTS, MOCK_PERMISSIONS, MOCK_ROLES, MOCK_ROLE_PERMISSIONS,
+  MOCK_ADMIN_USERS, MOCK_ADMIN_USER_ROLES, MOCK_USER_AUDIT_LOGS,
 } from "./seed"
 import type { Brand } from "@/types/brand"
 import type { Organization, Employee } from "@/features/organizations/types"
@@ -13,6 +17,11 @@ import type { Member, Administrator } from "@/features/users/types"
 import type { AuditLogEntry } from "@/features/audit-log/types"
 import type { GeneratedVoucher } from "@/features/voucher-packages/types"
 import type { Account } from "@/features/accounts/types"
+import type { BenefitAssignment } from "@/types/benefit-assignment"
+import type { EmployeeUsageLog, WalletUsageLog } from "@/types/usage-log"
+import type { MemberProfile } from "@/types/member-profile"
+import type { EmployeeAccount, DependentAccount } from "@/types/employee-account"
+import type { Tenant, Permission, Role, RolePermission, AdminUser, AdminUserRole, UserAuditLog } from "@/types/iam"
 import type { PolicyListItem } from "@/features/policies/types"
 import type { PolicyData } from "@/features/policies/types"
 import type { PolicyBundle } from "./factories/policy"
@@ -71,14 +80,30 @@ function createPolicyStore(bundles: PolicyBundle[]) {
   }
 }
 
-export const brandStore = createStore<Brand>(MOCK_BRANDS)
-export const orgStore = createStore<Organization>(MOCK_ORGS)
-export const spStore = createStore<ServiceProvider>(MOCK_SPS)
-export const employeeStore = createStore<Employee>(MOCK_EMPLOYEE_ENTITIES)
-export const memberStore = createStore<Member>(MOCK_MEMBERS)
-export const adminStore = createStore<Administrator>(MOCK_ADMINS)
-export const claimStore = createStore(MOCK_CLAIMS)
-export const voucherStore = createStore<GeneratedVoucher>(MOCK_GENERATED_VOUCHERS)
-export const accountStore = createStore<Account>(MOCK_ACCOUNTS)
-export const auditLogStore = createStore<AuditLogEntry>(MOCK_AUDIT_LOGS)
-export const policyStore = createPolicyStore(MOCK_POLICY_BUNDLES)
+export const brandStore          = createStore<Brand>(MOCK_BRANDS)
+export const orgStore            = createStore<Organization>(MOCK_ORGS)
+export const spStore             = createStore<ServiceProvider>(MOCK_SPS)
+export const employeeStore       = createStore<Employee>(MOCK_EMPLOYEE_ENTITIES)
+export const memberStore         = createStore<Member>(MOCK_MEMBERS)
+export const adminStore          = createStore<Administrator>(MOCK_ADMINS)
+export const claimStore          = createStore(MOCK_CLAIMS)
+export const voucherStore        = createStore<GeneratedVoucher>(MOCK_GENERATED_VOUCHERS)
+export const accountStore        = createStore<Account>(MOCK_ACCOUNTS)
+export const auditLogStore       = createStore<AuditLogEntry>(MOCK_AUDIT_LOGS)
+export const policyStore         = createPolicyStore(MOCK_POLICY_BUNDLES)
+export const benefitAssignmentStore  = createStore<BenefitAssignment>(MOCK_BENEFIT_ASSIGNMENTS)
+export const employeeUsageLogStore   = createStore<EmployeeUsageLog>(MOCK_EMPLOYEE_USAGE_LOGS)
+export const walletUsageLogStore     = createStore<WalletUsageLog>(MOCK_WALLET_USAGE_LOGS)
+export const memberProfileStore      = createStore<MemberProfile>(MOCK_MEMBER_PROFILES)
+export const employeeAccountStore    = createStore<EmployeeAccount>(MOCK_EMPLOYEE_ACCOUNTS)
+export const dependentAccountStore   = createStore<DependentAccount>(MOCK_DEPENDENT_ACCOUNTS)
+// IAM stores
+export const tenantStore             = createStore<Tenant>(MOCK_TENANTS)
+export const permissionStore         = createStore<Permission>(MOCK_PERMISSIONS)
+export const roleStore               = createStore<Role>(MOCK_ROLES)
+export const rolePermissionStore     = createStore<RolePermission & { id: string }>(
+  MOCK_ROLE_PERMISSIONS.map((rp, i) => ({ ...rp, id: `RP-${i}` }))
+)
+export const adminUserStore          = createStore<AdminUser>(MOCK_ADMIN_USERS)
+export const adminUserRoleStore      = createStore<AdminUserRole>(MOCK_ADMIN_USER_ROLES)
+export const userAuditLogStore       = createStore<UserAuditLog>(MOCK_USER_AUDIT_LOGS)

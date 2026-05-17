@@ -13,7 +13,14 @@ import { createGeneratedVoucher, createTopupTransaction } from "./factories/vouc
 import { createAccount } from "./factories/account"
 import { createAuditLog } from "./factories/audit-log"
 import { createDependent } from "./factories/dependent"
-import { createEntitlement } from "./factories/entitlement"
+import { createBenefitAssignment } from "./factories/benefit-assignment"
+import { createEmployeeUsageLog, createWalletUsageLog } from "./factories/usage-log"
+import { createMemberProfile } from "./factories/member-profile"
+import { createEmployeeAccount, createDependentAccount } from "./factories/employee-account"
+import {
+  TENANTS, PERMISSIONS, ROLES, ROLE_PERMISSION_RECORDS,
+  ADMIN_USERS, ADMIN_USER_ROLES, USER_AUDIT_LOGS,
+} from "./factories/iam"
 
 function seedAll() {
   // Dependency order: no-dep entities first, then dependents
@@ -31,7 +38,20 @@ function seedAll() {
   const topupHistory = Array.from({ length: 10 }, (_, i) => createTopupTransaction(i))
   const auditLogs = Array.from({ length: 10 }, (_, i) => createAuditLog(i))
   const dependents = Array.from({ length: 10 }, (_, i) => createDependent(i))
-  const entitlements = Array.from({ length: 8 }, (_, i) => createEntitlement(i))
+  const benefitAssignments  = Array.from({ length: 9 },  (_, i) => createBenefitAssignment(i))
+  const employeeUsageLogs   = Array.from({ length: 15 }, (_, i) => createEmployeeUsageLog(i))
+  const walletUsageLogs     = Array.from({ length: 13 }, (_, i) => createWalletUsageLog(i))
+  const memberProfiles      = Array.from({ length: 10 }, (_, i) => createMemberProfile(i))
+  const employeeAccounts    = Array.from({ length: 10 }, (_, i) => createEmployeeAccount(i))
+  const dependentAccounts   = Array.from({ length: 2 },  (_, i) => createDependentAccount(i))
+  // IAM — pre-built singletons
+  const tenants         = TENANTS
+  const permissions     = PERMISSIONS
+  const roles           = ROLES
+  const rolePermissions = ROLE_PERMISSION_RECORDS
+  const adminUsers      = ADMIN_USERS
+  const adminUserRoles  = ADMIN_USER_ROLES
+  const userAuditLogs   = USER_AUDIT_LOGS
 
   // Populate registry (single source of truth for ID lookups)
   brands.forEach(b => Registry.brands.set(b.id, b))
@@ -65,7 +85,19 @@ function seedAll() {
     topupHistory,
     auditLogs,
     dependents,
-    entitlements,
+    benefitAssignments,
+    employeeUsageLogs,
+    walletUsageLogs,
+    memberProfiles,
+    employeeAccounts,
+    dependentAccounts,
+    tenants,
+    permissions,
+    roles,
+    rolePermissions,
+    adminUsers,
+    adminUserRoles,
+    userAuditLogs,
   }
 }
 
@@ -86,7 +118,19 @@ export const MOCK_ACCOUNTS = SEED.accounts
 export const MOCK_TOPUP_HISTORY = SEED.topupHistory
 export const MOCK_AUDIT_LOGS = SEED.auditLogs
 export const MOCK_DEPENDENTS = SEED.dependents
-export const MOCK_ENTITLEMENTS = SEED.entitlements
+export const MOCK_BENEFIT_ASSIGNMENTS  = SEED.benefitAssignments
+export const MOCK_EMPLOYEE_USAGE_LOGS  = SEED.employeeUsageLogs
+export const MOCK_WALLET_USAGE_LOGS    = SEED.walletUsageLogs
+export const MOCK_MEMBER_PROFILES      = SEED.memberProfiles
+export const MOCK_EMPLOYEE_ACCOUNTS    = SEED.employeeAccounts
+export const MOCK_DEPENDENT_ACCOUNTS   = SEED.dependentAccounts
+export const MOCK_TENANTS              = SEED.tenants
+export const MOCK_PERMISSIONS          = SEED.permissions
+export const MOCK_ROLES                = SEED.roles
+export const MOCK_ROLE_PERMISSIONS     = SEED.rolePermissions
+export const MOCK_ADMIN_USERS          = SEED.adminUsers
+export const MOCK_ADMIN_USER_ROLES     = SEED.adminUserRoles
+export const MOCK_USER_AUDIT_LOGS      = SEED.userAuditLogs
 
 // Policy data map keyed by policy ID (replaces POLICY_DATA_MAP_INITIAL)
 export const MOCK_POLICY_DATA_MAP: Record<string, ReturnType<typeof import("./factories/policy").createPolicy>["data"]> = Object.fromEntries(

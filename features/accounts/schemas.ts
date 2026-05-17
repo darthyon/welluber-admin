@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-export const AccountStatusEnum = z.enum(["active", "suspended", "closed"]);
-export const AccountTypeEnum = z.enum(["new", "existing"]);
+// isActive boolean replaces the old status enum on Account
+export const AccountTypeEnum = z.enum(["new", "existing"]); // kept for branch-form UI only
 
 export const createAccountSchema = z.object({
   name: z.string().min(1, "Account name is required"),
