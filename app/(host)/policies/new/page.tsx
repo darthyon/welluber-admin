@@ -22,7 +22,6 @@ const ICON_MAP: Record<string, React.ElementType> = {
 const ANCHOR_ITEMS = [
   { id: "policy-details", label: "Policy Details" },
   { id: "pool-cycle", label: "Pool & Cycle" },
-  { id: "groups-services", label: "Benefit Groups" },
 ];
 
 type DraftShape = { policy: Partial<BenefitPolicy>; groups: BenefitGroup[]; benefits: Benefit[] };
@@ -112,7 +111,11 @@ function NewPolicyForm() {
   );
 
   useEffect(() => {
-    if (resumeDecided || templateId || cloneId) return;
+    if (resumeDecided) return;
+    if (templateId || cloneId) {
+      setResumeDecided(true);
+      return;
+    }
     const sessionDraft = typeof window !== "undefined" ? sessionStorage.getItem("policy-draft") : null;
     if (sessionDraft) {
       setTimeout(() => setResumeDecided(true), 0);

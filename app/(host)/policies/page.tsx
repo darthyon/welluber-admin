@@ -19,7 +19,7 @@ import { FilterItem } from "@/components/shared/filter-item";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { SharedDataTable, Column } from "@/components/shared/data-table";
 import { ActionPopover, type ActionItem } from "@/components/shared/action-popover";
-import { PolicyDetailView } from "@/components/host/policies/policy-detail-view";
+import { PolicyDetailView, type TabId } from "@/components/host/policies/policy-detail-view";
 import { PolicyCreationLauncher } from "@/components/host/policies/policy-creation-launcher";
 import { MOCK_POLICIES, MOCK_POLICY_DATA_MAP } from "@/lib/mock-data";
 import type { PolicyListItem, PolicyData } from "@/features/policies/types";
@@ -146,6 +146,7 @@ function PoliciesContent() {
   const [wizardStatus] = useQueryState("wizard");
   const [wizardMode] = useQueryState("mode");
   const [activePolicyId] = useQueryState("policyId");
+  const [activeTabParam] = useQueryState("tab");
   const updateQueryParams = useUpdateQueryParams();
 
   const showWizard = wizardStatus === "open";
@@ -482,6 +483,7 @@ function PoliciesContent() {
             employees={MOCK_EMPLOYEES.filter(e => e.orgId === policy.organizationId)}
             parentPolicyName={parentPolicyName}
             parentBenefits={parentBenefits}
+            initialTab={(activeTabParam as TabId | null) ?? "overview"}
             onEdit={() => router.push(`/policies/${policy.id}/edit`)}
             onClone={() => handleClone(policy)}
             onDeactivate={() => handleDeactivate(policy)}

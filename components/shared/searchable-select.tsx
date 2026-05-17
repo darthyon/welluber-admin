@@ -45,11 +45,22 @@ export function SearchableSelect({
   emptyText = "No results found.",
 }: SearchableSelectProps) {
   const [open, setOpen] = React.useState(false);
+  const [search, setSearch] = React.useState("");
 
   const selectedOption = options.find((o) => o.value === value);
 
+  const filteredOptions = React.useMemo(
+    () =>
+      search
+        ? options.filter((o) =>
+            o.label.toLowerCase().includes(search.toLowerCase())
+          )
+        : options,
+    [options, search]
+  );
+
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={(o) => { setOpen(o); if (!o) setSearch(""); }}>
       <PopoverTrigger asChild>
         <Button
           type="button"
@@ -72,30 +83,38 @@ export function SearchableSelect({
         className="w-[var(--radix-popover-trigger-width)] p-0 rounded-xl bg-popover border border-border shadow-lg"
         align="start"
       >
-        <Command className="bg-transparent">
-          <CommandInput placeholder={searchPlaceholder} />
+        <Command shouldFilter={false} className="bg-transparent">
+          <CommandInput
+            placeholder={searchPlaceholder}
+            value={search}
+            onValueChange={setSearch}
+          />
           <CommandList className="max-h-[300px]">
-            <CommandEmpty className="py-4 text-label text-muted-foreground text-center">
-              {emptyText}
-            </CommandEmpty>
-            <CommandGroup>
-              {options.map((opt) => (
-                <CommandItem
-                  key={opt.value}
-                  value={opt.value}
-                  onSelect={(currentValue) => {
-                    onChange(currentValue === value ? "" : currentValue);
-                    setOpen(false);
-                  }}
-                  className="cursor-pointer rounded-lg text-body font-medium"
-                >
-                  <span className="flex-1 truncate">{opt.label}</span>
-                  {value === opt.value && (
-                    <Check size={14} className="shrink-0 text-primary" />
-                  )}
-                </CommandItem>
-              ))}
-            </CommandGroup>
+            {filteredOptions.length === 0 ? (
+              <CommandEmpty className="py-4 text-label text-muted-foreground text-center">
+                {emptyText}
+              </CommandEmpty>
+            ) : (
+              <CommandGroup>
+                {filteredOptions.map((opt) => (
+                  <CommandItem
+                    key={opt.value}
+                    value={opt.value}
+                    onSelect={() => {
+                      onChange(opt.value);
+                      setOpen(false);
+                      setSearch("");
+                    }}
+                    className="cursor-pointer rounded-lg text-body font-medium"
+                  >
+                    <span className="flex-1 truncate">{opt.label}</span>
+                    {value === opt.value && (
+                      <Check size={14} className="shrink-0 text-primary" />
+                    )}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            )}
           </CommandList>
         </Command>
       </PopoverContent>

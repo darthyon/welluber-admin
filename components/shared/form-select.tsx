@@ -9,6 +9,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { SearchableSelect } from "@/components/shared/searchable-select";
+
+const SEARCH_THRESHOLD = 7;
 
 interface SelectOption {
   label: string;
@@ -20,9 +23,11 @@ interface FormSelectProps {
   onChange: (value: string) => void;
   options: SelectOption[];
   placeholder?: string;
+  searchPlaceholder?: string;
   disabled?: boolean;
   triggerClassName?: string;
   error?: boolean;
+  searchable?: boolean;
 }
 
 export function FormSelect({
@@ -30,13 +35,31 @@ export function FormSelect({
   onChange,
   options,
   placeholder = "Select...",
+  searchPlaceholder,
   disabled,
   triggerClassName,
   error,
+  searchable,
 }: FormSelectProps) {
-  // Filter out placeholder options with empty string values — Radix SelectItem
-  // requires a non-empty value prop. Placeholder is handled by SelectValue.
   const validOptions = options.filter((opt) => opt.value !== "");
+  const isSearchable = searchable ?? validOptions.length > SEARCH_THRESHOLD;
+
+  if (isSearchable) {
+    return (
+      <SearchableSelect
+        value={value}
+        onChange={onChange}
+        options={validOptions}
+        placeholder={placeholder}
+        searchPlaceholder={searchPlaceholder}
+        disabled={disabled}
+        triggerClassName={cn(
+          error && "border-destructive focus:border-destructive focus:ring-destructive/20",
+          triggerClassName
+        )}
+      />
+    );
+  }
 
   return (
     <Select value={value || ""} onValueChange={onChange} disabled={disabled}>
