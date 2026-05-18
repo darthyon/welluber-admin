@@ -14,7 +14,7 @@ export const MOCK_POLICY_TEMPLATES: PolicyTemplate[] = [
       benefitPoolType: "Individual",
       utilisationMode: "Fixed",
       refreshCycle: "Yearly",
-      refreshStartReference: "fy_start",
+      refreshStartReference: "financial_year",
       groups: [
         { id: "grp-standard-physical", policyId: "", name: "Physical Wellbeing", distributionType: "IndividualBenefitAmount", isTaxable: true },
         { id: "grp-standard-mental", policyId: "", name: "Psychological Wellbeing", distributionType: "IndividualBenefitAmount", isTaxable: false },
@@ -41,7 +41,7 @@ export const MOCK_POLICY_TEMPLATES: PolicyTemplate[] = [
       benefitPoolType: "Shared",
       utilisationMode: "Fixed",
       refreshCycle: "Yearly",
-      refreshStartReference: "fy_start",
+      refreshStartReference: "financial_year",
       groups: [
         { id: "grp-exec-physical", policyId: "", name: "Physical Wellbeing", distributionType: "SharedAmount", maxUsagePerCycle: 4500, isTaxable: true },
         { id: "grp-exec-care", policyId: "", name: "Personal Care", distributionType: "SharedAmount", maxUsagePerCycle: 3000, isTaxable: true },
@@ -66,7 +66,7 @@ export const MOCK_POLICY_TEMPLATES: PolicyTemplate[] = [
       benefitPoolType: "Individual",
       utilisationMode: "Prorated",
       refreshCycle: "Monthly",
-      refreshStartReference: "join_date",
+      refreshStartReference: "financial_year",
       groups: [
         { id: "grp-contractor-mental", policyId: "", name: "Psychological Wellbeing", distributionType: "IndividualBenefitAmount", isTaxable: false },
         { id: "grp-contractor-physical", policyId: "", name: "Physical Wellbeing", distributionType: "IndividualBenefitAmount", isTaxable: true },
@@ -90,7 +90,7 @@ export const MOCK_POLICY_TEMPLATES: PolicyTemplate[] = [
       benefitPoolType: "Individual",
       utilisationMode: "Fixed",
       refreshCycle: "Yearly",
-      refreshStartReference: "fy_start",
+      refreshStartReference: "financial_year",
       groups: [
         { id: "grp-mental-core", policyId: "", name: "Psychological Wellbeing", distributionType: "IndividualBenefitAmount", isTaxable: false },
       ],

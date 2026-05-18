@@ -9,7 +9,6 @@ import {
   Users,
   User,
   UsersFour,
-
   Gear,
   TreeStructure,
   Plus,
@@ -21,6 +20,8 @@ import {
   Receipt,
   Check,
   Warning,
+  CalendarBlank,
+  Calendar,
   type IconProps
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
@@ -192,7 +193,8 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
     benefitPoolType: "Individual",
     utilisationMode: "Fixed",
     refreshCycle: "Yearly",
-    refreshStartReference: "fy_start",
+    refreshStartReference: "financial_year",
+    refreshStartMonth: 1,
     status: "draft",
   });
 
@@ -260,8 +262,8 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
         errors.dependentsPoolType = "Select a pool type for dependents";
       }
 
-      if (policyData.refreshStartReference === "custom_date" && !policyData.refreshCustomDate) {
-        errors.refreshCustomDate = "Pick when this policy resets each cycle";
+      if (!policyData.refreshStartMonth || policyData.refreshStartMonth < 1 || policyData.refreshStartMonth > 12) {
+        errors.refreshStartMonth = "Select a start month";
       }
 
       if (policyData.utilisationMode === "Prorated" && policyData.prorateUnit) {
@@ -356,7 +358,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
     }
   };
 
-  const updateBenefit = (benefitId: string, field: string, value: string | number | boolean) => {
+  const updateBenefit = (benefitId: string, field: string, value: string | number | boolean | string[]) => {
     setBenefits(benefits.map(b => {
       if (b.id !== benefitId) return b;
       if (field.includes(".")) {
@@ -546,8 +548,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                   );
                 })()}
                 {EMPLOYMENT_TYPES.map((type) => {
-                  const allSel = EMPLOYMENT_TYPES.every((t) => policyData.eligibleEmploymentTypes?.includes(t.id));
-                  const selected = !allSel && (policyData.eligibleEmploymentTypes?.includes(type.id) || false);
+                  const selected = policyData.eligibleEmploymentTypes?.includes(type.id) || false;
                   return (
                     <button
                       key={type.id}
@@ -621,9 +622,8 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
 
     if (isViewMode) {
       const refreshLabels: Record<string, string> = {
-        fy_start: "Organisation Financial Year",
-        join_date: "Employee Join Date",
-        custom_date: "Custom Start Date",
+        financial_year: "Financial Year",
+        calendar_year: "Calendar Year",
       };
       return (
         <div className="space-y-8 animate-in fade-in duration-300">
@@ -645,8 +645,8 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <ReadField label="Refresh Cycle" value={policyData.refreshCycle} />
               <ReadField label="Refresh Start Reference" value={refreshLabels[policyData.refreshStartReference || ""] || policyData.refreshStartReference} />
-              {policyData.refreshStartReference === "custom_date" && (
-                <ReadField label="Custom Refresh Date" value={policyData.refreshCustomDate} />
+              {policyData.refreshStartMonth && (
+                <ReadField label="Start Month" value={["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][policyData.refreshStartMonth - 1]} />
               )}
             </div>
           </DetailSection>
@@ -723,7 +723,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                         </button>
                         {DEPENDENT_TYPES.map((opt) => {
                           const isSelected = policyData.dependentCoverages?.some((c) => c.type === opt.value) ?? false;
-                          const selected = !allSelected && isSelected;
+                          const selected = isSelected;
                           return (
                             <button
                               key={opt.value}
@@ -857,44 +857,46 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
               {validationErrors.refreshCycle && <p className="text-label text-rose-600 dark:text-rose-400 font-medium">{validationErrors.refreshCycle}</p>}
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-3">
               <label className="text-label font-medium text-subtle inline-flex items-center gap-1.5">Refresh Start Reference <FieldHelp termKey="refreshCycle" /></label>
-              <div className="grid grid-cols-1 gap-2">
-                {(["fy_start", "join_date", "custom_date"] as const).map((ref) => (
-                  <div key={ref} className="space-y-2">
-                    <button
-                      type="button"
-                      onClick={() => setPolicyData({ ...policyData, refreshStartReference: ref })}
-                      className={cn(
-                        "flex items-center gap-3 px-4 py-2.5 rounded-lg border text-body font-medium transition-all text-left w-full",
-                        policyData.refreshStartReference === ref ? "border-primary bg-primary/5 text-primary" : "border-border bg-card text-muted-foreground hover:border-border/80"
-                      )}
-                    >
-                      <div className={cn("w-4 h-4 rounded-full border flex items-center justify-center shrink-0", policyData.refreshStartReference === ref ? "border-primary" : "border-border")}>
-                        {policyData.refreshStartReference === ref && <div className="w-2 h-2 rounded-full bg-primary" />}
-                      </div>
-                      <div className="flex flex-col">
-                        <span>{ref === "fy_start" ? "Organisation Financial Year" : ref === "join_date" ? "Employee Joining Date" : "Custom Date"}</span>
-                        <span className="text-label text-faint font-normal">{ref === "fy_start" ? "Follows the organisation's FY settings" : ref === "join_date" ? "Based on the employee's join date" : "Set a fixed start date"}</span>
-                      </div>
-                    </button>
-                    {ref === "custom_date" && policyData.refreshStartReference === "custom_date" && (
-                      <div className="pl-11 space-y-1.5 animate-in fade-in slide-in-from-top-1 duration-300">
-                        <label className="text-label font-medium text-subtle">
-                          Custom Refresh Date <span className="text-rose-600 dark:text-rose-400">*</span>
-                        </label>
-                        <DatePickerField
-                          value={policyData.refreshCustomDate || ""}
-                          onChange={(v) => setPolicyData({ ...policyData, refreshCustomDate: v })}
-                          placeholder="Select refresh date"
-                          clearable={false}
-                          className={validationErrors.refreshCustomDate ? "[&>button]:border-rose-300 [&>button]:focus:border-rose-300" : ""}
-                        />
-                        {validationErrors.refreshCustomDate && <p className="text-label text-rose-600 dark:text-rose-400 font-medium">{validationErrors.refreshCustomDate}</p>}
-                      </div>
-                    )}
-                  </div>
-                ))}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <ChoiceCard
+                  title="Financial Year"
+                  description="Cycle aligns to the organisation's financial year."
+                  icon={CalendarBlank}
+                  selected={policyData.refreshStartReference === "financial_year"}
+                  onSelect={() => setPolicyData({ ...policyData, refreshStartReference: "financial_year" })}
+                />
+                <ChoiceCard
+                  title="Calendar Year"
+                  description="Cycle aligns to the standard Jan–Dec calendar year."
+                  icon={Calendar}
+                  selected={policyData.refreshStartReference === "calendar_year"}
+                  onSelect={() => setPolicyData({ ...policyData, refreshStartReference: "calendar_year" })}
+                />
+              </div>
+              <div className="space-y-2">
+                <p className="text-label font-medium text-subtle">Start Month</p>
+                {validationErrors.refreshStartMonth && <p className="text-label text-rose-600 dark:text-rose-400 font-medium">{validationErrors.refreshStartMonth}</p>}
+                <div className="flex flex-wrap gap-2">
+                  {["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"].map((month, idx) => {
+                    const monthNum = idx + 1;
+                    const selected = policyData.refreshStartMonth === monthNum;
+                    return (
+                      <button
+                        key={month}
+                        type="button"
+                        onClick={() => setPolicyData({ ...policyData, refreshStartMonth: monthNum })}
+                        className={cn(
+                          "px-3 py-1.5 rounded-lg text-label font-semibold border transition-all min-w-[48px] text-center",
+                          selected ? "bg-primary text-primary-foreground border-primary shadow-sm" : "bg-background text-muted-foreground border-border hover:border-primary/30"
+                        )}
+                      >
+                        {month}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
@@ -1028,6 +1030,9 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                         splitBenefitIds={splitBenefitIds}
                         groupErrors={groupErrors}
                         hasDependents={(policyData.dependentCoverages?.length ?? 0) > 0}
+                        dependentCoverageTypes={(policyData.dependentCoverages ?? []).map((c) => c.type)}
+                        policyEmployeeCap={policyData.totalCapAmount}
+                        policyDependentCap={policyData.dependentCapAmount}
                         onToggleService={(serviceId) => toggleService(group.id, serviceId)}
                         onUpdateBenefit={updateBenefit}
                         onToggleSplit={handleToggleSplit}
@@ -1333,8 +1338,8 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
             <ReadField label="Utilisation Mode" value={policyData.utilisationMode === "Fixed" ? "Fixed Allocation" : "Prorated Allocation"} />
             {policyData.utilisationMode === "Prorated" && <ReadField label="Prorate Unit" value={policyData.prorateUnit} />}
             <ReadField label="Refresh Cycle" value={policyData.refreshCycle} />
-            <ReadField label="Start Reference" value={policyData.refreshStartReference === "fy_start" ? "Financial Year" : policyData.refreshStartReference === "join_date" ? "Join Date" : "Custom Date"} />
-            {policyData.refreshStartReference === "custom_date" && <ReadField label="Custom Date" value={policyData.refreshCustomDate} />}
+            <ReadField label="Start Reference" value={policyData.refreshStartReference === "financial_year" ? "Financial Year" : "Calendar Year"} />
+            {policyData.refreshStartMonth && <ReadField label="Start Month" value={["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][policyData.refreshStartMonth - 1]} />}
           </div>
         </DetailSection>
 

@@ -7,20 +7,22 @@ import {
   Users,
   User,
   UsersFour,
-
   TreeStructure,
   Plus,
   Trash,
   Check,
   DiceFive,
   CaretDown,
+  CalendarBlank,
+  Calendar,
+  ArrowCounterClockwise,
+  ChartLineUp,
   type IconProps,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { ChoiceCard } from "@/components/shared/choice-card";
 import { FieldHelp } from "@/components/shared/field-help";
 import { FormSelect } from "@/components/shared/form-select";
-import { DatePickerField } from "@/components/shared/date-picker-field";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 import {
@@ -30,6 +32,7 @@ import {
   ProrateUnit,
   RefreshCycle,
   DependentsPoolType,
+  DependentCoverageType,
 } from "@/types/policy";
 import type { PolicyGlossaryKey } from "@/lib/policy-glossary";
 import { MOCK_ORGS, SERVICES } from "@/lib/mock-data";
@@ -49,6 +52,8 @@ const EMPLOYMENT_TYPES = [
 
 const PRORATE_UNITS: ProrateUnit[] = ["Daily", "Weekly", "Monthly", "Quarterly"];
 const REFRESH_CYCLES: RefreshCycle[] = ["Daily", "Weekly", "Monthly", "Quarterly", "Yearly"];
+
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 const DEPENDENTS_POOL_OPTIONS: { value: DependentsPoolType; title: string; description: string; icon: React.ElementType<IconProps> }[] = [
   { value: "Individual", title: "Individual", description: "Each dependent has their own benefit pool.", icon: User },
@@ -181,15 +186,14 @@ export function PolicyReviewCards({ policy, groups, benefits }: PolicyReviewCard
         <ReadField label="Refresh Cycle" value={policy.refreshCycle} />
         <ReadField
           label="Start Reference"
-          value={
-            policy.refreshStartReference === "fy_start"
-              ? "Organisation Financial Year"
-              : policy.refreshStartReference === "join_date"
-              ? "Employee Join Date"
-              : "Custom Start Date"
-          }
+          value={policy.refreshStartReference === "financial_year" ? "Financial Year" : "Calendar Year"}
         />
-        {policy.refreshStartReference === "custom_date" && <ReadField label="Custom Date" value={policy.refreshCustomDate} />}
+        {policy.refreshStartMonth && (
+          <ReadField
+            label="Start Month"
+            value={["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][policy.refreshStartMonth - 1]}
+          />
+        )}
       </div>
 
       <div className="bg-card border border-border rounded-lg p-5 space-y-4 md:col-span-2">
@@ -287,8 +291,8 @@ const SECTION_FOR_KEY: Array<{ test: (key: string) => boolean; section: string }
       [
         "prorateUnit",
         "dependentsPoolType",
-        "refreshCustomDate",
         "refreshCycle",
+        "refreshStartMonth",
       ].includes(k),
     section: "pool-cycle",
   },
@@ -344,7 +348,8 @@ export function PolicyWizardContent({ mode = "create", groupsOnly = false, initi
       benefitPoolType: "Individual",
       utilisationMode: "Fixed",
       refreshCycle: "Yearly",
-      refreshStartReference: "fy_start",
+      refreshStartReference: "financial_year",
+      refreshStartMonth: 1,
       status: "draft",
     }
   );
@@ -483,15 +488,6 @@ export function PolicyWizardContent({ mode = "create", groupsOnly = false, initi
 
   useEffect(() => {
     if (
-      validationErrors.refreshCustomDate &&
-      (policyData.refreshStartReference !== "custom_date" || policyData.refreshCustomDate)
-    ) {
-      setTimeout(() => setFieldError("refreshCustomDate", undefined), 0);
-    }
-  }, [policyData.refreshStartReference, policyData.refreshCustomDate, validationErrors.refreshCustomDate, setFieldError]);
-
-  useEffect(() => {
-    if (
       validationErrors.dependentsPoolType &&
       ((policyData.dependentCoverages?.length ?? 0) === 0 || policyData.dependentsPoolType)
     ) {
@@ -610,8 +606,8 @@ export function PolicyWizardContent({ mode = "create", groupsOnly = false, initi
         });
       }
 
-      if (policyData.refreshStartReference === "custom_date" && !policyData.refreshCustomDate) {
-        errors.refreshCustomDate = "Pick when this policy resets each cycle";
+      if (!policyData.refreshStartMonth || policyData.refreshStartMonth < 1 || policyData.refreshStartMonth > 12) {
+        errors.refreshStartMonth = "Select a start month";
       }
 
       if (policyData.utilisationMode === "Prorated" && policyData.prorateUnit) {
@@ -710,6 +706,16 @@ export function PolicyWizardContent({ mode = "create", groupsOnly = false, initi
     );
   };
 
+  const updateDependentCoPayment = (groupId: string, field: "required" | "type" | "value", value: boolean | string | number) => {
+    setGroups((prev) =>
+      prev.map((g) => {
+        if (g.id !== groupId) return g;
+        const dependentCoPayment = g.dependentCoPayment ?? { required: false, type: "Percentage" as const, value: 0 };
+        return { ...g, dependentCoPayment: { ...dependentCoPayment, [field]: value } };
+      })
+    );
+  };
+
   const toggleService = useCallback((groupId: string, serviceId: MainServiceId) => {
     setBenefits((prev) => {
       const exists = prev.find((b) => b.groupId === groupId && b.serviceId === serviceId);
@@ -729,7 +735,7 @@ export function PolicyWizardContent({ mode = "create", groupsOnly = false, initi
     });
   }, []);
 
-  const updateBenefit = (benefitId: string, field: string, value: string | number | boolean) => {
+  const updateBenefit = (benefitId: string, field: string, value: string | number | boolean | string[]) => {
     setBenefits((prev) =>
       prev.map((b) => {
         if (b.id !== benefitId) return b;
@@ -843,7 +849,7 @@ export function PolicyWizardContent({ mode = "create", groupsOnly = false, initi
               variant="ghost"
               size="sm"
               className="h-7 px-2 text-label font-medium text-primary hover:bg-primary/5 gap-1"
-              onClick={() => window.open(`/organizations/${policyData.organizationId}?tab=employees&subTab=tiers`, "_blank")}
+              onClick={() => window.open(`/organizations/${policyData.organizationId}?tab=settings`, "_blank")}
             >
               <Plus size={12} weight="bold" />
               Add Tier
@@ -912,7 +918,7 @@ export function PolicyWizardContent({ mode = "create", groupsOnly = false, initi
               variant="ghost"
               size="sm"
               className="h-7 px-2 text-label font-medium text-primary hover:bg-primary/5 gap-1"
-              onClick={() => window.open(`/organizations/${policyData.organizationId}?tab=employees&subTab=departments`, "_blank")}
+              onClick={() => window.open(`/organizations/${policyData.organizationId}?tab=settings`, "_blank")}
             >
               <Plus size={12} weight="bold" />
               Add Department
@@ -981,7 +987,12 @@ export function PolicyWizardContent({ mode = "create", groupsOnly = false, initi
             return (
               <button
                 type="button"
-                onClick={() => setPolicyData({ ...policyData, eligibleEmploymentTypes: allSelected ? policyData.eligibleEmploymentTypes : EMPLOYMENT_TYPES.map((t) => t.id) })}
+                onClick={() =>
+                  setPolicyData({
+                    ...policyData,
+                    eligibleEmploymentTypes: allSelected ? [] : EMPLOYMENT_TYPES.map((t) => t.id),
+                  })
+                }
                 className={cn("px-4 py-2 rounded-full text-body font-semibold border transition-all", allSelected ? "bg-primary text-primary-foreground border-primary shadow-sm" : "bg-background text-muted-foreground border-border hover:border-primary/30")}
               >
                 {allSelected && <Check size={12} weight="bold" className="inline mr-1.5" />}All
@@ -989,8 +1000,7 @@ export function PolicyWizardContent({ mode = "create", groupsOnly = false, initi
             );
           })()}
           {EMPLOYMENT_TYPES.map((type) => {
-            const allSel = EMPLOYMENT_TYPES.every((t) => policyData.eligibleEmploymentTypes?.includes(t.id));
-            const selected = !allSel && (policyData.eligibleEmploymentTypes?.includes(type.id) || false);
+            const selected = policyData.eligibleEmploymentTypes?.includes(type.id) || false;
             return (
               <button
                 type="button"
@@ -1172,7 +1182,7 @@ export function PolicyWizardContent({ mode = "create", groupsOnly = false, initi
                   </button>
                   {DEPENDENT_TYPES.map((opt) => {
                     const isSelected = policyData.dependentCoverages?.some((c) => c.type === opt.value) ?? false;
-                    const selected = !allSelected && isSelected;
+                    const selected = isSelected;
                     return (
                       <button
                         key={opt.value}
@@ -1313,63 +1323,16 @@ export function PolicyWizardContent({ mode = "create", groupsOnly = false, initi
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <div className="space-y-1.5">
-          <FieldLabel helpKey="refreshCycle">Refresh Cycle</FieldLabel>
-          <FormSelect
-            value={policyData.refreshCycle}
-            onChange={(v) => setPolicyData({ ...policyData, refreshCycle: v as RefreshCycle })}
-            options={availableCycles.map((c) => ({ label: c, value: c }))}
-            error={!!validationErrors.refreshCycle}
-          />
-          {validationErrors.refreshCycle && <ErrorText>{validationErrors.refreshCycle}</ErrorText>}
-        </div>
-
-        <div className="space-y-1.5">
-          <FieldLabel helpKey="refreshCycle">Refresh Start Reference</FieldLabel>
-          <div className="space-y-2">
-            {(["fy_start", "join_date", "custom_date"] as const).map((ref) => (
-              <div key={ref} className="space-y-2">
-                <button
-                  type="button"
-                  onClick={() => setPolicyData({ ...policyData, refreshStartReference: ref })}
-                  className={cn(
-                    "flex items-center gap-3 px-4 py-2.5 rounded-lg border text-body font-medium transition-all text-left w-full",
-                    policyData.refreshStartReference === ref
-                      ? "border-primary bg-primary/5 text-primary"
-                      : "border-border bg-card text-muted-foreground hover:border-border/80"
-                  )}
-                >
-                  <div
-                    className={cn(
-                      "w-4 h-4 rounded-full border flex items-center justify-center shrink-0",
-                      policyData.refreshStartReference === ref ? "border-primary" : "border-border"
-                    )}
-                  >
-                    {policyData.refreshStartReference === ref && <div className="w-2 h-2 rounded-full bg-primary" />}
-                  </div>
-                  <div className="flex flex-col">
-                    <span>{ref === "fy_start" ? "Organisation Financial Year" : ref === "join_date" ? "Employee Joining Date" : "Custom Date"}</span>
-                    <span className="text-label text-faint font-normal">{ref === "fy_start" ? "Follows the organisation's FY settings" : ref === "join_date" ? "Based on the employee's join date" : "Set a fixed start date"}</span>
-                  </div>
-                </button>
-                {ref === "custom_date" && policyData.refreshStartReference === "custom_date" && (
-                  <div className="pl-11 space-y-1.5 animate-in fade-in slide-in-from-top-1 duration-300">
-                    <FieldLabel required>Custom Refresh Date</FieldLabel>
-                    <DatePickerField
-                      value={policyData.refreshCustomDate || ""}
-                      onChange={(v) => setPolicyData({ ...policyData, refreshCustomDate: v })}
-                      placeholder="Select refresh date"
-                      clearable={false}
-                      className={validationErrors.refreshCustomDate ? "[&>button]:border-destructive [&>button]:focus:border-destructive" : ""}
-                    />
-                    {validationErrors.refreshCustomDate && <ErrorText>{validationErrors.refreshCustomDate}</ErrorText>}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
+      <div className="space-y-1.5">
+        <FieldLabel helpKey="refreshCycle">Refresh Cycle</FieldLabel>
+        <FormSelect
+          value={policyData.refreshCycle}
+          onChange={(v) => setPolicyData({ ...policyData, refreshCycle: v as RefreshCycle })}
+          options={availableCycles.map((c) => ({ label: c, value: c }))}
+          error={!!validationErrors.refreshCycle}
+          triggerClassName="max-w-[240px]"
+        />
+        {validationErrors.refreshCycle && <ErrorText>{validationErrors.refreshCycle}</ErrorText>}
       </div>
 
       </div>
@@ -1377,6 +1340,60 @@ export function PolicyWizardContent({ mode = "create", groupsOnly = false, initi
     </div>
     );
   };
+
+  // ── Refresh Start Reference section ──────────────────────────────────────
+  const renderRefreshStartSection = () => (
+    <div className="space-y-6">
+      <SectionHeader icon={Calendar} title="Refresh Start Reference" description="When should this policy's benefit cycle begin each year?" />
+
+      <div className="space-y-3">
+        <FieldLabel required>Cycle Type</FieldLabel>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <ChoiceCard
+            title="Financial Year"
+            description="Cycle aligns to the organisation's financial year."
+            icon={CalendarBlank}
+            selected={policyData.refreshStartReference === "financial_year"}
+            onSelect={() => setPolicyData({ ...policyData, refreshStartReference: "financial_year" })}
+          />
+          <ChoiceCard
+            title="Calendar Year"
+            description="Cycle aligns to the standard Jan–Dec calendar year."
+            icon={Calendar}
+            selected={policyData.refreshStartReference === "calendar_year"}
+            onSelect={() => setPolicyData({ ...policyData, refreshStartReference: "calendar_year" })}
+          />
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <FieldLabel required>Start Month</FieldLabel>
+        <p className="text-micro text-faint -mt-1">Which month does the cycle begin?</p>
+        {validationErrors.refreshStartMonth && <ErrorText>{validationErrors.refreshStartMonth}</ErrorText>}
+        <div className="flex flex-wrap gap-2">
+          {MONTHS.map((month, idx) => {
+            const monthNum = idx + 1;
+            const selected = policyData.refreshStartMonth === monthNum;
+            return (
+              <button
+                key={month}
+                type="button"
+                onClick={() => setPolicyData({ ...policyData, refreshStartMonth: monthNum })}
+                className={cn(
+                  "px-3 py-1.5 rounded-lg text-label font-semibold border transition-all min-w-[48px] text-center",
+                  selected
+                    ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                    : "bg-background text-muted-foreground border-border hover:border-primary/30"
+                )}
+              >
+                {month}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
 
   // ── Groups section ────────────────────────────────────────────────────────
   const renderGroupsSection = () => (
@@ -1437,168 +1454,253 @@ export function PolicyWizardContent({ mode = "create", groupsOnly = false, initi
                 </div>
 
                 {/* Card body */}
-                <div className="p-4 space-y-4">
-                  {/* Distribution + max usage */}
-                  <div className="flex items-start gap-6 flex-wrap">
-                    <div className="space-y-1.5">
-                      <p className="text-label font-medium text-muted-foreground">Distribution</p>
-                      <div className="flex flex-col gap-1.5">
-                        <div className="flex p-0.5 bg-muted rounded-lg">
-                          {(["SharedAmount", "IndividualBenefitAmount"] as const).map((type) => (
+                <div className="p-4 space-y-5">
+
+                  {/* Distribution toggle */}
+                  <div className="space-y-1.5">
+                    <p className="text-label font-medium text-muted-foreground">Distribution</p>
+                    <div className="inline-flex p-0.5 bg-muted rounded-lg">
+                      {(["SharedAmount", "IndividualBenefitAmount"] as const).map((type) => (
+                        <button
+                          type="button"
+                          key={type}
+                          onClick={() => updateGroup(group.id, "distributionType", type)}
+                          className={cn(
+                            "px-3 py-1.5 text-label font-medium rounded-md transition-all",
+                            group.distributionType === type ? "bg-background text-primary shadow-sm" : "text-muted-foreground"
+                          )}
+                        >
+                          {type === "SharedAmount" ? "Shared Pool" : "Individual"}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Employee / Dependent two-column grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Employee column */}
+                    <div className="rounded-lg border border-border bg-muted/10 p-4 space-y-4">
+                      <p className="text-label font-semibold text-foreground flex items-center gap-1.5">
+                        <User size={14} weight="duotone" className="text-primary" />
+                        Employee
+                      </p>
+                      <div className="space-y-1.5">
+                        <p className="text-label font-medium text-muted-foreground">
+                          <span className="inline-flex items-center gap-1.5">Group Cap <FieldHelp termKey="groupCap" /></span>
+                          {group.distributionType !== "SharedAmount" && <span className="text-faint font-normal ml-1">(optional)</span>}
+                        </p>
+                        <input
+                          type="number"
+                          className={cn("w-32 px-2.5 py-1.5 border bg-background rounded-lg text-label outline-none focus:ring-2 focus:ring-primary/10", validationErrors[`group_cap_${group.id}`] ? "border-destructive" : "border-border")}
+                          value={group.maxUsagePerCycle || ""}
+                          onChange={(e) => updateGroup(group.id, "maxUsagePerCycle", e.target.value === "" ? undefined : parseFloat(e.target.value))}
+                          placeholder="0.00"
+                        />
+                        {validationErrors[`group_cap_${group.id}`] && <ErrorText>{validationErrors[`group_cap_${group.id}`]}</ErrorText>}
+                      </div>
+                      {group.distributionType === "SharedAmount" && (
+                        <div className="space-y-1.5">
+                          <label className="text-label font-medium text-muted-foreground inline-flex items-center gap-1.5">
+                            Co-payment <FieldHelp termKey="coPayment" />
+                          </label>
+                          <div className="flex items-center gap-2">
                             <button
                               type="button"
-                              key={type}
-                              onClick={() => updateGroup(group.id, "distributionType", type)}
-                              className={cn(
-                                "px-2.5 py-1 text-label font-medium rounded-md transition-all",
-                                group.distributionType === type ? "bg-background text-primary shadow-sm" : "text-muted-foreground"
-                              )}
+                              onClick={() => updateGroupCoPayment(group.id, "required", !(group.coPayment?.required ?? false))}
+                              aria-pressed={group.coPayment?.required ?? false}
+                              className={cn("w-9 h-5 rounded-full border transition-colors relative shrink-0", group.coPayment?.required ? "bg-primary border-primary" : "bg-muted border-border")}
                             >
-                              {type === "SharedAmount" ? "Shared Pool" : "Individual"}
+                              <div className={cn("w-3.5 h-3.5 rounded-full bg-background shadow-sm absolute top-[2px] transition-all", group.coPayment?.required ? "right-0.5" : "left-0.5")} />
                             </button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="space-y-1.5">
-                      <p className="text-label font-medium text-muted-foreground">
-                        <span className="inline-flex items-center gap-1.5">Group Cap <FieldHelp termKey="groupCap" /></span>
-                        {group.distributionType !== "SharedAmount" && (
-                          <span className="text-faint font-normal ml-1">(optional)</span>
-                        )}
-                      </p>
-                      <input
-                        type="number"
-                        className={cn("w-28 px-2.5 py-1 border bg-background rounded-lg text-label outline-none focus:ring-2 focus:ring-primary/10", validationErrors[`group_cap_${group.id}`] ? "border-destructive" : "border-border")}
-                        value={group.maxUsagePerCycle || ""}
-                        onChange={(e) =>
-                          updateGroup(group.id, "maxUsagePerCycle", e.target.value === "" ? undefined : parseFloat(e.target.value))
-                        }
-                        placeholder="0.00"
-                      />
-                      {validationErrors[`group_cap_${group.id}`] && <ErrorText>{validationErrors[`group_cap_${group.id}`]}</ErrorText>}
-                    </div>
-                    <div className="space-y-1.5">
-                      <p className="text-label font-medium text-muted-foreground">Tax Treatment</p>
-                      <label className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-body font-medium text-foreground">
-                        <input
-                          type="checkbox"
-                          checked={group.isTaxable === true}
-                          onChange={(e) => updateGroup(group.id, "isTaxable", e.target.checked)}
-                          className="h-4 w-4 rounded border-border text-primary focus:ring-ring"
-                        />
-                        Taxable (BIK)
-                      </label>
-                      <HelpText>Use this for Malaysia LHDN benefit-in-kind classification.</HelpText>
-                    </div>
-                    {group.distributionType === "SharedAmount" && (
-                      <div className="space-y-1.5">
-                        <label className="text-label font-medium text-subtle inline-flex items-center gap-1.5">
-                          Co-payment <FieldHelp termKey="coPayment" />
-                        </label>
-                        <div className="flex items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() => updateGroupCoPayment(group.id, "required", !(group.coPayment?.required ?? false))}
-                            aria-pressed={group.coPayment?.required ?? false}
-                            className={cn(
-                              "w-11 h-6 rounded-full border transition-colors relative shrink-0",
-                              group.coPayment?.required ? "bg-primary border-primary" : "bg-muted border-border"
+                            {group.coPayment?.required && (
+                              <div className="flex items-center gap-1.5">
+                                <FormSelect
+                                  value={group.coPayment?.type ?? "Percentage"}
+                                  onChange={(v) => updateGroupCoPayment(group.id, "type", v)}
+                                  options={[{ label: "%", value: "Percentage" }, { label: "RM", value: "Fixed" }]}
+                                  triggerClassName="w-16 h-8"
+                                />
+                                <input
+                                  type="number"
+                                  className={cn("w-20 px-2.5 py-1.5 bg-background border rounded-lg text-label font-mono outline-none text-right", validationErrors[`group_copay_${group.id}`] ? "border-destructive" : "border-border")}
+                                  value={group.coPayment?.value || ""}
+                                  onChange={(e) => updateGroupCoPayment(group.id, "value", e.target.value === "" ? 0 : parseFloat(e.target.value))}
+                                  onBlur={() => blurGroupCopayValue(group.id, group.coPayment?.type ?? "Percentage", group.coPayment?.value ?? 0)}
+                                />
+                              </div>
                             )}
-                          >
-                            <div
-                              className={cn(
-                                "w-4 h-4 rounded-full bg-background shadow-sm absolute top-[3px] transition-all",
-                                group.coPayment?.required ? "right-1" : "left-1"
-                              )}
-                            />
-                          </button>
-                          <div className={cn("flex items-center gap-1.5 transition-opacity", !(group.coPayment?.required ?? false) && "opacity-40 pointer-events-none")}>
-                            <FormSelect
-                              disabled={!(group.coPayment?.required ?? false)}
-                              value={group.coPayment?.type ?? "Percentage"}
-                              onChange={(v) => updateGroupCoPayment(group.id, "type", v)}
-                              options={[
-                                { label: "%", value: "Percentage" },
-                                { label: "RM", value: "Fixed" },
-                              ]}
-                              triggerClassName="w-20 h-9"
-                            />
-                            <input
-                              type="number"
-                              disabled={!(group.coPayment?.required ?? false)}
-                              className={cn(
-                                "w-24 px-3 py-2 bg-background border rounded-lg text-body font-mono outline-none text-right",
-                                validationErrors[`group_copay_${group.id}`] ? "border-destructive" : "border-border"
-                              )}
-                              value={group.coPayment?.value || ""}
-                              onChange={(e) =>
-                                updateGroupCoPayment(group.id, "value", e.target.value === "" ? 0 : parseFloat(e.target.value))
-                              }
-                              onBlur={() => blurGroupCopayValue(group.id, group.coPayment?.type ?? "Percentage", group.coPayment?.value ?? 0)}
-                            />
                           </div>
+                          {validationErrors[`group_copay_${group.id}`] && <ErrorText>{validationErrors[`group_copay_${group.id}`]}</ErrorText>}
                         </div>
-                        {validationErrors[`group_copay_${group.id}`] && (
-                          <ErrorText>{validationErrors[`group_copay_${group.id}`]}</ErrorText>
+                      )}
+                    </div>
+
+                    {/* Dependent column */}
+                    {(policyData.dependentCoverages?.length ?? 0) > 0 ? (
+                      <div className="rounded-lg border border-border bg-muted/10 p-4 space-y-4">
+                        <p className="text-label font-semibold text-foreground flex items-center gap-1.5">
+                          <UsersFour size={14} weight="duotone" className="text-primary" />
+                          Dependent
+                        </p>
+                        <div className="space-y-1.5">
+                          <p className="text-label font-medium text-muted-foreground">
+                            <span className="inline-flex items-center gap-1.5">Group Cap <FieldHelp termKey="groupCap" /></span>
+                            <span className="text-faint font-normal ml-1">(optional)</span>
+                          </p>
+                          <input
+                            type="number"
+                            className="w-32 px-2.5 py-1.5 border border-border bg-background rounded-lg text-label outline-none focus:ring-2 focus:ring-primary/10"
+                            value={group.dependentGroupCap || ""}
+                            onChange={(e) => updateGroup(group.id, "dependentGroupCap", e.target.value === "" ? undefined : parseFloat(e.target.value))}
+                            placeholder="0.00"
+                          />
+                        </div>
+                        {group.distributionType === "SharedAmount" && (
+                          <div className="space-y-1.5">
+                            <label className="text-label font-medium text-muted-foreground inline-flex items-center gap-1.5">
+                              Co-payment <FieldHelp termKey="coPayment" />
+                            </label>
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => updateDependentCoPayment(group.id, "required", !(group.dependentCoPayment?.required ?? false))}
+                                aria-pressed={group.dependentCoPayment?.required ?? false}
+                                className={cn("w-9 h-5 rounded-full border transition-colors relative shrink-0", group.dependentCoPayment?.required ? "bg-primary border-primary" : "bg-muted border-border")}
+                              >
+                                <div className={cn("w-3.5 h-3.5 rounded-full bg-background shadow-sm absolute top-[2px] transition-all", group.dependentCoPayment?.required ? "right-0.5" : "left-0.5")} />
+                              </button>
+                              {group.dependentCoPayment?.required && (
+                                <div className="flex items-center gap-1.5">
+                                  <FormSelect
+                                    value={group.dependentCoPayment?.type ?? "Percentage"}
+                                    onChange={(v) => updateDependentCoPayment(group.id, "type", v)}
+                                    options={[{ label: "%", value: "Percentage" }, { label: "RM", value: "Fixed" }]}
+                                    triggerClassName="w-16 h-8"
+                                  />
+                                  <input
+                                    type="number"
+                                    className="w-20 px-2.5 py-1.5 bg-background border border-border rounded-lg text-label font-mono outline-none text-right"
+                                    value={group.dependentCoPayment?.value || ""}
+                                    onChange={(e) => updateDependentCoPayment(group.id, "value", e.target.value === "" ? 0 : parseFloat(e.target.value))}
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          </div>
                         )}
+                      </div>
+                    ) : (
+                      <div className="rounded-lg border border-dashed border-border bg-muted/5 p-4 flex flex-col items-center justify-center gap-2 text-center min-h-[120px]">
+                        <UsersFour size={28} weight="duotone" className="text-border" />
+                        <p className="text-label font-medium text-faint">No dependent coverage</p>
+                        <button
+                          type="button"
+                          onClick={() => window.open(`/policies/${policyData.id || "new"}/edit`, "_blank")}
+                          className="text-label text-primary font-medium hover:underline"
+                        >
+                          Enable in policy settings →
+                        </button>
                       </div>
                     )}
                   </div>
 
-                  {/* Utilisation override */}
-                  <div className="flex items-start gap-6 flex-wrap">
-                    <div className="space-y-1.5">
-                      <p className="text-label font-medium text-muted-foreground">Utilisation Mode</p>
-                      <FormSelect
-                        value={group.utilisationMode ?? ""}
-                        onChange={(v) => {
-                          const next = v === "" ? undefined : (v as "Fixed" | "Prorated");
-                          updateGroup(group.id, "utilisationMode", next);
-                          if (next !== "Prorated") updateGroup(group.id, "prorateUnit", undefined);
-                          if (next === "Prorated" && !group.prorateUnit) updateGroup(group.id, "prorateUnit", "Monthly");
+                  {/* Utilisation mode override — choice cards */}
+                  <div className="space-y-3 pt-2 border-t border-border/60">
+                    <p className="text-label font-medium text-muted-foreground">Utilisation Mode</p>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                      <ChoiceCard
+                        title="Inherit from Policy"
+                        description={`Using ${policyData.utilisationMode === "Prorated" ? `Prorated · ${policyData.prorateUnit ?? "Monthly"}` : "Fixed Allocation"}`}
+                        icon={ArrowCounterClockwise}
+                        selected={!group.utilisationMode}
+                        onSelect={() => {
+                          updateGroup(group.id, "utilisationMode", undefined);
+                          updateGroup(group.id, "prorateUnit", undefined);
                         }}
-                        options={[
-                          { label: `Inherit from Policy (${policyData.utilisationMode ?? "Fixed"})`, value: "" },
-                          { label: "Fixed", value: "Fixed" },
-                          { label: "Prorated", value: "Prorated" },
-                        ]}
-                        triggerClassName="w-[260px]"
+                      />
+                      <ChoiceCard
+                        title="Fixed"
+                        description="Full allocation granted immediately."
+                        icon={Gear}
+                        selected={group.utilisationMode === "Fixed"}
+                        onSelect={() => {
+                          updateGroup(group.id, "utilisationMode", "Fixed");
+                          updateGroup(group.id, "prorateUnit", undefined);
+                        }}
+                      />
+                      <ChoiceCard
+                        title="Prorated"
+                        description="Amounts prorated based on time."
+                        icon={ChartLineUp}
+                        selected={group.utilisationMode === "Prorated"}
+                        onSelect={() => {
+                          updateGroup(group.id, "utilisationMode", "Prorated");
+                          if (!group.prorateUnit) updateGroup(group.id, "prorateUnit", "Monthly");
+                        }}
                       />
                     </div>
                     {(group.utilisationMode ?? policyData.utilisationMode) === "Prorated" && (
-                      <div className="space-y-1.5">
+                      <div className="space-y-1.5 animate-in fade-in slide-in-from-top-1 duration-200">
                         <p className="text-label font-medium text-muted-foreground">Prorate Unit</p>
-                        <FormSelect
-                          value={group.prorateUnit ?? ""}
-                          onChange={(v) => updateGroup(group.id, "prorateUnit", v === "" ? undefined : (v as ProrateUnit))}
-                          options={[
-                            { label: `Inherit from Policy (${policyData.prorateUnit ?? "Monthly"})`, value: "" },
-                            ...PRORATE_UNITS.map((u) => ({ label: u, value: u })),
-                          ]}
-                          triggerClassName="w-[260px]"
-                        />
+                        <div className="flex flex-wrap gap-2">
+                          {PRORATE_UNITS.map((unit) => {
+                            const isInherit = !group.utilisationMode;
+                            const effectiveUnit = isInherit ? (policyData.prorateUnit ?? "Monthly") : (group.prorateUnit ?? "Monthly");
+                            const isSelected = isInherit ? unit === effectiveUnit : unit === (group.prorateUnit ?? "Monthly");
+                            return (
+                              <button
+                                key={unit}
+                                type="button"
+                                disabled={isInherit}
+                                onClick={() => updateGroup(group.id, "prorateUnit", unit)}
+                                className={cn(
+                                  "px-3 py-1.5 rounded-lg text-label font-medium border transition-all",
+                                  isSelected ? "bg-primary text-primary-foreground border-primary shadow-sm" : "bg-background text-muted-foreground border-border hover:border-primary/30",
+                                  isInherit && "opacity-60 cursor-not-allowed"
+                                )}
+                              >
+                                {unit}
+                              </button>
+                            );
+                          })}
+                          {!group.utilisationMode && (
+                            <span className="text-micro text-faint self-center">Inherited from policy</span>
+                          )}
+                        </div>
                       </div>
                     )}
                   </div>
 
                   {/* Benefits selector */}
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <p className="text-label font-medium text-muted-foreground">Benefits</p>
-                      {groupError && <ErrorText>{groupError}</ErrorText>}
-                    </div>
-                    <BenefitServiceSelector
-                      groupId={group.id}
-                      groupBenefits={groupBenefits}
-                      isViewMode={false}
-                      splitBenefitIds={splitBenefitIds}
-                      groupErrors={validationErrors}
-                      hasDependents={(policyData.dependentCoverages?.length ?? 0) > 0}
-                      onToggleService={(serviceId) => toggleService(group.id, serviceId)}
-                      onUpdateBenefit={updateBenefit}
-                      onToggleSplit={handleToggleSplit}
-                    />
+                  <div className="space-y-3 pt-2 border-t border-border/60">
+                    <Collapsible defaultOpen={gIdx === 0}>
+                      <CollapsibleTrigger className="group w-full flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <p className="text-label font-semibold text-foreground">Services</p>
+                          {groupBenefits.length > 0 && (
+                            <span className="text-micro font-medium text-primary bg-primary/10 px-1.5 rounded">{groupBenefits.length}</span>
+                          )}
+                          {groupError && <ErrorText>{groupError}</ErrorText>}
+                        </div>
+                        <CaretDown size={13} weight="bold" className="text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180 shrink-0" />
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="mt-3">
+                        <BenefitServiceSelector
+                          groupId={group.id}
+                          groupBenefits={groupBenefits}
+                          isViewMode={false}
+                          splitBenefitIds={splitBenefitIds}
+                          groupErrors={validationErrors}
+                          hasDependents={(policyData.dependentCoverages?.length ?? 0) > 0}
+                          dependentCoverageTypes={(policyData.dependentCoverages ?? []).map((c) => c.type)}
+                          policyEmployeeCap={policyData.totalCapAmount}
+                          policyDependentCap={policyData.dependentCapAmount}
+                          onToggleService={(serviceId) => toggleService(group.id, serviceId)}
+                          onUpdateBenefit={updateBenefit}
+                          onToggleSplit={handleToggleSplit}
+                        />
+                      </CollapsibleContent>
+                    </Collapsible>
                   </div>
                 </div>
               </div>
@@ -1714,6 +1816,15 @@ export function PolicyWizardContent({ mode = "create", groupsOnly = false, initi
         <section id="pool-cycle" className="scroll-mt-32">
           <div className="bg-card border border-border rounded-lg shadow-sm overflow-hidden">
             <div className="p-6 md:p-8">{renderPoolSection()}</div>
+          </div>
+        </section>
+      )}
+
+      {/* Refresh Start Reference */}
+      {!groupsOnly && (
+        <section id="refresh-start" className="scroll-mt-32">
+          <div className="bg-card border border-border rounded-lg shadow-sm overflow-hidden">
+            <div className="p-6 md:p-8">{renderRefreshStartSection()}</div>
           </div>
         </section>
       )}

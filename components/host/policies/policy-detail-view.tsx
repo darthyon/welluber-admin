@@ -78,9 +78,7 @@ function formatCadence(policy: BenefitPolicy): string {
   parts.push(`${policy.refreshCycle} refresh`);
   parts.push(`${policy.utilisationMode} allocation`);
   if ((policy.dependentCoverages?.length ?? 0) > 0) parts.push("+dependents");
-  if (policy.refreshStartReference === "fy_start") parts.push("FY start");
-  else if (policy.refreshStartReference === "join_date") parts.push("Join date");
-  else parts.push("Custom date");
+  parts.push(policy.refreshStartReference === "financial_year" ? "FY start" : "Cal year");
   return parts.join(" · ");
 }
 
@@ -459,9 +457,8 @@ function OverviewTab({
   onEdit: () => void;
 }) {
   const refreshLabels: Record<string, string> = {
-    fy_start: "Organisation Financial Year",
-    join_date: "Employee Join Date",
-    custom_date: "Custom Start Date",
+    financial_year: "Financial Year",
+    calendar_year: "Calendar Year",
   };
 
   return (
@@ -526,8 +523,11 @@ function OverviewTab({
             label="Start Reference"
             value={refreshLabels[policy.refreshStartReference] || policy.refreshStartReference}
           />
-          {policy.refreshStartReference === "custom_date" && (
-            <DetailField label="Custom Date" value={policy.refreshCustomDate || "—"} />
+          {policy.refreshStartMonth && (
+            <DetailField
+              label="Start Month"
+              value={["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][policy.refreshStartMonth - 1] ?? "—"}
+            />
           )}
         </div>
       </DetailSection>

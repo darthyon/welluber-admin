@@ -178,7 +178,7 @@ function NewPolicyForm() {
           benefitPoolType: "Individual" as const,
           utilisationMode: "Fixed" as const,
           refreshCycle: "Yearly" as const,
-          refreshStartReference: "fy_start" as const,
+          refreshStartReference: "financial_year" as const,
           status: "draft" as const,
         },
         groups: [],
