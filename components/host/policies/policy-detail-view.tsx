@@ -43,6 +43,7 @@ interface PolicyDetailViewProps {
   parentPolicyName?: string;
   parentBenefits?: Benefit[];
   employees?: EmployeeDirectoryItem[];
+  initialTab?: TabId;
   onEdit: () => void;
   onClone: () => void;
   onDeactivate: () => void;
@@ -55,6 +56,7 @@ interface PolicyDetailViewProps {
 
 const TABS = [
   { id: "overview", label: "Overview", icon: IdentificationCard },
+  { id: "benefit-groups", label: "Benefit Groups", icon: TreeStructure },
   { id: "versions", label: "Versions", icon: TreeStructure },
   { id: "employees", label: "Assigned Employees", icon: Buildings },
   { id: "audit", label: "Audit Log", icon: ClockCounterClockwise },
@@ -67,7 +69,7 @@ const EMPLOYMENT_TYPE_LABELS: Record<string, string> = {
   "internship": "Internship",
 };
 
-type TabId = (typeof TABS)[number]["id"];
+export type TabId = (typeof TABS)[number]["id"];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -93,6 +95,7 @@ export function PolicyDetailView({
   parentPolicyName,
   parentBenefits,
   employees,
+  initialTab,
   onEdit,
   onClone,
   onDeactivate,
@@ -109,7 +112,7 @@ export function PolicyDetailView({
     () => (isVersion ? TABS.filter((tab) => tab.id !== "versions") : TABS),
     [isVersion]
   );
-  const [selectedTab, setSelectedTab] = useState<TabId>("overview");
+  const [selectedTab, setSelectedTab] = useState<TabId>(initialTab ?? "overview");
   const activeTab = availableTabs.some((tab) => tab.id === selectedTab) ? selectedTab : "overview";
 
   const statusVariant = policy.status === "active" ? "emerald" : policy.status === "draft" ? "amber" : "rose";
@@ -241,6 +244,9 @@ export function PolicyDetailView({
               ) : (
                 <OverviewTab policy={policy} groups={groups} benefits={benefits} onEdit={onEdit} />
               )
+            )}
+            {activeTab === "benefit-groups" && (
+              <BenefitGroupsTab groups={groups} benefits={benefits} onEdit={onEdit} />
             )}
             {!isVersion && activeTab === "versions" && (
               <VersionsTab
@@ -560,7 +566,23 @@ function OverviewTab({
         </DetailSection>
       )}
 
-      {/* Benefit Groups */}
+    </div>
+  );
+}
+
+// ─── Benefit Groups Tab ───────────────────────────────────────────────────────
+
+function BenefitGroupsTab({
+  groups,
+  benefits,
+  onEdit,
+}: {
+  groups: BenefitGroup[];
+  benefits: Benefit[];
+  onEdit: () => void;
+}) {
+  return (
+    <div className="space-y-6">
       <DetailSection
         title="Benefit Groups"
         icon={<TreeStructure size={18} weight="duotone" />}
@@ -582,6 +604,10 @@ function OverviewTab({
             <TreeStructure size={36} weight="duotone" className="text-faint mb-3" />
             <p className="text-body font-medium text-muted-foreground">No benefit groups configured.</p>
             <p className="text-label text-faint mt-1">Add groups to define which benefits are available.</p>
+            <Button variant="ghost" size="sm" onClick={onEdit} className="mt-3 text-primary font-semibold">
+              <NotePencil size={14} weight="bold" className="mr-1.5" />
+              Edit Policy to Add Groups
+            </Button>
           </div>
         ) : (
           <div className="space-y-4">

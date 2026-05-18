@@ -583,6 +583,8 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
     if (!policyData.name?.trim()) errors.name = "Policy name is required";
     else if (policyData.name.length > 100) errors.name = "Max 100 characters";
 
+    if (!policyData.organizationId) errors.organizationId = "Select an organisation";
+
     if (!policyData.eligibleEmploymentTypes || policyData.eligibleEmploymentTypes.length === 0) {
       errors.eligibleEmploymentTypes = "Select at least one employment type";
     }
@@ -616,46 +618,48 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
       }
     }
 
-    if (groups.length === 0) errors.groups = "Add at least one benefit group";
+    if (mode !== "create") {
+      if (groups.length === 0) errors.groups = "Add at least one benefit group";
 
-    groups.forEach((group, idx) => {
-      const groupIssue = validateGroupInsert(policyData.id || "temp", group.name, groups, group.id);
-      if (groupIssue) {
-        errors[`group_name_${group.id}`] = groupIssue.message;
-      }
-
-      if (group.distributionType === "SharedAmount" && (!group.maxUsagePerCycle || group.maxUsagePerCycle <= 0)) {
-        errors[`group_cap_${group.id}`] = "Shared pools need a cap (e.g. 1000)";
-      }
-
-      if (group.distributionType === "SharedAmount") {
-        const copayIssue = validateCoPayment(undefined, group.coPayment);
-        if (copayIssue) {
-          errors[`group_copay_${group.id}`] = copayIssue.message;
+      groups.forEach((group, idx) => {
+        const groupIssue = validateGroupInsert(policyData.id || "temp", group.name, groups, group.id);
+        if (groupIssue) {
+          errors[`group_name_${group.id}`] = groupIssue.message;
         }
-      }
 
-      const groupBenefits = benefits.filter((b) => b.groupId === group.id);
-      if (groupBenefits.length === 0) {
-        errors[`group_${idx}`] = `Select at least one benefit for ${group.name || "this group"}`;
-      }
-      groupBenefits.forEach((benefit) => {
-        const issues = validateBenefit(benefit, benefits);
-        issues.forEach((issue) => {
-          if (issue.field === "amount") {
-            errors[`benefit_${group.id}_${benefit.serviceId}`] = issue.message;
+        if (group.distributionType === "SharedAmount" && (!group.maxUsagePerCycle || group.maxUsagePerCycle <= 0)) {
+          errors[`group_cap_${group.id}`] = "Shared pools need a cap (e.g. 1000)";
+        }
+
+        if (group.distributionType === "SharedAmount") {
+          const copayIssue = validateCoPayment(undefined, group.coPayment);
+          if (copayIssue) {
+            errors[`group_copay_${group.id}`] = copayIssue.message;
           }
-          if (issue.field === "coPayment.value") {
-            if (group.distributionType !== "SharedAmount") {
-              errors[`copay_${group.id}_${benefit.serviceId}`] = issue.message;
+        }
+
+        const groupBenefits = benefits.filter((b) => b.groupId === group.id);
+        if (groupBenefits.length === 0) {
+          errors[`group_${idx}`] = `Select at least one benefit for ${group.name || "this group"}`;
+        }
+        groupBenefits.forEach((benefit) => {
+          const issues = validateBenefit(benefit, benefits);
+          issues.forEach((issue) => {
+            if (issue.field === "amount") {
+              errors[`benefit_${group.id}_${benefit.serviceId}`] = issue.message;
             }
-          }
-          if (issue.field === "serviceId") {
-            errors[`group_${idx}`] = issue.message;
-          }
+            if (issue.field === "coPayment.value") {
+              if (group.distributionType !== "SharedAmount") {
+                errors[`copay_${group.id}_${benefit.serviceId}`] = issue.message;
+              }
+            }
+            if (issue.field === "serviceId") {
+              errors[`group_${idx}`] = issue.message;
+            }
+          });
         });
       });
-    });
+    }
 
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
@@ -815,85 +819,141 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
       </div>
 
       <div className="space-y-3">
-        <FieldLabel>Eligible Tiers</FieldLabel>
+        <div className="flex items-center justify-between">
+          <FieldLabel>Eligible Tiers</FieldLabel>
+          {policyData.organizationId && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-label font-medium text-primary hover:bg-primary/5 gap-1"
+              onClick={() => window.open(`/organizations/${policyData.organizationId}?tab=employees&subTab=tiers`, "_blank")}
+            >
+              <Plus size={12} weight="bold" />
+              Add Tier
+            </Button>
+          )}
+        </div>
         {!policyData.organizationId ? (
           <p className="text-label text-faint italic">Select an organisation to load tier options.</p>
-        ) : tierOptions.length === 0 ? (
-          <p className="text-label text-faint italic">No tiers configured for this organisation.</p>
         ) : (
           <div className="flex flex-wrap gap-2">
-            {tierOptions.map((tier) => {
-              const selected = policyData.eligibility?.tierIds?.includes(tier.value) ?? false;
+            {(() => {
+              const allSelected = !policyData.eligibility?.tierIds?.length;
               return (
-                <button
-                  type="button"
-                  key={tier.value}
-                  onClick={() => {
-                    const current = policyData.eligibility?.tierIds ?? [];
-                    const updated = selected
-                      ? current.filter((id) => id !== tier.value)
-                      : [...current, tier.value];
-                    setPolicyData({
-                      ...policyData,
-                      eligibility: { ...policyData.eligibility, tierIds: updated },
-                    });
-                  }}
-                  className={cn(
-                    "px-4 py-2 rounded-full text-body font-semibold border transition-all",
-                    selected
-                      ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                      : "bg-background text-muted-foreground border-border hover:border-primary/30"
-                  )}
-                >
-                  {selected && <Check size={12} weight="bold" className="inline mr-1.5" />}
-                  {tier.label}
-                </button>
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setPolicyData({ ...policyData, eligibility: { ...policyData.eligibility, tierIds: [] } })}
+                    className={cn(
+                      "px-4 py-2 rounded-full text-body font-semibold border transition-all",
+                      allSelected
+                        ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                        : "bg-background text-muted-foreground border-border hover:border-primary/30"
+                    )}
+                  >
+                    {allSelected && <Check size={12} weight="bold" className="inline mr-1.5" />}
+                    All
+                  </button>
+                  {tierOptions.map((tier) => {
+                    const selected = policyData.eligibility?.tierIds?.includes(tier.value) ?? false;
+                    return (
+                      <button
+                        type="button"
+                        key={tier.value}
+                        onClick={() => {
+                          const current = policyData.eligibility?.tierIds ?? [];
+                          const updated = selected
+                            ? current.filter((id) => id !== tier.value)
+                            : [...current, tier.value];
+                          setPolicyData({ ...policyData, eligibility: { ...policyData.eligibility, tierIds: updated } });
+                        }}
+                        className={cn(
+                          "px-4 py-2 rounded-full text-body font-semibold border transition-all",
+                          selected
+                            ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                            : "bg-background text-muted-foreground border-border hover:border-primary/30"
+                        )}
+                      >
+                        {selected && <Check size={12} weight="bold" className="inline mr-1.5" />}
+                        {tier.label}
+                      </button>
+                    );
+                  })}
+                </>
               );
-            })}
+            })()}
           </div>
         )}
-        <HelpText>Leave all unselected to apply to every tier.</HelpText>
       </div>
 
       <div className="space-y-3">
-        <FieldLabel>Eligible Departments</FieldLabel>
+        <div className="flex items-center justify-between">
+          <FieldLabel>Eligible Departments</FieldLabel>
+          {policyData.organizationId && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-label font-medium text-primary hover:bg-primary/5 gap-1"
+              onClick={() => window.open(`/organizations/${policyData.organizationId}?tab=employees&subTab=departments`, "_blank")}
+            >
+              <Plus size={12} weight="bold" />
+              Add Department
+            </Button>
+          )}
+        </div>
         {!policyData.organizationId ? (
           <p className="text-label text-faint italic">Select an organisation to load department options.</p>
-        ) : departmentOptions.length === 0 ? (
-          <p className="text-label text-faint italic">No departments configured for this organisation.</p>
         ) : (
           <div className="flex flex-wrap gap-2">
-            {departmentOptions.map((dept) => {
-              const selected = policyData.eligibility?.departmentIds?.includes(dept.value) ?? false;
+            {(() => {
+              const allSelected = !policyData.eligibility?.departmentIds?.length;
               return (
-                <button
-                  type="button"
-                  key={dept.value}
-                  onClick={() => {
-                    const current = policyData.eligibility?.departmentIds ?? [];
-                    const updated = selected
-                      ? current.filter((id) => id !== dept.value)
-                      : [...current, dept.value];
-                    setPolicyData({
-                      ...policyData,
-                      eligibility: { ...policyData.eligibility, departmentIds: updated },
-                    });
-                  }}
-                  className={cn(
-                    "px-4 py-2 rounded-full text-body font-semibold border transition-all",
-                    selected
-                      ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                      : "bg-background text-muted-foreground border-border hover:border-primary/30"
-                  )}
-                >
-                  {selected && <Check size={12} weight="bold" className="inline mr-1.5" />}
-                  {dept.label}
-                </button>
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setPolicyData({ ...policyData, eligibility: { ...policyData.eligibility, departmentIds: [] } })}
+                    className={cn(
+                      "px-4 py-2 rounded-full text-body font-semibold border transition-all",
+                      allSelected
+                        ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                        : "bg-background text-muted-foreground border-border hover:border-primary/30"
+                    )}
+                  >
+                    {allSelected && <Check size={12} weight="bold" className="inline mr-1.5" />}
+                    All
+                  </button>
+                  {departmentOptions.map((dept) => {
+                    const selected = policyData.eligibility?.departmentIds?.includes(dept.value) ?? false;
+                    return (
+                      <button
+                        type="button"
+                        key={dept.value}
+                        onClick={() => {
+                          const current = policyData.eligibility?.departmentIds ?? [];
+                          const updated = selected
+                            ? current.filter((id) => id !== dept.value)
+                            : [...current, dept.value];
+                          setPolicyData({ ...policyData, eligibility: { ...policyData.eligibility, departmentIds: updated } });
+                        }}
+                        className={cn(
+                          "px-4 py-2 rounded-full text-body font-semibold border transition-all",
+                          selected
+                            ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                            : "bg-background text-muted-foreground border-border hover:border-primary/30"
+                        )}
+                      >
+                        {selected && <Check size={12} weight="bold" className="inline mr-1.5" />}
+                        {dept.label}
+                      </button>
+                    );
+                  })}
+                </>
               );
-            })}
+            })()}
           </div>
         )}
-        <HelpText>Leave all unselected to apply to every department.</HelpText>
       </div>
 
       <div className="space-y-3">
@@ -1610,6 +1670,11 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
                                           Total: {((benefit!.employeeAmount ?? 0) + (benefit!.dependantAmount ?? 0)).toLocaleString()}
                                         </span>
                                       </div>
+                                      {validationErrors[`benefit_${group.id}_${service.id}`] && (
+                                        <div className="w-full pl-0">
+                                          <ErrorText>{validationErrors[`benefit_${group.id}_${service.id}`]}</ErrorText>
+                                        </div>
+                                      )}
                                     </>
                                   ) : (
                                   <div className="space-y-1.5">
@@ -1808,12 +1873,14 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
         </div>
       </section>
 
-      {/* Groups & Services */}
-      <section id="groups-services" className="scroll-mt-32">
-        <div className="bg-card border border-border rounded-lg shadow-sm overflow-hidden">
-          <div className="p-6 md:p-8">{renderGroupsSection()}</div>
-        </div>
-      </section>
+      {/* Groups & Services — edit mode only */}
+      {mode !== "create" && (
+        <section id="groups-services" className="scroll-mt-32">
+          <div className="bg-card border border-border rounded-lg shadow-sm overflow-hidden">
+            <div className="p-6 md:p-8">{renderGroupsSection()}</div>
+          </div>
+        </section>
+      )}
 
       {/* Review step is handled by the parent in create mode; edit mode renders everything inline */}
     </form>
