@@ -1,12 +1,17 @@
 export type PoolType = "Individual" | "Shared";
 export type DependentsPoolType = "Individual" | "Shared" | "SharedWithEmployee";
+export type DependentCoverageType = "spouse" | "child" | "parent" | "other";
 export type UtilisationMode = "Fixed" | "Prorated";
 export type ProrateUnit = "Daily" | "Weekly" | "Monthly" | "Quarterly";
 export type RefreshCycle = "Daily" | "Weekly" | "Monthly" | "Quarterly" | "Yearly";
 export type RefreshStartReference = "fy_start" | "join_date" | "custom_date";
-export type ActivationMode = "after_join" | "after_probation" | "custom_date";
 export type PolicyStatus = "draft" | "active" | "deactivated";
 export type DistributionType = "SharedAmount" | "IndividualBenefitAmount";
+
+export interface DependentCoverage {
+  type: DependentCoverageType;
+  capAmount?: number;
+}
 
 export interface BenefitPolicy {
   id: string;
@@ -15,19 +20,18 @@ export interface BenefitPolicy {
   description?: string;
   organizationId: string; // Policy belongs to exactly one org
   eligibleEmploymentTypes: string[];
-  coversDependents: boolean;
+  dependentCoverages?: DependentCoverage[];
   benefitPoolType: PoolType; // employee pool type
-  dependentsPoolType?: DependentsPoolType; // only when coversDependents is true
+  dependentsPoolType?: DependentsPoolType; // only when dependents are covered
   utilisationMode: UtilisationMode;
   prorateUnit?: ProrateUnit;
   refreshCycle: RefreshCycle;
   refreshStartReference: RefreshStartReference;
   refreshCustomDate?: string; // ISO date string
-  activationMode: ActivationMode;
-  activationCustomDate?: string; // ISO date string, only when activationMode === "custom_date"
+  effectiveDate?: "immediate" | "scheduled";
+  effectiveCustomDate?: string; // ISO date string, only when effectiveDate === "scheduled"
   status: PolicyStatus;
   totalCapAmount?: number; // employee-level spending ceiling (RM), optional
-  dependentsCapAmount?: number; // dependents-level spending ceiling (RM), optional
   createdAt?: string;
   groupCount?: number;
   clonedFrom?: string; // original policy id
@@ -55,13 +59,12 @@ export interface PolicyTemplate {
     name?: string;
     description?: string;
     eligibleEmploymentTypes: string[];
-    coversDependents: boolean;
+    dependentCoverages?: DependentCoverage[];
     benefitPoolType: PoolType;
     dependentsPoolType?: DependentsPoolType;
     utilisationMode: UtilisationMode;
     refreshCycle: RefreshCycle;
     refreshStartReference: RefreshStartReference;
-    activationMode: ActivationMode;
     groups: BenefitGroup[];
     benefits: Benefit[];
   };
@@ -74,6 +77,10 @@ export interface BenefitGroup {
   description?: string;
   distributionType: DistributionType;
   maxUsagePerCycle?: number;
+  isTaxable?: boolean; // Malaysia LHDN BIK classification at benefit-category (group) level
+  coPayment?: Benefit["coPayment"]; // Applies when distributionType === "SharedAmount"
+  utilisationMode?: UtilisationMode; // Optional override; unset = inherit from policy
+  prorateUnit?: ProrateUnit; // Optional override when utilisationMode === "Prorated"
 }
 
 export interface Benefit {
@@ -81,8 +88,8 @@ export interface Benefit {
   groupId: string;
   serviceId: string; // MainServiceId from unified taxonomy
   amount: number;
-  employeeAmount?: number; // employee portion when split (coversDependents)
-  dependantAmount?: number; // dependant portion when split (coversDependents)
+  employeeAmount?: number; // employee portion when split (dependents enabled)
+  dependantAmount?: number; // dependant portion when split (dependents enabled)
   coPayment: {
     required: boolean;
     type: "Percentage" | "Fixed";
@@ -96,4 +103,3 @@ export interface BenefitCategory {
   icon: string;
   color: string;
 }
-

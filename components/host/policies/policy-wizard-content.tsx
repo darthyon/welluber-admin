@@ -14,9 +14,6 @@ import {
   Check,
   DiceFive,
   CaretDown,
-  CalendarCheck,
-  RocketLaunch,
-  ClockCountdown,
   type IconProps,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
@@ -33,12 +30,11 @@ import {
   ProrateUnit,
   RefreshCycle,
   DependentsPoolType,
-  ActivationMode,
 } from "@/types/policy";
 import type { PolicyGlossaryKey } from "@/lib/policy-glossary";
 import { MOCK_ORGS, SERVICES } from "@/lib/mock-data";
 import type { MainServiceId } from "@/lib/mock-data/service-catalog";
-import { validateBenefit, validateGroupInsert } from "@/lib/policy/validation";
+import { validateBenefit, validateCoPayment, validateGroupInsert } from "@/lib/policy/validation";
 import { usePolicyDraft } from "@/hooks/use-policy-draft";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -57,12 +53,6 @@ const DEPENDENTS_POOL_OPTIONS: { value: DependentsPoolType; title: string; descr
   { value: "Individual", title: "Individual", description: "Each dependent has their own benefit pool.", icon: User },
   { value: "Shared", title: "Shared", description: "All dependents share the same pool.", icon: UsersFour },
   { value: "SharedWithEmployee", title: "Shared with Employee", description: "Dependents share the employee's pool.", icon: Users },
-];
-
-const ACTIVATION_MODES: { value: ActivationMode; label: string; description: string; icon: React.ElementType<IconProps> }[] = [
-  { value: "after_join", label: "After Join Date", description: "Immediately on join (most common).", icon: RocketLaunch },
-  { value: "after_probation", label: "After Probation Ends", description: "Policy activates once probation is completed.", icon: ClockCountdown },
-  { value: "custom_date", label: "Custom Date", description: "Set a specific activation date.", icon: CalendarCheck },
 ];
 
 function getAvailableRefreshCycles(
@@ -173,14 +163,17 @@ export function PolicyReviewCards({ policy, groups, benefits }: PolicyReviewCard
           <Gear size={16} weight="duotone" className="text-primary" />
           Pool & Cycle
         </h4>
-        <ReadField label="Dependents" value={policy.coversDependents ? "Covered" : "Employee Only"} />
-        <ReadField label="Benefit Policy Amount" value={policy.totalCapAmount ? `RM ${policy.totalCapAmount.toFixed(2)}` : "Not Set"} />
-        {policy.coversDependents && <ReadField label="Dependents Pool Type" value={policy.dependentsPoolType === "SharedWithEmployee" ? "Shared with Employee" : policy.dependentsPoolType} />}
-        {policy.coversDependents && policy.dependentsPoolType !== "SharedWithEmployee" && (
-          <ReadField
-            label="Dependents Policy Amount"
-            value={policy.dependentsCapAmount ? `RM ${policy.dependentsCapAmount.toFixed(2)}` : "Not Set"}
-          />
+        <ReadField
+          label="Dependents"
+          value={
+            (policy.dependentCoverages?.length ?? 0) > 0
+              ? `Covered (${policy.dependentCoverages?.map((c) => c.type).join(", ")})`
+              : "Employee Only"
+          }
+        />
+        <ReadField label="Employee Policy Amount" value={policy.totalCapAmount ? `RM ${policy.totalCapAmount.toFixed(2)}` : "Not Set"} />
+        {(policy.dependentCoverages?.length ?? 0) > 0 && (
+          <ReadField label="Dependents Pool Type" value={policy.dependentsPoolType === "SharedWithEmployee" ? "Shared with Employee" : policy.dependentsPoolType} />
         )}
         <ReadField label="Utilisation Mode" value={policy.utilisationMode === "Fixed" ? "Fixed Allocation" : "Prorated Allocation"} />
         {policy.utilisationMode === "Prorated" && <ReadField label="Prorate Unit" value={policy.prorateUnit} />}
@@ -196,17 +189,6 @@ export function PolicyReviewCards({ policy, groups, benefits }: PolicyReviewCard
           }
         />
         {policy.refreshStartReference === "custom_date" && <ReadField label="Custom Date" value={policy.refreshCustomDate} />}
-        <ReadField
-          label="Activation"
-          value={
-            policy.activationMode === "after_join"
-              ? "After Join Date"
-              : policy.activationMode === "after_probation"
-              ? "After Probation Ends"
-              : "Custom Date"
-          }
-        />
-        {policy.activationMode === "custom_date" && <ReadField label="Activation Date" value={policy.activationCustomDate} />}
       </div>
 
       <div className="bg-card border border-border rounded-lg p-5 space-y-4 md:col-span-2">
@@ -303,17 +285,17 @@ const SECTION_FOR_KEY: Array<{ test: (key: string) => boolean; section: string }
       [
         "prorateUnit",
         "dependentsPoolType",
-        "dependentsCapAmount",
         "refreshCustomDate",
-        "activationCustomDate",
         "refreshCycle",
       ].includes(k),
     section: "pool-cycle",
   },
+  { test: (k) => k.startsWith("dependent_cap_"), section: "pool-cycle" },
   {
     test: (k) =>
       k === "groups" ||
       k.startsWith("group_") ||
+      k.startsWith("group_copay_") ||
       k.startsWith("group_name_") ||
       k.startsWith("group_cap_") ||
       k.startsWith("benefit_") ||
@@ -333,6 +315,12 @@ function targetIdForKey(key: string): string {
   if (key.startsWith("group_name_") || key.startsWith("group_cap_")) {
     return `group-${key.replace(/^group_(name|cap)_/, "")}`;
   }
+  if (key.startsWith("group_copay_")) {
+    return `group-${key.replace(/^group_copay_/, "")}`;
+  }
+  if (key.startsWith("dependent_cap_")) {
+    return "pool-cycle";
+  }
   if (key.startsWith("benefit_") || key.startsWith("copay_")) {
     const parts = key.split("_");
     return parts.length >= 2 ? `group-${parts[1]}` : sectionForKey(key);
@@ -350,12 +338,11 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
       name: "",
       description: "",
       eligibleEmploymentTypes: ["full-time", "part-time", "contract", "internship"],
-      coversDependents: false,
+      dependentCoverages: [],
       benefitPoolType: "Individual",
       utilisationMode: "Fixed",
       refreshCycle: "Yearly",
       refreshStartReference: "fy_start",
-      activationMode: "after_join",
       status: "draft",
     }
   );
@@ -453,6 +440,20 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
     [setFieldError]
   );
 
+  const blurGroupCopayValue = useCallback(
+    (groupId: string, type: "Percentage" | "Fixed", value: number) => {
+      const key = `group_copay_${groupId}`;
+      if (type === "Percentage" && (value < 0 || value > 100)) {
+        setFieldError(key, "Percentage must be 0–100");
+      } else if (value < 0) {
+        setFieldError(key, "Co-payment cannot be negative");
+      } else {
+        setFieldError(key, undefined);
+      }
+    },
+    [setFieldError]
+  );
+
   // ── Realtime error clearing on valid input ──────────────────────────────
   useEffect(() => {
     if (validationErrors.name && policyData.name?.trim() && policyData.name.length <= 100) {
@@ -489,32 +490,12 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
 
   useEffect(() => {
     if (
-      validationErrors.activationCustomDate &&
-      (policyData.activationMode !== "custom_date" || policyData.activationCustomDate)
-    ) {
-      setTimeout(() => setFieldError("activationCustomDate", undefined), 0);
-    }
-  }, [policyData.activationMode, policyData.activationCustomDate, validationErrors.activationCustomDate, setFieldError]);
-
-  useEffect(() => {
-    if (
       validationErrors.dependentsPoolType &&
-      (!policyData.coversDependents || policyData.dependentsPoolType)
+      ((policyData.dependentCoverages?.length ?? 0) === 0 || policyData.dependentsPoolType)
     ) {
       setTimeout(() => setFieldError("dependentsPoolType", undefined), 0);
     }
-  }, [policyData.coversDependents, policyData.dependentsPoolType, validationErrors.dependentsPoolType, setFieldError]);
-
-  useEffect(() => {
-    if (
-      validationErrors.dependentsCapAmount &&
-      (!policyData.coversDependents ||
-        policyData.dependentsPoolType === "SharedWithEmployee" ||
-        (policyData.dependentsCapAmount && policyData.dependentsCapAmount > 0))
-    ) {
-      setTimeout(() => setFieldError("dependentsCapAmount", undefined), 0);
-    }
-  }, [policyData.coversDependents, policyData.dependentsPoolType, policyData.dependentsCapAmount, validationErrors.dependentsCapAmount, setFieldError]);
+  }, [policyData.dependentCoverages, policyData.dependentsPoolType, validationErrors.dependentsPoolType, setFieldError]);
 
   useEffect(() => {
     if (validationErrors.prorateUnit && (policyData.utilisationMode !== "Prorated" || policyData.prorateUnit)) {
@@ -567,11 +548,33 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
             delete next[nameKey];
             changed = true;
           }
+
+          const groupCopayKey = `group_copay_${g.id}`;
+          if (next[groupCopayKey]) {
+            const copay = g.coPayment;
+            const v = copay?.value ?? 0;
+            const ok =
+              !copay?.required ||
+              (copay.type === "Percentage" && v >= 0 && v <= 100) ||
+              copay.type === "Fixed";
+            if (ok) {
+              delete next[groupCopayKey];
+              changed = true;
+            }
+          }
+        });
+
+        (policyData.dependentCoverages ?? []).forEach((c) => {
+          const key = `dependent_cap_${c.type}`;
+          if (next[key] && (c.capAmount ?? 0) > 0) {
+            delete next[key];
+            changed = true;
+          }
         });
         return changed ? next : prev;
       });
     }, 0);
-  }, [benefits, groups]);
+  }, [benefits, groups, policyData.dependentCoverages]);
 
   // ── Validation ────────────────────────────────────────────────────────────
   const validate = (): boolean => {
@@ -590,25 +593,22 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
       errors.prorateUnit = "Pick a prorate unit (Monthly is most common)";
     }
 
-    if (policyData.coversDependents && !policyData.dependentsPoolType) {
+    const hasDependents = (policyData.dependentCoverages?.length ?? 0) > 0;
+
+    if (hasDependents && !policyData.dependentsPoolType) {
       errors.dependentsPoolType = "Select a pool type for dependents";
     }
 
-    if (
-      policyData.coversDependents &&
-      policyData.dependentsPoolType &&
-      policyData.dependentsPoolType !== "SharedWithEmployee" &&
-      (!policyData.dependentsCapAmount || policyData.dependentsCapAmount <= 0)
-    ) {
-      errors.dependentsCapAmount = "Enter a dependents spending cap greater than 0";
+    if (hasDependents && policyData.dependentsPoolType && policyData.dependentsPoolType !== "SharedWithEmployee") {
+      (policyData.dependentCoverages ?? []).forEach((coverage) => {
+        if (!coverage.capAmount || coverage.capAmount <= 0) {
+          errors[`dependent_cap_${coverage.type}`] = "Enter an amount greater than 0";
+        }
+      });
     }
 
     if (policyData.refreshStartReference === "custom_date" && !policyData.refreshCustomDate) {
       errors.refreshCustomDate = "Pick when this policy resets each cycle";
-    }
-
-    if (policyData.activationMode === "custom_date" && !policyData.activationCustomDate) {
-      errors.activationCustomDate = "Enter a custom activation date";
     }
 
     if (policyData.utilisationMode === "Prorated" && policyData.prorateUnit) {
@@ -631,6 +631,13 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
           errors[`group_cap_${group.id}`] = "Shared pools need a cap (e.g. 1000)";
         }
 
+        if (group.distributionType === "SharedAmount") {
+          const copayIssue = validateCoPayment(undefined, group.coPayment);
+          if (copayIssue) {
+            errors[`group_copay_${group.id}`] = copayIssue.message;
+          }
+        }
+
         const groupBenefits = benefits.filter((b) => b.groupId === group.id);
         if (groupBenefits.length === 0) {
           errors[`group_${idx}`] = `Select at least one benefit for ${group.name || "this group"}`;
@@ -642,7 +649,9 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
               errors[`benefit_${group.id}_${benefit.serviceId}`] = issue.message;
             }
             if (issue.field === "coPayment.value") {
-              errors[`copay_${group.id}_${benefit.serviceId}`] = issue.message;
+              if (group.distributionType !== "SharedAmount") {
+                errors[`copay_${group.id}_${benefit.serviceId}`] = issue.message;
+              }
             }
             if (issue.field === "serviceId") {
               errors[`group_${idx}`] = issue.message;
@@ -673,6 +682,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
       policyId: policyData.id || "temp",
       name: "New Benefit Group",
       distributionType: "IndividualBenefitAmount",
+      coPayment: { required: false, type: "Percentage", value: 0 },
     };
     setGroups((prev) => [...prev, newGroup]);
   }, [policyData.id]);
@@ -682,8 +692,18 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
     setBenefits(benefits.filter((b) => b.groupId !== groupId));
   };
 
-  const updateGroup = (groupId: string, field: keyof BenefitGroup, value: string | number | undefined) => {
+  const updateGroup = (groupId: string, field: keyof BenefitGroup, value: string | number | boolean | undefined) => {
     setGroups(groups.map((g) => (g.id === groupId ? { ...g, [field]: value } : g)));
+  };
+
+  const updateGroupCoPayment = (groupId: string, field: "required" | "type" | "value", value: boolean | string | number) => {
+    setGroups((prev) =>
+      prev.map((g) => {
+        if (g.id !== groupId) return g;
+        const coPayment = g.coPayment ?? { required: false, type: "Percentage" as const, value: 0 };
+        return { ...g, coPayment: { ...coPayment, [field]: value } };
+      })
+    );
   };
 
   const toggleService = useCallback((groupId: string, serviceId: MainServiceId) => {
@@ -1054,11 +1074,11 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
 
     return (
     <div className="space-y-6">
-      <SectionHeader icon={Gear} title="Pool & Cycle" description="Configure fund allocation, refresh intervals, and activation" />
+      <SectionHeader icon={Gear} title="Pool & Cycle" description="Configure fund allocation and refresh intervals" />
 
-      {/* ── Benefit Policy Amount ── */}
+      {/* ── Employee Policy Amount ── */}
       <div className="space-y-1.5">
-        <FieldLabel helpKey="spendingCap">Benefit Policy Amount</FieldLabel>
+        <FieldLabel helpKey="spendingCap">Employee Policy Amount</FieldLabel>
         <input
           type="number"
           min={0}
@@ -1073,31 +1093,61 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
           }
         />
         <HelpText>Optional. Maximum total an employee can claim under this policy per cycle.</HelpText>
+        {(policyData.dependentCoverages?.length ?? 0) > 0 && policyData.dependentsPoolType === "SharedWithEmployee" && (
+          <p className="text-micro text-faint">
+            Dependents share this employee amount{typeof policyData.totalCapAmount === "number" ? ` (RM ${policyData.totalCapAmount.toFixed(2)})` : ""}.
+          </p>
+        )}
       </div>
 
-      {/* ── Cover Dependents ── */}
+      {/* ── Dependent Coverage ── */}
       <div className="space-y-2">
-        <FieldLabel helpKey="dependentsPooling">Cover Dependents</FieldLabel>
-        <label className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-body font-medium text-foreground">
-          <input
-            type="checkbox"
-            checked={policyData.coversDependents === true}
-            onChange={(e) =>
-              setPolicyData({
-                ...policyData,
-                coversDependents: e.target.checked,
-                dependentsPoolType: e.target.checked ? policyData.dependentsPoolType : undefined,
-                dependentsCapAmount: e.target.checked ? policyData.dependentsCapAmount : undefined,
-              })
-            }
-            className="h-4 w-4 rounded border-border text-primary focus:ring-ring"
-          />
-          Include dependents in this policy
-        </label>
+        <FieldLabel helpKey="dependentsPooling">Dependent Coverage</FieldLabel>
+        <div className="flex flex-wrap gap-2">
+          {([
+            { value: "spouse", label: "Spouse" },
+            { value: "child", label: "Child" },
+            { value: "parent", label: "Parent" },
+            { value: "other", label: "Other" },
+          ] as const).map((opt) => {
+            const current = policyData.dependentCoverages ?? [];
+            const selected = current.some((c) => c.type === opt.value);
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() =>
+                  setPolicyData((prev) => {
+                    const existing = prev.dependentCoverages ?? [];
+                    const next = selected
+                      ? existing.filter((c) => c.type !== opt.value)
+                      : [...existing, { type: opt.value, capAmount: undefined }];
+                    const hasDependents = next.length > 0;
+                    return {
+                      ...prev,
+                      dependentCoverages: next,
+                      dependentsPoolType: hasDependents ? prev.dependentsPoolType : undefined,
+                    };
+                  })
+                }
+                className={cn(
+                  "px-3 py-1.5 rounded-full text-label font-medium border transition-all",
+                  selected
+                    ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                    : "bg-background text-muted-foreground border-border hover:border-primary/30"
+                )}
+              >
+                {selected && <Check size={11} weight="bold" className="inline mr-1.5" />}
+                {opt.label}
+              </button>
+            );
+          })}
+        </div>
+        <HelpText>Choose which dependent types are eligible under this policy.</HelpText>
       </div>
 
       {/* ── Dependents Pool Type ── */}
-      {policyData.coversDependents && (
+      {(policyData.dependentCoverages?.length ?? 0) > 0 && (
         <div className="space-y-3 animate-in fade-in slide-in-from-top-1 duration-300">
           <FieldLabel required helpKey="dependentsPooling">Dependents Pool Type</FieldLabel>
           {validationErrors.dependentsPoolType && <ErrorText>{validationErrors.dependentsPoolType}</ErrorText>}
@@ -1113,8 +1163,6 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
                   setPolicyData({
                     ...policyData,
                     dependentsPoolType: opt.value,
-                    dependentsCapAmount:
-                      opt.value === "SharedWithEmployee" ? undefined : policyData.dependentsCapAmount,
                   })
                 }
               />
@@ -1123,27 +1171,48 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
         </div>
       )}
 
-      {policyData.coversDependents && policyData.dependentsPoolType !== "SharedWithEmployee" && (
-        <div className="space-y-1.5 animate-in fade-in slide-in-from-top-1 duration-300">
-          <FieldLabel required helpKey="spendingCap">Dependents Policy Amount</FieldLabel>
-          <input
-            type="number"
-            min={0}
-            placeholder="e.g. 1500"
-            className={cn(
-              "w-full max-w-[240px] px-4 py-2.5 bg-background border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all",
-              validationErrors.dependentsCapAmount ? "border-destructive" : "border-border"
-            )}
-            value={policyData.dependentsCapAmount ?? ""}
-            onChange={(e) =>
-              setPolicyData({
-                ...policyData,
-                dependentsCapAmount: e.target.value === "" ? undefined : parseFloat(e.target.value),
-              })
-            }
-          />
-          {validationErrors.dependentsCapAmount && <ErrorText>{validationErrors.dependentsCapAmount}</ErrorText>}
-          <HelpText>Maximum total dependents can claim per cycle for this policy.</HelpText>
+      {(policyData.dependentCoverages?.length ?? 0) > 0 && policyData.dependentsPoolType !== "SharedWithEmployee" && (
+        <div className="space-y-3 animate-in fade-in slide-in-from-top-1 duration-300">
+          <FieldLabel required helpKey="spendingCap">Dependent Amounts</FieldLabel>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-xl">
+            {(policyData.dependentCoverages ?? []).map((coverage) => (
+              <div key={coverage.type} className="space-y-1.5">
+                <label className="block text-label font-medium text-subtle">
+                  {coverage.type === "spouse"
+                    ? "Spouse"
+                    : coverage.type === "child"
+                    ? "Child"
+                    : coverage.type === "parent"
+                    ? "Parent"
+                    : "Other"}
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  placeholder="e.g. 1500"
+                  className={cn(
+                    "w-full px-4 py-2.5 bg-background border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all",
+                    validationErrors[`dependent_cap_${coverage.type}`] ? "border-destructive" : "border-border"
+                  )}
+                  value={coverage.capAmount ?? ""}
+                  onChange={(e) =>
+                    setPolicyData((prev) => ({
+                      ...prev,
+                      dependentCoverages: (prev.dependentCoverages ?? []).map((c) =>
+                        c.type === coverage.type
+                          ? { ...c, capAmount: e.target.value === "" ? undefined : parseFloat(e.target.value) }
+                          : c
+                      ),
+                    }))
+                  }
+                />
+                {validationErrors[`dependent_cap_${coverage.type}`] && (
+                  <ErrorText>{validationErrors[`dependent_cap_${coverage.type}`]}</ErrorText>
+                )}
+              </div>
+            ))}
+          </div>
+          <HelpText>Set per-dependent-type amounts (required unless Shared with Employee is selected).</HelpText>
         </div>
       )}
 
@@ -1153,6 +1222,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
       {/* ── Utilisation Mode ── */}
       <div className="space-y-3">
         <FieldLabel helpKey="utilisationMode">Utilisation Mode</FieldLabel>
+        <HelpText>This will be the default for all benefit groups, which can be overridden per group.</HelpText>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <ChoiceCard
             title="Fixed Allocation"
@@ -1259,67 +1329,6 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
 
       </div>
 
-      {/* ── Activation Mode ── */}
-      <div className="border-t border-border/60 pt-6 space-y-3">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-7 h-7 rounded-md bg-primary/10 text-primary flex items-center justify-center border border-primary/20 shrink-0">
-            <RocketLaunch size={14} weight="duotone" />
-          </div>
-          <div>
-            <h4 className="text-body font-semibold text-foreground inline-flex items-center gap-1.5">Activation <FieldHelp termKey="activationMode" /></h4>
-            <p className="text-label text-muted-foreground">When the policy takes effect for new members</p>
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          {ACTIVATION_MODES.map((mode) => {
-            const Icon = mode.icon;
-            return (
-              <div key={mode.value} className="space-y-2">
-                <button
-                  type="button"
-                  onClick={() => setPolicyData({ ...policyData, activationMode: mode.value, activationCustomDate: mode.value !== "custom_date" ? undefined : policyData.activationCustomDate })}
-                  className={cn(
-                    "flex items-center gap-3 px-4 py-3 rounded-lg border text-body font-medium transition-all text-left w-full",
-                    policyData.activationMode === mode.value
-                      ? "border-primary bg-primary/5 text-primary"
-                      : "border-border bg-card text-muted-foreground hover:border-border/80"
-                  )}
-                >
-                  <div
-                    className={cn(
-                      "w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0",
-                      policyData.activationMode === mode.value ? "border-primary" : "border-border"
-                    )}
-                  >
-                    {policyData.activationMode === mode.value && (
-                      <div className="w-2.5 h-2.5 rounded-full bg-primary" />
-                    )}
-                  </div>
-                  <Icon size={18} weight={policyData.activationMode === mode.value ? "fill" : "regular"} className="shrink-0" />
-                  <div className="flex flex-col">
-                    <span>{mode.label}</span>
-                    <span className="text-label text-faint font-normal">{mode.description}</span>
-                  </div>
-                </button>
-                {mode.value === "custom_date" && policyData.activationMode === "custom_date" && (
-                  <div className="pl-12 space-y-1.5 animate-in fade-in slide-in-from-top-1 duration-300">
-                    <FieldLabel required>Custom Activation Date</FieldLabel>
-                    <DatePickerField
-                      value={policyData.activationCustomDate || ""}
-                      onChange={(v) => setPolicyData({ ...policyData, activationCustomDate: v })}
-                      placeholder="Select activation date"
-                      clearable={false}
-                      className={validationErrors.activationCustomDate ? "[&>button]:border-destructive [&>button]:focus:border-destructive" : ""}
-                    />
-                    {validationErrors.activationCustomDate && <ErrorText>{validationErrors.activationCustomDate}</ErrorText>}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
     </div>
     );
   };
@@ -1422,6 +1431,108 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
                       />
                       {validationErrors[`group_cap_${group.id}`] && <ErrorText>{validationErrors[`group_cap_${group.id}`]}</ErrorText>}
                     </div>
+                    <div className="space-y-1.5">
+                      <p className="text-label font-medium text-muted-foreground">Tax Treatment</p>
+                      <label className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-body font-medium text-foreground">
+                        <input
+                          type="checkbox"
+                          checked={group.isTaxable === true}
+                          onChange={(e) => updateGroup(group.id, "isTaxable", e.target.checked)}
+                          className="h-4 w-4 rounded border-border text-primary focus:ring-ring"
+                        />
+                        Taxable (BIK)
+                      </label>
+                      <HelpText>Use this for Malaysia LHDN benefit-in-kind classification.</HelpText>
+                    </div>
+                    {group.distributionType === "SharedAmount" && (
+                      <div className="space-y-1.5">
+                        <label className="text-label font-medium text-subtle inline-flex items-center gap-1.5">
+                          Co-payment <FieldHelp termKey="coPayment" />
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => updateGroupCoPayment(group.id, "required", !(group.coPayment?.required ?? false))}
+                            aria-pressed={group.coPayment?.required ?? false}
+                            className={cn(
+                              "w-11 h-6 rounded-full border transition-colors relative shrink-0",
+                              group.coPayment?.required ? "bg-primary border-primary" : "bg-muted border-border"
+                            )}
+                          >
+                            <div
+                              className={cn(
+                                "w-4 h-4 rounded-full bg-background shadow-sm absolute top-[3px] transition-all",
+                                group.coPayment?.required ? "right-1" : "left-1"
+                              )}
+                            />
+                          </button>
+                          <div className={cn("flex items-center gap-1.5 transition-opacity", !(group.coPayment?.required ?? false) && "opacity-40 pointer-events-none")}>
+                            <FormSelect
+                              disabled={!(group.coPayment?.required ?? false)}
+                              value={group.coPayment?.type ?? "Percentage"}
+                              onChange={(v) => updateGroupCoPayment(group.id, "type", v)}
+                              options={[
+                                { label: "%", value: "Percentage" },
+                                { label: "RM", value: "Fixed" },
+                              ]}
+                              triggerClassName="w-20 h-9"
+                            />
+                            <input
+                              type="number"
+                              disabled={!(group.coPayment?.required ?? false)}
+                              className={cn(
+                                "w-24 px-3 py-2 bg-background border rounded-lg text-body font-mono outline-none text-right",
+                                validationErrors[`group_copay_${group.id}`] ? "border-destructive" : "border-border"
+                              )}
+                              value={group.coPayment?.value || ""}
+                              onChange={(e) =>
+                                updateGroupCoPayment(group.id, "value", e.target.value === "" ? 0 : parseFloat(e.target.value))
+                              }
+                              onBlur={() => blurGroupCopayValue(group.id, group.coPayment?.type ?? "Percentage", group.coPayment?.value ?? 0)}
+                            />
+                          </div>
+                        </div>
+                        {validationErrors[`group_copay_${group.id}`] && (
+                          <ErrorText>{validationErrors[`group_copay_${group.id}`]}</ErrorText>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Utilisation override */}
+                  <div className="flex items-start gap-6 flex-wrap">
+                    <div className="space-y-1.5">
+                      <p className="text-label font-medium text-muted-foreground">Utilisation Mode</p>
+                      <FormSelect
+                        value={group.utilisationMode ?? ""}
+                        onChange={(v) => {
+                          const next = v === "" ? undefined : (v as "Fixed" | "Prorated");
+                          updateGroup(group.id, "utilisationMode", next);
+                          if (next !== "Prorated") updateGroup(group.id, "prorateUnit", undefined);
+                          if (next === "Prorated" && !group.prorateUnit) updateGroup(group.id, "prorateUnit", "Monthly");
+                        }}
+                        options={[
+                          { label: `Inherit from Policy (${policyData.utilisationMode ?? "Fixed"})`, value: "" },
+                          { label: "Fixed", value: "Fixed" },
+                          { label: "Prorated", value: "Prorated" },
+                        ]}
+                        triggerClassName="w-[260px]"
+                      />
+                    </div>
+                    {(group.utilisationMode ?? policyData.utilisationMode) === "Prorated" && (
+                      <div className="space-y-1.5">
+                        <p className="text-label font-medium text-muted-foreground">Prorate Unit</p>
+                        <FormSelect
+                          value={group.prorateUnit ?? ""}
+                          onChange={(v) => updateGroup(group.id, "prorateUnit", v === "" ? undefined : (v as ProrateUnit))}
+                          options={[
+                            { label: `Inherit from Policy (${policyData.prorateUnit ?? "Monthly"})`, value: "" },
+                            ...PRORATE_UNITS.map((u) => ({ label: u, value: u })),
+                          ]}
+                          triggerClassName="w-[260px]"
+                        />
+                      </div>
+                    )}
                   </div>
 
                   {/* Service category selector */}
@@ -1492,7 +1603,7 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
                             {isChecked && (
                               <div className="px-4 pb-4">
                                 <div className="flex items-start gap-4 flex-wrap pl-8">
-                                  {policyData.coversDependents && (
+                                  {(policyData.dependentCoverages?.length ?? 0) > 0 && (
                                     <div className="flex items-center gap-2 w-full mb-1">
                                       <button
                                         type="button"
@@ -1586,57 +1697,59 @@ export function PolicyWizardContent({ mode = "create", initialData, onSubmit, on
                                   </div>
                                   )}
 
-                                  <div className="space-y-1.5">
-                                    <label className="text-label font-medium text-subtle inline-flex items-center gap-1.5">Co-payment <FieldHelp termKey="coPayment" /></label>
-                                    <div className="flex items-center gap-2">
-                                      <button
-                                        type="button"
-                                        onClick={() => updateBenefit(benefit!.id, "coPayment.required", !benefit!.coPayment.required)}
-                                        aria-pressed={benefit!.coPayment.required}
-                                        className={cn(
-                                          "w-11 h-6 rounded-full border transition-colors relative shrink-0",
-                                          benefit!.coPayment.required
-                                            ? "bg-primary border-primary"
-                                            : "bg-muted border-border"
-                                        )}
-                                      >
-                                        <div
+                                  {group.distributionType !== "SharedAmount" && (
+                                    <div className="space-y-1.5">
+                                      <label className="text-label font-medium text-subtle inline-flex items-center gap-1.5">Co-payment <FieldHelp termKey="coPayment" /></label>
+                                      <div className="flex items-center gap-2">
+                                        <button
+                                          type="button"
+                                          onClick={() => updateBenefit(benefit!.id, "coPayment.required", !benefit!.coPayment.required)}
+                                          aria-pressed={benefit!.coPayment.required}
                                           className={cn(
-                                            "w-4 h-4 rounded-full bg-background shadow-sm absolute top-[3px] transition-all",
-                                            benefit!.coPayment.required ? "right-1" : "left-1"
+                                            "w-11 h-6 rounded-full border transition-colors relative shrink-0",
+                                            benefit!.coPayment.required
+                                              ? "bg-primary border-primary"
+                                              : "bg-muted border-border"
                                           )}
-                                        />
-                                      </button>
-                                      <div className={cn("flex items-center gap-1.5 transition-opacity", !benefit!.coPayment.required && "opacity-40 pointer-events-none")}>
-                                        <FormSelect
-                                          disabled={!benefit!.coPayment.required}
-                                          value={benefit!.coPayment.type}
-                                          onChange={(v) => updateBenefit(benefit!.id, "coPayment.type", v)}
-                                          options={[
-                                            { label: "%", value: "Percentage" },
-                                            { label: "RM", value: "Fixed" },
-                                          ]}
-                                          triggerClassName="w-20 h-9"
-                                        />
-                                        <input
-                                          type="number"
-                                          disabled={!benefit!.coPayment.required}
-                                          className={cn(
-                                            "w-24 px-3 py-2 bg-background border rounded-lg text-body font-mono outline-none text-right",
-                                            validationErrors[`copay_${group.id}_${service.id}`] ? "border-destructive" : "border-border"
-                                          )}
-                                          value={benefit!.coPayment.value || ""}
-                                          onChange={(e) =>
-                                            updateBenefit(benefit!.id, "coPayment.value", e.target.value === "" ? 0 : parseFloat(e.target.value))
-                                          }
-                                          onBlur={() => blurCopayValue(group.id, service.id, benefit!.coPayment.type, benefit!.coPayment.value || 0, benefit!.amount || 0)}
-                                        />
+                                        >
+                                          <div
+                                            className={cn(
+                                              "w-4 h-4 rounded-full bg-background shadow-sm absolute top-[3px] transition-all",
+                                              benefit!.coPayment.required ? "right-1" : "left-1"
+                                            )}
+                                          />
+                                        </button>
+                                        <div className={cn("flex items-center gap-1.5 transition-opacity", !benefit!.coPayment.required && "opacity-40 pointer-events-none")}>
+                                          <FormSelect
+                                            disabled={!benefit!.coPayment.required}
+                                            value={benefit!.coPayment.type}
+                                            onChange={(v) => updateBenefit(benefit!.id, "coPayment.type", v)}
+                                            options={[
+                                              { label: "%", value: "Percentage" },
+                                              { label: "RM", value: "Fixed" },
+                                            ]}
+                                            triggerClassName="w-20 h-9"
+                                          />
+                                          <input
+                                            type="number"
+                                            disabled={!benefit!.coPayment.required}
+                                            className={cn(
+                                              "w-24 px-3 py-2 bg-background border rounded-lg text-body font-mono outline-none text-right",
+                                              validationErrors[`copay_${group.id}_${service.id}`] ? "border-destructive" : "border-border"
+                                            )}
+                                            value={benefit!.coPayment.value || ""}
+                                            onChange={(e) =>
+                                              updateBenefit(benefit!.id, "coPayment.value", e.target.value === "" ? 0 : parseFloat(e.target.value))
+                                            }
+                                            onBlur={() => blurCopayValue(group.id, service.id, benefit!.coPayment.type, benefit!.coPayment.value || 0, benefit!.amount || 0)}
+                                          />
+                                        </div>
                                       </div>
+                                      {validationErrors[`copay_${group.id}_${service.id}`] && (
+                                        <ErrorText>{validationErrors[`copay_${group.id}_${service.id}`]}</ErrorText>
+                                      )}
                                     </div>
-                                    {validationErrors[`copay_${group.id}_${service.id}`] && (
-                                      <ErrorText>{validationErrors[`copay_${group.id}_${service.id}`]}</ErrorText>
-                                    )}
-                                  </div>
+                                  )}
                                 </div>
                               </div>
                             )}

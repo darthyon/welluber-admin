@@ -28,13 +28,6 @@ function isEmployeeEligible(employee: EmployeeDirectoryItem, policy: Partial<Ben
   return true;
 }
 
-function getActivationSummary(policy: Partial<BenefitPolicy>) {
-  if (policy.activationMode === "after_join") return "Immediately on join (most common)";
-  if (policy.activationMode === "after_probation") return "After probation ends";
-  if (policy.activationMode === "custom_date") return policy.activationCustomDate ? `On ${policy.activationCustomDate}` : "On custom date";
-  return "Based on policy activation settings";
-}
-
 export function PolicyLaunchConfirmModal({
   policy,
   assignedEmployeeIds,
@@ -83,10 +76,6 @@ export function PolicyLaunchConfirmModal({
             <p className="text-body font-medium text-foreground">
               Will reassign {reassigned.length} employee{reassigned.length !== 1 ? "s" : ""} from {reassignmentSummary}
             </p>
-          </div>
-
-          <div className="rounded-lg border border-border bg-muted/20 p-3">
-            <p className="text-body font-medium text-foreground">Activation: {getActivationSummary(policy)}</p>
           </div>
 
           <p className="text-micro text-faint">

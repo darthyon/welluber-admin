@@ -207,9 +207,21 @@ export default function EditPolicyReviewPage({ params }: { params: Promise<{ id:
               selectedDeptIds={draft.policy.eligibility?.departmentIds ?? []}
               tierOptions={tierOptions}
               departmentOptions={departmentOptions}
+              effectiveDate={draft.policy.effectiveDate ?? "immediate"}
+              scheduledDate={draft.policy.effectiveCustomDate}
               onToggleEmpType={toggleEmpType}
               onToggleTier={toggleTier}
               onToggleDept={toggleDept}
+              onEffectiveDateChange={({ effectiveDate, scheduledDate }) => {
+                updateDraft({
+                  ...draft,
+                  policy: {
+                    ...draft.policy,
+                    effectiveDate,
+                    effectiveCustomDate: effectiveDate === "scheduled" ? scheduledDate : undefined,
+                  },
+                });
+              }}
             />
           </div>
 

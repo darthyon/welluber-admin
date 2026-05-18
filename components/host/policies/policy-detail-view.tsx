@@ -77,7 +77,7 @@ function formatCadence(policy: BenefitPolicy): string {
   const parts: string[] = [];
   parts.push(`${policy.refreshCycle} refresh`);
   parts.push(`${policy.utilisationMode} allocation`);
-  if (policy.coversDependents) parts.push("+dependents");
+  if ((policy.dependentCoverages?.length ?? 0) > 0) parts.push("+dependents");
   if (policy.refreshStartReference === "fy_start") parts.push("FY start");
   else if (policy.refreshStartReference === "join_date") parts.push("Join date");
   else parts.push("Custom date");
@@ -504,11 +504,17 @@ function OverviewTab({
       <DetailSection
         title="Pool & Cycle"
         icon={<Gear size={18} weight="duotone" />}
-        description="Fund allocation, refresh configuration, and activation"
+        description="Fund allocation and refresh configuration"
       >
         <div className="grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-4">
-          <DetailField label="Dependents" value={policy.coversDependents ? "Covered" : "Employee Only"} />
-          {policy.coversDependents && (
+          <DetailField label="Dependents" value={(policy.dependentCoverages?.length ?? 0) > 0 ? "Covered" : "Employee Only"} />
+          {(policy.dependentCoverages?.length ?? 0) > 0 && (
+            <DetailField
+              label="Dependent Types"
+              value={policy.dependentCoverages?.map((c) => c.type).join(", ") || "—"}
+            />
+          )}
+          {(policy.dependentCoverages?.length ?? 0) > 0 && (
             <DetailField label="Dependents Pool Type" value={policy.dependentsPoolType === "SharedWithEmployee" ? "Shared with Employee" : policy.dependentsPoolType || "—"} />
           )}
           <DetailField label="Utilisation Mode" value={policy.utilisationMode === "Fixed" ? "Fixed Allocation" : "Prorated Allocation"} />
@@ -522,13 +528,6 @@ function OverviewTab({
           />
           {policy.refreshStartReference === "custom_date" && (
             <DetailField label="Custom Date" value={policy.refreshCustomDate || "—"} />
-          )}
-          <DetailField
-            label="Activation"
-            value={policy.activationMode === "after_join" ? "After Join Date" : policy.activationMode === "after_probation" ? "After Probation Ends" : "Custom Date"}
-          />
-          {policy.activationMode === "custom_date" && (
-            <DetailField label="Activation Date" value={policy.activationCustomDate || "—"} />
           )}
         </div>
       </DetailSection>
@@ -622,7 +621,14 @@ function BenefitGroupsTab({
                         <TreeStructure size={18} weight="duotone" />
                       </div>
                       <div>
-                        <p className="text-body font-semibold text-foreground">{group.name}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-body font-semibold text-foreground">{group.name}</p>
+                          {group.isTaxable === true ? (
+                            <Badge variant="secondary">Taxable (BIK)</Badge>
+                          ) : group.isTaxable === false ? (
+                            <Badge variant="secondary">Non-Taxable</Badge>
+                          ) : null}
+                        </div>
                         {group.description && (
                           <p className="text-label text-muted-foreground">{group.description}</p>
                         )}
@@ -637,33 +643,46 @@ function BenefitGroupsTab({
                       <p className="text-label text-faint font-medium">
                         {group.distributionType === "SharedAmount" ? "Shared Pool" : "Per Benefit"}
                       </p>
+                      <p className="text-label text-faint font-medium">
+                        Utilisation:{" "}
+                        {group.utilisationMode
+                          ? group.utilisationMode === "Fixed"
+                            ? "Fixed"
+                            : `Prorated (${group.prorateUnit || policy.prorateUnit || "Monthly"})`
+                          : policy.utilisationMode === "Fixed"
+                          ? "Inherit (Fixed)"
+                          : `Inherit (Prorated · ${policy.prorateUnit || "Monthly"})`}
+                      </p>
                     </div>
                   </div>
                   <div className="p-4 space-y-2">
-                    {groupBenefits.map((benefit) => (
-                      <div
-                        key={benefit.id}
-                        className="flex items-center justify-between px-4 py-3 rounded-lg bg-muted/30 border border-border/50"
-                      >
-                        <div className="flex items-center gap-3">
-                          <IdentificationCard size={16} className="text-faint" />
-                          <span className="text-body font-medium text-foreground">
-                            {SERVICES.find((s) => s.id === benefit.serviceId)?.name || benefit.serviceId}
+                    {groupBenefits.map((benefit) => {
+                      const coPayment = group.distributionType === "SharedAmount" ? group.coPayment : benefit.coPayment;
+                      return (
+                        <div
+                          key={benefit.id}
+                          className="flex items-center justify-between px-4 py-3 rounded-lg bg-muted/30 border border-border/50"
+                        >
+                          <div className="flex items-center gap-3">
+                            <IdentificationCard size={16} className="text-faint" />
+                            <span className="text-body font-medium text-foreground">
+                              {SERVICES.find((s) => s.id === benefit.serviceId)?.name || benefit.serviceId}
+                            </span>
+                            {coPayment?.required && (
+                              <Badge variant="secondary">
+                                Co-pay{" "}
+                                {coPayment.type === "Percentage"
+                                  ? `${coPayment.value}%`
+                                  : `RM ${coPayment.value}`}
+                              </Badge>
+                            )}
+                          </div>
+                          <span className="text-body font-semibold text-foreground font-mono tabular-nums">
+                            RM {benefit.amount.toFixed(2)}
                           </span>
-                          {benefit.coPayment.required && (
-                            <Badge variant="secondary">
-                              Co-pay{" "}
-                              {benefit.coPayment.type === "Percentage"
-                                ? `${benefit.coPayment.value}%`
-                                : `RM ${benefit.coPayment.value}`}
-                            </Badge>
-                          )}
                         </div>
-                        <span className="text-body font-semibold text-foreground font-mono tabular-nums">
-                          RM {benefit.amount.toFixed(2)}
-                        </span>
-                      </div>
-                    ))}
+                      );
+                    })}
                     {groupBenefits.length === 0 && (
                       <p className="text-center py-4 text-label text-faint italic">No benefits configured for this group.</p>
                     )}
