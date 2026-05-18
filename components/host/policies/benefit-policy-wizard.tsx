@@ -327,10 +327,10 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
       id: `grp-new-${groupIdRef.current}`,
       policyId: policyData.id || "temp",
       name: "New Benefit Group",
-      distributionType: policyData.benefitPoolType === "Shared" ? "SharedAmount" : "IndividualBenefitAmount",
+      distributionType: "IndividualBenefitAmount",
     };
     setGroups(prev => [...prev, newGroup]);
-  }, [policyData.id, policyData.benefitPoolType]);
+  }, [policyData.id]);
 
   const removeGroup = (groupId: string) => {
     setGroups(groups.filter(g => g.id !== groupId));
@@ -528,8 +528,26 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                 <p className="text-label text-rose-600 dark:text-rose-400 font-medium">{validationErrors.eligibleEmploymentTypes}</p>
               )}
               <div className="flex flex-wrap gap-2">
+                {(() => {
+                  const allSelected = EMPLOYMENT_TYPES.every((t) => policyData.eligibleEmploymentTypes?.includes(t.id));
+                  return (
+                    <button
+                      type="button"
+                      disabled={isViewMode}
+                      onClick={() => setPolicyData({ ...policyData, eligibleEmploymentTypes: allSelected ? policyData.eligibleEmploymentTypes : EMPLOYMENT_TYPES.map((t) => t.id) })}
+                      className={cn(
+                        "px-4 py-2 rounded-full text-body font-semibold border transition-all",
+                        allSelected ? "bg-primary text-primary-foreground border-primary shadow-sm" : "bg-background text-muted-foreground border-border hover:border-primary/30"
+                      )}
+                    >
+                      {allSelected && <Check size={12} weight="bold" className="inline mr-1.5" />}
+                      All
+                    </button>
+                  );
+                })()}
                 {EMPLOYMENT_TYPES.map((type) => {
-                  const selected = policyData.eligibleEmploymentTypes?.includes(type.id) || false;
+                  const allSel = EMPLOYMENT_TYPES.every((t) => policyData.eligibleEmploymentTypes?.includes(t.id));
+                  const selected = !allSel && (policyData.eligibleEmploymentTypes?.includes(type.id) || false);
                   return (
                     <button
                       key={type.id}
@@ -611,6 +629,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
         <div className="space-y-8 animate-in fade-in duration-300">
           <DetailSection title="Benefit Pool Strategy" icon={<Gear size={18} weight="duotone" />} description="Fund allocation configuration" ghost>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <ReadField label="Pool Type" value={policyData.benefitPoolType === "Shared" ? "Shared Pool" : "Individual"} />
               <ReadField label="Dependents" value={(policyData.dependentCoverages?.length ?? 0) > 0 ? "Covered" : "Employee Only"} />
               <ReadField label="Employee Policy Amount" value={policyData.totalCapAmount ? `RM ${policyData.totalCapAmount.toFixed(2)}` : "Not Set"} />
               {(policyData.dependentCoverages?.length ?? 0) > 0 && (
@@ -660,29 +679,78 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
             </div>
 
             {/* ── Cover Dependents ── */}
-	            <div className="space-y-2">
-	              <label className="text-label font-medium text-subtle inline-flex items-center gap-1.5">Cover Dependents <FieldHelp termKey="dependentsPooling" /></label>
-	              <label className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-body font-medium text-foreground">
-	                <input
-	                  type="checkbox"
-	                  checked={(policyData.dependentCoverages?.length ?? 0) > 0}
-	                  onChange={(e) =>
-	                    setPolicyData({
-	                      ...policyData,
-	                      dependentCoverages: e.target.checked ? (policyData.dependentCoverages?.length ? policyData.dependentCoverages : [{ type: "spouse" }]) : [],
-	                      dependentsPoolType: e.target.checked ? (policyData.dependentsPoolType ?? "SharedWithEmployee") : undefined,
-	                    })
-	                  }
-	                  className="h-4 w-4 rounded border-border text-primary focus:ring-ring"
-	                  disabled={isViewMode}
-	                />
-	                Include dependents in this policy
-	              </label>
-	            </div>
+            <div className="space-y-3">
+              <label className="text-label font-medium text-subtle inline-flex items-center gap-1.5">Cover Dependents <FieldHelp termKey="dependentsPooling" /></label>
+              <label className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-body font-medium text-foreground w-fit">
+                <input
+                  type="checkbox"
+                  checked={(policyData.dependentCoverages?.length ?? 0) > 0}
+                  onChange={(e) =>
+                    setPolicyData({
+                      ...policyData,
+                      dependentCoverages: e.target.checked
+                        ? (policyData.dependentCoverages?.length ? policyData.dependentCoverages : [{ type: "spouse" }, { type: "child" }, { type: "mother" }, { type: "father" }, { type: "sibling" }, { type: "inlaw" }])
+                        : [],
+                      dependentsPoolType: e.target.checked ? (policyData.dependentsPoolType ?? "SharedWithEmployee") : undefined,
+                    })
+                  }
+                  className="h-4 w-4 rounded border-border text-primary focus:ring-ring"
+                  disabled={isViewMode}
+                />
+                Include dependents in this policy
+              </label>
+              {(policyData.dependentCoverages?.length ?? 0) > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {(() => {
+                    const DEPENDENT_TYPES = [
+                      { value: "spouse" as const,  label: "Spouse" },
+                      { value: "child" as const,   label: "Child" },
+                      { value: "mother" as const,  label: "Mother" },
+                      { value: "father" as const,  label: "Father" },
+                      { value: "sibling" as const, label: "Sibling" },
+                      { value: "inlaw" as const,   label: "In-law" },
+                    ];
+                    const allSelected = DEPENDENT_TYPES.every((t) => policyData.dependentCoverages?.some((c) => c.type === t.value));
+                    return (
+                      <>
+                        <button
+                          type="button"
+                          disabled={isViewMode}
+                          onClick={() => setPolicyData({ ...policyData, dependentCoverages: allSelected ? [] : DEPENDENT_TYPES.map((t) => ({ type: t.value })), dependentsPoolType: allSelected ? undefined : (policyData.dependentsPoolType ?? "SharedWithEmployee") })}
+                          className={cn("px-3 py-1.5 rounded-full text-label font-medium border transition-all", allSelected ? "bg-primary text-primary-foreground border-primary shadow-sm" : "bg-background text-muted-foreground border-border hover:border-primary/30")}
+                        >
+                          {allSelected && <Check size={11} weight="bold" className="inline mr-1.5" />}All
+                        </button>
+                        {DEPENDENT_TYPES.map((opt) => {
+                          const isSelected = policyData.dependentCoverages?.some((c) => c.type === opt.value) ?? false;
+                          const selected = !allSelected && isSelected;
+                          return (
+                            <button
+                              key={opt.value}
+                              type="button"
+                              disabled={isViewMode}
+                              onClick={() => {
+                                const next = isSelected
+                                  ? (policyData.dependentCoverages ?? []).filter((c) => c.type !== opt.value)
+                                  : [...(policyData.dependentCoverages ?? []), { type: opt.value }];
+                                setPolicyData({ ...policyData, dependentCoverages: next, dependentsPoolType: next.length > 0 ? (policyData.dependentsPoolType ?? "SharedWithEmployee") : undefined });
+                              }}
+                              className={cn("px-3 py-1.5 rounded-full text-label font-medium border transition-all", selected ? "bg-primary text-primary-foreground border-primary shadow-sm" : "bg-background text-muted-foreground border-border hover:border-primary/30")}
+                            >
+                              {selected && <Check size={11} weight="bold" className="inline mr-1.5" />}{opt.label}
+                            </button>
+                          );
+                        })}
+                      </>
+                    );
+                  })()}
+                </div>
+              )}
+            </div>
 
             {/* ── Dependents Pool Type ── */}
-	            {(policyData.dependentCoverages?.length ?? 0) > 0 && (
-	              <div className="space-y-3">
+            {(policyData.dependentCoverages?.length ?? 0) > 0 && (
+              <div className="space-y-3">
                 <label className="text-label font-medium text-subtle inline-flex items-center gap-1.5">
                   Dependents Pool Type <span className="text-rose-600 dark:text-rose-400">*</span>
                   <FieldHelp termKey="dependentsPooling" />
@@ -695,19 +763,53 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                       title={opt.title}
                       description={opt.description}
                       icon={opt.icon}
-	                      selected={policyData.dependentsPoolType === opt.value}
-	                      onSelect={() =>
-	                        setPolicyData({
-	                          ...policyData,
-	                          dependentsPoolType: opt.value,
-	                        })
-	                      }
+                      selected={policyData.dependentsPoolType === opt.value}
+                      onSelect={() => setPolicyData({ ...policyData, dependentsPoolType: opt.value })}
                     />
                   ))}
                 </div>
-	              </div>
-	            )}
+              </div>
+            )}
 
+            {/* ── Dependent Amount (Shared pool) ── */}
+            {(policyData.dependentCoverages?.length ?? 0) > 0 && policyData.dependentsPoolType === "Shared" && (
+              <div className="space-y-1.5">
+                <label className="text-label font-medium text-subtle">Dependent Pool Amount</label>
+                <input
+                  type="number"
+                  min={0}
+                  placeholder="e.g. 1500"
+                  className="w-full max-w-xs px-4 py-2.5 bg-background border border-border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all"
+                  value={policyData.dependentCapAmount ?? ""}
+                  onChange={(e) => setPolicyData({ ...policyData, dependentCapAmount: e.target.value === "" ? undefined : parseFloat(e.target.value) })}
+                  disabled={isViewMode}
+                />
+                <p className="text-micro text-faint">Total shared pool for all dependents per cycle.</p>
+              </div>
+            )}
+
+            {/* ── Dependent Amounts (Individual pool) ── */}
+            {(policyData.dependentCoverages?.length ?? 0) > 0 && policyData.dependentsPoolType === "Individual" && (
+              <div className="space-y-3">
+                <label className="text-label font-medium text-subtle">Dependent Amounts <span className="text-rose-600 dark:text-rose-400">*</span></label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl">
+                  {(policyData.dependentCoverages ?? []).map((coverage) => (
+                    <div key={coverage.type} className="space-y-1.5">
+                      <label className="block text-label font-medium text-subtle">{coverage.type === "spouse" ? "Spouse" : coverage.type === "child" ? "Child" : coverage.type === "mother" ? "Mother" : coverage.type === "father" ? "Father" : coverage.type === "sibling" ? "Sibling" : "In-law"}</label>
+                      <input
+                        type="number"
+                        min={0}
+                        placeholder="e.g. 1500"
+                        className="w-full px-4 py-2.5 bg-background border border-border rounded-lg text-body font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all"
+                        value={coverage.capAmount ?? ""}
+                        onChange={(e) => setPolicyData((prev) => ({ ...prev, dependentCoverages: (prev.dependentCoverages ?? []).map((c) => c.type === coverage.type ? { ...c, capAmount: e.target.value === "" ? undefined : parseFloat(e.target.value) } : c) }))}
+                        disabled={isViewMode}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             {/* ── Utilisation Mode ── */}
             <div className="space-y-3">
               <label className="text-label font-medium text-subtle inline-flex items-center gap-1.5">Utilisation Mode <FieldHelp termKey="utilisationMode" /></label>
@@ -894,11 +996,6 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                                 </button>
                               ))}
                             </div>
-                            {group.distributionType === (policyData.benefitPoolType === "Shared" ? "SharedAmount" : "IndividualBenefitAmount") ? (
-                              <span className="text-micro text-faint">Inherited from policy</span>
-                            ) : (
-                              <span className="text-micro text-primary/70 font-medium">Override</span>
-                            )}
                           </div>
                         )}
                       </div>

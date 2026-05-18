@@ -34,7 +34,7 @@ export function createPolicy(index: number): PolicyBundle {
       { id: `${id}-B4`, groupId: `${id}-G3`, serviceId: "NT-NUT", amount: 100, coPayment: { required: false, type: "Percentage", value: 0 } },
     ]
     return {
-      policy: { id, name: "Acme Employee Wellness Policy FY2026", code: "BEN-STD-01", description: "Core employee wellness handbook policy for full-time staff coverage.", organizationId: org.orgId, eligibleEmploymentTypes: ["full-time"], dependentCoverages: [], benefitPoolType: "Individual", utilisationMode: "Fixed", refreshCycle: "Yearly", refreshStartReference: "fy_start", status: "active", groupCount: groups.length, orgName: org.orgName, createdAt: "2026-01-15T10:00:00Z" },
+      policy: { id, name: "Acme Employee Wellness Policy FY2026", code: "BEN-STD-01", description: "Core employee wellness handbook policy for full-time staff coverage.", organizationId: org.orgId, eligibleEmploymentTypes: ["full-time"], dependentCoverages: [{ type: "spouse" }, { type: "child" }, { type: "mother" }, { type: "father" }, { type: "sibling" }], dependentsPoolType: "SharedWithEmployee", benefitPoolType: "Individual", utilisationMode: "Fixed", refreshCycle: "Yearly", refreshStartReference: "fy_start", status: "active", groupCount: groups.length, orgName: org.orgName, createdAt: "2026-01-15T10:00:00Z" },
       data: { groups, benefits },
     }
   }
@@ -62,7 +62,7 @@ export function createPolicy(index: number): PolicyBundle {
       { id: `${id}-B1`, groupId: `${id}-G1`, serviceId: "FX-GYM", amount: 50, coPayment: { required: false, type: "Percentage", value: 0 } },
     ]
     return {
-      policy: { id, name: "Global Tech Core Benefits Policy FY2026", code: "BEN-CON-03", description: "Core logistics workforce handbook policy for contract and internship coverage.", organizationId: org.orgId, eligibleEmploymentTypes: ["contract", "internship"], dependentCoverages: [], benefitPoolType: "Shared", utilisationMode: "Fixed", refreshCycle: "Yearly", refreshStartReference: "fy_start", status: "deactivated", groupCount: groups.length, orgName: org.orgName, createdAt: "2026-11-05T09:15:00Z" },
+      policy: { id, name: "Global Tech Core Benefits Policy FY2026", code: "BEN-CON-03", description: "Core logistics workforce handbook policy for contract and internship coverage.", organizationId: org.orgId, eligibleEmploymentTypes: ["contract", "internship"], dependentCoverages: [], benefitPoolType: "Individual", utilisationMode: "Fixed", refreshCycle: "Yearly", refreshStartReference: "fy_start", status: "deactivated", groupCount: groups.length, orgName: org.orgName, createdAt: "2026-11-05T09:15:00Z" },
       data: { groups, benefits },
     }
   }
