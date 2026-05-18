@@ -246,7 +246,7 @@ export function PolicyDetailView({
               )
             )}
             {activeTab === "benefit-groups" && (
-              <BenefitGroupsTab groups={groups} benefits={benefits} onEdit={onEdit} />
+              <BenefitGroupsTab policy={policy} groups={groups} benefits={benefits} />
             )}
             {!isVersion && activeTab === "versions" && (
               <VersionsTab
@@ -511,7 +511,7 @@ function OverviewTab({
           {(policy.dependentCoverages?.length ?? 0) > 0 && (
             <DetailField
               label="Dependent Types"
-              value={policy.dependentCoverages?.map((c) => c.type).join(", ") || "—"}
+              value={policy.dependentCoverages?.map((c) => c.type === "spouse" ? "Spouse" : c.type === "child" ? "Child" : c.type === "mother" ? "Mother" : c.type === "father" ? "Father" : c.type === "sibling" ? "Sibling" : "In-law").join(", ") || "—"}
             />
           )}
           {(policy.dependentCoverages?.length ?? 0) > 0 && (
@@ -573,16 +573,67 @@ function OverviewTab({
 // ─── Benefit Groups Tab ───────────────────────────────────────────────────────
 
 function BenefitGroupsTab({
+  policy,
   groups,
   benefits,
-  onEdit,
 }: {
+  policy: BenefitPolicy;
   groups: BenefitGroup[];
   benefits: Benefit[];
-  onEdit: () => void;
 }) {
+  const router = useRouter();
+  const org = MOCK_ORGS.find((o) => o.id === policy.organizationId);
+
+  const depLabel = (() => {
+    if (!policy.dependentCoverages?.length) return "Employee only";
+    const typeMap: Record<string, string> = { spouse: "Spouse", child: "Child", mother: "Mother", father: "Father", sibling: "Sibling", inlaw: "In-law" };
+    return policy.dependentCoverages.map((c) => typeMap[c.type] ?? c.type).join(", ");
+  })();
+
   return (
     <div className="space-y-6">
+      {/* Policy summary */}
+      <div className="rounded-lg border border-border bg-muted/20 p-4">
+        <p className="text-label font-semibold text-faint uppercase tracking-wide mb-3">Policy Summary</p>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-3">
+          <div>
+            <p className="text-micro font-medium text-faint uppercase tracking-wide">Policy</p>
+            <p className="text-body font-semibold text-foreground">{policy.name}</p>
+            {policy.code && <p className="text-label text-faint font-medium">{policy.code}</p>}
+          </div>
+          {org && (
+            <div>
+              <p className="text-micro font-medium text-faint uppercase tracking-wide">Organisation</p>
+              <p className="text-body font-medium text-foreground">{org.name}</p>
+            </div>
+          )}
+          <div>
+            <p className="text-micro font-medium text-faint uppercase tracking-wide">Eligible Types</p>
+            <p className="text-body font-medium text-foreground capitalize">{policy.eligibleEmploymentTypes?.join(", ") || "—"}</p>
+          </div>
+          <div>
+            <p className="text-micro font-medium text-faint uppercase tracking-wide">Utilisation</p>
+            <p className="text-body font-medium text-foreground">
+              {policy.utilisationMode === "Fixed" ? "Fixed" : `Prorated · ${policy.prorateUnit || "Monthly"}`}
+            </p>
+          </div>
+          <div>
+            <p className="text-micro font-medium text-faint uppercase tracking-wide">Refresh</p>
+            <p className="text-body font-medium text-foreground">{policy.refreshCycle}</p>
+          </div>
+          <div>
+            <p className="text-micro font-medium text-faint uppercase tracking-wide">Employee Cap</p>
+            <p className="text-body font-medium text-foreground">
+              {policy.totalCapAmount ? `RM ${policy.totalCapAmount.toLocaleString()}` : "Unlimited"}
+            </p>
+          </div>
+          <div className="col-span-2 md:col-span-3">
+            <p className="text-micro font-medium text-faint uppercase tracking-wide">Dependents</p>
+            <p className="text-body font-medium text-foreground">{depLabel}</p>
+          </div>
+        </div>
+      </div>
+
       <DetailSection
         title="Benefit Groups"
         icon={<TreeStructure size={18} weight="duotone" />}
@@ -591,7 +642,12 @@ function BenefitGroupsTab({
           <Button
             variant="secondary"
             size="sm"
-            onClick={onEdit}
+            onClick={() => {
+              if (typeof window !== "undefined") {
+                sessionStorage.setItem(`policy-groups-draft-${policy.id}`, JSON.stringify({ policy, groups, benefits }));
+              }
+              router.push(`/policies/${policy.id}/groups/edit`);
+            }}
             className="flex h-8 items-center gap-2 text-label font-medium"
           >
             <NotePencil size={14} weight="bold" />
@@ -604,9 +660,14 @@ function BenefitGroupsTab({
             <TreeStructure size={36} weight="duotone" className="text-faint mb-3" />
             <p className="text-body font-medium text-muted-foreground">No benefit groups configured.</p>
             <p className="text-label text-faint mt-1">Add groups to define which benefits are available.</p>
-            <Button variant="ghost" size="sm" onClick={onEdit} className="mt-3 text-primary font-semibold">
+            <Button variant="ghost" size="sm" onClick={() => {
+              if (typeof window !== "undefined") {
+                sessionStorage.setItem(`policy-groups-draft-${policy.id}`, JSON.stringify({ policy, groups, benefits }));
+              }
+              router.push(`/policies/${policy.id}/groups/edit`);
+            }} className="mt-3 text-primary font-semibold">
               <NotePencil size={14} weight="bold" className="mr-1.5" />
-              Edit Policy to Add Groups
+              Add Groups
             </Button>
           </div>
         ) : (

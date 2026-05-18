@@ -1,6 +1,6 @@
 export type PoolType = "Individual" | "Shared";
 export type DependentsPoolType = "Individual" | "Shared" | "SharedWithEmployee";
-export type DependentCoverageType = "spouse" | "child" | "parent" | "other";
+export type DependentCoverageType = "spouse" | "child" | "mother" | "father" | "sibling" | "inlaw";
 export type UtilisationMode = "Fixed" | "Prorated";
 export type ProrateUnit = "Daily" | "Weekly" | "Monthly" | "Quarterly";
 export type RefreshCycle = "Daily" | "Weekly" | "Monthly" | "Quarterly" | "Yearly";
@@ -32,6 +32,7 @@ export interface BenefitPolicy {
   effectiveCustomDate?: string; // ISO date string, only when effectiveDate === "scheduled"
   status: PolicyStatus;
   totalCapAmount?: number; // employee-level spending ceiling (RM), optional
+  dependentCapAmount?: number; // shared dependent pool ceiling when dependentsPoolType === "Shared"
   createdAt?: string;
   groupCount?: number;
   clonedFrom?: string; // original policy id
