@@ -65,7 +65,7 @@ export function FormSelect({
     <Select value={value || ""} onValueChange={onChange} disabled={disabled}>
       <SelectTrigger
         className={cn(
-          "w-full h-[38px] px-3 py-2 bg-background border border-border rounded-lg text-body font-medium text-foreground transition-all",
+          "w-full h-10 px-3 py-2 bg-background border border-border rounded-lg text-body font-medium text-foreground transition-all",
           "hover:border-foreground/20 focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30",
           "disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-muted/50",
           "data-[placeholder]:text-faint",

@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { CreateOrganizationData, InviteAdminData } from "./schemas";
+import { CreateOrganizationData, HqBranchData, InviteAdminData } from "./schemas";
 
 export async function createOrganization(data: CreateOrganizationData) {
   // Simulate API delay
@@ -20,6 +20,15 @@ export async function createOrganization(data: CreateOrganizationData) {
       ...data,
       status: "active"
     } 
+  };
+}
+
+export async function createHqBranch(orgId: string, data: HqBranchData) {
+  await new Promise((resolve) => setTimeout(resolve, 600));
+  revalidatePath(`/organizations/${orgId}`);
+  return {
+    success: true,
+    data: { id: `br_${Date.now().toString().slice(-6)}`, ...data, type: "hq", orgId },
   };
 }
 

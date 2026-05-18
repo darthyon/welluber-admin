@@ -9,8 +9,7 @@ export const createOrganizationSchema = z.object({
   type: z.enum(["sole_proprietorship", "partnership", "sdn_bhd", "llp", "bhd", "clbg"] as const, {
     message: "Please select an organization type",
   }),
-  financialYearMode: z.enum(["calendar", "follow_month"]).default("calendar"),
-  financialYearMonth: z.number().min(1).max(12).optional(),
+  financialYearStart: z.string().optional(),
   subscription: z.object({
     plan: z.enum(["standard", "premium", "enterprise"] as const, {
       message: "Please select a subscription plan",
@@ -39,6 +38,23 @@ export const createOrganizationSchema = z.object({
 });
 
 export type CreateOrganizationData = z.infer<typeof createOrganizationSchema>;
+
+export const hqBranchSchema = z.object({
+  name: z.string().min(2, "Branch name is required"),
+  address: z.object({
+    line: z.string().min(5, "Address line is required"),
+    city: z.string().min(2, "City is required"),
+    state: z.string().min(2, "State is required"),
+    country: z.string().min(2, "Country is required"),
+    postalCode: z.string().min(5, "Postal code is required"),
+  }),
+  accountType: z.enum(["new", "existing"]),
+  accountName: z.string().optional(),
+  creditLimit: z.number().optional(),
+  existingAccountId: z.string().optional(),
+});
+
+export type HqBranchData = z.infer<typeof hqBranchSchema>;
 
 export const inviteAdminSchema = z.object({
   name: z.string().min(2, "Admin name is required"),
