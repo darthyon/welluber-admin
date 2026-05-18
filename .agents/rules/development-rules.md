@@ -61,6 +61,11 @@
 
 ## Workflow for New Features
 
+### Before analyzing code structure
+Run `graphify query "<your question>"` or read `graphify-out/GRAPH_REPORT.md`.
+The knowledge graph maps 1,679 nodes and 4,111 edges across 118 communities.
+Querying it before reading files cold saves tokens and surfaces non-obvious dependencies.
+
 1. **Read the relevant docs** — `docs/prd.md`, `docs/flows/flows_*.md`, `docs/design.md`
 2. **Plan** — Propose an implementation plan before writing code
 3. **Implement** — Follow the coding standards above

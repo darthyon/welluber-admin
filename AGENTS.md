@@ -174,5 +174,49 @@ Before every PR or agent session output, verify:
 
 ---
 
-*Last updated: 2026-04-30*
+## 9. Knowledge Graph
+
+A live knowledge graph of this codebase lives in `graphify-out/`.
+
+**Before analyzing structure, imports, dependencies, or component relationships — query the graph first.**
+It is faster and more accurate than reading files cold.
+
+### Quick reference
+- `graphify-out/GRAPH_REPORT.md` — god nodes, community map, surprising connections
+- `graphify-out/graph.json` — raw graph data (nodes, edges, communities)
+
+### God nodes (highest connectivity — touch carefully)
+
+| Node | Edges | Location |
+|------|-------|----------|
+| `cn()` | 300 | `lib/utils.ts` |
+| `Button` | 89 | `components/ui/button.tsx` |
+| `OrganizationDetailContent` | 47 | `app/(host)/organizations/[id]/page.tsx` |
+| `StatusBadge` | 41 | `components/shared/status-badge.tsx` |
+| `ActionPopover` | 33 | `components/shared/action-popover.tsx` |
+| `BenefitPolicyWizard` | 23 | `components/host/policies/benefit-policy-wizard.tsx` |
+
+### How to query
+```bash
+graphify query "how does BenefitPolicyWizard relate to org context?"
+graphify query "what components consume StatusBadge?"
+graphify path "EmployeeForm" "BenefitPolicy"
+graphify explain "OrganizationDetailContent"
+```
+
+### Key findings
+- `OrganizationDetailContent` is a god component — branch, employee, policy, accounts, vouchers, manual topup, and audit log all wire through it. Candidate for splitting.
+- `ClaimStatus` is shared between claims and voucher redemptions — changes ripple both domains.
+- `POLICY_SERVICE_CATALOG` derives from `MASTER_SERVICE_TAXONOMY` (provider domain). Policy coverage options are downstream of SP taxonomy — not a separate config.
+- `BenefitPolicyWizard` is entered from two paths: standalone `/policies/new` and org-scoped `/organizations/[id]/policies/new`. Draft state persists via `usePolicyDraft`.
+
+### Keeping it current
+After adding or significantly modifying files, run:
+```bash
+/graphify --update   # incremental re-extraction, skips unchanged files
+```
+
+---
+
+*Last updated: 2026-05-18*
 *Primary source: `docs/design.md` (reconciled with `app/globals.css`)*
