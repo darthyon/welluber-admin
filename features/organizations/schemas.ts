@@ -10,6 +10,8 @@ export const createOrganizationSchema = z.object({
     message: "Please select an organization type",
   }),
   financialYearStart: z.string().optional(),
+  financialYearMode: z.enum(["calendar", "follow_month"]).optional(),
+  financialYearMonth: z.number().min(1).max(12).optional(),
   subscription: z.object({
     plan: z.enum(["standard", "premium", "enterprise"] as const, {
       message: "Please select a subscription plan",
