@@ -246,7 +246,7 @@ export function PolicyDetailView({
               )
             )}
             {activeTab === "benefit-groups" && (
-              <BenefitGroupsTab groups={groups} benefits={benefits} onEdit={onEdit} />
+              <BenefitGroupsTab policy={policy} groups={groups} benefits={benefits} onEdit={onEdit} />
             )}
             {!isVersion && activeTab === "versions" && (
               <VersionsTab
@@ -573,10 +573,12 @@ function OverviewTab({
 // ─── Benefit Groups Tab ───────────────────────────────────────────────────────
 
 function BenefitGroupsTab({
+  policy,
   groups,
   benefits,
   onEdit,
 }: {
+  policy: BenefitPolicy;
   groups: BenefitGroup[];
   benefits: Benefit[];
   onEdit: () => void;
