@@ -4,7 +4,7 @@ export type DependentCoverageType = "spouse" | "child" | "mother" | "father" | "
 export type UtilisationMode = "Fixed" | "Prorated";
 export type ProrateUnit = "Daily" | "Weekly" | "Monthly" | "Quarterly";
 export type RefreshCycle = "Daily" | "Weekly" | "Monthly" | "Quarterly" | "Yearly";
-export type RefreshStartReference = "fy_start" | "join_date" | "custom_date";
+export type RefreshStartReference = "financial_year" | "calendar_year";
 export type PolicyStatus = "draft" | "active" | "deactivated";
 export type DistributionType = "SharedAmount" | "IndividualBenefitAmount";
 
@@ -27,7 +27,7 @@ export interface BenefitPolicy {
   prorateUnit?: ProrateUnit;
   refreshCycle: RefreshCycle;
   refreshStartReference: RefreshStartReference;
-  refreshCustomDate?: string; // ISO date string
+  refreshStartMonth?: number; // 1–12, month the cycle begins
   effectiveDate?: "immediate" | "scheduled";
   effectiveCustomDate?: string; // ISO date string, only when effectiveDate === "scheduled"
   status: PolicyStatus;
@@ -66,6 +66,7 @@ export interface PolicyTemplate {
     utilisationMode: UtilisationMode;
     refreshCycle: RefreshCycle;
     refreshStartReference: RefreshStartReference;
+    refreshStartMonth?: number;
     groups: BenefitGroup[];
     benefits: Benefit[];
   };
@@ -77,9 +78,11 @@ export interface BenefitGroup {
   name: string;
   description?: string;
   distributionType: DistributionType;
-  maxUsagePerCycle?: number;
+  maxUsagePerCycle?: number; // employee group cap per cycle
+  dependentGroupCap?: number; // dependent group cap per cycle
   isTaxable?: boolean; // Malaysia LHDN BIK classification at benefit-category (group) level
-  coPayment?: Benefit["coPayment"]; // Applies when distributionType === "SharedAmount"
+  coPayment?: Benefit["coPayment"]; // employee copayment at group level (SharedAmount)
+  dependentCoPayment?: Benefit["coPayment"]; // dependent copayment at group level (SharedAmount)
   utilisationMode?: UtilisationMode; // Optional override; unset = inherit from policy
   prorateUnit?: ProrateUnit; // Optional override when utilisationMode === "Prorated"
 }
@@ -91,6 +94,7 @@ export interface Benefit {
   amount: number;
   employeeAmount?: number; // employee portion when split (dependents enabled)
   dependantAmount?: number; // dependant portion when split (dependents enabled)
+  dependantTypes?: string[]; // which dependent types get this override amount
   coPayment: {
     required: boolean;
     type: "Percentage" | "Fixed";

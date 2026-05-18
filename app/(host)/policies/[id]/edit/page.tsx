@@ -2,15 +2,17 @@
 
 import { useMemo, use } from "react";
 import { useRouter } from "next/navigation";
-import { CaretLeft, NavigationArrow } from "@phosphor-icons/react";
+import { CaretLeft, NavigationArrow, CaretDown, IdentificationCard } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav";
-import { PolicyWizardContent } from "@/components/host/policies/policy-wizard-content";
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
+import { PolicyWizardContent, PolicyReviewCards } from "@/components/host/policies/policy-wizard-content";
 import { BenefitPolicy, BenefitGroup, Benefit } from "@/types/policy";
 
 const ANCHOR_ITEMS = [
   { id: "policy-details", label: "Policy Details" },
   { id: "pool-cycle", label: "Pool & Cycle" },
+  { id: "refresh-start", label: "Refresh Start" },
 ];
 
 export default function EditPolicyPage({ params }: { params: Promise<{ id: string }> }) {
@@ -37,7 +39,27 @@ export default function EditPolicyPage({ params }: { params: Promise<{ id: strin
     <div className="pb-24 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="mx-auto max-w-[1280px] flex flex-col lg:flex-row gap-12 lg:gap-16 items-start">
         {/* Left Column: Navigation */}
-        <aside className="hidden xl:block w-52 shrink-0 sticky top-20 self-start">
+        <aside className="hidden xl:flex xl:flex-col w-52 shrink-0 sticky top-20 self-start gap-3">
+          {initialData && (
+            <Collapsible defaultOpen={false}>
+              <CollapsibleTrigger className="group w-full flex items-center justify-between px-3 py-2.5 rounded-lg border border-border bg-card text-left hover:bg-muted/20 transition-colors">
+                <span className="flex items-center gap-2 text-label font-semibold text-foreground">
+                  <IdentificationCard size={14} weight="duotone" className="text-primary" />
+                  Policy Summary
+                </span>
+                <CaretDown size={12} weight="bold" className="text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180 shrink-0" />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="mt-2">
+                <div className="rounded-lg border border-border bg-card p-3 space-y-2">
+                  <PolicyReviewCards
+                    policy={initialData.policy}
+                    groups={initialData.groups}
+                    benefits={initialData.benefits}
+                  />
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+          )}
           <FloatingAnchorNav items={ANCHOR_ITEMS} />
         </aside>
 

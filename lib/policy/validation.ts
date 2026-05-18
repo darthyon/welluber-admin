@@ -1,4 +1,4 @@
-import type { Benefit, BenefitGroup } from "@/types/policy"
+import type { Benefit, BenefitGroup, BenefitPolicy } from "@/types/policy"
 
 export interface ValidationIssue {
   field: string
@@ -78,6 +78,18 @@ export function validateCoPayment(
     }
   }
   return null
+}
+
+/**
+ * Validate refresh start reference — requires a month (1–12) to be selected.
+ */
+export function validateRefreshStart(
+  policy: Pick<BenefitPolicy, "refreshStartReference" | "refreshStartMonth">
+): ValidationIssue | null {
+  if (!policy.refreshStartMonth || policy.refreshStartMonth < 1 || policy.refreshStartMonth > 12) {
+    return { field: "refreshStartMonth", message: "Select a start month" };
+  }
+  return null;
 }
 
 /**

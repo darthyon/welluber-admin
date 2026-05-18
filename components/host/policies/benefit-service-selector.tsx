@@ -7,7 +7,7 @@ import { FormSelect } from "@/components/shared/form-select";
 import { FieldHelp } from "@/components/shared/field-help";
 import { SERVICES } from "@/lib/mock-data/service-catalog";
 import type { MainServiceId } from "@/lib/mock-data/service-catalog";
-import type { Benefit } from "@/types/policy";
+import type { Benefit, DependentCoverageType } from "@/types/policy";
 
 interface BenefitServiceSelectorProps {
   groupId: string;
@@ -16,8 +16,11 @@ interface BenefitServiceSelectorProps {
   splitBenefitIds: Set<string>;
   groupErrors: Record<string, string>;
   hasDependents: boolean;
+  dependentCoverageTypes?: DependentCoverageType[];
+  policyEmployeeCap?: number;
+  policyDependentCap?: number;
   onToggleService: (serviceId: MainServiceId) => void;
-  onUpdateBenefit: (benefitId: string, field: string, value: string | number | boolean) => void;
+  onUpdateBenefit: (benefitId: string, field: string, value: string | number | boolean | string[]) => void;
   onToggleSplit: (benefitId: string) => void;
 }
 
@@ -35,6 +38,65 @@ const GROUPED_SERVICES = SERVICES.reduce<{ category: string; services: typeof SE
   []
 );
 
+function CoPaymentToggle({
+  required,
+  type,
+  value,
+  errorKey,
+  groupErrors,
+  onToggle,
+  onChangeType,
+  onChangeValue,
+}: {
+  required: boolean;
+  type: "Percentage" | "Fixed";
+  value: number;
+  errorKey: string;
+  groupErrors: Record<string, string>;
+  onToggle: () => void;
+  onChangeType: (v: string) => void;
+  onChangeValue: (v: number) => void;
+}) {
+  return (
+    <div className="space-y-1">
+      <label className="text-micro font-medium text-faint inline-flex items-center gap-1">
+        Co-payment <FieldHelp termKey="coPayment" />
+      </label>
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={onToggle}
+          className={cn("w-8 h-4 rounded-full transition-colors relative shrink-0", required ? "bg-primary" : "bg-border")}
+        >
+          <div className={cn("w-3 h-3 rounded-full bg-background border border-border/40 absolute top-[2px] transition-all", required ? "right-0.5" : "left-0.5")} />
+        </button>
+        {required && (
+          <div className="flex items-center gap-1.5">
+            <FormSelect
+              value={type}
+              onChange={onChangeType}
+              options={[{ label: "%", value: "Percentage" }, { label: "RM", value: "Fixed" }]}
+              triggerClassName="w-16 h-8"
+            />
+            <input
+              type="number"
+              className={cn(
+                "w-16 px-2 py-1.5 bg-background border rounded-lg text-label font-mono outline-none text-right focus:ring-2 focus:ring-primary/10",
+                groupErrors[errorKey] ? "border-rose-300" : "border-border"
+              )}
+              value={value || ""}
+              onChange={(e) => onChangeValue(e.target.value === "" ? 0 : parseFloat(e.target.value))}
+            />
+          </div>
+        )}
+      </div>
+      {groupErrors[errorKey] && (
+        <p className="text-micro text-rose-600 dark:text-rose-400">{groupErrors[errorKey]}</p>
+      )}
+    </div>
+  );
+}
+
 export function BenefitServiceSelector({
   groupId,
   groupBenefits,
@@ -42,12 +104,16 @@ export function BenefitServiceSelector({
   splitBenefitIds,
   groupErrors,
   hasDependents,
+  dependentCoverageTypes = [],
+  policyEmployeeCap,
+  policyDependentCap,
   onToggleService,
   onUpdateBenefit,
   onToggleSplit,
 }: BenefitServiceSelectorProps) {
   const [search, setSearch] = useState("");
   const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set());
+  const [expandedBenefits, setExpandedBenefits] = useState<Set<string>>(new Set());
 
   const selectedServiceIds = useMemo(
     () => new Set(groupBenefits.map((b) => b.serviceId)),
@@ -68,6 +134,15 @@ export function BenefitServiceSelector({
       const next = new Set(prev);
       if (next.has(cat)) next.delete(cat);
       else next.add(cat);
+      return next;
+    });
+  };
+
+  const toggleBenefitExpanded = (benefitId: string) => {
+    setExpandedBenefits((prev) => {
+      const next = new Set(prev);
+      if (next.has(benefitId)) next.delete(benefitId);
+      else next.add(benefitId);
       return next;
     });
   };
@@ -194,7 +269,7 @@ export function BenefitServiceSelector({
         </div>
       </div>
 
-      {/* Right: Selected services config */}
+      {/* Right: Selected services config — accordion rows */}
       <div className="flex-1 flex flex-col min-w-0">
         <div className="px-4 py-2.5 border-b border-border/60 bg-muted/10">
           <p className="text-label font-medium text-muted-foreground">
@@ -214,159 +289,166 @@ export function BenefitServiceSelector({
               {groupBenefits.map((benefit) => {
                 const service = SERVICES.find((s) => s.id === benefit.serviceId);
                 const isSplit = splitBenefitIds.has(benefit.id);
+                const isExpanded = expandedBenefits.has(benefit.id);
+                const amountSummary = isSplit
+                  ? `RM ${(benefit.employeeAmount ?? 0).toLocaleString()} emp / RM ${(benefit.dependantAmount ?? 0).toLocaleString()} dep`
+                  : benefit.amount > 0
+                  ? `RM ${benefit.amount.toLocaleString()}`
+                  : "Set amount";
 
                 return (
-                  <div key={benefit.id} className="px-4 py-3 space-y-2.5">
-                    {/* Service name row */}
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-label font-medium text-foreground truncate">{service?.name ?? benefit.serviceId}</span>
-                      <span className="text-micro text-faint shrink-0">{service?.category}</span>
-                    </div>
+                  <div key={benefit.id}>
+                    {/* Accordion header */}
+                    <button
+                      type="button"
+                      onClick={() => toggleBenefitExpanded(benefit.id)}
+                      className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/20 transition-colors text-left"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span className="text-label font-medium text-foreground truncate">{service?.name ?? benefit.serviceId}</span>
+                        <span className="text-micro text-faint shrink-0">{service?.category}</span>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0 ml-2">
+                        <span className={cn("text-label font-mono tabular-nums", benefit.amount > 0 ? "text-foreground font-semibold" : "text-faint italic")}>
+                          {amountSummary}
+                        </span>
+                        <CaretDown size={12} weight="bold" className={cn("text-muted-foreground transition-transform duration-200 shrink-0", isExpanded && "rotate-180")} />
+                      </div>
+                    </button>
 
-                    {/* Config row */}
-                    <div className="flex items-end gap-3 flex-wrap pl-0">
-                      {/* Split toggle (dependants) */}
-                      {hasDependents && (
-                        <div className="flex items-center gap-1.5">
-                          <button
-                            type="button"
-                            onClick={() => onToggleSplit(benefit.id)}
-                            className={cn(
-                              "w-7 h-3.5 rounded-full transition-colors relative shrink-0",
-                              isSplit ? "bg-primary" : "bg-border"
-                            )}
-                          >
-                            <div
-                              className={cn(
-                                "w-2.5 h-2.5 rounded-full bg-background border border-border/40 absolute top-[2px] transition-all",
-                                isSplit ? "right-0.5" : "left-0.5"
-                              )}
-                            />
-                          </button>
-                          <span className="text-micro text-faint">Split emp / dep</span>
-                        </div>
-                      )}
+                    {/* Accordion body */}
+                    {isExpanded && (
+                      <div className="px-4 pb-4 pt-1 space-y-3 bg-muted/10 border-t border-border/40 animate-in fade-in slide-in-from-top-1 duration-150">
 
-                      {/* Amount(s) */}
-                      {isSplit ? (
-                        <>
-                          <div className="space-y-1">
-                            <label className="text-micro font-medium text-faint block">Emp (RM)</label>
-                            <input
-                              type="number"
-                              className="w-20 px-2 py-1.5 bg-background border border-border rounded-lg text-label font-mono outline-none text-right focus:ring-2 focus:ring-primary/10"
-                              value={benefit.employeeAmount || ""}
-                              onChange={(e) => {
-                                const emp = e.target.value === "" ? 0 : parseFloat(e.target.value);
-                                const dep = benefit.dependantAmount ?? 0;
-                                onUpdateBenefit(benefit.id, "employeeAmount", emp);
-                                onUpdateBenefit(benefit.id, "amount", emp + dep);
-                              }}
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <label className="text-micro font-medium text-faint block">Dep (RM)</label>
-                            <input
-                              type="number"
-                              className="w-20 px-2 py-1.5 bg-background border border-border rounded-lg text-label font-mono outline-none text-right focus:ring-2 focus:ring-primary/10"
-                              value={benefit.dependantAmount || ""}
-                              onChange={(e) => {
-                                const dep = e.target.value === "" ? 0 : parseFloat(e.target.value);
-                                const emp = benefit.employeeAmount ?? 0;
-                                onUpdateBenefit(benefit.id, "dependantAmount", dep);
-                                onUpdateBenefit(benefit.id, "amount", emp + dep);
-                              }}
-                            />
-                          </div>
-                          <span className="text-micro text-faint pb-2">
-                            Total: RM {((benefit.employeeAmount ?? 0) + (benefit.dependantAmount ?? 0)).toLocaleString()}
-                          </span>
-                        </>
-                      ) : (
-                        <div className="space-y-1">
-                          <label className="text-micro font-medium text-faint block">Amount (RM)</label>
-                          <input
-                            type="number"
-                            className={cn(
-                              "w-24 px-2 py-1.5 bg-background border rounded-lg text-label font-mono outline-none text-right focus:ring-2 focus:ring-primary/10",
-                              groupErrors[`benefit_${groupId}_${benefit.serviceId}`]
-                                ? "border-rose-300"
-                                : "border-border"
-                            )}
-                            value={benefit.amount || ""}
-                            onChange={(e) =>
-                              onUpdateBenefit(benefit.id, "amount", e.target.value === "" ? 0 : parseFloat(e.target.value))
-                            }
-                          />
-                          {groupErrors[`benefit_${groupId}_${benefit.serviceId}`] && (
-                            <p className="text-micro text-rose-600 dark:text-rose-400">
-                              {groupErrors[`benefit_${groupId}_${benefit.serviceId}`]}
-                            </p>
-                          )}
-                        </div>
-                      )}
+                        {/* Policy defaults hint */}
+                        {(policyEmployeeCap || policyDependentCap) && (
+                          <p className="text-micro text-faint">
+                            Policy default:{" "}
+                            {policyEmployeeCap ? `RM ${policyEmployeeCap.toLocaleString()} emp` : ""}
+                            {policyEmployeeCap && policyDependentCap ? " / " : ""}
+                            {policyDependentCap ? `RM ${policyDependentCap.toLocaleString()} dep` : ""}
+                          </p>
+                        )}
 
-                      {/* Co-payment */}
-                      <div className="space-y-1">
-                        <label className="text-micro font-medium text-faint inline-flex items-center gap-1">
-                          Co-payment <FieldHelp termKey="coPayment" />
-                        </label>
-                        <div className="flex items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              onUpdateBenefit(benefit.id, "coPayment.required", !benefit.coPayment.required)
-                            }
-                            className={cn(
-                              "w-8 h-4 rounded-full transition-colors relative shrink-0",
-                              benefit.coPayment.required ? "bg-primary" : "bg-border"
-                            )}
-                          >
-                            <div
-                              className={cn(
-                                "w-3 h-3 rounded-full bg-background border border-border/40 absolute top-[2px] transition-all",
-                                benefit.coPayment.required ? "right-0.5" : "left-0.5"
-                              )}
-                            />
-                          </button>
-                          {benefit.coPayment.required && (
+                        <div className="flex items-end gap-3 flex-wrap">
+                          {/* Split toggle */}
+                          {hasDependents && (
                             <div className="flex items-center gap-1.5">
-                              <FormSelect
-                                value={benefit.coPayment.type}
-                                onChange={(v) => onUpdateBenefit(benefit.id, "coPayment.type", v)}
-                                options={[
-                                  { label: "%", value: "Percentage" },
-                                  { label: "RM", value: "Fixed" },
-                                ]}
-                                triggerClassName="w-16 h-8"
-                              />
+                              <button
+                                type="button"
+                                onClick={() => onToggleSplit(benefit.id)}
+                                className={cn("w-7 h-3.5 rounded-full transition-colors relative shrink-0", isSplit ? "bg-primary" : "bg-border")}
+                              >
+                                <div className={cn("w-2.5 h-2.5 rounded-full bg-background border border-border/40 absolute top-[2px] transition-all", isSplit ? "right-0.5" : "left-0.5")} />
+                              </button>
+                              <span className="text-micro text-faint">Split emp / dep</span>
+                            </div>
+                          )}
+
+                          {/* Amount inputs */}
+                          {isSplit ? (
+                            <>
+                              <div className="space-y-1">
+                                <label className="text-micro font-medium text-faint block">Emp (RM)</label>
+                                <input
+                                  type="number"
+                                  className="w-20 px-2 py-1.5 bg-background border border-border rounded-lg text-label font-mono outline-none text-right focus:ring-2 focus:ring-primary/10"
+                                  value={benefit.employeeAmount || ""}
+                                  onChange={(e) => {
+                                    const emp = e.target.value === "" ? 0 : parseFloat(e.target.value);
+                                    const dep = benefit.dependantAmount ?? 0;
+                                    onUpdateBenefit(benefit.id, "employeeAmount", emp);
+                                    onUpdateBenefit(benefit.id, "amount", emp + dep);
+                                  }}
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <label className="text-micro font-medium text-faint block">Dep (RM)</label>
+                                <input
+                                  type="number"
+                                  className="w-20 px-2 py-1.5 bg-background border border-border rounded-lg text-label font-mono outline-none text-right focus:ring-2 focus:ring-primary/10"
+                                  value={benefit.dependantAmount || ""}
+                                  onChange={(e) => {
+                                    const dep = e.target.value === "" ? 0 : parseFloat(e.target.value);
+                                    const emp = benefit.employeeAmount ?? 0;
+                                    onUpdateBenefit(benefit.id, "dependantAmount", dep);
+                                    onUpdateBenefit(benefit.id, "amount", emp + dep);
+                                  }}
+                                />
+                              </div>
+                              <span className="text-micro text-faint pb-2">
+                                Total: RM {((benefit.employeeAmount ?? 0) + (benefit.dependantAmount ?? 0)).toLocaleString()}
+                              </span>
+                            </>
+                          ) : (
+                            <div className="space-y-1">
+                              <label className="text-micro font-medium text-faint block">Amount (RM)</label>
                               <input
                                 type="number"
                                 className={cn(
-                                  "w-16 px-2 py-1.5 bg-background border rounded-lg text-label font-mono outline-none text-right focus:ring-2 focus:ring-primary/10",
-                                  groupErrors[`copay_${groupId}_${benefit.serviceId}`]
-                                    ? "border-rose-300"
-                                    : "border-border"
+                                  "w-24 px-2 py-1.5 bg-background border rounded-lg text-label font-mono outline-none text-right focus:ring-2 focus:ring-primary/10",
+                                  groupErrors[`benefit_${groupId}_${benefit.serviceId}`] ? "border-rose-300" : "border-border"
                                 )}
-                                value={benefit.coPayment.value || ""}
+                                value={benefit.amount || ""}
                                 onChange={(e) =>
-                                  onUpdateBenefit(
-                                    benefit.id,
-                                    "coPayment.value",
-                                    e.target.value === "" ? 0 : parseFloat(e.target.value)
-                                  )
+                                  onUpdateBenefit(benefit.id, "amount", e.target.value === "" ? 0 : parseFloat(e.target.value))
                                 }
                               />
+                              {groupErrors[`benefit_${groupId}_${benefit.serviceId}`] && (
+                                <p className="text-micro text-rose-600 dark:text-rose-400">
+                                  {groupErrors[`benefit_${groupId}_${benefit.serviceId}`]}
+                                </p>
+                              )}
                             </div>
                           )}
+
+                          {/* Co-payment */}
+                          <CoPaymentToggle
+                            required={benefit.coPayment.required}
+                            type={benefit.coPayment.type}
+                            value={benefit.coPayment.value}
+                            errorKey={`copay_${groupId}_${benefit.serviceId}`}
+                            groupErrors={groupErrors}
+                            onToggle={() => onUpdateBenefit(benefit.id, "coPayment.required", !benefit.coPayment.required)}
+                            onChangeType={(v) => onUpdateBenefit(benefit.id, "coPayment.type", v)}
+                            onChangeValue={(v) => onUpdateBenefit(benefit.id, "coPayment.value", v)}
+                          />
                         </div>
-                        {groupErrors[`copay_${groupId}_${benefit.serviceId}`] && (
-                          <p className="text-micro text-rose-600 dark:text-rose-400">
-                            {groupErrors[`copay_${groupId}_${benefit.serviceId}`]}
-                          </p>
+
+                        {/* Dependent type selector (when split) */}
+                        {isSplit && dependentCoverageTypes.length > 0 && (
+                          <div className="space-y-1.5">
+                            <p className="text-micro font-medium text-faint">Which dependents get this override?</p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {dependentCoverageTypes.map((depType) => {
+                                const isSelected = benefit.dependantTypes?.includes(depType) ?? false;
+                                return (
+                                  <button
+                                    key={depType}
+                                    type="button"
+                                    onClick={() => {
+                                      const current = benefit.dependantTypes ?? [];
+                                      const next = isSelected
+                                        ? current.filter((t) => t !== depType)
+                                        : [...current, depType];
+                                      onUpdateBenefit(benefit.id, "dependantTypes", next);
+                                    }}
+                                    className={cn(
+                                      "px-2.5 py-1 rounded-full text-micro font-medium border transition-all capitalize",
+                                      isSelected
+                                        ? "bg-primary text-primary-foreground border-primary"
+                                        : "bg-background text-muted-foreground border-border hover:border-primary/30"
+                                    )}
+                                  >
+                                    {depType}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
                         )}
                       </div>
-                    </div>
+                    )}
                   </div>
                 );
               })}

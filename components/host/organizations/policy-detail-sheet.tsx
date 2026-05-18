@@ -60,7 +60,7 @@ export function PolicyDetailSheet({ isOpen, onClose, policy, groups, benefits, o
               <RuleItem icon={CurrencyCircleDollar} label="Pool Type" value={`${policy.benefitPoolType} Pool`} />
               <RuleItem icon={Gear} label="Allocation" value={policy.utilisationMode} />
               <RuleItem icon={Clock} label="Refresh Cycle" value={policy.refreshCycle} />
-              <RuleItem icon={CheckCircle} label="Start Reference" value={policy.refreshStartReference === "fy_start" ? "Financial Year" : policy.refreshStartReference === "join_date" ? "Join Date" : "Custom Date"} />
+              <RuleItem icon={CheckCircle} label="Start Reference" value={policy.refreshStartReference === "financial_year" ? "Financial Year" : "Calendar Year"} />
             </div>
           </section>
 
