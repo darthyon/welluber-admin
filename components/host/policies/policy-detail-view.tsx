@@ -642,9 +642,16 @@ function BenefitGroupsTab({
                           ? `RM ${group.maxUsagePerCycle?.toFixed(2) || "0.00"}`
                           : "Individual"}
                       </p>
-                      <p className="text-label text-faint font-medium">
-                        {group.distributionType === "SharedAmount" ? "Shared Pool" : "Per Benefit"}
-                      </p>
+                      <div className="flex items-center justify-end gap-1.5">
+                        <p className="text-label text-faint font-medium">
+                          {group.distributionType === "SharedAmount" ? "Shared Pool" : "Per Benefit"}
+                        </p>
+                        {group.distributionType === (policy.benefitPoolType === "Shared" ? "SharedAmount" : "IndividualBenefitAmount") ? (
+                          <span className="text-micro text-faint bg-muted px-1.5 py-0.5 rounded">Inherited</span>
+                        ) : (
+                          <span className="text-micro text-primary/70 font-medium bg-primary/8 px-1.5 py-0.5 rounded">Override</span>
+                        )}
+                      </div>
                       <p className="text-label text-faint font-medium">
                         Utilisation:{" "}
                         {group.utilisationMode
