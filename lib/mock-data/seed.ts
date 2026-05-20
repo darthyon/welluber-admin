@@ -3,7 +3,7 @@ import type { EmployeeDirectoryItem, AssignablePolicy, FormPolicy, VoucherRedemp
 import { Registry } from "./registry"
 import { MOCK_POLICY_TEMPLATES } from "./policy-templates"
 import { createBrand } from "./factories/brand"
-import { createOrganization } from "./factories/organization"
+import { createOrganization, createNewOrganization } from "./factories/organization"
 import { createServiceProvider } from "./factories/service-provider"
 import { createEmployee } from "./factories/employee"
 import { createMember, createAdmin } from "./factories/user"
@@ -18,7 +18,63 @@ import { createEntitlement } from "./factories/entitlement"
 function seedAll() {
   // Dependency order: no-dep entities first, then dependents
   const brands = Array.from({ length: 10 }, (_, i) => createBrand(i))
-  const organizations = Array.from({ length: 10 }, (_, i) => createOrganization(i))
+  const organizations = [
+    ...Array.from({ length: 7 }, (_, i) => createOrganization(i)),
+    createNewOrganization({
+      id: "ORG-NEW-20260501-0001",
+      name: "Maju Retail Sdn Bhd",
+      registrationNumber: "202401089231",
+      industry: "Retail",
+      type: "sdn_bhd",
+      financialYearStart: "2026-01-01T00:00:00Z",
+      tinNumber: "C20240108923",
+      state: "Selangor",
+      country: "Malaysia",
+      bankAccountDetails: { bankName: "Maybank Berhad", accountNumber: "5142 0001 2345", accountName: "Maju Retail Sdn Bhd" },
+      subscription: { plan: "standard", startDate: "2026-04-01T00:00:00Z" },
+      accountLimit: 50000,
+      creditLimit: 50000,
+      branches: ["BR-NEW-20260501-0001"],
+      createdAt: "2026-04-01T09:00:00Z",
+      updatedAt: "2026-04-01T09:00:00Z",
+    }),
+    createNewOrganization({
+      id: "ORG-NEW-20260510-0002",
+      name: "Borneo Logistics Partners",
+      registrationNumber: "202501045678",
+      industry: "Logistics",
+      type: "partnership",
+      financialYearStart: "2026-04-01T00:00:00Z",
+      tinNumber: "D20250104567",
+      state: "Sabah",
+      country: "Malaysia",
+      bankAccountDetails: { bankName: "Public Bank Berhad", accountNumber: "3112 5544 3322", accountName: "Borneo Logistics Partners" },
+      subscription: { plan: "standard", startDate: "2026-05-01T00:00:00Z" },
+      accountLimit: 30000,
+      creditLimit: 30000,
+      branches: ["BR-NEW-20260510-0001"],
+      createdAt: "2026-05-01T09:00:00Z",
+      updatedAt: "2026-05-01T09:00:00Z",
+    }),
+    createNewOrganization({
+      id: "ORG-NEW-20260515-0003",
+      name: "TechVenture MY Sdn Bhd",
+      registrationNumber: "202601001122",
+      industry: "Technology",
+      type: "sdn_bhd",
+      financialYearStart: "2026-01-01T00:00:00Z",
+      tinNumber: "C20260100112",
+      state: "Kuala Lumpur",
+      country: "Malaysia",
+      bankAccountDetails: { bankName: "CIMB Bank Berhad", accountNumber: "8001 0011 2233", accountName: "TechVenture MY Sdn Bhd" },
+      subscription: { plan: "premium", startDate: "2026-05-15T00:00:00Z" },
+      accountLimit: 100000,
+      creditLimit: 100000,
+      branches: ["BR-NEW-20260515-0001"],
+      createdAt: "2026-05-15T09:00:00Z",
+      updatedAt: "2026-05-15T09:00:00Z",
+    }),
+  ]
   const serviceProviders = Array.from({ length: 10 }, (_, i) => createServiceProvider(i))
   const employees = Array.from({ length: 50 }, (_, i) => createEmployee(i))
   const members = Array.from({ length: 10 }, (_, i) => createMember(i))

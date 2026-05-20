@@ -130,6 +130,7 @@ Status colors use Tailwind utilities with `dark:` variants. Never use them for s
 - ❌ Never use `px` units for spacing — use Tailwind spacing scale
 - ❌ Never create files outside of `app/`, `components/`, `features/`, `lib/`, `hooks/`, `types/`
 - ❌ Never use `console.log` in production code
+- ❌ **Test cases and mock data must never use healthcare/clinical orgs as example companies, and must never reference inpatient, outpatient, or clinical services as benefits.** All benefit examples must be flexi-benefit (gym, fitness, wellness, nutrition, mental health lifestyle, optical, dental lifestyle). Org examples should use industries like Retail, Technology, Logistics, Finance, Education, or Manufacturing.
 
 ---
 
