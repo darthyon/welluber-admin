@@ -113,7 +113,7 @@ function NewPolicyForm() {
   useEffect(() => {
     if (resumeDecided) return;
     if (templateId || cloneId) {
-      setResumeDecided(true);
+      setTimeout(() => setResumeDecided(true), 0);
       return;
     }
     const sessionDraft = typeof window !== "undefined" ? sessionStorage.getItem("policy-draft") : null;
