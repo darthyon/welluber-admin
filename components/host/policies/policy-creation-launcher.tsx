@@ -10,13 +10,15 @@ import { FormSelect } from "@/components/shared/form-select";
 interface PolicyCreationLauncherProps {
   onManual: (orgId?: string) => void;
   onTemplate: (templateId: string, orgId?: string) => void;
+  preselectedOrgId?: string;
+  hideOrgPicker?: boolean;
 }
 
-export function PolicyCreationLauncher({ onManual, onTemplate }: PolicyCreationLauncherProps) {
+export function PolicyCreationLauncher({ onManual, onTemplate, preselectedOrgId, hideOrgPicker }: PolicyCreationLauncherProps) {
   const [open, setOpen] = useState(false);
   const [selectedMode, setSelectedMode] = useState<"scratch" | "template" | null>(null);
   const [selectedTemplateId, setSelectedTemplateId] = useState("");
-  const [selectedOrgId, setSelectedOrgId] = useState("");
+  const [selectedOrgId, setSelectedOrgId] = useState(preselectedOrgId ?? "");
   const { templates, isLoading } = usePolicyTemplates();
 
   const hasTemplates = useMemo(() => templates.length > 0, [templates]);
@@ -51,21 +53,23 @@ export function PolicyCreationLauncher({ onManual, onTemplate }: PolicyCreationL
             </div>
 
             <div className="px-8 pb-2 space-y-4">
-              {/* Organisation — required first step */}
-              <div className="space-y-1.5">
-                <label className="text-label font-medium text-subtle flex items-center gap-1.5">
-                  <Buildings size={14} />
-                  Organisation
-                  <span className="text-destructive">*</span>
-                </label>
-                <FormSelect
-                  value={selectedOrgId}
-                  onChange={(v) => setSelectedOrgId(v)}
-                  options={[{ label: "Select organisation...", value: "" }, ...orgOptions]}
-                  placeholder="Select organisation..."
-                />
-                <p className="text-micro text-faint">Tiers and departments will load automatically once an organisation is selected.</p>
-              </div>
+              {/* Organisation — required first step (hidden when org is pre-selected) */}
+              {!hideOrgPicker && (
+                <div className="space-y-1.5">
+                  <label className="text-label font-medium text-subtle flex items-center gap-1.5">
+                    <Buildings size={14} />
+                    Organisation
+                    <span className="text-destructive">*</span>
+                  </label>
+                  <FormSelect
+                    value={selectedOrgId}
+                    onChange={(v) => setSelectedOrgId(v)}
+                    options={[{ label: "Select organisation...", value: "" }, ...orgOptions]}
+                    placeholder="Select organisation..."
+                  />
+                  <p className="text-micro text-faint">Tiers and departments will load automatically once an organisation is selected.</p>
+                </div>
+              )}
 
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <button

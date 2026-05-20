@@ -62,7 +62,7 @@ function CoPaymentToggle({
       <label className="text-micro font-medium text-faint inline-flex items-center gap-1">
         Co-payment <FieldHelp termKey="coPayment" />
       </label>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3">
         <button
           type="button"
           onClick={onToggle}
@@ -112,7 +112,7 @@ export function BenefitServiceSelector({
   onToggleSplit,
 }: BenefitServiceSelectorProps) {
   const [search, setSearch] = useState("");
-  const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set());
+  const [openCategory, setOpenCategory] = useState<string | null>(GROUPED_SERVICES[0]?.category ?? null);
   const [expandedBenefits, setExpandedBenefits] = useState<Set<string>>(new Set());
 
   const selectedServiceIds = useMemo(
@@ -130,12 +130,7 @@ export function BenefitServiceSelector({
   }, [search]);
 
   const toggleCategory = (cat: string) => {
-    setCollapsedCategories((prev) => {
-      const next = new Set(prev);
-      if (next.has(cat)) next.delete(cat);
-      else next.add(cat);
-      return next;
-    });
+    setOpenCategory((prev) => (prev === cat ? null : cat));
   };
 
   const toggleBenefitExpanded = (benefitId: string) => {
@@ -208,7 +203,7 @@ export function BenefitServiceSelector({
             <p className="text-center py-6 text-label text-faint">No results</p>
           ) : (
             filteredGroups.map((group) => {
-              const isCollapsed = collapsedCategories.has(group.category) && !search.trim();
+              const isCollapsed = openCategory !== group.category && !search.trim();
               const selectedCount = group.services.filter((s) => selectedServiceIds.has(s.id as MainServiceId)).length;
 
               return (
@@ -291,7 +286,7 @@ export function BenefitServiceSelector({
                 const isSplit = splitBenefitIds.has(benefit.id);
                 const isExpanded = expandedBenefits.has(benefit.id);
                 const amountSummary = isSplit
-                  ? `RM ${(benefit.employeeAmount ?? 0).toLocaleString()} emp / RM ${(benefit.dependantAmount ?? 0).toLocaleString()} dep`
+                  ? `RM ${(benefit.employeeAmount ?? 0).toLocaleString()} employee / RM ${(benefit.dependantAmount ?? 0).toLocaleString()} dependent`
                   : benefit.amount > 0
                   ? `RM ${benefit.amount.toLocaleString()}`
                   : "Set amount";
@@ -318,7 +313,7 @@ export function BenefitServiceSelector({
 
                     {/* Accordion body */}
                     {isExpanded && (
-                      <div className="px-4 pb-4 pt-1 space-y-3 bg-muted/10 border-t border-border/40 animate-in fade-in slide-in-from-top-1 duration-150">
+                      <div className="px-4 pb-5 pt-3 space-y-4 bg-muted/10 border-t border-border/40 animate-in fade-in slide-in-from-top-1 duration-150">
 
                         {/* Policy defaults hint */}
                         {(policyEmployeeCap || policyDependentCap) && (
@@ -330,29 +325,15 @@ export function BenefitServiceSelector({
                           </p>
                         )}
 
-                        <div className="flex items-end gap-3 flex-wrap">
-                          {/* Split toggle */}
-                          {hasDependents && (
-                            <div className="flex items-center gap-1.5">
-                              <button
-                                type="button"
-                                onClick={() => onToggleSplit(benefit.id)}
-                                className={cn("w-7 h-3.5 rounded-full transition-colors relative shrink-0", isSplit ? "bg-primary" : "bg-border")}
-                              >
-                                <div className={cn("w-2.5 h-2.5 rounded-full bg-background border border-border/40 absolute top-[2px] transition-all", isSplit ? "right-0.5" : "left-0.5")} />
-                              </button>
-                              <span className="text-micro text-faint">Split emp / dep</span>
-                            </div>
-                          )}
-
+                        <div className="flex items-end gap-5 flex-wrap">
                           {/* Amount inputs */}
                           {isSplit ? (
                             <>
                               <div className="space-y-1">
-                                <label className="text-micro font-medium text-faint block">Emp (RM)</label>
+                                <label className="text-micro font-medium text-faint block">Employee Amount (RM)</label>
                                 <input
                                   type="number"
-                                  className="w-20 px-2 py-1.5 bg-background border border-border rounded-lg text-label font-mono outline-none text-right focus:ring-2 focus:ring-primary/10"
+                                  className="w-32 px-2 py-1.5 bg-background border border-border rounded-lg text-label font-mono outline-none text-right focus:ring-2 focus:ring-primary/10"
                                   value={benefit.employeeAmount || ""}
                                   onChange={(e) => {
                                     const emp = e.target.value === "" ? 0 : parseFloat(e.target.value);
@@ -363,10 +344,10 @@ export function BenefitServiceSelector({
                                 />
                               </div>
                               <div className="space-y-1">
-                                <label className="text-micro font-medium text-faint block">Dep (RM)</label>
+                                <label className="text-micro font-medium text-faint block">Dependent Amount (RM)</label>
                                 <input
                                   type="number"
-                                  className="w-20 px-2 py-1.5 bg-background border border-border rounded-lg text-label font-mono outline-none text-right focus:ring-2 focus:ring-primary/10"
+                                  className="w-32 px-2 py-1.5 bg-background border border-border rounded-lg text-label font-mono outline-none text-right focus:ring-2 focus:ring-primary/10"
                                   value={benefit.dependantAmount || ""}
                                   onChange={(e) => {
                                     const dep = e.target.value === "" ? 0 : parseFloat(e.target.value);
@@ -413,6 +394,22 @@ export function BenefitServiceSelector({
                             onChangeType={(v) => onUpdateBenefit(benefit.id, "coPayment.type", v)}
                             onChangeValue={(v) => onUpdateBenefit(benefit.id, "coPayment.value", v)}
                           />
+
+                          {/* Split emp/dep checkbox */}
+                          {hasDependents && (
+                            <div className="space-y-1 pb-0.5">
+                              <label className="text-micro font-medium text-faint block invisible select-none">Split</label>
+                              <label className="flex items-center gap-1.5 cursor-pointer pb-2">
+                                <input
+                                  type="checkbox"
+                                  checked={isSplit}
+                                  onChange={() => onToggleSplit(benefit.id)}
+                                  className="w-3.5 h-3.5 accent-primary rounded cursor-pointer"
+                                />
+                                <span className="text-micro text-faint">Split between Employee and Dependent</span>
+                              </label>
+                            </div>
+                          )}
                         </div>
 
                         {/* Dependent type selector (when split) */}
@@ -420,6 +417,19 @@ export function BenefitServiceSelector({
                           <div className="space-y-1.5">
                             <p className="text-micro font-medium text-faint">Which dependents get this override?</p>
                             <div className="flex flex-wrap gap-1.5">
+                              {/* All chip — active when no specific types selected */}
+                              <button
+                                type="button"
+                                onClick={() => onUpdateBenefit(benefit.id, "dependantTypes", [])}
+                                className={cn(
+                                  "px-2.5 py-1 rounded-full text-micro font-medium border transition-all",
+                                  !benefit.dependantTypes || benefit.dependantTypes.length === 0
+                                    ? "bg-primary text-primary-foreground border-primary"
+                                    : "bg-background text-muted-foreground border-border hover:border-primary/30"
+                                )}
+                              >
+                                All
+                              </button>
                               {dependentCoverageTypes.map((depType) => {
                                 const isSelected = benefit.dependantTypes?.includes(depType) ?? false;
                                 return (
@@ -431,7 +441,7 @@ export function BenefitServiceSelector({
                                       const next = isSelected
                                         ? current.filter((t) => t !== depType)
                                         : [...current, depType];
-                                      onUpdateBenefit(benefit.id, "dependantTypes", next);
+                                      onUpdateBenefit(benefit.id, "dependantTypes", next.length === dependentCoverageTypes.length ? [] : next);
                                     }}
                                     className={cn(
                                       "px-2.5 py-1 rounded-full text-micro font-medium border transition-all capitalize",
