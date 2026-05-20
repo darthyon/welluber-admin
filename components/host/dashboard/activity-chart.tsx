@@ -63,14 +63,14 @@ function SearchableSelect({
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center justify-between gap-2 px-3 py-1.5 bg-card border border-border hover:bg-muted/50 rounded-md text-label font-medium text-foreground w-[180px] text-left transition-colors"
+        className="flex items-center justify-between gap-2 px-3 h-7 bg-background border border-border hover:border-foreground/20 rounded-lg text-label font-medium text-foreground w-[160px] text-left transition-colors focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30"
       >
         <span className="truncate">{selectedName}</span>
-        <CaretDown size={14} className="text-muted-foreground shrink-0" />
+        <CaretDown size={12} className="text-muted-foreground shrink-0" />
       </button>
 
       {open && (
-        <div className="absolute top-full left-0 mt-1 w-[220px] bg-card border border-border shadow-md rounded-md z-[60] overflow-hidden flex flex-col">
+        <div className="absolute top-full left-0 mt-1 w-[200px] bg-card border border-border shadow-md rounded-lg z-[60] overflow-hidden flex flex-col">
           <div className="p-2 border-b border-border/50 flex items-center gap-2">
             <MagnifyingGlass size={14} className="text-muted-foreground" />
             <input 
@@ -144,7 +144,7 @@ export function ActivityChart() {
           </div>
         </div>
         
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex items-center gap-1.5 shrink-0">
           {/* Entity Filter (Searchable) */}
           <SearchableSelect 
             value={entityFilter} 
@@ -161,7 +161,8 @@ export function ActivityChart() {
               { label: "Issued Volume", value: "issued" },
               { label: "Redemption Volume", value: "checkedIn" },
             ]}
-            triggerClassName="h-8"
+            size="xs"
+            triggerClassName="w-auto min-w-[130px]"
           />
         </div>
       </div>

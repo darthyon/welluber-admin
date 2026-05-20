@@ -26,6 +26,7 @@ interface FormSelectProps {
   searchPlaceholder?: string;
   disabled?: boolean;
   triggerClassName?: string;
+  size?: "xs" | "sm" | "default";
   error?: boolean;
   searchable?: boolean;
 }
@@ -38,6 +39,7 @@ export function FormSelect({
   searchPlaceholder,
   disabled,
   triggerClassName,
+  size = "default",
   error,
   searchable,
 }: FormSelectProps) {
@@ -64,8 +66,10 @@ export function FormSelect({
   return (
     <Select value={value || ""} onValueChange={onChange} disabled={disabled}>
       <SelectTrigger
+        size={size}
         className={cn(
-          "w-full h-10 px-3 py-2 bg-background border border-border rounded-lg text-body font-medium text-foreground transition-all",
+          "w-full px-3 py-2 bg-background border border-border rounded-lg font-medium text-foreground transition-all",
+          size === "xs" ? "text-xs" : "text-body",
           "hover:border-foreground/20 focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30",
           "disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-muted/50",
           "data-[placeholder]:text-faint",

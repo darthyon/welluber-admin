@@ -1,15 +1,15 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { TrendUp, TrendDown, Barbell, Brain, Tooth, Stethoscope, Sparkle, Info } from "@phosphor-icons/react"
+import { TrendUp, TrendDown, Barbell, Leaf, ForkKnife, Trophy, BookOpen, Info } from "@phosphor-icons/react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 const CATEGORIES = [
   { id: "c1", name: "Fitness & Gym", icon: Barbell, value: 14200, percentage: 100, trend: 14 },
-  { id: "c2", name: "Dental Care", icon: Tooth, value: 9800, percentage: 69, trend: 8 },
-  { id: "c3", name: "Physiotherapy", icon: Sparkle, value: 7400, percentage: 52, trend: 22 },
-  { id: "c4", name: "Mental Health", icon: Brain, value: 5100, percentage: 35, trend: 45 },
-  { id: "c5", name: "Health Screenings", icon: Stethoscope, value: 4200, percentage: 29, trend: -3 },
+  { id: "c2", name: "Wellness & Spa", icon: Leaf, value: 9800, percentage: 69, trend: 8 },
+  { id: "c3", name: "Nutrition", icon: ForkKnife, value: 7400, percentage: 52, trend: 22 },
+  { id: "c4", name: "Sports & Recreation", icon: Trophy, value: 5100, percentage: 35, trend: 45 },
+  { id: "c5", name: "Personal Development", icon: BookOpen, value: 4200, percentage: 29, trend: -3 },
 ]
 
 export function TrendingCategories() {
@@ -31,8 +31,8 @@ export function TrendingCategories() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto min-h-0 -mx-5 px-5">
-        <div className="space-y-4">
+      <div className="flex-1 min-h-0 -mx-5 px-5">
+        <div className="flex flex-col justify-between h-full">
           {CATEGORIES.map((category) => {
             const Icon = category.icon;
             return (
