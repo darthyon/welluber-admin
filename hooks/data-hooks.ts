@@ -22,8 +22,8 @@ import {
   tenantStore,
   permissionStore,
   roleStore,
-  adminUserStore,
-  adminUserRoleStore,
+  userStore,
+  userRoleStore,
   userAuditLogStore,
 } from "@/lib/mock-data/store"
 import type { Brand } from "@/types/brand"
@@ -39,7 +39,7 @@ import { getAvailableAmount, getUtilisationPct } from "@/types/benefit-assignmen
 import type { EmployeeUsageLog, WalletUsageLog, UsagePeriod } from "@/types/usage-log"
 import type { MemberProfile } from "@/types/member-profile"
 import type { EmployeeAccount, DependentAccount, EmployeeAccountLinkageStatus } from "@/types/employee-account"
-import type { Tenant, Permission, Role, AdminUser, AdminUserRole, UserAuditLog, TenantType, RoleKey, PermissionKey } from "@/types/iam"
+import type { Tenant, Permission, Role, User, UserRole, UserAuditLog, TenantType, RoleKey, PermissionKey } from "@/types/iam"
 import type { GlobalClaimRow } from "@/lib/mock-data/factories/claim"
 import type { PolicyListItem, PolicyData } from "@/features/policies/types"
 
@@ -259,25 +259,25 @@ export function usePermissions(keys?: PermissionKey[]) {
 }
 
 export function useAdminUsers(opts?: { tenantId?: string; status?: AdminUser["status"] }) {
-  const data = useSyncExternalStore(adminUserStore.subscribe, adminUserStore.get, adminUserStore.get) as AdminUser[]
+  const data = useSyncExternalStore(userStore.subscribe, userStore.get, userStore.get) as AdminUser[]
   const adminUsers = useMemo(() => {
     let r = data
     if (opts?.tenantId) r = r.filter(u => u.tenantId === opts.tenantId)
     if (opts?.status)   r = r.filter(u => u.status === opts.status)
     return r
   }, [data, opts?.tenantId, opts?.status])
-  return { adminUsers, add: adminUserStore.add, update: adminUserStore.update }
+  return { adminUsers, add: userStore.add, update: userStore.update }
 }
 
-export function useAdminUserRoles(adminUserId?: string) {
-  const data = useSyncExternalStore(adminUserRoleStore.subscribe, adminUserRoleStore.get, adminUserRoleStore.get) as AdminUserRole[]
-  const assignments = useMemo(() => adminUserId ? data.filter(r => r.adminUserId === adminUserId && r.isActive) : data, [data, adminUserId])
-  return { assignments, add: adminUserRoleStore.add, update: adminUserRoleStore.update }
+export function useAdminUserRoles(userId?: string) {
+  const data = useSyncExternalStore(userRoleStore.subscribe, userRoleStore.get, userRoleStore.get) as AdminUserRole[]
+  const assignments = useMemo(() => userId ? data.filter(r => r.userId === userId && r.isActive) : data, [data, userId])
+  return { assignments, add: userRoleStore.add, update: userRoleStore.update }
 }
 
 /** Returns effective permission keys for a user (union of all assigned roles) */
-export function useEffectivePermissions(adminUserId: string): PermissionKey[] {
-  const { assignments } = useAdminUserRoles(adminUserId)
+export function useEffectivePermissions(userId: string): PermissionKey[] {
+  const { assignments } = useAdminUserRoles(userId)
   const { roles } = useRoles()
   const { permissions } = usePermissions()
   const { rolePermissions } = useMemo(() => ({ rolePermissions: [] as { roleId: string; permissionId: string }[] }), [])
@@ -295,15 +295,15 @@ export function useEffectivePermissions(adminUserId: string): PermissionKey[] {
   }, [assignments, roles])
 }
 
-export function useUserAuditLogs(opts?: { adminUserId?: string; tenantId?: string; resource?: string }) {
+export function useUserAuditLogs(opts?: { userId?: string; tenantId?: string; resource?: string }) {
   const data = useSyncExternalStore(userAuditLogStore.subscribe, userAuditLogStore.get, userAuditLogStore.get) as UserAuditLog[]
   const logs = useMemo(() => {
     let r = data
-    if (opts?.adminUserId) r = r.filter(l => l.adminUserId === opts.adminUserId)
+    if (opts?.userId) r = r.filter(l => l.userId === opts.userId)
     if (opts?.tenantId)    r = r.filter(l => l.tenantId === opts.tenantId)
     if (opts?.resource)    r = r.filter(l => l.resource === opts.resource)
     return r.sort((a, b) => b.createdAt.localeCompare(a.createdAt))
-  }, [data, opts?.adminUserId, opts?.tenantId, opts?.resource])
+  }, [data, opts?.userId, opts?.tenantId, opts?.resource])
   return { logs, add: userAuditLogStore.add }
 }
 

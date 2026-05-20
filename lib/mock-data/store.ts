@@ -8,7 +8,7 @@ import {
   MOCK_EMPLOYEE_USAGE_LOGS, MOCK_WALLET_USAGE_LOGS,
   MOCK_MEMBER_PROFILES, MOCK_EMPLOYEE_ACCOUNTS, MOCK_DEPENDENT_ACCOUNTS,
   MOCK_TENANTS, MOCK_PERMISSIONS, MOCK_ROLES, MOCK_ROLE_PERMISSIONS,
-  MOCK_ADMIN_USERS, MOCK_ADMIN_USER_ROLES, MOCK_USER_AUDIT_LOGS,
+  MOCK_USERS, MOCK_USER_ROLES, MOCK_USER_AUDIT_LOGS,
 } from "./seed"
 import type { Brand } from "@/types/brand"
 import type { Organization, Employee } from "@/features/organizations/types"
@@ -21,7 +21,7 @@ import type { BenefitAssignment } from "@/types/benefit-assignment"
 import type { EmployeeUsageLog, WalletUsageLog } from "@/types/usage-log"
 import type { MemberProfile } from "@/types/member-profile"
 import type { EmployeeAccount, DependentAccount } from "@/types/employee-account"
-import type { Tenant, Permission, Role, RolePermission, AdminUser, AdminUserRole, UserAuditLog } from "@/types/iam"
+import type { Tenant, Permission, Role, RolePermission, User, UserRole, UserAuditLog } from "@/types/iam"
 import type { PolicyListItem } from "@/features/policies/types"
 import type { PolicyData } from "@/features/policies/types"
 import type { PolicyBundle } from "./factories/policy"
@@ -104,6 +104,6 @@ export const roleStore               = createStore<Role>(MOCK_ROLES)
 export const rolePermissionStore     = createStore<RolePermission & { id: string }>(
   MOCK_ROLE_PERMISSIONS.map((rp, i) => ({ ...rp, id: `RP-${i}` }))
 )
-export const adminUserStore          = createStore<AdminUser>(MOCK_ADMIN_USERS)
-export const adminUserRoleStore      = createStore<AdminUserRole>(MOCK_ADMIN_USER_ROLES)
+export const userStore          = createStore<User>(MOCK_USERS)
+export const userRoleStore      = createStore<UserRole>(MOCK_USER_ROLES)
 export const userAuditLogStore       = createStore<UserAuditLog>(MOCK_USER_AUDIT_LOGS)

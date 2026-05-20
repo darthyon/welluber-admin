@@ -1,14 +1,13 @@
 /**
  * IAM — Identity & Access Management
  *
- * Standalone domain covering all admin-portal users, multi-tenant contexts,
- * role-based access control (RBAC), and user action audit logging.
- *
- * Replaces:
+ * Standalone domain. A single `User` entity covers every identity in the system,
+ * scoped by `Tenant`. This replaces all fragmented user types:
  *   - Administrator (features/users/types.ts)
  *   - OrganizationAdmin (features/organizations/types.ts)
  *   - SpAdmin (types/provider.ts)
  *   - AuditLogEntry (features/audit-log/types.ts)
+ *   - MemberProfile (types/member-profile.ts) — planned, see note below
  *
  * ─────────────────────────────────────────────────────────────────────────────
  * Multi-tenancy model
@@ -17,33 +16,51 @@
  *   Tenant "host"            → WellUber platform team
  *   Tenant "org-{orgId}"     → One per Organization
  *   Tenant "sp-{spId}"       → One per ServiceProvider
+ *   Tenant "member"          → [planned] Public/consumer users (Member App)
  *
- * A user (AdminUser) belongs to exactly one tenant.
+ * Every `User` belongs to exactly one Tenant.
  * Roles and permissions are scoped per tenant type.
  *
  * ─────────────────────────────────────────────────────────────────────────────
  * RBAC model
  * ─────────────────────────────────────────────────────────────────────────────
  *
- *   Permission  = atomic action on a resource (e.g. "employee:write")
- *   Role        = named set of permissions (e.g. "hr_manager")
- *   AdminUser   = has one or more Roles within their Tenant
+ *   Permission = atomic action on a resource (e.g. "employee:write")
+ *   Role       = named set of permissions    (e.g. "hr_manager")
+ *   User       = has one or more Roles within their Tenant
  *
- * Effective permissions = union of all permissions from all assigned roles.
+ * Effective permissions = union of permissions from all assigned roles.
  * System roles (isSystem: true) cannot be deleted or modified.
  *
  * ─────────────────────────────────────────────────────────────────────────────
  * Pre-defined roles
  * ─────────────────────────────────────────────────────────────────────────────
  *
- *   Host:  super_admin, platform_admin, finance_viewer, viewer
- *   Org:   org_admin, hr_manager, hr_viewer, finance_manager
- *   SP:    sp_admin, branch_manager, staff
+ *   Host:    super_admin, platform_admin, finance_viewer, viewer
+ *   Org:     org_admin, hr_manager, hr_viewer, finance_manager
+ *   SP:      sp_admin, branch_manager, staff
+ *   Member:  member_user  [planned — replaces MemberProfile when added]
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Planned: Member tenant
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ * When member (consumer) users are onboarded into IAM:
+ *   - TenantType expands to include "member"
+ *   - A single "member" tenant covers all public/consumer users
+ *   - MemberProfile fields move to User (personalEmail, authProvider, etc.)
+ *   - EmployeeAccount becomes the bridge from User → Employee (HR record)
+ *   - Roles: member_user (can browse + purchase), member_linked (has active
+ *     EmployeeAccount, benefit wallet unlocked)
  */
 
 // ── Tenant ────────────────────────────────────────────────────────────────────
 
-export type TenantType = "host" | "org" | "sp"
+export type TenantType =
+  | "host"    // WellUber platform team
+  | "org"     // One tenant per Organization
+  | "sp"      // One tenant per ServiceProvider
+  | "member"  // [planned] All consumer/member app users
 
 export interface Tenant {
   /**
@@ -130,6 +147,9 @@ export type RoleKey =
   | "sp_admin"          // Full SP management
   | "branch_manager"    // Branch management + vouchers (own branches)
   | "staff"             // Walk-in claim processing (own assigned branches)
+  // Member roles [planned]
+  | "member_user"       // Public user — can browse marketplace
+  | "member_linked"     // Linked to an EmployeeAccount — benefit wallet active
 
 export interface Role {
   id: string
@@ -151,42 +171,48 @@ export interface RolePermission {
   createdAt: string
 }
 
-// ── AdminUser ─────────────────────────────────────────────────────────────────
+// ── User ──────────────────────────────────────────────────────────────────────
 
 /**
- * An admin-portal user. Replaces Administrator, OrganizationAdmin, SpAdmin.
+ * A user in the IAM system. Generic — covers every identity type:
  *
- * Distinct from MemberProfile (consumer identity).
- * AdminUser belongs to exactly one Tenant.
- * Roles are assigned via AdminUserRole (junction).
+ *   tenantType "host"   → WellUber platform team member
+ *   tenantType "org"    → HR manager, finance staff, org admin
+ *   tenantType "sp"     → SP admin, branch manager, front-desk staff
+ *   tenantType "member" → [planned] Consumer / Member App user
+ *
+ * Replaces: Administrator, OrganizationAdmin, SpAdmin, (future) MemberProfile.
+ * Roles are assigned via UserRole (junction table).
  */
-export type AdminUserStatus = "active" | "pending_activation" | "suspended" | "deactivated"
+export type UserStatus = "active" | "pending_activation" | "suspended" | "deactivated"
 
-export interface AdminUser {
-  id: string                   // Firebase UID within the tenant
-  tenantId: string             // FK → Tenant
+export interface User {
+  id: string          // Firebase UID within the tenant
+  tenantId: string    // FK → Tenant
   email: string
   name: string
   avatarUrl?: string
-  status: AdminUserStatus
-  /** Scope restriction for SP staff: only these branches */
-  branchIds?: string[]         // Only relevant for "staff" role in SP tenant
-  /** Who invited this user */
-  invitedBy?: string           // FK → AdminUser
+  status: UserStatus
+  /**
+   * Branch scope — only relevant for SP staff role.
+   * Limits claim processing to these specific branches.
+   */
+  branchIds?: string[]
+  /** Who sent the invite that created this user */
+  invitedBy?: string  // FK → User
   invitedAt?: string
-  /** Timestamps */
   lastLoginAt?: string
   createdAt: string
   updatedAt: string
 }
 
-// ── AdminUserRole (junction) ──────────────────────────────────────────────────
+// ── UserRole (junction) ───────────────────────────────────────────────────────
 
-export interface AdminUserRole {
+export interface UserRole {
   id: string
-  adminUserId: string   // FK → AdminUser
-  tenantId: string      // FK → Tenant (redundant but useful for queries)
-  roleId: string        // FK → Role
+  userId: string    // FK → User
+  tenantId: string  // FK → Tenant (denormalised for query efficiency)
+  roleId: string    // FK → Role
   assignedBy: string    // FK → AdminUser (who granted this role)
   assignedAt: string
   /** Optional expiry for time-limited access grants */
@@ -207,7 +233,7 @@ export interface AdminUserRole {
  */
 export interface UserAuditLog {
   id: string
-  adminUserId: string  // FK → AdminUser (who performed the action)
+  userId: string       // FK → User (who performed the action)
   tenantId: string     // FK → Tenant (which tenant context)
   /**
    * Dot-notation action key: "{resource}.{verb}"
@@ -288,6 +314,10 @@ export const ROLE_PERMISSIONS: Record<RoleKey, PermissionKey[]> = {
     "claim:read", "settlement:read",
     "audit:read",
   ],
+
+  // ── Member [planned] ─────────────────────────────────────────────────────
+  member_user:   [],  // No admin permissions — member roles TBD when member tenant is built
+  member_linked: [],  // Same — wallet access governed by EmployeeAccount, not IAM permissions
 
   // ── SP ────────────────────────────────────────────────────────────────────
   sp_admin: [

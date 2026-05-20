@@ -19,7 +19,7 @@ import { createMemberProfile } from "./factories/member-profile"
 import { createEmployeeAccount, createDependentAccount } from "./factories/employee-account"
 import {
   TENANTS, PERMISSIONS, ROLES, ROLE_PERMISSION_RECORDS,
-  ADMIN_USERS, ADMIN_USER_ROLES, USER_AUDIT_LOGS,
+  USERS, USER_ROLES, USER_AUDIT_LOGS,
 } from "./factories/iam"
 
 function seedAll() {
@@ -49,9 +49,9 @@ function seedAll() {
   const permissions     = PERMISSIONS
   const roles           = ROLES
   const rolePermissions = ROLE_PERMISSION_RECORDS
-  const adminUsers      = ADMIN_USERS
-  const adminUserRoles  = ADMIN_USER_ROLES
-  const userAuditLogs   = USER_AUDIT_LOGS
+  const users         = USERS
+  const userRoles     = USER_ROLES
+  const userAuditLogs = USER_AUDIT_LOGS
 
   // Populate registry (single source of truth for ID lookups)
   brands.forEach(b => Registry.brands.set(b.id, b))
@@ -95,8 +95,8 @@ function seedAll() {
     permissions,
     roles,
     rolePermissions,
-    adminUsers,
-    adminUserRoles,
+    users,
+    userRoles,
     userAuditLogs,
   }
 }
@@ -128,8 +128,8 @@ export const MOCK_TENANTS              = SEED.tenants
 export const MOCK_PERMISSIONS          = SEED.permissions
 export const MOCK_ROLES                = SEED.roles
 export const MOCK_ROLE_PERMISSIONS     = SEED.rolePermissions
-export const MOCK_ADMIN_USERS          = SEED.adminUsers
-export const MOCK_ADMIN_USER_ROLES     = SEED.adminUserRoles
+export const MOCK_USERS          = SEED.users
+export const MOCK_USER_ROLES     = SEED.userRoles
 export const MOCK_USER_AUDIT_LOGS      = SEED.userAuditLogs
 
 // Policy data map keyed by policy ID (replaces POLICY_DATA_MAP_INITIAL)

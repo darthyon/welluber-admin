@@ -1,6 +1,6 @@
 import type {
   Tenant, Permission, Role, RolePermission,
-  AdminUser, AdminUserRole, UserAuditLog,
+  User, UserRole, UserAuditLog,
   PermissionKey, RoleKey, TenantType,
 } from "@/types/iam"
 import { ROLE_PERMISSIONS } from "@/types/iam"
@@ -99,9 +99,9 @@ export const ROLE_PERMISSION_RECORDS: RolePermission[] = ROLES.flatMap(role => {
     }))
 })
 
-// ── AdminUsers ────────────────────────────────────────────────────────────────
+// ── Users ────────────────────────────────────────────────────────────────
 
-const ADMIN_DEFS: Array<Omit<AdminUser, "id" | "createdAt" | "updatedAt">> = [
+const ADMIN_DEFS: Array<Omit<User, "id" | "createdAt" | "updatedAt">> = [
   // Host admins
   { tenantId: "host", email: "yon@welluber.com",     name: "Yon Yusuf",     status: "active",              lastLoginAt: "2026-05-14T14:30:00Z" },
   { tenantId: "host", email: "danish@welluber.com",  name: "Danish Azhar",  status: "active",              lastLoginAt: "2026-05-12T09:15:00Z" },
@@ -119,37 +119,37 @@ const ADMIN_DEFS: Array<Omit<AdminUser, "id" | "createdAt" | "updatedAt">> = [
   { tenantId: "sp-SP-20260115-0002", email: "admin@agilemind.my",    name: "Sara Lim",         status: "active",   invitedAt: "2026-01-15T08:00:00Z", lastLoginAt: "2026-05-12T14:00:00Z" },
 ]
 
-export const ADMIN_USERS: AdminUser[] = ADMIN_DEFS.map((a, i) => ({
+export const USERS: User[] = ADMIN_DEFS.map((a, i) => ({
   id: `ADM-20260115-${String(i + 1).padStart(4, "0")}`,
   ...a,
   createdAt: NOW,
   updatedAt: NOW,
 }))
 
-// ── AdminUserRoles ────────────────────────────────────────────────────────────
+// ── UserRoles ────────────────────────────────────────────────────────────
 
 function roleId(key: RoleKey): string {
   return ROLES.find(r => r.key === key)!.id
 }
 
-const USER_ROLE_DEFS: Array<Omit<AdminUserRole, "id" | "createdAt" | "updatedAt">> = [
+const USER_ROLE_DEFS: Array<Omit<UserRole, "id" | "createdAt" | "updatedAt">> = [
   // Host
-  { adminUserId: "ADM-20260115-0001", tenantId: "host", roleId: roleId("super_admin"),    assignedBy: "ADM-20260115-0001", assignedAt: NOW, isActive: true },
-  { adminUserId: "ADM-20260115-0002", tenantId: "host", roleId: roleId("platform_admin"), assignedBy: "ADM-20260115-0001", assignedAt: NOW, isActive: true },
-  { adminUserId: "ADM-20260115-0003", tenantId: "host", roleId: roleId("finance_viewer"), assignedBy: "ADM-20260115-0001", assignedAt: NOW, isActive: true },
+  { userId: "ADM-20260115-0001", tenantId: "host", roleId: roleId("super_admin"),    assignedBy: "ADM-20260115-0001", assignedAt: NOW, isActive: true },
+  { userId: "ADM-20260115-0002", tenantId: "host", roleId: roleId("platform_admin"), assignedBy: "ADM-20260115-0001", assignedAt: NOW, isActive: true },
+  { userId: "ADM-20260115-0003", tenantId: "host", roleId: roleId("finance_viewer"), assignedBy: "ADM-20260115-0001", assignedAt: NOW, isActive: true },
   // Acme org
-  { adminUserId: "ADM-20260115-0004", tenantId: "org-ORG-20260115-0001", roleId: roleId("org_admin"),      assignedBy: "ADM-20260115-0001", assignedAt: NOW, isActive: true },
-  { adminUserId: "ADM-20260115-0005", tenantId: "org-ORG-20260115-0001", roleId: roleId("finance_manager"),assignedBy: "ADM-20260115-0004", assignedAt: NOW, isActive: true },
-  { adminUserId: "ADM-20260115-0006", tenantId: "org-ORG-20260115-0001", roleId: roleId("hr_viewer"),      assignedBy: "ADM-20260115-0004", assignedAt: NOW, isActive: true },
+  { userId: "ADM-20260115-0004", tenantId: "org-ORG-20260115-0001", roleId: roleId("org_admin"),      assignedBy: "ADM-20260115-0001", assignedAt: NOW, isActive: true },
+  { userId: "ADM-20260115-0005", tenantId: "org-ORG-20260115-0001", roleId: roleId("finance_manager"),assignedBy: "ADM-20260115-0004", assignedAt: NOW, isActive: true },
+  { userId: "ADM-20260115-0006", tenantId: "org-ORG-20260115-0001", roleId: roleId("hr_viewer"),      assignedBy: "ADM-20260115-0004", assignedAt: NOW, isActive: true },
   // Global Tech org
-  { adminUserId: "ADM-20260115-0007", tenantId: "org-ORG-20260301-0002", roleId: roleId("hr_manager"),     assignedBy: "ADM-20260115-0001", assignedAt: NOW, isActive: true },
+  { userId: "ADM-20260115-0007", tenantId: "org-ORG-20260301-0002", roleId: roleId("hr_manager"),     assignedBy: "ADM-20260115-0001", assignedAt: NOW, isActive: true },
   // SP
-  { adminUserId: "ADM-20260115-0008", tenantId: "sp-SP-20260101-0001", roleId: roleId("sp_admin"),       assignedBy: "ADM-20260115-0001", assignedAt: NOW, isActive: true },
-  { adminUserId: "ADM-20260115-0009", tenantId: "sp-SP-20260101-0001", roleId: roleId("staff"),           assignedBy: "ADM-20260115-0008", assignedAt: NOW, isActive: true },
-  { adminUserId: "ADM-20260115-0010", tenantId: "sp-SP-20260115-0002", roleId: roleId("sp_admin"),       assignedBy: "ADM-20260115-0001", assignedAt: NOW, isActive: true },
+  { userId: "ADM-20260115-0008", tenantId: "sp-SP-20260101-0001", roleId: roleId("sp_admin"),       assignedBy: "ADM-20260115-0001", assignedAt: NOW, isActive: true },
+  { userId: "ADM-20260115-0009", tenantId: "sp-SP-20260101-0001", roleId: roleId("staff"),           assignedBy: "ADM-20260115-0008", assignedAt: NOW, isActive: true },
+  { userId: "ADM-20260115-0010", tenantId: "sp-SP-20260115-0002", roleId: roleId("sp_admin"),       assignedBy: "ADM-20260115-0001", assignedAt: NOW, isActive: true },
 ]
 
-export const ADMIN_USER_ROLES: AdminUserRole[] = USER_ROLE_DEFS.map((r, i) => ({
+export const USER_ROLES: UserRole[] = USER_ROLE_DEFS.map((r, i) => ({
   id: `AUR-20260115-${String(i + 1).padStart(4, "0")}`,
   ...r,
   createdAt: NOW,
@@ -159,16 +159,16 @@ export const ADMIN_USER_ROLES: AdminUserRole[] = USER_ROLE_DEFS.map((r, i) => ({
 // ── UserAuditLogs ─────────────────────────────────────────────────────────────
 
 const AUDIT_DEFS: Array<Omit<UserAuditLog, "id">> = [
-  { adminUserId: "ADM-20260115-0001", tenantId: "host",                    action: "org.create",          resource: "Organization",  resourceId: "ORG-20260115-0001", description: "Created Acme Corporation Sdn Bhd", after: { name: "Acme Corporation Sdn Bhd", status: "draft" }, createdAt: "2026-01-15T09:00:00Z" },
-  { adminUserId: "ADM-20260115-0001", tenantId: "host",                    action: "user.invite",         resource: "AdminUser",     resourceId: "ADM-20260115-0004", description: "Invited Haziq Rashid as org_admin for Acme",                                                            createdAt: "2026-01-15T09:05:00Z" },
-  { adminUserId: "ADM-20260115-0004", tenantId: "org-ORG-20260115-0001",  action: "employee.create",     resource: "Employee",      resourceId: "EMP-20260115-0001", description: "Added Ahmad Faizal to Kuala Lumpur HQ",                                                                 createdAt: "2026-01-15T10:00:00Z" },
-  { adminUserId: "ADM-20260115-0004", tenantId: "org-ORG-20260115-0001",  action: "policy.assign",       resource: "BenefitPolicy", resourceId: "POL-20260115-0001", description: "Assigned Acme Employee Wellness Policy to Ahmad Faizal",                                                createdAt: "2026-01-16T09:00:00Z" },
-  { adminUserId: "ADM-20260115-0005", tenantId: "org-ORG-20260115-0001",  action: "account.topup",       resource: "Account",       resourceId: "ACC-20260115-0001", description: "Submitted top-up request RM 10,000 for Acme HQ Wallet", after: { amount: 10000, method: "bank_transfer" }, createdAt: "2026-03-15T14:00:00Z" },
-  { adminUserId: "ADM-20260115-0001", tenantId: "host",                    action: "account.credit_limit",resource: "Account",       resourceId: "ACC-20260115-0001", description: "Updated credit limit to RM 5,000", before: { creditLimit: 3000 }, after: { creditLimit: 5000 },        createdAt: "2026-02-01T10:00:00Z" },
-  { adminUserId: "ADM-20260115-0008", tenantId: "sp-SP-20260101-0001",    action: "voucher.publish",     resource: "SpVoucher",     resourceId: "VCH-2024-0081",     description: "Published Wellness Allocation Voucher",                                                                 createdAt: "2026-01-20T11:00:00Z" },
-  { adminUserId: "ADM-20260115-0001", tenantId: "host",                    action: "settlement.trigger",  resource: "Settlement",    resourceId: "SET-2026-0001",     description: "Triggered payout to Zenith Yoga Studio — April 2026",                                                  createdAt: "2026-05-01T09:00:00Z" },
-  { adminUserId: "ADM-20260115-0004", tenantId: "org-ORG-20260115-0001",  action: "employee.deactivate", resource: "Employee",      resourceId: "EMP-20260115-0006", description: "Offboarded Priya Raj — last day 31 Mar 2026",                                                           createdAt: "2026-04-01T00:00:00Z" },
-  { adminUserId: "ADM-20260115-0002", tenantId: "host",                    action: "policy.write",        resource: "BenefitPolicy", resourceId: "POL-20260115-0002", description: "Updated Acme Leadership Benefits Policy — increased totalCapAmount", before: { totalCapAmount: 1500 }, after: { totalCapAmount: 2000 }, createdAt: "2026-04-10T14:00:00Z" },
+  { userId: "ADM-20260115-0001", tenantId: "host",                    action: "org.create",          resource: "Organization",  resourceId: "ORG-20260115-0001", description: "Created Acme Corporation Sdn Bhd", after: { name: "Acme Corporation Sdn Bhd", status: "draft" }, createdAt: "2026-01-15T09:00:00Z" },
+  { userId: "ADM-20260115-0001", tenantId: "host",                    action: "user.invite",         resource: "User",     resourceId: "ADM-20260115-0004", description: "Invited Haziq Rashid as org_admin for Acme",                                                            createdAt: "2026-01-15T09:05:00Z" },
+  { userId: "ADM-20260115-0004", tenantId: "org-ORG-20260115-0001",  action: "employee.create",     resource: "Employee",      resourceId: "EMP-20260115-0001", description: "Added Ahmad Faizal to Kuala Lumpur HQ",                                                                 createdAt: "2026-01-15T10:00:00Z" },
+  { userId: "ADM-20260115-0004", tenantId: "org-ORG-20260115-0001",  action: "policy.assign",       resource: "BenefitPolicy", resourceId: "POL-20260115-0001", description: "Assigned Acme Employee Wellness Policy to Ahmad Faizal",                                                createdAt: "2026-01-16T09:00:00Z" },
+  { userId: "ADM-20260115-0005", tenantId: "org-ORG-20260115-0001",  action: "account.topup",       resource: "Account",       resourceId: "ACC-20260115-0001", description: "Submitted top-up request RM 10,000 for Acme HQ Wallet", after: { amount: 10000, method: "bank_transfer" }, createdAt: "2026-03-15T14:00:00Z" },
+  { userId: "ADM-20260115-0001", tenantId: "host",                    action: "account.credit_limit",resource: "Account",       resourceId: "ACC-20260115-0001", description: "Updated credit limit to RM 5,000", before: { creditLimit: 3000 }, after: { creditLimit: 5000 },        createdAt: "2026-02-01T10:00:00Z" },
+  { userId: "ADM-20260115-0008", tenantId: "sp-SP-20260101-0001",    action: "voucher.publish",     resource: "SpVoucher",     resourceId: "VCH-2024-0081",     description: "Published Wellness Allocation Voucher",                                                                 createdAt: "2026-01-20T11:00:00Z" },
+  { userId: "ADM-20260115-0001", tenantId: "host",                    action: "settlement.trigger",  resource: "Settlement",    resourceId: "SET-2026-0001",     description: "Triggered payout to Zenith Yoga Studio — April 2026",                                                  createdAt: "2026-05-01T09:00:00Z" },
+  { userId: "ADM-20260115-0004", tenantId: "org-ORG-20260115-0001",  action: "employee.deactivate", resource: "Employee",      resourceId: "EMP-20260115-0006", description: "Offboarded Priya Raj — last day 31 Mar 2026",                                                           createdAt: "2026-04-01T00:00:00Z" },
+  { userId: "ADM-20260115-0002", tenantId: "host",                    action: "policy.write",        resource: "BenefitPolicy", resourceId: "POL-20260115-0002", description: "Updated Acme Leadership Benefits Policy — increased totalCapAmount", before: { totalCapAmount: 1500 }, after: { totalCapAmount: 2000 }, createdAt: "2026-04-10T14:00:00Z" },
 ]
 
 export const USER_AUDIT_LOGS: UserAuditLog[] = AUDIT_DEFS.map((a, i) => ({
@@ -181,6 +181,6 @@ export const USER_AUDIT_LOGS: UserAuditLog[] = AUDIT_DEFS.map((a, i) => ({
 export function createTenant(index: number):      Tenant        { return TENANTS[index % TENANTS.length]! }
 export function createPermission(index: number):  Permission    { return PERMISSIONS[index % PERMISSIONS.length]! }
 export function createRole(index: number):        Role          { return ROLES[index % ROLES.length]! }
-export function createAdminUser(index: number):   AdminUser     { return ADMIN_USERS[index % ADMIN_USERS.length]! }
-export function createAdminUserRole(index: number): AdminUserRole { return ADMIN_USER_ROLES[index % ADMIN_USER_ROLES.length]! }
+export function createUser(index: number):   AdminUser     { return USERS[index % USERS.length]! }
+export function createUserRole(index: number): AdminUserRole { return USER_ROLES[index % USER_ROLES.length]! }
 export function createUserAuditLog(index: number): UserAuditLog { return USER_AUDIT_LOGS[index % USER_AUDIT_LOGS.length]! }
