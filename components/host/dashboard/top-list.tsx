@@ -40,7 +40,8 @@ export function TopList({ title, type, data }: TopListProps) {
             { label: "Commission", value: "commission" },
             { label: "Rating", value: "rating" },
           ]}
-          triggerClassName="shrink-0 h-8"
+          size="xs"
+          triggerClassName="shrink-0 w-auto"
         />
       </div>
 
