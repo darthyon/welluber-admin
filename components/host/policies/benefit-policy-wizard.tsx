@@ -44,6 +44,7 @@ import type { EmployeeDirectoryItem } from "@/features/employees/types";
 import { MOCK_EMPLOYEE_UTILISATION, SERVICES } from "@/lib/mock-data";
 import type { MainServiceId } from "@/lib/mock-data/service-catalog";
 import { BenefitServiceSelector } from "@/components/host/policies/benefit-service-selector";
+import { MonthPickerField } from "@/components/shared/month-picker-field";
 import { validateBenefit, validateGroupInsert } from "@/lib/policy/validation";
 import { usePolicyDraft } from "@/hooks/use-policy-draft";
 
@@ -265,7 +266,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
         errors.dependentsPoolType = "Select a pool type for dependents";
       }
 
-      if (!policyData.refreshStartMonth || policyData.refreshStartMonth < 1 || policyData.refreshStartMonth > 12) {
+      if (policyData.refreshStartReference === "calendar_year" && (!policyData.refreshStartMonth || policyData.refreshStartMonth < 1 || policyData.refreshStartMonth > 12)) {
         errors.refreshStartMonth = "Select a start month";
       }
 
@@ -888,7 +889,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                   description="Cycle aligns to the organisation's financial year."
                   icon={CalendarBlank}
                   selected={policyData.refreshStartReference === "financial_year"}
-                  onSelect={() => setPolicyData({ ...policyData, refreshStartReference: "financial_year" })}
+                  onSelect={() => setPolicyData({ ...policyData, refreshStartReference: "financial_year", refreshStartMonth: undefined })}
                 />
                 <ChoiceCard
                   title="Calendar Year"
@@ -898,29 +899,17 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                   onSelect={() => setPolicyData({ ...policyData, refreshStartReference: "calendar_year" })}
                 />
               </div>
-              <div className="space-y-2">
-                <p className="text-label font-medium text-subtle">Start Month</p>
-                {validationErrors.refreshStartMonth && <p className="text-label text-rose-600 dark:text-rose-400 font-medium">{validationErrors.refreshStartMonth}</p>}
-                <div className="flex flex-wrap gap-2">
-                  {["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"].map((month, idx) => {
-                    const monthNum = idx + 1;
-                    const selected = policyData.refreshStartMonth === monthNum;
-                    return (
-                      <button
-                        key={month}
-                        type="button"
-                        onClick={() => setPolicyData({ ...policyData, refreshStartMonth: monthNum })}
-                        className={cn(
-                          "px-3 py-1.5 rounded-lg text-label font-semibold border transition-all min-w-[48px] text-center",
-                          selected ? "bg-primary text-primary-foreground border-primary shadow-sm" : "bg-background text-muted-foreground border-border hover:border-primary/30"
-                        )}
-                      >
-                        {month}
-                      </button>
-                    );
-                  })}
+              {policyData.refreshStartReference === "calendar_year" && (
+                <div className="space-y-2">
+                  <p className="text-label font-medium text-subtle">Start Month</p>
+                  {validationErrors.refreshStartMonth && <p className="text-label text-rose-600 dark:text-rose-400 font-medium">{validationErrors.refreshStartMonth}</p>}
+                  <MonthPickerField
+                    value={policyData.refreshStartMonth}
+                    onChange={(m) => setPolicyData({ ...policyData, refreshStartMonth: m })}
+                    error={!!validationErrors.refreshStartMonth}
+                  />
                 </div>
-              </div>
+              )}
             </div>
 
           </div>
@@ -1016,7 +1005,6 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                         <div className="space-y-1.5">
                           <p className="text-label font-medium text-muted-foreground">
                             <span className="inline-flex items-center gap-1.5">Group Cap <FieldHelp termKey="groupCap" /></span>
-                            <span className="text-faint font-normal ml-1">(optional)</span>
                           </p>
                           <input
                             type="number"

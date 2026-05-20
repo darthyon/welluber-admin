@@ -38,6 +38,7 @@ import type { PolicyGlossaryKey } from "@/lib/policy-glossary";
 import { MOCK_ORGS, SERVICES } from "@/lib/mock-data";
 import type { MainServiceId } from "@/lib/mock-data/service-catalog";
 import { BenefitServiceSelector } from "@/components/host/policies/benefit-service-selector";
+import { MonthPickerField } from "@/components/shared/month-picker-field";
 import { validateBenefit, validateCoPayment, validateGroupInsert } from "@/lib/policy/validation";
 import { usePolicyDraft } from "@/hooks/use-policy-draft";
 
@@ -608,7 +609,7 @@ export function PolicyWizardContent({ mode = "create", groupsOnly = false, initi
         });
       }
 
-      if (!policyData.refreshStartMonth || policyData.refreshStartMonth < 1 || policyData.refreshStartMonth > 12) {
+      if (policyData.refreshStartReference === "calendar_year" && (!policyData.refreshStartMonth || policyData.refreshStartMonth < 1 || policyData.refreshStartMonth > 12)) {
         errors.refreshStartMonth = "Select a start month";
       }
 
@@ -863,12 +864,21 @@ export function PolicyWizardContent({ mode = "create", groupsOnly = false, initi
         ) : (
           <div className="flex flex-wrap gap-2">
             {(() => {
-              const allSelected = !policyData.eligibility?.tierIds?.length;
+              const tierIds = policyData.eligibility?.tierIds ?? [];
+              const allSelected = tierOptions.length > 0 && tierOptions.every((t) => tierIds.includes(t.value));
               return (
                 <>
                   <button
                     type="button"
-                    onClick={() => setPolicyData({ ...policyData, eligibility: { ...policyData.eligibility, tierIds: [] } })}
+                    onClick={() =>
+                      setPolicyData({
+                        ...policyData,
+                        eligibility: {
+                          ...policyData.eligibility,
+                          tierIds: allSelected ? [] : tierOptions.map((t) => t.value),
+                        },
+                      })
+                    }
                     className={cn(
                       "px-4 py-2 rounded-full text-body font-semibold border transition-all",
                       allSelected
@@ -880,16 +890,15 @@ export function PolicyWizardContent({ mode = "create", groupsOnly = false, initi
                     All
                   </button>
                   {tierOptions.map((tier) => {
-                    const selected = policyData.eligibility?.tierIds?.includes(tier.value) ?? false;
+                    const selected = tierIds.includes(tier.value);
                     return (
                       <button
                         type="button"
                         key={tier.value}
                         onClick={() => {
-                          const current = policyData.eligibility?.tierIds ?? [];
                           const updated = selected
-                            ? current.filter((id) => id !== tier.value)
-                            : [...current, tier.value];
+                            ? tierIds.filter((id) => id !== tier.value)
+                            : [...tierIds, tier.value];
                           setPolicyData({ ...policyData, eligibility: { ...policyData.eligibility, tierIds: updated } });
                         }}
                         className={cn(
@@ -932,12 +941,21 @@ export function PolicyWizardContent({ mode = "create", groupsOnly = false, initi
         ) : (
           <div className="flex flex-wrap gap-2">
             {(() => {
-              const allSelected = !policyData.eligibility?.departmentIds?.length;
+              const deptIds = policyData.eligibility?.departmentIds ?? [];
+              const allSelected = departmentOptions.length > 0 && departmentOptions.every((d) => deptIds.includes(d.value));
               return (
                 <>
                   <button
                     type="button"
-                    onClick={() => setPolicyData({ ...policyData, eligibility: { ...policyData.eligibility, departmentIds: [] } })}
+                    onClick={() =>
+                      setPolicyData({
+                        ...policyData,
+                        eligibility: {
+                          ...policyData.eligibility,
+                          departmentIds: allSelected ? [] : departmentOptions.map((d) => d.value),
+                        },
+                      })
+                    }
                     className={cn(
                       "px-4 py-2 rounded-full text-body font-semibold border transition-all",
                       allSelected
@@ -949,16 +967,15 @@ export function PolicyWizardContent({ mode = "create", groupsOnly = false, initi
                     All
                   </button>
                   {departmentOptions.map((dept) => {
-                    const selected = policyData.eligibility?.departmentIds?.includes(dept.value) ?? false;
+                    const selected = deptIds.includes(dept.value);
                     return (
                       <button
                         type="button"
                         key={dept.value}
                         onClick={() => {
-                          const current = policyData.eligibility?.departmentIds ?? [];
                           const updated = selected
-                            ? current.filter((id) => id !== dept.value)
-                            : [...current, dept.value];
+                            ? deptIds.filter((id) => id !== dept.value)
+                            : [...deptIds, dept.value];
                           setPolicyData({ ...policyData, eligibility: { ...policyData.eligibility, departmentIds: updated } });
                         }}
                         className={cn(
@@ -1356,7 +1373,7 @@ export function PolicyWizardContent({ mode = "create", groupsOnly = false, initi
             description="Cycle aligns to the organisation's financial year."
             icon={CalendarBlank}
             selected={policyData.refreshStartReference === "financial_year"}
-            onSelect={() => setPolicyData({ ...policyData, refreshStartReference: "financial_year" })}
+            onSelect={() => setPolicyData({ ...policyData, refreshStartReference: "financial_year", refreshStartMonth: undefined })}
           />
           <ChoiceCard
             title="Calendar Year"
@@ -1368,32 +1385,17 @@ export function PolicyWizardContent({ mode = "create", groupsOnly = false, initi
         </div>
       </div>
 
-      <div className="space-y-3">
-        <FieldLabel required>Start Month</FieldLabel>
-        <p className="text-micro text-faint -mt-1">Which month does the cycle begin?</p>
-        {validationErrors.refreshStartMonth && <ErrorText>{validationErrors.refreshStartMonth}</ErrorText>}
-        <div className="flex flex-wrap gap-2">
-          {MONTHS.map((month, idx) => {
-            const monthNum = idx + 1;
-            const selected = policyData.refreshStartMonth === monthNum;
-            return (
-              <button
-                key={month}
-                type="button"
-                onClick={() => setPolicyData({ ...policyData, refreshStartMonth: monthNum })}
-                className={cn(
-                  "px-3 py-1.5 rounded-lg text-label font-semibold border transition-all min-w-[48px] text-center",
-                  selected
-                    ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                    : "bg-background text-muted-foreground border-border hover:border-primary/30"
-                )}
-              >
-                {month}
-              </button>
-            );
-          })}
+      {policyData.refreshStartReference === "calendar_year" && (
+        <div className="space-y-2">
+          <FieldLabel required>Start Month</FieldLabel>
+          {validationErrors.refreshStartMonth && <ErrorText>{validationErrors.refreshStartMonth}</ErrorText>}
+          <MonthPickerField
+            value={policyData.refreshStartMonth}
+            onChange={(m) => setPolicyData({ ...policyData, refreshStartMonth: m })}
+            error={!!validationErrors.refreshStartMonth}
+          />
         </div>
-      </div>
+      )}
     </div>
   );
 
@@ -1469,7 +1471,6 @@ export function PolicyWizardContent({ mode = "create", groupsOnly = false, initi
                       <div className="space-y-1.5">
                         <p className="text-label font-medium text-muted-foreground">
                           <span className="inline-flex items-center gap-1.5">Group Cap <FieldHelp termKey="groupCap" /></span>
-                          <span className="text-faint font-normal ml-1">(optional)</span>
                         </p>
                         <input
                           type="number"
@@ -1525,7 +1526,6 @@ export function PolicyWizardContent({ mode = "create", groupsOnly = false, initi
                         <div className="space-y-1.5">
                           <p className="text-label font-medium text-muted-foreground">
                             <span className="inline-flex items-center gap-1.5">Group Cap <FieldHelp termKey="groupCap" /></span>
-                            <span className="text-faint font-normal ml-1">(optional)</span>
                           </p>
                           <input
                             type="number"
@@ -1865,8 +1865,8 @@ export function PolicyWizardContent({ mode = "create", groupsOnly = false, initi
         </section>
       )}
 
-      {/* Groups & Services — edit mode or groups-only mode */}
-      {(mode !== "create" || groupsOnly) && (
+      {/* Groups & Services — groups-only mode only */}
+      {groupsOnly && (
         <section id="groups-services" className="scroll-mt-32">
           <div className="bg-card border border-border rounded-lg shadow-sm overflow-hidden">
             <div className="p-6 md:p-8">{renderGroupsSection()}</div>
