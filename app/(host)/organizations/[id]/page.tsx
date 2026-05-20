@@ -53,6 +53,7 @@ import { OrgStructureConfig } from "@/components/host/organizations/org-structur
 import { AssignPolicyModal } from "@/components/host/organizations/assign-policy-modal"
 import { BenefitPolicyWizard } from "@/components/host/policies/benefit-policy-wizard"
 import { PolicyDetailView } from "@/components/host/policies/policy-detail-view"
+import { PolicyCreationLauncher } from "@/components/host/policies/policy-creation-launcher"
 import { BenefitPolicy, Benefit } from "@/types/policy"
 import type { FlatClaimRow } from "@/types/claims"
 import { DetailSection } from "@/components/shared/detail-section"
@@ -1921,14 +1922,12 @@ function OrganizationDetailContent() {
                     >
                       <Plus size={14} weight="bold" /> Assign Policy
                     </Button>
-                    <Button
-                      onClick={() => router.push(`/organizations/${orgId}/policies/new`)}
-                      variant="secondary"
-                      size="sm"
-                      className="flex h-8 items-center gap-2 rounded-full px-4 text-label font-medium"
-                    >
-                      <Plus size={14} weight="bold" /> Add Benefit Policy
-                    </Button>
+                    <PolicyCreationLauncher
+                      preselectedOrgId={orgId}
+                      hideOrgPicker
+                      onManual={(oid) => router.push(`/policies/new?orgId=${oid}`)}
+                      onTemplate={(tid, oid) => router.push(`/policies/new?template=${tid}&orgId=${oid}`)}
+                    />
                   </div>
                 </div>
                 <DataFilterBar

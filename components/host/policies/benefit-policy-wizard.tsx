@@ -22,6 +22,8 @@ import {
   Warning,
   CalendarBlank,
   Calendar,
+  ArrowCounterClockwise,
+  ChartLineUp,
   type IconProps
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
@@ -35,7 +37,7 @@ import { SuccessCelebration } from "@/components/shared/success-celebration";
 import { PolicyLaunchConfirmModal } from "@/components/host/policies/policy-launch-confirm-modal";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
-import { BenefitPolicy, BenefitGroup, Benefit, PolicyStatus, DistributionType, DependentsPoolType, ProrateUnit, RefreshCycle } from "@/types/policy";
+import { BenefitPolicy, BenefitGroup, Benefit, PolicyStatus, DistributionType, DependentsPoolType, ProrateUnit, RefreshCycle, DependentCoverageType, UtilisationMode } from "@/types/policy";
 import { UtilisationClaimsTable } from "@/components/shared/utilisation-claims-table";
 import { MOCK_EMPLOYEES, MOCK_ORGS } from "@/lib/mock-data";
 import type { EmployeeDirectoryItem } from "@/features/employees/types";
@@ -184,6 +186,7 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [depModalGroupId, setDepModalGroupId] = useState<string | null>(null);
 
   const [policyData, setPolicyData] = useState<Partial<BenefitPolicy>>(initialData?.policy || {
     name: "",
@@ -339,8 +342,28 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
     setBenefits(benefits.filter(b => b.groupId !== groupId));
   };
 
-  const updateGroup = (groupId: string, field: keyof BenefitGroup, value: string | number | DistributionType | undefined) => {
-    setGroups(groups.map(g => g.id === groupId ? { ...g, [field]: value } : g));
+  const updateGroup = (groupId: string, field: keyof BenefitGroup, value: string | number | boolean | DistributionType | UtilisationMode | ProrateUnit | undefined) => {
+    setGroups(prev => prev.map(g => g.id === groupId ? { ...g, [field]: value } : g));
+  };
+
+  const updateGroupCoPayment = (groupId: string, field: "required" | "type" | "value", value: boolean | string | number) => {
+    setGroups((prev) =>
+      prev.map((g) => {
+        if (g.id !== groupId) return g;
+        const coPayment = g.coPayment ?? { required: false, type: "Percentage" as const, value: 0 };
+        return { ...g, coPayment: { ...coPayment, [field]: value } };
+      })
+    );
+  };
+
+  const updateDependentCoPayment = (groupId: string, field: "required" | "type" | "value", value: boolean | string | number) => {
+    setGroups((prev) =>
+      prev.map((g) => {
+        if (g.id !== groupId) return g;
+        const coPayment = g.dependentCoPayment ?? { required: false, type: "Percentage" as const, value: 0 };
+        return { ...g, dependentCoPayment: { ...coPayment, [field]: value } };
+      })
+    );
   };
   const toggleService = (groupId: string, serviceId: MainServiceId) => {
     const exists = benefits.find(b => b.groupId === groupId && b.serviceId === serviceId);
@@ -980,47 +1003,259 @@ export function BenefitPolicyWizard({ onCancel, onSuccess, onSaveDraft, onEdit, 
                   </div>
 
                   {/* Card body */}
-                  <div className="p-4 space-y-4">
-                    {/* Distribution type + max usage */}
-                    <div className="flex items-start gap-6 flex-wrap">
-                      <div className="space-y-1.5">
-                        <p className="text-label font-medium text-muted-foreground">Distribution</p>
-                        {isViewMode ? (
-                          <p className="text-label font-semibold text-subtle">{group.distributionType === "SharedAmount" ? "Shared Pool" : "Individual Per Benefit"}</p>
-                        ) : (
-                          <div className="flex flex-col gap-1.5">
-                            <div className="flex p-0.5 bg-muted rounded-lg">
-                              {(["SharedAmount", "IndividualBenefitAmount"] as const).map((type) => (
-                                <button key={type} onClick={() => updateGroup(group.id, "distributionType", type)}
-                                  className={cn("px-2.5 py-1 text-label font-medium rounded-md transition-all", group.distributionType === type ? "bg-background text-primary shadow-sm" : "text-muted-foreground")}
-                                >
-                                  {type === "SharedAmount" ? "Shared Pool" : "Individual"}
-                                </button>
-                              ))}
+                  <div className="p-4 space-y-5">
+
+                    {/* Employee / Dependent two-column grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Employee column */}
+                      <div className="rounded-lg border border-border bg-muted/10 p-4 space-y-4">
+                        <p className="text-label font-semibold text-foreground flex items-center gap-1.5">
+                          <User size={14} weight="duotone" className="text-primary" />
+                          Employee
+                        </p>
+                        <div className="space-y-1.5">
+                          <p className="text-label font-medium text-muted-foreground">
+                            <span className="inline-flex items-center gap-1.5">Group Cap <FieldHelp termKey="groupCap" /></span>
+                            <span className="text-faint font-normal ml-1">(optional)</span>
+                          </p>
+                          <input
+                            type="number"
+                            className={cn("w-32 px-2.5 py-1.5 border bg-background rounded-lg text-label outline-none focus:ring-2 focus:ring-primary/10", groupErrors[`group_cap_${group.id}`] ? "border-rose-300" : "border-border")}
+                            value={group.maxUsagePerCycle || ""}
+                            onChange={(e) => updateGroup(group.id, "maxUsagePerCycle", e.target.value === "" ? undefined : parseFloat(e.target.value))}
+                            placeholder="0.00"
+                          />
+                          {groupErrors[`group_cap_${group.id}`] && <p className="text-micro text-rose-600 dark:text-rose-400">{groupErrors[`group_cap_${group.id}`]}</p>}
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-label font-medium text-muted-foreground inline-flex items-center gap-1.5">
+                            Co-payment <FieldHelp termKey="coPayment" />
+                          </label>
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => updateGroupCoPayment(group.id, "required", !(group.coPayment?.required ?? false))}
+                              aria-pressed={group.coPayment?.required ?? false}
+                              className={cn("w-9 h-5 rounded-full border transition-colors relative shrink-0", group.coPayment?.required ? "bg-primary border-primary" : "bg-muted border-border")}
+                            >
+                              <div className={cn("w-3.5 h-3.5 rounded-full bg-background shadow-sm absolute top-[2px] transition-all", group.coPayment?.required ? "right-0.5" : "left-0.5")} />
+                            </button>
+                            {group.coPayment?.required && (
+                              <div className="flex items-center gap-1.5">
+                                <FormSelect
+                                  value={group.coPayment?.type ?? "Percentage"}
+                                  onChange={(v) => updateGroupCoPayment(group.id, "type", v)}
+                                  options={[{ label: "%", value: "Percentage" }, { label: "RM", value: "Fixed" }]}
+                                  triggerClassName="w-16 h-8"
+                                />
+                                <input
+                                  type="number"
+                                  className="w-20 px-2.5 py-1.5 bg-background border border-border rounded-lg text-label font-mono outline-none text-right"
+                                  value={group.coPayment?.value || ""}
+                                  onChange={(e) => updateGroupCoPayment(group.id, "value", e.target.value === "" ? 0 : parseFloat(e.target.value))}
+                                />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Dependent column */}
+                      {(policyData.dependentCoverages?.length ?? 0) > 0 ? (
+                        <div className="rounded-lg border border-border bg-muted/10 p-4 space-y-4">
+                          <p className="text-label font-semibold text-foreground flex items-center gap-1.5">
+                            <UsersFour size={14} weight="duotone" className="text-primary" />
+                            Dependent
+                          </p>
+                          <div className="space-y-1.5">
+                            <p className="text-label font-medium text-muted-foreground">
+                              <span className="inline-flex items-center gap-1.5">Group Cap <FieldHelp termKey="groupCap" /></span>
+                              <span className="text-faint font-normal ml-1">(optional)</span>
+                            </p>
+                            <input
+                              type="number"
+                              className="w-32 px-2.5 py-1.5 border border-border bg-background rounded-lg text-label outline-none focus:ring-2 focus:ring-primary/10"
+                              value={group.dependentGroupCap || ""}
+                              onChange={(e) => updateGroup(group.id, "dependentGroupCap", e.target.value === "" ? undefined : parseFloat(e.target.value))}
+                              placeholder="0.00"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-label font-medium text-muted-foreground inline-flex items-center gap-1.5">
+                              Co-payment <FieldHelp termKey="coPayment" />
+                            </label>
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => updateDependentCoPayment(group.id, "required", !(group.dependentCoPayment?.required ?? false))}
+                                aria-pressed={group.dependentCoPayment?.required ?? false}
+                                className={cn("w-9 h-5 rounded-full border transition-colors relative shrink-0", group.dependentCoPayment?.required ? "bg-primary border-primary" : "bg-muted border-border")}
+                              >
+                                <div className={cn("w-3.5 h-3.5 rounded-full bg-background shadow-sm absolute top-[2px] transition-all", group.dependentCoPayment?.required ? "right-0.5" : "left-0.5")} />
+                              </button>
+                              {group.dependentCoPayment?.required && (
+                                <div className="flex items-center gap-1.5">
+                                  <FormSelect
+                                    value={group.dependentCoPayment?.type ?? "Percentage"}
+                                    onChange={(v) => updateDependentCoPayment(group.id, "type", v)}
+                                    options={[{ label: "%", value: "Percentage" }, { label: "RM", value: "Fixed" }]}
+                                    triggerClassName="w-16 h-8"
+                                  />
+                                  <input
+                                    type="number"
+                                    className="w-20 px-2.5 py-1.5 bg-background border border-border rounded-lg text-label font-mono outline-none text-right"
+                                    value={group.dependentCoPayment?.value || ""}
+                                    onChange={(e) => updateDependentCoPayment(group.id, "value", e.target.value === "" ? 0 : parseFloat(e.target.value))}
+                                  />
+                                </div>
+                              )}
                             </div>
                           </div>
-                        )}
-                      </div>
-                      <div className="space-y-1.5">
-                        <p className="text-label font-medium text-muted-foreground">
-                          <span className="inline-flex items-center gap-1.5">Group Cap (RM) <FieldHelp termKey="groupCap" /></span>
-                          {group.distributionType !== "SharedAmount" && (
-                            <span className="text-faint font-normal ml-1">(optional)</span>
-                          )}
-                        </p>
-                        {isViewMode ? (
-                          <p className="text-label font-semibold text-foreground">{group.maxUsagePerCycle ? `RM ${group.maxUsagePerCycle.toFixed(2)}` : "—"}</p>
+                        </div>
+                      ) : (
+                        <div className="rounded-lg border border-dashed border-border bg-muted/5 p-4 flex flex-col items-center justify-center gap-2 text-center min-h-[120px]">
+                          <UsersFour size={28} weight="duotone" className="text-border" />
+                          <p className="text-label font-medium text-faint">No dependent coverage</p>
+                          <button
+                            type="button"
+                            onClick={() => setDepModalGroupId(group.id)}
+                            className="text-label text-primary font-medium hover:underline"
+                          >
+                            Add dependent coverage →
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Dependent coverage mini modal */}
+                    {depModalGroupId === group.id && (() => {
+                      const DEP_TYPES: { value: DependentCoverageType; label: string }[] = [
+                        { value: "spouse",  label: "Spouse" },
+                        { value: "child",   label: "Child" },
+                        { value: "mother",  label: "Mother" },
+                        { value: "father",  label: "Father" },
+                        { value: "sibling", label: "Sibling" },
+                        { value: "inlaw",   label: "In-law" },
+                      ];
+                      const current = policyData.dependentCoverages ?? [];
+                      const allSelected = DEP_TYPES.every((t) => current.some((c) => c.type === t.value));
+                      return (
+                        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4 backdrop-blur-[2px]">
+                          <div className="w-full max-w-sm rounded-2xl border border-border bg-card shadow-2xl">
+                            <div className="p-6 pb-4 space-y-1">
+                              <p className="text-body font-semibold text-foreground">Add Dependent Coverage</p>
+                              <p className="text-label text-subtle">Select which dependents this group covers.</p>
+                            </div>
+                            <div className="px-6 pb-4">
+                              <div className="flex flex-wrap gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => setPolicyData({ ...policyData, dependentCoverages: allSelected ? [] : DEP_TYPES.map((t) => ({ type: t.value, capAmount: undefined })), dependentsPoolType: allSelected ? undefined : (policyData.dependentsPoolType ?? "SharedWithEmployee") })}
+                                  className={cn("px-3 py-1.5 rounded-full text-label font-medium border transition-all", allSelected ? "bg-primary text-primary-foreground border-primary shadow-sm" : "bg-background text-muted-foreground border-border hover:border-primary/30")}
+                                >
+                                  {allSelected && <Check size={11} weight="bold" className="inline mr-1.5" />}All
+                                </button>
+                                {DEP_TYPES.map((opt) => {
+                                  const isSelected = current.some((c) => c.type === opt.value);
+                                  return (
+                                    <button
+                                      key={opt.value}
+                                      type="button"
+                                      onClick={() => {
+                                        const next = isSelected
+                                          ? current.filter((c) => c.type !== opt.value)
+                                          : [...current, { type: opt.value, capAmount: undefined }];
+                                        setPolicyData({ ...policyData, dependentCoverages: next, dependentsPoolType: next.length > 0 ? (policyData.dependentsPoolType ?? "SharedWithEmployee") : undefined });
+                                      }}
+                                      className={cn("px-3 py-1.5 rounded-full text-label font-medium border transition-all", isSelected ? "bg-primary text-primary-foreground border-primary shadow-sm" : "bg-background text-muted-foreground border-border hover:border-primary/30")}
+                                    >
+                                      {isSelected && <Check size={11} weight="bold" className="inline mr-1.5" />}{opt.label}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                            <div className="flex items-center justify-end gap-2 border-t border-border px-6 py-4">
+                              <button
+                                type="button"
+                                onClick={() => setDepModalGroupId(null)}
+                                className="px-4 py-2 text-label font-medium text-muted-foreground hover:text-foreground transition-colors"
+                              >
+                                Cancel
+                              </button>
+                              <button
+                                type="button"
+                                disabled={(policyData.dependentCoverages?.length ?? 0) === 0}
+                                onClick={() => setDepModalGroupId(null)}
+                                className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-label font-medium disabled:opacity-40"
+                              >
+                                Confirm
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
+
+                    {/* Utilisation mode override */}
+                    <div className="space-y-3 pt-2 border-t border-border/60">
+                      <div className="flex items-center justify-between">
+                        <p className="text-label font-medium text-muted-foreground">Utilisation Mode</p>
+                        {group.utilisationMode ? (
+                          <button
+                            type="button"
+                            onClick={() => { updateGroup(group.id, "utilisationMode", undefined); updateGroup(group.id, "prorateUnit", undefined); }}
+                            className="flex items-center gap-1 text-micro text-faint hover:text-muted-foreground transition-colors"
+                          >
+                            <ArrowCounterClockwise size={11} />
+                            Reset to policy default
+                          </button>
                         ) : (
-                          <input type="number" className={cn("w-28 px-2.5 py-1 border bg-background rounded-lg text-label outline-none focus:ring-2 focus:ring-primary/10", groupErrors[`group_cap_${group.id}`] ? "border-rose-300" : "border-border")} value={group.maxUsagePerCycle || ""} onChange={(e) => updateGroup(group.id, "maxUsagePerCycle", e.target.value === "" ? undefined : parseFloat(e.target.value))} placeholder="0.00" />
+                          <span className="inline-flex items-center gap-1 text-micro text-faint bg-muted px-2 py-0.5 rounded-full">
+                            <ArrowCounterClockwise size={11} />
+                            Inheriting: {policyData.utilisationMode === "Prorated" ? `Prorated · ${policyData.prorateUnit ?? "Monthly"}` : "Fixed Allocation"}
+                          </span>
                         )}
-                        {groupErrors[`group_cap_${group.id}`] && <p className="text-micro text-rose-600 dark:text-rose-400">{groupErrors[`group_cap_${group.id}`]}</p>}
                       </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <ChoiceCard
+                          title="Fixed Allocation"
+                          description="Full allocation granted immediately."
+                          icon={Gear}
+                          selected={group.utilisationMode === "Fixed"}
+                          onSelect={() => {
+                            updateGroup(group.id, "utilisationMode", "Fixed");
+                            updateGroup(group.id, "prorateUnit", undefined);
+                          }}
+                        />
+                        <ChoiceCard
+                          title="Prorated Allocation"
+                          description="Amounts prorated based on time."
+                          icon={ChartLineUp}
+                          selected={group.utilisationMode === "Prorated"}
+                          onSelect={() => {
+                            updateGroup(group.id, "utilisationMode", "Prorated");
+                            if (!group.prorateUnit) updateGroup(group.id, "prorateUnit", "Monthly");
+                          }}
+                        />
+                      </div>
+                      {group.utilisationMode === "Prorated" && (
+                        <div className="space-y-1.5 animate-in fade-in slide-in-from-top-1 duration-200">
+                          <p className="text-label font-medium text-muted-foreground">Prorate Unit</p>
+                          <FormSelect
+                            value={group.prorateUnit ?? "Monthly"}
+                            onChange={(v) => updateGroup(group.id, "prorateUnit", v)}
+                            options={PRORATE_UNITS.map((u) => ({ label: u, value: u }))}
+                            triggerClassName="max-w-[240px]"
+                          />
+                        </div>
+                      )}
                     </div>
 
                     {/* Benefits selector */}
-                    <div className="space-y-3">
+                    <div className="space-y-3 pt-2 border-t border-border/60">
                       <div className="flex items-center justify-between">
-                        <p className="text-label font-medium text-muted-foreground">Benefits</p>
+                        <p className="text-label font-semibold text-foreground">Services</p>
                         {groupErrors[`group_${gIdx}`] && <p className="text-label text-rose-600 dark:text-rose-400 font-medium">{groupErrors[`group_${gIdx}`]}</p>}
                       </div>
                       <BenefitServiceSelector

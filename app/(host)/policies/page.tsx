@@ -324,44 +324,12 @@ function PoliciesContent() {
       ),
     },
     {
-      header: "Employment Types",
+      header: "Version",
       render: (row) => (
-        <div className="flex flex-wrap gap-1">
-          {row.eligibleEmploymentTypes.map(t => (
-            <Badge key={t} variant="outline" className="capitalize">
-              {t.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")}
-            </Badge>
-          ))}
-        </div>
+        row.version
+          ? <Badge variant="outline" className="text-label font-mono">{row.version}</Badge>
+          : <span className="text-label text-faint">—</span>
       ),
-    },
-    {
-      header: "Benefit Groups",
-      accessorKey: "groupCount",
-      align: "left",
-      render: (row) => {
-        const data = MOCK_POLICY_DATA_MAP[row.id];
-        const groupNames = data?.groups.map(g => g.name) ?? [];
-        const visible = groupNames.slice(0, 2);
-        const overflow = groupNames.length - visible.length;
-        return (
-          <div className="flex flex-wrap items-center justify-start gap-1">
-            {visible.map(name => (
-              <Badge key={name} variant="secondary">
-                {name}
-              </Badge>
-            ))}
-            {overflow > 0 && (
-              <Badge variant="outline">
-                +{overflow}
-              </Badge>
-            )}
-            {groupNames.length === 0 && (
-              <span className="text-label text-faint">—</span>
-            )}
-          </div>
-        );
-      },
     },
     {
       header: "Organisation",
@@ -372,7 +340,7 @@ function PoliciesContent() {
       ),
     },
     {
-      header: "Created",
+      header: "Last Updated",
       accessorKey: "createdAt",
       render: (row) => (
         <span className="text-body text-faint font-medium">

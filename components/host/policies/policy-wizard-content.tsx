@@ -218,7 +218,7 @@ export function PolicyReviewCards({ policy, groups, benefits }: PolicyReviewCard
                         <div className="text-left">
                           <p className="text-body font-medium text-foreground">{group.name}</p>
                           <p className="text-label text-muted-foreground font-semibold">
-                            {groupBenefits.length} benefits · {group.distributionType === "SharedAmount" ? "Shared Pool" : "Individual"}
+                            {groupBenefits.length} benefit{groupBenefits.length !== 1 ? "s" : ""}
                           </p>
                         </div>
                       </div>
@@ -361,6 +361,7 @@ export function PolicyWizardContent({ mode = "create", groupsOnly = false, initi
   const [splitBenefitIds, setSplitBenefitIds] = useState<Set<string>>(new Set());
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [groupCategories, setGroupCategories] = useState<Record<string, string[]>>({});
+  const [depModalGroupId, setDepModalGroupId] = useState<string | null>(null);
 
   const SERVICE_CATEGORIES = useMemo(
     () => Array.from(new Set(SERVICES.map((s) => s.category))),
@@ -694,7 +695,7 @@ export function PolicyWizardContent({ mode = "create", groupsOnly = false, initi
   };
 
   const updateGroup = (groupId: string, field: keyof BenefitGroup, value: string | number | boolean | undefined) => {
-    setGroups(groups.map((g) => (g.id === groupId ? { ...g, [field]: value } : g)));
+    setGroups(prev => prev.map((g) => (g.id === groupId ? { ...g, [field]: value } : g)));
   };
 
   const updateGroupCoPayment = (groupId: string, field: "required" | "type" | "value", value: boolean | string | number) => {
@@ -1457,26 +1458,6 @@ export function PolicyWizardContent({ mode = "create", groupsOnly = false, initi
                 {/* Card body */}
                 <div className="p-4 space-y-5">
 
-                  {/* Distribution toggle */}
-                  <div className="space-y-1.5">
-                    <p className="text-label font-medium text-muted-foreground">Distribution</p>
-                    <div className="inline-flex p-0.5 bg-muted rounded-lg">
-                      {(["SharedAmount", "IndividualBenefitAmount"] as const).map((type) => (
-                        <button
-                          type="button"
-                          key={type}
-                          onClick={() => updateGroup(group.id, "distributionType", type)}
-                          className={cn(
-                            "px-3 py-1.5 text-label font-medium rounded-md transition-all",
-                            group.distributionType === type ? "bg-background text-primary shadow-sm" : "text-muted-foreground"
-                          )}
-                        >
-                          {type === "SharedAmount" ? "Shared Pool" : "Individual"}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
                   {/* Employee / Dependent two-column grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Employee column */}
@@ -1488,7 +1469,7 @@ export function PolicyWizardContent({ mode = "create", groupsOnly = false, initi
                       <div className="space-y-1.5">
                         <p className="text-label font-medium text-muted-foreground">
                           <span className="inline-flex items-center gap-1.5">Group Cap <FieldHelp termKey="groupCap" /></span>
-                          {group.distributionType !== "SharedAmount" && <span className="text-faint font-normal ml-1">(optional)</span>}
+                          <span className="text-faint font-normal ml-1">(optional)</span>
                         </p>
                         <input
                           type="number"
@@ -1499,41 +1480,39 @@ export function PolicyWizardContent({ mode = "create", groupsOnly = false, initi
                         />
                         {validationErrors[`group_cap_${group.id}`] && <ErrorText>{validationErrors[`group_cap_${group.id}`]}</ErrorText>}
                       </div>
-                      {group.distributionType === "SharedAmount" && (
-                        <div className="space-y-1.5">
-                          <label className="text-label font-medium text-muted-foreground inline-flex items-center gap-1.5">
-                            Co-payment <FieldHelp termKey="coPayment" />
-                          </label>
-                          <div className="flex items-center gap-2">
-                            <button
-                              type="button"
-                              onClick={() => updateGroupCoPayment(group.id, "required", !(group.coPayment?.required ?? false))}
-                              aria-pressed={group.coPayment?.required ?? false}
-                              className={cn("w-9 h-5 rounded-full border transition-colors relative shrink-0", group.coPayment?.required ? "bg-primary border-primary" : "bg-muted border-border")}
-                            >
-                              <div className={cn("w-3.5 h-3.5 rounded-full bg-background shadow-sm absolute top-[2px] transition-all", group.coPayment?.required ? "right-0.5" : "left-0.5")} />
-                            </button>
-                            {group.coPayment?.required && (
-                              <div className="flex items-center gap-1.5">
-                                <FormSelect
-                                  value={group.coPayment?.type ?? "Percentage"}
-                                  onChange={(v) => updateGroupCoPayment(group.id, "type", v)}
-                                  options={[{ label: "%", value: "Percentage" }, { label: "RM", value: "Fixed" }]}
-                                  triggerClassName="w-16 h-8"
-                                />
-                                <input
-                                  type="number"
-                                  className={cn("w-20 px-2.5 py-1.5 bg-background border rounded-lg text-label font-mono outline-none text-right", validationErrors[`group_copay_${group.id}`] ? "border-destructive" : "border-border")}
-                                  value={group.coPayment?.value || ""}
-                                  onChange={(e) => updateGroupCoPayment(group.id, "value", e.target.value === "" ? 0 : parseFloat(e.target.value))}
-                                  onBlur={() => blurGroupCopayValue(group.id, group.coPayment?.type ?? "Percentage", group.coPayment?.value ?? 0)}
-                                />
-                              </div>
-                            )}
-                          </div>
-                          {validationErrors[`group_copay_${group.id}`] && <ErrorText>{validationErrors[`group_copay_${group.id}`]}</ErrorText>}
+                      <div className="space-y-1.5">
+                        <label className="text-label font-medium text-muted-foreground inline-flex items-center gap-1.5">
+                          Co-payment <FieldHelp termKey="coPayment" />
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => updateGroupCoPayment(group.id, "required", !(group.coPayment?.required ?? false))}
+                            aria-pressed={group.coPayment?.required ?? false}
+                            className={cn("w-9 h-5 rounded-full border transition-colors relative shrink-0", group.coPayment?.required ? "bg-primary border-primary" : "bg-muted border-border")}
+                          >
+                            <div className={cn("w-3.5 h-3.5 rounded-full bg-background shadow-sm absolute top-[2px] transition-all", group.coPayment?.required ? "right-0.5" : "left-0.5")} />
+                          </button>
+                          {group.coPayment?.required && (
+                            <div className="flex items-center gap-1.5">
+                              <FormSelect
+                                value={group.coPayment?.type ?? "Percentage"}
+                                onChange={(v) => updateGroupCoPayment(group.id, "type", v)}
+                                options={[{ label: "%", value: "Percentage" }, { label: "RM", value: "Fixed" }]}
+                                triggerClassName="w-16 h-8"
+                              />
+                              <input
+                                type="number"
+                                className={cn("w-20 px-2.5 py-1.5 bg-background border rounded-lg text-label font-mono outline-none text-right", validationErrors[`group_copay_${group.id}`] ? "border-destructive" : "border-border")}
+                                value={group.coPayment?.value || ""}
+                                onChange={(e) => updateGroupCoPayment(group.id, "value", e.target.value === "" ? 0 : parseFloat(e.target.value))}
+                                onBlur={() => blurGroupCopayValue(group.id, group.coPayment?.type ?? "Percentage", group.coPayment?.value ?? 0)}
+                              />
+                            </div>
+                          )}
                         </div>
-                      )}
+                        {validationErrors[`group_copay_${group.id}`] && <ErrorText>{validationErrors[`group_copay_${group.id}`]}</ErrorText>}
+                      </div>
                     </div>
 
                     {/* Dependent column */}
@@ -1556,39 +1535,37 @@ export function PolicyWizardContent({ mode = "create", groupsOnly = false, initi
                             placeholder="0.00"
                           />
                         </div>
-                        {group.distributionType === "SharedAmount" && (
-                          <div className="space-y-1.5">
-                            <label className="text-label font-medium text-muted-foreground inline-flex items-center gap-1.5">
-                              Co-payment <FieldHelp termKey="coPayment" />
-                            </label>
-                            <div className="flex items-center gap-2">
-                              <button
-                                type="button"
-                                onClick={() => updateDependentCoPayment(group.id, "required", !(group.dependentCoPayment?.required ?? false))}
-                                aria-pressed={group.dependentCoPayment?.required ?? false}
-                                className={cn("w-9 h-5 rounded-full border transition-colors relative shrink-0", group.dependentCoPayment?.required ? "bg-primary border-primary" : "bg-muted border-border")}
-                              >
-                                <div className={cn("w-3.5 h-3.5 rounded-full bg-background shadow-sm absolute top-[2px] transition-all", group.dependentCoPayment?.required ? "right-0.5" : "left-0.5")} />
-                              </button>
-                              {group.dependentCoPayment?.required && (
-                                <div className="flex items-center gap-1.5">
-                                  <FormSelect
-                                    value={group.dependentCoPayment?.type ?? "Percentage"}
-                                    onChange={(v) => updateDependentCoPayment(group.id, "type", v)}
-                                    options={[{ label: "%", value: "Percentage" }, { label: "RM", value: "Fixed" }]}
-                                    triggerClassName="w-16 h-8"
-                                  />
-                                  <input
-                                    type="number"
-                                    className="w-20 px-2.5 py-1.5 bg-background border border-border rounded-lg text-label font-mono outline-none text-right"
-                                    value={group.dependentCoPayment?.value || ""}
-                                    onChange={(e) => updateDependentCoPayment(group.id, "value", e.target.value === "" ? 0 : parseFloat(e.target.value))}
-                                  />
-                                </div>
-                              )}
-                            </div>
+                        <div className="space-y-1.5">
+                          <label className="text-label font-medium text-muted-foreground inline-flex items-center gap-1.5">
+                            Co-payment <FieldHelp termKey="coPayment" />
+                          </label>
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => updateDependentCoPayment(group.id, "required", !(group.dependentCoPayment?.required ?? false))}
+                              aria-pressed={group.dependentCoPayment?.required ?? false}
+                              className={cn("w-9 h-5 rounded-full border transition-colors relative shrink-0", group.dependentCoPayment?.required ? "bg-primary border-primary" : "bg-muted border-border")}
+                            >
+                              <div className={cn("w-3.5 h-3.5 rounded-full bg-background shadow-sm absolute top-[2px] transition-all", group.dependentCoPayment?.required ? "right-0.5" : "left-0.5")} />
+                            </button>
+                            {group.dependentCoPayment?.required && (
+                              <div className="flex items-center gap-1.5">
+                                <FormSelect
+                                  value={group.dependentCoPayment?.type ?? "Percentage"}
+                                  onChange={(v) => updateDependentCoPayment(group.id, "type", v)}
+                                  options={[{ label: "%", value: "Percentage" }, { label: "RM", value: "Fixed" }]}
+                                  triggerClassName="w-16 h-8"
+                                />
+                                <input
+                                  type="number"
+                                  className="w-20 px-2.5 py-1.5 bg-background border border-border rounded-lg text-label font-mono outline-none text-right"
+                                  value={group.dependentCoPayment?.value || ""}
+                                  onChange={(e) => updateDependentCoPayment(group.id, "value", e.target.value === "" ? 0 : parseFloat(e.target.value))}
+                                />
+                              </div>
+                            )}
                           </div>
-                        )}
+                        </div>
                       </div>
                     ) : (
                       <div className="rounded-lg border border-dashed border-border bg-muted/5 p-4 flex flex-col items-center justify-center gap-2 text-center min-h-[120px]">
@@ -1596,31 +1573,108 @@ export function PolicyWizardContent({ mode = "create", groupsOnly = false, initi
                         <p className="text-label font-medium text-faint">No dependent coverage</p>
                         <button
                           type="button"
-                          onClick={() => window.open(`/policies/${policyData.id || "new"}/edit`, "_blank")}
+                          onClick={() => setDepModalGroupId(group.id)}
                           className="text-label text-primary font-medium hover:underline"
                         >
-                          Enable in policy settings →
+                          Add dependent coverage →
                         </button>
                       </div>
                     )}
                   </div>
 
-                  {/* Utilisation mode override — choice cards */}
+                  {/* Dependent coverage mini modal */}
+                  {depModalGroupId === group.id && (() => {
+                    const DEP_TYPES: { value: DependentCoverageType; label: string }[] = [
+                      { value: "spouse",  label: "Spouse" },
+                      { value: "child",   label: "Child" },
+                      { value: "mother",  label: "Mother" },
+                      { value: "father",  label: "Father" },
+                      { value: "sibling", label: "Sibling" },
+                      { value: "inlaw",   label: "In-law" },
+                    ];
+                    const current = policyData.dependentCoverages ?? [];
+                    const allSelected = DEP_TYPES.every((t) => current.some((c) => c.type === t.value));
+                    return (
+                      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4 backdrop-blur-[2px]">
+                        <div className="w-full max-w-sm rounded-2xl border border-border bg-card shadow-2xl">
+                          <div className="p-6 pb-4 space-y-1">
+                            <p className="text-body font-semibold text-foreground">Add Dependent Coverage</p>
+                            <p className="text-label text-subtle">Select which dependents this group covers.</p>
+                          </div>
+                          <div className="px-6 pb-4">
+                            <div className="flex flex-wrap gap-2">
+                              <button
+                                type="button"
+                                onClick={() => setPolicyData({ ...policyData, dependentCoverages: allSelected ? [] : DEP_TYPES.map((t) => ({ type: t.value, capAmount: undefined })), dependentsPoolType: allSelected ? undefined : (policyData.dependentsPoolType ?? "SharedWithEmployee") })}
+                                className={cn("px-3 py-1.5 rounded-full text-label font-medium border transition-all", allSelected ? "bg-primary text-primary-foreground border-primary shadow-sm" : "bg-background text-muted-foreground border-border hover:border-primary/30")}
+                              >
+                                {allSelected && <Check size={11} weight="bold" className="inline mr-1.5" />}All
+                              </button>
+                              {DEP_TYPES.map((opt) => {
+                                const isSelected = current.some((c) => c.type === opt.value);
+                                return (
+                                  <button
+                                    key={opt.value}
+                                    type="button"
+                                    onClick={() => {
+                                      const next = isSelected
+                                        ? current.filter((c) => c.type !== opt.value)
+                                        : [...current, { type: opt.value, capAmount: undefined }];
+                                      setPolicyData({ ...policyData, dependentCoverages: next, dependentsPoolType: next.length > 0 ? (policyData.dependentsPoolType ?? "SharedWithEmployee") : undefined });
+                                    }}
+                                    className={cn("px-3 py-1.5 rounded-full text-label font-medium border transition-all", isSelected ? "bg-primary text-primary-foreground border-primary shadow-sm" : "bg-background text-muted-foreground border-border hover:border-primary/30")}
+                                  >
+                                    {isSelected && <Check size={11} weight="bold" className="inline mr-1.5" />}{opt.label}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-end gap-2 border-t border-border px-6 py-4">
+                            <button
+                              type="button"
+                              onClick={() => setDepModalGroupId(null)}
+                              className="px-4 py-2 text-label font-medium text-muted-foreground hover:text-foreground transition-colors"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              type="button"
+                              disabled={(policyData.dependentCoverages?.length ?? 0) === 0}
+                              onClick={() => setDepModalGroupId(null)}
+                              className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-label font-medium disabled:opacity-40"
+                            >
+                              Confirm
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Utilisation mode override */}
                   <div className="space-y-3 pt-2 border-t border-border/60">
-                    <p className="text-label font-medium text-muted-foreground">Utilisation Mode</p>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                    <div className="flex items-center justify-between">
+                      <p className="text-label font-medium text-muted-foreground">Utilisation Mode</p>
+                      {group.utilisationMode ? (
+                        <button
+                          type="button"
+                          onClick={() => { updateGroup(group.id, "utilisationMode", undefined); updateGroup(group.id, "prorateUnit", undefined); }}
+                          className="flex items-center gap-1 text-micro text-faint hover:text-muted-foreground transition-colors"
+                        >
+                          <ArrowCounterClockwise size={11} />
+                          Reset to policy default
+                        </button>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-micro text-faint bg-muted px-2 py-0.5 rounded-full">
+                          <ArrowCounterClockwise size={11} />
+                          Inheriting: {policyData.utilisationMode === "Prorated" ? `Prorated · ${policyData.prorateUnit ?? "Monthly"}` : "Fixed Allocation"}
+                        </span>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                       <ChoiceCard
-                        title="Inherit from Policy"
-                        description={`Using ${policyData.utilisationMode === "Prorated" ? `Prorated · ${policyData.prorateUnit ?? "Monthly"}` : "Fixed Allocation"}`}
-                        icon={ArrowCounterClockwise}
-                        selected={!group.utilisationMode}
-                        onSelect={() => {
-                          updateGroup(group.id, "utilisationMode", undefined);
-                          updateGroup(group.id, "prorateUnit", undefined);
-                        }}
-                      />
-                      <ChoiceCard
-                        title="Fixed"
+                        title="Fixed Allocation"
                         description="Full allocation granted immediately."
                         icon={Gear}
                         selected={group.utilisationMode === "Fixed"}
@@ -1630,7 +1684,7 @@ export function PolicyWizardContent({ mode = "create", groupsOnly = false, initi
                         }}
                       />
                       <ChoiceCard
-                        title="Prorated"
+                        title="Prorated Allocation"
                         description="Amounts prorated based on time."
                         icon={ChartLineUp}
                         selected={group.utilisationMode === "Prorated"}
@@ -1640,34 +1694,15 @@ export function PolicyWizardContent({ mode = "create", groupsOnly = false, initi
                         }}
                       />
                     </div>
-                    {(group.utilisationMode ?? policyData.utilisationMode) === "Prorated" && (
+                    {group.utilisationMode === "Prorated" && (
                       <div className="space-y-1.5 animate-in fade-in slide-in-from-top-1 duration-200">
                         <p className="text-label font-medium text-muted-foreground">Prorate Unit</p>
-                        <div className="flex flex-wrap gap-2">
-                          {PRORATE_UNITS.map((unit) => {
-                            const isInherit = !group.utilisationMode;
-                            const effectiveUnit = isInherit ? (policyData.prorateUnit ?? "Monthly") : (group.prorateUnit ?? "Monthly");
-                            const isSelected = isInherit ? unit === effectiveUnit : unit === (group.prorateUnit ?? "Monthly");
-                            return (
-                              <button
-                                key={unit}
-                                type="button"
-                                disabled={isInherit}
-                                onClick={() => updateGroup(group.id, "prorateUnit", unit)}
-                                className={cn(
-                                  "px-3 py-1.5 rounded-lg text-label font-medium border transition-all",
-                                  isSelected ? "bg-primary text-primary-foreground border-primary shadow-sm" : "bg-background text-muted-foreground border-border hover:border-primary/30",
-                                  isInherit && "opacity-60 cursor-not-allowed"
-                                )}
-                              >
-                                {unit}
-                              </button>
-                            );
-                          })}
-                          {!group.utilisationMode && (
-                            <span className="text-micro text-faint self-center">Inherited from policy</span>
-                          )}
-                        </div>
+                        <FormSelect
+                          value={group.prorateUnit ?? "Monthly"}
+                          onChange={(v) => updateGroup(group.id, "prorateUnit", v)}
+                          options={PRORATE_UNITS.map((u) => ({ label: u, value: u }))}
+                          triggerClassName="max-w-[240px]"
+                        />
                       </div>
                     )}
                   </div>
