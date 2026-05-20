@@ -351,6 +351,7 @@ export function PolicyWizardContent({ mode = "create", groupsOnly = false, initi
       refreshStartReference: "financial_year",
       refreshStartMonth: 1,
       status: "draft",
+      ...(lockedOrganizationId ? { organizationId: lockedOrganizationId } : {}),
     }
   );
 

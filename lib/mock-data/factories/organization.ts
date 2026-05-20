@@ -177,6 +177,71 @@ export function createOrganization(index: number): Organization {
   }
 }
 
+interface NewOrganizationOverrides {
+  id?: string
+  name?: string
+  registrationNumber?: string
+  industry?: string
+  subIndustry?: string
+  type?: Organization["type"]
+  financialYearStart?: string
+  tinNumber?: string
+  state?: string
+  country?: string
+  bankAccountDetails?: Organization["bankAccountDetails"]
+  subscription?: Partial<Organization["subscription"]>
+  accountLimit?: number
+  creditLimit?: number
+  createdAt?: string
+  updatedAt?: string
+  branches?: string[]
+}
+
+export function createNewOrganization(overrides: NewOrganizationOverrides = {}): Organization {
+  const now = new Date().toISOString()
+  return {
+    id: overrides.id ?? `ORG-NEW-${Date.now()}`,
+    name: overrides.name ?? "New Organisation",
+    registrationNumber: overrides.registrationNumber ?? "",
+    industry: overrides.industry ?? "Technology",
+    subIndustry: overrides.subIndustry,
+    type: overrides.type ?? "sdn_bhd",
+    financialYearStart: overrides.financialYearStart ?? "2026-01-01T00:00:00Z",
+    tinNumber: overrides.tinNumber ?? "",
+    state: overrides.state ?? "Kuala Lumpur",
+    country: overrides.country ?? "Malaysia",
+    bankAccountDetails: overrides.bankAccountDetails ?? {
+      bankName: "",
+      accountNumber: "",
+      accountName: "",
+    },
+    subscription: {
+      plan: "standard",
+      startDate: overrides.createdAt ?? now,
+      status: "inactive",
+      ...overrides.subscription,
+    },
+    status: "inactive",
+    employeeCount: 0,
+    picId: null,
+    utilizationRate: 0,
+    claimsCount: 0,
+    totalAccountBalance: 0,
+    accountLimit: overrides.accountLimit ?? 50000,
+    creditLimit: overrides.creditLimit ?? 50000,
+    needsAction: ["Missing PIC", "No Employees", "No Policy"],
+    services: [],
+    policies: [],
+    branches: overrides.branches ?? [],
+    documents: [],
+    employeesWithoutPolicy: 0,
+    tierConfigs: [],
+    departmentConfigs: [],
+    createdAt: overrides.createdAt ?? now,
+    updatedAt: overrides.updatedAt ?? now,
+  }
+}
+
 // Org utilisation rows for detail view
 export const MOCK_ORG_UTILISATION = [
   {
