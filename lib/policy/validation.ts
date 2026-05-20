@@ -14,7 +14,9 @@ export function validateBenefitInsert(
   serviceId: Benefit["serviceId"],
   existing: Benefit[]
 ): ValidationIssue | null {
-  const dup = existing.find((b) => b.groupId === groupId && b.serviceId === serviceId)
+  const dup = existing.find(
+    (b) => b.groupId === groupId && b.serviceId === serviceId
+  )
   if (dup) {
     return {
       field: "serviceId",
@@ -38,7 +40,10 @@ export function validateGroupInsert(
     return { field: "name", message: "Group name is required" }
   }
   const dup = existing.find(
-    (g) => g.policyId === policyId && g.id !== ignoreId && g.name.trim().toLowerCase() === target
+    (g) =>
+      g.policyId === policyId &&
+      g.id !== ignoreId &&
+      g.name.trim().toLowerCase() === target
   )
   if (dup) {
     return {
@@ -60,7 +65,10 @@ export function validateCoPayment(
 ): ValidationIssue | null {
   if (!coPayment || !coPayment.required) return null
   if (coPayment.value < 0) {
-    return { field: "coPayment.value", message: "Co-payment cannot be negative" }
+    return {
+      field: "coPayment.value",
+      message: "Co-payment cannot be negative",
+    }
   }
   if (coPayment.type === "Percentage") {
     if (coPayment.value > 100) {
@@ -86,22 +94,49 @@ export function validateCoPayment(
 export function validateRefreshStart(
   policy: Pick<BenefitPolicy, "refreshStartReference" | "refreshStartMonth">
 ): ValidationIssue | null {
-  if (!policy.refreshStartMonth || policy.refreshStartMonth < 1 || policy.refreshStartMonth > 12) {
-    return { field: "refreshStartMonth", message: "Select a start month" };
+  if (
+    !policy.refreshStartMonth ||
+    policy.refreshStartMonth < 1 ||
+    policy.refreshStartMonth > 12
+  ) {
+    return { field: "refreshStartMonth", message: "Select a start month" }
   }
-  return null;
+  return null
 }
 
 /**
  * Validate a complete Benefit row before persistence.
  * Returns all issues found (not short-circuit) so the UI can render every problem at once.
  */
-export function validateBenefit(b: Benefit, existing: Benefit[]): ValidationIssue[] {
+export function validateBenefit(
+  b: Benefit,
+  existing: Benefit[]
+): ValidationIssue[] {
   const issues: ValidationIssue[] = []
-  if (b.amount <= 0) issues.push({ field: "amount", message: "Amount must be greater than 0" })
-  const dup = validateBenefitInsert(b.groupId, b.serviceId, existing.filter((e) => e.id !== b.id))
+  if (b.amount <= 0)
+    issues.push({ field: "amount", message: "Amount must be greater than 0" })
+  const dup = validateBenefitInsert(
+    b.groupId,
+    b.serviceId,
+    existing.filter((e) => e.id !== b.id)
+  )
   if (dup) issues.push(dup)
-  const copay = validateCoPayment(b.amount, b.coPayment)
-  if (copay) issues.push(copay)
+
+  const employeeAmount =
+    typeof b.employeeAmount === "number" ? b.employeeAmount : b.amount
+  const dependentAmount =
+    typeof b.dependantAmount === "number" ? b.dependantAmount : b.amount
+
+  const employeeCopay = validateCoPayment(employeeAmount, b.coPayment)
+  if (employeeCopay) issues.push(employeeCopay)
+
+  if (b.dependentCoPayment) {
+    const dependentCopay = validateCoPayment(
+      dependentAmount,
+      b.dependentCoPayment
+    )
+    if (dependentCopay)
+      issues.push({ ...dependentCopay, field: "dependentCoPayment.value" })
+  }
   return issues
 }

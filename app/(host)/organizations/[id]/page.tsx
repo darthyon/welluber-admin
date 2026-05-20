@@ -24,7 +24,7 @@ import {
   MapPin,
   Ticket,
   Rows,
-  Info
+  Info,
 } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { Breadcrumbs } from "@/components/shared/breadcrumbs"
@@ -32,9 +32,7 @@ import { BranchSheet } from "@/components/host/organizations/branch-sheet"
 import { InviteAdminModal } from "@/components/host/organizations/invite-admin-modal"
 import { Button } from "@/components/ui/button"
 import { ViewToggle, ViewMode } from "@/components/shared/view-toggle"
-import {
-  VerticalTabs,
-} from "@/components/shared/vertical-tabs"
+import { VerticalTabs } from "@/components/shared/vertical-tabs"
 import { BranchCard } from "@/components/host/organizations/branch-card"
 import { BranchDetailView } from "@/components/host/organizations/branch-detail-view"
 
@@ -54,7 +52,7 @@ import { AssignPolicyModal } from "@/components/host/organizations/assign-policy
 import { BenefitPolicyWizard } from "@/components/host/policies/benefit-policy-wizard"
 import { PolicyDetailView } from "@/components/host/policies/policy-detail-view"
 import { PolicyCreationLauncher } from "@/components/host/policies/policy-creation-launcher"
-import { BenefitPolicy, Benefit } from "@/types/policy"
+import { BenefitPolicy, Benefit, BenefitGroup } from "@/types/policy"
 import type { FlatClaimRow } from "@/types/claims"
 import { DetailSection } from "@/components/shared/detail-section"
 import { DetailField } from "@/components/shared/detail-field"
@@ -76,7 +74,13 @@ import {
   suspendOrganization,
 } from "@/features/organizations/actions"
 import { OrganizationStatus } from "@/features/organizations/types"
-import { MOCK_ORGS, MOCK_DEPENDENTS, MOCK_ENTITLEMENTS, MOCK_EMPLOYEE_UTILISATION, MOCK_EMPLOYEES } from "@/lib/mock-data"
+import {
+  MOCK_ORGS,
+  MOCK_DEPENDENTS,
+  MOCK_ENTITLEMENTS,
+  MOCK_EMPLOYEE_UTILISATION,
+  MOCK_EMPLOYEES,
+} from "@/lib/mock-data"
 import { EntityAvatar } from "@/components/shared/entity-avatar"
 
 const ORG_TYPE_LABELS: Record<string, string> = {
@@ -119,27 +123,43 @@ function PostAssignPolicyModal({
     <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 p-4 backdrop-blur-[2px]">
       <div className="w-full max-w-lg rounded-[24px] border border-border bg-card shadow-2xl">
         <div className="p-8 pb-4">
-          <h3 className="text-heading font-semibold text-foreground">Policy Assigned</h3>
+          <h3 className="text-heading font-semibold text-foreground">
+            Policy Assigned
+          </h3>
           <p className="mt-1 text-body text-subtle">
-            <span className="font-medium text-foreground">{policyName}</span> is now assigned to this organisation.
+            <span className="font-medium text-foreground">{policyName}</span> is
+            now assigned to this organisation.
           </p>
-          <p className="mt-2 text-label text-muted-foreground">Do you want to assign it to employees now?</p>
+          <p className="mt-2 text-label text-muted-foreground">
+            Do you want to assign it to employees now?
+          </p>
         </div>
 
         <div className="space-y-2 px-8 pb-2">
           <Button className="h-11 w-full rounded-4xl" onClick={onAutoMatch}>
             Assign to Employees (Tier Auto-Match)
           </Button>
-          <Button variant="outline" className="h-11 w-full rounded-4xl" onClick={onManual}>
+          <Button
+            variant="outline"
+            className="h-11 w-full rounded-4xl"
+            onClick={onManual}
+          >
             Assign to Employees Manually
           </Button>
-          <Button variant="ghost" className="h-11 w-full rounded-4xl" onClick={onLater}>
+          <Button
+            variant="ghost"
+            className="h-11 w-full rounded-4xl"
+            onClick={onLater}
+          >
             Later
           </Button>
         </div>
 
         <div className="border-t border-border bg-muted/30 p-8 pt-4">
-          <p className="text-micro text-faint">You can manage employee assignment from Employees or Benefit Policy tabs anytime.</p>
+          <p className="text-micro text-faint">
+            You can manage employee assignment from Employees or Benefit Policy
+            tabs anytime.
+          </p>
         </div>
       </div>
     </div>
@@ -148,7 +168,10 @@ function PostAssignPolicyModal({
 
 // Mock Data for Breadcrumb Dropdowns
 const OTHER_ORGS = [
-  { label: "Acme Corporation Sdn Bhd", href: "/organizations/ORG-20260115-0001" },
+  {
+    label: "Acme Corporation Sdn Bhd",
+    href: "/organizations/ORG-20260115-0001",
+  },
   { label: "Global Tech Solutions", href: "/organizations/ORG-20260301-0002" },
   { label: "Nexus Innovations", href: "/organizations/ORG-20260310-0003" },
 ]
@@ -161,8 +184,7 @@ function OrganizationDetailContent() {
   const [activeTab, setActiveTab] = useTabPersistence<TabId>("profile")
   const [isInviteModalOpen, setIsInviteModalOpen] = useQueryState("inviteAdmin")
   const [isBranchSheetOpen, setIsBranchSheetOpen] = useQueryState("branchSheet")
-  const [selectedBranchName] =
-    useQueryState("branchName")
+  const [selectedBranchName] = useQueryState("branchName")
   const [toastMessage, setToastMessage] = useState<string | null>(null)
   const [orgStatus, setOrgStatus] = useState<OrganizationStatus>("active")
   const [isDangerModalOpen, setIsDangerModalOpen] = useState(false)
@@ -172,7 +194,8 @@ function OrganizationDetailContent() {
   >(null)
 
   // Voucher detail sheet state
-  const [selectedVoucherClaim, setSelectedVoucherClaim] = useState<FlatClaimRow | null>(null)
+  const [selectedVoucherClaim, setSelectedVoucherClaim] =
+    useState<FlatClaimRow | null>(null)
 
   // View modes
   const [branchesView, setBranchesView] = useState<ViewMode>("list")
@@ -306,12 +329,7 @@ function OrganizationDetailContent() {
         policyFilters.benefitGroup === "all" ||
         p.groups?.includes(policyFilters.benefitGroup)
 
-      return (
-        matchesSearch &&
-        matchesStatus &&
-        matchesService &&
-        matchesGroup
-      )
+      return matchesSearch && matchesStatus && matchesService && matchesGroup
     })
   }, [assignedPolicies, policySearch, policyStatusFilter, policyFilters])
 
@@ -326,12 +344,13 @@ function OrganizationDetailContent() {
   }, [dependentSearch])
 
   // Mock Groups and Benefits for the Detail Sheet
-  const [mockGroups] = useState([
+  const [mockGroups] = useState<BenefitGroup[]>([
     {
       id: "g1",
       policyId: "pol_1",
       name: "Physical Wellbeing",
       description: "Standard physical health services",
+      coverageScope: "Employee",
       distributionType: "IndividualBenefitAmount" as const,
     },
     {
@@ -339,6 +358,7 @@ function OrganizationDetailContent() {
       policyId: "pol_1",
       name: "Mental Fitness",
       description: "Counseling and meditation support",
+      coverageScope: "Employee",
       distributionType: "IndividualBenefitAmount" as const,
     },
     {
@@ -346,6 +366,7 @@ function OrganizationDetailContent() {
       policyId: "pol_2",
       name: "Flexi-Benefits",
       description: "Shared budget for various lifestyle services",
+      coverageScope: "Employee",
       distributionType: "SharedAmount" as const,
       maxUsagePerCycle: 500,
     },
@@ -483,7 +504,9 @@ function OrganizationDetailContent() {
           setShowPostAssignModal(false)
           setActiveTab("employees")
           setIsBulkUploading("true")
-          setToastMessage("Opened employee import with policy auto-match suggestion")
+          setToastMessage(
+            "Opened employee import with policy auto-match suggestion"
+          )
         }}
         onManual={() => {
           setShowPostAssignModal(false)
@@ -524,7 +547,7 @@ function OrganizationDetailContent() {
               <EntityAvatar name={orgName} size="xl" />
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
-                  <h1 className="text-display font-semibold tracking-tight text-foreground">
+                  <h1 className="tracking-tight text-display font-semibold text-foreground">
                     {orgName}
                   </h1>
                   <StatusBadge
@@ -630,7 +653,9 @@ function OrganizationDetailContent() {
               policyCount={assignedPolicies.length}
               employeesWithoutPolicy={orgForSetup.employeesWithoutPolicy ?? 0}
             />
-            {orgStatus !== "inactive" && <OrgSetupGuide organization={orgForSetup} />}
+            {orgStatus !== "inactive" && (
+              <OrgSetupGuide organization={orgForSetup} />
+            )}
             {/* Organisation Profile */}
             <DetailSection
               title="Organisation Profile"
@@ -640,7 +665,10 @@ function OrganizationDetailContent() {
               <div className="grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-4">
                 <DetailField label="Name" value="Acme Corporation Sdn Bhd" />
                 <DetailField label="Industry" value="Technology" />
-                <DetailField label="Sub-industry" value="Software Development" />
+                <DetailField
+                  label="Sub-industry"
+                  value="Software Development"
+                />
                 <DetailField label="Financial Year Start" value="01 January" />
               </div>
             </DetailSection>
@@ -654,7 +682,12 @@ function OrganizationDetailContent() {
               <div className="grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-4">
                 <DetailField label="Registration No." value="1234567-T" />
                 <DetailField label="TIN No." value="TR-882910-01" />
-                <DetailField label="Organisation Type" value={ORG_TYPE_LABELS[mockOrg?.type ?? ""] ?? mockOrg?.type ?? "—"} />
+                <DetailField
+                  label="Organisation Type"
+                  value={
+                    ORG_TYPE_LABELS[mockOrg?.type ?? ""] ?? mockOrg?.type ?? "—"
+                  }
+                />
               </div>
             </DetailSection>
 
@@ -665,7 +698,10 @@ function OrganizationDetailContent() {
               description="Official registered office address"
             >
               <div className="grid grid-cols-1 gap-x-6 gap-y-8 md:grid-cols-2">
-                <DetailField label="Address Line" value="Level 15, Menara Southpoint, Mid Valley City" />
+                <DetailField
+                  label="Address Line"
+                  value="Level 15, Menara Southpoint, Mid Valley City"
+                />
                 <div className="grid grid-cols-2 gap-4">
                   <DetailField label="Country" value="Malaysia" />
                   <DetailField label="Postal Code" value="59200" />
@@ -684,7 +720,10 @@ function OrganizationDetailContent() {
               <div className="grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-4">
                 <DetailField label="Bank Name" value="Maybank Berhad" />
                 <DetailField label="Account Number" value="5140 1234 5678" />
-                <DetailField label="Account Name" value="Acme Corporation Sdn Bhd" />
+                <DetailField
+                  label="Account Name"
+                  value="Acme Corporation Sdn Bhd"
+                />
               </div>
             </DetailSection>
 
@@ -696,14 +735,22 @@ function OrganizationDetailContent() {
             >
               <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 {[
-                  { name: "SSM_Registration_2024.pdf", size: "1.2 MB", type: "SSM Certificate" },
-                  { name: "Form_49_Directors.pdf", size: "850 KB", type: "Form Section 14" },
+                  {
+                    name: "SSM_Registration_2024.pdf",
+                    size: "1.2 MB",
+                    type: "SSM Certificate",
+                  },
+                  {
+                    name: "Form_49_Directors.pdf",
+                    size: "850 KB",
+                    type: "Form Section 14",
+                  },
                 ].map((doc, i) => (
                   <div
                     key={i}
-                    className="flex items-center gap-3 rounded-xl border border-border bg-muted/20 p-3 group hover:border-primary/30 transition-all"
+                    className="group flex items-center gap-3 rounded-xl border border-border bg-muted/20 p-3 transition-all hover:border-primary/30"
                   >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-background text-faint group-hover:text-primary transition-colors">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-background text-faint transition-colors group-hover:text-primary">
                       <Article size={20} weight="duotone" />
                     </div>
                     <div className="flex-1 overflow-hidden">
@@ -729,15 +776,22 @@ function OrganizationDetailContent() {
                 branchId={viewBranchId}
                 onBack={() => setViewBranchId(null)}
                 onEdit={() => {
-                  router.push(`/organizations/${orgId}/branches/${viewBranchId}/edit`)
+                  router.push(
+                    `/organizations/${orgId}/branches/${viewBranchId}/edit`
+                  )
                 }}
               />
             ) : (
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="text-heading font-semibold text-foreground">Branches</h2>
-                    <p className="text-body text-subtle">Manage geographical locations and their specific account configurations</p>
+                    <h2 className="text-heading font-semibold text-foreground">
+                      Branches
+                    </h2>
+                    <p className="text-body text-subtle">
+                      Manage geographical locations and their specific account
+                      configurations
+                    </p>
                   </div>
                   <div className="flex items-center gap-2">
                     <Button
@@ -757,254 +811,287 @@ function OrganizationDetailContent() {
                     />
                   </div>
                 </div>
-                  <DataFilterBar
-                    searchQuery={branchSearch}
-                    onSearchChange={setBranchSearch}
-                    searchPlaceholder="Search branches..."
-                    filters={
-                      <>
-                        <FilterItem
-                          label="Region"
-                          value="all"
-                          onChange={() => {}}
-                          options={[
-                            { label: "All States", value: "all" },
-                            { label: "Selangor", value: "sel" },
-                            { label: "Kuala Lumpur", value: "kl" },
-                          ]}
-                        />
-                        <FilterItem
-                          label="Status"
-                          value="all"
-                          onChange={() => {}}
-                          options={[
-                            { label: "All Status", value: "all" },
-                            { label: "Active", value: "active" },
-                            { label: "Inactive", value: "inactive" },
-                          ]}
-                        />
-                      </>
-                    }
-                  />
+                <DataFilterBar
+                  searchQuery={branchSearch}
+                  onSearchChange={setBranchSearch}
+                  searchPlaceholder="Search branches..."
+                  filters={
+                    <>
+                      <FilterItem
+                        label="Region"
+                        value="all"
+                        onChange={() => {}}
+                        options={[
+                          { label: "All States", value: "all" },
+                          { label: "Selangor", value: "sel" },
+                          { label: "Kuala Lumpur", value: "kl" },
+                        ]}
+                      />
+                      <FilterItem
+                        label="Status"
+                        value="all"
+                        onChange={() => {}}
+                        options={[
+                          { label: "All Status", value: "all" },
+                          { label: "Active", value: "active" },
+                          { label: "Inactive", value: "inactive" },
+                        ]}
+                      />
+                    </>
+                  }
+                />
 
-                  {branchesView === "grid" ? (
-                    <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-                      <BranchCard
-                        branch={{
-                          id: "br_1",
-                          name: "ACME HQ (Kuala Lumpur)",
-                          type: "HQ",
-                          accountModel: "New",
-                          accountName: "KL HQ Account",
-                          accountId: "ACC-20260115-0001",
-                          address: {
-                            city: "Kuala Lumpur",
-                            state: "Wilayah Persekutuan",
-                          },
-                          employeesCount: 1240,
-                          status: "Active",
-                          cashBalance: 45000,
-                          creditBalance: 10000,
-                          claimsCount: 12,
-                        }}
-                        onView={() => setViewBranchId("br_1")}
-                        onEdit={() => router.push(`/organizations/${orgId}/branches/br_1/edit`)}
-                      />
-                      <BranchCard
-                        branch={{
-                          id: "br_2",
-                          name: "ACME Subang Jaya",
-                          type: "Branch Office",
-                          accountModel: "Existing",
-                          accountName: "Acme Shared Account",
-                          accountId: "ACC-20260115-0002",
-                          address: { city: "Subang Jaya", state: "Selangor" },
-                          employeesCount: 450,
-                          status: "Active",
-                          cashBalance: 12500,
-                          creditBalance: 5000,
-                          claimsCount: 5,
-                        }}
-                        onView={() => setViewBranchId("br_2")}
-                        onEdit={() => router.push(`/organizations/${orgId}/branches/br_2/edit`)}
-                      />
-                    </div>
-                  ) : (
-                    <SharedDataTable
-                      freezeFirst
-                      freezeLast
-                      onRowClick={(branch) => setViewBranchId(branch.id)}
-                      columns={[
-                        {
-                          header: "Branch name",
-                          accessorKey: "name",
-                          sortable: true,
-                          render: (branch: { name: string }) => (
-                            <span className="text-body font-medium text-foreground transition-colors group-hover:text-primary">
-                              {branch.name}
-                            </span>
-                          ),
+                {branchesView === "grid" ? (
+                  <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+                    <BranchCard
+                      branch={{
+                        id: "br_1",
+                        name: "ACME HQ (Kuala Lumpur)",
+                        type: "HQ",
+                        accountModel: "New",
+                        accountName: "KL HQ Account",
+                        accountId: "ACC-20260115-0001",
+                        address: {
+                          city: "Kuala Lumpur",
+                          state: "Wilayah Persekutuan",
                         },
-                        {
-                          header: "Status",
-                          accessorKey: "status",
-                          sortable: true,
-                          render: (branch: { status: string }) => (
-                            <StatusBadge
-                              status={branch.status}
-                              variant="emerald"
-                            />
-                          ),
-                        },
-                        {
-                          header: "Type",
-                          accessorKey: "type",
-                          sortable: true,
-                          render: (branch: { type: string }) => (
-                            <span className="text-body text-subtle">
-                              {branch.type}
-                            </span>
-                          ),
-                        },
-                        {
-                          header: "Employees",
-                          accessorKey: "employees",
-                          sortable: true,
-                          render: (branch: { employees: number | string }) => (
-                            <span className="text-body text-subtle">
-                              {branch.employees}
-                            </span>
-                          ),
-                        },
-                        {
-                          header: "Account",
-                          accessorKey: "accountName",
-                          sortable: true,
-                          headerClassName: "min-w-[220px]",
-                          render: (branch: { accountName: string; accountId: string; cashBalance: number; creditBalance: number }) => {
-                            const total = branch.cashBalance + branch.creditBalance;
-                            return (
-                              <div className="flex items-center gap-3">
-                                <div className="flex flex-col min-w-0">
-                                  <span className="text-body font-semibold text-foreground truncate">
-                                    {branch.accountName}
-                                  </span>
-                                  <span className="mt-0.5 text-label font-mono text-subtle tracking-tight">
-                                    {branch.accountId}
-                                  </span>
-                                </div>
-                                <Tooltip delayDuration={0}>
-                                  <TooltipTrigger asChild>
-                                    <button
-                                      onClick={(e) => e.stopPropagation()}
-                                      className="ml-auto text-body font-semibold tabular-nums text-foreground hover:text-primary transition-colors"
-                                    >
-                                      RM {total.toLocaleString()}
-                                    </button>
-                                  </TooltipTrigger>
-                                  <TooltipContent className="w-56 bg-card rounded-lg border-border shadow-2xl z-[200] p-3">
-                                    <div className="flex flex-col gap-2">
-                                      <div className="flex items-center justify-between">
-                                        <span className="text-label font-medium text-subtle">Cash balance</span>
-                                        <span className="text-label font-semibold text-foreground tabular-nums">RM {branch.cashBalance.toLocaleString()}</span>
-                                      </div>
-                                      <div className="flex items-center justify-between">
-                                        <span className="text-label font-medium text-subtle">Credit available</span>
-                                        <span className="text-label font-semibold text-foreground tabular-nums">RM {branch.creditBalance.toLocaleString()}</span>
-                                      </div>
-                                      <div className="h-px bg-border/60 my-0.5" />
-                                      <div className="flex items-center justify-between">
-                                        <span className="text-label font-semibold text-subtle">Total</span>
-                                        <span className="text-label font-semibold text-primary tabular-nums">RM {total.toLocaleString()}</span>
-                                      </div>
-                                    </div>
-                                  </TooltipContent>
-                                </Tooltip>
+                        employeesCount: 1240,
+                        status: "Active",
+                        cashBalance: 45000,
+                        creditBalance: 10000,
+                        claimsCount: 12,
+                      }}
+                      onView={() => setViewBranchId("br_1")}
+                      onEdit={() =>
+                        router.push(
+                          `/organizations/${orgId}/branches/br_1/edit`
+                        )
+                      }
+                    />
+                    <BranchCard
+                      branch={{
+                        id: "br_2",
+                        name: "ACME Subang Jaya",
+                        type: "Branch Office",
+                        accountModel: "Existing",
+                        accountName: "Acme Shared Account",
+                        accountId: "ACC-20260115-0002",
+                        address: { city: "Subang Jaya", state: "Selangor" },
+                        employeesCount: 450,
+                        status: "Active",
+                        cashBalance: 12500,
+                        creditBalance: 5000,
+                        claimsCount: 5,
+                      }}
+                      onView={() => setViewBranchId("br_2")}
+                      onEdit={() =>
+                        router.push(
+                          `/organizations/${orgId}/branches/br_2/edit`
+                        )
+                      }
+                    />
+                  </div>
+                ) : (
+                  <SharedDataTable
+                    freezeFirst
+                    freezeLast
+                    onRowClick={(branch) => setViewBranchId(branch.id)}
+                    columns={[
+                      {
+                        header: "Branch name",
+                        accessorKey: "name",
+                        sortable: true,
+                        render: (branch: { name: string }) => (
+                          <span className="text-body font-medium text-foreground transition-colors group-hover:text-primary">
+                            {branch.name}
+                          </span>
+                        ),
+                      },
+                      {
+                        header: "Status",
+                        accessorKey: "status",
+                        sortable: true,
+                        render: (branch: { status: string }) => (
+                          <StatusBadge
+                            status={branch.status}
+                            variant="emerald"
+                          />
+                        ),
+                      },
+                      {
+                        header: "Type",
+                        accessorKey: "type",
+                        sortable: true,
+                        render: (branch: { type: string }) => (
+                          <span className="text-body text-subtle">
+                            {branch.type}
+                          </span>
+                        ),
+                      },
+                      {
+                        header: "Employees",
+                        accessorKey: "employees",
+                        sortable: true,
+                        render: (branch: { employees: number | string }) => (
+                          <span className="text-body text-subtle">
+                            {branch.employees}
+                          </span>
+                        ),
+                      },
+                      {
+                        header: "Account",
+                        accessorKey: "accountName",
+                        sortable: true,
+                        headerClassName: "min-w-[220px]",
+                        render: (branch: {
+                          accountName: string
+                          accountId: string
+                          cashBalance: number
+                          creditBalance: number
+                        }) => {
+                          const total =
+                            branch.cashBalance + branch.creditBalance
+                          return (
+                            <div className="flex items-center gap-3">
+                              <div className="flex min-w-0 flex-col">
+                                <span className="truncate text-body font-semibold text-foreground">
+                                  {branch.accountName}
+                                </span>
+                                <span className="tracking-tight mt-0.5 font-mono text-label text-subtle">
+                                  {branch.accountId}
+                                </span>
                               </div>
-                            );
-                          },
-                        },
-                        {
-                          header: (
-                            <span className="inline-flex items-center gap-1">
-                              Claims
                               <Tooltip delayDuration={0}>
                                 <TooltipTrigger asChild>
                                   <button
-                                    type="button"
                                     onClick={(e) => e.stopPropagation()}
-                                    className="text-faint hover:text-foreground transition-colors"
-                                    aria-label="About claims"
+                                    className="ml-auto text-body font-semibold text-foreground tabular-nums transition-colors hover:text-primary"
                                   >
-                                    <Info size={12} weight="regular" />
+                                    RM {total.toLocaleString()}
                                   </button>
                                 </TooltipTrigger>
-                                <TooltipContent className="bg-card rounded-lg border-border shadow-2xl z-[200] px-2.5 py-1.5">
-                                  <span className="text-label font-medium text-foreground">Based on current month&apos;s claim</span>
+                                <TooltipContent className="z-[200] w-56 rounded-lg border-border bg-card p-3 shadow-2xl">
+                                  <div className="flex flex-col gap-2">
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-label font-medium text-subtle">
+                                        Cash balance
+                                      </span>
+                                      <span className="text-label font-semibold text-foreground tabular-nums">
+                                        RM {branch.cashBalance.toLocaleString()}
+                                      </span>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-label font-medium text-subtle">
+                                        Credit available
+                                      </span>
+                                      <span className="text-label font-semibold text-foreground tabular-nums">
+                                        RM{" "}
+                                        {branch.creditBalance.toLocaleString()}
+                                      </span>
+                                    </div>
+                                    <div className="my-0.5 h-px bg-border/60" />
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-label font-semibold text-subtle">
+                                        Total
+                                      </span>
+                                      <span className="text-label font-semibold text-primary tabular-nums">
+                                        RM {total.toLocaleString()}
+                                      </span>
+                                    </div>
+                                  </div>
                                 </TooltipContent>
                               </Tooltip>
-                            </span>
-                          ),
-                          accessorKey: "claimsCount",
-                          sortable: true,
-                          headerClassName: "min-w-[120px]",
-                          render: (branch: { claimsCount: number }) => (
-                            <span className="text-body font-medium tabular-nums text-foreground">
-                              {branch.claimsCount.toLocaleString()}
-                            </span>
-                          ),
-                        },
-                        {
-                          header: "Actions",
-                          align: "right",
-                          render: (branch: { id: string; type: string }) => (
-                            <div onClick={(e) => e.stopPropagation()}>
-                              <ActionPopover
-                                actions={[
-                                  {
-                                    label: "View Details",
-                                    onClick: () => setViewBranchId(branch.id),
-                                  },
-                                  {
-                                    label: "Edit Branch",
-                                    onClick: () =>
-                                      router.push(`/organizations/${orgId}/branches/${branch.id}/edit`),
-                                  },
-                                  ...(branch.type.toLowerCase() !== "hq" ? [{ label: "Deactivate", isDanger: true }] : []),
-                                ]}
-                              />
                             </div>
-                          ),
+                          )
                         },
-                      ]}
-                      data={[
-                        {
-                          id: "br_1",
-                          name: "ACME HQ (Kuala Lumpur)",
-                          type: "HQ",
-                          status: "Active",
-                          employees: 1240,
-                          accountName: "KL HQ Account",
-                          accountId: "ACC-20260115-0001",
-                          cashBalance: 45000,
-                          creditBalance: 10000,
-                          claimsCount: 12,
-                        },
-                        {
-                          id: "br_2",
-                          name: "ACME Subang Jaya",
-                          type: "Branch office",
-                          status: "Active",
-                          employees: 450,
-                          accountName: "Subang Shared Pool",
-                          accountId: "ACC-20260115-0002",
-                          cashBalance: 12500,
-                          creditBalance: 5000,
-                          claimsCount: 5,
-                        },
-                      ]}
-                    />
-                  )}
+                      },
+                      {
+                        header: (
+                          <span className="inline-flex items-center gap-1">
+                            Claims
+                            <Tooltip delayDuration={0}>
+                              <TooltipTrigger asChild>
+                                <button
+                                  type="button"
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="text-faint transition-colors hover:text-foreground"
+                                  aria-label="About claims"
+                                >
+                                  <Info size={12} weight="regular" />
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent className="z-[200] rounded-lg border-border bg-card px-2.5 py-1.5 shadow-2xl">
+                                <span className="text-label font-medium text-foreground">
+                                  Based on current month&apos;s claim
+                                </span>
+                              </TooltipContent>
+                            </Tooltip>
+                          </span>
+                        ),
+                        accessorKey: "claimsCount",
+                        sortable: true,
+                        headerClassName: "min-w-[120px]",
+                        render: (branch: { claimsCount: number }) => (
+                          <span className="text-body font-medium text-foreground tabular-nums">
+                            {branch.claimsCount.toLocaleString()}
+                          </span>
+                        ),
+                      },
+                      {
+                        header: "Actions",
+                        align: "right",
+                        render: (branch: { id: string; type: string }) => (
+                          <div onClick={(e) => e.stopPropagation()}>
+                            <ActionPopover
+                              actions={[
+                                {
+                                  label: "View Details",
+                                  onClick: () => setViewBranchId(branch.id),
+                                },
+                                {
+                                  label: "Edit Branch",
+                                  onClick: () =>
+                                    router.push(
+                                      `/organizations/${orgId}/branches/${branch.id}/edit`
+                                    ),
+                                },
+                                ...(branch.type.toLowerCase() !== "hq"
+                                  ? [{ label: "Deactivate", isDanger: true }]
+                                  : []),
+                              ]}
+                            />
+                          </div>
+                        ),
+                      },
+                    ]}
+                    data={[
+                      {
+                        id: "br_1",
+                        name: "ACME HQ (Kuala Lumpur)",
+                        type: "HQ",
+                        status: "Active",
+                        employees: 1240,
+                        accountName: "KL HQ Account",
+                        accountId: "ACC-20260115-0001",
+                        cashBalance: 45000,
+                        creditBalance: 10000,
+                        claimsCount: 12,
+                      },
+                      {
+                        id: "br_2",
+                        name: "ACME Subang Jaya",
+                        type: "Branch office",
+                        status: "Active",
+                        employees: 450,
+                        accountName: "Subang Shared Pool",
+                        accountId: "ACC-20260115-0002",
+                        cashBalance: 12500,
+                        creditBalance: 5000,
+                        claimsCount: 5,
+                      },
+                    ]}
+                  />
+                )}
               </div>
             )}
           </div>
@@ -1018,10 +1105,10 @@ function OrganizationDetailContent() {
                 onBack={() => setIsBulkUploading(null)}
                 onSuccess={() => setIsBulkUploading(null)}
                 orgTierConfigs={orgTierConfigs}
-                availablePolicies={assignedPolicies.map(p => ({
+                availablePolicies={assignedPolicies.map((p) => ({
                   name: p.name,
                   version: p.version,
-                  tiers: orgTierConfigs.map(tc => tc.code || tc.name),
+                  tiers: orgTierConfigs.map((tc) => tc.code || tc.name),
                 }))}
               />
             ) : (
@@ -1131,7 +1218,8 @@ function OrganizationDetailContent() {
                               dependentsCount: 2,
                               benefitPolicies: [
                                 {
-                                  policyName: "Acme Employee Wellness Policy FY2026",
+                                  policyName:
+                                    "Acme Employee Wellness Policy FY2026",
                                   benefitGroups: [
                                     "Gym Membership",
                                     "Mental Health",
@@ -1163,7 +1251,8 @@ function OrganizationDetailContent() {
                               dependentsCount: 0,
                               benefitPolicies: [
                                 {
-                                  policyName: "Acme Leadership Benefits Policy FY2026",
+                                  policyName:
+                                    "Acme Leadership Benefits Policy FY2026",
                                   benefitGroups: ["Travel", "Food"],
                                   utilisation: 85,
                                 },
@@ -1201,9 +1290,15 @@ function OrganizationDetailContent() {
                           ].map((emp) => (
                             <EmployeeCard
                               key={emp.id}
-                              employee={emp as ComponentProps<typeof EmployeeCard>["employee"]}
+                              employee={
+                                emp as ComponentProps<
+                                  typeof EmployeeCard
+                                >["employee"]
+                              }
                               onView={(id) => router.push(`/employees/${id}`)}
-                              onEdit={(id) => router.push(`/employees/${id}/edit`)}
+                              onEdit={(id) =>
+                                router.push(`/employees/${id}/edit`)
+                              }
                             />
                           ))}
                         </div>
@@ -1212,7 +1307,9 @@ function OrganizationDetailContent() {
                           <SharedDataTable
                             freezeFirst
                             freezeLast
-                            onRowClick={(emp) => router.push(`/employees/${emp.id}`)}
+                            onRowClick={(emp) =>
+                              router.push(`/employees/${emp.id}`)
+                            }
                             columns={[
                               {
                                 header: "Employee",
@@ -1244,7 +1341,10 @@ function OrganizationDetailContent() {
                                 accessorKey: "branch",
                                 sortable: true,
                                 render: (emp) => (
-                                  <Badge variant="outline" className="whitespace-nowrap text-label font-medium">
+                                  <Badge
+                                    variant="outline"
+                                    className="text-label font-medium whitespace-nowrap"
+                                  >
                                     {emp.branch}
                                   </Badge>
                                 ),
@@ -1264,7 +1364,10 @@ function OrganizationDetailContent() {
                                 accessorKey: "tier",
                                 sortable: true,
                                 render: (emp) => (
-                                  <Badge variant="secondary" className="whitespace-nowrap text-label font-medium">
+                                  <Badge
+                                    variant="secondary"
+                                    className="text-label font-medium whitespace-nowrap"
+                                  >
                                     {emp.tier || "—"}
                                   </Badge>
                                 ),
@@ -1275,7 +1378,8 @@ function OrganizationDetailContent() {
                                 sortable: true,
                                 render: (emp) => (
                                   <span className="text-label font-medium text-muted-foreground capitalize">
-                                    {emp.employmentType?.replace("-", " ") || "—"}
+                                    {emp.employmentType?.replace("-", " ") ||
+                                      "—"}
                                   </span>
                                 ),
                               },
@@ -1306,23 +1410,38 @@ function OrganizationDetailContent() {
                                     {emp.benefitPolicies &&
                                     emp.benefitPolicies.length > 0 ? (
                                       <>
-                                        {emp.benefitPolicies
-                                          .slice(0, 2)
-                                          .map((policy: { policyName: string; benefitGroups?: string[]; utilisation?: number }, idx: number) => (
-                                              <Tooltip key={idx}>
-                                                <TooltipTrigger asChild>
-                                                  <div className="flex cursor-help items-center">
-                                                    <Badge variant="secondary" className="whitespace-nowrap text-label font-medium transition-colors hover:bg-secondary/80">
-                                                      {policy.policyName}
-                                                      {policy.benefitGroups &&
-                                                        policy.benefitGroups.length > 0 && (
-                                                          <span className="ml-1 max-w-[80px] truncate font-medium text-subtle">
-                                                            ({policy.benefitGroups.length})
-                                                          </span>
-                                                        )}
-                                                    </Badge>
-                                                  </div>
-                                                </TooltipTrigger>
+                                        {emp.benefitPolicies.slice(0, 2).map(
+                                          (
+                                            policy: {
+                                              policyName: string
+                                              benefitGroups?: string[]
+                                              utilisation?: number
+                                            },
+                                            idx: number
+                                          ) => (
+                                            <Tooltip key={idx}>
+                                              <TooltipTrigger asChild>
+                                                <div className="flex cursor-help items-center">
+                                                  <Badge
+                                                    variant="secondary"
+                                                    className="text-label font-medium whitespace-nowrap transition-colors hover:bg-secondary/80"
+                                                  >
+                                                    {policy.policyName}
+                                                    {policy.benefitGroups &&
+                                                      policy.benefitGroups
+                                                        .length > 0 && (
+                                                        <span className="ml-1 max-w-[80px] truncate font-medium text-subtle">
+                                                          (
+                                                          {
+                                                            policy.benefitGroups
+                                                              .length
+                                                          }
+                                                          )
+                                                        </span>
+                                                      )}
+                                                  </Badge>
+                                                </div>
+                                              </TooltipTrigger>
                                               <TooltipContent
                                                 side="top"
                                                 className="z-[200] w-56 p-2"
@@ -1344,13 +1463,19 @@ function OrganizationDetailContent() {
                                                       No specific groups.
                                                     </div>
                                                   )}
-                                                  {policy.utilisation !== undefined && (
-                                                    <StatusBadge status={`${policy.utilisation}% Utilized`} variant="emerald" className="mt-0.5" />
+                                                  {policy.utilisation !==
+                                                    undefined && (
+                                                    <StatusBadge
+                                                      status={`${policy.utilisation}% Utilized`}
+                                                      variant="emerald"
+                                                      className="mt-0.5"
+                                                    />
                                                   )}
                                                 </div>
                                               </TooltipContent>
                                             </Tooltip>
-                                          ))}
+                                          )
+                                        )}
                                         {emp.benefitPolicies.length > 2 && (
                                           <Tooltip>
                                             <TooltipTrigger asChild>
@@ -1371,42 +1496,57 @@ function OrganizationDetailContent() {
                                               <div className="px-1 text-label font-semibold text-muted-foreground opacity-60">
                                                 Other policies
                                               </div>
-                                              {emp.benefitPolicies
-                                                .slice(2)
-                                                  .map(
-                                                   (policy: { policyName: string; benefitGroups?: string[]; utilisation?: number }, i: number) => (
-                                                    <div
-                                                      key={i}
-                                                      className="flex flex-col gap-1.5 border-b border-border/50 px-1 pb-2.5 last:border-0 last:pb-0"
-                                                    >
-                                                      <div className="mt-1 text-label font-semibold text-foreground">
-                                                        {policy.policyName}
-                                                      </div>
-                                                      {policy.benefitGroups &&
-                                                      policy.benefitGroups
-                                                        .length > 0 ? (
-                                                        <div className="text-label leading-snug text-muted-foreground">
-                                                          {policy.benefitGroups.join(
-                                                            ", "
-                                                          )}
-                                                        </div>
-                                                      ) : (
-                                                        <div className="text-label text-muted-foreground italic">
-                                                          No specific groups.
-                                                        </div>
-                                                      )}
-                                                      {policy.utilisation !== undefined && (
-                                                        <StatusBadge status={`${policy.utilisation}% Utilized`} variant="emerald" className="mt-0.5" />
-                                                      )}
+                                              {emp.benefitPolicies.slice(2).map(
+                                                (
+                                                  policy: {
+                                                    policyName: string
+                                                    benefitGroups?: string[]
+                                                    utilisation?: number
+                                                  },
+                                                  i: number
+                                                ) => (
+                                                  <div
+                                                    key={i}
+                                                    className="flex flex-col gap-1.5 border-b border-border/50 px-1 pb-2.5 last:border-0 last:pb-0"
+                                                  >
+                                                    <div className="mt-1 text-label font-semibold text-foreground">
+                                                      {policy.policyName}
                                                     </div>
-                                                  )
-                                                )}
+                                                    {policy.benefitGroups &&
+                                                    policy.benefitGroups
+                                                      .length > 0 ? (
+                                                      <div className="text-label leading-snug text-muted-foreground">
+                                                        {policy.benefitGroups.join(
+                                                          ", "
+                                                        )}
+                                                      </div>
+                                                    ) : (
+                                                      <div className="text-label text-muted-foreground italic">
+                                                        No specific groups.
+                                                      </div>
+                                                    )}
+                                                    {policy.utilisation !==
+                                                      undefined && (
+                                                      <StatusBadge
+                                                        status={`${policy.utilisation}% Utilized`}
+                                                        variant="emerald"
+                                                        className="mt-0.5"
+                                                      />
+                                                    )}
+                                                  </div>
+                                                )
+                                              )}
                                             </TooltipContent>
                                           </Tooltip>
                                         )}
                                       </>
                                     ) : (
-                                      <Badge variant="outline" className="text-label font-medium">None</Badge>
+                                      <Badge
+                                        variant="outline"
+                                        className="text-label font-medium"
+                                      >
+                                        None
+                                      </Badge>
                                     )}
                                   </div>
                                 ),
@@ -1440,7 +1580,9 @@ function OrganizationDetailContent() {
                                       {
                                         label: "Edit Employee",
                                         onClick: () => {
-                                          router.push(`/employees/${emp.id}/edit`)
+                                          router.push(
+                                            `/employees/${emp.id}/edit`
+                                          )
                                         },
                                       },
                                       {
@@ -1467,7 +1609,8 @@ function OrganizationDetailContent() {
                                 employmentType: "full-time",
                                 benefitPolicies: [
                                   {
-                                    policyName: "Acme Employee Wellness Policy FY2026",
+                                    policyName:
+                                      "Acme Employee Wellness Policy FY2026",
                                     benefitGroups: ["Gym", "Mental Health"],
                                     utilisation: 48,
                                   },
@@ -1488,7 +1631,8 @@ function OrganizationDetailContent() {
                                 employmentType: "full-time",
                                 benefitPolicies: [
                                   {
-                                    policyName: "Acme Leadership Benefits Policy FY2026",
+                                    policyName:
+                                      "Acme Leadership Benefits Policy FY2026",
                                     benefitGroups: ["Food", "Travel"],
                                     utilisation: 85,
                                   },
@@ -1622,15 +1766,18 @@ function OrganizationDetailContent() {
                                 </button>
                               ),
                             },
-                              {
-                                header: "Relationship",
-                                accessorKey: "relationship",
-                                render: (dep) => (
-                                  <Badge variant="outline" className="text-label font-medium capitalize">
-                                    {dep.relationship}
-                                  </Badge>
-                                ),
-                              },
+                            {
+                              header: "Relationship",
+                              accessorKey: "relationship",
+                              render: (dep) => (
+                                <Badge
+                                  variant="outline"
+                                  className="text-label font-medium capitalize"
+                                >
+                                  {dep.relationship}
+                                </Badge>
+                              ),
+                            },
                             {
                               header: "Status",
                               accessorKey: "status",
@@ -1721,9 +1868,7 @@ function OrganizationDetailContent() {
                                 <span className="text-body font-medium text-foreground">
                                   {ent.beneficiaryName}
                                 </span>
-                                <span
-                                  className="mt-1 w-fit rounded-full px-1.5 py-0.5 text-label font-medium text-primary border border-primary/10 bg-primary/5"
-                                >
+                                <span className="mt-1 w-fit rounded-full border border-primary/10 bg-primary/5 px-1.5 py-0.5 text-label font-medium text-primary">
                                   {ent.type}
                                 </span>
                               </div>
@@ -1750,7 +1895,13 @@ function OrganizationDetailContent() {
                           {
                             header: "Claims Usage",
                             render: (ent) => {
-                              const pct = ent.allocatedAmount > 0 ? Math.round((ent.usedAmount / ent.allocatedAmount) * 100) : 0
+                              const pct =
+                                ent.allocatedAmount > 0
+                                  ? Math.round(
+                                      (ent.usedAmount / ent.allocatedAmount) *
+                                        100
+                                    )
+                                  : 0
                               const isHigh = pct > 80
                               return (
                                 <div className="flex w-[160px] flex-col gap-1.5">
@@ -1758,15 +1909,26 @@ function OrganizationDetailContent() {
                                     <span className="text-faint">
                                       RM {ent.usedAmount.toLocaleString()}
                                     </span>
-                                    <span className={isHigh ? "font-semibold text-rose-600 dark:text-rose-400" : "font-semibold text-primary"}>{pct}%</span>
+                                    <span
+                                      className={
+                                        isHigh
+                                          ? "font-semibold text-rose-600 dark:text-rose-400"
+                                          : "font-semibold text-primary"
+                                      }
+                                    >
+                                      {pct}%
+                                    </span>
                                   </div>
                                   <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-muted">
                                     <div
-                                      className={isHigh
-                                        ? "h-full rounded-full bg-rose-500 dark:bg-rose-400 transition-all duration-700"
-                                        : "h-full rounded-full bg-primary transition-all duration-700"
+                                      className={
+                                        isHigh
+                                          ? "h-full rounded-full bg-rose-500 transition-all duration-700 dark:bg-rose-400"
+                                          : "h-full rounded-full bg-primary transition-all duration-700"
                                       }
-                                      style={{ width: `${Math.min(pct, 100)}%` }}
+                                      style={{
+                                        width: `${Math.min(pct, 100)}%`,
+                                      }}
                                     />
                                   </div>
                                 </div>
@@ -1811,10 +1973,11 @@ function OrganizationDetailContent() {
                         </div>
                       </div>
 
-                      <UtilisationClaimsTable data={MOCK_EMPLOYEE_UTILISATION} />
+                      <UtilisationClaimsTable
+                        data={MOCK_EMPLOYEE_UTILISATION}
+                      />
                     </div>
                   )}
-
                 </div>
               </div>
             )}
@@ -1829,7 +1992,9 @@ function OrganizationDetailContent() {
               <PolicyDetailView
                 key={viewingPolicyId}
                 policy={assignedPolicies.find((p) => p.id === viewingPolicyId)!}
-                groups={mockGroups.filter((g) => g.policyId === viewingPolicyId)}
+                groups={mockGroups.filter(
+                  (g) => g.policyId === viewingPolicyId
+                )}
                 benefits={mockBenefits.filter((b) =>
                   mockGroups.some(
                     (g) => g.id === b.groupId && g.policyId === viewingPolicyId
@@ -1838,23 +2003,31 @@ function OrganizationDetailContent() {
                 employees={MOCK_EMPLOYEES}
                 onEdit={() => setEditingPolicyId(viewingPolicyId)}
                 onClone={() => {
-                  const p = assignedPolicies.find((p) => p.id === viewingPolicyId)
+                  const p = assignedPolicies.find(
+                    (p) => p.id === viewingPolicyId
+                  )
                   if (p) {
-                    setToastMessage(`Cloned from ${p.name} — open Host Policies to edit`)
+                    setToastMessage(
+                      `Cloned from ${p.name} — open Host Policies to edit`
+                    )
                     setViewingPolicyId(null)
                   }
                 }}
                 onDeactivate={() => {
                   setAssignedPolicies((prev) =>
                     prev.map((p) =>
-                      p.id === viewingPolicyId ? { ...p, status: "deactivated" as const } : p
+                      p.id === viewingPolicyId
+                        ? { ...p, status: "deactivated" as const }
+                        : p
                     )
                   )
                   setToastMessage("Policy deactivated")
                   setViewingPolicyId(null)
                 }}
                 onDelete={() => {
-                  setAssignedPolicies((prev) => prev.filter((p) => p.id !== viewingPolicyId))
+                  setAssignedPolicies((prev) =>
+                    prev.filter((p) => p.id !== viewingPolicyId)
+                  )
                   setToastMessage("Policy unassigned from organisation")
                   setViewingPolicyId(null)
                 }}
@@ -1910,8 +2083,13 @@ function OrganizationDetailContent() {
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="text-heading font-semibold text-foreground">Benefit Policies</h2>
-                    <p className="text-body text-subtle">Manage which benefit structures are assigned to this organisation&apos;s workforce</p>
+                    <h2 className="text-heading font-semibold text-foreground">
+                      Benefit Policies
+                    </h2>
+                    <p className="text-body text-subtle">
+                      Manage which benefit structures are assigned to this
+                      organisation&apos;s workforce
+                    </p>
                   </div>
                   <div className="flex items-center gap-2">
                     <Button
@@ -1925,8 +2103,14 @@ function OrganizationDetailContent() {
                     <PolicyCreationLauncher
                       preselectedOrgId={orgId}
                       hideOrgPicker
-                      onManual={(oid) => router.push(`/policies/new?orgId=${oid}`)}
-                      onTemplate={(tid, oid) => router.push(`/policies/new?template=${tid}&orgId=${oid}`)}
+                      onManual={(oid) =>
+                        router.push(`/policies/new?orgId=${oid}`)
+                      }
+                      onTemplate={(tid, oid) =>
+                        router.push(
+                          `/policies/new?template=${tid}&orgId=${oid}`
+                        )
+                      }
                     />
                   </div>
                 </div>
@@ -2021,10 +2205,14 @@ function OrganizationDetailContent() {
           </div>
         )}
         {activeTab === "claims" && (
-          <div className="animate-in fade-in space-y-6">
+          <div className="animate-in space-y-6 fade-in">
             <div>
-              <h2 className="text-heading font-semibold text-foreground">Claims</h2>
-              <p className="text-body text-subtle">Claim history across all employees in this organisation</p>
+              <h2 className="text-heading font-semibold text-foreground">
+                Claims
+              </h2>
+              <p className="text-body text-subtle">
+                Claim history across all employees in this organisation
+              </p>
             </div>
             <OrganizationClaimsTable
               data={MOCK_EMPLOYEE_UTILISATION}
@@ -2035,10 +2223,15 @@ function OrganizationDetailContent() {
         )}
 
         {activeTab === "vouchers" && (
-          <div className="animate-in fade-in space-y-6">
+          <div className="animate-in space-y-6 fade-in">
             <div>
-              <h2 className="text-heading font-semibold text-foreground">Vouchers</h2>
-              <p className="text-body text-subtle">Voucher redemption records across all employees in this organisation</p>
+              <h2 className="text-heading font-semibold text-foreground">
+                Vouchers
+              </h2>
+              <p className="text-body text-subtle">
+                Voucher redemption records across all employees in this
+                organisation
+              </p>
             </div>
             <VouchersTable
               data={MOCK_EMPLOYEE_UTILISATION}
@@ -2101,7 +2294,10 @@ function OrganizationDetailContent() {
                     header: "Branch",
                     accessorKey: "branchName",
                     sortable: true,
-                    render: (admin: { branchId: string; branchName: string }) => (
+                    render: (admin: {
+                      branchId: string
+                      branchName: string
+                    }) => (
                       <button
                         onClick={() => {
                           setActiveTab("branches")
@@ -2209,7 +2405,6 @@ function OrganizationDetailContent() {
                     </Button>
                   </div>
                 </div>
-
               </div>
             </DetailSection>
           </div>
@@ -2248,9 +2443,7 @@ function OrganizationDetailContent() {
             const res = await dangerActionConfig[dangerAction].run()
             if (res.success) {
               setOrgStatus(
-                dangerAction === "deactivate"
-                  ? "deactivated"
-                  : "suspended"
+                dangerAction === "deactivate" ? "deactivated" : "suspended"
               )
               setToastMessage(res.message)
               setIsDangerModalOpen(false)
@@ -2263,7 +2456,7 @@ function OrganizationDetailContent() {
       />
 
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center rounded-lg bg-foreground px-5 py-3 text-primary-foreground shadow-lg animate-in slide-in-from-bottom-4 fade-in">
+        <div className="fixed right-6 bottom-6 z-50 flex animate-in items-center rounded-lg bg-foreground px-5 py-3 text-primary-foreground shadow-lg fade-in slide-in-from-bottom-4">
           <p className="text-body font-semibold">{toastMessage}</p>
           <button
             onClick={() => setToastMessage(null)}
