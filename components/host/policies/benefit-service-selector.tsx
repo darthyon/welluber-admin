@@ -10,6 +10,7 @@ import {
 import { cn } from "@/lib/utils"
 import { FormSelect } from "@/components/shared/form-select"
 import { FieldHelp } from "@/components/shared/field-help"
+import { Switch } from "@/components/shared/switch"
 import { SERVICES } from "@/lib/mock-data/service-catalog"
 import type { MainServiceId } from "@/lib/mock-data/service-catalog"
 import type { Benefit, BenefitGroupCoverageScope } from "@/types/policy"
@@ -44,45 +45,33 @@ const GROUPED_SERVICES = SERVICES.reduce<
 }, [])
 
 function CoPaymentToggle({
+  label,
   required,
   type,
   value,
   errorKey,
   groupErrors,
-  onToggle,
+  onCheckedChange,
   onChangeType,
   onChangeValue,
 }: {
+  label: string
   required: boolean
   type: "Percentage" | "Fixed"
   value: number
   errorKey: string
   groupErrors: Record<string, string>
-  onToggle: () => void
+  onCheckedChange: (checked: boolean) => void
   onChangeType: (v: string) => void
   onChangeValue: (v: number) => void
 }) {
   return (
     <div className="space-y-1">
       <label className="inline-flex items-center gap-1 text-micro font-medium text-faint">
-        Co-payment <FieldHelp termKey="coPayment" />
+        {label} <FieldHelp termKey="coPayment" />
       </label>
       <div className="flex items-center gap-3">
-        <button
-          type="button"
-          onClick={onToggle}
-          className={cn(
-            "relative h-4 w-8 shrink-0 rounded-full transition-colors",
-            required ? "bg-primary" : "bg-border"
-          )}
-        >
-          <div
-            className={cn(
-              "absolute top-[2px] h-3 w-3 rounded-full border border-border/40 bg-background transition-all",
-              required ? "right-0.5" : "left-0.5"
-            )}
-          />
-        </button>
+        <Switch checked={required} onCheckedChange={onCheckedChange} />
         {required && (
           <div className="flex items-center gap-1.5">
             <FormSelect
@@ -92,12 +81,12 @@ function CoPaymentToggle({
                 { label: "%", value: "Percentage" },
                 { label: "RM", value: "Fixed" },
               ]}
-              triggerClassName="w-16 h-8"
+              triggerClassName="h-10 min-w-[76px]"
             />
             <input
               type="number"
               className={cn(
-                "w-16 rounded-lg border bg-background px-2 py-1.5 text-right font-mono text-label outline-none focus:ring-2 focus:ring-primary/10",
+                "h-10 w-24 rounded-lg border bg-background px-3 py-2 text-right font-mono text-label outline-none focus:ring-2 focus:ring-primary/10",
                 groupErrors[errorKey] ? "border-destructive" : "border-border"
               )}
               value={value || ""}
@@ -162,6 +151,9 @@ export function BenefitServiceSelector({
       return next
     })
   }
+
+  const isDependentOnly = coverageScope === "Dependent"
+  const isBoth = coverageScope === "Both"
 
   // View mode: simple flat list
   if (isViewMode) {
@@ -366,16 +358,15 @@ export function BenefitServiceSelector({
                   typeof benefit.dependantAmount === "number"
                     ? benefit.dependantAmount
                     : benefit.amount
-                const amountSummary =
-                  coverageScope === "Both"
-                    ? `RM ${employeeAmount.toLocaleString()} employee / RM ${dependentAmount.toLocaleString()} dependent`
-                    : coverageScope === "Dependent"
-                      ? dependentAmount > 0
-                        ? `RM ${dependentAmount.toLocaleString()}`
-                        : "Set amount"
-                      : benefit.amount > 0
-                        ? `RM ${benefit.amount.toLocaleString()}`
-                        : "Set amount"
+                const amountSummary = isBoth
+                  ? `RM ${employeeAmount.toLocaleString()} employee / RM ${dependentAmount.toLocaleString()} dependent`
+                  : isDependentOnly
+                    ? dependentAmount > 0
+                      ? `RM ${dependentAmount.toLocaleString()}`
+                      : "Set amount"
+                    : benefit.amount > 0
+                      ? `RM ${benefit.amount.toLocaleString()}`
+                      : "Set amount"
 
                 return (
                   <div key={benefit.id}>
@@ -434,18 +425,21 @@ export function BenefitServiceSelector({
                           </p>
                         )}
 
-                        <div className="flex flex-wrap items-end gap-5">
-                          {/* Amount inputs */}
-                          {coverageScope === "Both" ? (
-                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        {isBoth ? (
+                          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                            {/* Employee */}
+                            <div className="space-y-3 rounded-lg border border-border/60 bg-background/40 p-3">
+                              <p className="text-label font-medium text-muted-foreground">
+                                Employee
+                              </p>
                               <div className="space-y-1">
                                 <label className="block text-micro font-medium text-faint">
-                                  Employee Amount (RM)
+                                  Amount (RM)
                                 </label>
                                 <input
                                   type="number"
                                   className={cn(
-                                    "w-32 rounded-lg border bg-background px-2 py-1.5 text-right font-mono text-label outline-none focus:ring-2 focus:ring-primary/10",
+                                    "h-10 w-32 rounded-lg border bg-background px-3 py-2 text-right font-mono text-label outline-none focus:ring-2 focus:ring-primary/10",
                                     groupErrors[
                                       `benefit_${groupId}_${benefit.serviceId}`
                                     ]
@@ -472,14 +466,50 @@ export function BenefitServiceSelector({
                                   }}
                                 />
                               </div>
+                              <CoPaymentToggle
+                                label="Co-payment"
+                                required={benefit.coPayment.required}
+                                type={benefit.coPayment.type}
+                                value={benefit.coPayment.value}
+                                errorKey={`copay_${groupId}_${benefit.serviceId}`}
+                                groupErrors={groupErrors}
+                                onCheckedChange={(checked) =>
+                                  onUpdateBenefit(
+                                    benefit.id,
+                                    "coPayment.required",
+                                    checked
+                                  )
+                                }
+                                onChangeType={(v) =>
+                                  onUpdateBenefit(
+                                    benefit.id,
+                                    "coPayment.type",
+                                    v
+                                  )
+                                }
+                                onChangeValue={(v) =>
+                                  onUpdateBenefit(
+                                    benefit.id,
+                                    "coPayment.value",
+                                    v
+                                  )
+                                }
+                              />
+                            </div>
+
+                            {/* Dependent */}
+                            <div className="space-y-3 rounded-lg border border-border/60 bg-background/40 p-3">
+                              <p className="text-label font-medium text-muted-foreground">
+                                Dependent
+                              </p>
                               <div className="space-y-1">
                                 <label className="block text-micro font-medium text-faint">
-                                  Dependent Amount (RM)
+                                  Amount (RM)
                                 </label>
                                 <input
                                   type="number"
                                   className={cn(
-                                    "w-32 rounded-lg border bg-background px-2 py-1.5 text-right font-mono text-label outline-none focus:ring-2 focus:ring-primary/10",
+                                    "h-10 w-32 rounded-lg border bg-background px-3 py-2 text-right font-mono text-label outline-none focus:ring-2 focus:ring-primary/10",
                                     groupErrors[
                                       `benefit_${groupId}_${benefit.serviceId}`
                                     ]
@@ -506,27 +536,65 @@ export function BenefitServiceSelector({
                                   }}
                                 />
                               </div>
-                              {groupErrors[
-                                `benefit_${groupId}_${benefit.serviceId}`
-                              ] && (
-                                <p className="text-micro text-destructive sm:col-span-2">
-                                  {
-                                    groupErrors[
-                                      `benefit_${groupId}_${benefit.serviceId}`
-                                    ]
-                                  }
-                                </p>
-                              )}
+                              <CoPaymentToggle
+                                label="Co-payment"
+                                required={
+                                  benefit.dependentCoPayment?.required ?? false
+                                }
+                                type={
+                                  benefit.dependentCoPayment?.type ??
+                                  "Percentage"
+                                }
+                                value={benefit.dependentCoPayment?.value ?? 0}
+                                errorKey={`dep_copay_${groupId}_${benefit.serviceId}`}
+                                groupErrors={groupErrors}
+                                onCheckedChange={(checked) =>
+                                  onUpdateBenefit(
+                                    benefit.id,
+                                    "dependentCoPayment.required",
+                                    checked
+                                  )
+                                }
+                                onChangeType={(v) =>
+                                  onUpdateBenefit(
+                                    benefit.id,
+                                    "dependentCoPayment.type",
+                                    v
+                                  )
+                                }
+                                onChangeValue={(v) =>
+                                  onUpdateBenefit(
+                                    benefit.id,
+                                    "dependentCoPayment.value",
+                                    v
+                                  )
+                                }
+                              />
                             </div>
-                          ) : (
+                            {groupErrors[
+                              `benefit_${groupId}_${benefit.serviceId}`
+                            ] && (
+                              <p className="text-micro text-destructive md:col-span-2">
+                                {
+                                  groupErrors[
+                                    `benefit_${groupId}_${benefit.serviceId}`
+                                  ]
+                                }
+                              </p>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="flex flex-wrap items-end gap-5">
                             <div className="space-y-1">
                               <label className="block text-micro font-medium text-faint">
-                                Amount (RM)
+                                {isDependentOnly
+                                  ? "Dependent Amount (RM)"
+                                  : "Employee Amount (RM)"}
                               </label>
                               <input
                                 type="number"
                                 className={cn(
-                                  "w-24 rounded-lg border bg-background px-2 py-1.5 text-right font-mono text-label outline-none focus:ring-2 focus:ring-primary/10",
+                                  "h-10 w-32 rounded-lg border bg-background px-3 py-2 text-right font-mono text-label outline-none focus:ring-2 focus:ring-primary/10",
                                   groupErrors[
                                     `benefit_${groupId}_${benefit.serviceId}`
                                   ]
@@ -534,7 +602,7 @@ export function BenefitServiceSelector({
                                     : "border-border"
                                 )}
                                 value={
-                                  coverageScope === "Dependent"
+                                  isDependentOnly
                                     ? (typeof benefit.dependantAmount ===
                                       "number"
                                         ? benefit.dependantAmount
@@ -546,7 +614,7 @@ export function BenefitServiceSelector({
                                     e.target.value === ""
                                       ? 0
                                       : parseFloat(e.target.value)
-                                  if (coverageScope === "Dependent") {
+                                  if (isDependentOnly) {
                                     onUpdateBenefit(
                                       benefit.id,
                                       "dependantAmount",
@@ -570,73 +638,62 @@ export function BenefitServiceSelector({
                                 </p>
                               )}
                             </div>
-                          )}
 
-                          {/* Co-payment */}
-                          {coverageScope !== "Dependent" && (
                             <CoPaymentToggle
-                              required={benefit.coPayment.required}
-                              type={benefit.coPayment.type}
-                              value={benefit.coPayment.value}
-                              errorKey={`copay_${groupId}_${benefit.serviceId}`}
-                              groupErrors={groupErrors}
-                              onToggle={() =>
-                                onUpdateBenefit(
-                                  benefit.id,
-                                  "coPayment.required",
-                                  !benefit.coPayment.required
-                                )
-                              }
-                              onChangeType={(v) =>
-                                onUpdateBenefit(benefit.id, "coPayment.type", v)
-                              }
-                              onChangeValue={(v) =>
-                                onUpdateBenefit(
-                                  benefit.id,
-                                  "coPayment.value",
-                                  v
-                                )
-                              }
-                            />
-                          )}
-                          {coverageScope !== "Employee" && (
-                            <CoPaymentToggle
+                              label="Co-payment"
                               required={
-                                benefit.dependentCoPayment?.required ?? false
+                                isDependentOnly
+                                  ? (benefit.dependentCoPayment?.required ??
+                                    false)
+                                  : benefit.coPayment.required
                               }
                               type={
-                                benefit.dependentCoPayment?.type ?? "Percentage"
+                                isDependentOnly
+                                  ? (benefit.dependentCoPayment?.type ??
+                                    "Percentage")
+                                  : benefit.coPayment.type
                               }
-                              value={benefit.dependentCoPayment?.value ?? 0}
-                              errorKey={`dep_copay_${groupId}_${benefit.serviceId}`}
+                              value={
+                                isDependentOnly
+                                  ? (benefit.dependentCoPayment?.value ?? 0)
+                                  : benefit.coPayment.value
+                              }
+                              errorKey={
+                                isDependentOnly
+                                  ? `dep_copay_${groupId}_${benefit.serviceId}`
+                                  : `copay_${groupId}_${benefit.serviceId}`
+                              }
                               groupErrors={groupErrors}
-                              onToggle={() =>
+                              onCheckedChange={(checked) =>
                                 onUpdateBenefit(
                                   benefit.id,
-                                  "dependentCoPayment.required",
-                                  !(
-                                    benefit.dependentCoPayment?.required ??
-                                    false
-                                  )
+                                  isDependentOnly
+                                    ? "dependentCoPayment.required"
+                                    : "coPayment.required",
+                                  checked
                                 )
                               }
                               onChangeType={(v) =>
                                 onUpdateBenefit(
                                   benefit.id,
-                                  "dependentCoPayment.type",
+                                  isDependentOnly
+                                    ? "dependentCoPayment.type"
+                                    : "coPayment.type",
                                   v
                                 )
                               }
                               onChangeValue={(v) =>
                                 onUpdateBenefit(
                                   benefit.id,
-                                  "dependentCoPayment.value",
+                                  isDependentOnly
+                                    ? "dependentCoPayment.value"
+                                    : "coPayment.value",
                                   v
                                 )
                               }
                             />
-                          )}
-                        </div>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>

@@ -32,6 +32,7 @@ import { ChoiceCard } from "@/components/shared/choice-card"
 import { FieldHelp } from "@/components/shared/field-help"
 import { DetailSection } from "@/components/shared/detail-section"
 import { FormSelect } from "@/components/shared/form-select"
+import { Switch } from "@/components/shared/switch"
 import { SuccessCelebration } from "@/components/shared/success-celebration"
 import { PolicyLaunchConfirmModal } from "@/components/host/policies/policy-launch-confirm-modal"
 import { cn } from "@/lib/utils"
@@ -1768,7 +1769,7 @@ export function BenefitPolicyWizard({
                             <input
                               type="number"
                               className={cn(
-                                "w-32 rounded-lg border bg-background px-2.5 py-1.5 text-label outline-none focus:ring-2 focus:ring-primary/10",
+                                "h-10 w-32 rounded-lg border bg-background px-3 py-2 text-label outline-none focus:ring-2 focus:ring-primary/10",
                                 groupErrors[`group_cap_${group.id}`]
                                   ? "border-destructive"
                                   : "border-border"
@@ -1796,34 +1797,16 @@ export function BenefitPolicyWizard({
                               Co-payment <FieldHelp termKey="coPayment" />
                             </label>
                             <div className="flex items-center gap-2">
-                              <button
-                                type="button"
-                                onClick={() =>
+                              <Switch
+                                checked={group.coPayment?.required ?? false}
+                                onCheckedChange={(checked) =>
                                   updateGroupCoPayment(
                                     group.id,
                                     "required",
-                                    !(group.coPayment?.required ?? false)
+                                    checked
                                   )
                                 }
-                                aria-pressed={
-                                  group.coPayment?.required ?? false
-                                }
-                                className={cn(
-                                  "relative h-5 w-9 shrink-0 rounded-full border transition-colors",
-                                  group.coPayment?.required
-                                    ? "border-primary bg-primary"
-                                    : "border-border bg-muted"
-                                )}
-                              >
-                                <div
-                                  className={cn(
-                                    "absolute top-[2px] h-3.5 w-3.5 rounded-full bg-background shadow-sm transition-all",
-                                    group.coPayment?.required
-                                      ? "right-0.5"
-                                      : "left-0.5"
-                                  )}
-                                />
-                              </button>
+                              />
                               {group.coPayment?.required && (
                                 <div className="flex items-center gap-1.5">
                                   <FormSelect
@@ -1837,11 +1820,11 @@ export function BenefitPolicyWizard({
                                       { label: "%", value: "Percentage" },
                                       { label: "RM", value: "Fixed" },
                                     ]}
-                                    triggerClassName="w-16 h-8"
+                                    triggerClassName="h-10 min-w-[76px]"
                                   />
                                   <input
                                     type="number"
-                                    className="w-20 rounded-lg border border-border bg-background px-2.5 py-1.5 text-right font-mono text-label outline-none"
+                                    className="h-10 w-24 rounded-lg border border-border bg-background px-3 py-2 text-right font-mono text-label outline-none"
                                     value={group.coPayment?.value || ""}
                                     onChange={(e) =>
                                       updateGroupCoPayment(
@@ -1889,7 +1872,7 @@ export function BenefitPolicyWizard({
                               <input
                                 type="number"
                                 className={cn(
-                                  "w-32 rounded-lg border bg-background px-2.5 py-1.5 text-label outline-none focus:ring-2 focus:ring-primary/10",
+                                  "h-10 w-32 rounded-lg border bg-background px-3 py-2 text-label outline-none focus:ring-2 focus:ring-primary/10",
                                   groupErrors[`group_dep_cap_${group.id}`]
                                     ? "border-destructive"
                                     : "border-border"
@@ -1917,37 +1900,18 @@ export function BenefitPolicyWizard({
                                 Co-payment <FieldHelp termKey="coPayment" />
                               </label>
                               <div className="flex items-center gap-2">
-                                <button
-                                  type="button"
-                                  onClick={() =>
+                                <Switch
+                                  checked={
+                                    group.dependentCoPayment?.required ?? false
+                                  }
+                                  onCheckedChange={(checked) =>
                                     updateDependentCoPayment(
                                       group.id,
                                       "required",
-                                      !(
-                                        group.dependentCoPayment?.required ??
-                                        false
-                                      )
+                                      checked
                                     )
                                   }
-                                  aria-pressed={
-                                    group.dependentCoPayment?.required ?? false
-                                  }
-                                  className={cn(
-                                    "relative h-5 w-9 shrink-0 rounded-full border transition-colors",
-                                    group.dependentCoPayment?.required
-                                      ? "border-primary bg-primary"
-                                      : "border-border bg-muted"
-                                  )}
-                                >
-                                  <div
-                                    className={cn(
-                                      "absolute top-[2px] h-3.5 w-3.5 rounded-full bg-background shadow-sm transition-all",
-                                      group.dependentCoPayment?.required
-                                        ? "right-0.5"
-                                        : "left-0.5"
-                                    )}
-                                  />
-                                </button>
+                                />
                                 {group.dependentCoPayment?.required && (
                                   <div className="flex items-center gap-1.5">
                                     <FormSelect
@@ -1966,12 +1930,12 @@ export function BenefitPolicyWizard({
                                         { label: "%", value: "Percentage" },
                                         { label: "RM", value: "Fixed" },
                                       ]}
-                                      triggerClassName="w-16 h-8"
+                                      triggerClassName="h-10 min-w-[76px]"
                                     />
                                     <input
                                       type="number"
                                       className={cn(
-                                        "w-20 rounded-lg border bg-background px-2.5 py-1.5 text-right font-mono text-label outline-none",
+                                        "h-10 w-24 rounded-lg border bg-background px-3 py-2 text-right font-mono text-label outline-none",
                                         groupErrors[
                                           `group_dep_copay_${group.id}`
                                         ]
@@ -2208,7 +2172,10 @@ export function BenefitPolicyWizard({
                           title="Fixed Allocation"
                           description="Full allocation granted immediately."
                           icon={Gear}
-                          selected={group.utilisationMode === "Fixed"}
+                          selected={
+                            (group.utilisationMode ??
+                              policyData.utilisationMode) === "Fixed"
+                          }
                           onSelect={() => {
                             updateGroup(group.id, "utilisationMode", "Fixed")
                             updateGroup(group.id, "prorateUnit", undefined)
@@ -2218,7 +2185,10 @@ export function BenefitPolicyWizard({
                           title="Prorated Allocation"
                           description="Amounts prorated based on time."
                           icon={ChartLineUp}
-                          selected={group.utilisationMode === "Prorated"}
+                          selected={
+                            (group.utilisationMode ??
+                              policyData.utilisationMode) === "Prorated"
+                          }
                           onSelect={() => {
                             updateGroup(group.id, "utilisationMode", "Prorated")
                             if (!group.prorateUnit)
@@ -2226,92 +2196,90 @@ export function BenefitPolicyWizard({
                           }}
                         />
                       </div>
-                      {(group.utilisationMode ?? policyData.utilisationMode) ===
-                        "Prorated" && (
+                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        {(group.utilisationMode ??
+                          policyData.utilisationMode) === "Prorated" && (
+                          <div className="animate-in space-y-1.5 duration-200 fade-in slide-in-from-top-1">
+                            <p className="text-label font-medium text-muted-foreground">
+                              Prorate Unit
+                            </p>
+                            <FormSelect
+                              value={
+                                group.prorateUnit ??
+                                policyData.prorateUnit ??
+                                "Monthly"
+                              }
+                              onChange={(v) => {
+                                const nextUnit = (v || undefined) as
+                                  | ProrateUnit
+                                  | undefined
+                                updateGroup(group.id, "prorateUnit", nextUnit)
+                                const available = getAvailableRefreshCycles(
+                                  "Prorated",
+                                  (nextUnit ??
+                                    policyData.prorateUnit ??
+                                    "Monthly") as ProrateUnit
+                                )
+                                const current =
+                                  group.refreshCycle ?? policyData.refreshCycle
+                                if (
+                                  current &&
+                                  !available.includes(current as RefreshCycle)
+                                ) {
+                                  updateGroup(
+                                    group.id,
+                                    "refreshCycle",
+                                    available[0]
+                                  )
+                                }
+                              }}
+                              options={[
+                                { label: "Inherit (Policy)", value: "" },
+                                ...PRORATE_UNITS.map((u) => ({
+                                  label: u,
+                                  value: u,
+                                })),
+                              ]}
+                              triggerClassName="max-w-[240px]"
+                              disabled={isViewMode}
+                            />
+                          </div>
+                        )}
+
                         <div className="animate-in space-y-1.5 duration-200 fade-in slide-in-from-top-1">
                           <p className="text-label font-medium text-muted-foreground">
-                            Prorate Unit
+                            Refresh Cycle
                           </p>
                           <FormSelect
-                            value={
-                              group.prorateUnit ??
-                              policyData.prorateUnit ??
-                              "Monthly"
-                            }
-                            onChange={(v) => {
-                              const nextUnit = (v || undefined) as
-                                | ProrateUnit
-                                | undefined
-                              updateGroup(group.id, "prorateUnit", nextUnit)
-                              const available = getAvailableRefreshCycles(
-                                "Prorated",
-                                (nextUnit ??
-                                  policyData.prorateUnit ??
-                                  "Monthly") as ProrateUnit
+                            value={group.refreshCycle ?? ""}
+                            onChange={(v) =>
+                              updateGroup(
+                                group.id,
+                                "refreshCycle",
+                                v === "" ? undefined : (v as RefreshCycle)
                               )
-                              const current =
-                                group.refreshCycle ?? policyData.refreshCycle
-                              if (
-                                current &&
-                                !available.includes(current as RefreshCycle)
-                              ) {
-                                updateGroup(
-                                  group.id,
-                                  "refreshCycle",
-                                  available[0]
-                                )
-                              }
-                            }}
+                            }
                             options={[
-                              { label: "Inherit (Policy)", value: "" },
-                              ...PRORATE_UNITS.map((u) => ({
-                                label: u,
-                                value: u,
-                              })),
+                              {
+                                label: `Inherit (Policy · ${policyData.refreshCycle ?? "Yearly"})`,
+                                value: "",
+                              },
+                              ...getAvailableRefreshCycles(
+                                (group.utilisationMode ??
+                                  policyData.utilisationMode ??
+                                  "Fixed") as "Fixed" | "Prorated",
+                                (group.utilisationMode ??
+                                  policyData.utilisationMode) === "Prorated"
+                                  ? ((group.prorateUnit ??
+                                      policyData.prorateUnit ??
+                                      "Monthly") as ProrateUnit)
+                                  : undefined
+                              ).map((c) => ({ label: c, value: c })),
                             ]}
                             triggerClassName="max-w-[240px]"
                             disabled={isViewMode}
                           />
                         </div>
-                      )}
-
-                      <div className="animate-in space-y-1.5 duration-200 fade-in slide-in-from-top-1">
-                        <p className="text-label font-medium text-muted-foreground">
-                          Refresh Cycle
-                        </p>
-                        <FormSelect
-                          value={group.refreshCycle ?? ""}
-                          onChange={(v) =>
-                            updateGroup(
-                              group.id,
-                              "refreshCycle",
-                              v === "" ? undefined : (v as RefreshCycle)
-                            )
-                          }
-                          options={[
-                            {
-                              label: `Inherit (Policy · ${policyData.refreshCycle ?? "Yearly"})`,
-                              value: "",
-                            },
-                            ...getAvailableRefreshCycles(
-                              (group.utilisationMode ??
-                                policyData.utilisationMode ??
-                                "Fixed") as "Fixed" | "Prorated",
-                              (group.utilisationMode ??
-                                policyData.utilisationMode) === "Prorated"
-                                ? ((group.prorateUnit ??
-                                    policyData.prorateUnit ??
-                                    "Monthly") as ProrateUnit)
-                                : undefined
-                            ).map((c) => ({ label: c, value: c })),
-                          ]}
-                          triggerClassName="max-w-[240px]"
-                          disabled={isViewMode}
-                        />
-                        <p className="text-micro text-faint">
-                          Set a different refresh cadence for this group
-                          (optional).
-                        </p>
                       </div>
                     </div>
 
