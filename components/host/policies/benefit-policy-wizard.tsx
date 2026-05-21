@@ -1644,19 +1644,29 @@ export function BenefitPolicyWizard({
                   {/* Card header */}
                   <div className="flex items-start justify-between gap-3 border-b border-border p-4">
                     <div className="flex min-w-0 flex-1 items-center gap-3">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                        <TreeStructure size={18} weight="duotone" />
-                      </div>
                       {isViewMode ? (
-                        <div className="min-w-0">
-                          <p className="truncate text-body font-semibold text-foreground">
-                            {group.name}
-                          </p>
-                          {group.description && (
-                            <p className="truncate text-label text-muted-foreground">
-                              {group.description}
+                        <div className="flex min-w-0 flex-1 items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <p className="truncate text-body font-semibold text-foreground">
+                              {group.name}
                             </p>
-                          )}
+                            {group.description && (
+                              <p className="truncate text-label text-muted-foreground">
+                                {group.description}
+                              </p>
+                            )}
+                            <BenefitGroupSnapshot
+                              policy={policyData}
+                              group={group}
+                              benefits={groupBenefits}
+                              variant="inline"
+                              className="mt-3"
+                            />
+                          </div>
+                          <Badge variant="outline">
+                            {groupBenefits.length}{" "}
+                            {groupBenefits.length === 1 ? "Service" : "Services"}
+                          </Badge>
                         </div>
                       ) : (
                         <div className="grid min-w-0 flex-1 grid-cols-1 gap-3 md:grid-cols-2">
@@ -1700,14 +1710,6 @@ export function BenefitPolicyWizard({
 
                   {/* Card body */}
                   <div className="space-y-5 p-4">
-                    {isViewMode && (
-                      <BenefitGroupSnapshot
-                        policy={policyData}
-                        group={group}
-                        benefits={groupBenefits}
-                      />
-                    )}
-
                     {/* Coverage scope */}
                     {!isViewMode && (
                       <div className="space-y-2">

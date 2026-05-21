@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo } from "react"
-import { DetailField } from "@/components/shared/detail-field"
+import type React from "react"
 import { cn } from "@/lib/utils"
 import type {
   Benefit,
@@ -17,49 +17,52 @@ function formatRM(amount: number | undefined): string {
   return `RM ${value.toFixed(2)}`
 }
 
-function allocationLabel(
+function allocationChipLabel(
   group: BenefitGroup,
   policy: Partial<Pick<BenefitPolicy, "utilisationMode" | "prorateUnit">>
 ): string {
-  const hasOverride = Boolean(group.utilisationMode)
   const fallbackMode: UtilisationMode = "Fixed"
   const effectiveMode =
     group.utilisationMode ?? policy.utilisationMode ?? fallbackMode
   if (effectiveMode === "Prorated") {
     const unit = group.prorateUnit ?? policy.prorateUnit ?? "Monthly"
-    return `${hasOverride ? "Override" : "Inherit"} · Prorated · ${unit}`
+    return `Prorated Allocation · ${unit}`
   }
-  return `${hasOverride ? "Override" : "Inherit"} · Fixed`
+  return "Fixed Allocation"
 }
 
-function refreshLabel(
+function refreshChipLabel(
   group: BenefitGroup,
   policy: Partial<Pick<BenefitPolicy, "refreshCycle">>
 ): string {
   const fallbackRefresh: RefreshCycle = "Yearly"
-  return group.refreshCycle
-    ? `Override · ${group.refreshCycle}`
-    : `Inherit · ${policy.refreshCycle ?? fallbackRefresh}`
+  const effective = group.refreshCycle ?? policy.refreshCycle ?? fallbackRefresh
+  return `${effective} Refresh`
 }
 
-function poolShapeLabel(group: BenefitGroup): string {
+function poolTypeChipLabel(group: BenefitGroup): string {
   return group.distributionType === "SharedAmount"
     ? "Shared Pool"
-    : "Per Benefit"
+    : "Per Benefit Group"
 }
 
-function budgetLabel(group: BenefitGroup): string {
+function capChipLabel(group: BenefitGroup): string {
   const coverageScope: BenefitGroupCoverageScope =
     group.coverageScope ?? "Employee"
-  if (group.distributionType !== "SharedAmount") return "Per Service Amounts"
+  if (group.distributionType !== "SharedAmount") return "Different Cap Per Service"
   if (coverageScope === "Both") {
-    return `${formatRM(group.maxUsagePerCycle)} / ${formatRM(group.dependentGroupCap)}`
+    return `Shared Cap ${formatRM(group.maxUsagePerCycle)} / ${formatRM(
+      group.dependentGroupCap
+    )}`
   }
-  if (coverageScope === "Dependent") return formatRM(group.dependentGroupCap)
-  return formatRM(group.maxUsagePerCycle)
+  if (coverageScope === "Dependent") return `Shared Cap ${formatRM(group.dependentGroupCap)}`
+  return `Shared Cap ${formatRM(group.maxUsagePerCycle)}`
 }
 
-function coPaySummary(group: BenefitGroup, benefits: Benefit[]): string {
+function coPayChipLabel(group: BenefitGroup, benefits: Benefit[]): {
+  label: string
+  variant: "neutral" | "warning"
+} {
   const scope: BenefitGroupCoverageScope = group.coverageScope ?? "Employee"
 
   if (group.distributionType === "SharedAmount") {
@@ -69,8 +72,11 @@ function coPaySummary(group: BenefitGroup, benefits: Benefit[]): string {
       scope !== "Employee" && (group.dependentCoPayment?.required ?? false)
     const count = (employeeRequired ? 1 : 0) + (dependentRequired ? 1 : 0)
     return count === 0
-      ? "No Co-pay"
-      : `${count} Side${count === 1 ? "" : "s"} Require Co-pay`
+      ? { label: "No Co-pay Required", variant: "neutral" }
+      : {
+          label: `${count} Side${count === 1 ? "" : "s"} Require Co-pay`,
+          variant: "warning",
+        }
   }
 
   const requiredCount = benefits.reduce((acc, b) => {
@@ -80,8 +86,40 @@ function coPaySummary(group: BenefitGroup, benefits: Benefit[]): string {
     return acc + (emp || dep ? 1 : 0)
   }, 0)
 
-  if (requiredCount === 0) return "No Co-pay"
-  return `${requiredCount} Service${requiredCount === 1 ? "" : "s"} Require Co-pay`
+  if (requiredCount === 0) {
+    return { label: "No Co-pay Required", variant: "neutral" }
+  }
+  return {
+    label: `${requiredCount} Service${requiredCount === 1 ? "" : "s"} Require Co-pay`,
+    variant: "warning",
+  }
+}
+
+function coverageChipLabel(scope: BenefitGroupCoverageScope): string {
+  if (scope === "Both") return "Employee + Dependent"
+  if (scope === "Dependent") return "Dependent Only"
+  return "Employee Only"
+}
+
+function RuleChip({
+  children,
+  variant = "neutral",
+}: {
+  children: React.ReactNode
+  variant?: "neutral" | "warning"
+}) {
+  return (
+    <span
+      className={cn(
+        "inline-flex h-7 items-center rounded-4xl border px-2.5 text-label font-medium",
+        variant === "warning"
+          ? "border-amber-500/20 bg-amber-500/10 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400"
+          : "border-border bg-muted/30 text-muted-foreground"
+      )}
+    >
+      {children}
+    </span>
+  )
 }
 
 export function BenefitGroupSnapshot({
@@ -89,6 +127,7 @@ export function BenefitGroupSnapshot({
   group,
   benefits,
   className,
+  variant = "card",
 }: {
   policy: Partial<
     Pick<BenefitPolicy, "utilisationMode" | "prorateUnit" | "refreshCycle">
@@ -96,23 +135,33 @@ export function BenefitGroupSnapshot({
   group: BenefitGroup
   benefits: Benefit[]
   className?: string
+  variant?: "card" | "inline"
 }) {
-  const tiles = useMemo(() => {
-    const covers: BenefitGroupCoverageScope = group.coverageScope ?? "Employee"
+  const chips = useMemo(() => {
+    const scope: BenefitGroupCoverageScope = group.coverageScope ?? "Employee"
+    const coPay = coPayChipLabel(group, benefits)
 
     return [
-      { label: "Covers", value: covers },
-      { label: "Pool Shape", value: poolShapeLabel(group) },
-      { label: "Budget / Cap", value: budgetLabel(group) },
-      { label: "Allocation", value: allocationLabel(group, policy) },
-      { label: "Refresh", value: refreshLabel(group, policy) },
-      {
-        label: "Services",
-        value: `${benefits.length} Service${benefits.length === 1 ? "" : "s"}`,
-      },
-      { label: "Co-pay", value: coPaySummary(group, benefits) },
+      { label: coverageChipLabel(scope), variant: "neutral" as const },
+      { label: poolTypeChipLabel(group), variant: "neutral" as const },
+      { label: capChipLabel(group), variant: "neutral" as const },
+      { label: allocationChipLabel(group, policy), variant: "neutral" as const },
+      { label: refreshChipLabel(group, policy), variant: "neutral" as const },
+      { label: coPay.label, variant: coPay.variant },
     ]
   }, [benefits, group, policy])
+
+  if (variant === "inline") {
+    return (
+      <div className={cn("flex flex-wrap gap-2", className)}>
+        {chips.map((chip) => (
+          <RuleChip key={chip.label} variant={chip.variant}>
+            {chip.label}
+          </RuleChip>
+        ))}
+      </div>
+    )
+  }
 
   return (
     <div
@@ -121,9 +170,11 @@ export function BenefitGroupSnapshot({
         className
       )}
     >
-      <div className="grid grid-cols-1 gap-x-8 gap-y-5 md:grid-cols-2 lg:grid-cols-3">
-        {tiles.map((t) => (
-          <DetailField key={t.label} label={t.label} value={t.value} />
+      <div className="flex flex-wrap gap-2">
+        {chips.map((chip) => (
+          <RuleChip key={chip.label} variant={chip.variant}>
+            {chip.label}
+          </RuleChip>
         ))}
       </div>
     </div>
