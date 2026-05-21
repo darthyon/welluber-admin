@@ -33,6 +33,15 @@ import {
   CaretLeft,
   Funnel,
   CaretDown,
+  Barbell,
+  Sparkle,
+  FlowerLotus,
+  Brain,
+  HandHeart,
+  Scissors,
+  Leaf,
+  Baby,
+  PersonSimpleWalk,
 } from "@phosphor-icons/react"
 import { BenefitPolicy, BenefitGroup, Benefit } from "@/types/policy"
 import { SERVICES } from "@/lib/mock-data/service-catalog"
@@ -78,6 +87,34 @@ const EMPLOYMENT_TYPE_LABELS: Record<string, string> = {
 }
 
 export type TabId = (typeof TABS)[number]["id"]
+
+function getMainServiceIcon(serviceId: string) {
+  const category = SERVICES.find((s) => s.id === serviceId)?.category
+  switch (category) {
+    case "Fitness & Exercise":
+      return <Barbell size={16} weight="duotone" className="text-faint" />
+    case "Massage & Bodywork":
+      return <HandHeart size={16} weight="duotone" className="text-faint" />
+    case "Spa & Aesthetics":
+      return <Sparkle size={16} weight="duotone" className="text-faint" />
+    case "Beauty & Personal Care":
+      return <Scissors size={16} weight="duotone" className="text-faint" />
+    case "Mental Health & Mindfulness":
+      return <Brain size={16} weight="duotone" className="text-faint" />
+    case "Alternative & Holistic Therapies":
+      return <Leaf size={16} weight="duotone" className="text-faint" />
+    case "Maternal & Child Wellness":
+      return <Baby size={16} weight="duotone" className="text-faint" />
+    case "Senior & Geriatric Wellness":
+      return (
+        <PersonSimpleWalk size={16} weight="duotone" className="text-faint" />
+      )
+    default:
+      return (
+        <FlowerLotus size={16} weight="duotone" className="text-faint" />
+      )
+  }
+}
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -871,30 +908,34 @@ function BenefitGroupsTab({
                   className="overflow-hidden rounded-lg border border-border bg-card/40"
                 >
                   <div className="border-b border-border bg-muted/30 p-4">
-                    <div className="flex items-start gap-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                        <TreeStructure size={18} weight="duotone" />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <p className="text-body font-semibold text-foreground">
-                            {group.name}
-                          </p>
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex min-w-0 flex-1 items-start gap-3">
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="truncate text-body font-semibold text-foreground">
+                              {group.name}
+                            </p>
+                          </div>
+                          {group.description && (
+                            <p className="truncate text-label text-muted-foreground">
+                              {group.description}
+                            </p>
+                          )}
+                          <BenefitGroupSnapshot
+                            policy={policy}
+                            group={group}
+                            benefits={groupBenefits}
+                            variant="inline"
+                            className="mt-3"
+                          />
                         </div>
-                        {group.description && (
-                          <p className="text-label text-muted-foreground">
-                            {group.description}
-                          </p>
-                        )}
                       </div>
-                    </div>
 
-                    <BenefitGroupSnapshot
-                      policy={policy}
-                      group={group}
-                      benefits={groupBenefits}
-                      className="mt-4"
-                    />
+                      <Badge variant="outline">
+                        {groupBenefits.length}{" "}
+                        {groupBenefits.length === 1 ? "Service" : "Services"}
+                      </Badge>
+                    </div>
                   </div>
                   <div className="space-y-2 p-4">
                     {groupBenefits.map((benefit) => {
@@ -920,10 +961,7 @@ function BenefitGroupsTab({
                           className="flex items-center justify-between rounded-lg border border-border/50 bg-muted/30 px-4 py-3"
                         >
                           <div className="flex items-center gap-3">
-                            <IdentificationCard
-                              size={16}
-                              className="text-faint"
-                            />
+                            {getMainServiceIcon(benefit.serviceId)}
                             <span className="text-body font-medium text-foreground">
                               {SERVICES.find((s) => s.id === benefit.serviceId)
                                 ?.name || benefit.serviceId}
