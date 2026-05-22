@@ -11,6 +11,14 @@ import { Button } from "@/components/ui/button";
 import { SuccessCelebration } from "@/components/shared/success-celebration";
 import { SearchableMultiSelect } from "@/components/shared/searchable-multi-select";
 import type { SpBranch } from "@/types/provider";
+import { z } from "zod";
+
+const inviteSpAdminUiSchema = inviteSpAdminSchema.extend({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+}).omit({ name: true });
+
+type InviteSpAdminUiData = z.infer<typeof inviteSpAdminUiSchema>;
 
 interface SpInviteAdminModalProps {
   spId: string;
@@ -39,9 +47,9 @@ export function SpInviteAdminModal({
     watch,
     control,
     formState: { errors },
-  } = useForm<InviteSpAdminData>({
+  } = useForm<InviteSpAdminUiData>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    resolver: zodResolver(inviteSpAdminSchema as any),
+    resolver: zodResolver(inviteSpAdminUiSchema as any),
     defaultValues: {
       branchIds: [],
     },
@@ -50,10 +58,16 @@ export function SpInviteAdminModal({
   const watchedEmail = watch("email") ?? "";
   const isDuplicateEmail = existingEmails.includes(watchedEmail.toLowerCase());
 
-  const onSubmit = async (data: InviteSpAdminData) => {
+  const onSubmit = async (data: InviteSpAdminUiData) => {
     setIsSubmitting(true);
     try {
-      const res = await inviteSpAdmin(spId, data);
+      const payload: InviteSpAdminData = {
+        name: `${data.firstName} ${data.lastName}`.trim(),
+        position: data.position,
+        email: data.email,
+        branchIds: data.branchIds,
+      };
+      const res = await inviteSpAdmin(spId, payload);
       if (res.success) {
         setInvitedEmail(data.email);
         setIsSuccess(true);
@@ -123,21 +137,51 @@ export function SpInviteAdminModal({
               )}
 
               <div className="space-y-1.5">
-                <label className="text-body font-medium text-foreground">Full Name</label>
+                <label className="text-label font-medium text-foreground">Full Name</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1.5">
+                    <input
+                      {...register("firstName")}
+                      className={inputCls(!!errors.firstName)}
+                      placeholder="First Name"
+                    />
+                    {errors.firstName && (
+                      <p className="text-label text-destructive flex items-center gap-1">
+                        <WarningCircle size={12} /> {errors.firstName.message}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-1.5">
+                    <input
+                      {...register("lastName")}
+                      className={inputCls(!!errors.lastName)}
+                      placeholder="Last Name"
+                    />
+                    {errors.lastName && (
+                      <p className="text-label text-destructive flex items-center gap-1">
+                        <WarningCircle size={12} /> {errors.lastName.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-label font-medium text-foreground">Position</label>
                 <input
-                  {...register("name")}
-                  className={inputCls(!!errors.name)}
-                  placeholder="e.g. Sara Lim"
+                  {...register("position")}
+                  className={inputCls(!!errors.position)}
+                  placeholder="e.g. Operations Admin"
                 />
-                {errors.name && (
+                {errors.position && (
                   <p className="text-label text-destructive flex items-center gap-1">
-                    <WarningCircle size={12} /> {errors.name.message}
+                    <WarningCircle size={12} /> {errors.position.message}
                   </p>
                 )}
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-body font-medium text-foreground">Email Address</label>
+                <label className="text-label font-medium text-foreground">Corporate Email</label>
                 <input
                   {...register("email")}
                   className={inputCls(!!errors.email)}

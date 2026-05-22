@@ -15,13 +15,19 @@ import { AdminCard } from "@/components/host/users/admin-card";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { EmptyState } from "@/components/shared/empty-state";
+import { InviteAdministratorDialog } from "@/components/host/users/invite-administrator-dialog";
+import { ActionPopover } from "@/components/shared/action-popover";
+import { Eye, PencilSimple, LockKey } from "@phosphor-icons/react";
+import { AdminViewDialog } from "@/components/host/users/admin-view-dialog";
 
 export default function AdministratorsPage() {
   const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [searchQuery, setSearchQuery] = useState("");
-  const [roleFilter, setRoleFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [entityFilter, setEntityFilter] = useState("all");
+  const [isInviteOpen, setIsInviteOpen] = useState(false);
+  const [selectedAdmin, setSelectedAdmin] = useState<Administrator | null>(null);
+  const [isViewOpen, setIsViewOpen] = useState(false);
 
   const filteredAdmins = useMemo(() => {
     return MOCK_ADMINS.filter((admin) => {
@@ -29,15 +35,14 @@ export default function AdministratorsPage() {
         admin.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         admin.email.toLowerCase().includes(searchQuery.toLowerCase());
       
-      const matchesRole = roleFilter === "all" || admin.role === roleFilter;
       const matchesStatus = statusFilter === "all" || admin.status === statusFilter;
       const matchesEntity = entityFilter === "all" || 
         (admin.entity?.name === entityFilter) || 
-        (entityFilter === "Platform Core" && !admin.entity);
+        (entityFilter === "Welluber Team" && !admin.entity);
 
-      return matchesSearch && matchesRole && matchesStatus && matchesEntity;
+      return matchesSearch && matchesStatus && matchesEntity;
     });
-  }, [searchQuery, roleFilter, statusFilter, entityFilter]);
+  }, [searchQuery, statusFilter, entityFilter]);
 
   const columns: Column<Administrator>[] = [
     {
@@ -49,17 +54,6 @@ export default function AdministratorsPage() {
           <span className="font-semibold text-foreground text-body">{row.name}</span>
           <span className="text-label text-muted-foreground font-medium">{row.email}</span>
         </div>
-      )
-    },
-    {
-      header: "User Type",
-      accessorKey: "role",
-      sortable: true,
-      render: (row) => (
-        <StatusBadge
-          status={row.role === "HostAdmin" ? "Admin" : row.role === "OrgAdmin" ? "Admin" : "SP Admin"}
-          variant={row.role === "HostAdmin" ? "primary" : row.role === "OrgAdmin" ? "emerald" : "amber"}
-        />
       )
     },
     {
@@ -80,7 +74,7 @@ export default function AdministratorsPage() {
           ) : (
              <div className="flex items-center gap-2">
                <Shield size={16} className="text-primary/60" />
-               <span className="text-label font-semibold text-primary">Platform Core</span>
+               <span className="text-body font-medium text-primary">Welluber Team</span>
              </div>
           )}
         </div>
@@ -122,11 +116,32 @@ export default function AdministratorsPage() {
       header: "Actions",
       headerClassName: "text-right",
       align: "right",
-      render: () => (
-        <Button variant="ghost" size="sm" className="h-8 text-label font-semibold text-faint hover:text-primary hover:bg-primary/5 transition-all">
-          Manage Access
-        </Button>
-      )
+      render: (row) => (
+        <div className="flex justify-end">
+          <ActionPopover
+            actions={[
+              {
+                label: "View",
+                icon: <Eye size={16} />,
+                onClick: () => {
+                  setSelectedAdmin(row);
+                  setIsViewOpen(true);
+                },
+              },
+              {
+                label: "Edit",
+                icon: <PencilSimple size={16} />,
+                className: "opacity-50 cursor-not-allowed",
+              },
+              {
+                label: "Manage Access",
+                icon: <LockKey size={16} />,
+                className: "opacity-50 cursor-not-allowed",
+              },
+            ]}
+          />
+        </div>
+      ),
     }
   ];
 
@@ -152,11 +167,9 @@ export default function AdministratorsPage() {
 
           <div className="h-4 w-[1px] bg-border mx-1" />
 
-          <Button asChild className="h-9 text-body font-medium shadow-sm">
-            <Link href="/users/administrators/invite">
-              <Plus size={16} weight="bold" className="mr-1.5" />
-              Invite Administrator
-            </Link>
+          <Button onClick={() => setIsInviteOpen(true)} className="h-9 text-body font-medium shadow-sm">
+            <Plus size={16} weight="bold" className="mr-1.5" />
+            Invite Administrator
           </Button>
         </div>
       </div>
@@ -168,17 +181,6 @@ export default function AdministratorsPage() {
         searchPlaceholder="Search administrators..."
         filters={
           <>
-            <FilterItem 
-              label="User Type"
-              value={roleFilter}
-              onChange={setRoleFilter}
-              options={[
-                { label: "All User Types", value: "all" },
-                { label: "Admin (Host)", value: "HostAdmin" },
-                { label: "Admin", value: "OrgAdmin" },
-                { label: "SP Admin", value: "SPAdmin" },
-              ]}
-            />
             <SearchableFilterItem 
               label="Assigned Entity"
               value={entityFilter}
@@ -186,10 +188,20 @@ export default function AdministratorsPage() {
               icon={<Buildings size={14} />}
               options={[
                 { label: "All Entities", value: "all" },
-                { label: "Platform Core", value: "Platform Core" },
+                { label: "Welluber Team", value: "Welluber Team" },
                 { label: "Acme Corporation", value: "Acme Corporation" },
                 { label: "Global Tech Solutions", value: "Global Tech Solutions" },
                 { label: "Nexus Innovations", value: "Nexus Innovations" },
+              ]}
+            />
+            <FilterItem
+              label="Status"
+              value={statusFilter}
+              onChange={setStatusFilter}
+              options={[
+                { label: "All Statuses", value: "all" },
+                { label: "Active", value: "Active" },
+                { label: "Inactive", value: "Inactive" },
               ]}
             />
           </>
@@ -221,7 +233,6 @@ export default function AdministratorsPage() {
                       <Button variant="ghost" onClick={() => {
                         setSearchQuery("");
                         setStatusFilter("all");
-                        setRoleFilter("all");
                         setEntityFilter("all");
                       }}>
                         Clear All Filters
@@ -247,7 +258,16 @@ export default function AdministratorsPage() {
           )}
         </AnimatePresence>
       </div>
+
+      <InviteAdministratorDialog open={isInviteOpen} onOpenChange={setIsInviteOpen} />
+      <AdminViewDialog
+        admin={selectedAdmin}
+        open={isViewOpen}
+        onOpenChange={(open) => {
+          setIsViewOpen(open);
+          if (!open) setSelectedAdmin(null);
+        }}
+      />
     </div>
   );
 }
-
