@@ -176,6 +176,7 @@ export type TaxProfileData = z.infer<typeof taxProfileSchema>;
 
 export const inviteSpAdminSchema = z.object({
   name: z.string().min(2, "Name is required"),
+  position: z.string().min(2, "Position is required"),
   email: z.string().email("Enter a valid email address"),
   branchIds: z.array(z.string()).default([]),
 });

@@ -9,6 +9,14 @@ import { inviteOrganizationAdmin } from "@/features/organizations/actions";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SuccessCelebration } from "@/components/shared/success-celebration";
+import { z } from "zod";
+
+const inviteAdminUiSchema = inviteAdminSchema.extend({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+}).omit({ name: true });
+
+type InviteAdminUiData = z.infer<typeof inviteAdminUiSchema>;
 
 interface InviteAdminModalProps {
   targetId: string;
@@ -21,18 +29,23 @@ export function InviteAdminModal({ targetId, isOpen, onClose, title = "Invite Ad
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
   
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<InviteAdminData>({
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<InviteAdminUiData>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    resolver: zodResolver(inviteAdminSchema as any),
+    resolver: zodResolver(inviteAdminUiSchema as any),
   });
 
   if (!isOpen) return null;
 
-  const onSubmit = async (data: InviteAdminData) => {
+  const onSubmit = async (data: InviteAdminUiData) => {
     setIsSubmitting(true);
     setSuccess(null);
     try {
-      const res = await inviteOrganizationAdmin(targetId, data);
+      const payload: InviteAdminData = {
+        name: `${data.firstName} ${data.lastName}`.trim(),
+        position: data.position,
+        email: data.email,
+      };
+      const res = await inviteOrganizationAdmin(targetId, payload);
       if (res.success) {
         setSuccess(res.message);
         setTimeout(() => {
@@ -80,24 +93,43 @@ export function InviteAdminModal({ targetId, isOpen, onClose, title = "Invite Ad
               
               <div className="space-y-1.5">
                 <label className="text-label font-medium text-foreground">Full Name</label>
-                <input 
-                  {...register("name")}
-                  className={cn(
-                    "w-full px-3 py-2 bg-background border rounded-md text-body outline-none transition-colors",
-                    errors.name ? "border-destructive focus:border-destructive" : "border-border focus:border-foreground/30 focus:bg-muted/30"
-                  )}
-                  placeholder="e.g. John Doe"
-                  autoFocus
-                />
-                {errors.name && (
-                  <p className="text-label text-destructive flex items-center gap-1 mt-1">
-                    <WarningCircle size={12} /> {errors.name.message}
-                  </p>
-                )}
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1.5">
+                    <input
+                      {...register("firstName")}
+                      className={cn(
+                        "w-full px-3 py-2 bg-background border rounded-md text-body outline-none transition-colors",
+                        errors.firstName ? "border-destructive focus:border-destructive" : "border-border focus:border-foreground/30 focus:bg-muted/30"
+                      )}
+                      placeholder="First Name"
+                      autoFocus
+                    />
+                    {errors.firstName && (
+                      <p className="text-label text-destructive flex items-center gap-1 mt-1">
+                        <WarningCircle size={12} /> {errors.firstName.message}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-1.5">
+                    <input
+                      {...register("lastName")}
+                      className={cn(
+                        "w-full px-3 py-2 bg-background border rounded-md text-body outline-none transition-colors",
+                        errors.lastName ? "border-destructive focus:border-destructive" : "border-border focus:border-foreground/30 focus:bg-muted/30"
+                      )}
+                      placeholder="Last Name"
+                    />
+                    {errors.lastName && (
+                      <p className="text-label text-destructive flex items-center gap-1 mt-1">
+                        <WarningCircle size={12} /> {errors.lastName.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-label font-medium text-foreground">Position / Role</label>
+                <label className="text-label font-medium text-foreground">Position</label>
                 <input 
                   {...register("position")}
                   className={cn(
@@ -170,4 +202,3 @@ export function InviteAdminModal({ targetId, isOpen, onClose, title = "Invite Ad
     </div>
   );
 }
-
