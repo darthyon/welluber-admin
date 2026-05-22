@@ -116,3 +116,63 @@ test.describe("ORG-LIST: New org fixtures in list", () => {
     await expect(page.getByText(/^inactive$/i).first()).toBeVisible();
   });
 });
+
+// ─── POLICIES: Assigned Policy Navigation ────────────────────────────────────
+
+test.describe("ORG-POLICIES: Assigned Policy Navigation", () => {
+  const ORG_ID = "ORG-20260115-0001";
+  const POLICY_NAME = "Acme Employee Wellness Policy FY2026";
+
+  test("ORG-POLICIES-01: Clicking a policy row opens policy detail", async ({ page }) => {
+    await page.goto(`/organizations/${ORG_ID}?tab=policies`);
+    await expect(page.getByRole("heading", { name: "Benefit Policies" })).toBeVisible({ timeout: 15000 });
+
+    const policyRow = page.getByRole("row", { name: new RegExp(POLICY_NAME) });
+    await expect(policyRow.first()).toBeVisible();
+    await policyRow.first().click();
+    await waitForAnimation(page);
+
+    await expect(page.getByRole("heading", { name: POLICY_NAME })).toBeVisible();
+  });
+
+  test("ORG-POLICIES-02: Actions menu 'View Policy' opens policy detail", async ({ page }) => {
+    await page.goto(`/organizations/${ORG_ID}?tab=policies`);
+    await expect(page.getByRole("heading", { name: "Benefit Policies" })).toBeVisible({ timeout: 15000 });
+
+    const policyRow = page.getByRole("row", { name: new RegExp(POLICY_NAME) });
+    await expect(policyRow.first()).toBeVisible();
+
+    await policyRow.first().getByTestId("action-popover-trigger").click();
+    await expect(page.getByRole("button", { name: "View Policy" })).toBeVisible();
+    await page.getByRole("button", { name: "View Policy" }).click();
+    await waitForAnimation(page);
+
+    await expect(page.getByRole("heading", { name: POLICY_NAME })).toBeVisible();
+  });
+
+  test("ORG-POLICIES-03: Benefit groups show service names (not raw ids)", async ({ page }) => {
+    await page.goto(`/organizations/${ORG_ID}?tab=policies&viewingPolicyId=pol_1`);
+    await expect(page.getByRole("heading", { name: POLICY_NAME })).toBeVisible({ timeout: 15000 });
+
+    const chips = page.getByTestId("policy-header-chips");
+    await expect(chips).toBeVisible();
+    await expect(chips.getByText(/^Full-time$/)).toBeVisible();
+    await expect(chips.getByText(/^Yearly · FY start$/)).toBeVisible();
+    await expect(chips.getByText(/^Fixed utilisation$/)).toBeVisible();
+    await expect(chips.getByText(/^Employee only$/)).toBeVisible();
+    await expect(chips.getByText(/^Unlimited amount$/)).toBeVisible();
+
+    await page.getByTestId("inherited-rules-trigger").click();
+    const popover = page.getByTestId("inherited-rules-popover");
+    await expect(popover).toBeVisible();
+    await expect(popover.getByText("Eligibility")).toBeVisible();
+    await expect(popover.getByText(/Full-time/i)).toBeVisible();
+    await expect(popover.getByText("Configurable in benefit groups")).toBeVisible();
+
+    await page.getByRole("button", { name: "Benefit Groups" }).click();
+    await waitForAnimation(page);
+
+    await expect(page.getByText(/\bGym Access\b/i).first()).toBeVisible();
+    await expect(page.getByText(/\bMeditation\b/i).first()).toBeVisible();
+  });
+});

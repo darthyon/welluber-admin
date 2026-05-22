@@ -11,6 +11,11 @@ import {
   CollapsibleTrigger,
   CollapsibleContent,
 } from "@/components/ui/collapsible"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { DetailSection } from "@/components/shared/detail-section"
 import { DetailField } from "@/components/shared/detail-field"
@@ -44,7 +49,7 @@ import {
   PersonSimpleWalk,
 } from "@phosphor-icons/react"
 import { BenefitPolicy, BenefitGroup, Benefit } from "@/types/policy"
-import { SERVICES } from "@/lib/mock-data/service-catalog"
+import { SERVICES, getMainServiceName, resolveMainServiceId } from "@/lib/mock-data/service-catalog"
 import { MOCK_ORGS } from "@/lib/mock-data"
 import type { PolicyListItem } from "@/features/policies/types"
 import type { EmployeeDirectoryItem } from "@/features/employees/types"
@@ -61,6 +66,12 @@ interface PolicyDetailViewProps {
   parentBenefits?: Benefit[]
   employees?: EmployeeDirectoryItem[]
   initialTab?: TabId
+  /**
+   * Visual density for the header/tabs.
+   * - `standalone`: full-page policy detail (global Policies).
+   * - `embedded`: compact header for org-scoped policy viewing.
+   */
+  headerVariant?: "standalone" | "embedded"
   onEdit: () => void
   onClone: () => void
   onDeactivate: () => void
@@ -89,7 +100,7 @@ const EMPLOYMENT_TYPE_LABELS: Record<string, string> = {
 export type TabId = (typeof TABS)[number]["id"]
 
 function getMainServiceIcon(serviceId: string) {
-  const category = SERVICES.find((s) => s.id === serviceId)?.category
+  const category = SERVICES.find((s) => s.id === resolveMainServiceId(serviceId))?.category
   switch (category) {
     case "Fitness & Exercise":
       return <Barbell size={16} weight="duotone" className="text-faint" />
@@ -118,15 +129,56 @@ function getMainServiceIcon(serviceId: string) {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-function formatCadence(policy: BenefitPolicy): string {
-  const parts: string[] = []
-  parts.push(`${policy.refreshCycle} refresh`)
-  parts.push(`${policy.utilisationMode} allocation`)
-  if ((policy.dependentCoverages?.length ?? 0) > 0) parts.push("+dependents")
-  parts.push(
-    policy.refreshStartReference === "financial_year" ? "FY start" : "Cal year"
+function formatDependentLabel(policy: BenefitPolicy): string {
+  if (!policy.dependentCoverages?.length) return "Employee only"
+  const typeMap: Record<string, string> = {
+    spouse: "Spouse",
+    child: "Child",
+    mother: "Mother",
+    father: "Father",
+    sibling: "Sibling",
+    inlaw: "In-law",
+  }
+  return policy.dependentCoverages
+    .map((c) => typeMap[c.type] ?? c.type)
+    .join(", ")
+}
+
+function formatEmploymentChip(policy: BenefitPolicy): string {
+  const types = (policy.eligibleEmploymentTypes ?? []).map(
+    (t) => EMPLOYMENT_TYPE_LABELS[t] ?? t
   )
-  return parts.join(" · ")
+  if (types.length === 0) return "No employment types"
+  if (types.length === 1) return types[0]
+  const joined = `${types[0]} + ${types[1]}`
+  if (types.length === 2 && joined.length <= 24) return joined
+  return `${types.length} employment types`
+}
+
+function formatRefreshChip(policy: BenefitPolicy): string {
+  if (policy.refreshCycle !== "Yearly") return policy.refreshCycle
+  return `Yearly · ${
+    policy.refreshStartReference === "financial_year"
+      ? "FY start"
+      : "Calendar year"
+  }`
+}
+
+function formatUtilisationChip(policy: BenefitPolicy): string {
+  if (policy.utilisationMode === "Fixed") return "Fixed utilisation"
+  return `Prorated ${(policy.prorateUnit ?? "Monthly").toLowerCase()}`
+}
+
+function formatCoverageChip(policy: BenefitPolicy): string {
+  return (policy.dependentCoverages?.length ?? 0) > 0
+    ? "Employee + dependents"
+    : "Employee only"
+}
+
+function formatAmountChip(policy: BenefitPolicy): string {
+  return typeof policy.totalCapAmount === "number"
+    ? `RM ${policy.totalCapAmount.toLocaleString()}`
+    : "Unlimited amount"
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -141,6 +193,7 @@ export function PolicyDetailView({
   parentBenefits,
   employees,
   initialTab,
+  headerVariant = "standalone",
   onEdit,
   onClone,
   onDeactivate,
@@ -174,93 +227,315 @@ export function PolicyDetailView({
 
   const canCreateVersion = policy.status === "active" && !policy.parentPolicyId
 
+  const employmentChip = formatEmploymentChip(policy)
+  const refreshChip = formatRefreshChip(policy)
+  const utilisationChip = formatUtilisationChip(policy)
+  const coverageChip = formatCoverageChip(policy)
+  const amountChip = formatAmountChip(policy)
+
+  const employmentList = (policy.eligibleEmploymentTypes ?? []).map(
+    (t) => EMPLOYMENT_TYPE_LABELS[t] ?? t
+  )
+  const dependentsLabel = formatDependentLabel(policy)
+  const hasDependents = (policy.dependentCoverages?.length ?? 0) > 0
+
+  const headerChips = (
+    <div className="flex flex-wrap items-center gap-2">
+      <div data-testid="policy-header-chips" className="flex flex-wrap items-center gap-2">
+        <Badge
+          variant="outline"
+          className="rounded-4xl border-border bg-muted/20 text-body font-medium text-muted-foreground"
+        >
+          {employmentChip}
+        </Badge>
+        <Badge
+          variant="outline"
+          className="rounded-4xl border-border bg-muted/20 text-body font-medium text-muted-foreground"
+        >
+          {refreshChip}
+        </Badge>
+        <Badge
+          variant="outline"
+          className="rounded-4xl border-border bg-muted/20 text-body font-medium text-muted-foreground"
+        >
+          {utilisationChip}
+        </Badge>
+        <Badge
+          variant="outline"
+          className="rounded-4xl border-border bg-muted/20 text-body font-medium text-muted-foreground"
+        >
+          {coverageChip}
+        </Badge>
+        <Badge
+          variant="outline"
+          className="rounded-4xl border-border bg-muted/20 text-body font-medium text-muted-foreground"
+        >
+          <span className="font-mono tabular-nums">{amountChip}</span>
+        </Badge>
+      </div>
+
+      <Popover>
+        <PopoverTrigger asChild>
+	          <Button
+	            data-testid="inherited-rules-trigger"
+	            variant="ghost"
+	            size="sm"
+	            className="h-7 rounded-4xl px-3 text-body font-medium text-primary hover:bg-primary/10 hover:text-primary"
+	          >
+	            View inherited rules
+	          </Button>
+        </PopoverTrigger>
+        <PopoverContent
+          data-testid="inherited-rules-popover"
+          align="start"
+          className="w-[420px] rounded-lg border border-border bg-card p-4 shadow-2xl"
+        >
+          <div className="space-y-4">
+            <div>
+              <p className="text-lead font-semibold text-foreground">
+                Inherited Rules
+              </p>
+              <p className="mt-0.5 text-label text-muted-foreground">
+                Policy defaults that benefit groups inherit.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <p className="text-label font-medium text-muted-foreground">
+                  Eligibility
+                </p>
+                <p className="text-body font-medium text-foreground">
+                  {employmentList.length} employment type
+                  {employmentList.length === 1 ? "" : "s"}
+                </p>
+                <p className="text-label text-faint">
+                  {employmentList.join(", ") || "—"}
+                </p>
+              </div>
+
+              <div className="space-y-1">
+                <p className="text-label font-medium text-muted-foreground">
+                  Cadence
+                </p>
+                <p className="text-body font-medium text-foreground">
+                  Refresh Cycle: {policy.refreshCycle}
+                </p>
+                <p className="text-label text-faint">
+                  {policy.refreshCycle === "Yearly"
+                    ? policy.refreshStartReference === "financial_year"
+                      ? "FY start"
+                      : "Calendar year"
+                    : "—"}
+                </p>
+              </div>
+
+              <div className="space-y-1">
+                <p className="text-label font-medium text-muted-foreground">
+                  Utilisation
+                </p>
+                <p className="text-body font-medium text-foreground">
+                  {policy.utilisationMode === "Fixed"
+                    ? "Fixed utilisation"
+                    : `Prorated (${policy.prorateUnit || "Monthly"})`}
+                </p>
+              </div>
+
+              <div className="space-y-1">
+                <p className="text-label font-medium text-muted-foreground">
+                  Coverage
+                </p>
+                <p className="text-body font-medium text-foreground">
+                  {coverageChip}
+                </p>
+                <p className="text-label text-faint">
+                  {hasDependents ? dependentsLabel : "No dependents covered"}
+                </p>
+              </div>
+
+              <div className="space-y-1">
+                <p className="text-label font-medium text-muted-foreground">
+                  Policy amount
+                </p>
+                <p className="text-body font-medium text-foreground">
+                  {amountChip}
+                </p>
+              </div>
+
+              <div className="space-y-1.5">
+                <p className="text-label font-medium text-muted-foreground">
+                  Configurable in benefit groups
+                </p>
+                <p className="text-label text-faint">
+                  Coverage scope · Distribution type · Benefit amount · Usage
+                  caps · Dependent caps · Co-pay rules
+                </p>
+              </div>
+            </div>
+          </div>
+        </PopoverContent>
+      </Popover>
+    </div>
+  )
+
   return (
     <div className="flex h-full flex-col bg-transparent">
-      {/* Header Banner - matches org page pattern */}
-      <div className="relative z-30 -mx-6 -mt-6 border-b border-border bg-card px-6 pt-6">
-        <div className="py-6 lg:px-2">
-          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
-            <div className="flex items-start gap-5">
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-primary/20 bg-primary/10 text-primary">
-                <IdentificationCard size={28} weight="duotone" />
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center gap-3">
-                  <h1 className="tracking-tight text-display font-semibold text-foreground">
-                    {policy.name}
-                  </h1>
-                  <StatusBadge
-                    status={policy.status}
-                    variant={statusVariant}
-                    dot
-                  />
+      {headerVariant === "standalone" ? (
+        <div className="relative z-30 -mx-6 -mt-6 border-b border-border bg-card px-6 pt-6">
+          <div className="py-6 lg:px-2">
+            <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
+              <div className="flex items-start gap-5">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-primary/20 bg-primary/10 text-primary">
+                  <IdentificationCard size={28} weight="duotone" />
                 </div>
-                <div className="flex items-center gap-3 text-body text-subtle">
-                  <span className="rounded border border-border bg-background px-2 py-0.5 font-mono text-label tracking-widest text-faint uppercase">
-                    {policy.code || "NO-CODE"}
-                  </span>
-                  <span className="text-faint">·</span>
-                  <span>{formatCadence(policy)}</span>
-                </div>
-                {policy.parentPolicyId && (
-                  <div className="mt-1 flex items-center gap-1.5 text-label text-faint">
-                    <TreeStructure size={12} />
-                    <span>
-                      Derived from{" "}
-                      <span className="font-semibold text-foreground">
-                        {parentPolicyName || policy.parentPolicyId}
-                      </span>
-                    </span>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3">
+                    <h1 className="tracking-tight text-display font-semibold text-foreground">
+                      {policy.name}
+                    </h1>
+                    <StatusBadge
+                      status={policy.status}
+                      variant={statusVariant}
+                      dot
+                    />
                   </div>
+                  <div className="flex flex-wrap items-center gap-3 text-body text-subtle">
+                    <span className="rounded border border-border bg-background px-2 py-0.5 font-mono text-label tracking-widest text-faint uppercase">
+                      {policy.code || "NO-CODE"}
+                    </span>
+                    {headerChips}
+                  </div>
+                  {policy.parentPolicyId && (
+                    <div className="mt-1 flex items-center gap-1.5 text-label text-faint">
+                      <TreeStructure size={12} />
+                      <span>
+                        Derived from{" "}
+                        <span className="font-semibold text-foreground">
+                          {parentPolicyName || policy.parentPolicyId}
+                        </span>
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+	                {policy.parentPolicyId && (
+	                  <Button
+	                    variant="outline"
+	                    size="lg"
+                    onClick={() =>
+                      router.push(
+                        `/policies?policyId=${policy.parentPolicyId}&mode=view&wizard=open`
+                      )
+                    }
+                    className="rounded-full text-body font-medium transition-all"
+                  >
+                    <CaretLeft size={16} weight="bold" className="mr-1.5" />
+	                    Back to Parent Policy
+	                  </Button>
+	                )}
+	                {canEdit && (
+	                  <Button
+	                    variant="secondary"
+	                    size="lg"
+                    onClick={onEdit}
+                    className="rounded-full text-body font-medium transition-all"
+                  >
+                    <NotePencil size={16} weight="bold" className="mr-1.5" />
+                    Edit Policy
+                  </Button>
                 )}
               </div>
+            </div>
+
+            <div className="mt-8 flex items-center gap-6 border-b border-border">
+              {availableTabs.map((tab) => {
+                const Icon = tab.icon
+                const isActive = activeTab === tab.id
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setSelectedTab(tab.id)}
+                    className={cn(
+                      "flex items-center gap-2 border-b-2 py-3 text-body font-medium transition-all duration-300",
+                      isActive
+                        ? "border-primary text-primary"
+                        : "border-transparent text-muted-foreground hover:border-border hover:text-foreground"
+                    )}
+                  >
+                    <Icon
+                      size={16}
+                      weight={isActive ? "fill" : "regular"}
+                      className={cn("transition-colors", isActive && "text-primary")}
+                    />
+                    {tab.label}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
+            <div className="min-w-0 space-y-1.5">
+              <div className="flex flex-wrap items-center gap-2">
+                <h2 className="min-w-0 truncate text-heading font-semibold text-foreground">
+                  {policy.name}
+                </h2>
+                <StatusBadge status={policy.status} variant={statusVariant} dot />
+              </div>
+              <div className="flex flex-wrap items-center gap-3 text-label text-muted-foreground">
+                <span className="rounded border border-border bg-muted/20 px-2 py-0.5 font-mono tracking-widest text-faint uppercase">
+                  {policy.code || "NO-CODE"}
+                </span>
+                {headerChips}
+              </div>
+              {policy.parentPolicyId && (
+                <div className="flex items-center gap-1.5 text-label text-faint">
+                  <TreeStructure size={12} />
+                  <span>
+                    Derived from{" "}
+                    <span className="font-semibold text-foreground">
+                      {parentPolicyName || policy.parentPolicyId}
+                    </span>
+                  </span>
+                </div>
+              )}
             </div>
 
             <div className="flex items-center gap-2">
               {policy.parentPolicyId && (
                 <Button
                   variant="outline"
-                  size="lg"
+                  size="sm"
                   onClick={() =>
                     router.push(
                       `/policies?policyId=${policy.parentPolicyId}&mode=view&wizard=open`
                     )
                   }
-                  className="rounded-full text-body font-medium transition-all"
+                  className="rounded-4xl text-body font-medium"
                 >
-                  <CaretLeft size={16} weight="bold" className="mr-1.5" />
-                  Back to Parent Policy
-                </Button>
-              )}
-              {canCreateVersion && (
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={() =>
-                    router.push(`/policies/${policy.id}/versions/new`)
-                  }
-                  className="rounded-full text-body font-medium transition-all"
-                >
-                  <TreeStructure size={16} weight="bold" className="mr-1.5" />
-                  Create Version
+                  <CaretLeft size={14} weight="bold" className="mr-1.5" />
+                  Parent Policy
                 </Button>
               )}
               {canEdit && (
                 <Button
                   variant="secondary"
-                  size="lg"
+                  size="sm"
                   onClick={onEdit}
-                  className="rounded-full text-body font-medium transition-all"
+                  className="rounded-4xl text-body font-medium"
                 >
-                  <NotePencil size={16} weight="bold" className="mr-1.5" />
-                  Edit Policy
+                  <NotePencil size={14} weight="bold" className="mr-1.5" />
+                  Edit
                 </Button>
               )}
             </div>
           </div>
 
-          {/* Tabs - matches org page pattern */}
-          <div className="mt-8 flex items-center gap-6 border-b border-border">
+          <div className="flex items-center gap-6 border-b border-border">
             {availableTabs.map((tab) => {
               const Icon = tab.icon
               const isActive = activeTab === tab.id
@@ -269,19 +544,16 @@ export function PolicyDetailView({
                   key={tab.id}
                   onClick={() => setSelectedTab(tab.id)}
                   className={cn(
-                    "flex items-center gap-2 border-b-2 py-3 text-body font-medium transition-all duration-300",
+                    "flex items-center gap-2 border-b-2 py-2 text-body font-medium transition-all duration-300",
                     isActive
                       ? "border-primary text-primary"
                       : "border-transparent text-muted-foreground hover:border-border hover:text-foreground"
                   )}
                 >
                   <Icon
-                    size={16}
+                    size={14}
                     weight={isActive ? "fill" : "regular"}
-                    className={cn(
-                      "transition-colors",
-                      isActive && "text-primary"
-                    )}
+                    className={cn("transition-colors", isActive && "text-primary")}
                   />
                   {tab.label}
                 </button>
@@ -289,10 +561,13 @@ export function PolicyDetailView({
             })}
           </div>
         </div>
-      </div>
+      )}
 
       {/* Content */}
-      <div className="flex-1 overflow-x-hidden overflow-y-auto pt-6">
+      <div className={cn(
+        "flex-1 overflow-x-hidden overflow-y-auto",
+        headerVariant === "standalone" ? "pt-6" : "pt-4"
+      )}>
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -749,97 +1024,9 @@ function BenefitGroupsTab({
   benefits: Benefit[]
 }) {
   const router = useRouter()
-  const org = MOCK_ORGS.find((o) => o.id === policy.organizationId)
-
-  const depLabel = (() => {
-    if (!policy.dependentCoverages?.length) return "Employee only"
-    const typeMap: Record<string, string> = {
-      spouse: "Spouse",
-      child: "Child",
-      mother: "Mother",
-      father: "Father",
-      sibling: "Sibling",
-      inlaw: "In-law",
-    }
-    return policy.dependentCoverages
-      .map((c) => typeMap[c.type] ?? c.type)
-      .join(", ")
-  })()
 
   return (
     <div className="space-y-6">
-      {/* Policy summary */}
-      <div className="rounded-lg border border-border bg-muted/20 p-4">
-        <p className="mb-3 text-lead font-semibold text-foreground">
-          Policy Summary
-        </p>
-        <div className="grid grid-cols-2 gap-x-6 gap-y-3 md:grid-cols-3">
-          <div>
-            <p className="text-label font-medium text-muted-foreground">
-              Policy
-            </p>
-            <p className="text-body font-semibold text-foreground">
-              {policy.name}
-            </p>
-            {policy.code && (
-              <p className="text-label font-medium text-faint">{policy.code}</p>
-            )}
-          </div>
-          {org && (
-            <div>
-              <p className="text-label font-medium text-muted-foreground">
-                Organisation
-              </p>
-              <p className="text-body font-medium text-foreground">
-                {org.name}
-              </p>
-            </div>
-          )}
-          <div>
-            <p className="text-label font-medium text-muted-foreground">
-              Eligible Types
-            </p>
-            <p className="text-body font-medium text-foreground capitalize">
-              {policy.eligibleEmploymentTypes?.join(", ") || "—"}
-            </p>
-          </div>
-          <div>
-            <p className="text-label font-medium text-muted-foreground">
-              Utilisation
-            </p>
-            <p className="text-body font-medium text-foreground">
-              {policy.utilisationMode === "Fixed"
-                ? "Fixed"
-                : `Prorated · ${policy.prorateUnit || "Monthly"}`}
-            </p>
-          </div>
-          <div>
-            <p className="text-label font-medium text-muted-foreground">
-              Refresh
-            </p>
-            <p className="text-body font-medium text-foreground">
-              {policy.refreshCycle}
-            </p>
-          </div>
-          <div>
-            <p className="text-label font-medium text-muted-foreground">
-              Employee Cap
-            </p>
-            <p className="text-body font-medium text-foreground">
-              {policy.totalCapAmount
-                ? `RM ${policy.totalCapAmount.toLocaleString()}`
-                : "Unlimited"}
-            </p>
-          </div>
-          <div className="col-span-2 md:col-span-3">
-            <p className="text-label font-medium text-muted-foreground">
-              Dependents
-            </p>
-            <p className="text-body font-medium text-foreground">{depLabel}</p>
-          </div>
-        </div>
-      </div>
-
       <DetailSection
         title="Benefit Groups"
         icon={<TreeStructure size={18} weight="duotone" />}
@@ -963,8 +1150,7 @@ function BenefitGroupsTab({
                           <div className="flex items-center gap-3">
                             {getMainServiceIcon(benefit.serviceId)}
                             <span className="text-body font-medium text-foreground">
-                              {SERVICES.find((s) => s.id === benefit.serviceId)
-                                ?.name || benefit.serviceId}
+                              {getMainServiceName(benefit.serviceId)}
                             </span>
                             {coverageScope !== "Dependent" &&
                               employeeCoPay?.required && (
@@ -1478,7 +1664,66 @@ function AssignedEmployeesTab({
 
 // ─── Audit Log Tab (Placeholder) ─────────────────────────────────────────────
 
+type PolicyAuditEvent = {
+  id: string
+  at: string
+  actor: string
+  action: string
+  summary: string
+  meta?: { label: string; value: string }[]
+}
+
+const MOCK_POLICY_AUDIT_EVENTS: PolicyAuditEvent[] = [
+  {
+    id: "AUD-20260521-0001",
+    at: "21 May 2026 · 10:12 AM",
+    actor: "Aina (Host Admin)",
+    action: "Created",
+    summary: "Policy created from template “Standard Health”.",
+    meta: [
+      { label: "Template", value: "standard-health" },
+      { label: "Refresh Cycle", value: "Yearly" },
+    ],
+  },
+  {
+    id: "AUD-20260521-0002",
+    at: "21 May 2026 · 10:18 AM",
+    actor: "Aina (Host Admin)",
+    action: "Updated",
+    summary: "Employment types updated.",
+    meta: [{ label: "Employment Types", value: "Full-time, Part-time" }],
+  },
+  {
+    id: "AUD-20260521-0003",
+    at: "21 May 2026 · 10:26 AM",
+    actor: "Irfan (Benefits Manager)",
+    action: "Updated",
+    summary: "Employee policy amount set.",
+    meta: [{ label: "Employee Policy Amount", value: "RM 3,000" }],
+  },
+  {
+    id: "AUD-20260521-0004",
+    at: "21 May 2026 · 10:33 AM",
+    actor: "Irfan (Benefits Manager)",
+    action: "Edited Groups",
+    summary: "Added 2 benefits under “Physical Wellbeing”.",
+    meta: [
+      { label: "Group", value: "Physical Wellbeing" },
+      { label: "Services", value: "Gym Access, Fitness Classes" },
+    ],
+  },
+  {
+    id: "AUD-20260521-0005",
+    at: "21 May 2026 · 10:47 AM",
+    actor: "System",
+    action: "Assigned",
+    summary: "Policy assigned to organisation.",
+    meta: [{ label: "Organisation", value: "Acme Corporation Sdn Bhd" }],
+  },
+]
+
 function AuditLogTab() {
+  const events = MOCK_POLICY_AUDIT_EVENTS
   return (
     <div className="space-y-6">
       <div>
@@ -1489,17 +1734,72 @@ function AuditLogTab() {
           Track changes to this policy over time.
         </p>
       </div>
-      <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border/60 bg-muted/10 py-20">
-        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-lg border border-border bg-card text-muted/30">
-          <ClockCounterClockwise size={32} weight="duotone" />
+      {events.length === 0 ? (
+        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border/60 bg-muted/10 py-20">
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-lg border border-border bg-card text-muted/30">
+            <ClockCounterClockwise size={32} weight="duotone" />
+          </div>
+          <p className="text-body font-medium text-muted-foreground">
+            No audit events yet.
+          </p>
+          <p className="mt-1 text-label text-faint">
+            Policy changes will be logged here once activity begins.
+          </p>
         </div>
-        <p className="text-body font-medium text-muted-foreground">
-          No audit events yet.
-        </p>
-        <p className="mt-1 text-label text-faint">
-          Policy changes will be logged here once activity begins.
-        </p>
-      </div>
+      ) : (
+        <div className="overflow-hidden rounded-lg border border-border bg-card">
+          <div className="divide-y divide-border/60">
+            {events.map((e) => (
+              <div key={e.id} className="p-4">
+                <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
+                  <div className="min-w-0 space-y-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge
+                        variant="outline"
+                        className="rounded-4xl border-border bg-muted/30 text-label font-medium text-muted-foreground"
+                      >
+                        {e.action}
+                      </Badge>
+                      <p className="text-body font-medium text-foreground">
+                        {e.summary}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2 text-label text-faint">
+                      <span className="font-medium text-muted-foreground">
+                        {e.actor}
+                      </span>
+                      <span className="text-faint">·</span>
+                      <span>{e.at}</span>
+                      <span className="text-faint">·</span>
+                      <span className="font-mono tracking-widest uppercase">
+                        {e.id}
+                      </span>
+                    </div>
+                  </div>
+                  {e.meta && e.meta.length > 0 && (
+                    <div className="flex max-w-full flex-wrap items-center justify-start gap-2 sm:justify-end">
+                      {e.meta.map((m) => (
+                        <Badge
+                          key={`${e.id}-${m.label}`}
+                          variant="outline"
+                          className="h-8 gap-2 rounded-4xl border-border bg-card/40 px-3 text-body font-medium text-foreground"
+                        >
+                          <span className="text-body font-medium text-muted-foreground">
+                            {m.label}:
+                          </span>
+                          <span className="max-w-[34ch] truncate font-mono tabular-nums">
+                            {m.value}
+                          </span>
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

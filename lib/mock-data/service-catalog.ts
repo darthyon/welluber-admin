@@ -22,6 +22,26 @@ export function isMainServiceId(value: string): value is import("@/features/prov
   return MAIN_SERVICE_IDS.includes(value)
 }
 
+/**
+ * Legacy main-service ids used by older mock data and early prototypes.
+ * Prefer updating data to use canonical `MainServiceId`, but keep this for
+ * backwards compatibility with persisted drafts / seeded mocks.
+ */
+const LEGACY_MAIN_SERVICE_ID_MAP: Record<string, import("@/features/providers/service-taxonomy").MainServiceId> =
+  {
+    s1: "FX-GYM",
+    s2: "FX-CLS",
+    s3: "MH-THR",
+    s4: "MH-MED",
+    s5: "NT-NUT",
+    s6: "SP-FAC",
+  }
+
+export function resolveMainServiceId(id: string): string {
+  return LEGACY_MAIN_SERVICE_ID_MAP[id] ?? id
+}
+
 export function getMainServiceName(id: string): string {
-  return POLICY_SERVICE_CATALOG.find((s) => s.id === id)?.name ?? id
+  const resolved = resolveMainServiceId(id)
+  return POLICY_SERVICE_CATALOG.find((s) => s.id === resolved)?.name ?? id
 }

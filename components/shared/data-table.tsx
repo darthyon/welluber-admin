@@ -175,9 +175,9 @@ export function SharedDataTable<T extends { id: string | number }>({
               {paginatedData.map((row, rowIndex) => (
                 <motion.tr 
                   key={row.id}
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -5 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
                   transition={{ duration: 0.15, delay: rowIndex * 0.03 }}
                   className={cn(
                     "hover:bg-muted/40 group transition-colors",

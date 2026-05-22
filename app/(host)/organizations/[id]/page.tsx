@@ -375,28 +375,28 @@ function OrganizationDetailContent() {
     {
       id: "b1",
       groupId: "g1",
-      serviceId: "s1",
+      serviceId: "FX-GYM",
       amount: 200,
       coPayment: { required: false, type: "Percentage", value: 0 },
     },
     {
       id: "b2",
       groupId: "g2",
-      serviceId: "s4",
+      serviceId: "MH-MED",
       amount: 150,
       coPayment: { required: true, type: "Percentage", value: 10 },
     },
     {
       id: "b3",
       groupId: "g3",
-      serviceId: "s5",
+      serviceId: "NT-NUT",
       amount: 100,
       coPayment: { required: false, type: "Percentage", value: 0 },
     },
     {
       id: "b4",
       groupId: "g3",
-      serviceId: "s6",
+      serviceId: "SP-FAC",
       amount: 100,
       coPayment: { required: false, type: "Percentage", value: 0 },
     },
@@ -529,7 +529,7 @@ function OrganizationDetailContent() {
       />
 
       {/* Header Banner */}
-      <div className="relative z-30 -mx-6 -mt-6 border-b border-border bg-card px-6 pt-6">
+      <div className="relative z-30 -mx-6 -mt-6 bg-card px-6 pt-6">
         <div className="py-6 lg:px-2">
           <Breadcrumbs
             items={[
@@ -1991,6 +1991,7 @@ function OrganizationDetailContent() {
             {viewingPolicyId ? (
               <PolicyDetailView
                 key={viewingPolicyId}
+                headerVariant="embedded"
                 policy={assignedPolicies.find((p) => p.id === viewingPolicyId)!}
                 groups={mockGroups.filter(
                   (g) => g.policyId === viewingPolicyId
@@ -2193,11 +2194,18 @@ function OrganizationDetailContent() {
                   }))}
                   onUnassign={handleUnassignPolicy}
                   onView={(id) => {
-                    setViewingPolicyId(id)
-                    setEditingPolicyId(null)
+                    updateQueryParams({
+                      viewingPolicyId: id,
+                      editingPolicyId: null,
+                      addPolicy: null,
+                    })
                   }}
                   onEdit={(id) => {
-                    setEditingPolicyId(id)
+                    updateQueryParams({
+                      editingPolicyId: id,
+                      viewingPolicyId: null,
+                      addPolicy: null,
+                    })
                   }}
                 />
               </div>
