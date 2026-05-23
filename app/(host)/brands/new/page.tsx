@@ -1,81 +1,107 @@
-"use client";
+"use client"
 
-import { useRouter } from "next/navigation";
-import { BrandForm } from "@/components/host/brands/brand-form";
-import { CaretLeft } from "@phosphor-icons/react";
-import { useState } from "react";
-import { SuccessCelebration } from "@/components/shared/success-celebration";
-import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation"
+import { BrandForm } from "@/components/host/brands/brand-form"
+import { CaretLeft, Plus } from "@phosphor-icons/react"
+import { useState } from "react"
+import { SuccessModal } from "@/components/shared/success-modal"
+import { Button } from "@/components/ui/button"
 
 export default function NewBrandPage() {
-  const router = useRouter();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
+  const router = useRouter()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
+  const [formKey, setFormKey] = useState(0)
 
   const handleSubmit = async (data: unknown) => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     // Simulate API call
-    console.log("Creating brand:", data);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsSubmitting(false);
-    setIsSuccess(true);
-  };
-
-  if (isSuccess) {
-    return (
-      <div className="py-12 animate-in fade-in zoom-in duration-500">
-        <div className="bg-card border border-border shadow-sm rounded-lg p-8 flex flex-col items-center">
-          <SuccessCelebration 
-            title="Brand Created Successfully" 
-            message="Your new brand identity has been established and is ready for service provider assignment." 
-          />
-          <div className="mt-8 flex flex-col items-center gap-4 w-full">
-            <Button 
-               onClick={() => router.push("/brands")}
-               className="w-full h-11 font-semibold text-body"
-            >
-              Back to Brand List
-            </Button>
-            <button 
-              onClick={() => setIsSuccess(false)}
-              className="text-body font-medium text-subtle hover:text-foreground transition-colors"
-            >
-              Create another brand
-            </button>
-          </div>
-        </div>
-      </div>
-    );
+    void data
+    await new Promise((resolve) => setTimeout(resolve, 1500))
+    setIsSubmitting(false)
+    setIsSuccess(true)
   }
 
   return (
-    <div className="pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      {/* Header */}
-      <div className="mb-8 space-y-4">
-        <button
-          onClick={() => router.back()}
-          className="flex items-center gap-1.5 text-body font-medium text-subtle hover:text-primary transition-colors group"
-        >
-          <CaretLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
-          Back
-        </button>
+    <div className="animate-in pb-24 duration-500 fade-in slide-in-from-bottom-4">
+      <SuccessModal
+        isOpen={isSuccess}
+        onClose={() => router.push("/brands")}
+        title="Brand Created Successfully"
+        message="Your new brand identity has been established and is ready for service provider assignment."
+        primaryAction={{
+          label: "Back to Brand List",
+          onClick: () => router.push("/brands"),
+        }}
+        secondaryAction={{
+          label: "Create Another Brand",
+          onClick: () => {
+            setIsSuccess(false)
+            setFormKey((k) => k + 1)
+          },
+        }}
+      />
 
-        <div>
-          <h1 className="text-display font-semibold tracking-tight text-foreground">Add New Brand</h1>
-          <p className="text-subtle text-body mt-1 font-normal opacity-80">
-            Create a new brand identity to organize service providers and branches.
-          </p>
+      <div className="flex flex-col items-start gap-12 lg:flex-row lg:gap-16">
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-col gap-6">
+            {/* Header */}
+            <div className="flex flex-col gap-4">
+              <button
+                onClick={() => router.back()}
+                className="inline-flex w-fit items-center gap-1.5 text-body font-medium text-subtle transition-colors hover:text-foreground"
+              >
+                <CaretLeft size={16} />
+                Back
+              </button>
+              <div>
+                <h1 className="text-heading font-semibold text-balance text-foreground">
+                  Add New Brand
+                </h1>
+                <p className="text-body text-subtle">
+                  Create a new brand identity to organize service providers and
+                  branches.
+                </p>
+              </div>
+            </div>
+
+            <BrandForm
+              key={formKey}
+              formId="newBrandForm"
+              showFooter={false}
+              onSubmit={handleSubmit}
+              onCancel={() => router.push("/brands")}
+              isSubmitting={isSubmitting}
+            />
+
+            {/* Floating Action Bar */}
+            <div className="fixed bottom-8 left-1/2 z-50 flex -translate-x-1/2 animate-in items-center gap-4 rounded-full border border-border bg-background/80 p-2 px-6 shadow-lg backdrop-blur-2xl duration-700 ease-out slide-in-from-bottom-10 lg:left-[calc(50%+104px)] lg:translate-x-0">
+              <Button
+                variant="ghost"
+                size="lg"
+                className="px-6 text-body font-semibold transition-colors"
+                onClick={() => router.back()}
+                disabled={isSubmitting}
+              >
+                Cancel
+              </Button>
+              <div className="h-6 w-px bg-border/40" />
+              <Button
+                type="submit"
+                form="newBrandForm"
+                size="lg"
+                disabled={isSubmitting}
+                className="flex items-center gap-2 px-8 text-body font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
+              >
+                Create Brand
+                <Plus size={14} weight="bold" />
+              </Button>
+            </div>
+
+            <div className="h-[60vh]" />
+          </div>
         </div>
       </div>
-
-      {/* Form Container */}
-      <div className="bg-card border border-border/60 rounded-lg p-6 shadow-sm">
-        <BrandForm 
-          onSubmit={handleSubmit} 
-          onCancel={() => router.push("/brands")}
-          isSubmitting={isSubmitting} 
-        />
-      </div>
     </div>
-  );
+  )
 }
