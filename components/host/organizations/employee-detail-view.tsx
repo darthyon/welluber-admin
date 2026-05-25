@@ -107,9 +107,11 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
     });
 
   const CLAIM_STATUS_STYLE: Record<Claim["status"], string> = {
-    "pre-auth":   "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20",
-    confirmed:    "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20",
-    cancelled:    "bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20",
+    "pre-auth":      "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20",
+    confirmed:       "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20",
+    cancelled:       "bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20",
+    pending_review:  "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20",
+    flagged:         "bg-destructive/10 text-destructive border border-destructive/20",
   };
 
   return (

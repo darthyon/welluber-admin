@@ -1,8 +1,6 @@
-/**
- * (org) route group — Organization Admin Portal
- * Placeholder layout — to be built when org persona is ready.
- * Will share AppSidebar with orgNavigation config.
- */
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
+import { TopBar } from "@/components/shared/top-bar"
+import { OrgSidebarWrapper } from "@/components/org/org-sidebar-wrapper"
 
 export default function OrgLayout({
   children,
@@ -10,13 +8,14 @@ export default function OrgLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="flex h-screen bg-background text-foreground overflow-hidden">
-      {/* Will use: <AppSidebar navigation={orgNavigation} persona="org" /> */}
-      <main className="flex flex-col h-screen flex-1 overflow-hidden">
-        <div className="p-8 space-y-6 flex-grow overflow-y-auto bg-background">
+    <SidebarProvider>
+      <OrgSidebarWrapper />
+      <TopBar />
+      <SidebarInset className="bg-background min-w-0">
+        <main className="flex-1 w-full mt-14 p-8 px-6">
           {children}
-        </div>
-      </main>
-    </div>
+        </main>
+      </SidebarInset>
+    </SidebarProvider>
   )
 }

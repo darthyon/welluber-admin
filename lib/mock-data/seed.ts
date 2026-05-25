@@ -184,6 +184,7 @@ export const MOCK_EMPLOYEE_UTILISATION: EmployeeUtilisationRow[] = [
       { id: "c2", voucherCode: "VCH-2026-0114", voucherName: "Wellness Allocation Voucher", transactionType: "redemption", service: "Clinical Therapy", provider: "Mind & Soul Clinic", location: "Mont Kiara", date: "20 Mar 2026", amount: 320, status: "confirmed" },
       { id: "c3", voucherCode: "VCH-2026-0198", voucherName: "Wellness Allocation Voucher", transactionType: "redemption", service: "Group Fitness", provider: "Ritual Yoga Studio", location: "Bangsar", date: "01 Apr 2026", amount: 95, status: "pre-auth" },
       { id: "c4", voucherCode: "VCH-2026-0211", voucherName: "Wellness Allocation Voucher", transactionType: "reimbursement", service: "Dietary Counseling", provider: "NutriCare Clinic", location: "Damansara", date: "05 Apr 2026", amount: 605, status: "confirmed" },
+      { id: "c4b", voucherCode: "VCH-2026-0302", voucherName: "Wellness Allocation Voucher", transactionType: "reimbursement", service: "Chiropractic Treatment", provider: "SpineCare KL", location: "Mont Kiara", date: "20 Apr 2026", amount: 1200, status: "flagged" },
     ],
   },
   {
@@ -196,6 +197,8 @@ export const MOCK_EMPLOYEE_UTILISATION: EmployeeUtilisationRow[] = [
       { id: "c8", voucherCode: "VCH-2026-0132", voucherName: "Lifestyle Pocket Voucher", transactionType: "redemption", service: "Group Fitness", provider: "Barry's Bootcamp", location: "TTDI", date: "22 Mar 2026", amount: 200, status: "cancelled" },
       { id: "c9", voucherCode: "VCH-2026-0201", voucherName: "Lifestyle Pocket Voucher", transactionType: "reimbursement", service: "Clinical Therapy", provider: "Therapy Works PJ", location: "Petaling Jaya", date: "08 Apr 2026", amount: 400, status: "confirmed" },
       { id: "c10", voucherCode: "VCH-2026-0215", voucherName: "Lifestyle Pocket Voucher", transactionType: "redemption", service: "Dietary Counseling", provider: "NutriCare Clinic", location: "Subang Jaya", date: "10 Apr 2026", amount: 800, status: "pre-auth" },
+      { id: "c10b", voucherCode: "VCH-2026-0318", voucherName: "Lifestyle Pocket Voucher", transactionType: "reimbursement", service: "Optical Frames", provider: "Specsavers Subang", location: "Subang Jaya", date: "22 Apr 2026", amount: 650, status: "pending_review" },
+      { id: "c10c", voucherCode: "VCH-2026-0341", voucherName: "Lifestyle Pocket Voucher", transactionType: "reimbursement", service: "Dental Treatment", provider: "SmileCare Dental", location: "Petaling Jaya", date: "28 Apr 2026", amount: 480, status: "pending_review" },
     ],
   },
   {

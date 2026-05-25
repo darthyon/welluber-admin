@@ -25,7 +25,11 @@ export const routes = {
   org: {
     dashboard: (slug: string) => `/${slug}/dashboard`,
     employees: (slug: string) => `/${slug}/employees`,
+    branches: (slug: string) => `/${slug}/branches`,
     policies: (slug: string) => `/${slug}/policies`,
+    claims: (slug: string) => `/${slug}/claims`,
+    vouchers: (slug: string) => `/${slug}/vouchers`,
+    activity: (slug: string) => `/${slug}/activity`,
     transactions: (slug: string) => `/${slug}/transactions`,
     settings: (slug: string) => `/${slug}/settings`,
   },

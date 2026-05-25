@@ -4,22 +4,18 @@ import * as React from "react"
 import {
   SquaresFour,
   Buildings,
-  CurrencyCircleDollar,
-  Wallet,
+  Users,
   Shield,
+  SealCheck,
+  Ticket,
+  ClockCounterClockwise,
   Gear,
-  Receipt,
-  Storefront,
-  TreeStructure,
   CaretDoubleLeft,
   CaretDoubleRight,
-  SignOut,
   CaretUpDown,
   Check,
-  Users,
-  Tag,
-  ChartBar,
-  List
+  SignOut,
+  Storefront,
 } from "@phosphor-icons/react"
 import { useRouter } from "next/navigation"
 
@@ -59,7 +55,6 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 
-// Personas Configuration
 const personas = [
   {
     id: "host",
@@ -81,61 +76,41 @@ const personas = [
   },
 ]
 
-// Navigation Data
-const navOperations: NavMainItem[] = [
-  { title: "Dashboard", url: "/dashboard", icon: SquaresFour },
-  {
-    title: "Organisations",
-    url: "#",
-    icon: Buildings,
-    items: [
-      { title: "All Organisations", url: "/organizations" },
-      { title: "Benefit Policies", url: "/policies" },
-      { title: "Claims", url: "/claims" },
-      { title: "Employees", url: "/employees" },
-    ],
-  },
-  {
-    title: "Service Providers",
-    url: "#",
-    icon: Storefront,
-    items: [
-      { title: "All Service Providers", url: "/service-providers" },
-      { title: "Voucher Packages", url: "/voucher-packages" },
-    ],
-  },
-]
+interface OrgSidebarProps extends React.ComponentProps<typeof Sidebar> {
+  orgSlug: string
+}
 
-const navSetup: NavMainItem[] = [
-  { title: "Services", url: "/services", icon: TreeStructure },
-  { title: "Brands", url: "/brands", icon: Tag },
-]
-
-const navUserMgmt: NavMainItem[] = [
-  { title: "Members", url: "/users/members", icon: Users },
-  { title: "Administrators", url: "/users/administrators", icon: Shield },
-]
-
-const navFinance: NavMainItem[] = [
-  { title: "Claims", url: "/claims", icon: Receipt },
-  { title: "Invoices", url: "/invoices", icon: List },
-  { title: "Settlements", url: "/settlements", icon: CurrencyCircleDollar },
-  { title: "Accounts", url: "/accounts", icon: Wallet },
-  { title: "Reports", url: "/reports", icon: ChartBar },
-]
-
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function OrgSidebar({ orgSlug, ...props }: OrgSidebarProps) {
   const { user } = useSession()
   const { state } = useSidebar()
   const router = useRouter()
-  const [activePersona, setActivePersona] = React.useState(personas[0])
+  const [activePersona, setActivePersona] = React.useState(
+    personas.find((p) => p.id === "org") ?? personas[1]
+  )
+
+  const navMyOrg: NavMainItem[] = [
+    { title: "Dashboard", url: routes.org.dashboard(orgSlug), icon: SquaresFour },
+    { title: "Employees", url: routes.org.employees(orgSlug), icon: Users },
+    { title: "Branches", url: routes.org.branches(orgSlug), icon: Buildings },
+  ]
+
+  const navBenefits: NavMainItem[] = [
+    { title: "Benefit Policies", url: routes.org.policies(orgSlug), icon: Shield },
+    { title: "Claims", url: routes.org.claims(orgSlug), icon: SealCheck },
+    { title: "Vouchers", url: routes.org.vouchers(orgSlug), icon: Ticket },
+  ]
+
+  const navAccount: NavMainItem[] = [
+    { title: "Activity", url: routes.org.activity(orgSlug), icon: ClockCounterClockwise },
+    { title: "Settings", url: routes.org.settings(orgSlug), icon: Gear },
+  ]
 
   function handlePersonaSwitch(persona: typeof personas[number]) {
     setActivePersona(persona)
     if (persona.id === "host") {
       router.push(routes.host.dashboard)
     } else if (persona.id === "org") {
-      router.push(routes.org.dashboard(user?.orgSlug ?? ""))
+      router.push(routes.org.dashboard(orgSlug))
     }
   }
 
@@ -157,11 +132,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <div className="relative z-30 flex flex-col h-full">
         <SidebarHeader className="group-data-[collapsible=icon]:p-2 pt-7 pb-2">
           <div className="flex items-center justify-between px-2 mb-4">
-            {/* Expanded logo */}
             <div className="flex items-center group-data-[collapsible=icon]:hidden">
               <WelluberLogo width={120} height={31} className="opacity-90" />
             </div>
-            {/* Collapsed mark */}
             <div className="hidden group-data-[collapsible=icon]:flex items-center justify-center flex-1">
               <WelluberMark size={32} className="opacity-90" />
             </div>
@@ -179,7 +152,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <SidebarMenuButton
-                    id="persona-dropdown-trigger"
                     size="lg"
                     className="data-[state=open]:bg-sidebar-foreground/5 data-[state=open]:text-sidebar-foreground hover:bg-sidebar-foreground/5 transition-all duration-300 group-data-[collapsible=icon]:!p-0 group-data-[collapsible=icon]:!justify-center group-data-[collapsible=icon]:!h-10 group-data-[collapsible=icon]:!w-10"
                   >
@@ -274,37 +246,28 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarContent className="px-2 pt-3 no-scrollbar h-full">
           <SidebarGroup className="py-2.5">
             <SidebarGroupLabel className="text-label font-medium text-sidebar-foreground/70 mb-2 px-3 group-data-[collapsible=icon]:hidden uppercase">
-              Operations
+              My Organisation
             </SidebarGroupLabel>
             <SidebarGroupContent>
-              <NavMain items={navOperations} />
+              <NavMain items={navMyOrg} />
             </SidebarGroupContent>
           </SidebarGroup>
 
           <SidebarGroup className="py-2.5">
             <SidebarGroupLabel className="text-label font-medium text-sidebar-foreground/70 mb-2 px-3 group-data-[collapsible=icon]:hidden uppercase">
-              Setup & Config
+              Benefits
             </SidebarGroupLabel>
             <SidebarGroupContent>
-              <NavMain items={navSetup} />
+              <NavMain items={navBenefits} />
             </SidebarGroupContent>
           </SidebarGroup>
 
           <SidebarGroup className="py-2.5">
             <SidebarGroupLabel className="text-label font-medium text-sidebar-foreground/70 mb-2 px-3 group-data-[collapsible=icon]:hidden uppercase">
-              User Management
+              Account
             </SidebarGroupLabel>
             <SidebarGroupContent>
-              <NavMain items={navUserMgmt} />
-            </SidebarGroupContent>
-          </SidebarGroup>
-
-          <SidebarGroup className="py-2.5">
-            <SidebarGroupLabel className="text-label font-medium text-sidebar-foreground/70 mb-2 px-3 group-data-[collapsible=icon]:hidden uppercase">
-              Finance & Reporting
-            </SidebarGroupLabel>
-            <SidebarGroupContent>
-              <NavMain items={navFinance} />
+              <NavMain items={navAccount} />
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
@@ -313,4 +276,3 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     </Sidebar>
   )
 }
-

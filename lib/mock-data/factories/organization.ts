@@ -40,7 +40,7 @@ export function createOrganization(index: number): Organization {
     policies: ["POL-20260115-0001", "POL-20260115-0002"],
     branches: ["BR-20260115-0001", "BR-20260115-0002", "BR-20260115-0003"],
     documents: [],
-    employeesWithoutPolicy: 0,
+    employeesWithoutPolicy: 2,
     tierConfigs: [
       { id: "TC-001", name: "Executive", code: "EXE" },
       { id: "TC-002", name: "Senior Manager", code: "SM" },

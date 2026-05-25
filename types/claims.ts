@@ -1,4 +1,4 @@
-export type ClaimStatus = "pre-auth" | "confirmed" | "cancelled";
+export type ClaimStatus = "pre-auth" | "confirmed" | "cancelled" | "pending_review" | "flagged";
 export type TransactionType = "redemption" | "reimbursement" | "refund";
 
 export interface Claim {
