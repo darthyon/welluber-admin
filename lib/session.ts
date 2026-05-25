@@ -24,6 +24,7 @@ const STUB_USER: SessionUser = {
   image: "https://github.com/shadcn.png",
   role: "host",
   initials: "YY",
+  orgSlug: "acme-corporation",
 }
 
 /**
