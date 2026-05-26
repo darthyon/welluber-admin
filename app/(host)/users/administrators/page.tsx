@@ -46,7 +46,7 @@ export default function AdministratorsPage() {
 
   const columns: Column<Administrator>[] = [
     {
-      header: "Admin Name",
+      header: "Admin",
       accessorKey: "name",
       sortable: true,
       render: (row) => (

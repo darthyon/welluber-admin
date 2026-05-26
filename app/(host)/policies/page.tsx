@@ -557,6 +557,7 @@ function PoliciesContent() {
           columns={columns}
           freezeFirst
           freezeLast
+          rowsPerPage={10}
           onRowClick={(row) => updateQueryParams({ policyId: row.id, mode: "view", wizard: "open" })}
         />
       )}

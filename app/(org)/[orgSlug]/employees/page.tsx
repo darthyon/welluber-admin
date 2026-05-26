@@ -189,6 +189,7 @@ export default function OrgEmployeesPage() {
             columns={empColumns}
             freezeFirst
             freezeLast
+            rowsPerPage={10}
             onRowClick={(e) => router.push(`${routes.org.employees(orgSlug)}/${e.id}`)}
           />
         )
@@ -205,6 +206,7 @@ export default function OrgEmployeesPage() {
             columns={depColumns}
             freezeFirst
             freezeLast
+            rowsPerPage={10}
           />
         )
       )}

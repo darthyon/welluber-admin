@@ -176,6 +176,7 @@ export default function OrgPoliciesPage() {
           columns={columns}
           freezeFirst
           freezeLast
+          rowsPerPage={10}
           onRowClick={(p) => router.push(`${routes.org.policies(orgSlug)}/${p.id}`)}
         />
       )}

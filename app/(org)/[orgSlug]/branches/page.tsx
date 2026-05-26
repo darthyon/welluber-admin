@@ -155,6 +155,7 @@ export default function OrgBranchesPage() {
           columns={listColumns}
           freezeFirst
           freezeLast
+          rowsPerPage={10}
           onRowClick={(b) => router.push(`${routes.org.branches(orgSlug)}/${b.id}`)}
         />
       )}

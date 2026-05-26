@@ -47,7 +47,7 @@ export default function MembersPage() {
 
   const columns: Column<Member>[] = [
     {
-      header: "Member Name",
+      header: "Member",
       accessorKey: "name",
       sortable: true,
       render: (row) => (
