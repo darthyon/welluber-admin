@@ -7,6 +7,7 @@ import {
   CreditCard,
   SignOut
 } from "@phosphor-icons/react"
+import { useRouter } from "next/navigation"
 import { useSession } from "@/lib/session"
 import {
   DropdownMenu,
@@ -29,6 +30,7 @@ interface UserNavProps {
 export function UserNav({ user: userProp }: UserNavProps) {
   const { user: sessionUser } = useSession()
   const user = userProp || sessionUser
+  const router = useRouter()
 
   const initials = React.useMemo(() => {
     if (!user?.name) return "G"
@@ -75,7 +77,10 @@ export function UserNav({ user: userProp }: UserNavProps) {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="cursor-pointer text-destructive focus:text-destructive">
+        <DropdownMenuItem
+          className="cursor-pointer text-destructive focus:text-destructive"
+          onClick={() => router.push("/signout")}
+        >
           <SignOut className="mr-2 h-4 w-4" />
           <span>Log out</span>
         </DropdownMenuItem>
