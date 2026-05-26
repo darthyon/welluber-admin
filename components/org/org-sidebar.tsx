@@ -13,9 +13,7 @@ import {
   CaretDoubleLeft,
   CaretDoubleRight,
   CaretUpDown,
-  Check,
   SignOut,
-  Storefront,
 } from "@phosphor-icons/react"
 import { useRouter } from "next/navigation"
 
@@ -55,26 +53,6 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 
-const personas = [
-  {
-    id: "host",
-    name: "Host Admin",
-    description: "Platform Infrastructure",
-    icon: Shield,
-  },
-  {
-    id: "org",
-    name: "Organisation Admin",
-    description: "Corporate Management",
-    icon: Buildings,
-  },
-  {
-    id: "provider",
-    name: "Provider Admin",
-    description: "Service & Vouchers",
-    icon: Storefront,
-  },
-]
 
 interface OrgSidebarProps extends React.ComponentProps<typeof Sidebar> {
   orgSlug: string
@@ -84,10 +62,6 @@ export function OrgSidebar({ orgSlug, ...props }: OrgSidebarProps) {
   const { user } = useSession()
   const { state } = useSidebar()
   const router = useRouter()
-  const [activePersona, setActivePersona] = React.useState(
-    personas.find((p) => p.id === "org") ?? personas[1]
-  )
-
   const navMyOrg: NavMainItem[] = [
     { title: "Dashboard", url: routes.org.dashboard(orgSlug), icon: SquaresFour },
     { title: "Employees", url: routes.org.employees(orgSlug), icon: Users },
@@ -104,15 +78,6 @@ export function OrgSidebar({ orgSlug, ...props }: OrgSidebarProps) {
     { title: "Activity", url: routes.org.activity(orgSlug), icon: ClockCounterClockwise },
     { title: "Settings", url: routes.org.settings(orgSlug), icon: Gear },
   ]
-
-  function handlePersonaSwitch(persona: typeof personas[number]) {
-    setActivePersona(persona)
-    if (persona.id === "host") {
-      router.push(routes.host.dashboard)
-    } else if (persona.id === "org") {
-      router.push(routes.org.dashboard(orgSlug))
-    }
-  }
 
   return (
     <Sidebar
@@ -133,7 +98,7 @@ export function OrgSidebar({ orgSlug, ...props }: OrgSidebarProps) {
         <SidebarHeader className="group-data-[collapsible=icon]:p-2 pt-7 pb-2">
           <div className="flex items-center justify-between px-2 mb-4">
             <div className="flex items-center group-data-[collapsible=icon]:hidden">
-              <WelluberLogo width={120} height={31} className="opacity-90" />
+              <WelluberLogo width={120} height={31} className="text-white opacity-90" />
             </div>
             <div className="hidden group-data-[collapsible=icon]:flex items-center justify-center flex-1">
               <WelluberMark size={32} className="opacity-90" />
@@ -156,13 +121,13 @@ export function OrgSidebar({ orgSlug, ...props }: OrgSidebarProps) {
                     className="data-[state=open]:bg-sidebar-foreground/5 data-[state=open]:text-sidebar-foreground hover:bg-sidebar-foreground/5 transition-all duration-300 group-data-[collapsible=icon]:!p-0 group-data-[collapsible=icon]:!justify-center group-data-[collapsible=icon]:!h-10 group-data-[collapsible=icon]:!w-10"
                   >
                     <div className="flex aspect-square size-8.5 items-center justify-center rounded-lg bg-sidebar-foreground/5 ring-1 ring-sidebar-foreground/10 shadow-sm text-primary shrink-0 group-data-[collapsible=icon]:size-7">
-                      <activePersona.icon size={19} weight="fill" />
+                      <Buildings size={19} weight="fill" />
                     </div>
                     <div className="grid flex-1 text-left text-body leading-tight group-data-[collapsible=icon]:hidden ml-3">
                       <span className="truncate font-medium text-body text-sidebar-foreground">
-                        {activePersona.name}
+                        {user?.name || "Admin"}
                       </span>
-                      <span className="truncate text-label font-medium text-sidebar-foreground/80">Admin account</span>
+                      <span className="truncate text-label font-medium text-sidebar-foreground/80">Organisation Admin</span>
                     </div>
                     <CaretUpDown className="ml-auto size-4 text-sidebar-foreground/50 group-data-[collapsible=icon]:hidden" />
                   </SidebarMenuButton>
@@ -195,43 +160,17 @@ export function OrgSidebar({ orgSlug, ...props }: OrgSidebarProps) {
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator className="bg-border/50" />
                   <DropdownMenuGroup>
-                    <DropdownMenuLabel className="px-3 py-1.5 text-label font-medium text-faint">
-                      Select account type
-                    </DropdownMenuLabel>
-                    {personas.map((persona) => (
-                      <DropdownMenuItem
-                        key={persona.id}
-                        onClick={() => handlePersonaSwitch(persona)}
-                        className="flex items-center gap-3 px-3 py-2 cursor-pointer focus:bg-primary/5 transition-all group/item"
-                      >
-                        <div className={cn(
-                          "flex aspect-square size-7 items-center justify-center rounded-lg ring-1 ring-border group-hover/item:ring-primary/20",
-                          activePersona.id === persona.id ? "bg-primary text-primary-foreground shadow-md shadow-primary/20 ring-0" : "bg-muted/30 text-muted-foreground"
-                        )}>
-                          <persona.icon size={15} weight="fill" />
-                        </div>
-                        <span className={cn(
-                          "text-body font-medium",
-                          activePersona.id === persona.id ? "text-primary font-semibold" : "text-subtle"
-                        )}>
-                          {persona.name}
-                        </span>
-                        {activePersona.id === persona.id && (
-                          <Check className="ml-auto size-4 text-primary" weight="bold" />
-                        )}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuGroup>
-                  <DropdownMenuSeparator className="bg-border/50" />
-                  <DropdownMenuGroup>
                     <DropdownMenuItem className="flex items-center gap-3 px-3 py-2 cursor-pointer focus:bg-primary/5 group/settings">
                       <div className="flex aspect-square size-7 items-center justify-center rounded-lg bg-muted/30 text-muted-foreground group-hover/settings:bg-primary/5 group-hover/settings:text-primary transition-colors border border-transparent group-hover/settings:border-primary/10">
                         <Gear size={15} weight="fill" />
                       </div>
                       <span className="text-body font-medium text-subtle group-hover/settings:text-primary transition-colors">Account Settings</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="flex items-center gap-3 px-3 py-2 cursor-pointer focus:bg-destructive/5 group/logout">
-                      <div className="flex aspect-square size-7 items-center justify-center rounded-lg bg-destructive/5 text-destructive/60 group-hover/logout:bg-destructive group-hover/logout:text-destructive-foreground transition-all shadow-sm">
+                    <DropdownMenuItem
+                      className="flex items-center gap-3 px-3 py-2 cursor-pointer focus:bg-destructive/5 group/logout"
+                      onClick={() => router.push("/signout")}
+                    >
+                      <div className="flex aspect-square size-7 items-center justify-center rounded-lg bg-destructive/5 text-destructive/60 group-hover/logout:bg-destructive/10 group-hover/logout:text-destructive transition-colors border border-transparent group-hover/logout:border-destructive/10">
                         <SignOut size={15} weight="fill" />
                       </div>
                       <span className="text-body font-medium text-destructive/70 group-hover/logout:text-destructive transition-colors">Log out</span>
