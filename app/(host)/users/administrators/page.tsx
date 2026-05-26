@@ -18,16 +18,15 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { InviteAdministratorDialog } from "@/components/host/users/invite-administrator-dialog";
 import { ActionPopover } from "@/components/shared/action-popover";
 import { Eye, PencilSimple, LockKey } from "@phosphor-icons/react";
-import { AdminViewDialog } from "@/components/host/users/admin-view-dialog";
+import { useRouter } from "next/navigation";
 
 export default function AdministratorsPage() {
+  const router = useRouter();
   const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [entityFilter, setEntityFilter] = useState("all");
   const [isInviteOpen, setIsInviteOpen] = useState(false);
-  const [selectedAdmin, setSelectedAdmin] = useState<Administrator | null>(null);
-  const [isViewOpen, setIsViewOpen] = useState(false);
 
   const filteredAdmins = useMemo(() => {
     return MOCK_ADMINS.filter((admin) => {
@@ -123,10 +122,7 @@ export default function AdministratorsPage() {
               {
                 label: "View",
                 icon: <Eye size={16} />,
-                onClick: () => {
-                  setSelectedAdmin(row);
-                  setIsViewOpen(true);
-                },
+                onClick: () => router.push(`/users/administrators/${row.id}`),
               },
               {
                 label: "Edit",
@@ -250,9 +246,13 @@ export default function AdministratorsPage() {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
             >
-              <SharedDataTable freezeFirst freezeLast 
+              <SharedDataTable
+                freezeFirst
+                freezeLast
+                rowsPerPage={10}
                 data={filteredAdmins}
                 columns={columns}
+                onRowClick={(row) => router.push(`/users/administrators/${row.id}`)}
               />
             </motion.div>
           )}
@@ -260,14 +260,6 @@ export default function AdministratorsPage() {
       </div>
 
       <InviteAdministratorDialog open={isInviteOpen} onOpenChange={setIsInviteOpen} />
-      <AdminViewDialog
-        admin={selectedAdmin}
-        open={isViewOpen}
-        onOpenChange={(open) => {
-          setIsViewOpen(open);
-          if (!open) setSelectedAdmin(null);
-        }}
-      />
     </div>
   );
 }
