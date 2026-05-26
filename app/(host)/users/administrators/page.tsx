@@ -51,8 +51,8 @@ export default function AdministratorsPage() {
       sortable: true,
       render: (row) => (
         <div className="flex flex-col">
-          <span className="font-semibold text-foreground text-body">{row.name}</span>
-          <span className="text-label text-muted-foreground font-medium">{row.email}</span>
+          <span className="font-medium text-foreground text-body">{row.name}</span>
+          <span className="text-label text-subtle font-medium">{row.email}</span>
         </div>
       )
     },
@@ -85,7 +85,7 @@ export default function AdministratorsPage() {
       accessorKey: "joinedDate",
       sortable: true,
       render: (row) => (
-        <span className="text-label font-medium text-muted-foreground">
+        <span className="text-label font-medium text-subtle">
           {row.joinedDate}
         </span>
       )
@@ -95,7 +95,7 @@ export default function AdministratorsPage() {
       accessorKey: "lastActive",
       sortable: true,
       render: (row) => (
-        <div className="flex items-center gap-2 text-label font-medium text-muted-foreground">
+        <div className="flex items-center gap-2 text-label font-medium text-subtle">
           <Clock size={14} />
           {row.lastActive}
         </div>
@@ -113,7 +113,7 @@ export default function AdministratorsPage() {
       )
     },
     {
-      header: "Actions",
+      header: "",
       headerClassName: "text-right",
       align: "right",
       render: (row) => (

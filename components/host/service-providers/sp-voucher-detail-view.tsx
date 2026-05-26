@@ -19,6 +19,7 @@ import { EntityHeader } from "@/components/shared/entity-header";
 import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav";
 import { resolveBranchServiceView } from "@/features/providers/service-taxonomy";
 import type { SpVoucher, SpVoucherStatus } from "@/types/provider";
+import { formatDate } from "@/lib/utils";
 
 interface SpVoucherDetailViewProps {
   voucher: SpVoucher;
@@ -319,27 +320,11 @@ export function SpVoucherDetailView({
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <DetailField
                       label="Start Date"
-                      value={new Date(
-                        voucher.activationPeriod.startDate
-                      ).toLocaleDateString("en-GB", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                      })}
+                      value={formatDate(voucher.activationPeriod.startDate)}
                     />
                     <DetailField
                       label="End Date"
-                      value={
-                        voucher.activationPeriod.endDate
-                          ? new Date(
-                              voucher.activationPeriod.endDate
-                            ).toLocaleDateString("en-GB", {
-                              day: "2-digit",
-                              month: "short",
-                              year: "numeric",
-                            })
-                          : "Open-ended"
-                      }
+                      value={voucher.activationPeriod.endDate ? formatDate(voucher.activationPeriod.endDate) : "Open-ended"}
                     />
                   </div>
                 </div>
@@ -370,13 +355,7 @@ export function SpVoucherDetailView({
                     ) : voucher.redemptionPeriod.date ? (
                       <DetailField
                         label="Expiry Date"
-                        value={new Date(
-                          voucher.redemptionPeriod.date
-                        ).toLocaleDateString("en-GB", {
-                          day: "2-digit",
-                          month: "short",
-                          year: "numeric",
-                        })}
+                        value={formatDate(voucher.redemptionPeriod.date)}
                       />
                     ) : null}
                   </div>

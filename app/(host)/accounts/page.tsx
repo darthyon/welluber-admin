@@ -23,6 +23,7 @@ import {
   DEFAULT_ADVANCED_FILTERS,
 } from "@/components/shared/advanced-filter-sheet"
 import { ExpandableDataTable } from "@/components/shared/expandable-data-table"
+import { SharedDataTable, type Column } from "@/components/shared/data-table"
 import { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
@@ -92,106 +93,107 @@ export default function AccountsPage() {
     })
   }
 
-  const renderExpanded = (row: OrgRow) => (
-    <div className="px-4 py-4">
-      <div className="rounded-lg border border-border/60 bg-card overflow-hidden">
-        {/* Nested Header */}
-        <div className="grid grid-cols-12 gap-4 px-4 py-2.5 bg-muted/30 border-b border-border/60 text-label font-semibold text-faint">
-          <div className="col-span-3">Account Name</div>
-          <div className="col-span-2">Branch</div>
-          <div className="col-span-2 text-right">Balance</div>
-          <div className="col-span-2 text-right">Pending</div>
-          <div className="col-span-1 text-center">Status</div>
-          <div className="col-span-2 text-right">Actions</div>
+  const nestedColumns: Column<Account>[] = [
+    {
+      header: "Account Name",
+      render: (wallet) => (
+        <div>
+          <span className="block text-body font-medium text-foreground whitespace-nowrap">
+            {wallet.name}
+          </span>
+          <span className="block font-mono text-label text-subtle tracking-tight whitespace-nowrap">
+            {wallet.id}
+          </span>
         </div>
-
-        {/* Account Rows */}
-        {row.accounts.map((wallet) => (
-          <div
-            key={wallet.id}
-            className="grid grid-cols-12 gap-4 px-4 py-3 items-center border-b border-border/40 last:border-b-0 hover:bg-muted/20 transition-colors cursor-pointer"
-            onClick={() => router.push(`/accounts/${wallet.id}`)}
-          >
-            <div className="col-span-3">
-              <span className="block text-body font-medium text-foreground">
-                {wallet.name}
-              </span>
-              <span className="block font-mono text-label text-faint">
-                {wallet.id}
-              </span>
-            </div>
-
-            <div className="col-span-2">
-              <span className="text-body text-subtle">
-                {wallet.branchName}
-              </span>
-            </div>
-
-            <div className="col-span-2 text-right">
-              <span
-                className={cn(
-                  "text-body font-semibold tabular-nums",
-                  wallet.balance < 0 ? "text-destructive" : "text-foreground"
-                )}
-              >
-                {wallet.balance < 0 ? "-" : ""}{Math.abs(wallet.balance).toLocaleString()} pts
-              </span>
-            </div>
-
-            <div className="col-span-2 text-right">
-              {wallet.pendingDeductions > 0 ? (
-                <div className="inline-flex items-center gap-1 rounded-md border border-amber-500/20 dark:border-amber-500/30 bg-amber-500/10 dark:bg-amber-500/20 px-1.5 py-0.5 text-label font-medium text-amber-600 dark:text-amber-400">
-                  <Ticket size={10} weight="fill" />
-                  {wallet.pendingDeductions.toLocaleString()} pts
-                </div>
-              ) : (
-                <span className="text-micro text-faint">—</span>
-              )}
-            </div>
-
-            <div className="col-span-1 flex justify-center">
-              <StatusBadge
-                status={wallet.status}
-                variant={wallet.status === "active" ? "emerald" : "zinc"}
-                className="rounded-md px-1.5 py-0.5 text-micro"
-              />
-            </div>
-
-            <div
-              className="col-span-2 text-right"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <ActionPopover
-                actions={[
-                  {
-                    label: "View account detail",
-                    onClick: () => router.push(`/accounts/${wallet.id}`),
-                  },
-                  {
-                    label: "Update balance",
-                    onClick: () => setUpdateBalanceAccount(wallet),
-                  },
-                  {
-                    label: "Record manual top-up",
-                    onClick: () => setRecordTopupAccount(wallet),
-                  },
-                  {
-                    label:
-                      wallet.status === "suspended"
-                        ? "Resume account"
-                        : "Suspend account",
-                    onClick: () => console.log("Toggle status", wallet.id),
-                    className:
-                      wallet.status === "suspended"
-                        ? "text-primary font-semibold"
-                        : "text-destructive font-semibold",
-                  },
-                ]}
-              />
-            </div>
+      ),
+    },
+    {
+      header: "Branch",
+      render: (wallet) => (
+        <span className="text-body text-subtle whitespace-nowrap">{wallet.branchName}</span>
+      ),
+    },
+    {
+      header: "Balance",
+      align: "right",
+      headerClassName: "text-right",
+      render: (wallet) => (
+        <span className={cn("text-body font-medium font-mono tabular-nums whitespace-nowrap", wallet.balance < 0 ? "text-destructive" : "text-foreground")}>
+          {wallet.balance < 0 ? "-" : ""}{Math.abs(wallet.balance).toLocaleString()} pts
+        </span>
+      ),
+    },
+    {
+      header: "Pending",
+      align: "right",
+      headerClassName: "text-right",
+      render: (wallet) =>
+        wallet.pendingDeductions > 0 ? (
+          <div className="flex justify-end">
+            <StatusBadge
+              status={`${wallet.pendingDeductions.toLocaleString()} pts`}
+              variant="amber"
+              className="text-label"
+            />
           </div>
-        ))}
-      </div>
+        ) : (
+          <span className="block text-right text-micro text-faint">—</span>
+        ),
+    },
+    {
+      header: "Status",
+      align: "center",
+      headerClassName: "text-center",
+      render: (wallet) => (
+        <div className="flex justify-center">
+          <StatusBadge
+            status={wallet.status}
+            variant={wallet.status === "active" ? "emerald" : "zinc"}
+          />
+        </div>
+      ),
+    },
+    {
+      header: "",
+      align: "right",
+      render: (wallet) => (
+        <div onClick={(e) => e.stopPropagation()}>
+          <ActionPopover
+            actions={[
+              {
+                label: "View account detail",
+                onClick: () => router.push(`/accounts/${wallet.id}`),
+              },
+              {
+                label: "Update balance",
+                onClick: () => setUpdateBalanceAccount(wallet),
+              },
+              {
+                label: "Record manual top-up",
+                onClick: () => setRecordTopupAccount(wallet),
+              },
+              {
+                label: wallet.status === "suspended" ? "Resume account" : "Suspend account",
+                onClick: () => console.log("Toggle status", wallet.id),
+                className: wallet.status === "suspended" ? "text-primary" : "text-destructive",
+              },
+            ]}
+          />
+        </div>
+      ),
+    },
+  ]
+
+  const renderExpanded = (row: OrgRow) => (
+    <div className="px-4 pb-4">
+      <SharedDataTable
+        data={row.accounts}
+        columns={nestedColumns}
+        ghost
+        freezeFirst
+        freezeLast
+        onRowClick={(wallet) => router.push(`/accounts/${wallet.id}`)}
+      />
     </div>
   )
 
@@ -203,7 +205,7 @@ export default function AccountsPage() {
           <h1 className="text-heading font-semibold text-foreground text-balance">
             Accounts
           </h1>
-          <p className="mt-1 text-body font-normal text-muted-foreground">
+          <p className="mt-1 text-body font-normal text-subtle">
             Monitor and manage organisation/branch accounts.
           </p>
         </div>
@@ -293,10 +295,10 @@ export default function AccountsPage() {
                       <Buildings size={20} weight="fill" />
                     </div>
                     <div>
-                      <span className="block text-body font-semibold text-foreground">
+                      <span className="block text-body font-medium text-foreground whitespace-nowrap">
                         {row.orgName}
                       </span>
-                      <span className="block font-mono text-label text-faint">
+                      <span className="block font-mono text-label text-subtle tracking-tight whitespace-nowrap">
                         {row.orgId}
                       </span>
                     </div>
@@ -328,7 +330,7 @@ export default function AccountsPage() {
                         variant="emerald"
                         className="rounded-md px-1.5 py-0.5 text-micro"
                       />
-                      <span className="text-label text-faint">
+                      <span className="text-label text-subtle">
                         +{row.suspendedCount} suspended
                       </span>
                     </div>
@@ -341,7 +343,7 @@ export default function AccountsPage() {
                   ),
               },
               {
-                header: "Actions",
+                header: "",
                 align: "right",
                 render: (row: OrgRow) => (
                   <ActionPopover

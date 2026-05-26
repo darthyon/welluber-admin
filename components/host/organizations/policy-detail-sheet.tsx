@@ -40,7 +40,7 @@ export function PolicyDetailSheet({ isOpen, onClose, policy, groups, benefits, o
              <div>
                <h3 className="text-heading font-semibold text-foreground tracking-tight">{policy.name}</h3>
                <div className="flex items-center gap-3 mt-1">
-                 <span className="text-label font-mono text-faint tracking-tight leading-none">{policy.code}</span>
+                 <span className="text-label font-mono text-subtle tracking-tight leading-none">{policy.code}</span>
                  <div className="w-1.5 h-1.5 rounded-full bg-muted" />
                   <StatusBadge status={policy.status} variant="emerald" />
                </div>

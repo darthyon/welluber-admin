@@ -25,7 +25,7 @@ import { useQueryState } from "@/hooks/use-tab-persistence"
 import type { Brand } from "@/types/brand"
 import type { ServiceProvider } from "@/types/provider"
 import { MOCK_SPS } from "@/lib/mock-data"
-import { cn } from "@/lib/utils"
+import { cn, formatDate } from "@/lib/utils"
 import Link from "next/link"
 import { ConfirmationModal } from "@/components/shared/confirmation-modal"
 
@@ -267,11 +267,7 @@ export function BrandDetailView({
               />
               <DetailField
                 label="Creation Date"
-                value={new Date(brand.createdAt).toLocaleDateString("en-GB", {
-                  day: "2-digit",
-                  month: "short",
-                  year: "numeric",
-                })}
+                value={formatDate(brand.createdAt)}
                 icon={<Plus size={16} />}
               />
             </div>

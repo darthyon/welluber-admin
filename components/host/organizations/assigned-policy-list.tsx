@@ -47,8 +47,8 @@ export function AssignedPolicyList({ policies, onUnassign, onView, onEdit }: Ass
             <IdentificationCard size={20} weight="duotone" />
           </div>
           <div>
-            <p className="text-body font-semibold text-foreground group-hover:text-primary transition-colors leading-tight">{policy.name}</p>
-            <p className="text-label font-mono text-faint tracking-tight leading-none mt-0.5">{policy.code}</p>
+            <p className="text-body font-medium text-foreground group-hover:text-primary transition-colors leading-tight">{policy.name}</p>
+            <p className="text-label font-mono text-subtle tracking-tight leading-none mt-0.5">{policy.code}</p>
           </div>
         </div>
       )
@@ -79,7 +79,7 @@ export function AssignedPolicyList({ policies, onUnassign, onView, onEdit }: Ass
       header: "Employees",
       headerClassName: "text-center",
       render: (policy) => (
-        <div className="text-center font-semibold text-body text-subtle tabular-nums">
+        <div className="text-center font-medium text-body text-subtle tabular-nums">
           {policy.employeeCount.toLocaleString()}
         </div>
       )
@@ -95,10 +95,10 @@ export function AssignedPolicyList({ policies, onUnassign, onView, onEdit }: Ass
     },
     {
       header: "Last Updated",
-      render: (policy) => <span className="text-body text-faint font-medium">{policy.lastUpdated}</span>
+      render: (policy) => <span className="text-label text-subtle font-medium">{policy.lastUpdated}</span>
     },
     {
-      header: "Actions",
+      header: "",
       headerClassName: "text-right",
       render: (policy) => (
         <div className="flex justify-end">

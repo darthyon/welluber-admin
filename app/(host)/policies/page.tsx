@@ -13,7 +13,7 @@ import {
   CheckCircle,
   Warning,
 } from "@phosphor-icons/react";
-import { cn } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import { EmptyState } from "@/components/shared/empty-state";
 import { FilterItem } from "@/components/shared/filter-item";
 import { StatusBadge } from "@/components/shared/status-badge";
@@ -300,14 +300,15 @@ function PoliciesContent() {
     {
       header: "Policy Name",
       accessorKey: "name",
+      sortable: true,
       render: (row) => (
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary border border-primary/10">
             <IdentificationCard size={20} weight="duotone" />
           </div>
           <div>
-            <p className="text-body font-semibold text-foreground">{row.name}</p>
-            <p className="text-label font-mono text-faint tracking-tight leading-none mt-0.5">{row.code}</p>
+            <p className="text-body font-medium text-foreground">{row.name}</p>
+            <p className="text-label font-mono text-subtle tracking-tight leading-none mt-0.5">{row.code}</p>
           </div>
         </div>
       ),
@@ -343,13 +344,13 @@ function PoliciesContent() {
       header: "Last Updated",
       accessorKey: "createdAt",
       render: (row) => (
-        <span className="text-body text-faint font-medium">
-          {new Date(row.createdAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
+        <span className="text-label text-subtle font-medium whitespace-nowrap">
+          {formatDate(row.createdAt)}
         </span>
       ),
     },
     {
-      header: "Actions",
+      header: "",
       headerClassName: "text-right",
       align: "right",
       render: (row) => {

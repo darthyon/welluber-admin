@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Plus, Ticket } from "@phosphor-icons/react";
+import { formatDate } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
 import { StatusBadge } from "@/components/shared/status-badge";
@@ -191,12 +192,12 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
                 {
                   header: "Period",
                   render: (voucher) => (
-                    <div className="text-label text-muted-foreground space-y-0.5">
-                      <p className="font-medium text-subtle">{new Date(voucher.activationPeriod.startDate).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</p>
+                    <div className="text-label space-y-0.5">
+                      <p className="font-medium text-subtle whitespace-nowrap">{formatDate(voucher.activationPeriod.startDate)}</p>
                       {voucher.activationPeriod.endDate ? (
-                        <p>→ {new Date(voucher.activationPeriod.endDate).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</p>
+                        <p className="text-subtle whitespace-nowrap">→ {formatDate(voucher.activationPeriod.endDate)}</p>
                       ) : (
-                        <p className="text-label text-faint italic">Open-ended</p>
+                        <p className="text-faint italic">Open-ended</p>
                       )}
                     </div>
                   ),

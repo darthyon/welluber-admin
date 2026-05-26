@@ -65,8 +65,8 @@ export default function OrgEmployeesPage() {
       header: "Employee",
       render: (e) => (
         <div>
-          <p className="text-body font-semibold text-foreground leading-tight">{e.name}</p>
-          <p className="text-label font-mono text-faint">{e.empCode}</p>
+          <p className="text-body font-medium text-foreground leading-tight whitespace-nowrap">{e.name}</p>
+          <p className="text-label font-mono text-subtle tracking-tight">{e.empCode}</p>
         </div>
       ),
     },
@@ -96,8 +96,8 @@ export default function OrgEmployeesPage() {
       ),
     },
     {
-      header: "Joined",
-      render: (e) => <span className="text-body text-faint">{e.joinDate}</span>,
+      header: "Joined Date",
+      render: (e) => <span className="text-label text-subtle font-medium whitespace-nowrap">{e.joinDate}</span>,
     },
   ]
 
@@ -106,8 +106,8 @@ export default function OrgEmployeesPage() {
       header: "Name",
       render: (d) => (
         <div>
-          <p className="text-body font-semibold text-foreground">{d.name}</p>
-          <p className="text-label text-faint capitalize">{d.relationship}</p>
+          <p className="text-body font-medium text-foreground whitespace-nowrap">{d.name}</p>
+          <p className="text-label text-subtle font-medium capitalize">{d.relationship}</p>
         </div>
       ),
     },
@@ -125,8 +125,8 @@ export default function OrgEmployeesPage() {
       ),
     },
     {
-      header: "Joined",
-      render: (d) => <span className="text-body text-faint">{d.joinDate}</span>,
+      header: "Joined Date",
+      render: (d) => <span className="text-label text-subtle font-medium whitespace-nowrap">{d.joinDate}</span>,
     },
   ]
 
@@ -188,6 +188,7 @@ export default function OrgEmployeesPage() {
             data={filteredEmployees}
             columns={empColumns}
             freezeFirst
+            freezeLast
             onRowClick={(e) => router.push(`${routes.org.employees(orgSlug)}/${e.id}`)}
           />
         )
@@ -203,6 +204,7 @@ export default function OrgEmployeesPage() {
             data={filteredDependents}
             columns={depColumns}
             freezeFirst
+            freezeLast
           />
         )
       )}

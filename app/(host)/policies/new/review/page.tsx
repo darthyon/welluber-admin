@@ -367,8 +367,8 @@ function NewPolicyReviewPageContent() {
                       {emp.name.charAt(0)}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-body font-semibold text-foreground leading-tight">{emp.name}</p>
-                      <p className="text-label text-faint font-mono">{emp.empCode}</p>
+                      <p className="text-body font-medium text-foreground leading-tight">{emp.name}</p>
+                      <p className="text-label font-mono text-subtle">{emp.empCode}</p>
                     </div>
                     <span className="ml-auto text-label text-primary font-medium">Include</span>
                   </button>
@@ -426,14 +426,14 @@ function NewPolicyReviewPageContent() {
                         </td>
                         <td className="p-3">
                           <div className="flex items-center gap-2">
-                            <p className="text-body font-semibold text-foreground">{emp.name}</p>
+                            <p className="text-body font-medium text-foreground">{emp.name}</p>
                             {isBypassed && (
                               <span className="px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 text-micro font-medium">
                                 Added
                               </span>
                             )}
                           </div>
-                          <p className="text-label font-mono text-faint mt-0.5">{emp.empCode}</p>
+                          <p className="text-label font-mono text-subtle mt-0.5">{emp.empCode}</p>
                         </td>
                         <td className="p-3">
                           <span className="text-body text-subtle capitalize">{(emp.employmentType ?? "—").replace(/_/g, " ")}</span>

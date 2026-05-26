@@ -26,7 +26,7 @@ import {
   Rows,
   Info,
 } from "@phosphor-icons/react"
-import { cn } from "@/lib/utils"
+import { cn, formatDate } from "@/lib/utils"
 import { Breadcrumbs } from "@/components/shared/breadcrumbs"
 import { BranchSheet } from "@/components/host/organizations/branch-sheet"
 import { InviteAdminModal } from "@/components/host/organizations/invite-admin-modal"
@@ -425,11 +425,7 @@ function OrganizationDetailContent() {
       status: "active" as const,
       assignedTo: "All Branches",
       employeeCount: 0,
-      lastUpdated: new Date().toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      }),
+      lastUpdated: formatDate(new Date()),
     }
 
     setAssignedPolicies([...assignedPolicies, newPolicy])

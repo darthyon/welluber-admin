@@ -185,8 +185,8 @@ export function SpBranchesTab({ sp }: SpBranchesTabProps) {
                       <GitBranch size={18} weight="fill" />
                     </div>
                     <div>
-                      <p className="text-body font-medium text-foreground group-hover:text-primary transition-colors">{branch.name}</p>
-                      <p className="text-label font-medium text-muted-foreground">{branch.isActive ? "Active branch" : "Inactive branch"}</p>
+                      <p className="text-body font-medium text-foreground group-hover:text-primary transition-colors whitespace-nowrap">{branch.name}</p>
+                      <p className="text-label font-medium text-subtle">{branch.isActive ? "Active branch" : "Inactive branch"}</p>
                     </div>
                   </div>
                 ),
@@ -194,7 +194,7 @@ export function SpBranchesTab({ sp }: SpBranchesTabProps) {
               {
                 header: "Location",
                 render: (branch) => (
-                  <span className="text-body text-subtle">
+                  <span className="text-body text-subtle whitespace-nowrap">
                     {branch.address.city}, {branch.address.state}
                   </span>
                 ),
