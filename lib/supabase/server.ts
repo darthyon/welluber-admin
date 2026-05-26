@@ -6,11 +6,15 @@ export async function createClient() {
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
   if (!url || !key) {
-    return {
-      auth: {
-        getUser: async () => ({ data: { user: null }, error: null }),
+    const authStub = {
+      getUser: async () => ({ data: { user: null }, error: null }),
+    }
+    return new Proxy({ auth: authStub } as Record<string, unknown>, {
+      get(target, prop) {
+        if (prop in target) return target[prop as string]
+        return () => Promise.resolve({ data: null, error: { message: "Supabase not configured" } })
       },
-    } as ReturnType<typeof createServerClient>
+    }) as ReturnType<typeof createServerClient>
   }
 
   const cookieStore = await cookies()
