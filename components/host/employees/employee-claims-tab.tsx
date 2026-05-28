@@ -55,7 +55,7 @@ const columns: Column<EmployeeClaim>[] = [
     accessorKey: "provider",
     render: (row) => (
       <div className="flex items-center gap-1.5 min-w-0">
-        <Storefront size={11} className="text-faint shrink-0" />
+        <Storefront size={14} className="text-faint shrink-0" />
         <p className="text-body text-subtle font-medium truncate">{row.provider}</p>
       </div>
     ),
@@ -65,7 +65,7 @@ const columns: Column<EmployeeClaim>[] = [
     accessorKey: "location",
     render: (row) => (
       <div className="flex items-center gap-1.5 min-w-0">
-        <MapPin size={11} className="text-faint shrink-0" />
+        <MapPin size={14} className="text-faint shrink-0" />
         <p className="text-body text-subtle font-medium truncate">{row.location}</p>
       </div>
     ),
@@ -75,8 +75,8 @@ const columns: Column<EmployeeClaim>[] = [
     accessorKey: "date",
     render: (row) => (
       <div className="flex items-center gap-1.5">
-        <Calendar size={11} className="text-faint shrink-0" />
-        <p className="text-label text-muted-foreground font-medium whitespace-nowrap">{row.date}</p>
+        <Calendar size={14} className="text-faint shrink-0" />
+        <p className="text-label text-subtle font-medium whitespace-nowrap">{row.date}</p>
       </div>
     ),
   },

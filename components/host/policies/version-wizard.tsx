@@ -466,8 +466,8 @@ export function VersionWizard({
                     {emp.name.charAt(0)}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-body font-semibold text-foreground leading-tight">{emp.name}</p>
-                    <p className="text-label text-faint font-mono">{emp.empCode}</p>
+                    <p className="text-body font-medium text-foreground leading-tight">{emp.name}</p>
+                    <p className="text-label font-mono text-subtle">{emp.empCode}</p>
                   </div>
                   <span className="ml-auto text-label text-faint">{emp.department}</span>
                 </button>
@@ -610,7 +610,7 @@ export function VersionWizard({
                           </span>
                         )}
                       </div>
-                      <p className="text-label font-mono text-faint">{emp.empCode}</p>
+                      <p className="text-label font-mono text-subtle">{emp.empCode}</p>
                     </div>
                     <div className="col-span-3">
                       <span className="text-body text-subtle">{emp.department}</span>

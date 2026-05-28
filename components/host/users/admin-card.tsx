@@ -6,16 +6,17 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { ActionPopover } from "@/components/shared/action-popover";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 interface AdminCardProps {
   admin: Administrator;
 }
 
 export function AdminCard({ admin }: AdminCardProps) {
+  const router = useRouter();
   const actions = [
-    { label: "Edit permissions", onClick: () => console.log("Permissions") },
-    { label: "View activity", onClick: () => console.log("Activity") },
-    { label: "Reset password", onClick: () => console.log("Reset") },
+    { label: "View Details", onClick: () => router.push(`/users/administrators/${admin.id}`) },
+    { label: "Edit permissions", onClick: () => console.log("Permissions"), className: "opacity-50 cursor-not-allowed" },
     { label: "Revoke access", onClick: () => console.log("Revoke"), className: "text-destructive" },
   ];
 
@@ -45,7 +46,8 @@ export function AdminCard({ admin }: AdminCardProps) {
     <motion.div
       whileHover={{ y: -2 }}
       transition={{ duration: 0.2 }}
-      className="group relative bg-card border border-border rounded-lg p-5 hover:border-primary/30 hover:shadow-md transition-all duration-300"
+      className="group relative bg-card border border-border rounded-lg p-5 hover:border-primary/30 hover:shadow-md transition-all duration-300 cursor-pointer"
+      onClick={() => router.push(`/users/administrators/${admin.id}`)}
     >
       <div className="flex items-start justify-between mb-8 relative z-10">
         <div className="flex items-center gap-3.5">
@@ -68,7 +70,9 @@ export function AdminCard({ admin }: AdminCardProps) {
             </div>
           </div>
         </div>
-        <ActionPopover actions={actions} />
+        <div onClick={(e) => e.stopPropagation()}>
+          <ActionPopover actions={actions} />
+        </div>
       </div>
 
       {/* Main Content: Standardized Field Grid */}

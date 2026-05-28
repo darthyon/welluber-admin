@@ -1,8 +1,10 @@
 "use client"
 
 import { SharedDataTable } from "@/components/shared/data-table"
+import { formatDate } from "@/lib/utils"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { ActionPopover } from "@/components/shared/action-popover"
+import { Badge } from "@/components/ui/badge"
 import type { SpVoucher, SpVoucherStatus } from "@/types/provider"
 
 export interface VoucherPackageItem extends SpVoucher {
@@ -51,7 +53,7 @@ export function VoucherPackagesTable({
               <p className="text-body font-medium text-foreground leading-none">
                 {voucher.name}
               </p>
-              <p className="text-label font-mono text-muted-foreground bg-muted w-fit px-1.5 py-0.5 rounded leading-none border border-border/50">
+              <p className="text-label font-mono text-subtle tracking-tight bg-muted w-fit px-1.5 py-0.5 rounded leading-none border border-border/50">
                 {voucher.code}
               </p>
             </div>
@@ -72,12 +74,9 @@ export function VoucherPackagesTable({
           render: (voucher) => (
             <div className="flex flex-wrap gap-1 max-w-[200px]">
               {voucher.branchNames.map((name, i) => (
-                <span
-                  key={i}
-                  className="rounded-md border border-border bg-muted/80 px-2 py-0.5 text-label font-semibold text-muted-foreground"
-                >
+                <Badge key={i} variant="outline" className="text-label font-medium whitespace-nowrap">
                   {name}
-                </span>
+                </Badge>
               ))}
             </div>
           ),
@@ -89,9 +88,9 @@ export function VoucherPackagesTable({
             <p className="text-label text-muted-foreground leading-relaxed line-clamp-2 max-w-[300px]">
               {voucher.description || "—"}
               {voucher.bookingRequired && (
-                <span className="ml-2 inline-flex items-center gap-1 text-label font-medium text-primary/70 tracking-tighter bg-primary/5 px-1.5 py-0.5 rounded border border-primary/10">
+                <Badge variant="outline" className="ml-2 text-label font-medium">
                   Booking Required
-                </span>
+                </Badge>
               )}
             </p>
           ),
@@ -99,26 +98,16 @@ export function VoucherPackagesTable({
         {
           header: "Period",
           render: (voucher) => (
-            <div className="text-label text-muted-foreground space-y-0.5">
-              <p className="font-medium text-subtle">
-                {new Date(voucher.activationPeriod.startDate).toLocaleDateString(
-                  "en-GB",
-                  { day: "2-digit", month: "short", year: "numeric" }
-                )}
+            <div className="text-label space-y-0.5">
+              <p className="font-medium text-subtle whitespace-nowrap">
+                {formatDate(voucher.activationPeriod.startDate)}
               </p>
               {voucher.activationPeriod.endDate ? (
-                <p>
-                  →{" "}
-                  {new Date(
-                    voucher.activationPeriod.endDate
-                  ).toLocaleDateString("en-GB", {
-                    day: "2-digit",
-                    month: "short",
-                    year: "numeric",
-                  })}
+                <p className="text-subtle whitespace-nowrap">
+                  → {formatDate(voucher.activationPeriod.endDate)}
                 </p>
               ) : (
-                <p className="text-label text-faint italic">Open-ended</p>
+                <p className="text-faint italic">Open-ended</p>
               )}
             </div>
           ),

@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { SharedDataTable, Column } from "@/components/shared/data-table";
+import { formatDate } from "@/lib/utils";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ActionPopover } from "@/components/shared/action-popover";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -86,8 +87,8 @@ export function SpDataTable({ data }: SpDataTableProps) {
       headerClassName: "text-right",
       align: "right",
       render: (sp) => (
-        <span className="text-label text-muted-foreground font-medium">
-          {new Date(sp.createdAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
+        <span className="text-label text-subtle font-medium whitespace-nowrap">
+          {formatDate(sp.createdAt)}
         </span>
       ),
     },

@@ -42,7 +42,7 @@ export function EmployeeDirectoryTable({
                 <span className="text-body font-medium text-foreground transition-colors group-hover:text-primary">
                   {emp.name}
                 </span>
-                <span className="mt-0.5 text-label font-medium text-muted-foreground">
+                <span className="mt-0.5 text-label font-medium text-subtle">
                   {emp.email}
                 </span>
               </div>
@@ -63,7 +63,7 @@ export function EmployeeDirectoryTable({
             accessorKey: "empCode",
             sortable: true,
             render: (emp) => (
-              <span className="text-body font-medium text-subtle">
+              <span className="text-label font-mono text-subtle tracking-tight">
                 {emp.empCode}
               </span>
             ),

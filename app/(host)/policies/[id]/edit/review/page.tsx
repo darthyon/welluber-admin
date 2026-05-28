@@ -52,8 +52,8 @@ const employeeColumns: Column<EmployeeDirectoryItem>[] = [
     accessorKey: "name",
     render: (e) => (
       <div>
-        <p className="text-body font-semibold text-foreground">{e.name}</p>
-        <p className="text-label font-mono text-faint mt-0.5">{e.empCode}</p>
+        <p className="text-body font-medium text-foreground">{e.name}</p>
+        <p className="text-label font-mono text-subtle mt-0.5">{e.empCode}</p>
       </div>
     ),
   },

@@ -47,13 +47,13 @@ export function useSession(): { user: SessionUser | null; isAuthenticated: boole
   useEffect(() => {
     const supabase = createClient()
 
-    supabase.auth.getUser().then(({ data }) => {
+    supabase.auth.getUser().then(({ data }: { data: { user: User | null } }) => {
       if (data.user) setUser(mapUser(data.user))
     })
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_, session) => {
+    } = supabase.auth.onAuthStateChange((_: string, session: { user: User } | null) => {
       setUser(session?.user ? mapUser(session.user) : null)
     })
 

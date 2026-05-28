@@ -3,18 +3,17 @@
 import { useState } from "react";
 import { CaretDown, MapPin, Calendar, Storefront, Receipt } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
+import { StatusBadge } from "@/components/shared/status-badge";
 import type { Claim, EmployeeUtilisationRow } from "@/types/claims";
 
 export type { Claim, EmployeeUtilisationRow };
 
-// ─── Status badge ─────────────────────────────────────────────────────────────
-
-const STATUS_STYLE: Record<Claim["status"], string> = {
-  "pre-auth":      "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20",
-  confirmed:       "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20",
-  cancelled:       "bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20",
-  pending_review:  "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20",
-  flagged:         "bg-destructive/10 text-destructive border border-destructive/20",
+const CLAIM_STATUS_VARIANT: Record<Claim["status"], "amber" | "emerald" | "rose" | "primary" | "zinc"> = {
+  "pre-auth":     "amber",
+  confirmed:      "emerald",
+  cancelled:      "rose",
+  pending_review: "primary",
+  flagged:        "rose",
 };
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -50,11 +49,11 @@ export function UtilisationClaimsTable({ data }: Props) {
     <div className="border border-border rounded-lg bg-card shadow-sm overflow-hidden flex flex-col">
       {/* Table header */}
       <div className="grid grid-cols-[2.5fr_1.5fr_140px_260px_80px] p-4 bg-muted/30 border-b border-border/60">
-        <p className="text-body font-semibold text-muted-foreground whitespace-nowrap">Employee</p>
-        <p className="text-body font-semibold text-muted-foreground whitespace-nowrap">Branch</p>
-        <p className="text-body font-semibold text-muted-foreground whitespace-nowrap text-right pr-4">Allocated</p>
-        <p className="text-body font-semibold text-muted-foreground whitespace-nowrap pl-3 text-left">Claims Usage</p>
-        <p className="text-body font-semibold text-muted-foreground whitespace-nowrap text-center">Claims</p>
+        <p className="text-label font-medium text-subtle whitespace-nowrap">Employee</p>
+        <p className="text-label font-medium text-subtle whitespace-nowrap">Branch</p>
+        <p className="text-label font-medium text-subtle whitespace-nowrap text-right pr-4">Allocated</p>
+        <p className="text-label font-medium text-subtle whitespace-nowrap pl-3 text-left">Claims Usage</p>
+        <p className="text-label font-medium text-subtle whitespace-nowrap text-center">Claims</p>
       </div>
 
       {data.map((emp) => {
@@ -71,7 +70,7 @@ export function UtilisationClaimsTable({ data }: Props) {
             >
               <div>
                 <p className="text-body font-medium text-foreground group-hover:text-primary transition-colors">{emp.name}</p>
-                <p className="text-label text-muted-foreground font-medium mt-0.5">{emp.empCode}</p>
+                <p className="text-label font-mono text-subtle mt-0.5">{emp.empCode}</p>
               </div>
 
               <p className="text-label font-semibold px-2 py-0.5 rounded-md bg-muted text-muted-foreground border border-border w-fit">{emp.branch}</p>
@@ -116,7 +115,7 @@ export function UtilisationClaimsTable({ data }: Props) {
                 {/* Claims sub-header */}
                 <div className="grid grid-cols-[140px_1fr_1fr_1fr_110px_90px] gap-3 px-10 py-2.5 border-b border-border/40">
                   {["Voucher", "Service", "Provider", "Location", "Date", "Amount"].map((h) => (
-                    <p key={h} className="text-label font-semibold text-faint font-sans">{h}</p>
+                    <p key={h} className="text-label font-medium text-subtle">{h}</p>
                   ))}
                 </div>
 
@@ -130,27 +129,25 @@ export function UtilisationClaimsTable({ data }: Props) {
                     >
                       {/* Voucher + status */}
                       <div className="flex items-center gap-2">
-                        <span className={cn("text-label font-medium px-1.5 py-0.5 rounded", STATUS_STYLE[claim.status])}>
-                          {claim.status}
-                        </span>
-                        <span className="text-label font-semibold text-primary cursor-pointer hover:underline underline-offset-2">{claim.voucherName || claim.voucherCode}</span>
+                        <StatusBadge status={claim.status} variant={CLAIM_STATUS_VARIANT[claim.status]} />
+                        <span className="text-label font-medium text-primary cursor-pointer hover:underline underline-offset-2">{claim.voucherName || claim.voucherCode}</span>
                       </div>
 
                       <p className="text-label text-subtle font-medium">{claim.service}</p>
 
                       <div className="flex items-center gap-1.5 min-w-0">
-                        <Storefront size={11} className="text-faint shrink-0" />
+                        <Storefront size={14} className="text-faint shrink-0" />
                         <p className="text-label text-subtle truncate">{claim.provider}</p>
                       </div>
 
                       <div className="flex items-center gap-1.5 min-w-0">
-                        <MapPin size={11} className="text-faint shrink-0" />
+                        <MapPin size={14} className="text-faint shrink-0" />
                         <p className="text-label text-subtle truncate">{claim.location}</p>
                       </div>
 
                       <div className="flex items-center gap-1.5">
-                        <Calendar size={11} className="text-faint shrink-0" />
-                        <p className="text-label text-muted-foreground whitespace-nowrap">{claim.date}</p>
+                        <Calendar size={14} className="text-faint shrink-0" />
+                        <p className="text-label text-subtle whitespace-nowrap">{claim.date}</p>
                       </div>
 
                       <p className="text-label font-semibold font-mono text-foreground text-right">

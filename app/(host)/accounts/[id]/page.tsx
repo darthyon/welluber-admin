@@ -31,7 +31,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { ConfirmationModal } from "@/components/shared/confirmation-modal";
 import { SharedDataTable } from "@/components/shared/data-table";
 import { useState, Suspense } from "react";
-import { cn } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import { UpdateBalanceModal } from "@/components/host/accounts/update-balance-modal";
 import { RecordTopupModal } from "@/components/host/accounts/record-topup-modal";
 
@@ -425,10 +425,10 @@ function AccountDetailContent() {
                       align: "center",
                       render: (trx: AccountTransactionRow) => (
                         <div className="text-center">
-                          <p className="text-body font-semibold text-subtle">
-                            {new Date(trx.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                          <p className="text-body font-medium text-subtle whitespace-nowrap">
+                            {formatDate(trx.createdAt)}
                           </p>
-                          <p className="text-label font-semibold text-faint">
+                          <p className="text-label font-medium text-faint">
                             {new Date(trx.createdAt).toLocaleTimeString('en-MY', { hour: '2-digit', minute: '2-digit' })}
                           </p>
                         </div>
@@ -469,8 +469,8 @@ function AccountDetailContent() {
                 />
                 <DetailField label="Organization" value={wallet.orgName} />
                 <DetailField label="Branch" value={wallet.branchName} />
-                <DetailField label="Creation date" value={new Date(wallet.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} />
-                <DetailField label="Last activity" value={new Date(wallet.updatedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} />
+                <DetailField label="Creation date" value={formatDate(wallet.createdAt)} />
+                <DetailField label="Last activity" value={formatDate(wallet.updatedAt)} />
               </div>
             </DetailSection>
           </div>
