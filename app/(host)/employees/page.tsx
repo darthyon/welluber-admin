@@ -3,7 +3,8 @@
 import { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { Plus, Users } from "@phosphor-icons/react"
+import { Plus, Upload, Users } from "@phosphor-icons/react"
+import { BulkUploadWizard } from "@/components/host/organizations/bulk-upload-wizard"
 import { Button } from "@/components/ui/button"
 import { DataFilterBar } from "@/components/shared/data-filter-bar"
 import { FilterItem } from "@/components/shared/filter-item"
@@ -28,6 +29,7 @@ const POLICY_STATUS_OPTIONS = [
 
 export default function EmployeesPage() {
   const router = useRouter()
+  const [showBulkUpload, setShowBulkUpload] = useState(false)
   const [viewMode, setViewMode] = useState<ViewMode>("list")
   const [searchQuery, setSearchQuery] = useState("")
   const [orgFilter, setOrgFilter] = useState("all")
@@ -60,6 +62,15 @@ export default function EmployeesPage() {
     return result
   }, [searchQuery, orgFilter, policyFilter])
 
+  if (showBulkUpload) {
+    return (
+      <BulkUploadWizard
+        onBack={() => setShowBulkUpload(false)}
+        onSuccess={() => setShowBulkUpload(false)}
+      />
+    )
+  }
+
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -71,6 +82,14 @@ export default function EmployeesPage() {
         </div>
         <div className="flex items-center gap-3">
           <ViewToggle mode={viewMode} onChange={setViewMode} />
+          <Button
+            size="sm"
+            variant="secondary"
+            className="h-9 text-label gap-2"
+            onClick={() => setShowBulkUpload(true)}
+          >
+            <Upload size={14} weight="bold" /> Bulk Upload
+          </Button>
           <Link href="/employees/new">
             <Button size="sm" variant="secondary" className="h-9 text-label gap-2">
               <Plus size={14} weight="bold" /> Add Employee

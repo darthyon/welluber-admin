@@ -31,6 +31,7 @@ export const routes = {
     vouchers: (slug: string) => `/${slug}/vouchers`,
     activity: (slug: string) => `/${slug}/activity`,
     transactions: (slug: string) => `/${slug}/transactions`,
+    reports: (slug: string) => `/${slug}/reports`,
     settings: (slug: string) => `/${slug}/settings`,
   },
   sp: {
