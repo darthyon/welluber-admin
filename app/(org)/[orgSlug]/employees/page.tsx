@@ -2,7 +2,10 @@
 
 import { useState, useMemo } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { Users, IdentificationCard } from "@phosphor-icons/react"
+import Link from "next/link"
+import { Users, IdentificationCard, Upload, Plus } from "@phosphor-icons/react"
+import { Button } from "@/components/ui/button"
+import { BulkUploadWizard } from "@/components/host/organizations/bulk-upload-wizard"
 import { SharedDataTable, type Column } from "@/components/shared/data-table"
 import { DataFilterBar } from "@/components/shared/data-filter-bar"
 import { FilterItem } from "@/components/shared/filter-item"
@@ -23,6 +26,7 @@ export default function OrgEmployeesPage() {
   const orgSlug = params.orgSlug as string
   const orgId = ORG_BY_SLUG[orgSlug] ?? ""
 
+  const [showBulkUpload, setShowBulkUpload] = useState(false)
   const [activeTab, setActiveTab] = useState<"directory" | "dependents">("directory")
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
@@ -130,13 +134,39 @@ export default function OrgEmployeesPage() {
     },
   ]
 
+  if (showBulkUpload) {
+    return (
+      <BulkUploadWizard
+        onBack={() => setShowBulkUpload(false)}
+        onSuccess={() => setShowBulkUpload(false)}
+      />
+    )
+  }
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-foreground">Employees</h1>
-        <p className="text-muted-foreground mt-0.5 text-body">
-          {employees.length} employees · {dependents.length} dependents
-        </p>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold text-foreground">Employees</h1>
+          <p className="text-muted-foreground mt-0.5 text-body">
+            {employees.length} employees · {dependents.length} dependents
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="secondary"
+            size="sm"
+            className="h-9 gap-2 text-label"
+            onClick={() => setShowBulkUpload(true)}
+          >
+            <Upload size={14} weight="bold" /> Bulk Upload
+          </Button>
+          <Link href={`/${orgSlug}/employees/new`}>
+            <Button variant="secondary" size="sm" className="h-9 gap-2 text-label">
+              <Plus size={14} weight="bold" /> Add Employee
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Tabs */}

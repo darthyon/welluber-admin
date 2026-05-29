@@ -8,6 +8,7 @@ import {
   Shield,
   SealCheck,
   Ticket,
+  ChartBar,
   ClockCounterClockwise,
   Gear,
   CaretDoubleLeft,
@@ -72,6 +73,10 @@ export function OrgSidebar({ orgSlug, ...props }: OrgSidebarProps) {
     { title: "Benefit Policies", url: routes.org.policies(orgSlug), icon: Shield },
     { title: "Claims", url: routes.org.claims(orgSlug), icon: SealCheck },
     { title: "Vouchers", url: routes.org.vouchers(orgSlug), icon: Ticket },
+  ]
+
+  const navReporting: NavMainItem[] = [
+    { title: "Reports", url: routes.org.reports(orgSlug), icon: ChartBar },
   ]
 
   const navAccount: NavMainItem[] = [
@@ -198,6 +203,15 @@ export function OrgSidebar({ orgSlug, ...props }: OrgSidebarProps) {
             </SidebarGroupLabel>
             <SidebarGroupContent>
               <NavMain items={navBenefits} />
+            </SidebarGroupContent>
+          </SidebarGroup>
+
+          <SidebarGroup className="py-2.5">
+            <SidebarGroupLabel className="text-label font-medium text-sidebar-foreground/70 mb-2 px-3 group-data-[collapsible=icon]:hidden uppercase">
+              Reporting
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <NavMain items={navReporting} />
             </SidebarGroupContent>
           </SidebarGroup>
 
