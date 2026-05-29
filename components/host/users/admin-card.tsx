@@ -13,10 +13,10 @@ interface AdminCardProps {
 
 export function AdminCard({ admin }: AdminCardProps) {
   const actions = [
-    { label: "Edit permissions", onClick: () => console.log("Permissions") },
-    { label: "View activity", onClick: () => console.log("Activity") },
-    { label: "Reset password", onClick: () => console.log("Reset") },
-    { label: "Revoke access", onClick: () => console.log("Revoke"), className: "text-destructive" },
+    { label: "Edit permissions", onClick: () => {} },
+    { label: "View activity", onClick: () => {} },
+    { label: "Reset password", onClick: () => {} },
+    { label: "Revoke access", onClick: () => {}, className: "text-destructive" },
   ];
 
   const getRoleStyle = (role: string) => {

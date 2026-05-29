@@ -170,9 +170,9 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
             <ActionPopover 
               align="end"
               actions={[
-                { label: "Reset Password", onClick: () => console.log("Reset Password") },
-                { label: "Download Records", onClick: () => console.log("Download Records") },
-                { label: "Terminate Link", isDanger: true, onClick: () => console.log("Terminate") },
+                { label: "Reset Password", onClick: () => {} },
+                { label: "Download Records", onClick: () => {} },
+                { label: "Terminate Link", isDanger: true, onClick: () => {} },
               ]}
             />
           </div>

@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { BrandForm } from "@/components/host/brands/brand-form"
+import { BrandForm, type BrandFormData } from "@/components/host/brands/brand-form"
 import { CaretLeft, Plus } from "@phosphor-icons/react"
 import { useState } from "react"
 import { SuccessModal } from "@/components/shared/success-modal"
@@ -13,7 +13,7 @@ export default function NewBrandPage() {
   const [isSuccess, setIsSuccess] = useState(false)
   const [formKey, setFormKey] = useState(0)
 
-  const handleSubmit = async (data: unknown) => {
+  const handleSubmit = async (data: BrandFormData) => {
     setIsSubmitting(true)
     // Simulate API call
     void data

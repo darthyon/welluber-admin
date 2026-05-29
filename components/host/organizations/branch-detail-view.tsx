@@ -278,7 +278,7 @@ export function BranchDetailView({ branchId, onBack, onEdit }: BranchDetailViewP
                 <StatusBadge status="Admin" variant="emerald" />
                 <ActionPopover
                   actions={[
-                    { label: "View Details", onClick: () => console.log("View", admin.name) },
+                    { label: "View Details", onClick: () => {} },
                     { label: "Reset Password", onClick: () => handleResetPassword(admin.email) },
                   ]}
                 />

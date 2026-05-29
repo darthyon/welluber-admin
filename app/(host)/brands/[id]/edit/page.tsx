@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation"
 import { useState } from "react"
-import { BrandForm } from "@/components/host/brands/brand-form"
+import { BrandForm, type BrandFormData } from "@/components/host/brands/brand-form"
 import { CaretLeft } from "@phosphor-icons/react"
 import { MOCK_BRANDS } from "@/lib/mock-data"
 
@@ -14,7 +14,7 @@ export default function EditBrandPage() {
   const brandId = params.id as string
   const brand = MOCK_BRANDS.find((b) => b.id === brandId) ?? null
 
-  const handleSubmit = async (data: unknown) => {
+  const handleSubmit = async (data: BrandFormData) => {
     setIsSubmitting(true)
     // Simulate API call
     void data

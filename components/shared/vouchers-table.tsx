@@ -209,7 +209,7 @@ export function VouchersTable({ data, onViewVoucher }: Props) {
             {
               label: "Download",
               icon: <Download size={14} />,
-              onClick: () => console.log("Download voucher", row.id),
+              onClick: () => {},
             },
           ]}
         />

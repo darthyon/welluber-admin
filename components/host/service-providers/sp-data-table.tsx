@@ -102,7 +102,7 @@ export function SpDataTable({ data }: SpDataTableProps) {
             { label: "Actions", isSectionTitle: true },
             {
               label: sp.status === "suspended" ? "Activate SP" : "Suspend SP",
-              onClick: () => console.log("toggle status", sp.id),
+              onClick: () => {},
               className: sp.status === "suspended" ? "text-primary font-semibold" : "text-destructive font-semibold",
             },
           ]}

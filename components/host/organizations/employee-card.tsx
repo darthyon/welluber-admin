@@ -18,24 +18,25 @@ export type EmployeeBenefitPolicy = {
   utilisation: number; // 0-100
 };
 
+export interface EmployeeCardEmployee {
+  id: string;
+  name: string;
+  email: string;
+  organization?: string;
+  branch: string;
+  status: string;
+  empCode: string;
+  joinDate: string;
+  lastActive?: string;
+  department?: string;
+  tier?: string;
+  employmentType?: string;
+  benefitPolicies: EmployeeBenefitPolicy[];
+  dependentsCount: number;
+}
+
 interface EmployeeCardProps {
-  employee: {
-    id: string;
-    name: string;
-    email: string;
-    organization?: string;
-    branch: string;
-    status: string;
-    employeeId: string;
-    empCode: string;
-    joinDate: string;
-    lastActive?: string;
-    department?: string;
-    tier?: string;
-    employmentType?: string;
-    benefitPolicies: EmployeeBenefitPolicy[];
-    dependentsCount: number;
-  };
+  employee: EmployeeCardEmployee;
   onEdit?: (id: string) => void;
   onView?: (id: string) => void;
 }
@@ -148,7 +149,7 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
           actions={[
             { label: "View employee", onClick: () => onView?.(employee.id) },
             { label: "Edit employee", onClick: () => onEdit?.(employee.id) },
-            { label: "Terminate link", isDanger: true, onClick: () => console.log("Terminate", employee.id) },
+            { label: "Terminate link", isDanger: true, onClick: () => {} },
           ]}
         />
       </div>

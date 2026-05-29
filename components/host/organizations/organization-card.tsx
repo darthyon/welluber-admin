@@ -57,7 +57,7 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
     },
     { 
       label: "Quick invite admin", 
-      onClick: () => console.log("Invite clicked") 
+      onClick: () => {} 
     },
     { 
       label: "Organisation settings", 

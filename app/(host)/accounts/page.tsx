@@ -180,7 +180,7 @@ export default function AccountsPage() {
                       wallet.status === "suspended"
                         ? "Resume account"
                         : "Suspend account",
-                    onClick: () => console.log("Toggle status", wallet.id),
+                    onClick: () => {},
                     className:
                       wallet.status === "suspended"
                         ? "text-primary font-semibold"
@@ -353,8 +353,7 @@ export default function AccountsPage() {
                       },
                       {
                         label: "Create account",
-                        onClick: () =>
-                          console.log("Create account", row.orgId),
+                        onClick: () => {},
                       },
                     ]}
                   />

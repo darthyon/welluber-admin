@@ -235,8 +235,8 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
                         actions={[
                           { label: "View Voucher Package", onClick: () => handleView(voucher) },
                           { label: "Edit Voucher Package", onClick: () => handleEdit(voucher) },
-                          { label: "Suspend Voucher", onClick: () => console.log("Suspend", voucher.id) },
-                          { label: "Remove Voucher", isDanger: true, onClick: () => console.log("Remove", voucher.id) },
+                          { label: "Suspend Voucher", onClick: () => {} },
+                          { label: "Remove Voucher", isDanger: true, onClick: () => {} },
                         ]}
                       />
                     </div>

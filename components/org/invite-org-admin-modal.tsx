@@ -29,8 +29,7 @@ export function InviteOrgAdminModal({ orgId, isOpen, onClose }: Props) {
   const [success, setSuccess] = useState<string | null>(null)
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm<FormData>({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    resolver: zodResolver(schema as any),
+    resolver: zodResolver(schema),
   })
 
   if (!isOpen) return null

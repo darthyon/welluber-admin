@@ -197,7 +197,7 @@ export function EmployeeClaimsTab({ employeeId }: EmployeeClaimsTabProps) {
           />
         }
         actions={
-          <Button variant="ghost" className="gap-2 text-label" onClick={() => console.log("Export CSV")}>
+          <Button variant="ghost" className="gap-2 text-label" onClick={() => {}}>
             <Download size={14} />
             Export CSV
           </Button>
