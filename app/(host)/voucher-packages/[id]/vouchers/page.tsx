@@ -10,6 +10,7 @@ import { SharedDataTable } from "@/components/shared/data-table"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { EmptyState } from "@/components/shared/empty-state"
 import { Breadcrumbs } from "@/components/shared/breadcrumbs"
+import { formatDate } from "@/lib/utils"
 import { MOCK_GENERATED_VOUCHERS } from "@/lib/mock-data"
 import { MOCK_SPS } from "@/lib/mock-data"
 import type { GeneratedVoucherStatus } from "@/features/voucher-packages/types"
@@ -182,8 +183,8 @@ export default function GeneratedVouchersPage() {
               align: "center",
               render: (v: (typeof filteredVouchers)[number]) => (
                 <div className="text-center">
-                  <p className="text-body font-semibold text-subtle">
-                    {new Date(v.generatedAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
+                  <p className="text-body font-medium text-subtle whitespace-nowrap">
+                    {formatDate(v.generatedAt)}
                   </p>
                 </div>
               ),
@@ -195,8 +196,8 @@ export default function GeneratedVouchersPage() {
               render: (v: (typeof filteredVouchers)[number]) => (
                 <div className="text-center">
                   {v.redeemedAt ? (
-                    <p className="text-body font-semibold text-subtle">
-                      {new Date(v.redeemedAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
+                    <p className="text-body font-medium text-subtle whitespace-nowrap">
+                      {formatDate(v.redeemedAt)}
                     </p>
                   ) : (
                     <span className="text-label text-faint">—</span>

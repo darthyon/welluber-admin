@@ -20,7 +20,7 @@ import {
   ShieldCheck
 } from "@phosphor-icons/react";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ConfirmationModal } from "@/components/shared/confirmation-modal";
@@ -264,7 +264,7 @@ export default function ServiceProviderDetailPage() {
                             />
                         }
                     />
-                    <DetailField label="On Platform Since" value={new Date(sp.createdAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })} />
+                    <DetailField label="On Platform Since" value={formatDate(sp.createdAt)} />
                 </div>
               </div>
             </DetailSection>

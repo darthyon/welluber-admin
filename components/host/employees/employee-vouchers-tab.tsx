@@ -151,7 +151,7 @@ function VoucherCard({ voucher }: { voucher: VoucherRedemption }) {
               {voucher.provider}
             </p>
             <div className="flex items-center gap-1 text-label text-muted-foreground font-medium">
-              <MapPin size={12} className="shrink-0" />
+              <MapPin size={14} className="shrink-0" />
               {voucher.city}
             </div>
           </div>
@@ -193,10 +193,10 @@ const columns: Column<VoucherRedemption>[] = [
     header: "Voucher",
     render: (row) => (
       <div className="flex flex-col gap-0.5">
-        <p className="text-body font-semibold text-primary cursor-pointer hover:underline underline-offset-2">
+        <p className="text-body font-medium text-primary cursor-pointer hover:underline underline-offset-2">
           {row.voucherName}
         </p>
-        <code className="text-label font-mono text-muted-foreground">
+        <code className="text-label font-mono text-subtle tracking-tight">
           {row.voucherCode}
         </code>
       </div>
@@ -220,8 +220,8 @@ const columns: Column<VoucherRedemption>[] = [
     accessorKey: "date",
     render: (row) => (
       <div className="flex items-center gap-1.5">
-        <Calendar size={11} className="text-faint shrink-0" />
-        <p className="text-label text-muted-foreground font-medium whitespace-nowrap">
+        <Calendar size={14} className="text-faint shrink-0" />
+        <p className="text-label text-subtle font-medium whitespace-nowrap">
           {row.date}
         </p>
       </div>
@@ -234,7 +234,7 @@ const columns: Column<VoucherRedemption>[] = [
         <p className="text-body font-medium text-foreground">
           {row.redeemedBy}
         </p>
-        <p className="text-label text-muted-foreground font-medium mt-0.5">
+        <p className="text-label text-subtle font-medium mt-0.5">
           {row.redeemedByType}
         </p>
       </div>
@@ -254,7 +254,7 @@ const columns: Column<VoucherRedemption>[] = [
     header: "Service Provider",
     render: (row) => (
       <div className="flex items-center gap-1.5 min-w-0">
-        <Storefront size={11} className="text-faint shrink-0" />
+        <Storefront size={14} className="text-faint shrink-0" />
         <p className="text-body text-subtle font-medium truncate">
           {row.provider}
         </p>
@@ -266,13 +266,13 @@ const columns: Column<VoucherRedemption>[] = [
     render: (row) => (
       <div className="flex flex-col gap-0.5">
         <div className="flex items-center gap-1.5">
-          <Buildings size={11} className="text-faint shrink-0" />
+          <Buildings size={14} className="text-faint shrink-0" />
           <p className="text-body font-medium text-foreground truncate">
             {row.branch}
           </p>
         </div>
-        <div className="flex items-center gap-1.5 text-label text-muted-foreground font-medium">
-          <MapPin size={11} className="shrink-0" />
+        <div className="flex items-center gap-1.5 text-label text-subtle font-medium">
+          <MapPin size={14} className="shrink-0" />
           {row.city}
         </div>
       </div>

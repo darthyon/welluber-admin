@@ -7,8 +7,9 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   const isLoginPage = pathname.startsWith("/login")
+  const hasCredentials = !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
 
-  if (!user && !isLoginPage) {
+  if (!user && !isLoginPage && hasCredentials) {
     const url = request.nextUrl.clone()
     url.pathname = "/login/host"
     return NextResponse.redirect(url)

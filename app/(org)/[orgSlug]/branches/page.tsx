@@ -87,8 +87,8 @@ export default function OrgBranchesPage() {
       header: "Branch",
       render: (b) => (
         <div>
-          <p className="text-body font-semibold text-foreground">{b.name}</p>
-          <p className="text-label text-faint">{b.address.city}, {b.address.state}</p>
+          <p className="text-body font-medium text-foreground whitespace-nowrap">{b.name}</p>
+          <p className="text-label text-subtle font-medium whitespace-nowrap">{b.address.city}, {b.address.state}</p>
         </div>
       ),
     },
@@ -100,13 +100,15 @@ export default function OrgBranchesPage() {
     {
       header: "Employees",
       headerClassName: "text-right",
-      render: (b) => <span className="block text-right text-body font-semibold tabular-nums">{b.employeesCount.toLocaleString()}</span>,
+      align: "right",
+      render: (b) => <span className="text-body font-medium tabular-nums">{b.employeesCount.toLocaleString()}</span>,
     },
     {
       header: "Balance",
       headerClassName: "text-right",
+      align: "right",
       render: (b) => (
-        <span className="block text-right text-body font-semibold tabular-nums">
+        <span className="text-body font-medium font-mono tabular-nums">
           RM {(b.cashBalance + b.creditBalance).toLocaleString()}
         </span>
       ),
@@ -114,7 +116,8 @@ export default function OrgBranchesPage() {
     {
       header: "Claims",
       headerClassName: "text-right",
-      render: (b) => <span className="block text-right text-body tabular-nums text-subtle">{b.claimsCount}</span>,
+      align: "right",
+      render: (b) => <span className="text-body font-medium tabular-nums text-subtle">{b.claimsCount}</span>,
     },
   ]
 
@@ -151,6 +154,8 @@ export default function OrgBranchesPage() {
           data={filtered}
           columns={listColumns}
           freezeFirst
+          freezeLast
+          rowsPerPage={10}
           onRowClick={(b) => router.push(`${routes.org.branches(orgSlug)}/${b.id}`)}
         />
       )}

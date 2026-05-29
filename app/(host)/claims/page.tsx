@@ -68,7 +68,7 @@ export default function ClaimsPage() {
       header: "Claim ID",
       accessorKey: "id",
       render: (row) => (
-        <code className="text-label font-mono text-muted-foreground">
+        <code className="text-label font-mono text-subtle tracking-tight whitespace-nowrap">
           {row.id}
         </code>
       ),
@@ -78,10 +78,10 @@ export default function ClaimsPage() {
       accessorKey: "employeeName",
       render: (row) => (
         <div>
-          <p className="text-body font-medium text-foreground">
+          <p className="text-body font-medium text-foreground whitespace-nowrap">
             {row.employeeName}
           </p>
-          <p className="text-label text-muted-foreground font-medium mt-0.5">
+          <p className="text-label font-mono text-subtle font-medium mt-0.5 tracking-tight">
             {row.empCode}
           </p>
         </div>
@@ -101,7 +101,7 @@ export default function ClaimsPage() {
       accessorKey: "provider",
       render: (row) => (
         <div className="flex items-center gap-1.5 min-w-0">
-          <MapPin size={11} className="text-faint shrink-0" />
+          <MapPin size={14} className="text-faint shrink-0" />
           <p className="text-body text-subtle font-medium truncate">
             {row.provider}
           </p>
@@ -112,7 +112,7 @@ export default function ClaimsPage() {
       header: "Service",
       accessorKey: "service",
       render: (row) => (
-        <p className="text-label font-medium text-foreground">{row.service}</p>
+        <p className="text-label font-medium text-foreground whitespace-nowrap">{row.service}</p>
       ),
     },
     {
@@ -120,7 +120,7 @@ export default function ClaimsPage() {
       render: (row) => (
         <div className="flex items-center gap-1.5 text-primary">
           <Ticket size={14} weight="bold" />
-          <span className="text-label font-semibold">
+          <span className="text-label font-medium whitespace-nowrap">
             {row.voucherName || row.voucherCode}
           </span>
         </div>
@@ -157,8 +157,8 @@ export default function ClaimsPage() {
       accessorKey: "date",
       render: (row) => (
         <div className="flex items-center gap-1.5">
-          <Calendar size={11} className="text-faint shrink-0" />
-          <p className="text-label text-muted-foreground font-medium whitespace-nowrap">
+          <Calendar size={14} className="text-faint shrink-0" />
+          <p className="text-label text-subtle font-medium whitespace-nowrap">
             {row.date}
           </p>
         </div>

@@ -84,10 +84,10 @@ export default function OrgPoliciesPage() {
             <IdentificationCard size={20} weight="duotone" />
           </div>
           <div>
-            <p className="text-body font-semibold text-foreground group-hover:text-primary transition-colors leading-tight">
+            <p className="text-body font-medium text-foreground group-hover:text-primary transition-colors leading-tight whitespace-nowrap">
               {p.name}
             </p>
-            <p className="text-label font-mono text-faint tracking-tight">{p.code}</p>
+            <p className="text-label font-mono text-subtle tracking-tight">{p.code}</p>
           </div>
         </div>
       ),
@@ -118,7 +118,7 @@ export default function OrgPoliciesPage() {
       header: "Employees",
       headerClassName: "text-center",
       render: (p) => (
-        <div className="text-center font-semibold text-body text-subtle tabular-nums">
+        <div className="text-center font-medium text-body text-subtle tabular-nums">
           {p.employeeCount.toLocaleString()}
         </div>
       ),
@@ -134,7 +134,7 @@ export default function OrgPoliciesPage() {
     },
     {
       header: "Last Updated",
-      render: (p) => <span className="text-body text-faint font-medium">{p.lastUpdated}</span>,
+      render: (p) => <span className="text-label text-subtle font-medium whitespace-nowrap">{p.lastUpdated}</span>,
     },
   ]
 
@@ -175,6 +175,8 @@ export default function OrgPoliciesPage() {
           data={filtered}
           columns={columns}
           freezeFirst
+          freezeLast
+          rowsPerPage={10}
           onRowClick={(p) => router.push(`${routes.org.policies(orgSlug)}/${p.id}`)}
         />
       )}

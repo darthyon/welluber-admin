@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { Buildings, TreeStructure, MagnifyingGlass, DownloadSimple } from "@phosphor-icons/react";
+import { Buildings, TreeStructure, MagnifyingGlass, DownloadSimple, Eye, PencilSimple } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { SharedDataTable, Column } from "@/components/shared/data-table";
 import { StatusBadge } from "@/components/shared/status-badge";
@@ -17,6 +17,8 @@ import { cn } from "@/lib/utils";
 import { useMounted } from "@/hooks/use-mounted";
 import { EmptyState } from "@/components/shared/empty-state";
 import { EntityAvatar } from "@/components/shared/entity-avatar";
+import { Badge } from "@/components/ui/badge";
+import { ActionPopover } from "@/components/shared/action-popover";
 
 export default function MembersPage() {
   const mounted = useMounted();
@@ -45,15 +47,15 @@ export default function MembersPage() {
 
   const columns: Column<Member>[] = [
     {
-      header: "Member Name",
+      header: "Member",
       accessorKey: "name",
       sortable: true,
       render: (row) => (
         <div className="flex items-center gap-3">
           <EntityAvatar name={row.name} size="sm" />
           <div className="flex flex-col">
-            <span className="font-semibold text-foreground text-body hover:text-primary transition-colors cursor-pointer">{row.name}</span>
-            <span className="text-label text-muted-foreground font-medium">{row.email}</span>
+            <span className="font-medium text-foreground text-body hover:text-primary transition-colors cursor-pointer">{row.name}</span>
+            <span className="text-label text-subtle font-medium">{row.email}</span>
           </div>
         </div>
       )
@@ -63,14 +65,9 @@ export default function MembersPage() {
       accessorKey: "type",
       sortable: true,
       render: (row) => (
-        <span className={cn(
-          "px-2 py-0.5 rounded-full text-label font-medium border backdrop-blur-sm",
-          row.type === "Employee" 
-            ? "bg-primary/10 text-primary border-primary/20" 
-            : "bg-primary/10 text-primary border-primary/20"
-        )}>
+        <Badge variant="secondary" className="text-label font-medium whitespace-nowrap">
           {row.type}
-        </span>
+        </Badge>
       )
     },
     {
@@ -80,7 +77,7 @@ export default function MembersPage() {
       render: (row) => (
         <div className="flex items-center gap-2">
           <Buildings size={16} className="text-faint" />
-          <span className="text-body font-semibold text-subtle">{row.organization.name}</span>
+          <span className="text-body font-medium text-subtle">{row.organization.name}</span>
         </div>
       )
     },
@@ -121,6 +118,29 @@ export default function MembersPage() {
       render: (row) => (
         <span className="text-label font-medium text-subtle">{row.lastActive}</span>
       )
+    },
+    {
+      header: "",
+      headerClassName: "text-right",
+      align: "right",
+      render: (row) => (
+        <div className="flex justify-end">
+          <ActionPopover
+            actions={[
+              {
+                label: "View member",
+                icon: <Eye size={16} />,
+                onClick: () => console.log("view", row.id),
+              },
+              {
+                label: "Edit member",
+                icon: <PencilSimple size={16} />,
+                onClick: () => console.log("edit", row.id),
+              },
+            ]}
+          />
+        </div>
+      ),
     },
   ];
 
