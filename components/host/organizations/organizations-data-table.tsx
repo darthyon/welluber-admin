@@ -211,7 +211,7 @@ export function OrganizationsDataTable({ data }: OrganizationsDataTableProps) {
         <ActionPopover
           actions={[
             { label: "Edit Organisation", href: `/organizations/${org.id}/edit` },
-            { label: "Quick Invite Admin", onClick: () => console.log("Invite clicked") },
+            { label: "Quick Invite Admin", onClick: () => {} },
             { label: "Settings", isSectionTitle: true },
             { label: "Benefit Policies", href: `/organizations/${org.id}?tab=policies`, className: "text-primary font-semibold" }
           ]}

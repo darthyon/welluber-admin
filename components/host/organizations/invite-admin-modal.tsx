@@ -30,8 +30,7 @@ export function InviteAdminModal({ targetId, isOpen, onClose, title = "Invite Ad
   const [success, setSuccess] = useState<string | null>(null);
   
   const { register, handleSubmit, formState: { errors }, reset } = useForm<InviteAdminUiData>({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    resolver: zodResolver(inviteAdminUiSchema as any),
+    resolver: zodResolver(inviteAdminUiSchema),
   });
 
   if (!isOpen) return null;

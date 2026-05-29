@@ -18,10 +18,23 @@ import { FormSelect } from "@/components/shared/form-select";
 import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav";
 import { MOCK_ACCOUNTS } from "@/lib/mock-data";
 
+export interface BranchFormData {
+  name: string;
+  address: {
+    line: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+    lat: string;
+    lon: string;
+  };
+}
+
 interface BranchFormProps {
   branchId?: string | null;
   onCancel: () => void;
-  onSubmit: (data: unknown) => void;
+  onSubmit: (data: BranchFormData) => void;
 }
 
 const ANCHOR_ITEMS = [

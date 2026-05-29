@@ -119,7 +119,6 @@ export default function EmployeesPage() {
                 organization: emp.organization,
                 branch: emp.branch,
                 status: emp.status,
-                employeeId: emp.id,
                 empCode: emp.empCode,
                 joinDate: emp.joinDate,
                 lastActive: emp.lastActive,

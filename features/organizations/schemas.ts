@@ -36,7 +36,7 @@ export const createOrganizationSchema = z.object({
     accountNumber: z.string().min(8, "Account number is required"),
     accountName: z.string().min(2, "Account name is required"),
   }),
-  documents: z.array(z.string()).default([]),
+  documents: z.array(z.string()).optional(),
 });
 
 export type CreateOrganizationData = z.infer<typeof createOrganizationSchema>;

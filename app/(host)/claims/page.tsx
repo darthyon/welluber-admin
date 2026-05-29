@@ -174,17 +174,17 @@ export default function ClaimsPage() {
             {
               label: "View Details",
               icon: <Eye size={14} />,
-              onClick: () => console.log("View claim", row.id),
+              onClick: () => {},
             },
             {
               label: "View Voucher",
               icon: <Ticket size={14} />,
-              onClick: () => console.log("View voucher", row.voucherCode),
+              onClick: () => {},
             },
             {
               label: "Download PDF",
               icon: <Download size={14} />,
-              onClick: () => console.log("Download PDF", row.id),
+              onClick: () => {},
             },
           ]}
         />

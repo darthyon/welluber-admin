@@ -136,11 +136,11 @@ export function BrandDetailView({
           actions={[
             {
               label: "View SP Portal",
-              onClick: () => console.log("view portal", sp.id),
+              onClick: () => {},
             },
             {
               label: "Branches",
-              onClick: () => console.log("manage branches", sp.id),
+              onClick: () => {},
             },
           ]}
         />

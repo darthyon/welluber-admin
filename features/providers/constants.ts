@@ -6,7 +6,7 @@ export const SP_STATUS_OPTIONS = [
   { label: "Pending", value: "pending" },
   { label: "Suspended", value: "suspended" },
   { label: "Removed", value: "removed" },
-] as const;
+];
 
 export const COMMISSION_RATE_MIN = 0.10;
 export const COMMISSION_RATE_MAX = 0.30;

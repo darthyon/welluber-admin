@@ -195,7 +195,7 @@ export function OrganizationClaimsTable({
             {
               label: "Download PDF",
               icon: <Download size={14} />,
-              onClick: () => console.log("Download PDF", row.id),
+              onClick: () => {},
             },
           ]}
         />

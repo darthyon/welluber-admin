@@ -14,7 +14,6 @@ export default function BrandsPage() {
 
   const handleRemoveConfirm = () => {
     if (!removingBrand) return;
-    console.log("Removing brand:", removingBrand.id);
     setRemovingBrand(null);
   };
 

@@ -48,8 +48,7 @@ export function SpInviteAdminModal({
     control,
     formState: { errors },
   } = useForm<InviteSpAdminUiData>({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    resolver: zodResolver(inviteSpAdminUiSchema as any),
+    resolver: zodResolver(inviteSpAdminUiSchema),
     defaultValues: {
       branchIds: [],
     },
@@ -65,7 +64,7 @@ export function SpInviteAdminModal({
         name: `${data.firstName} ${data.lastName}`.trim(),
         position: data.position,
         email: data.email,
-        branchIds: data.branchIds,
+        branchIds: data.branchIds ?? [],
       };
       const res = await inviteSpAdmin(spId, payload);
       if (res.success) {
@@ -207,7 +206,7 @@ export function SpInviteAdminModal({
                     <SearchableMultiSelect
                       taxonomy={branchTaxonomy}
                       staticOptions={["Assign to all branches"]}
-                      selected={field.value.map(idOrName => {
+                      selected={(field.value ?? []).map(idOrName => {
                         if (idOrName === "all") return "Assign to all branches";
                         const branch = branches.find(b => b.id === idOrName || b.name === idOrName);
                         return branch?.name ?? idOrName;
@@ -216,8 +215,9 @@ export function SpInviteAdminModal({
                         // Mutual exclusion logic
                         let finalIds: string[] = [];
                         
-                        const newlySelectedAll = names.includes("Assign to all branches") && !field.value.includes("all");
-                        const previouslySelectedAll = field.value.includes("all");
+                        const currentValue = field.value ?? []
+                        const newlySelectedAll = names.includes("Assign to all branches") && !currentValue.includes("all");
+                        const previouslySelectedAll = currentValue.includes("all");
                         const hasOtherBranches = names.some(n => n !== "Assign to all branches");
 
                         if (newlySelectedAll) {

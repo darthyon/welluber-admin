@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useForm } from "react-hook-form";
+import { useForm, type FieldError } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Buildings, Shield, Storefront } from "@phosphor-icons/react";
@@ -63,8 +63,7 @@ export function InviteAdministratorDialog({ open, onOpenChange }: InviteAdminist
   const [submitError, setSubmitError] = React.useState<string | null>(null);
 
   const form = useForm<InviteAdministratorForm>({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    resolver: zodResolver(inviteAdministratorSchema as any),
+    resolver: zodResolver(inviteAdministratorSchema),
     defaultValues: {
       scope: "host",
       firstName: "",
@@ -75,7 +74,8 @@ export function InviteAdministratorDialog({ open, onOpenChange }: InviteAdminist
   });
 
   const scope = form.watch("scope");
-  const errors = form.formState.errors as Record<string, { message?: unknown } | undefined>;
+  // FieldErrors on a discriminated union can't narrow scope-specific fields (orgId, spId)
+  const errors = form.formState.errors as Record<string, FieldError | undefined>;
 
   React.useEffect(() => {
     if (!open) {

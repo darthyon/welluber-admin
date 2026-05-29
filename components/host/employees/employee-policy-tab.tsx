@@ -46,18 +46,15 @@ export function EmployeePolicyTab({ employeeId }: EmployeePolicyTabProps) {
 
   const handleAssignPolicy = () => {
     setShowAssignModal(true);
-    console.log("Assign policy to employee:", employeeId);
   };
 
   const handleUnassignPolicy = () => {
     setShowUnassignModal(true);
-    console.log("Unassign policy from employee:", employeeId);
   };
 
   const confirmUnassign = () => {
     setHasPolicy(false);
     setShowUnassignModal(false);
-    console.log("Policy unassigned from employee:", employeeId);
   };
 
   return (
@@ -296,10 +293,8 @@ export function EmployeePolicyTab({ employeeId }: EmployeePolicyTabProps) {
         onOpenChange={setShowAssignModal}
         employeeId={employeeId}
         employeeName={employeeName}
-        onAssign={(policyId) => {
-          console.log("Assigning policy:", policyId);
+        onAssign={() => {
           setHasPolicy(true);
-          // In a real app, you would update the policy data here
         }}
       />
 

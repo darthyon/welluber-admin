@@ -175,12 +175,12 @@ export function VoucherPackagesTable({
                   },
                   {
                     label: "Suspend Voucher",
-                    onClick: () => console.log("Suspend", voucher.id),
+                    onClick: () => {},
                   },
                   {
                     label: "Remove Voucher",
                     isDanger: true,
-                    onClick: () => console.log("Remove", voucher.id),
+                    onClick: () => {},
                   },
                 ]}
               />

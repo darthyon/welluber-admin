@@ -91,12 +91,12 @@ function VoucherCard({ voucher }: { voucher: VoucherRedemption }) {
             {
               label: "View",
               icon: <Eye size={14} />,
-              onClick: () => console.log("View voucher", voucher.id),
+              onClick: () => {},
             },
             {
               label: "Download",
               icon: <Download size={14} />,
-              onClick: () => console.log("Download voucher", voucher.id),
+              onClick: () => {},
             },
           ]}
         />
@@ -293,12 +293,12 @@ const columns: Column<VoucherRedemption>[] = [
           {
             label: "View",
             icon: <Eye size={14} />,
-            onClick: () => console.log("View voucher", row.id),
+            onClick: () => {},
           },
           {
             label: "Download",
             icon: <Download size={14} />,
-            onClick: () => console.log("Download voucher", row.id),
+            onClick: () => {},
           },
         ]}
       />

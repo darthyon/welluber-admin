@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   CaretLeft,
@@ -80,9 +80,8 @@ export default function NewOrganizationPage() {
   const [existingAccountId, setExistingAccountId] = useState("");
 
   const { register, handleSubmit, control, setValue, watch, formState: { errors } } = useForm<CreateOrganizationData>({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    resolver: zodResolver(createOrganizationSchema as any),
-    defaultValues: { type: "sdn_bhd" },
+    resolver: zodResolver(createOrganizationSchema) as Resolver<CreateOrganizationData>,
+    defaultValues: { type: "sdn_bhd", documents: [] },
   });
 
   const industryValue = watch("industry");

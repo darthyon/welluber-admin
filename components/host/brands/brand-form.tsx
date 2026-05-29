@@ -20,7 +20,7 @@ const brandSchema = z.object({
     .min(1, "Select at least one service category"),
 })
 
-type BrandFormData = z.infer<typeof brandSchema>
+export type BrandFormData = z.infer<typeof brandSchema>
 
 interface BrandFormProps {
   initialData?: Brand

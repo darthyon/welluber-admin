@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { useForm, Controller, useWatch } from "react-hook-form";
+import { useForm, Controller, useWatch, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   CaretLeft,
@@ -58,8 +58,7 @@ export default function EditOrganizationPage() {
   const [fyPickerOpen, setFyPickerOpen] = useState(false);
 
   const { register, handleSubmit, control, setValue, formState: { errors } } = useForm<CreateOrganizationData>({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    resolver: zodResolver(createOrganizationSchema as any),
+    resolver: zodResolver(createOrganizationSchema) as Resolver<CreateOrganizationData>,
     defaultValues: {
       name: "Acme Corporation Sdn Bhd",
       registrationNumber: "1234567-T",

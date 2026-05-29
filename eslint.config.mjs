@@ -15,6 +15,12 @@ const eslintConfig = defineConfig([
     // Local Claude Code worktrees and generated artifacts:
     ".claude/**",
   ]),
+  {
+    rules: {
+      "max-lines": ["warn", { max: 400, skipBlankLines: true, skipComments: true }],
+      "@typescript-eslint/no-explicit-any": "error",
+    },
+  },
 ]);
 
 export default eslintConfig;
