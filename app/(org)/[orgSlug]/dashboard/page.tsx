@@ -1,18 +1,40 @@
 "use client"
 
+import { useState } from "react"
 import { useParams } from "next/navigation"
-import { Users, Shield, SealCheck, Wallet } from "@phosphor-icons/react"
-import { BentoGrid, BentoCard } from "@/components/shared/bento-grid"
-import { Progress } from "@/components/ui/progress"
-import { OrgTaskCentre, type OrgTask } from "@/components/org/org-task-centre"
-import { MOCK_ORGS, MOCK_EMPLOYEE_UTILISATION } from "@/lib/mock-data"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { DashboardKpiRow } from "@/components/org/dashboard-kpi-row"
+import { DashboardClaimsChart } from "@/components/org/dashboard-claims-chart"
+import { DashboardBenefitChart } from "@/components/org/dashboard-benefit-chart"
+import { DashboardTopTen } from "@/components/org/dashboard-top-ten"
+import { DashboardActionCentre } from "@/components/org/dashboard-action-centre"
+import { DashboardRecentActivity } from "@/components/org/dashboard-recent-activity"
+import { type OrgTask } from "@/components/org/org-task-centre"
+import {
+  MOCK_ORGS,
+  MOCK_EMPLOYEE_UTILISATION,
+  MOCK_CLAIMS_TIMESERIES,
+  MOCK_BENEFIT_GROUP_USAGE,
+  MOCK_TOP_PROVIDERS,
+  MOCK_BRANCH_WALLETS,
+  MOCK_POLICY_UTILISATION,
+  MOCK_COVERAGE_FUNNEL,
+  MOCK_EMPLOYEE_GROUP_UTILISATION,
+  MOCK_VOUCHER_COUNTS,
+  MOCK_RECENT_ACTIVITY,
+} from "@/lib/mock-data"
 import { routes } from "@/lib/navigation"
 
 const ORG_BY_SLUG: Record<string, string> = {
   "acme-corporation": "ORG-20260115-0001",
 }
 
-// Derive actionable tasks from live org + claims data
 function deriveOrgTasks(
   org: (typeof MOCK_ORGS)[number],
   orgSlug: string,
@@ -21,93 +43,71 @@ function deriveOrgTasks(
   const tasks: OrgTask[] = []
   const allClaims = claimsData.flatMap((r) => r.claims)
 
-  // 1. Employees without policy
-  const unassigned = org.employeesWithoutPolicy ?? 0
-  if (unassigned > 0) {
-    tasks.push({
-      id: "employees-no-policy",
-      category: "employees",
-      priority: "high",
-      title: "Employees without benefit policy",
-      description: `${unassigned} employee${unassigned > 1 ? "s" : ""} enrolled but not assigned to any benefit policy.`,
-      count: unassigned,
-      cta: { label: "View employees", href: routes.org.employees(orgSlug) },
-    })
-  }
-
-  // 2. Manual claims pending review
-  const pendingReview = allClaims.filter((c) => c.status === "pending_review")
-  if (pendingReview.length > 0) {
-    tasks.push({
-      id: "claims-pending-review",
-      category: "claims",
-      priority: "high",
-      title: "Claims awaiting manual review",
-      description: "Reimbursement claims submitted by employees that require your approval before processing.",
-      count: pendingReview.length,
-      cta: { label: "Review claims", href: routes.org.claims(orgSlug) },
-    })
-  }
-
-  // 3. Flagged / suspicious claims
   const flagged = allClaims.filter((c) => c.status === "flagged")
   if (flagged.length > 0) {
     tasks.push({
       id: "claims-flagged",
       category: "claims",
       priority: "critical",
-      title: "Flagged claims require investigation",
-      description: `${flagged.length} claim${flagged.length > 1 ? "s" : ""} flagged for unusual amount or pattern. Review before they are processed.`,
+      title: "Flagged Claims",
+      description: `${flagged.length} claim${flagged.length > 1 ? "s" : ""} flagged for unusual pattern. Requires investigation.`,
       count: flagged.length,
       cta: { label: "Investigate", href: routes.org.claims(orgSlug) },
     })
   }
 
-  // 4. Stale pre-auth (older than 14 days — simplified: any pre-auth in data)
   const preAuth = allClaims.filter((c) => c.status === "pre-auth")
   if (preAuth.length > 0) {
     tasks.push({
       id: "claims-stale-preauth",
       category: "claims",
-      priority: "medium",
-      title: "Pre-authorised claims pending confirmation",
-      description: `${preAuth.length} claim${preAuth.length > 1 ? "s" : ""} in pre-auth status. Confirm or cancel to keep records accurate.`,
+      priority: "high",
+      title: "Pre-Authorised Claims",
+      description: `${preAuth.length} claim${preAuth.length > 1 ? "s" : ""} awaiting confirmation.`,
       count: preAuth.length,
-      cta: { label: "View claims", href: routes.org.claims(orgSlug) },
+      cta: { label: "Confirm", href: routes.org.claims(orgSlug) },
     })
   }
 
-  // 5. Budget low (< 20% remaining)
-  const budgetPct = org.accountLimit > 0
-    ? Math.round((org.totalAccountBalance / org.accountLimit) * 100)
-    : 100
+  tasks.push({
+    id: "admin-pending-invite",
+    category: "admin",
+    priority: "medium",
+    title: "Admin Invite Pending",
+    description: "Khairul Anwar was invited 15 days ago and hasn't activated their account yet.",
+    count: 1,
+    cta: { label: "Manage Admins", href: routes.org.settings(orgSlug) },
+  })
+
+  const budgetPct =
+    org.accountLimit > 0
+      ? Math.round((org.totalAccountBalance / org.accountLimit) * 100)
+      : 100
   if (org.totalAccountBalance <= 0) {
     tasks.push({
       id: "budget-depleted",
       category: "budget",
       priority: "critical",
-      title: "Account balance depleted",
-      description: "Your prepaid balance has run out. New claims will be blocked until the account is topped up.",
+      title: "Low Wallet Warning",
+      description: "Account balance is depleted. New claims will be blocked until topped up.",
     })
   } else if (budgetPct < 20) {
     tasks.push({
       id: "budget-low",
       category: "budget",
       priority: "high",
-      title: "Budget running low",
-      description: `Only ${budgetPct}% of your account limit remains (RM ${org.totalAccountBalance.toLocaleString()}). Request a top-up to avoid claim disruption.`,
+      title: "Low Wallet Warning",
+      description: `Only ${budgetPct}% remains. Request a top-up to avoid disruption.`,
+    })
+  } else {
+    tasks.push({
+      id: "budget-ok",
+      category: "budget",
+      priority: "low",
+      title: "Low Wallet Warning",
+      description: "Wallet balance is healthy.",
     })
   }
-
-  // 6. Pending admin invites (mock: assume 1 pending invite from settings data)
-  tasks.push({
-    id: "admin-pending-invite",
-    category: "admin",
-    priority: "low",
-    title: "Admin invite not yet accepted",
-    description: "Khairul Anwar was invited 15 days ago and hasn't activated their account yet.",
-    cta: { label: "Manage admins", href: routes.org.settings(orgSlug) },
-  })
 
   return tasks
 }
@@ -119,87 +119,94 @@ export default function OrgDashboardPage() {
   const orgId = ORG_BY_SLUG[orgSlug]
   const org = MOCK_ORGS.find((o) => o.id === orgId) ?? MOCK_ORGS[0]!
 
-  // Enrolled employees
-  const totalEmployees = org.employeeCount
-  const linkedEmployees = Math.round(totalEmployees * 0.78)
-  const enrolledPct = Math.round((linkedEmployees / totalEmployees) * 100)
+  const [selectedBranch, setSelectedBranch] = useState<string>("all")
 
-  // Budget
-  const budgetUsed = org.accountLimit - org.totalAccountBalance
-  const budgetPct = Math.round((budgetUsed / org.accountLimit) * 100)
-  const budgetColor =
-    budgetPct >= 85 ? "text-destructive" : budgetPct >= 65 ? "text-amber-500" : "text-emerald-500"
-
-  // Claims
   const orgUtilRows = MOCK_EMPLOYEE_UTILISATION.filter((r) => r.branch.includes("ACME"))
-  const claimsThisMonth = orgUtilRows.flatMap((r) => r.claims).length
-  const confirmedClaims = orgUtilRows
-    .flatMap((r) => r.claims)
-    .filter((c) => c.status === "confirmed").length
+  const filteredUtilRows =
+    selectedBranch === "all"
+      ? orgUtilRows
+      : orgUtilRows.filter((r) => {
+          const wallet = MOCK_BRANCH_WALLETS.find((w) => w.branchId === selectedBranch)
+          return wallet
+            ? r.branch.toLowerCase().includes(wallet.branchName.split(" ")[1]?.toLowerCase() ?? "")
+            : true
+        })
 
-  // Tasks
+  const allFilteredClaims = filteredUtilRows.flatMap((r) => r.claims)
+  const claimsThisMonth = allFilteredClaims.length
+  const confirmedClaims = allFilteredClaims.filter((c) => c.status === "confirmed")
+  const pendingClaims = allFilteredClaims.filter(
+    (c) => c.status === "pending_review" || c.status === "pre-auth"
+  )
+  const confirmedClaimsCount = confirmedClaims.length
+  const pendingClaimsCount = pendingClaims.length
+
   const tasks = deriveOrgTasks(org, orgSlug, orgUtilRows)
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-foreground">{org.name}</h1>
-        <p className="text-muted-foreground mt-0.5 text-body">
-          Organisation overview — {new Date().toLocaleDateString("en-MY", { month: "long", year: "numeric" })}
-        </p>
+    <div className="space-y-8 pb-8">
+
+      {/* ── Header ─────────────────────────────────────────────────────────── */}
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-semibold text-foreground">{org.name}</h1>
+          <p className="text-label text-muted-foreground mt-0.5">Organisation Dashboard</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Select value={selectedBranch} onValueChange={setSelectedBranch}>
+            <SelectTrigger className="w-48 h-8 text-[13px]">
+              <SelectValue placeholder="All Branches" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Branches</SelectItem>
+              {MOCK_BRANCH_WALLETS.map((w) => (
+                <SelectItem key={w.branchId} value={w.branchId}>
+                  {w.branchName}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
-      {/* Metrics */}
-      <BentoGrid>
-        <BentoCard
-          title="Enrolled Employees"
-          value={`${linkedEmployees.toLocaleString()}`}
-          icon={Users}
-          span={1}
-        >
-          <div className="w-full space-y-1.5">
-            <div className="flex items-center justify-between text-label font-medium text-subtle">
-              <span>{enrolledPct}% enrolled</span>
-              <span className="text-faint">{totalEmployees.toLocaleString()} total</span>
-            </div>
-            <Progress value={enrolledPct} className="h-1.5" />
-          </div>
-        </BentoCard>
+      {/* ── KPI Row ─────────────────────────────────────────────────────────── */}
+      <DashboardKpiRow
+        wallets={MOCK_BRANCH_WALLETS}
+        funnel={MOCK_COVERAGE_FUNNEL}
+        voucherCounts={MOCK_VOUCHER_COUNTS}
+        claimsThisMonth={claimsThisMonth}
+        confirmedClaimsCount={confirmedClaimsCount}
+        pendingClaimsCount={pendingClaimsCount}
+        selectedBranch={selectedBranch}
+      />
 
-        <BentoCard
-          title="Benefit Utilisation Rate"
-          value={`${org.utilizationRate}%`}
-          icon={Shield}
-          trend={{ value: "+4%", label: "vs last month", isPositive: true }}
-          span={1}
+      {/* ── Claims Trend ─────────────────────────────────────────────────────── */}
+      <DashboardClaimsChart
+        data={MOCK_CLAIMS_TIMESERIES}
+        selectedBranch={selectedBranch}
+        wallets={MOCK_BRANCH_WALLETS}
+      />
+
+      {/* ── Benefit Utilisation + Top Policies ───────────────────────────────── */}
+      <div className="grid grid-cols-2 gap-6">
+        <DashboardBenefitChart
+          data={MOCK_BENEFIT_GROUP_USAGE}
+          selectedBranch={selectedBranch}
         />
-
-        <BentoCard
-          title="Claims This Month"
-          value={claimsThisMonth}
-          icon={SealCheck}
-          description={`${confirmedClaims} confirmed`}
-          span={1}
+        <DashboardTopTen
+          policies={MOCK_POLICY_UTILISATION}
+          providers={MOCK_TOP_PROVIDERS}
+          employeeGroups={MOCK_EMPLOYEE_GROUP_UTILISATION}
+          selectedBranch={selectedBranch}
         />
+      </div>
 
-        <BentoCard
-          title="Budget Remaining"
-          value={`RM ${org.totalAccountBalance.toLocaleString()}`}
-          icon={Wallet}
-          span={1}
-        >
-          <div className="w-full space-y-1.5">
-            <div className="flex items-center justify-between text-label font-medium text-subtle">
-              <span className={budgetColor}>{100 - budgetPct}% remaining</span>
-              <span className="text-faint">of RM {org.accountLimit.toLocaleString()}</span>
-            </div>
-            <Progress value={100 - budgetPct} className="h-1.5" />
-          </div>
-        </BentoCard>
-      </BentoGrid>
+      {/* ── Action Centre + Recent Activity ──────────────────────────────────── */}
+      <div className="grid grid-cols-2 gap-6">
+        <DashboardActionCentre tasks={tasks} orgSlug={orgSlug} />
+        <DashboardRecentActivity activities={MOCK_RECENT_ACTIVITY} />
+      </div>
 
-      {/* Task Centre */}
-      <OrgTaskCentre tasks={tasks} />
     </div>
   )
 }

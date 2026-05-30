@@ -14,6 +14,18 @@ import { createAccount } from "./factories/account"
 import { createAuditLog } from "./factories/audit-log"
 import { createDependent } from "./factories/dependent"
 import { createEntitlement } from "./factories/entitlement"
+import {
+  createClaimsTimeSeries,
+  createBenefitBreakdown,
+  createTopProviders,
+  createBranchWallets,
+  createPolicyUtilisation,
+  createOrgCoverageFunnel,
+  createBenefitGroupUsage,
+  createEmployeeGroupUtilisation,
+  createVoucherCounts,
+  createRecentActivity,
+} from "./factories/org-analytics"
 
 function seedAll() {
   // Dependency order: no-dep entities first, then dependents
@@ -271,3 +283,16 @@ export const MOCK_FORM_POLICIES: FormPolicy[] = [
 ]
 
 export { MOCK_POLICY_TEMPLATES }
+
+// Org analytics — dashboard charts and top-10 panels
+const ACME_ORG_ID = "ORG-20260115-0001"
+export const MOCK_CLAIMS_TIMESERIES = createClaimsTimeSeries(ACME_ORG_ID)
+export const MOCK_BENEFIT_BREAKDOWN = createBenefitBreakdown(ACME_ORG_ID)
+export const MOCK_TOP_PROVIDERS = createTopProviders(ACME_ORG_ID)
+export const MOCK_BRANCH_WALLETS = createBranchWallets(ACME_ORG_ID)
+export const MOCK_POLICY_UTILISATION = createPolicyUtilisation(ACME_ORG_ID)
+export const MOCK_COVERAGE_FUNNEL = createOrgCoverageFunnel(ACME_ORG_ID)
+export const MOCK_BENEFIT_GROUP_USAGE = createBenefitGroupUsage(ACME_ORG_ID)
+export const MOCK_EMPLOYEE_GROUP_UTILISATION = createEmployeeGroupUtilisation(ACME_ORG_ID)
+export const MOCK_VOUCHER_COUNTS = createVoucherCounts(ACME_ORG_ID)
+export const MOCK_RECENT_ACTIVITY = createRecentActivity(ACME_ORG_ID)
