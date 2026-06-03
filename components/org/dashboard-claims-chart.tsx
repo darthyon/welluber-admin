@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from "recharts"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from "recharts"
 import { CaretLeft, CaretRight } from "@phosphor-icons/react"
 import { Card } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -9,26 +9,25 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { parseISO } from "date-fns"
-import type { ClaimsDataPoint, BranchWallet } from "@/lib/mock-data"
-import { bucketByMonth } from "@/lib/mock-data"
+import type { ClaimsDataPoint, BranchAccount } from "@/lib/mock-data"
+import { bucketByMonth, bucketByYear } from "@/lib/mock-data"
 
 type PeriodType = "month" | "quarter" | "year"
-type Metric = "count" | "amount" | "uniqueClaimants"
+type Metric = "count" | "amount"
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 const AVAILABLE_YEARS = [2025, 2026]
 const BRANCH_SCALE: Record<string, number> = { br_1: 0.6, br_2: 0.4 }
 
 const METRIC_TABS: { label: string; value: Metric }[] = [
-  { label: "Claim Count",       value: "count" },
-  { label: "Claim Amount",      value: "amount" },
-  { label: "Unique Claimants",  value: "uniqueClaimants" },
+  { label: "Claim Count",  value: "count"  },
+  { label: "Claim Amount", value: "amount" },
 ]
 
 interface DashboardClaimsChartProps {
   data: ClaimsDataPoint[]
   selectedBranch: string | "all"
-  wallets: BranchWallet[]
+  accounts: BranchAccount[]
   className?: string
 }
 
@@ -51,7 +50,7 @@ function filterByPeriod(
     )
     return bucketByMonth(data.filter((d) => monthKeys.some((k) => d.date.startsWith(k))))
   }
-  return bucketByMonth(data.filter((d) => d.date.startsWith(year)))
+  return bucketByYear(data, year)
 }
 
 function applyBranchScale(data: ClaimsDataPoint[], branch: string | "all"): ClaimsDataPoint[] {
@@ -184,7 +183,9 @@ function ClaimsTooltip({ active, payload, label, metric, periodType }: {
       {payload.map((p) => (
         <div key={p.name} className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-sm flex-shrink-0" style={{ backgroundColor: p.color }} />
-          <span className="text-muted-foreground capitalize">{p.name === "confirmedCount" ? "Confirmed" : p.name === "pendingCount" ? "Pending" : "Claimants"}:</span>
+          <span className="text-muted-foreground">
+            {p.name === "confirmedCount" ? "Confirmed" : "Pending"}:
+          </span>
           <span className="font-medium text-foreground ml-auto pl-3">
             {metric === "amount" ? `RM ${p.value.toLocaleString("en-MY")}` : p.value}
           </span>
@@ -196,7 +197,7 @@ function ClaimsTooltip({ active, payload, label, metric, periodType }: {
 
 // ─── Main chart ───────────────────────────────────────────────────────────────
 
-export function DashboardClaimsChart({ data, selectedBranch, wallets, className }: DashboardClaimsChartProps) {
+export function DashboardClaimsChart({ data, selectedBranch, accounts, className }: DashboardClaimsChartProps) {
   const [metric, setMetric] = useState<Metric>("count")
   const [periodType, setPeriodType] = useState<PeriodType>("month")
   const [selectedMonth, setSelectedMonth] = useState("2026-05")
@@ -212,23 +213,40 @@ export function DashboardClaimsChart({ data, selectedBranch, wallets, className 
   )
 
   const branchName = selectedBranch !== "all"
-    ? wallets.find((w) => w.branchId === selectedBranch)?.branchName
+    ? accounts.find((a) => a.branchId === selectedBranch)?.branchName
     : null
 
-  const barSize = periodType === "month" ? 8 : 28
-
+  const barSize = periodType === "month" ? 5 : periodType === "year" ? 14 : 20
   const isAmountMetric = metric === "amount"
-  const isUniqueMetric = metric === "uniqueClaimants"
+
+  // For side-by-side: use confirmedCount/pendingCount for "count", or split amount proportionally
+  const confirmedKey = metric === "count" ? "confirmedCount" : "confirmedCount"
+  const pendingKey = metric === "count" ? "pendingCount" : "pendingCount"
+
+  // Build chart data with amount split if needed
+  const finalChartData = useMemo(() => {
+    if (metric === "amount") {
+      return chartData.map((d) => ({
+        ...d,
+        confirmedAmount: d.count > 0 ? Math.round(d.amount * (d.confirmedCount / d.count)) : 0,
+        pendingAmount: d.count > 0 ? Math.round(d.amount * (d.pendingCount / d.count)) : 0,
+      }))
+    }
+    return chartData
+  }, [chartData, metric])
+
+  const confirmedDataKey = metric === "amount" ? "confirmedAmount" : "confirmedCount"
+  const pendingDataKey = metric === "amount" ? "pendingAmount" : "pendingCount"
 
   return (
     <Card className={cn("overflow-hidden", className)}>
-      <div className="flex items-start justify-between gap-4 px-5 pt-5 pb-0">
+      <div className="flex flex-col gap-3 px-5 pt-5 pb-0 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-body font-semibold text-foreground">Claims Trend</p>
           {branchName && <p className="mt-0.5 text-label text-muted-foreground">{branchName}</p>}
         </div>
 
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex flex-wrap items-center gap-2">
           {/* Metric tabs */}
           <div className="flex items-center gap-0.5 rounded-lg border border-border bg-muted/40 p-0.5">
             {METRIC_TABS.map((m) => (
@@ -266,30 +284,26 @@ export function DashboardClaimsChart({ data, selectedBranch, wallets, className 
       </div>
 
       {/* Legend */}
-      {!isUniqueMetric && (
-        <div className="flex items-center gap-4 px-5 pt-3">
-          <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-sm bg-primary" />
-            <span className="text-[11px] text-muted-foreground font-medium">Confirmed</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-sm bg-primary/25" />
-            <span className="text-[11px] text-muted-foreground font-medium">Pending</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-5 border-t-2 border-dashed border-primary/60" />
-            <span className="text-[11px] text-muted-foreground font-medium">Total trend</span>
-          </div>
+      <div className="flex items-center gap-4 px-5 pt-3">
+        <div className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-sm bg-primary" />
+          <span className="text-[11px] text-muted-foreground font-medium">Confirmed</span>
         </div>
-      )}
+        <div className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-sm bg-primary/30" />
+          <span className="text-[11px] text-muted-foreground font-medium">Pending</span>
+        </div>
+      </div>
 
       {/* Chart */}
-      <div className="px-2 pt-4 pb-2 min-h-[220px]">
+      <div className="pr-2 pt-4 pb-2 min-h-[220px]">
         <ResponsiveContainer width="100%" height={220}>
-          <ComposedChart
-            data={chartData}
+          <BarChart
+            data={finalChartData}
             margin={{ top: 4, right: 8, left: 0, bottom: 0 }}
             barSize={barSize}
+            barGap={2}
+            barCategoryGap="35%"
           >
             <CartesianGrid vertical={false} stroke="hsl(var(--border))" strokeOpacity={0.5} />
             <XAxis
@@ -309,42 +323,21 @@ export function DashboardClaimsChart({ data, selectedBranch, wallets, className 
             />
             <Tooltip
               content={<ClaimsTooltip metric={metric} periodType={periodType} />}
-              cursor={{ fill: "hsl(var(--muted))", opacity: 0.4 }}
+              cursor={{ fill: "hsl(var(--muted-foreground))", opacity: 0.06 }}
             />
-
-            {isUniqueMetric ? (
-              <Bar
-                dataKey="uniqueClaimants"
-                fill="var(--primary)"
-                radius={[3, 3, 0, 0]}
-              />
-            ) : (
-              <>
-                <Bar
-                  dataKey="confirmedCount"
-                  stackId="claims"
-                  fill="var(--primary)"
-                  radius={[0, 0, 0, 0]}
-                />
-                <Bar
-                  dataKey="pendingCount"
-                  stackId="claims"
-                  fill="color-mix(in oklch, var(--primary) 25%, transparent)"
-                  radius={[3, 3, 0, 0]}
-                />
-                <Line
-                  dataKey="count"
-                  type="monotone"
-                  stroke="var(--primary)"
-                  strokeOpacity={0.5}
-                  strokeWidth={1.5}
-                  strokeDasharray="4 3"
-                  dot={false}
-                  activeDot={false}
-                />
-              </>
-            )}
-          </ComposedChart>
+            <Bar
+              dataKey={confirmedDataKey}
+              fill="var(--primary)"
+              radius={[3, 3, 0, 0]}
+              name="confirmedCount"
+            />
+            <Bar
+              dataKey={pendingDataKey}
+              fill="oklch(0.75 0.12 277)"
+              radius={[3, 3, 0, 0]}
+              name="pendingCount"
+            />
+          </BarChart>
         </ResponsiveContainer>
       </div>
 

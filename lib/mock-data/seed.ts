@@ -18,7 +18,7 @@ import {
   createClaimsTimeSeries,
   createBenefitBreakdown,
   createTopProviders,
-  createBranchWallets,
+  createBranchAccounts,
   createPolicyUtilisation,
   createOrgCoverageFunnel,
   createBenefitGroupUsage,
@@ -289,7 +289,7 @@ const ACME_ORG_ID = "ORG-20260115-0001"
 export const MOCK_CLAIMS_TIMESERIES = createClaimsTimeSeries(ACME_ORG_ID)
 export const MOCK_BENEFIT_BREAKDOWN = createBenefitBreakdown(ACME_ORG_ID)
 export const MOCK_TOP_PROVIDERS = createTopProviders(ACME_ORG_ID)
-export const MOCK_BRANCH_WALLETS = createBranchWallets(ACME_ORG_ID)
+export const MOCK_BRANCH_ACCOUNTS = createBranchAccounts(ACME_ORG_ID)
 export const MOCK_POLICY_UTILISATION = createPolicyUtilisation(ACME_ORG_ID)
 export const MOCK_COVERAGE_FUNNEL = createOrgCoverageFunnel(ACME_ORG_ID)
 export const MOCK_BENEFIT_GROUP_USAGE = createBenefitGroupUsage(ACME_ORG_ID)

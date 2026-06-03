@@ -1,10 +1,12 @@
 "use client"
 
+import { useState, useEffect } from "react"
+import { CaretLeft, CaretRight, Wallet, Users, ClipboardText, Ticket } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
-import type { BranchWallet, OrgCoverageFunnel, VoucherCounts } from "@/lib/mock-data"
+import type { BranchAccount, OrgCoverageFunnel, VoucherCounts } from "@/lib/mock-data"
 
 interface DashboardKpiRowProps {
-  wallets: BranchWallet[]
+  accounts: BranchAccount[]
   funnel: OrgCoverageFunnel
   voucherCounts: VoucherCounts
   claimsThisMonth: number
@@ -25,7 +27,7 @@ function fmtK(n: number) {
   return `RM ${fmt(n)}`
 }
 
-// ─── Single KPI card ──────────────────────────────────────────────────────────
+// ─── Generic KPI card ─────────────────────────────────────────────────────────
 
 function KpiCard({
   label,
@@ -33,6 +35,7 @@ function KpiCard({
   sub,
   footer,
   footerVariant = "default",
+  icon: Icon,
   className,
 }: {
   label: string
@@ -40,22 +43,38 @@ function KpiCard({
   sub: string
   footer: string
   footerVariant?: "default" | "warning" | "muted"
+  icon: React.ElementType
   className?: string
 }) {
   return (
-    <div className={cn("bg-card border border-border rounded-lg p-5 flex flex-col gap-3", className)}>
-      <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground leading-none">
-        {label}
-      </p>
-      <div>
+    <div className={cn(
+      "relative overflow-hidden group bg-card border border-border rounded-lg p-5 flex flex-col justify-between",
+      "hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-500",
+      className
+    )}>
+      <div className="absolute -right-8 -bottom-8 w-24 h-24 bg-primary/5 rounded-full blur-2xl pointer-events-none group-hover:w-32 group-hover:h-32 group-hover:bg-primary/10 transition-all duration-500" />
+
+      {/* Icon + label */}
+      <div className="flex items-center gap-3 relative z-10">
+        <div className="w-9 h-9 rounded-lg bg-muted/60 border border-border/60 text-muted-foreground flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary transition-all duration-300 flex-shrink-0">
+          <Icon size={16} weight="fill" />
+        </div>
+        <p className="text-label font-semibold text-muted-foreground leading-none group-hover:text-primary transition-colors">
+          {label}
+        </p>
+      </div>
+
+      {/* Value + sub */}
+      <div className="py-2 relative z-10">
         <p className="text-[28px] font-semibold tabular-nums text-foreground leading-none tracking-tight">
           {value}
         </p>
-        <p className="text-label text-muted-foreground mt-1.5 leading-snug">{sub}</p>
+        <p className="text-label text-muted-foreground mt-2 leading-snug">{sub}</p>
       </div>
+
       <p
         className={cn(
-          "text-[11px] leading-none pt-3 border-t border-border/50",
+          "text-[11px] leading-none pt-3 border-t border-border/50 relative z-10",
           footerVariant === "warning" && "text-amber-600 dark:text-amber-400",
           footerVariant === "muted" && "text-muted-foreground/60",
           footerVariant === "default" && "text-muted-foreground"
@@ -67,10 +86,132 @@ function KpiCard({
   )
 }
 
+function runwayLabel(days: number): string {
+  if (days < 14) return "Less than 2 weeks of funds left"
+  if (days < 30) return `About ${Math.round(days / 7)} weeks of funds left`
+  if (days < 60) return "About 1 month of funds left"
+  return `~${Math.round(days / 30)} months of funds remaining`
+}
+
+// ─── Account Health card with carousel ────────────────────────────────────────
+
+function AccountCard({
+  accounts,
+  selectedBranch,
+}: {
+  accounts: BranchAccount[]
+  selectedBranch: string | "all"
+}) {
+  const [index, setIndex] = useState(0)
+
+  useEffect(() => { setIndex(0) }, [selectedBranch])
+
+  const visibleAccounts =
+    selectedBranch === "all"
+      ? accounts
+      : accounts.filter((a) => a.branchId === selectedBranch)
+
+  const account = visibleAccounts[index]
+  const total = visibleAccounts.length
+  const showNav = selectedBranch === "all" && total > 1
+
+  if (!account) return null
+
+  const creditRemaining = account.creditLimit - account.creditBalance
+  const isLowRunway = account.runwayDays < 30
+
+  return (
+    <div className="relative overflow-hidden group bg-card border border-border rounded-lg p-5 flex flex-col justify-between hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-500">
+      <div className="absolute -right-8 -bottom-8 w-24 h-24 bg-primary/5 rounded-full blur-2xl pointer-events-none group-hover:w-32 group-hover:h-32 group-hover:bg-primary/10 transition-all duration-500" />
+      {/* Icon + Label + nav */}
+      <div className="flex items-center justify-between relative z-10">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg bg-muted/60 border border-border/60 text-muted-foreground flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary transition-all duration-300 flex-shrink-0">
+            <Wallet size={16} weight="fill" />
+          </div>
+          <p className="text-label font-semibold text-muted-foreground leading-none group-hover:text-primary transition-colors">
+            Account Balance
+          </p>
+        </div>
+        {showNav && (
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setIndex((i) => (i - 1 + total) % total)}
+              className="h-5 w-5 flex items-center justify-center rounded border border-border hover:bg-muted transition-colors"
+              aria-label="Previous account"
+            >
+              <CaretLeft size={10} weight="bold" />
+            </button>
+            <button
+              onClick={() => setIndex((i) => (i + 1) % total)}
+              className="h-5 w-5 flex items-center justify-center rounded border border-border hover:bg-muted transition-colors"
+              aria-label="Next account"
+            >
+              <CaretRight size={10} weight="bold" />
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Branch name */}
+      {showNav && (
+        <p className="text-[11px] text-muted-foreground/60 relative z-10">{account.branchName}</p>
+      )}
+
+      {/* Two-column: Cash Balance + Credit Remaining */}
+      <div className="py-2 flex items-start gap-4 relative z-10">
+        <div className="flex-1 min-w-0">
+          <p className="text-[10px] text-muted-foreground/60 font-medium mb-1">Cash Balance</p>
+          <p className="text-[28px] font-semibold tabular-nums text-foreground leading-none tracking-tight">
+            RM {fmt(account.cashBalance)}
+          </p>
+          <p className="text-[11px] text-muted-foreground/70 mt-1.5 leading-snug">
+            {fmtK(account.availableBalance)} available · {fmtK(account.reservedBalance)} on hold
+          </p>
+        </div>
+        <div className="flex-shrink-0 text-right">
+          <p className="text-[10px] text-muted-foreground/60 font-medium mb-1">Credit Remaining</p>
+          <p className="text-[20px] font-semibold tabular-nums text-foreground leading-none tracking-tight">
+            {fmtK(creditRemaining)}
+          </p>
+          <p className="text-[11px] text-muted-foreground/70 mt-1.5 leading-snug">
+            of {fmtK(account.creditLimit)} limit
+          </p>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="flex items-center justify-between pt-3 border-t border-border/50 relative z-10">
+        <p className={cn(
+          "text-[11px]",
+          isLowRunway ? "text-amber-600 dark:text-amber-400" : "text-muted-foreground"
+        )}>
+          {runwayLabel(account.runwayDays)}
+        </p>
+        {showNav && (
+          <div className="flex items-center gap-1">
+            {visibleAccounts.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setIndex(i)}
+                className={cn(
+                  "h-1 rounded-full transition-all",
+                  i === index ? "w-4 bg-primary" : "w-1.5 bg-border hover:bg-muted-foreground/40"
+                )}
+                aria-label={`Account ${i + 1}`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // ─── Main row ─────────────────────────────────────────────────────────────────
 
 export function DashboardKpiRow({
-  wallets,
+  accounts,
   funnel,
   voucherCounts,
   claimsThisMonth,
@@ -81,42 +222,20 @@ export function DashboardKpiRow({
 }: DashboardKpiRowProps) {
   const scale = selectedBranch !== "all" ? (BRANCH_SCALE[selectedBranch] ?? 1) : 1
 
-  // Wallet Health
-  const wallet =
-    selectedBranch !== "all"
-      ? wallets.find((w) => w.branchId === selectedBranch) ?? wallets[0]
-      : null
-  const totalCash = wallet
-    ? wallet.cashBalance
-    : wallets.reduce((s, w) => s + w.cashBalance, 0)
-  const totalAvailable = wallet
-    ? wallet.availableBalance
-    : wallets.reduce((s, w) => s + w.availableBalance, 0)
-  const totalReserved = wallet
-    ? wallet.reservedBalance
-    : wallets.reduce((s, w) => s + w.reservedBalance, 0)
-  const runwayDays = wallet
-    ? wallet.runwayDays
-    : Math.min(...wallets.map((w) => w.runwayDays))
-
-  // Coverage
   const coveredCount = Math.round(funnel.coveredCount * scale)
   const empCovered = Math.round(funnel.employeeCovered * scale)
   const depCovered = Math.round(funnel.dependentCovered * scale)
   const unassigned = Math.round(funnel.unassigned * scale)
 
   return (
-    <div className={cn("grid grid-cols-4 gap-4", className)}>
-      <KpiCard
-        label="Wallet Health"
-        value={`RM ${fmt(totalCash)}`}
-        sub={`${fmtK(totalAvailable)} available · ${fmtK(totalReserved)} reserved`}
-        footer={`${runwayDays} days runway`}
-        footerVariant={runwayDays < 30 ? "warning" : "default"}
-      />
+    <div className={cn("grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4", className)}>
+      <div className="col-span-2 md:col-span-1">
+        <AccountCard accounts={accounts} selectedBranch={selectedBranch} />
+      </div>
 
       <KpiCard
-        label="Coverage"
+        label="Benefit Coverage"
+        icon={Users}
         value={`${funnel.coveragePct}%`}
         sub={`${fmt(empCovered)} employees · ${fmt(depCovered)} dependents covered`}
         footer={`${unassigned} unassigned`}
@@ -124,7 +243,8 @@ export function DashboardKpiRow({
       />
 
       <KpiCard
-        label="Claims This Month"
+        label="Claims Summary"
+        icon={ClipboardText}
         value={String(claimsThisMonth)}
         sub={`${pendingClaimsCount} pending · ${confirmedClaimsCount} confirmed`}
         footer="vs Apr +2"
@@ -132,8 +252,9 @@ export function DashboardKpiRow({
 
       <KpiCard
         label="Vouchers In Use"
+        icon={Ticket}
         value={`${voucherCounts.activeCount} Active`}
-        sub={`${voucherCounts.redeemedCount} redeemed · ${voucherCounts.expiringSoon} expiring soon`}
+        sub={`${voucherCounts.totalIssued} issued · ${voucherCounts.redeemedCount} redeemed`}
         footer={`${voucherCounts.expiringSoon} expiring in 30 days`}
         footerVariant={voucherCounts.expiringSoon > 0 ? "warning" : "muted"}
       />

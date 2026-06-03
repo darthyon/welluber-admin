@@ -32,43 +32,57 @@ function formatRM(v: number): string {
   return v >= 1000 ? `RM ${(v / 1000).toFixed(1)}k` : `RM ${v}`
 }
 
-// ─── Category tile ────────────────────────────────────────────────────────────
+// ─── Category list row ────────────────────────────────────────────────────────
 
-function CategoryTile({ group, metric, totalClaims }: {
+function CategoryRow({
+  group,
+  metric,
+  totalClaims,
+  rank,
+}: {
   group: BenefitGroupUsage & { claimsCount: number; usedAmount: number; allocatedAmount: number }
   metric: Metric
   totalClaims: number
+  rank: number
 }) {
-  const barPct = metric === "amount"
-    ? (group.allocatedAmount > 0 ? (group.usedAmount / group.allocatedAmount) * 100 : 0)
-    : (totalClaims > 0 ? (group.claimsCount / totalClaims) * 100 : 0)
-  const pctLabel = metric === "amount"
-    ? `${group.utilisationPct}%`
-    : `${totalClaims > 0 ? Math.round((group.claimsCount / totalClaims) * 100) : 0}%`
+  const barPct =
+    metric === "amount"
+      ? group.allocatedAmount > 0 ? (group.usedAmount / group.allocatedAmount) * 100 : 0
+      : totalClaims > 0 ? (group.claimsCount / totalClaims) * 100 : 0
+
+  const pctLabel =
+    metric === "amount"
+      ? `${group.utilisationPct}%`
+      : `${totalClaims > 0 ? Math.round((group.claimsCount / totalClaims) * 100) : 0}%`
 
   return (
-    <div className="rounded-lg border border-border/50 bg-muted/20 p-3 flex flex-col gap-2">
-      <div className="flex items-center justify-between gap-1">
-        <div className="flex items-center gap-1.5 min-w-0">
-          <span className="h-2 w-2 rounded-full flex-shrink-0" style={{ backgroundColor: group.color }} />
-          <span className="text-[11px] font-medium text-foreground truncate">{group.groupName}</span>
+    <div className="flex items-center gap-3 py-2.5 border-b border-border/40 last:border-0">
+      <span className="text-[10px] font-semibold tabular-nums text-muted-foreground/50 w-3 flex-shrink-0 text-right">
+        {rank}
+      </span>
+      <span className="h-2 w-2 rounded-full flex-shrink-0" style={{ backgroundColor: group.color }} />
+      <span className="text-label font-medium text-foreground flex-1 min-w-0 truncate">
+        {group.groupName}
+      </span>
+      <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="h-1 w-20 rounded-full bg-border/60 overflow-hidden">
+          <div
+            className="h-full rounded-full transition-all"
+            style={{
+              width: `${Math.min(barPct, 100)}%`,
+              backgroundColor: group.color,
+              opacity: 0.85,
+            }}
+          />
         </div>
-        <span className="text-[10px] font-semibold text-muted-foreground flex-shrink-0">{pctLabel}</span>
-      </div>
-      <p className="text-[10px] text-muted-foreground leading-none">
-        {metric === "amount"
-          ? `${formatRM(group.usedAmount)} of ${formatRM(group.allocatedAmount)}`
-          : `${group.claimsCount} of ${totalClaims} claims`}
-      </p>
-      <div className="h-1 rounded-full bg-border/60 overflow-hidden">
-        <div
-          className="h-full rounded-full transition-all"
-          style={{
-            width: `${Math.min(barPct, 100)}%`,
-            backgroundColor: "var(--primary)",
-            opacity: 0.6,
-          }}
-        />
+        <span className="text-[11px] font-semibold tabular-nums text-muted-foreground w-8 text-right">
+          {pctLabel}
+        </span>
+        <span className="text-label font-medium tabular-nums text-foreground text-right min-w-[90px]">
+          {metric === "amount"
+            ? `${formatRM(group.usedAmount)} / ${formatRM(group.allocatedAmount)}`
+            : `${group.claimsCount} claims`}
+        </span>
       </div>
     </div>
   )
@@ -130,18 +144,18 @@ export function DashboardBenefitChart({ data, selectedBranch, className }: Dashb
         </div>
       </div>
 
-      <div className="grid px-5 pt-4 pb-5 gap-6" style={{ gridTemplateColumns: "220px 1fr" }}>
+      <div className="flex flex-col gap-6 px-5 pt-4 pb-5 md:grid md:gap-6" style={{ gridTemplateColumns: "180px 1fr" }}>
         {/* Donut */}
-        <div className="flex-shrink-0">
-          <ChartContainer config={config} className="h-[200px] w-full">
+        <div className="flex-shrink-0 flex flex-col items-center">
+          <ChartContainer config={config} className="h-[180px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={chartData}
                   cx="50%"
                   cy="50%"
-                  innerRadius={58}
-                  outerRadius={90}
+                  innerRadius={52}
+                  outerRadius={82}
                   paddingAngle={2}
                   dataKey="value"
                   nameKey="name"
@@ -166,35 +180,32 @@ export function DashboardBenefitChart({ data, selectedBranch, className }: Dashb
                     )
                   }}
                 />
-                {/* Center: pct */}
                 <text x="50%" y="44%" textAnchor="middle" dominantBaseline="middle"
-                  style={{ fontSize: 20, fontWeight: 600, fill: "hsl(var(--foreground))" }}>
+                  style={{ fontSize: 18, fontWeight: 600, fill: "hsl(var(--foreground))" }}>
                   {overallPct}%
                 </text>
-                <text x="50%" y="56%" textAnchor="middle" dominantBaseline="middle"
+                <text x="50%" y="57%" textAnchor="middle" dominantBaseline="middle"
                   style={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}>
                   Used
                 </text>
               </PieChart>
             </ResponsiveContainer>
           </ChartContainer>
-          {/* Under donut */}
           <div className="text-center mt-1">
-            <p className="text-[11px] text-muted-foreground leading-snug">
-              {formatRM(totalUsed)} of {formatRM(totalAllocated)}
-            </p>
+            <p className="text-[11px] text-muted-foreground">{formatRM(totalUsed)} of {formatRM(totalAllocated)}</p>
             <p className="text-[10px] text-muted-foreground/60">allocation used</p>
           </div>
         </div>
 
-        {/* Category tiles — 2 × N grid */}
-        <div className="grid grid-cols-2 gap-2 content-start">
-          {sorted.map((d) => (
-            <CategoryTile
+        {/* Sorted list */}
+        <div className="flex flex-col min-w-0">
+          {sorted.map((d, i) => (
+            <CategoryRow
               key={d.groupName}
               group={d}
               metric={metric}
               totalClaims={totalClaims}
+              rank={i + 1}
             />
           ))}
         </div>

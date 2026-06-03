@@ -30,9 +30,9 @@ export interface TopProvider {
   amount: number
 }
 
-// ─── Wallet ───────────────────────────────────────────────────────────────────
+// ─── Branch Account ───────────────────────────────────────────────────────────
 
-export interface BranchWallet {
+export interface BranchAccount {
   branchId: string
   branchName: string
   branchType: "hq" | "branch"
@@ -131,13 +131,13 @@ export interface ActivityFeedItem {
 // ─── Colors ───────────────────────────────────────────────────────────────────
 
 const CATEGORY_COLORS: Record<string, string> = {
-  "Gym & Fitness":    "oklch(0.55 0.20 250)",
-  "Mental Health":    "oklch(0.58 0.16 160)",
-  "Nutrition & Diet": "oklch(0.68 0.17 75)",
-  "Spa & Bodywork":   "oklch(0.60 0.17 320)",
-  "Optical":          "oklch(0.58 0.20 25)",
-  "Group Fitness":    "oklch(0.62 0.16 200)",
-  "Dental":           "oklch(0.65 0.15 140)",
+  "Mental Health":    "oklch(0.46 0.215 277)",
+  "Gym & Fitness":    "oklch(0.57 0.18 258)",
+  "Spa & Bodywork":   "oklch(0.62 0.14 235)",
+  "Nutrition & Diet": "oklch(0.65 0.13 210)",
+  "Optical":          "oklch(0.60 0.15 195)",
+  "Group Fitness":    "oklch(0.68 0.10 180)",
+  "Dental":           "oklch(0.72 0.08 175)",
 }
 
 // ─── Seeded pseudo-random ─────────────────────────────────────────────────────
@@ -193,7 +193,7 @@ export function createTopProviders(_orgId: string): TopProvider[] {
   ]
 }
 
-export function createBranchWallets(_orgId: string): BranchWallet[] {
+export function createBranchAccounts(_orgId: string): BranchAccount[] {
   return [
     {
       branchId: "br_1",
@@ -367,6 +367,30 @@ export function createRecentActivity(_orgId: string): ActivityFeedItem[] {
 }
 
 // ─── Bucket daily timeseries into monthly aggregates ─────────────────────────
+
+export function bucketByYear(series: ClaimsDataPoint[], year: string): ClaimsDataPoint[] {
+  const y = parseInt(year)
+  const months = eachMonthOfInterval({
+    start: new Date(y, 0, 1),
+    end: new Date(y, 11, 31),
+  })
+  return months.map((m) => {
+    const start = startOfMonth(m)
+    const end = endOfMonth(m)
+    const inRange = series.filter((d) => {
+      const date = new Date(d.date)
+      return date >= start && date <= end
+    })
+    return {
+      date: format(m, "MMM yyyy"),
+      count: inRange.reduce((s, d) => s + d.count, 0),
+      amount: inRange.reduce((s, d) => s + d.amount, 0),
+      confirmedCount: inRange.reduce((s, d) => s + d.confirmedCount, 0),
+      pendingCount: inRange.reduce((s, d) => s + d.pendingCount, 0),
+      uniqueClaimants: inRange.reduce((s, d) => s + d.uniqueClaimants, 0),
+    }
+  })
+}
 
 export function bucketByMonth(series: ClaimsDataPoint[]): ClaimsDataPoint[] {
   const today = new Date(2026, 4, 29)

@@ -12,9 +12,9 @@ import {
 import { DashboardKpiRow } from "@/components/org/dashboard-kpi-row"
 import { DashboardClaimsChart } from "@/components/org/dashboard-claims-chart"
 import { DashboardBenefitChart } from "@/components/org/dashboard-benefit-chart"
-import { DashboardTopTen } from "@/components/org/dashboard-top-ten"
+import { DashboardTopPolicies } from "@/components/org/dashboard-top-policies"
+import { DashboardTopCentres } from "@/components/org/dashboard-top-centres"
 import { DashboardActionCentre } from "@/components/org/dashboard-action-centre"
-import { DashboardRecentActivity } from "@/components/org/dashboard-recent-activity"
 import { type OrgTask } from "@/components/org/org-task-centre"
 import {
   MOCK_ORGS,
@@ -22,12 +22,11 @@ import {
   MOCK_CLAIMS_TIMESERIES,
   MOCK_BENEFIT_GROUP_USAGE,
   MOCK_TOP_PROVIDERS,
-  MOCK_BRANCH_WALLETS,
+  MOCK_BRANCH_ACCOUNTS,
   MOCK_POLICY_UTILISATION,
   MOCK_COVERAGE_FUNNEL,
   MOCK_EMPLOYEE_GROUP_UTILISATION,
   MOCK_VOUCHER_COUNTS,
-  MOCK_RECENT_ACTIVITY,
 } from "@/lib/mock-data"
 import { routes } from "@/lib/navigation"
 
@@ -88,7 +87,7 @@ function deriveOrgTasks(
       id: "budget-depleted",
       category: "budget",
       priority: "critical",
-      title: "Low Wallet Warning",
+      title: "Low Account Warning",
       description: "Account balance is depleted. New claims will be blocked until topped up.",
     })
   } else if (budgetPct < 20) {
@@ -96,7 +95,7 @@ function deriveOrgTasks(
       id: "budget-low",
       category: "budget",
       priority: "high",
-      title: "Low Wallet Warning",
+      title: "Low Account Warning",
       description: `Only ${budgetPct}% remains. Request a top-up to avoid disruption.`,
     })
   } else {
@@ -104,8 +103,8 @@ function deriveOrgTasks(
       id: "budget-ok",
       category: "budget",
       priority: "low",
-      title: "Low Wallet Warning",
-      description: "Wallet balance is healthy.",
+      title: "Low Account Warning",
+      description: "Account balance is healthy.",
     })
   }
 
@@ -126,9 +125,9 @@ export default function OrgDashboardPage() {
     selectedBranch === "all"
       ? orgUtilRows
       : orgUtilRows.filter((r) => {
-          const wallet = MOCK_BRANCH_WALLETS.find((w) => w.branchId === selectedBranch)
-          return wallet
-            ? r.branch.toLowerCase().includes(wallet.branchName.split(" ")[1]?.toLowerCase() ?? "")
+          const account = MOCK_BRANCH_ACCOUNTS.find((a) => a.branchId === selectedBranch)
+          return account
+            ? r.branch.toLowerCase().includes(account.branchName.split(" ")[1]?.toLowerCase() ?? "")
             : true
         })
 
@@ -147,21 +146,21 @@ export default function OrgDashboardPage() {
     <div className="space-y-8 pb-8">
 
       {/* ── Header ─────────────────────────────────────────────────────────── */}
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-xl font-semibold text-foreground">{org.name}</h1>
           <p className="text-label text-muted-foreground mt-0.5">Organisation Dashboard</p>
         </div>
         <div className="flex items-center gap-2">
           <Select value={selectedBranch} onValueChange={setSelectedBranch}>
-            <SelectTrigger className="w-48 h-8 text-[13px]">
+            <SelectTrigger className="w-full sm:w-48 h-8 text-[13px]">
               <SelectValue placeholder="All Branches" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Branches</SelectItem>
-              {MOCK_BRANCH_WALLETS.map((w) => (
-                <SelectItem key={w.branchId} value={w.branchId}>
-                  {w.branchName}
+              {MOCK_BRANCH_ACCOUNTS.map((a) => (
+                <SelectItem key={a.branchId} value={a.branchId}>
+                  {a.branchName}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -171,7 +170,7 @@ export default function OrgDashboardPage() {
 
       {/* ── KPI Row ─────────────────────────────────────────────────────────── */}
       <DashboardKpiRow
-        wallets={MOCK_BRANCH_WALLETS}
+        accounts={MOCK_BRANCH_ACCOUNTS}
         funnel={MOCK_COVERAGE_FUNNEL}
         voucherCounts={MOCK_VOUCHER_COUNTS}
         claimsThisMonth={claimsThisMonth}
@@ -184,28 +183,30 @@ export default function OrgDashboardPage() {
       <DashboardClaimsChart
         data={MOCK_CLAIMS_TIMESERIES}
         selectedBranch={selectedBranch}
-        wallets={MOCK_BRANCH_WALLETS}
+        accounts={MOCK_BRANCH_ACCOUNTS}
       />
 
-      {/* ── Benefit Utilisation + Top Policies ───────────────────────────────── */}
-      <div className="grid grid-cols-2 gap-6">
-        <DashboardBenefitChart
-          data={MOCK_BENEFIT_GROUP_USAGE}
-          selectedBranch={selectedBranch}
-        />
-        <DashboardTopTen
+      {/* ── Benefit Utilisation By Category ──────────────────────────────────── */}
+      <DashboardBenefitChart
+        data={MOCK_BENEFIT_GROUP_USAGE}
+        selectedBranch={selectedBranch}
+      />
+
+      {/* ── Policy Performance + Top Wellness Centres ────────────────────────── */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <DashboardTopPolicies
           policies={MOCK_POLICY_UTILISATION}
-          providers={MOCK_TOP_PROVIDERS}
           employeeGroups={MOCK_EMPLOYEE_GROUP_UTILISATION}
           selectedBranch={selectedBranch}
         />
+        <DashboardTopCentres
+          providers={MOCK_TOP_PROVIDERS}
+          selectedBranch={selectedBranch}
+        />
       </div>
 
-      {/* ── Action Centre + Recent Activity ──────────────────────────────────── */}
-      <div className="grid grid-cols-2 gap-6">
-        <DashboardActionCentre tasks={tasks} orgSlug={orgSlug} />
-        <DashboardRecentActivity activities={MOCK_RECENT_ACTIVITY} />
-      </div>
+      {/* ── Action Centre ─────────────────────────────────────────────────────── */}
+      <DashboardActionCentre tasks={tasks} orgSlug={orgSlug} />
 
     </div>
   )

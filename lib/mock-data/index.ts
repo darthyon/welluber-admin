@@ -28,7 +28,7 @@ export {
   MOCK_CLAIMS_TIMESERIES,
   MOCK_BENEFIT_BREAKDOWN,
   MOCK_TOP_PROVIDERS,
-  MOCK_BRANCH_WALLETS,
+  MOCK_BRANCH_ACCOUNTS,
   MOCK_POLICY_UTILISATION,
   MOCK_COVERAGE_FUNNEL,
   MOCK_BENEFIT_GROUP_USAGE,
@@ -42,7 +42,7 @@ export type {
   ClaimsDataPoint,
   BenefitCategoryBreakdown,
   TopProvider,
-  BranchWallet,
+  BranchAccount,
   PolicyUtilisation,
   OrgCoverageFunnel,
   BenefitGroupUsage,
@@ -51,7 +51,7 @@ export type {
   ActivityFeedItem,
   ActivityEventType,
 } from "./factories/org-analytics"
-export { bucketByMonth } from "./factories/org-analytics"
+export { bucketByMonth, bucketByYear } from "./factories/org-analytics"
 
 // Service taxonomy
 export { SERVICES } from "./service-catalog"
