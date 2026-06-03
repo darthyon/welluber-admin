@@ -209,14 +209,11 @@ export function SpVoucherForm({
                 <div className="space-y-5">
                   {/* Branch — chosen first; its account wallet sets the currency that scopes line-item pricing. */}
                   <div className="space-y-3">
-                    <div className="space-y-0.5">
-                      <label className="text-body font-medium text-foreground">Branch Assignment</label>
-                      <p className="text-label text-muted-foreground">Which locations accept this voucher? The branch&apos;s account wallet sets the pricing currency.</p>
-                    </div>
+                    <label className="text-body font-medium text-foreground">Branch Assignment</label>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <ChoiceCard
-                        title="Global"
-                        description="All branch locations"
+                        title="All Branches"
+                        description=""
                         icon={Buildings}
                         selected={branchScope === "all"}
                         onSelect={() => {
@@ -226,8 +223,8 @@ export function SpVoucherForm({
                         className="p-3"
                       />
                       <ChoiceCard
-                        title="Local"
-                        description="Selected branches only"
+                        title="Specific Branches"
+                        description=""
                         icon={MapPin}
                         selected={branchScope === "specific"}
                         onSelect={() => setValue("branchScope", "specific")}
@@ -353,17 +350,6 @@ export function SpVoucherForm({
                     <Switch checked={watch("bookingRequired")} onCheckedChange={(v) => setValue("bookingRequired", v)} />
                   </div>
 
-                  <div className="space-y-1.5">
-                    <label className="text-body font-medium text-foreground">Display Location</label>
-                    <input
-                      {...register("displayLocation.line")}
-                      className={cn(
-                        "w-full px-3 py-2 bg-background border rounded-md text-body outline-none transition-colors",
-                        "border-border focus:border-foreground/30 focus:bg-muted/30"
-                      )}
-                      placeholder="e.g. KLCC Branch, Level 3"
-                    />
-                  </div>
                 </div>
               </div>
             </div>
@@ -381,7 +367,7 @@ export function SpVoucherForm({
                 <div className="space-y-5">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-body font-medium text-foreground">Initial Price ({currency || "MYR"})</label>
+                      <label className="text-body font-medium text-foreground">Price</label>
                       <input
                         type="number"
                         step="0.01"
@@ -395,6 +381,15 @@ export function SpVoucherForm({
                     <div className="space-y-1.5">
                       <label className="text-body font-medium text-foreground">Discount</label>
                       <div className="flex items-stretch gap-2">
+                        <FormSelect
+                          value={discountType}
+                          onChange={(v) => setValue("discount.type", v as "amount" | "percent")}
+                          options={[
+                            { label: "Amount", value: "amount" },
+                            { label: "%", value: "percent" },
+                          ]}
+                          triggerClassName="w-32 shrink-0"
+                        />
                         <input
                           type="number"
                           step="0.01"
@@ -406,25 +401,13 @@ export function SpVoucherForm({
                           )}
                           placeholder="0"
                         />
-                        <FormSelect
-                          value={discountType}
-                          onChange={(v) => setValue("discount.type", v as "amount" | "percent")}
-                          options={[
-                            { label: currency || "MYR", value: "amount" },
-                            { label: "%", value: "percent" },
-                          ]}
-                          triggerClassName="w-24 shrink-0"
-                        />
                       </div>
                     </div>
                   </div>
 
                   {/* Computed Final Price */}
                   <div className="flex items-center justify-between p-4 bg-primary/5 rounded-lg border border-primary/10">
-                    <div className="space-y-0.5">
-                      <p className="text-body font-semibold text-foreground">Final Price</p>
-                      <p className="text-label text-faint">Computed from initial price minus discount, rounded to the nearest whole {currency || "MYR"}.</p>
-                    </div>
+                    <p className="text-body font-semibold text-foreground">Final Price</p>
                     <p className="text-heading font-semibold text-primary font-mono tabular-nums">
                       {currency || "MYR"} {finalPrice.toLocaleString()}
                     </p>
