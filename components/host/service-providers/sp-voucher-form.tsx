@@ -15,7 +15,6 @@ import {
   MapPin,
   Clock,
   Stack,
-  Image as ImageIcon,
   PaperPlaneTilt,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
@@ -36,10 +35,9 @@ import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav";
 import type { SpVoucher } from "@/types/provider";
 
 const ANCHOR_ITEMS = [
-  { id: "voucher-details", label: "Voucher Details" },
+  { id: "details", label: "Details" },
+  { id: "voucher-configuration", label: "Voucher Configuration" },
   { id: "manage-services", label: "Manage Services" },
-  { id: "lifecycle", label: "Lifecycle & Validity" },
-  { id: "display-image", label: "Display Image" },
 ];
 
 interface SpVoucherFormProps {
@@ -200,14 +198,14 @@ export function SpVoucherForm({
         {/* Right Column: Form Sections */}
         <div className="flex-1">
           <div className="flex flex-col gap-6">
-            {/* Voucher Details */}
-            <div id="voucher-details" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
+            {/* Details */}
+            <div id="details" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
               <div className="p-6 space-y-6">
                 <div className="flex items-center gap-2 pb-2">
                   <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                     <Ticket size={16} weight="fill" />
                   </div>
-                  <h3 className="text-lead font-semibold text-foreground">Voucher Details</h3>
+                  <h3 className="text-lead font-semibold text-foreground">Details</h3>
                 </div>
 
                 <div className="space-y-5">
@@ -270,38 +268,6 @@ export function SpVoucherForm({
                     </div>
                   </div>
 
-                  {/* Generation & usage limits */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-body font-medium text-foreground">No. of Vouchers</label>
-                      <input
-                        type="number"
-                        min={0}
-                        {...register("voucherCount", { valueAsNumber: true })}
-                        className={cn(
-                          "w-full px-3 py-2 bg-background border rounded-md text-body font-mono outline-none transition-colors",
-                          "border-border focus:border-foreground/30 focus:bg-muted/30"
-                        )}
-                        placeholder="e.g. 500"
-                      />
-                      <p className="text-label text-faint">How many vouchers to generate for this package.</p>
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-body font-medium text-foreground">Max Distribution Per User</label>
-                      <input
-                        type="number"
-                        min={1}
-                        {...register("maxUsagePerUser", { valueAsNumber: true })}
-                        className={cn(
-                          "w-full px-3 py-2 bg-background border rounded-md text-body font-mono outline-none transition-colors",
-                          "border-border focus:border-foreground/30 focus:bg-muted/30"
-                        )}
-                        placeholder="e.g. 5"
-                      />
-                      <p className="text-label text-faint">How many times each member can redeem this voucher.</p>
-                    </div>
-                  </div>
-
                   {isEditing && (
                     <div className="space-y-1.5">
                       <label className="text-body font-medium text-foreground">Package ID</label>
@@ -354,6 +320,169 @@ export function SpVoucherForm({
                     <Switch checked={watch("bookingRequired")} onCheckedChange={(v) => setValue("bookingRequired", v)} />
                   </div>
 
+                  <div className="space-y-4">
+                    <div className="space-y-0.5">
+                      <p className="text-body font-semibold text-foreground">Display Image</p>
+                      <p className="text-label text-muted-foreground">The primary image seen by users on the marketplace.</p>
+                    </div>
+                    <LogoUpload
+                      label="Search Result / Hero Image"
+                      value={watch("photo")}
+                      onChange={(file) => setValue("photo", file)}
+                      className="w-full"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Voucher Configuration */}
+            <div id="voucher-configuration" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
+              <div className="p-6 space-y-6">
+                <div className="flex items-center gap-2 pb-2">
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                    <Stack size={16} weight="fill" />
+                  </div>
+                  <h3 className="text-lead font-semibold text-foreground">Voucher Configuration</h3>
+                </div>
+
+                <div className="space-y-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-body font-medium text-foreground">No. of Vouchers</label>
+                      <input
+                        type="number"
+                        min={0}
+                        {...register("voucherCount", { valueAsNumber: true })}
+                        className={cn(
+                          "w-full px-3 py-2 bg-background border rounded-md text-body font-mono outline-none transition-colors",
+                          "border-border focus:border-foreground/30 focus:bg-muted/30"
+                        )}
+                        placeholder="e.g. 500"
+                      />
+                      <p className="text-label text-faint">How many vouchers to generate for this package.</p>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-body font-medium text-foreground">Max Distribution Per User</label>
+                      <input
+                        type="number"
+                        min={1}
+                        {...register("maxUsagePerUser", { valueAsNumber: true })}
+                        className={cn(
+                          "w-full px-3 py-2 bg-background border rounded-md text-body font-mono outline-none transition-colors",
+                          "border-border focus:border-foreground/30 focus:bg-muted/30"
+                        )}
+                        placeholder="e.g. 5"
+                      />
+                      <p className="text-label text-faint">How many times each member can redeem this voucher.</p>
+                    </div>
+                  </div>
+
+                  {/* Listing Period */}
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="text-body font-semibold text-foreground">Listing Period</h4>
+                      <p className="text-label text-muted-foreground mt-0.5">Validity start–end shown on the member app.</p>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <DatePickerField
+                        placeholder="Start Date"
+                        value={watch("activationPeriod.startDate")}
+                        onChange={(v: string) => setValue("activationPeriod.startDate", v)}
+                        clearable={false}
+                      />
+                      <DatePickerField
+                        placeholder="End Date (Optional)"
+                        value={watch("activationPeriod.endDate") || ""}
+                        onChange={(v: string) => setValue("activationPeriod.endDate", v)}
+                        clearable
+                      />
+                    </div>
+                  </div>
+
+                  <div className="h-px bg-border/40" />
+
+                  {/* Redemption Period */}
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="text-body font-semibold text-foreground">Redemption Period</h4>
+                      <p className="text-label text-muted-foreground mt-0.5">When can customers use this voucher?</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <ChoiceCard
+                        title="Relative"
+                        description="Valid after purchase."
+                        icon={Clock}
+                        selected={redemptionMode === "after_purchase"}
+                        onSelect={() => setValue("redemptionPeriod.mode", "after_purchase")}
+                        className="p-3"
+                      />
+                      <ChoiceCard
+                        title="Fixed"
+                        description="Set expiry date."
+                        icon={CalendarBlank}
+                        selected={redemptionMode === "exact_date"}
+                        onSelect={() => setValue("redemptionPeriod.mode", "exact_date")}
+                        className="p-3"
+                      />
+                    </div>
+
+                    {redemptionMode === "after_purchase" && (
+                      <div className="mt-4 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                        <div className="flex flex-col gap-2">
+                          <label className="text-label font-medium text-subtle">Valid For</label>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="number"
+                              className="w-16 px-3 py-1.5 bg-background border border-border rounded-md text-body text-center font-semibold outline-none focus:ring-2 focus:ring-primary/10"
+                              {...register("redemptionPeriod.value", { valueAsNumber: true })}
+                            />
+                            <FormSelect
+                              value={watch("redemptionPeriod.unit")}
+                              onChange={(v) => setValue("redemptionPeriod.unit", v as "hr" | "day" | "month")}
+                              options={[
+                                { label: "Hours", value: "hr" },
+                                { label: "Days", value: "day" },
+                                { label: "Months", value: "month" },
+                              ]}
+                              triggerClassName="flex-1"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {redemptionMode === "exact_date" && (
+                      <div className="mt-4 space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                        <label className="text-label font-medium text-subtle block">Expiry Date</label>
+                        <DatePickerField
+                          value={watch("redemptionPeriod.date") || ""}
+                          onChange={(v: string) => setValue("redemptionPeriod.date", v)}
+                          clearable
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="h-px bg-border/40" />
+
+                  {/* Membership Start Day */}
+                  <div className="space-y-3">
+                    <div>
+                      <h4 className="text-body font-semibold text-foreground">Membership Start Day</h4>
+                      <p className="text-label text-muted-foreground mt-0.5">When do membership periods begin?</p>
+                    </div>
+                    <FormSelect
+                      value={watch("membershipStartDay")}
+                      onChange={(v) => setValue("membershipStartDay", v as "none" | "1st" | "15th")}
+                      options={[
+                        { label: "None (immediate)", value: "none" },
+                        { label: "1st of the month", value: "1st" },
+                        { label: "15th of the month", value: "15th" },
+                      ]}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -496,150 +625,6 @@ export function SpVoucherForm({
                       </p>
                     </div>
                   </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Lifecycle & Validity */}
-            <div id="lifecycle" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
-              <div className="p-6 space-y-6">
-                <div className="flex items-center gap-2 pb-2">
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                    <Stack size={16} weight="fill" />
-                  </div>
-                  <h3 className="text-lead font-semibold text-foreground">Lifecycle & Validity</h3>
-                </div>
-
-                <div className="space-y-8">
-                  {/* Listing Period */}
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="text-body font-semibold text-foreground">Listing Period</h4>
-                      <p className="text-label text-muted-foreground mt-0.5">Validity start–end shown on the member app.</p>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <DatePickerField
-                        placeholder="Start Date"
-                        value={watch("activationPeriod.startDate")}
-                        onChange={(v: string) => setValue("activationPeriod.startDate", v)}
-                        clearable={false}
-                      />
-                      <DatePickerField
-                        placeholder="End Date (Optional)"
-                        value={watch("activationPeriod.endDate") || ""}
-                        onChange={(v: string) => setValue("activationPeriod.endDate", v)}
-                        clearable
-                      />
-                    </div>
-                  </div>
-
-                  <div className="h-px bg-border/40" />
-
-                  {/* Redemption Period */}
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="text-body font-semibold text-foreground">Redemption Period</h4>
-                      <p className="text-label text-muted-foreground mt-0.5">When can customers use this voucher?</p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      <ChoiceCard
-                        title="Relative"
-                        description="Valid after purchase."
-                        icon={Clock}
-                        selected={redemptionMode === "after_purchase"}
-                        onSelect={() => setValue("redemptionPeriod.mode", "after_purchase")}
-                        className="p-3"
-                      />
-                      <ChoiceCard
-                        title="Fixed"
-                        description="Set expiry date."
-                        icon={CalendarBlank}
-                        selected={redemptionMode === "exact_date"}
-                        onSelect={() => setValue("redemptionPeriod.mode", "exact_date")}
-                        className="p-3"
-                      />
-                    </div>
-
-                    {redemptionMode === "after_purchase" && (
-                      <div className="mt-4 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
-                        <div className="flex flex-col gap-2">
-                          <label className="text-label font-medium text-subtle">Valid For</label>
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="number"
-                              className="w-16 px-3 py-1.5 bg-background border border-border rounded-md text-body text-center font-semibold outline-none focus:ring-2 focus:ring-primary/10"
-                              {...register("redemptionPeriod.value", { valueAsNumber: true })}
-                            />
-                            <FormSelect
-                              value={watch("redemptionPeriod.unit")}
-                              onChange={(v) => setValue("redemptionPeriod.unit", v as "hr" | "day" | "month")}
-                              options={[
-                                { label: "Hours", value: "hr" },
-                                { label: "Days", value: "day" },
-                                { label: "Months", value: "month" },
-                              ]}
-                              triggerClassName="flex-1"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {redemptionMode === "exact_date" && (
-                      <div className="mt-4 space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                        <label className="text-label font-medium text-subtle block">Expiry Date</label>
-                        <DatePickerField
-                          value={watch("redemptionPeriod.date") || ""}
-                          onChange={(v: string) => setValue("redemptionPeriod.date", v)}
-                          clearable
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="h-px bg-border/40" />
-
-                  {/* Membership Start Day */}
-                  <div className="space-y-3">
-                    <div>
-                      <h4 className="text-body font-semibold text-foreground">Membership Start Day</h4>
-                      <p className="text-label text-muted-foreground mt-0.5">When do membership periods begin?</p>
-                    </div>
-                    <FormSelect
-                      value={watch("membershipStartDay")}
-                      onChange={(v) => setValue("membershipStartDay", v as "none" | "1st" | "15th")}
-                      options={[
-                        { label: "None (immediate)", value: "none" },
-                        { label: "1st of the month", value: "1st" },
-                        { label: "15th of the month", value: "15th" },
-                      ]}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Display Image */}
-            <div id="display-image" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
-              <div className="p-6 space-y-6">
-                <div className="flex items-center gap-2 pb-2">
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                    <ImageIcon size={16} weight="fill" />
-                  </div>
-                  <div className="space-y-0.5">
-                    <h3 className="text-lead font-semibold text-foreground">Display Image</h3>
-                    <p className="text-label text-muted-foreground">The primary image seen by users on the marketplace.</p>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <LogoUpload
-                    label="Search Result / Hero Image"
-                    value={watch("photo")}
-                    onChange={(file) => setValue("photo", file)}
-                    className="w-full"
-                  />
                 </div>
               </div>
             </div>
