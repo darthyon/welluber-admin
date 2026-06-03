@@ -53,6 +53,7 @@ const serviceLineSchema = z.object({
   subServices: z.array(z.string()).min(1, "Select at least one sub-service"),
   description: z.string().optional(),
   descriptionList: z.string().optional(), // WYSIWYG list
+  price: z.coerce.number().min(0, "Price must be 0 or more").default(0),
 });
 
 // ─── SP Branch ────────────────────────────────────────────────────────────────
@@ -124,7 +125,15 @@ export const createVoucherSchema = z.object({
     .min(1, "Add at least one service line"),
   currency: z.string().default("MYR"),
   initialPrice: z.number().min(0, "Initial price must be 0 or more"),
-  finalPrice: z.number().int("Final price must be a whole number").min(0),
+  discount: z
+    .object({
+      type: z.enum(["amount", "percent"]),
+      value: z.coerce.number().min(0, "Discount must be 0 or more"),
+    })
+    .default({ type: "amount", value: 0 }),
+  finalPrice: z.number().int("Final price must be a whole number").min(0).default(0), // computed from initialPrice − discount
+  voucherCount: z.coerce.number().int().min(0, "Must be 0 or more").optional(),
+  maxUsagePerUser: z.coerce.number().int().min(1, "Must be at least 1").optional(),
   activationPeriod: z.object({
     startDate: z.string().min(1, "Start date is required"),
     endDate: z.string().optional(),

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -26,14 +26,12 @@ import { createVoucher, updateVoucher, publishVoucher } from "@/features/provide
 import { Button } from "@/components/ui/button";
 import { ChoiceCard } from "@/components/shared/choice-card";
 import { SuccessCelebration } from "@/components/shared/success-celebration";
-import { CURRENCIES } from "@/features/providers/constants";
 import { SERVICE_TAXONOMY, SERVICE_SPEC_TAXONOMY } from "@/features/organizations/constants";
 import { SectionedSearchSelect } from "@/components/shared/sectioned-search-select";
 import { CustomMultiSelect } from "@/components/shared/custom-multi-select";
 import { DatePickerField } from "@/components/shared/date-picker-field";
 import { LogoUpload } from "@/components/shared/logo-upload";
 import { FormSelect } from "@/components/shared/form-select";
-import { SearchableSelect } from "@/components/shared/searchable-select";
 import { ItemSection } from "@/components/shared/item-section";
 import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav";
 import type { SpVoucher } from "@/types/provider";
@@ -43,7 +41,6 @@ const ANCHOR_ITEMS = [
   { id: "commercials", label: "Commercials" },
   { id: "service-lines", label: "Service Line Items" },
   { id: "lifecycle", label: "Lifecycle & Validity" },
-  { id: "branch-assignment", label: "Branch Assignment" },
   { id: "display-image", label: "Display Image" },
 ];
 
@@ -79,11 +76,14 @@ export function SpVoucherForm({
       displayLocation: voucher?.displayLocation || { line: "" },
       photo: voucher?.photo || "",
       serviceLines: voucher?.serviceLines || [
-        { service: "", subServices: [], description: "", descriptionList: "" },
+        { service: "", subServices: [], description: "", descriptionList: "", price: 0 },
       ],
       currency: voucher?.currency || "MYR",
       initialPrice: voucher?.initialPrice || 0,
+      discount: voucher?.discount || { type: "amount", value: 0 },
       finalPrice: voucher?.finalPrice || 0,
+      voucherCount: voucher?.voucherCount,
+      maxUsagePerUser: voucher?.maxUsagePerUser ?? 1,
       activationPeriod: voucher?.activationPeriod || {
         startDate: new Date().toISOString().split("T")[0],
       },
@@ -101,6 +101,23 @@ export function SpVoucherForm({
   const { fields: serviceLineFields, append: appendLine, remove: removeLine } = useFieldArray({ control, name: "serviceLines" });
   const redemptionMode = watch("redemptionPeriod.mode");
   const branchScope = watch("branchScope");
+  const currency = watch("currency");
+
+  // Final Price is computed from Initial Price minus the discount (amount or %), rounded to whole number.
+  const initialPrice = Number(watch("initialPrice")) || 0;
+  const discountType = watch("discount.type");
+  const discountValue = Number(watch("discount.value")) || 0;
+  const finalPrice = useMemo(() => {
+    const raw =
+      discountType === "percent"
+        ? initialPrice * (1 - discountValue / 100)
+        : initialPrice - discountValue;
+    return Math.max(0, Math.round(raw));
+  }, [initialPrice, discountType, discountValue]);
+
+  useEffect(() => {
+    setValue("finalPrice", finalPrice);
+  }, [finalPrice, setValue]);
 
   const onSave = async (data: z.input<typeof createVoucherSchema>) => {
     setIsSubmitting(true);
@@ -190,6 +207,100 @@ export function SpVoucherForm({
                 </div>
 
                 <div className="space-y-5">
+                  {/* Branch — chosen first; its account wallet sets the currency that scopes line-item pricing. */}
+                  <div className="space-y-3">
+                    <div className="space-y-0.5">
+                      <label className="text-body font-medium text-foreground">Branch Assignment</label>
+                      <p className="text-label text-muted-foreground">Which locations accept this voucher? The branch&apos;s account wallet sets the pricing currency.</p>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <ChoiceCard
+                        title="Global"
+                        description="All branch locations"
+                        icon={Buildings}
+                        selected={branchScope === "all"}
+                        onSelect={() => {
+                          setValue("branchScope", "all");
+                          setValue("branchIds", []);
+                        }}
+                        className="p-3"
+                      />
+                      <ChoiceCard
+                        title="Local"
+                        description="Selected branches only"
+                        icon={MapPin}
+                        selected={branchScope === "specific"}
+                        onSelect={() => setValue("branchScope", "specific")}
+                        className="p-3"
+                      />
+                    </div>
+                    {branchScope === "specific" && (
+                      <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                        <label className="text-label font-medium text-subtle">Select Branches</label>
+                        <CustomMultiSelect
+                          options={spBranches.map((b) => b.name)}
+                          selected={(watch("branchIds") ?? []).map(
+                            (id) => spBranches.find((b) => b.id === id)?.name || id
+                          )}
+                          onChange={(names) => {
+                            const ids = names.map(
+                              (name) => spBranches.find((b) => b.name === name)?.id || name
+                            );
+                            setValue("branchIds", ids);
+                          }}
+                          placeholder="Search branches..."
+                        />
+                        {errors.branchIds && (
+                          <p className="text-label text-destructive flex items-center gap-1 mt-1">
+                            <WarningCircle size={12} /> {errors.branchIds.message}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Currency — locked to the branch account wallet (MYR for v1). */}
+                  <div className="space-y-1.5">
+                    <label className="text-body font-medium text-foreground">Currency</label>
+                    <div className="flex items-center gap-3 w-full px-3 py-2 bg-muted/20 border border-border rounded-md text-body">
+                      <span className="w-8 h-5 bg-muted rounded-sm flex items-center justify-center text-label font-medium text-muted-foreground">{currency || "MYR"}</span>
+                      <span className="text-foreground font-medium whitespace-nowrap">Malaysian Ringgit (RM)</span>
+                      <span className="ml-auto text-label text-faint font-medium">From branch account · Locked</span>
+                    </div>
+                  </div>
+
+                  {/* Generation & usage limits */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-body font-medium text-foreground">No. of Vouchers</label>
+                      <input
+                        type="number"
+                        min={0}
+                        {...register("voucherCount", { valueAsNumber: true })}
+                        className={cn(
+                          "w-full px-3 py-2 bg-background border rounded-md text-body font-mono outline-none transition-colors",
+                          "border-border focus:border-foreground/30 focus:bg-muted/30"
+                        )}
+                        placeholder="e.g. 500"
+                      />
+                      <p className="text-label text-faint">How many vouchers to generate for this package.</p>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-body font-medium text-foreground">Max Distribution Per User</label>
+                      <input
+                        type="number"
+                        min={1}
+                        {...register("maxUsagePerUser", { valueAsNumber: true })}
+                        className={cn(
+                          "w-full px-3 py-2 bg-background border rounded-md text-body font-mono outline-none transition-colors",
+                          "border-border focus:border-foreground/30 focus:bg-muted/30"
+                        )}
+                        placeholder="e.g. 5"
+                      />
+                      <p className="text-label text-faint">How many times each member can redeem this voucher.</p>
+                    </div>
+                  </div>
+
                   {isEditing && (
                     <div className="space-y-1.5">
                       <label className="text-body font-medium text-foreground">Voucher Code</label>
@@ -268,22 +379,9 @@ export function SpVoucherForm({
                 </div>
 
                 <div className="space-y-5">
-                  <div className="space-y-1.5">
-                    <label className="text-body font-medium text-foreground">Currency</label>
-                    <SearchableSelect
-                      value={watch("currency")}
-                      onChange={(v) => setValue("currency", v)}
-                      options={Object.entries(CURRENCIES).map(([code, name]) => ({
-                        label: `${code} - ${name}`,
-                        value: code,
-                      }))}
-                      searchPlaceholder="Search currency..."
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-body font-medium text-foreground">Initial Price</label>
+                      <label className="text-body font-medium text-foreground">Initial Price ({currency || "MYR"})</label>
                       <input
                         type="number"
                         step="0.01"
@@ -295,24 +393,41 @@ export function SpVoucherForm({
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-body font-medium text-foreground">Final Price</label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        {...register("finalPrice", { valueAsNumber: true })}
-                        className={cn(
-                          "w-full px-3 py-2 bg-background border rounded-md text-body font-mono font-semibold outline-none transition-colors",
-                          errors.finalPrice
-                            ? "border-destructive ring-1 ring-destructive/20"
-                            : "border-primary/20 focus:border-primary/30 bg-primary/5"
-                        )}
-                      />
-                      {errors.finalPrice && (
-                        <p className="text-label text-destructive flex items-center gap-1 mt-1">
-                          <WarningCircle size={12} /> {errors.finalPrice.message}
-                        </p>
-                      )}
+                      <label className="text-body font-medium text-foreground">Discount</label>
+                      <div className="flex items-stretch gap-2">
+                        <input
+                          type="number"
+                          step="0.01"
+                          min={0}
+                          {...register("discount.value", { valueAsNumber: true })}
+                          className={cn(
+                            "flex-1 min-w-0 px-3 py-2 bg-background border rounded-md text-body font-mono outline-none transition-colors",
+                            "border-border focus:border-foreground/30 focus:bg-muted/30"
+                          )}
+                          placeholder="0"
+                        />
+                        <FormSelect
+                          value={discountType}
+                          onChange={(v) => setValue("discount.type", v as "amount" | "percent")}
+                          options={[
+                            { label: currency || "MYR", value: "amount" },
+                            { label: "%", value: "percent" },
+                          ]}
+                          triggerClassName="w-24 shrink-0"
+                        />
+                      </div>
                     </div>
+                  </div>
+
+                  {/* Computed Final Price */}
+                  <div className="flex items-center justify-between p-4 bg-primary/5 rounded-lg border border-primary/10">
+                    <div className="space-y-0.5">
+                      <p className="text-body font-semibold text-foreground">Final Price</p>
+                      <p className="text-label text-faint">Computed from initial price minus discount, rounded to the nearest whole {currency || "MYR"}.</p>
+                    </div>
+                    <p className="text-heading font-semibold text-primary font-mono tabular-nums">
+                      {currency || "MYR"} {finalPrice.toLocaleString()}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -371,6 +486,20 @@ export function SpVoucherForm({
                             />
                           </div>
                           <div className="space-y-1.5 sm:col-span-2">
+                            <label className="text-label font-medium text-subtle">Price ({currency || "MYR"})</label>
+                            <input
+                              type="number"
+                              step="0.01"
+                              min={0}
+                              {...register(`serviceLines.${i}.price`, { valueAsNumber: true })}
+                              className={cn(
+                                "w-full px-3 py-2 bg-background border rounded-md text-body font-mono outline-none transition-colors",
+                                "border-border focus:border-foreground/30 focus:bg-muted/30"
+                              )}
+                              placeholder="0.00"
+                            />
+                          </div>
+                          <div className="space-y-1.5 sm:col-span-2">
                             <label className="text-label font-medium text-subtle">Voucher Features</label>
                             <textarea
                               {...register(`serviceLines.${i}.descriptionList`)}
@@ -394,7 +523,7 @@ export function SpVoucherForm({
                       variant="outline"
                       className="w-full border-dashed border-border h-14 text-muted-foreground hover:text-primary hover:border-primary/30 transition-all bg-card rounded-lg font-semibold shadow-sm"
                       onClick={() =>
-                        appendLine({ service: "", subServices: [], description: "", descriptionList: "" })
+                        appendLine({ service: "", subServices: [], description: "", descriptionList: "", price: 0 })
                       }
                     >
                       <Plus size={18} weight="bold" className="mr-2" />
@@ -416,11 +545,11 @@ export function SpVoucherForm({
                 </div>
 
                 <div className="space-y-8">
-                  {/* Activation Period */}
+                  {/* Listing Period */}
                   <div className="space-y-4">
                     <div>
-                      <h4 className="text-body font-semibold text-foreground">Activation Period</h4>
-                      <p className="text-label text-muted-foreground mt-0.5">When is this voucher available for purchase?</p>
+                      <h4 className="text-body font-semibold text-foreground">Listing Period</h4>
+                      <p className="text-label text-muted-foreground mt-0.5">Validity start–end shown on the member app.</p>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <DatePickerField
@@ -521,69 +650,6 @@ export function SpVoucherForm({
                       ]}
                     />
                   </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Branch Assignment */}
-            <div id="branch-assignment" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
-              <div className="p-6 space-y-6">
-                <div className="flex items-center gap-2 pb-2">
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                    <Buildings size={16} weight="fill" />
-                  </div>
-                  <div className="space-y-0.5">
-                    <h3 className="text-lead font-semibold text-foreground">Branch Assignment</h3>
-                    <p className="text-label text-muted-foreground">Which locations accept this voucher?</p>
-                  </div>
-                </div>
-
-                <div className="space-y-5">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <ChoiceCard
-                      title="Global"
-                      description="All branch locations"
-                      icon={Buildings}
-                      selected={branchScope === "all"}
-                      onSelect={() => {
-                        setValue("branchScope", "all");
-                        setValue("branchIds", []);
-                      }}
-                      className="p-3"
-                    />
-                    <ChoiceCard
-                      title="Local"
-                      description="Selected branches only"
-                      icon={MapPin}
-                      selected={branchScope === "specific"}
-                      onSelect={() => setValue("branchScope", "specific")}
-                      className="p-3"
-                    />
-                  </div>
-
-                  {branchScope === "specific" && (
-                    <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                      <label className="text-label font-medium text-subtle">Select Branches</label>
-                      <CustomMultiSelect
-                        options={spBranches.map((b) => b.name)}
-                        selected={(watch("branchIds") ?? []).map(
-                          (id) => spBranches.find((b) => b.id === id)?.name || id
-                        )}
-                        onChange={(names) => {
-                          const ids = names.map(
-                            (name) => spBranches.find((b) => b.name === name)?.id || name
-                          );
-                          setValue("branchIds", ids);
-                        }}
-                        placeholder="Search branches..."
-                      />
-                      {errors.branchIds && (
-                        <p className="text-label text-destructive flex items-center gap-1 mt-1">
-                          <WarningCircle size={12} /> {errors.branchIds.message}
-                        </p>
-                      )}
-                    </div>
-                  )}
                 </div>
               </div>
             </div>

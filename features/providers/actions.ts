@@ -78,18 +78,11 @@ export async function publishVoucher(spId: string, voucherId: string) {
   return { success: true, message: "Voucher published successfully." };
 }
 
-export async function pauseVoucher(spId: string, voucherId: string) {
+export async function expireVoucher(spId: string, voucherId: string) {
   void voucherId;
   await new Promise((resolve) => setTimeout(resolve, 500));
   revalidatePath(`/service-providers/${spId}`);
-  return { success: true, message: "Voucher paused." };
-}
-
-export async function endVoucher(spId: string, voucherId: string) {
-  void voucherId;
-  await new Promise((resolve) => setTimeout(resolve, 500));
-  revalidatePath(`/service-providers/${spId}`);
-  return { success: true, message: "Voucher ended." };
+  return { success: true, message: "Voucher expired." };
 }
 
 // ─── Commission Schema ────────────────────────────────────────────────────────

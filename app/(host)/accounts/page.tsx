@@ -119,7 +119,7 @@ export default function AccountsPage() {
       headerClassName: "text-right",
       render: (wallet) => (
         <span className={cn("text-body font-medium font-mono tabular-nums whitespace-nowrap", wallet.balance < 0 ? "text-destructive" : "text-foreground")}>
-          {wallet.balance < 0 ? "-" : ""}{Math.abs(wallet.balance).toLocaleString()} pts
+          {wallet.balance < 0 ? "-" : ""}RM {Math.abs(wallet.balance).toLocaleString()}
         </span>
       ),
     },
@@ -131,7 +131,7 @@ export default function AccountsPage() {
         wallet.pendingDeductions > 0 ? (
           <div className="flex justify-end">
             <StatusBadge
-              status={`${wallet.pendingDeductions.toLocaleString()} pts`}
+              status={`RM ${wallet.pendingDeductions.toLocaleString()}`}
               variant="amber"
               className="text-label"
             />

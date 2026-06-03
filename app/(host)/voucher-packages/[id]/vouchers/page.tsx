@@ -96,6 +96,7 @@ export default function GeneratedVouchersPage() {
           <p className="text-body text-subtle">
             {voucherPackage.name} &middot; {voucherPackage.providerName}
           </p>
+          <p className="text-label text-faint font-mono mt-0.5">Package ID: {packageId}</p>
         </div>
       </div>
 
@@ -138,7 +139,7 @@ export default function GeneratedVouchersPage() {
                   <p className="font-mono text-body font-semibold text-foreground tracking-tight">
                     {v.code}
                   </p>
-                  <p className="text-label text-faint">ID: {v.id}</p>
+                  <p className="text-label text-faint">Ref: {v.id}</p>
                 </div>
               ),
             },
@@ -160,7 +161,7 @@ export default function GeneratedVouchersPage() {
               align: "right",
               render: (v: (typeof filteredVouchers)[number]) => (
                 <span className="text-body font-semibold text-foreground tabular-nums">
-                  {v.amount.toLocaleString()} pts
+                  RM {v.amount.toLocaleString()}
                 </span>
               ),
             },

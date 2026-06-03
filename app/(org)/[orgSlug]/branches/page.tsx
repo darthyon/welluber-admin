@@ -10,57 +10,9 @@ import { ViewToggle, type ViewMode } from "@/components/shared/view-toggle"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { EmptyState } from "@/components/shared/empty-state"
 import { routes } from "@/lib/navigation"
+import { ACME_BRANCHES, ACME_BRANCHES_BY_SLUG, type AcmeBranchRow } from "@/lib/mock-data"
 
-type Branch = {
-  id: string
-  name: string
-  type: string
-  accountModel: string
-  accountName?: string
-  accountId?: string
-  address: { city: string; state: string }
-  employeesCount: number
-  status: string
-  cashBalance: number
-  creditBalance: number
-  claimsCount: number
-}
-
-// Inline mock data — same branches as host org detail view
-const ACME_BRANCHES: Branch[] = [
-  {
-    id: "br_1",
-    name: "ACME HQ",
-    type: "HQ",
-    accountModel: "New",
-    accountName: "KL HQ Account",
-    accountId: "ACC-20260115-0001",
-    address: { city: "Kuala Lumpur", state: "Wilayah Persekutuan" },
-    employeesCount: 1240,
-    status: "Active",
-    cashBalance: 45000,
-    creditBalance: 10000,
-    claimsCount: 12,
-  },
-  {
-    id: "br_2",
-    name: "ACME Subang Jaya",
-    type: "Branch Office",
-    accountModel: "Existing",
-    accountName: "Acme Shared Account",
-    accountId: "ACC-20260115-0002",
-    address: { city: "Subang Jaya", state: "Selangor" },
-    employeesCount: 450,
-    status: "Active",
-    cashBalance: 12500,
-    creditBalance: 5000,
-    claimsCount: 5,
-  },
-]
-
-const BRANCHES_BY_SLUG: Record<string, Branch[]> = {
-  "acme-corporation": ACME_BRANCHES,
-}
+type Branch = AcmeBranchRow
 
 export default function OrgBranchesPage() {
   const params = useParams()
@@ -70,7 +22,7 @@ export default function OrgBranchesPage() {
   const [view, setView] = useState<ViewMode>("grid")
   const [search, setSearch] = useState("")
 
-  const branches = BRANCHES_BY_SLUG[orgSlug] ?? ACME_BRANCHES
+  const branches = ACME_BRANCHES_BY_SLUG[orgSlug] ?? ACME_BRANCHES
 
   const filtered = branches.filter((b) => {
     const q = search.toLowerCase()

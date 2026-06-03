@@ -17,9 +17,7 @@ const STATUS_FILTER_TABS: { label: string; value: SpVoucherStatus | "all" }[] = 
   { label: "All", value: "all" },
   { label: "Draft", value: "draft" },
   { label: "Published", value: "published" },
-  { label: "Activated", value: "activated" },
-  { label: "Paused", value: "paused" },
-  { label: "Ended", value: "ended" },
+  { label: "Expired", value: "expired" },
 ]
 
 const ALL_VOUCHERS: VoucherPackageItem[] = MOCK_SPS.flatMap((sp) =>

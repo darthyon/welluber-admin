@@ -57,6 +57,15 @@ export { bucketByMonth, bucketByYear } from "./factories/org-analytics"
 export { SERVICES } from "./service-catalog"
 export type { ServiceId } from "./service-catalog"
 
+// Acme org-detail seed (shared by host org-detail tabs + org portal)
+export {
+  ACME_BRANCHES,
+  ACME_POLICIES,
+  ACME_BRANCHES_BY_SLUG,
+  ACME_POLICIES_BY_SLUG,
+} from "./acme-org-detail"
+export type { AcmeBranchRow, AcmePolicyRow } from "./acme-org-detail"
+
 // Registry (ID → entity lookups)
 export { Registry, resetRegistry } from "./registry"
 

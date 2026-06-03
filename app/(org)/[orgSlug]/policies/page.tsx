@@ -10,48 +10,9 @@ import { StatusBadge } from "@/components/shared/status-badge"
 import { EmptyState } from "@/components/shared/empty-state"
 import { Badge } from "@/components/ui/badge"
 import { routes } from "@/lib/navigation"
+import { ACME_POLICIES, ACME_POLICIES_BY_SLUG, type AcmePolicyRow } from "@/lib/mock-data"
 
-type PolicyRow = {
-  id: string
-  name: string
-  code: string
-  version?: string
-  type: string
-  assignedTo: string
-  status: "draft" | "active" | "deactivated"
-  employeeCount: number
-  lastUpdated: string
-}
-
-// Same inline data as host org detail page
-const ACME_POLICIES: PolicyRow[] = [
-  {
-    id: "pol_1",
-    name: "Acme Employee Wellness Policy FY2026",
-    code: "BEN-STD-01",
-    version: "V1.1",
-    type: "Wellness",
-    assignedTo: "All Branches",
-    status: "active",
-    employeeCount: 1240,
-    lastUpdated: "24 Mar 2026",
-  },
-  {
-    id: "pol_2",
-    name: "Acme Leadership Benefits Policy FY2026",
-    code: "BEN-EXC-02",
-    version: "V2.0",
-    type: "Lifestyle",
-    assignedTo: "Subang Jaya",
-    status: "active",
-    employeeCount: 450,
-    lastUpdated: "02 Apr 2026",
-  },
-]
-
-const POLICIES_BY_SLUG: Record<string, PolicyRow[]> = {
-  "acme-corporation": ACME_POLICIES,
-}
+type PolicyRow = AcmePolicyRow
 
 export default function OrgPoliciesPage() {
   const params = useParams()
@@ -61,7 +22,7 @@ export default function OrgPoliciesPage() {
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
 
-  const policies = POLICIES_BY_SLUG[orgSlug] ?? ACME_POLICIES
+  const policies = ACME_POLICIES_BY_SLUG[orgSlug] ?? ACME_POLICIES
 
   const filtered = useMemo(() => {
     return policies.filter((p) => {

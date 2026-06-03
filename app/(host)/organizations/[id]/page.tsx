@@ -28,17 +28,17 @@ import { ClaimsTab } from "@/components/host/organizations/tabs/claims-tab"
 import { VouchersTab } from "@/components/host/organizations/tabs/vouchers-tab"
 import { SettingsTab } from "@/components/host/organizations/tabs/settings-tab"
 import { TABS, OTHER_ORGS, type TabId, type AssignedPolicy } from "@/components/host/organizations/constants"
-import { MOCK_ORGS } from "@/lib/mock-data"
+import { MOCK_ORGS, ACME_POLICIES } from "@/lib/mock-data"
 import type { FlatClaimRow } from "@/types/claims"
 import type { OrganizationStatus } from "@/features/organizations/types"
 
+// Shared base fields (id/name/code/version/status/assignedTo/employeeCount/lastUpdated)
+// come from the centralised Acme seed so host + org portal never drift.
+// Host-only benefit-policy detail stays here.
 const INITIAL_POLICIES: AssignedPolicy[] = [
   {
-    id: "pol_1",
+    ...ACME_POLICIES[0],
     organizationId: "org-123",
-    name: "Acme Employee Wellness Policy FY2026",
-    code: "BEN-STD-01",
-    version: "V1.1",
     description: "Standard wellness benefits for HQ staff including gym and mental health support.",
     eligibleEmploymentTypes: ["full-time"],
     dependentCoverages: [],
@@ -46,19 +46,12 @@ const INITIAL_POLICIES: AssignedPolicy[] = [
     utilisationMode: "Fixed" as const,
     refreshCycle: "Yearly" as const,
     refreshStartReference: "financial_year" as const,
-    status: "active" as const,
-    assignedTo: "All Branches",
-    employeeCount: 1240,
-    lastUpdated: "24 Mar 2024",
     categories: ["Physical Wellbeing", "Psychological Wellbeing"],
     groups: ["Gym Access", "Mental Support"],
   },
   {
-    id: "pol_2",
+    ...ACME_POLICIES[1],
     organizationId: "org-123",
-    name: "Acme Leadership Benefits Policy FY2026",
-    code: "BEN-EXC-02",
-    version: "V2.0",
     description: "Flexible lifestyle benefits for travel, food, and personal development.",
     eligibleEmploymentTypes: ["full-time", "part-time"],
     dependentCoverages: [],
@@ -66,10 +59,6 @@ const INITIAL_POLICIES: AssignedPolicy[] = [
     utilisationMode: "Prorated" as const,
     refreshCycle: "Monthly" as const,
     refreshStartReference: "financial_year" as const,
-    status: "active" as const,
-    assignedTo: "Subang Jaya",
-    employeeCount: 450,
-    lastUpdated: "02 Apr 2024",
     categories: ["Nutritional Support", "Personal Care"],
     groups: ["Flexi-Benefits"],
   },
