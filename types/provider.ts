@@ -5,7 +5,7 @@ type ISODate = string;
 
 export type ServiceProviderStatus = "active" | "suspended" | "pending" | "removed";
 export type SpAdminStatus = "active" | "pending_activation";
-export type SpVoucherStatus = "draft" | "published" | "activated" | "paused" | "ended";
+export type SpVoucherStatus = "draft" | "published" | "expired";
 export type SpBranchContactType = "branch_manager" | "staff" | "reception";
 export type DurationUnit = "session" | "min" | "hr" | "day" | "month" | "year";
 export type ValidationUnit = "days" | "months" | "half_year" | "year";
@@ -107,6 +107,7 @@ export interface ServiceLine {
   subServices: string[];
   description?: string;
   descriptionList?: string; // WYSIWYG rich content
+  price?: number; // per-line price in the voucher's currency
 }
 
 export interface RedemptionPeriod {
@@ -137,9 +138,12 @@ export interface SpVoucher {
     startDate: ISODate;
     endDate?: ISODate; // optional — open-ended if not set
   };
-  currency: string; // "MYR" for v1; dropdown-selectable
+  currency: string; // "MYR" for v1; derived from the selected branch's account wallet
   initialPrice: number;
-  finalPrice: number; // integer, rounded per standard rounding
+  discount?: { type: "amount" | "percent"; value: number }; // drives finalPrice
+  finalPrice: number; // computed from initialPrice − discount; integer, rounded
+  voucherCount?: number; // number of vouchers to generate
+  maxUsagePerUser?: number; // how many times one member can redeem this voucher
   validationDuration?: {
     unit: ValidationUnit;
     value: number;

@@ -206,7 +206,7 @@ function AccountDetailContent() {
                   <div className="space-y-1">
                     <p className="text-label font-semibold text-primary-foreground/80">Available Balance</p>
                     <h2 className="text-display font-semibold tracking-tight text-primary-foreground tabular-nums">
-                      {(wallet.balance - wallet.pendingDeductions).toLocaleString()} pts
+                      RM {(wallet.balance - wallet.pendingDeductions).toLocaleString()}
                     </h2>
                     <p className="text-label text-primary-foreground/70">
                       Last updated {new Date(wallet.updatedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}, {new Date(wallet.updatedAt).toLocaleTimeString('en-MY', { hour: '2-digit', minute: '2-digit' })}
@@ -371,7 +371,7 @@ function AccountDetailContent() {
                       align: "right",
                       render: (trx: AccountTransactionRow) => {
                         const isTopup = trx.type === "topup"
-                        const unit = isTopup ? "RM" : "pts"
+                        const unit = "RM"
                         const amountClass = trx.type === "cancelled"
                           ? "text-lead font-semibold tracking-tight tabular-nums line-through text-rose-500 dark:text-rose-400"
                           : trx.type === "pre-auth"
@@ -385,7 +385,7 @@ function AccountDetailContent() {
                           <p className={amountClass}>
                             {prefix} {unit} {Math.abs(trx.amount).toLocaleString()}
                           </p>
-                          <p className="text-label font-medium text-faint text-nowrap tabular-nums">Balance after: {trx.balanceAfter.toLocaleString()} pts</p>
+                          <p className="text-label font-medium text-faint text-nowrap tabular-nums">Balance after: RM {trx.balanceAfter.toLocaleString()}</p>
                         </div>
                       )},
                     },

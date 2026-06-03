@@ -68,7 +68,7 @@ export function VoucherDetailSheet({ claim, onClose }: VoucherDetailSheetProps) 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <label className="text-label font-semibold text-subtle flex items-center gap-1.5">
-                <IdentificationBadge size={14} /> Voucher ID
+                <IdentificationBadge size={14} /> Voucher Code
               </label>
               <code className="text-body font-mono text-foreground block">
                 {claim.voucherCode}

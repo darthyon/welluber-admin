@@ -31,13 +31,11 @@ interface SpVoucherDetailViewProps {
 
 const STATUS_VARIANT: Record<
   SpVoucherStatus,
-  "emerald" | "amber" | "zinc" | "rose"
+  "emerald" | "zinc" | "rose"
 > = {
   draft: "zinc",
-  published: "amber",
-  activated: "emerald",
-  paused: "rose",
-  ended: "zinc",
+  published: "emerald",
+  expired: "rose",
 };
 
 const ANCHOR_ITEMS = [

@@ -24,17 +24,13 @@ const STATUS_FILTER_TABS: { label: string; value: SpVoucherStatus | "all" }[] = 
   { label: "All", value: "all" },
   { label: "Draft", value: "draft" },
   { label: "Published", value: "published" },
-  { label: "Activated", value: "activated" },
-  { label: "Paused", value: "paused" },
-  { label: "Ended", value: "ended" },
+  { label: "Expired", value: "expired" },
 ];
 
-const STATUS_VARIANT: Record<SpVoucherStatus, "emerald" | "amber" | "zinc" | "rose" | "primary"> = {
+const STATUS_VARIANT: Record<SpVoucherStatus, "emerald" | "zinc" | "rose"> = {
   draft: "zinc",
-  published: "amber",
-  activated: "emerald",
-  paused: "rose",
-  ended: "zinc",
+  published: "emerald",
+  expired: "rose",
 };
 
 export function SpVouchersTab({ sp }: SpVouchersTabProps) {

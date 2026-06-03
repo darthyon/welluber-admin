@@ -23,13 +23,11 @@ interface VoucherPackagesTableProps {
 
 const STATUS_VARIANT: Record<
   SpVoucherStatus,
-  "emerald" | "amber" | "zinc" | "rose" | "primary"
+  "emerald" | "zinc" | "rose"
 > = {
   draft: "zinc",
-  published: "amber",
-  activated: "emerald",
-  paused: "rose",
-  ended: "zinc",
+  published: "emerald",
+  expired: "rose",
 }
 
 export function VoucherPackagesTable({
