@@ -119,7 +119,7 @@ export function SpVoucherDetailView({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <DetailField label="Voucher Name" value={voucher.name} />
                   <DetailField
-                    label="Voucher Code"
+                    label="Package ID"
                     value={
                       <span className="font-mono text-body text-muted-foreground bg-muted px-1.5 py-0.5 rounded border border-border/50">
                         {voucher.code}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import {
@@ -12,7 +12,6 @@ import {
   CalendarBlank,
   ListBullets,
   Buildings,
-  CurrencyCircleDollar,
   MapPin,
   Clock,
   Stack,
@@ -38,8 +37,7 @@ import type { SpVoucher } from "@/types/provider";
 
 const ANCHOR_ITEMS = [
   { id: "voucher-details", label: "Voucher Details" },
-  { id: "commercials", label: "Commercials" },
-  { id: "service-lines", label: "Service Line Items" },
+  { id: "manage-services", label: "Manage Services" },
   { id: "lifecycle", label: "Lifecycle & Validity" },
   { id: "display-image", label: "Display Image" },
 ];
@@ -103,21 +101,27 @@ export function SpVoucherForm({
   const branchScope = watch("branchScope");
   const currency = watch("currency");
 
-  // Final Price is computed from Initial Price minus the discount (amount or %), rounded to whole number.
-  const initialPrice = Number(watch("initialPrice")) || 0;
-  const discountType = watch("discount.type");
-  const discountValue = Number(watch("discount.value")) || 0;
+  // Subtotal = sum of each service's price. One overall discount (amount or %)
+  // is applied to the subtotal to give the Final Price, rounded to a whole number.
+  const serviceLinesWatch = useWatch({ control, name: "serviceLines" });
+  const discountType = useWatch({ control, name: "discount.type" });
+  const discountValue = Number(useWatch({ control, name: "discount.value" })) || 0;
+  const subtotal = useMemo(
+    () => (serviceLinesWatch || []).reduce((sum, l) => sum + (Number(l?.price) || 0), 0),
+    [serviceLinesWatch]
+  );
   const finalPrice = useMemo(() => {
     const raw =
       discountType === "percent"
-        ? initialPrice * (1 - discountValue / 100)
-        : initialPrice - discountValue;
+        ? subtotal * (1 - discountValue / 100)
+        : subtotal - discountValue;
     return Math.max(0, Math.round(raw));
-  }, [initialPrice, discountType, discountValue]);
+  }, [subtotal, discountType, discountValue]);
 
   useEffect(() => {
+    setValue("initialPrice", subtotal);
     setValue("finalPrice", finalPrice);
-  }, [finalPrice, setValue]);
+  }, [subtotal, finalPrice, setValue]);
 
   const onSave = async (data: z.input<typeof createVoucherSchema>) => {
     setIsSubmitting(true);
@@ -300,7 +304,7 @@ export function SpVoucherForm({
 
                   {isEditing && (
                     <div className="space-y-1.5">
-                      <label className="text-body font-medium text-foreground">Voucher Code</label>
+                      <label className="text-body font-medium text-foreground">Package ID</label>
                       <div className="w-full px-3 py-2 bg-muted/10 border border-border rounded-md text-body font-mono text-faint cursor-not-allowed">
                         {voucher?.code}
                       </div>
@@ -354,78 +358,16 @@ export function SpVoucherForm({
               </div>
             </div>
 
-            {/* Commercials */}
-            <div id="commercials" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
-              <div className="p-6 space-y-6">
-                <div className="flex items-center gap-2 pb-2">
-                  <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400 dark:bg-emerald-500/20">
-                    <CurrencyCircleDollar size={16} weight="fill" />
-                  </div>
-                  <h3 className="text-lead font-semibold text-foreground">Commercials</h3>
-                </div>
-
-                <div className="space-y-5">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-body font-medium text-foreground">Price</label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        {...register("initialPrice", { valueAsNumber: true })}
-                        className={cn(
-                          "w-full px-3 py-2 bg-background border rounded-md text-body font-mono outline-none transition-colors",
-                          "border-border focus:border-foreground/30 focus:bg-muted/30"
-                        )}
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-body font-medium text-foreground">Discount</label>
-                      <div className="flex items-stretch gap-2">
-                        <FormSelect
-                          value={discountType}
-                          onChange={(v) => setValue("discount.type", v as "amount" | "percent")}
-                          options={[
-                            { label: "Amount", value: "amount" },
-                            { label: "%", value: "percent" },
-                          ]}
-                          triggerClassName="w-32 shrink-0"
-                        />
-                        <input
-                          type="number"
-                          step="0.01"
-                          min={0}
-                          {...register("discount.value", { valueAsNumber: true })}
-                          className={cn(
-                            "flex-1 min-w-0 px-3 py-2 bg-background border rounded-md text-body font-mono outline-none transition-colors",
-                            "border-border focus:border-foreground/30 focus:bg-muted/30"
-                          )}
-                          placeholder="0"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Computed Final Price */}
-                  <div className="flex items-center justify-between p-4 bg-primary/5 rounded-lg border border-primary/10">
-                    <p className="text-body font-semibold text-foreground">Final Price</p>
-                    <p className="text-heading font-semibold text-primary font-mono tabular-nums">
-                      {currency || "MYR"} {finalPrice.toLocaleString()}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Service Line Items */}
-            <div id="service-lines" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
+            {/* Manage Services */}
+            <div id="manage-services" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
               <div className="p-6 space-y-6">
                 <div className="flex items-center gap-2 pb-2">
                   <div className="w-8 h-8 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-600 dark:text-amber-400 dark:bg-amber-500/20">
                     <ListBullets size={16} weight="fill" />
                   </div>
                   <div className="space-y-0.5">
-                    <h3 className="text-lead font-semibold text-foreground">Service Line Items</h3>
-                    <p className="text-label text-muted-foreground">Specific services included in this voucher package.</p>
+                    <h3 className="text-lead font-semibold text-foreground">Manage Services</h3>
+                    <p className="text-label text-muted-foreground">Add the services included in this voucher and set a price for each.</p>
                   </div>
                 </div>
 
@@ -441,7 +383,7 @@ export function SpVoucherForm({
                       <ItemSection
                         key={field.id}
                         index={i + 1}
-                        label="Service Line Item"
+                        label="Service"
                         onRemove={serviceLineFields.length > 1 ? () => removeLine(i) : undefined}
                       >
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -510,8 +452,49 @@ export function SpVoucherForm({
                       }
                     >
                       <Plus size={18} weight="bold" className="mr-2" />
-                      <span>Add Service Item</span>
+                      <span>Add Service</span>
                     </Button>
+                  </div>
+
+                  {/* Pricing summary — catalogue-style: subtotal of services, one overall discount, final price */}
+                  <div className="rounded-lg border border-border bg-muted/20 divide-y divide-border/60">
+                    <div className="flex items-center justify-between px-4 py-3">
+                      <p className="text-body text-subtle">Subtotal</p>
+                      <p className="text-body font-medium text-foreground font-mono tabular-nums">
+                        {currency || "MYR"} {subtotal.toLocaleString()}
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-between gap-4 px-4 py-3">
+                      <p className="text-body text-subtle shrink-0">Overall Discount</p>
+                      <div className="flex items-stretch gap-2 max-w-[260px] w-full">
+                        <FormSelect
+                          value={discountType}
+                          onChange={(v) => setValue("discount.type", v as "amount" | "percent")}
+                          options={[
+                            { label: "Amount", value: "amount" },
+                            { label: "%", value: "percent" },
+                          ]}
+                          triggerClassName="w-28 shrink-0"
+                        />
+                        <input
+                          type="number"
+                          step="0.01"
+                          min={0}
+                          {...register("discount.value", { valueAsNumber: true })}
+                          className={cn(
+                            "flex-1 min-w-0 px-3 py-2 bg-background border rounded-md text-body font-mono outline-none transition-colors text-right",
+                            "border-border focus:border-foreground/30 focus:bg-muted/30"
+                          )}
+                          placeholder="0"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between px-4 py-4 bg-primary/5">
+                      <p className="text-body font-semibold text-foreground">Final Price</p>
+                      <p className="text-heading font-semibold text-primary font-mono tabular-nums">
+                        {currency || "MYR"} {finalPrice.toLocaleString()}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
