@@ -20,7 +20,7 @@ export default function EditGroupsPage({ params }: { params: Promise<{ id: strin
     catch { return undefined; }
   }, [draftKey]);
 
-  const handleSave = (data: { policy: Partial<BenefitPolicy>; groups: BenefitGroup[]; benefits: Benefit[] }) => {
+  const handleSave = () => {
     if (typeof window !== "undefined") {
       sessionStorage.removeItem(draftKey);
     }

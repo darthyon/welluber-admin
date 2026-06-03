@@ -22,7 +22,6 @@ import { ActivityTimeline, type ActivityType } from "@/components/shared/activit
 import { EmptyState } from "@/components/shared/empty-state"
 import { ActionPopover } from "@/components/shared/action-popover"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import type { Administrator } from "@/features/users/types"
 

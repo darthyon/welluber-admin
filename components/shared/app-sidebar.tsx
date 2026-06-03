@@ -124,7 +124,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <div className="flex items-center justify-between px-2 mb-4">
             {/* Expanded logo */}
             <div className="flex items-center group-data-[collapsible=icon]:hidden">
-              <WelluberLogo width={120} height={31} className="text-white opacity-90" />
+              <WelluberLogo width={120} height={31} className="text-primary-foreground opacity-90" />
             </div>
             {/* Collapsed mark */}
             <div className="hidden group-data-[collapsible=icon]:flex items-center justify-center flex-1">
@@ -280,4 +280,3 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     </Sidebar>
   )
 }
-

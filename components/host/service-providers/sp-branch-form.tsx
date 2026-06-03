@@ -1,25 +1,28 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useForm, useFieldArray, Controller, useWatch } from "react-hook-form";
+import { useForm, useFieldArray, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { CaretLeft, Building, MapPin, Clock, Tag, Users, Plus, Trash, WarningCircle, CheckCircle, PaperPlaneTilt } from "@phosphor-icons/react";
+import { Building, MapPin, Tag, WarningCircle } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { createBranchSchema } from "@/features/providers/schemas";
 import { createBranch, updateBranch } from "@/features/providers/actions";
-import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/shared/switch";
-import { BRANCH_CONTACT_TYPES, OPERATING_DAYS, DEFAULT_OPERATING_HOURS } from "@/features/providers/constants";
+import { DEFAULT_OPERATING_HOURS } from "@/features/providers/constants";
 import { buildBranchServiceCatalog } from "@/features/providers/service-taxonomy";
 import { SuccessModal } from "@/components/shared/success-modal";
 import { LocationPicker } from "@/components/shared/location-picker";
 import { ServiceToggleCard } from "@/components/shared/service-toggle-card";
-import { PhoneInput } from "@/components/shared/phone-input";
-import { FormSelect } from "@/components/shared/form-select";
 import type { SpBranch, CommissionSchemaRow } from "@/types/provider";
 import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav";
 import { toast } from "sonner";
+import { BranchFormActionBar, BranchFormHeader } from "@/components/host/service-providers/sp-branch-form-frame";
+import {
+  BranchBenefitsSection,
+  BranchGovernanceSection,
+  BranchOperatingHoursSection,
+} from "@/components/host/service-providers/sp-branch-form-sections";
 
 const ANCHOR_ITEMS = [
   { id: "branch-identity", label: "Branch Identity" },
@@ -204,23 +207,7 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
       })} 
       className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500"
     >
-      <div className="flex flex-col gap-4">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="inline-flex items-center gap-1.5 text-body font-medium text-subtle hover:text-foreground transition-colors w-fit"
-        >
-          <CaretLeft size={16} />
-          Back to Branches
-        </button>
-        
-        <div>
-          <h1 className="text-heading font-semibold text-foreground text-balance">
-            {isEditing ? "Edit Branch" : "Add New Branch"}
-          </h1>
-          <p className="text-subtle text-body mt-1">Configure location, access, and operating details.</p>
-        </div>
-      </div>
+      <BranchFormHeader isEditing={isEditing} onCancel={onCancel} />
 
       <div className="flex flex-col xl:flex-row gap-8 items-start relative">
         {/* Left Column: Jump-to-section Navigation */}
@@ -361,278 +348,45 @@ export function SpBranchForm({ spId, serviceCategories, portfolio, branch, onSuc
               </div>
             </div>
 
-            {/* Governance */}
-            <div id="governance" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
-              <div className="p-6 space-y-6">
-                <div className="flex items-center justify-between pb-2">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                      <Users size={16} weight="fill" />
-                    </div>
-                    <div className="space-y-0.5">
-                      <h3 className="text-lead font-semibold text-foreground">Branch Governance</h3>
-                      <p className="text-label text-muted-foreground">Administrators and PICs for this location.</p>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="text-label gap-1.5"
-                      onClick={() => appendAdmin({ name: "", email: "", role: "Administrator", designateAsPic: false })}
-                    >
-                      <Plus size={14} weight="bold" /> Add Admin
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="text-label gap-1.5"
-                      onClick={() => appendContact({ name: "", email: "", type: "staff", phone: "", isPublic: true })}
-                    >
-                      <Plus size={14} weight="bold" /> Add PIC
-                    </Button>
-                  </div>
-                </div>
-                
-                <div className="space-y-8">
-                  {/* Administrators Section */}
-                  <div className="space-y-4">
-                    <p className="text-label font-medium text-faint uppercase tracking-widest px-1">Local Administrators</p>
-                    <div className="space-y-4">
-                      {adminFields.map((field, i) => (
-                        <div key={field.id} className="p-4 rounded-lg border border-border bg-muted/10 space-y-4 relative group">
-                          <button 
-                            type="button"
-                            onClick={() => removeAdmin(i)}
-                            className="absolute top-4 right-4 text-faint hover:text-destructive transition-colors"
-                          >
-                            <Trash size={16} />
-                          </button>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-1.5">
-                              <label className="text-label font-medium text-subtle">Name</label>
-                              <input {...register(`administrators.${i}.name`)} className={inputCls(!!errors.administrators?.[i]?.name)} placeholder="Full name" />
-                            </div>
-                            <div className="space-y-1.5">
-                              <label className="text-label font-medium text-subtle">Corporate Email</label>
-                              <input type="email" {...register(`administrators.${i}.email`)} className={inputCls(!!errors.administrators?.[i]?.email)} placeholder="name@company.com" />
-                            </div>
-                          </div>
+            <BranchGovernanceSection
+              adminFields={adminFields}
+              appendAdmin={() => appendAdmin({ name: "", email: "", role: "Administrator", designateAsPic: false })}
+              appendContact={() => appendContact({ name: "", email: "", type: "staff", phone: "", isPublic: true })}
+              contactFields={contactFields}
+              control={control}
+              errors={errors}
+              inputCls={inputCls}
+              onAdminPicSync={handleAdminPicSync}
+              register={register}
+              removeAdmin={removeAdmin}
+              removeContact={removeContact}
+            />
 
-                          <div className="flex items-center justify-between pt-2 border-t border-border/40">
-                            <div className="flex items-center gap-2">
-                              <Controller
-                                control={control}
-                                name={`administrators.${i}.designateAsPic`}
-                                render={({ field }) => (
-                                  <Switch 
-                                    checked={field.value} 
-                                    onCheckedChange={(v) => {
-                                      field.onChange(v);
-                                      handleAdminPicSync(i, v);
-                                    }} 
-                                  />
-                                )}
-                              />
-                              <span className="text-label font-semibold text-foreground">Designate as PIC</span>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+            <BranchOperatingHoursSection
+              errors={errors}
+              inputCls={inputCls}
+              operatingHours={operatingHours}
+              register={register}
+              setValue={setValue}
+            />
 
-                  {/* PICs Section */}
-                  <div className="space-y-4">
-                    <p className="text-label font-medium text-faint uppercase tracking-widest px-1">Persons In Charge (PIC)</p>
-                    <div className="space-y-4">
-                      {contactFields.map((field, i) => (
-                        <div key={field.id} className="p-4 rounded-lg border border-border bg-muted/10 space-y-4 relative group">
-                          <button 
-                            type="button"
-                            onClick={() => removeContact(i)}
-                            className="absolute top-4 right-4 text-faint hover:text-destructive transition-colors"
-                          >
-                            <Trash size={16} />
-                          </button>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-1.5">
-                              <label className="text-label font-medium text-subtle">Name <span className="text-destructive">*</span></label>
-                              <input {...register(`contacts.${i}.name`)} className={inputCls(!!errors.contacts?.[i]?.name)} placeholder="Full name" />
-                            </div>
-                            <div className="space-y-1.5">
-                              <label className="text-label font-medium text-subtle">Corporate Email <span className="text-destructive">*</span></label>
-                              <input type="email" {...register(`contacts.${i}.email`)} className={inputCls(!!errors.contacts?.[i]?.email)} placeholder="name@company.com" />
-                            </div>
-                            <div className="space-y-1.5">
-                              <label className="text-label font-medium text-subtle">Job Role</label>
-                              <Controller
-                                control={control}
-                                name={`contacts.${i}.type`}
-                                render={({ field }) => (
-                                  <FormSelect
-                                    value={field.value}
-                                    onChange={(v) => field.onChange(v)}
-                                    options={BRANCH_CONTACT_TYPES.map((t) => ({ label: t.label, value: t.value }))}
-                                  />
-                                )}
-                              />
-                            </div>
-                            <div className="space-y-1.5">
-                              <label className="text-label font-medium text-subtle">Phone <span className="text-destructive">*</span></label>
-                              <Controller
-                                control={control}
-                                name={`contacts.${i}.phone`}
-                                render={({ field }) => (
-                                  <PhoneInput
-                                    value={field.value}
-                                    onChange={field.onChange}
-                                    error={!!errors.contacts?.[i]?.phone}
-                                    placeholder="Enter mobile number"
-                                  />
-                                )}
-                              />
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-2 pt-2 border-t border-border/40">
-                            <Controller
-                              control={control}
-                              name={`contacts.${i}.isPublic`}
-                              render={({ field }) => (
-                                <Switch checked={field.value} onCheckedChange={field.onChange} />
-                              )}
-                            />
-                            <span className="text-label font-semibold text-foreground">Public profile visibility</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Operating Hours */}
-            <div id="operating-hours" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
-              <div className="p-6 space-y-6">
-                <div className="flex items-center gap-2 pb-2">
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                    <Clock size={16} weight="fill" />
-                  </div>
-                  <div className="space-y-0.5">
-                    <h3 className="text-lead font-semibold text-foreground">Operating Hours</h3>
-                    <p className="text-label text-muted-foreground">Weekly open and close schedule.</p>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  {OPERATING_DAYS.map(({ key, label }) => {
-                    const isClosed = operatingHours?.[key]?.isClosed ?? false;
-                    return (
-                      <div key={key} className="grid grid-cols-[90px_1fr] md:grid-cols-[100px_1fr_120px_120px] gap-3 items-center py-1.5">
-                        <span className="text-body font-medium text-foreground">{label.slice(0, 3)}</span>
-                        <div className="flex items-center gap-2">
-                          <Switch checked={!isClosed} onCheckedChange={(v) => setValue(`operatingHours.${key}.isClosed`, !v)} />
-                          <span className="text-label text-muted-foreground ml-1">{isClosed ? "Closed" : "Open"}</span>
-                        </div>
-                        {!isClosed && (
-                          <>
-                            <input type="time" {...register(`operatingHours.${key}.open`)} disabled={isClosed} className={cn(inputCls(!!errors.operatingHours?.[key]?.open), "text-center text-label font-mono")} />
-                            <input type="time" {...register(`operatingHours.${key}.close`)} disabled={isClosed} className={cn(inputCls(!!errors.operatingHours?.[key]?.close), "text-center text-label font-mono")} />
-                          </>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            {/* Benefits */}
-            <div id="benefits" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
-              <div className="p-6 space-y-6">
-                <div className="flex items-center gap-2 pb-2">
-                  <div className="w-8 h-8 rounded-full bg-muted/10 flex items-center justify-center text-muted-foreground">
-                    <CheckCircle size={16} weight="fill" />
-                  </div>
-                  <div className="space-y-0.5">
-                    <h3 className="text-lead font-semibold text-foreground">Benefits</h3>
-                    <p className="text-label text-muted-foreground">Amenities and benefits available at this branch.</p>
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <div className="flex gap-2">
-                    <input
-                      value={benefitInput}
-                      onChange={(e) => setBenefitInput(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          addBenefit();
-                        }
-                      }}
-                      className={inputCls()}
-                      placeholder="e.g. Free WiFi"
-                    />
-                    <Button type="button" variant="ghost" size="sm" className="shrink-0 h-10" onClick={addBenefit}>
-                      <Plus size={14} />
-                    </Button>
-                  </div>
-                  {benefits.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
-                      {benefits.map((f, i) => (
-                        <span key={i} className="inline-flex items-center gap-1.5 text-label px-2.5 py-1 bg-muted border border-border rounded-lg font-medium">
-                          {f}
-                          <button type="button" onClick={() => removeBenefit(i)} className="text-muted-foreground hover:text-destructive transition-colors">
-                            <Trash size={11} />
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
+            <BranchBenefitsSection
+              addBenefit={addBenefit}
+              benefitInput={benefitInput}
+              benefits={benefits}
+              inputCls={inputCls}
+              onBenefitInputChange={setBenefitInput}
+              removeBenefit={removeBenefit}
+            />
           </div>
         </div>
       </div>
 
-      {/* Floating Action Bar */}
-      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[calc(50%+104px)] z-50 flex items-center gap-4 p-2 px-6 bg-background/80 backdrop-blur-2xl border border-border shadow-lg rounded-full animate-in slide-in-from-bottom-10 duration-700 ease-out">
-        <Button 
-          type="button" 
-          variant="ghost" 
-          size="lg"
-          onClick={onCancel}
-          className="text-body font-semibold px-6"
-        >
-          Cancel
-        </Button>
-        <div className="w-px h-6 bg-border/40" />
-        <Button
-          type="submit"
-          disabled={isSubmitting}
-          size="lg"
-          className="text-body font-semibold px-8 flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
-        >
-          {isSubmitting ? (
-            <>
-              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              {isEditing ? "Saving..." : "Creating..."}
-            </>
-          ) : (
-            <>
-              {isEditing ? "Save Branch" : "Create Branch"}
-              <PaperPlaneTilt size={14} weight="bold" />
-            </>
-          )}
-        </Button>
-      </div>
-
-      {/* Spacer to allow last sections to scroll to top */}
-      <div className="h-64" />
+      <BranchFormActionBar
+        isEditing={isEditing}
+        isSubmitting={isSubmitting}
+        onCancel={onCancel}
+      />
     </form>
   );
 }

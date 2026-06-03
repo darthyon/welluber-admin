@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CaretDown, IdentificationCard, IdentificationBadge } from "@phosphor-icons/react";
+import { CaretDown, IdentificationCard } from "@phosphor-icons/react";
 import {
   Popover,
   PopoverContent,

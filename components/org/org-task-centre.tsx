@@ -4,7 +4,6 @@ import {
   UserCircleMinus,
   FileX,
   Warning,
-  ClockCountdown,
   CurrencyCircleDollar,
   IdentificationCard,
   UserCircleDashed,
@@ -13,6 +12,7 @@ import {
 } from "@phosphor-icons/react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
+import { StatusBadge, type StatusColor } from "@/components/shared/status-badge"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -30,23 +30,19 @@ export interface OrgTask {
 
 const PRIORITY_CONFIG = {
   critical: {
-    dot: "bg-destructive",
-    badge: "bg-destructive/10 text-destructive border-destructive/20",
+    variant: "rose" as StatusColor,
     label: "Critical",
   },
   high: {
-    dot: "bg-amber-500",
-    badge: "bg-amber-500/10 text-amber-600 border-amber-500/20",
+    variant: "amber" as StatusColor,
     label: "Action required",
   },
   medium: {
-    dot: "bg-blue-500",
-    badge: "bg-blue-500/10 text-blue-600 border-blue-500/20",
+    variant: "primary" as StatusColor,
     label: "Recommended",
   },
   low: {
-    dot: "bg-muted-foreground",
-    badge: "bg-muted text-muted-foreground border-border",
+    variant: "zinc" as StatusColor,
     label: "Info",
   },
 }
@@ -74,9 +70,7 @@ function TaskRow({ task }: { task: OrgTask }) {
         <div className="flex items-start gap-2 flex-wrap">
           <p className="text-body font-semibold text-foreground leading-tight">{task.title}</p>
           {task.count !== undefined && (
-            <span className={cn("text-label font-semibold px-1.5 py-0.5 rounded border text-xs tabular-nums shrink-0", cfg.badge)}>
-              {task.count}
-            </span>
+            <StatusBadge status={String(task.count)} variant={cfg.variant} className="shrink-0 tabular-nums" />
           )}
         </div>
         <p className="text-body text-subtle mt-0.5">{task.description}</p>
@@ -101,10 +95,10 @@ function TaskRow({ task }: { task: OrgTask }) {
 function AllClear() {
   return (
     <div className="flex flex-col items-center justify-center py-10 gap-2 text-center">
-      <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center">
-        <CheckCircle size={20} weight="duotone" className="text-emerald-500" />
+      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+        <CheckCircle size={20} weight="duotone" />
       </div>
-      <p className="text-body font-semibold text-foreground">All clear</p>
+      <p className="text-body font-semibold text-foreground">All Clear</p>
       <p className="text-label text-muted-foreground">No open tasks — everything is up to date.</p>
     </div>
   )
@@ -150,7 +144,7 @@ export function OrgTaskCentre({ tasks }: Props) {
           {urgent.length > 0 && (
             <div>
               <div className="px-5 py-2 bg-muted/30 border-b border-border/50">
-                <p className="text-label font-semibold text-muted-foreground uppercase tracking-wide">
+                <p className="text-label font-semibold text-muted-foreground">
                   Requires Action
                 </p>
               </div>
@@ -162,7 +156,7 @@ export function OrgTaskCentre({ tasks }: Props) {
           {recommended.length > 0 && (
             <div>
               <div className={cn("px-5 py-2 bg-muted/30 border-b border-border/50", urgent.length > 0 && "border-t")}>
-                <p className="text-label font-semibold text-muted-foreground uppercase tracking-wide">
+                <p className="text-label font-semibold text-muted-foreground">
                   Recommended
                 </p>
               </div>

@@ -178,7 +178,7 @@ function ClaimsTooltip({ active, payload, label, metric, periodType }: {
   if (!active || !payload?.length) return null
   const tick = label ? tickLabel(label, periodType) : label
   return (
-    <div className="bg-card border border-border rounded-lg shadow-sm px-3 py-2.5 text-[12px]">
+    <div className="bg-card border border-border rounded-lg shadow-sm px-3 py-2.5 text-label">
       <p className="font-medium text-foreground mb-1.5">{tick}</p>
       {payload.map((p) => (
         <div key={p.name} className="flex items-center gap-2">
@@ -218,10 +218,6 @@ export function DashboardClaimsChart({ data, selectedBranch, accounts, className
 
   const barSize = periodType === "month" ? 5 : periodType === "year" ? 14 : 20
   const isAmountMetric = metric === "amount"
-
-  // For side-by-side: use confirmedCount/pendingCount for "count", or split amount proportionally
-  const confirmedKey = metric === "count" ? "confirmedCount" : "confirmedCount"
-  const pendingKey = metric === "count" ? "pendingCount" : "pendingCount"
 
   // Build chart data with amount split if needed
   const finalChartData = useMemo(() => {
@@ -287,11 +283,11 @@ export function DashboardClaimsChart({ data, selectedBranch, accounts, className
       <div className="flex items-center gap-4 px-5 pt-3">
         <div className="flex items-center gap-1.5">
           <span className="w-2.5 h-2.5 rounded-sm bg-primary" />
-          <span className="text-[11px] text-muted-foreground font-medium">Confirmed</span>
+          <span className="text-label text-muted-foreground font-medium">Confirmed</span>
         </div>
         <div className="flex items-center gap-1.5">
           <span className="w-2.5 h-2.5 rounded-sm bg-primary/30" />
-          <span className="text-[11px] text-muted-foreground font-medium">Pending</span>
+          <span className="text-label text-muted-foreground font-medium">Pending</span>
         </div>
       </div>
 
@@ -343,7 +339,7 @@ export function DashboardClaimsChart({ data, selectedBranch, accounts, className
 
       {/* Insight strip */}
       <div className="px-5 py-3 border-t border-border/40 bg-muted/20">
-        <p className="text-[11px] text-muted-foreground/70 leading-snug">
+        <p className="text-label text-muted-foreground/70 leading-snug">
           Trend insights improve with more history. Keep processing claims to unlock deeper analysis.
         </p>
       </div>

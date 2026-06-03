@@ -57,7 +57,7 @@ function CategoryRow({
 
   return (
     <div className="flex items-center gap-3 py-2.5 border-b border-border/40 last:border-0">
-      <span className="text-[10px] font-semibold tabular-nums text-muted-foreground/50 w-3 flex-shrink-0 text-right">
+      <span className="text-micro font-semibold tabular-nums text-muted-foreground/50 w-3 flex-shrink-0 text-right">
         {rank}
       </span>
       <span className="h-2 w-2 rounded-full flex-shrink-0" style={{ backgroundColor: group.color }} />
@@ -75,7 +75,7 @@ function CategoryRow({
             }}
           />
         </div>
-        <span className="text-[11px] font-semibold tabular-nums text-muted-foreground w-8 text-right">
+        <span className="text-label font-semibold tabular-nums text-muted-foreground w-8 text-right">
           {pctLabel}
         </span>
         <span className="text-label font-medium tabular-nums text-foreground text-right min-w-[90px]">
@@ -192,8 +192,8 @@ export function DashboardBenefitChart({ data, selectedBranch, className }: Dashb
             </ResponsiveContainer>
           </ChartContainer>
           <div className="text-center mt-1">
-            <p className="text-[11px] text-muted-foreground">{formatRM(totalUsed)} of {formatRM(totalAllocated)}</p>
-            <p className="text-[10px] text-muted-foreground/60">allocation used</p>
+            <p className="text-label text-muted-foreground">{formatRM(totalUsed)} of {formatRM(totalAllocated)}</p>
+            <p className="text-micro text-muted-foreground/60">allocation used</p>
           </div>
         </div>
 

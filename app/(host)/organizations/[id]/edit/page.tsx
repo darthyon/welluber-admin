@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useForm, Controller, useWatch, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { format, isValid, parse } from "date-fns";
 import {
   CaretLeft,
   Buildings,
@@ -20,6 +21,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { createOrganizationSchema, CreateOrganizationData } from "@/features/organizations/schemas";
 import { Button } from "@/components/ui/button";
@@ -28,6 +30,7 @@ import { LocationPicker } from "@/components/shared/location-picker";
 import { DocumentUploadSection } from "@/components/shared/document-upload-section";
 import { FormSelect } from "@/components/shared/form-select";
 import { MALAYSIAN_BANKS } from "@/lib/constants/banks";
+import { Spinner } from "@/components/shared/spinner";
 import { toast } from "sonner";
 
 const ANCHOR_ITEMS = [
@@ -46,9 +49,6 @@ const ORG_TYPES = [
   { id: "clbg", label: "CLBG", docs: "Memorandum & Articles" },
 ];
 
-const MONTH_SHORT = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-const MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-
 export default function EditOrganizationPage() {
   const router = useRouter();
   const params = useParams();
@@ -66,7 +66,7 @@ export default function EditOrganizationPage() {
       subIndustry: "Software Development",
       type: "bhd",
       tinNumber: "TR-882910-01",
-      financialYearMode: "calendar",
+      financialYearStart: "2025-01-01",
       address: {
         line: "Level 15, Menara Southpoint, Mid Valley City",
         city: "Kuala Lumpur",
@@ -84,7 +84,6 @@ export default function EditOrganizationPage() {
   });
 
   const orgType = useWatch({ control, name: "type" });
-  const fyMode = useWatch({ control, name: "financialYearMode" });
   const industryValue = useWatch({ control, name: "industry" });
   const bankNameValue = useWatch({ control, name: "bankAccountDetails.bankName" });
 
@@ -95,8 +94,7 @@ export default function EditOrganizationPage() {
       await new Promise(r => setTimeout(r, 800));
       toast.success("Organisation profile updated successfully");
       router.push(`/organizations/${orgId}`);
-    } catch (e) {
-      console.error(e);
+    } catch {
       toast.error("Failed to update organisation");
       setIsSubmitting(false);
     }
@@ -196,79 +194,47 @@ export default function EditOrganizationPage() {
                       />
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-1.5">
                       <label className={labelCls}>Financial Year Start</label>
-                      <div className="flex gap-2">
-                        {([
-                          { mode: "calendar" as const, label: "Calendar Year" },
-                          { mode: "follow_month" as const, label: "Organisation Financial Year" },
-                        ]).map(({ mode, label }) => (
-                          <button
-                            key={mode}
-                            type="button"
-                            onClick={() => setValue("financialYearMode", mode)}
-                            className={cn(
-                              "flex-1 py-2 px-3 border rounded-lg text-body font-medium transition-all",
-                              fyMode === mode
-                                ? "border-primary bg-primary/5 text-primary"
-                                : "border-border text-muted-foreground hover:border-border-hover"
-                            )}
-                          >
-                            {label}
-                          </button>
-                        ))}
-                      </div>
-                      {fyMode === "calendar" && (
-                        <p className="text-label text-muted-foreground">From January 1 – December 31.</p>
-                      )}
-                      {fyMode === "follow_month" && (
-                        <Controller
-                          control={control}
-                          name="financialYearMonth"
-                          render={({ field }) => (
-                            <div className="space-y-1.5">
-                              <Popover open={fyPickerOpen} onOpenChange={setFyPickerOpen}>
-                                <PopoverTrigger asChild>
-                                  <button
-                                    type="button"
-                                    className="w-full flex items-center gap-2 h-[38px] px-3 bg-background border border-border rounded-lg text-body transition-all hover:border-primary/30 focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30"
-                                  >
-                                    <CalendarBlank size={16} className="text-faint shrink-0" />
-                                    <span className={field.value ? "text-foreground font-medium" : "text-faint"}>
-                                      {field.value ? MONTH_NAMES[field.value - 1] : "Select FY start month"}
-                                    </span>
-                                    <CaretDown size={14} className={cn("text-faint ml-auto transition-transform", fyPickerOpen && "rotate-180")} />
-                                  </button>
-                                </PopoverTrigger>
-                                <PopoverContent align="start" className="w-[280px] p-3">
-                                  <div className="grid grid-cols-4 gap-1.5">
-                                    {MONTH_SHORT.map((m, i) => (
-                                      <button
-                                        key={m}
-                                        type="button"
-                                        onClick={() => { field.onChange(i + 1); setFyPickerOpen(false); }}
-                                        className={cn(
-                                          "py-2 rounded-lg text-label font-medium border transition-all",
-                                          field.value === i + 1
-                                            ? "border-primary bg-primary/5 text-primary ring-1 ring-primary/20"
-                                            : "border-border text-muted-foreground hover:border-primary/30 hover:text-foreground"
-                                        )}
-                                      >
-                                        {m}
-                                      </button>
-                                    ))}
-                                  </div>
-                                  {field.value && (
-                                    <p className="text-label text-muted-foreground mt-2 px-1">
-                                      FY runs {MONTH_NAMES[field.value - 1]} 1 – last day of {MONTH_NAMES[(field.value - 2 + 12) % 12]}.
-                                    </p>
+                      <Controller
+                        control={control}
+                        name="financialYearStart"
+                        render={({ field }) => {
+                          const parsed = field.value ? parse(field.value, "yyyy-MM-dd", new Date()) : undefined;
+                          const selected = parsed && isValid(parsed) ? parsed : undefined;
+                          return (
+                            <Popover open={fyPickerOpen} onOpenChange={setFyPickerOpen}>
+                              <PopoverTrigger asChild>
+                                <button
+                                  type="button"
+                                  className={cn(
+                                    "w-full flex items-center gap-2 h-10 px-3 bg-background border rounded-lg text-body transition-all",
+                                    "hover:border-primary/30 focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/30",
+                                    errors.financialYearStart ? "border-destructive" : "border-border"
                                   )}
-                                </PopoverContent>
-                              </Popover>
-                            </div>
-                          )}
-                        />
-                      )}
+                                >
+                                  <CalendarBlank size={16} className="text-faint shrink-0" />
+                                  <span className={selected ? "text-foreground font-medium" : "text-faint"}>
+                                    {selected ? format(selected, "d MMM yyyy") : "Select date"}
+                                  </span>
+                                  <CaretDown size={14} className={cn("text-faint ml-auto transition-transform", fyPickerOpen && "rotate-180")} />
+                                </button>
+                              </PopoverTrigger>
+                              <PopoverContent align="start" className="w-auto p-0">
+                                <Calendar
+                                  mode="single"
+                                  selected={selected}
+                                  onSelect={(date) => {
+                                    field.onChange(date ? format(date, "yyyy-MM-dd") : "");
+                                    setFyPickerOpen(false);
+                                  }}
+                                  initialFocus
+                                />
+                              </PopoverContent>
+                            </Popover>
+                          );
+                        }}
+                      />
                     </div>
                   </div>
                 </div>
@@ -423,7 +389,7 @@ export default function EditOrganizationPage() {
                 >
                   {isSubmitting ? (
                     <>
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <Spinner size="sm" variant="white" />
                       Saving...
                     </>
                   ) : (

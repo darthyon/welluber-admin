@@ -153,7 +153,7 @@ export default function OrgDashboardPage() {
         </div>
         <div className="flex items-center gap-2">
           <Select value={selectedBranch} onValueChange={setSelectedBranch}>
-            <SelectTrigger className="w-full sm:w-48 h-8 text-[13px]">
+            <SelectTrigger className="w-full sm:w-48 h-8 text-body">
               <SelectValue placeholder="All Branches" />
             </SelectTrigger>
             <SelectContent>

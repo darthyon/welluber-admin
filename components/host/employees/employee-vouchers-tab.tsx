@@ -11,43 +11,23 @@ import {
   Download,
   User,
 } from "@phosphor-icons/react";
-import { cn } from "@/lib/utils";
 import { SharedDataTable, type Column } from "@/components/shared/data-table";
 import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { FilterItem } from "@/components/shared/filter-item";
 import { ActionPopover } from "@/components/shared/action-popover";
+import { StatusBadge } from "@/components/shared/status-badge";
 import { ViewToggle, type ViewMode } from "@/components/shared/view-toggle";
 import type { ClaimStatus } from "@/types/claims";
 import type { VoucherRedemption } from "@/features/employees/types";
 import { MOCK_EMPLOYEE_VOUCHERS } from "@/lib/mock-data";
 
-// ─── Status badge ─────────────────────────────────────────────────────────────
-
-const STATUS_STYLE: Record<ClaimStatus, string> = {
-  "pre-auth":
-    "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20",
-  confirmed:
-    "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20",
-  cancelled:
-    "bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20",
-  pending_review:
-    "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20",
-  flagged:
-    "bg-destructive/10 text-destructive border border-destructive/20",
+const STATUS_VARIANT: Record<ClaimStatus, "amber" | "emerald" | "rose" | "primary"> = {
+  "pre-auth": "amber",
+  confirmed: "emerald",
+  cancelled: "rose",
+  pending_review: "primary",
+  flagged: "rose",
 };
-
-function StatusBadge({ status }: { status: ClaimStatus }) {
-  return (
-    <span
-      className={cn(
-        "text-label font-medium px-2 py-0.5 rounded-4xl",
-        STATUS_STYLE[status]
-      )}
-    >
-      {status}
-    </span>
-  );
-}
 
 // ─── Card View ────────────────────────────────────────────────────────────────
 
@@ -77,7 +57,7 @@ function VoucherCard({ voucher }: { voucher: VoucherRedemption }) {
               </h4>
             </div>
             <div className="flex items-center gap-2">
-              <StatusBadge status={voucher.status} />
+              <StatusBadge status={voucher.status} variant={STATUS_VARIANT[voucher.status]} />
               <code className="text-micro text-faint font-mono bg-background/50 px-1.5 py-0.5 rounded border border-border/40 tracking-tight">
                 {voucher.voucherCode}
               </code>
@@ -286,7 +266,7 @@ const columns: Column<VoucherRedemption>[] = [
   {
     header: "",
     align: "right",
-    render: (row) => (
+    render: () => (
       <ActionPopover
         align="end"
         actions={[

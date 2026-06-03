@@ -2,25 +2,18 @@
 
 import { useState, useId, useRef } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Plus,
-  Trash,
-  X,
-  Check,
-} from "@phosphor-icons/react";
+import { Plus, Trash, X, Check } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { ICON_LIBRARY, CATEGORY_COLORS } from "@/hooks/use-service-taxonomy-store";
 import type { CategoryEntry } from "@/hooks/use-service-taxonomy-store";
-
 interface ServiceItem {
   localId: string;
   name: string;
   specs: string[];
 }
-
 interface CategoryWizardFormProps {
   mode: "create" | "edit";
   initialCategory?: CategoryEntry;
@@ -175,17 +168,11 @@ export function CategoryWizardForm({
   return (
     <div className="pb-24 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start">
-
-        {/* Left: Anchor Nav */}
         <aside className="hidden xl:block w-52 shrink-0 sticky top-20 self-start">
           <FloatingAnchorNav items={ANCHOR_ITEMS} />
         </aside>
-
-        {/* Right: Content */}
         <div className="flex-1 min-w-0">
           <div className="flex flex-col gap-6">
-
-            {/* Page header */}
             <div className="flex flex-col gap-4">
               <Breadcrumbs
                 items={
@@ -212,19 +199,14 @@ export function CategoryWizardForm({
                 </p>
               </div>
             </div>
-
-            {/* ── Section 1: Category Details ── */}
             <div
               id="category-details"
               className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-24"
             >
               <div className="p-6 space-y-6">
-                {/* Section heading — static, no live icon preview */}
                 <div className="pb-2">
                   <h2 className="text-lead font-semibold text-foreground">Service Category Details</h2>
                 </div>
-
-                {/* Name */}
                 <div className="space-y-1.5">
                   <label htmlFor={`${uid}-name`} className={labelCls}>
                     Category Name <span className="text-destructive">*</span>
@@ -244,8 +226,6 @@ export function CategoryWizardForm({
                     <p className="mt-1 text-label text-destructive">{nameError}</p>
                   )}
                 </div>
-
-                {/* Description */}
                 <div className="space-y-1.5">
                   <label htmlFor={`${uid}-desc`} className={labelCls}>
                     Description{" "}
@@ -259,8 +239,6 @@ export function CategoryWizardForm({
                     className={inputCls()}
                   />
                 </div>
-
-                {/* Category Icon */}
                 <div className="space-y-1.5">
                   <label className={labelCls}>
                     Category Icon{" "}
@@ -288,8 +266,6 @@ export function CategoryWizardForm({
                     ))}
                   </div>
                 </div>
-
-                {/* Accent Color */}
                 <div className="space-y-1.5">
                   <label className={labelCls}>
                     Accent Color{" "}
@@ -311,7 +287,7 @@ export function CategoryWizardForm({
                         style={{ backgroundColor: hex }}
                       >
                         {categoryColor === hex && (
-                          <Check size={14} weight="bold" className="text-white" />
+                          <Check size={14} weight="bold" className="text-primary-foreground" />
                         )}
                       </button>
                     ))}
@@ -319,8 +295,6 @@ export function CategoryWizardForm({
                 </div>
               </div>
             </div>
-
-            {/* ── Section 2: Main Services ── */}
             <div id="main-services" className="scroll-mt-24 space-y-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -352,14 +326,12 @@ export function CategoryWizardForm({
                   </Button>
                 </div>
               )}
-
               {services.map((svc) => (
                 <div
                   key={svc.localId}
                   data-service-card
                   className="bg-card border border-border rounded-lg shadow-sm overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300"
                 >
-                  {/* Service name row */}
                   <div className="flex items-center gap-3 px-5 py-4 border-b border-border bg-muted/20">
                     <input
                       value={svc.name}
@@ -376,8 +348,6 @@ export function CategoryWizardForm({
                       <Trash size={15} weight="duotone" />
                     </button>
                   </div>
-
-                  {/* Specs */}
                   <div className="px-5 py-4 space-y-3">
                     {svc.specs.length > 0 && (
                       <p className="text-label font-semibold text-muted-foreground">Sub-services</p>
@@ -417,12 +387,10 @@ export function CategoryWizardForm({
                 </div>
               ))}
             </div>
-
           </div>
         </div>
       </div>
 
-      {/* Floating Action Bar */}
       <div className="fixed bottom-8 left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[calc(50%+104px)] z-50 flex items-center gap-4 p-2 px-6 bg-background/80 backdrop-blur-2xl border border-border shadow-lg rounded-full animate-in slide-in-from-bottom-10 duration-700 ease-out">
         <Button
           variant="ghost"

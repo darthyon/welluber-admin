@@ -1,6 +1,6 @@
 "use client"
 
-import { IdentificationCard, Check, Plus, DiceFive, CaretDown } from "@phosphor-icons/react"
+import { IdentificationCard, Plus, DiceFive, CaretDown } from "@phosphor-icons/react"
 import { Button } from "@/components/ui/button"
 import {
   Collapsible,
@@ -9,8 +9,10 @@ import {
 } from "@/components/ui/collapsible"
 import { cn } from "@/lib/utils"
 import { EMPLOYMENT_TYPES } from "../wizard-constants"
-import { SectionHeader, FieldLabel, ErrorText, HelpText } from "../wizard-shared-ui"
+import { SectionHeader, FieldLabel, ErrorText } from "../wizard-shared-ui"
 import type { PolicyWizardCtx } from "../wizard-section-types"
+import { PolicyAdvancedFilters } from "../policy-advanced-filters"
+import { SelectablePillGroup } from "../selectable-pill-group"
 
 const AI_POLICY_NAMES = [
   "Wellness Allocation 2026",
@@ -22,7 +24,6 @@ const AI_POLICY_NAMES = [
   "Recovery & Recharge",
   "Corporate Vitality Plan",
 ]
-
 import { MOCK_ORGS } from "@/lib/mock-data"
 import { FormSelect } from "@/components/shared/form-select"
 
@@ -42,6 +43,9 @@ export function PolicyDetailsSection({ ctx }: PolicyDetailsSectionProps) {
     toggleEmploymentType,
     blurName,
   } = ctx
+  const selectedTierIds = policyData.eligibility?.tierIds ?? []
+  const selectedDepartmentIds = policyData.eligibility?.departmentIds ?? []
+  const selectedEmploymentTypes = policyData.eligibleEmploymentTypes ?? []
 
   return (
     <div className="space-y-6">
@@ -150,65 +154,34 @@ export function PolicyDetailsSection({ ctx }: PolicyDetailsSectionProps) {
         {!policyData.organizationId ? (
           <p className="text-label text-faint italic">Select an organisation to load tier options.</p>
         ) : (
-          <div className="flex flex-wrap gap-2">
-            {(() => {
-              const tierIds = policyData.eligibility?.tierIds ?? []
-              const allSelected =
-                tierOptions.length > 0 && tierOptions.every((t) => tierIds.includes(t.value))
-              return (
-                <>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setPolicyData({
-                        ...policyData,
-                        eligibility: {
-                          ...policyData.eligibility,
-                          tierIds: allSelected ? [] : tierOptions.map((t) => t.value),
-                        },
-                      })
-                    }
-                    className={cn(
-                      "rounded-full border px-4 py-2 text-body font-semibold transition-all",
-                      allSelected
-                        ? "border-primary bg-primary text-primary-foreground shadow-sm"
-                        : "border-border bg-background text-muted-foreground hover:border-primary/30"
-                    )}
-                  >
-                    {allSelected && <Check size={12} weight="bold" className="mr-1.5 inline" />}
-                    All
-                  </button>
-                  {tierOptions.map((tier) => {
-                    const selected = tierIds.includes(tier.value)
-                    return (
-                      <button
-                        type="button"
-                        key={tier.value}
-                        onClick={() => {
-                          const updated = selected
-                            ? tierIds.filter((id) => id !== tier.value)
-                            : [...tierIds, tier.value]
-                          setPolicyData({
-                            ...policyData,
-                            eligibility: { ...policyData.eligibility, tierIds: updated },
-                          })
-                        }}
-                        className={cn(
-                          "rounded-full border px-4 py-2 text-body font-semibold transition-all",
-                          selected
-                            ? "border-primary bg-primary text-primary-foreground shadow-sm"
-                            : "border-border bg-background text-muted-foreground hover:border-primary/30"
-                        )}
-                      >
-                        {selected && <Check size={12} weight="bold" className="mr-1.5 inline" />}
-                        {tier.label}
-                      </button>
-                    )
-                  })}
-                </>
-              )
-            })()}
-          </div>
+          <SelectablePillGroup
+            options={tierOptions}
+            selectedValues={selectedTierIds}
+            buttonClassName="px-4 py-2 text-body font-semibold"
+            onToggleAll={() =>
+              setPolicyData({
+                ...policyData,
+                eligibility: {
+                  ...policyData.eligibility,
+                  tierIds:
+                    tierOptions.length > 0 && tierOptions.every((tier) => selectedTierIds.includes(tier.value))
+                      ? []
+                      : tierOptions.map((tier) => tier.value),
+                },
+              })
+            }
+            onToggle={(value) =>
+              setPolicyData({
+                ...policyData,
+                eligibility: {
+                  ...policyData.eligibility,
+                  tierIds: selectedTierIds.includes(value)
+                    ? selectedTierIds.filter((currentId) => currentId !== value)
+                    : [...selectedTierIds, value],
+                },
+              })
+            }
+          />
         )}
       </div>
 
@@ -236,66 +209,35 @@ export function PolicyDetailsSection({ ctx }: PolicyDetailsSectionProps) {
             Select an organisation to load department options.
           </p>
         ) : (
-          <div className="flex flex-wrap gap-2">
-            {(() => {
-              const deptIds = policyData.eligibility?.departmentIds ?? []
-              const allSelected =
-                departmentOptions.length > 0 &&
-                departmentOptions.every((d) => deptIds.includes(d.value))
-              return (
-                <>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setPolicyData({
-                        ...policyData,
-                        eligibility: {
-                          ...policyData.eligibility,
-                          departmentIds: allSelected ? [] : departmentOptions.map((d) => d.value),
-                        },
-                      })
-                    }
-                    className={cn(
-                      "rounded-full border px-4 py-2 text-body font-semibold transition-all",
-                      allSelected
-                        ? "border-primary bg-primary text-primary-foreground shadow-sm"
-                        : "border-border bg-background text-muted-foreground hover:border-primary/30"
-                    )}
-                  >
-                    {allSelected && <Check size={12} weight="bold" className="mr-1.5 inline" />}
-                    All
-                  </button>
-                  {departmentOptions.map((dept) => {
-                    const selected = deptIds.includes(dept.value)
-                    return (
-                      <button
-                        type="button"
-                        key={dept.value}
-                        onClick={() => {
-                          const updated = selected
-                            ? deptIds.filter((id) => id !== dept.value)
-                            : [...deptIds, dept.value]
-                          setPolicyData({
-                            ...policyData,
-                            eligibility: { ...policyData.eligibility, departmentIds: updated },
-                          })
-                        }}
-                        className={cn(
-                          "rounded-full border px-4 py-2 text-body font-semibold transition-all",
-                          selected
-                            ? "border-primary bg-primary text-primary-foreground shadow-sm"
-                            : "border-border bg-background text-muted-foreground hover:border-primary/30"
-                        )}
-                      >
-                        {selected && <Check size={12} weight="bold" className="mr-1.5 inline" />}
-                        {dept.label}
-                      </button>
-                    )
-                  })}
-                </>
-              )
-            })()}
-          </div>
+          <SelectablePillGroup
+            options={departmentOptions}
+            selectedValues={selectedDepartmentIds}
+            buttonClassName="px-4 py-2 text-body font-semibold"
+            onToggleAll={() =>
+              setPolicyData({
+                ...policyData,
+                eligibility: {
+                  ...policyData.eligibility,
+                  departmentIds:
+                    departmentOptions.length > 0 &&
+                    departmentOptions.every((department) => selectedDepartmentIds.includes(department.value))
+                      ? []
+                      : departmentOptions.map((department) => department.value),
+                },
+              })
+            }
+            onToggle={(value) =>
+              setPolicyData({
+                ...policyData,
+                eligibility: {
+                  ...policyData.eligibility,
+                  departmentIds: selectedDepartmentIds.includes(value)
+                    ? selectedDepartmentIds.filter((currentId) => currentId !== value)
+                    : [...selectedDepartmentIds, value],
+                },
+              })
+            }
+          />
         )}
       </div>
 
@@ -305,52 +247,21 @@ export function PolicyDetailsSection({ ctx }: PolicyDetailsSectionProps) {
         {validationErrors.eligibleEmploymentTypes && (
           <ErrorText>{validationErrors.eligibleEmploymentTypes}</ErrorText>
         )}
-        <div className="flex flex-wrap gap-2">
-          {(() => {
-            const allSelected = EMPLOYMENT_TYPES.every((t) =>
-              policyData.eligibleEmploymentTypes?.includes(t.id)
-            )
-            return (
-              <button
-                type="button"
-                onClick={() =>
-                  setPolicyData({
-                    ...policyData,
-                    eligibleEmploymentTypes: allSelected ? [] : EMPLOYMENT_TYPES.map((t) => t.id),
-                  })
-                }
-                className={cn(
-                  "rounded-full border px-4 py-2 text-body font-semibold transition-all",
-                  allSelected
-                    ? "border-primary bg-primary text-primary-foreground shadow-sm"
-                    : "border-border bg-background text-muted-foreground hover:border-primary/30"
-                )}
-              >
-                {allSelected && <Check size={12} weight="bold" className="mr-1.5 inline" />}
-                All
-              </button>
-            )
-          })()}
-          {EMPLOYMENT_TYPES.map((type) => {
-            const selected = policyData.eligibleEmploymentTypes?.includes(type.id) || false
-            return (
-              <button
-                type="button"
-                key={type.id}
-                onClick={() => toggleEmploymentType(type.id)}
-                className={cn(
-                  "rounded-full border px-4 py-2 text-body font-semibold transition-all",
-                  selected
-                    ? "border-primary bg-primary text-primary-foreground shadow-sm"
-                    : "border-border bg-background text-muted-foreground hover:border-primary/30"
-                )}
-              >
-                {selected && <Check size={12} weight="bold" className="mr-1.5 inline" />}
-                {type.label}
-              </button>
-            )
-          })}
-        </div>
+        <SelectablePillGroup
+          options={EMPLOYMENT_TYPES.map((type) => ({ label: type.label, value: type.id }))}
+          selectedValues={selectedEmploymentTypes}
+          buttonClassName="px-4 py-2 text-body font-semibold"
+          onToggleAll={() =>
+            setPolicyData({
+              ...policyData,
+              eligibleEmploymentTypes:
+                EMPLOYMENT_TYPES.every((type) => selectedEmploymentTypes.includes(type.id))
+                  ? []
+                  : EMPLOYMENT_TYPES.map((type) => type.id),
+            })
+          }
+          onToggle={toggleEmploymentType}
+        />
       </div>
 
       {/* Advanced Filters */}
@@ -369,72 +280,7 @@ export function PolicyDetailsSection({ ctx }: PolicyDetailsSectionProps) {
             <p className="mb-4 text-label text-muted-foreground">
               Narrow which employees are automatically assigned this policy.
             </p>
-            <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-              <div className="space-y-1.5">
-                <FieldLabel>Age Range (Min)</FieldLabel>
-                <input
-                  type="number"
-                  placeholder="e.g. 18"
-                  className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-body font-medium transition-all outline-none focus:ring-2 focus:ring-primary/10"
-                  value={policyData.eligibility?.minAge || ""}
-                  onChange={(e) =>
-                    setPolicyData({
-                      ...policyData,
-                      eligibility: {
-                        ...policyData.eligibility,
-                        minAge: e.target.value ? parseInt(e.target.value) : undefined,
-                      },
-                    })
-                  }
-                />
-                <HelpText>Leave blank for no minimum.</HelpText>
-              </div>
-              <div className="space-y-1.5">
-                <FieldLabel>Age Range (Max)</FieldLabel>
-                <input
-                  type="number"
-                  placeholder="e.g. 65"
-                  className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-body font-medium transition-all outline-none focus:ring-2 focus:ring-primary/10"
-                  value={policyData.eligibility?.maxAge || ""}
-                  onChange={(e) =>
-                    setPolicyData({
-                      ...policyData,
-                      eligibility: {
-                        ...policyData.eligibility,
-                        maxAge: e.target.value ? parseInt(e.target.value) : undefined,
-                      },
-                    })
-                  }
-                />
-                <HelpText>Leave blank for no maximum.</HelpText>
-              </div>
-              <div className="space-y-1.5">
-                <FieldLabel>Gender</FieldLabel>
-                <div className="flex gap-2">
-                  {(["all", "male", "female"] as const).map((g) => (
-                    <button
-                      type="button"
-                      key={g}
-                      onClick={() =>
-                        setPolicyData({
-                          ...policyData,
-                          eligibility: { ...policyData.eligibility, gender: g },
-                        })
-                      }
-                      className={cn(
-                        "flex-1 rounded-lg border px-3 py-2 text-body font-medium capitalize transition-all",
-                        policyData.eligibility?.gender === g ||
-                          (!policyData.eligibility?.gender && g === "all")
-                          ? "border-primary bg-primary/5 text-primary"
-                          : "border-border bg-card text-muted-foreground hover:border-border/80"
-                      )}
-                    >
-                      {g}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
+            <PolicyAdvancedFilters policyData={policyData} setPolicyData={setPolicyData} />
           </CollapsibleContent>
         </Collapsible>
       </div>

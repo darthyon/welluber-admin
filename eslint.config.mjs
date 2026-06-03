@@ -21,6 +21,12 @@ const eslintConfig = defineConfig([
       "@typescript-eslint/no-explicit-any": "error",
     },
   },
+  {
+    files: ["components/ui/**/*.ts", "components/ui/**/*.tsx"],
+    rules: {
+      "max-lines": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;

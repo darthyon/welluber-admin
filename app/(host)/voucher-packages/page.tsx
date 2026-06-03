@@ -2,10 +2,11 @@
 
 import { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
-import { Ticket } from "@phosphor-icons/react"
+import { Plus, Ticket } from "@phosphor-icons/react"
 import { DataFilterBar } from "@/components/shared/data-filter-bar"
 import { FilterItem } from "@/components/shared/filter-item"
 import { EmptyState } from "@/components/shared/empty-state"
+import { Button } from "@/components/ui/button"
 import {
   VoucherPackagesTable,
   VoucherPackageItem,
@@ -50,6 +51,10 @@ export default function VoucherPackagesPage() {
   const [statusTab, setStatusTab] = useState<SpVoucherStatus | "all">("all")
   const [spFilter, setSpFilter] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
+  const selectedProvider = useMemo(
+    () => MOCK_SPS.find((sp) => sp.name === spFilter),
+    [spFilter]
+  )
 
   const filteredData = useMemo(() => {
     return ALL_VOUCHERS.filter((v) => {
@@ -64,6 +69,11 @@ export default function VoucherPackagesPage() {
     })
   }, [statusTab, spFilter, searchQuery])
 
+  const handleAddVoucherPackage = () => {
+    if (!selectedProvider) return
+    router.push(`/service-providers/${selectedProvider.id}?voucherView=add`)
+  }
+
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -73,6 +83,21 @@ export default function VoucherPackagesPage() {
           </h1>
           <p className="text-body text-subtle">
             All voucher packages across service providers.
+          </p>
+        </div>
+        <div className="flex flex-col items-start gap-1 sm:items-end">
+          <Button
+            onClick={handleAddVoucherPackage}
+            disabled={!selectedProvider}
+            className="gap-2"
+          >
+            <Plus size={14} weight="bold" />
+            Add Voucher Package
+          </Button>
+          <p className="text-label text-muted-foreground">
+            {selectedProvider
+              ? `Create a voucher package for ${selectedProvider.name}.`
+              : "Select a service provider to add a voucher package."}
           </p>
         </div>
       </div>
@@ -119,6 +144,14 @@ export default function VoucherPackagesPage() {
             searchQuery || statusTab !== "all"
               ? "Try another search or clear the status filter."
               : "Voucher packages will appear here once providers create them."
+          }
+          action={
+            selectedProvider ? (
+              <Button onClick={handleAddVoucherPackage} size="sm" className="gap-2">
+                <Plus size={14} weight="bold" />
+                Add Voucher Package
+              </Button>
+            ) : undefined
           }
         />
       ) : (

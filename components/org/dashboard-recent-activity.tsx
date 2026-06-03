@@ -29,12 +29,12 @@ const EVENT_ICON: Record<ActivityEventType, React.ElementType> = {
 }
 
 const EVENT_ICON_COLOR: Record<ActivityEventType, string> = {
-  claim_confirmed: "text-emerald-500 bg-emerald-500/10",
-  claim_flagged: "text-rose-500 bg-rose-500/10",
-  claim_pending: "text-amber-600 bg-amber-500/10",
+  claim_confirmed: "text-primary bg-primary/10",
+  claim_flagged: "text-primary bg-primary/10",
+  claim_pending: "text-primary bg-primary/10",
   voucher_redeemed: "text-primary bg-primary/10",
   voucher_expired: "text-muted-foreground bg-muted/60",
-  account_topup: "text-emerald-500 bg-emerald-500/10",
+  account_topup: "text-primary bg-primary/10",
   admin_invite: "text-primary bg-primary/10",
 }
 
@@ -86,7 +86,7 @@ function ActivityRow({ item }: { item: ActivityFeedItem }) {
                 RM {item.amount.toLocaleString("en-MY")}
               </p>
             )}
-            <p className="text-[11px] text-muted-foreground/50">{timeAgo(item.timestamp)}</p>
+            <p className="text-label text-muted-foreground/50">{timeAgo(item.timestamp)}</p>
           </div>
         </div>
       </div>

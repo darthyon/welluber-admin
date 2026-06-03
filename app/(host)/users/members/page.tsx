@@ -13,7 +13,6 @@ import { SearchableFilterItem } from "@/components/shared/searchable-filter-item
 import { ViewToggle, ViewMode } from "@/components/shared/view-toggle";
 import { MemberCard } from "@/components/host/users/member-card";
 import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
 import { useMounted } from "@/hooks/use-mounted";
 import { EmptyState } from "@/components/shared/empty-state";
 import { EntityAvatar } from "@/components/shared/entity-avatar";

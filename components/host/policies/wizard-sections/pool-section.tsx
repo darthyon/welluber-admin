@@ -1,17 +1,11 @@
 "use client"
-
 import { Gear, Check, CalendarBlank, Calendar } from "@phosphor-icons/react"
 import { ChoiceCard } from "@/components/shared/choice-card"
 import { FormSelect } from "@/components/shared/form-select"
 import { MonthPickerField } from "@/components/shared/month-picker-field"
 import { cn } from "@/lib/utils"
 import type { ProrateUnit, RefreshCycle } from "@/types/policy"
-import {
-  DEPENDENTS_POOL_OPTIONS,
-  PRORATE_UNITS,
-  REFRESH_CYCLES,
-  getAvailableRefreshCycles,
-} from "../wizard-constants"
+import { DEPENDENTS_POOL_OPTIONS, PRORATE_UNITS, REFRESH_CYCLES, getAvailableRefreshCycles } from "../wizard-constants"
 import { SectionHeader, FieldLabel, ErrorText, HelpText } from "../wizard-shared-ui"
 import type { PolicyWizardCtx } from "../wizard-section-types"
 
@@ -36,10 +30,8 @@ const DEPENDENT_LABELS: Record<string, string> = {
 interface PoolSectionProps {
   ctx: PolicyWizardCtx
 }
-
 export function PoolSection({ ctx }: PoolSectionProps) {
   const { policyData, setPolicyData, validationErrors } = ctx
-
   const availableCycles = getAvailableRefreshCycles(
     policyData.utilisationMode ?? "Fixed",
     policyData.prorateUnit

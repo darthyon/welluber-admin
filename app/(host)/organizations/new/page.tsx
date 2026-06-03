@@ -5,17 +5,12 @@ import { useRouter } from "next/navigation";
 import { useForm, Controller, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  CaretLeft,
   Buildings,
   NavigationArrow,
   WarningCircle,
   IdentificationCard,
   MapPin,
   Bank,
-  Building,
-  Wallet,
-  CheckCircle,
-  ArrowLeft,
   CalendarBlank,
   CaretDown,
 } from "@phosphor-icons/react";
@@ -35,10 +30,10 @@ import { LocationPicker } from "@/components/shared/location-picker";
 import type { LocationData } from "@/components/shared/location-picker";
 import { DocumentUploadSection } from "@/components/shared/document-upload-section";
 import { FormSelect } from "@/components/shared/form-select";
-import { ChoiceCard } from "@/components/shared/choice-card";
 import { MALAYSIAN_BANKS } from "@/lib/constants/banks";
-import { MOCK_ACCOUNTS } from "@/lib/mock-data";
 import { toast } from "sonner";
+import { NewOrganizationStepTwo } from "@/components/host/organizations/new-organization-step-two";
+import { NewOrganizationPageHeader } from "@/components/host/organizations/new-organization-page-header";
 
 const STEP1_ANCHORS = [
   { id: "org-profile", label: "Organisation Profile" },
@@ -87,7 +82,6 @@ export default function NewOrganizationPage() {
   const industryValue = watch("industry");
   const bankNameValue = watch("bankAccountDetails.bankName");
   const orgType = watch("type");
-  const orgName = watch("name");
 
   const onStep1Submit = (data: CreateOrganizationData) => {
     setPendingOrgData(data);
@@ -158,30 +152,11 @@ export default function NewOrganizationPage() {
         <div className="flex-1 min-w-0">
           <div className="flex flex-col gap-6">
 
-            {/* Header */}
-            <div className="flex flex-col gap-4">
-              <button
-                onClick={() => step === 1 ? router.back() : setStep(1)}
-                className="inline-flex items-center gap-1.5 text-body font-medium text-subtle hover:text-foreground transition-colors w-fit"
-              >
-                <CaretLeft size={16} /> {step === 1 ? "Back" : "Back to Organisation"}
-              </button>
-              <div>
-                <div className="flex items-center gap-3 mb-1">
-                  <h1 className="text-heading font-semibold text-foreground text-balance">
-                    {step === 1 ? "Add New Organisation" : "Set Up HQ Branch"}
-                  </h1>
-                  <span className="text-label font-semibold text-muted-foreground bg-muted/50 border border-border px-2 py-0.5 rounded-full">
-                    Step {step} of 2
-                  </span>
-                </div>
-                <p className="text-subtle text-body">
-                  {step === 1
-                    ? "Register a new corporate client on the platform."
-                    : `Configure the HQ branch and account for ${pendingOrgData?.name ?? "this organisation"}.`}
-                </p>
-              </div>
-            </div>
+            <NewOrganizationPageHeader
+              onBack={() => (step === 1 ? router.back() : setStep(1))}
+              orgName={pendingOrgData?.name}
+              step={step}
+            />
 
             {/* ── STEP 1 ── */}
             {step === 1 && (
@@ -432,182 +407,24 @@ export default function NewOrganizationPage() {
 
             {/* ── STEP 2 ── */}
             {step === 2 && (
-              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-400">
-
-                {/* HQ Branch Identity */}
-                <div id="hq-identity" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-24">
-                  <div className="p-6 space-y-6">
-                    <div className="flex items-center gap-2 pb-2">
-                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                        <Building size={16} weight="fill" />
-                      </div>
-                      <div className="space-y-0.5">
-                        <h3 className="text-lead font-semibold text-foreground">HQ Branch Identity</h3>
-                        <p className="text-label text-muted-foreground">Basic identifiers for the headquarters branch.</p>
-                      </div>
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className={labelCls}>Branch Name</label>
-                      <input
-                        value={branchName}
-                        onChange={(e) => setBranchName(e.target.value)}
-                        placeholder="e.g. Acme Corporation HQ"
-                        className="w-full h-10 px-3 py-2 bg-background border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/40 transition-all font-medium text-foreground"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Location Mapping */}
-                <div id="hq-location" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
-                  <div className="p-6 space-y-6">
-                    <div className="flex items-center gap-2 pb-2">
-                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                        <MapPin size={16} weight="fill" />
-                      </div>
-                      <div className="space-y-0.5">
-                        <h3 className="text-lead font-semibold text-foreground">Location Mapping</h3>
-                        <p className="text-label text-muted-foreground">Geographical data and coordinate pinning.</p>
-                      </div>
-                    </div>
-                    <div className="p-1">
-                      <LocationPicker value={branchAddress} onChange={setBranchAddress} />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Account Configuration */}
-                <div id="hq-account" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
-                  <div className="p-6 space-y-6">
-                    <div className="flex items-center gap-2 pb-2">
-                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                        <Wallet size={16} weight="fill" />
-                      </div>
-                      <div className="space-y-0.5">
-                        <h3 className="text-lead font-semibold text-foreground">Account Configuration</h3>
-                        <p className="text-label text-muted-foreground">Define how this branch is funded. Top up after creation from the branch detail page.</p>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 gap-4">
-                      <ChoiceCard
-                        title="New Account"
-                        description="Create a dedicated standalone account for this branch. Funds are isolated."
-                        selected={accountType === "new"}
-                        onSelect={() => setAccountType("new")}
-                        icon={Wallet}
-                      />
-                      <ChoiceCard
-                        title="Existing Account"
-                        description="Link this branch to an existing account (e.g. shared with another cluster)."
-                        selected={accountType === "existing"}
-                        onSelect={() => setAccountType("existing")}
-                        icon={IdentificationCard}
-                      />
-                    </div>
-
-                    <div className="space-y-6">
-                      {accountType === "new" ? (
-                        <div className="space-y-5 animate-in fade-in slide-in-from-top-2 duration-300">
-                          <div className="space-y-1.5">
-                            <label className={labelCls}>Account Name</label>
-                            <input
-                              value={accountName}
-                              onChange={(e) => setAccountName(e.target.value)}
-                              placeholder="e.g. HQ Main Account"
-                              className="w-full h-10 px-3 py-2 bg-background border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/40 transition-all font-semibold text-foreground"
-                            />
-                          </div>
-                          <div className="space-y-1.5">
-                            <label className={labelCls}>Credit Limit (RM)</label>
-                            <input
-                              type="number"
-                              value={creditLimit}
-                              onChange={(e) => setCreditLimit(e.target.value)}
-                              placeholder="0.00"
-                              className="w-full h-10 px-3 py-2 bg-background border border-border rounded-lg text-body outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/40 transition-all font-semibold text-foreground"
-                            />
-                            <p className="text-label text-faint font-medium">Max overdraft this branch may use beyond its balance.</p>
-                          </div>
-                          <div className="space-y-1.5">
-                            <label className={labelCls}>Default Currency</label>
-                            <div className="flex items-center gap-3 w-full px-3 py-2 bg-muted/20 border border-border rounded-lg text-body">
-                              <span className="w-8 h-5 bg-muted rounded-sm flex items-center justify-center text-label font-medium text-muted-foreground">MYR</span>
-                              <span className="text-foreground font-semibold whitespace-nowrap">Malaysian Ringgit (RM)</span>
-                              <span className="ml-auto text-label text-faint font-semibold">Locked</span>
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-300">
-                          <label className={labelCls}>Bridge to Existing Account</label>
-                          <FormSelect
-                            value={existingAccountId}
-                            onChange={(v) => setExistingAccountId(v)}
-                            options={[
-                              { label: "Select an account...", value: "" },
-                              ...MOCK_ACCOUNTS.map((acc) => ({
-                                label: `${acc.name} — RM ${acc.balance.toLocaleString()} MYR`,
-                                value: acc.id,
-                              })),
-                            ]}
-                          />
-                          <p className="text-label text-faint mt-1.5 font-medium italic">
-                            * This branch will consume funds from the selected centralized liquidity pool.
-                          </p>
-                        </div>
-                      )}
-
-                      <div className="p-4 rounded-lg border border-border bg-muted/20 space-y-3">
-                        <div className="flex items-start gap-3 text-body text-subtle">
-                          <CheckCircle size={18} weight="fill" className="text-primary mt-0.5 shrink-0" />
-                          <span>Administrative fees are consolidated at the parent organization level for all linked accounts.</span>
-                        </div>
-                        {accountType === "new" && (
-                          <div className="flex items-start gap-3 text-body text-subtle animate-in fade-in duration-300">
-                            <CheckCircle size={18} weight="fill" className="text-primary mt-0.5 shrink-0" />
-                            <span>A 1.5% administrative fee applies to all standalone accounts.</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Floating Action Bar — Step 2 */}
-                <div className="fixed bottom-8 left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[calc(50%+104px)] z-50 flex items-center gap-4 p-2 px-6 bg-background/80 backdrop-blur-2xl border border-border shadow-lg rounded-full animate-in slide-in-from-bottom-10 duration-700 ease-out">
-                  <Button
-                    variant="ghost"
-                    size="lg"
-                    className="text-body font-semibold px-6 transition-colors flex items-center gap-2"
-                    onClick={() => setStep(1)}
-                    disabled={isSubmitting}
-                  >
-                    <ArrowLeft size={14} weight="bold" /> Back
-                  </Button>
-                  <div className="w-px h-6 bg-border/40" />
-                  <Button
-                    size="lg"
-                    onClick={handleConfirm}
-                    disabled={isSubmitting}
-                    className="text-body font-semibold px-8 flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        Creating...
-                      </>
-                    ) : (
-                      <>
-                        Confirm & Create
-                        <NavigationArrow size={14} weight="bold" className="rotate-90" />
-                      </>
-                    )}
-                  </Button>
-                </div>
-
-                <div className="h-[60vh]" />
-              </div>
+              <NewOrganizationStepTwo
+                accountName={accountName}
+                accountType={accountType}
+                branchAddress={branchAddress}
+                branchName={branchName}
+                creditLimit={creditLimit}
+                existingAccountId={existingAccountId}
+                isSubmitting={isSubmitting}
+                labelCls={labelCls}
+                onAccountNameChange={setAccountName}
+                onAccountTypeChange={setAccountType}
+                onBack={() => setStep(1)}
+                onBranchAddressChange={setBranchAddress}
+                onBranchNameChange={setBranchName}
+                onConfirm={handleConfirm}
+                onCreditLimitChange={setCreditLimit}
+                onExistingAccountChange={setExistingAccountId}
+              />
             )}
           </div>
         </div>

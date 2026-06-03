@@ -63,25 +63,25 @@ export function VisualPanel({ role }: VisualPanelProps) {
       {/* Content */}
       <div className="relative z-10 flex flex-1 flex-col items-start justify-center px-12 pb-16">
         {/* Logo */}
-        <WelluberLogo width={200} height={52} className="mb-10 text-white opacity-90" />
+        <WelluberLogo width={200} height={52} className="mb-10 text-primary-foreground opacity-90" />
 
         {role === "host" ? (
           <div className="space-y-8">
             <div>
-              <p className="text-heading font-semibold leading-snug text-white/90">
+              <p className="text-heading font-semibold leading-snug text-primary-foreground/90">
                 The command center for WellUber operations.
               </p>
-              <p className="mt-2 text-body text-white/50">
+              <p className="mt-2 text-body text-primary-foreground/50">
                 Everything you need to run the platform, in one place.
               </p>
             </div>
             <ul className="space-y-4">
               {HOST_HIGHLIGHTS.map(({ icon: Icon, text }) => (
                 <li key={text} className="flex items-start gap-3">
-                  <div className="mt-0.5 shrink-0 rounded-md bg-white/10 p-1.5">
-                    <Icon size={14} weight="fill" className="text-white/70" />
+                  <div className="mt-0.5 shrink-0 rounded-md bg-primary-foreground/10 p-1.5">
+                    <Icon size={14} weight="fill" className="text-primary-foreground/70" />
                   </div>
-                  <span className="text-body text-white/70">{text}</span>
+                  <span className="text-body text-primary-foreground/70">{text}</span>
                 </li>
               ))}
             </ul>
@@ -90,7 +90,7 @@ export function VisualPanel({ role }: VisualPanelProps) {
           <>
             {/* Decorative quote mark */}
             <p
-              className="mb-4 font-serif leading-none text-white/15 select-none"
+              className="mb-4 font-serif leading-none text-primary-foreground/15 select-none"
               style={{ fontSize: "7rem", lineHeight: 1 }}
               aria-hidden
             >
@@ -98,12 +98,12 @@ export function VisualPanel({ role }: VisualPanelProps) {
             </p>
 
             <blockquote className="space-y-6">
-              <p className="text-heading font-medium leading-snug text-white/90">
+              <p className="text-heading font-medium leading-snug text-primary-foreground/90">
                 {QUOTES[role].text}
               </p>
               <footer className="space-y-0.5">
-                <p className="text-body font-medium text-white/80">{QUOTES[role].name}</p>
-                <p className="text-label text-white/45">{QUOTES[role].title}</p>
+                <p className="text-body font-medium text-primary-foreground/80">{QUOTES[role].name}</p>
+                <p className="text-label text-primary-foreground/45">{QUOTES[role].title}</p>
               </footer>
             </blockquote>
           </>

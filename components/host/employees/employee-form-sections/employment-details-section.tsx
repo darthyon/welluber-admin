@@ -6,7 +6,7 @@ import { DatePickerField } from "@/components/shared/date-picker-field"
 import { IdentificationInput } from "@/components/shared/identification-input"
 import { FormSelect } from "@/components/shared/form-select"
 import { cn } from "@/lib/utils"
-import { EMPLOYMENT_TYPES, MOCK_BRANCHES, ID_TYPES_BY_COUNTRY } from "../employee-form-constants"
+import { EMPLOYMENT_TYPES, MOCK_BRANCHES } from "../employee-form-constants"
 import type { IdTypeOption } from "@/components/shared/identification-input"
 
 function calcTimeUntil(dateStr: string): { months: number; days: number } | null {

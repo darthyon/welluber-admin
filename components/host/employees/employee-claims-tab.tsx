@@ -5,30 +5,20 @@ import { Receipt, MapPin, Calendar, Storefront, Download } from "@phosphor-icons
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 import { SharedDataTable, type Column } from "@/components/shared/data-table";
 import { DataFilterBar } from "@/components/shared/data-filter-bar";
 import { FilterItem } from "@/components/shared/filter-item";
+import { StatusBadge } from "@/components/shared/status-badge";
 import type { ClaimStatus, EmployeeClaim } from "@/types/claims";
 import { MOCK_EMPLOYEE_CLAIMS } from "@/lib/mock-data";
 
-// ─── Status badge ─────────────────────────────────────────────────────────────
-
-const STATUS_STYLE: Record<ClaimStatus, string> = {
-  "pre-auth":      "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20",
-  confirmed:       "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20",
-  cancelled:       "bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20",
-  pending_review:  "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20",
-  flagged:         "bg-destructive/10 text-destructive border border-destructive/20",
+const STATUS_VARIANT: Record<ClaimStatus, "amber" | "emerald" | "rose" | "primary"> = {
+  "pre-auth": "amber",
+  confirmed: "emerald",
+  cancelled: "rose",
+  pending_review: "primary",
+  flagged: "rose",
 };
-
-function StatusBadge({ status }: { status: ClaimStatus }) {
-  return (
-    <span className={cn("text-label font-medium px-1.5 py-0.5 rounded", STATUS_STYLE[status])}>
-      {status}
-    </span>
-  );
-}
 
 // ─── Column definitions ───────────────────────────────────────────────────────
 
@@ -38,7 +28,7 @@ const columns: Column<EmployeeClaim>[] = [
     accessorKey: "voucherCode",
     render: (row) => (
       <div className="flex items-center gap-2">
-        <StatusBadge status={row.status} />
+        <StatusBadge status={row.status} variant={STATUS_VARIANT[row.status]} />
         <span className="text-label font-semibold text-primary cursor-pointer hover:underline underline-offset-2">{row.voucherName || row.voucherCode}</span>
       </div>
     ),

@@ -167,7 +167,7 @@ export default function ClaimsPage() {
     {
       header: "",
       align: "right",
-      render: (row) => (
+      render: () => (
         <ActionPopover
           align="end"
           actions={[

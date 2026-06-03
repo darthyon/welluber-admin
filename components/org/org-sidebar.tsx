@@ -17,8 +17,6 @@ import {
   SignOut,
 } from "@phosphor-icons/react"
 import { useRouter } from "next/navigation"
-
-import { cn } from "@/lib/utils"
 import { WelluberLogo } from "@/components/shared/welluber-logo"
 import { WelluberMark } from "@/components/shared/welluber-mark"
 import { useSession } from "@/lib/session"
@@ -103,7 +101,7 @@ export function OrgSidebar({ orgSlug, ...props }: OrgSidebarProps) {
         <SidebarHeader className="group-data-[collapsible=icon]:p-2 pt-7 pb-2">
           <div className="flex items-center justify-between px-2 mb-4">
             <div className="flex items-center group-data-[collapsible=icon]:hidden">
-              <WelluberLogo width={120} height={31} className="text-white opacity-90" />
+              <WelluberLogo width={120} height={31} className="text-primary-foreground opacity-90" />
             </div>
             <div className="hidden group-data-[collapsible=icon]:flex items-center justify-center flex-1">
               <WelluberMark size={32} className="opacity-90" />

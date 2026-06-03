@@ -8,7 +8,6 @@ import {
   Envelope,
   Users,
   UserPlus,
-  Shield,
   TreeStructure,
 } from "@phosphor-icons/react"
 import { DetailSection } from "@/components/shared/detail-section"

@@ -45,7 +45,7 @@ function PaginationBar({ page, total, onPrev, onNext }: {
 
   return (
     <div className="flex items-center justify-between pt-3 border-t border-border/40 mt-1">
-      <span className="text-[11px] text-muted-foreground/60">
+      <span className="text-label text-muted-foreground/60">
         {start}–{end} of {total}
       </span>
       <div className="flex items-center gap-1">

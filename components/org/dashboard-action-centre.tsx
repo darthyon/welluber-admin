@@ -4,14 +4,13 @@ import Link from "next/link"
 import {
   UserCircleMinus,
   FileX,
-  Warning,
-  ClockCountdown,
   CurrencyCircleDollar,
   IdentificationCard,
   ArrowRight,
   CheckCircle,
 } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
+import { StatusBadge } from "@/components/shared/status-badge"
 import type { OrgTask } from "@/components/org/org-task-centre"
 
 interface DashboardActionCentreProps {
@@ -28,18 +27,12 @@ const CATEGORY_ICON: Record<OrgTask["category"], React.ElementType> = {
   admin: IdentificationCard,
 }
 
-const PRIORITY_DOT: Record<OrgTask["priority"], string> = {
-  critical: "bg-rose-500",
-  high: "bg-amber-500",
-  medium: "bg-muted-foreground/40",
-  low: "bg-muted-foreground/20",
-}
-
 function ActionRow({ task }: { task: OrgTask }) {
   const Icon = CATEGORY_ICON[task.category]
   const isCritical = task.priority === "critical"
   const isHigh = task.priority === "high"
   const isUrgent = isCritical || isHigh
+  const countVariant = isCritical ? "rose" : isHigh ? "amber" : "zinc"
 
   return (
     <div
@@ -51,8 +44,7 @@ function ActionRow({ task }: { task: OrgTask }) {
       <div
         className={cn(
           "mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md",
-          isCritical && "bg-rose-500/10 text-rose-500",
-          isHigh && "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+          isUrgent && "bg-primary/10 text-primary",
           !isUrgent && "bg-muted/60 text-muted-foreground"
         )}
       >
@@ -65,19 +57,10 @@ function ActionRow({ task }: { task: OrgTask }) {
             {task.title}
           </p>
           {task.count !== undefined && task.count > 0 && (
-            <span
-              className={cn(
-                "inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-semibold leading-none",
-                isCritical && "bg-rose-500/10 text-rose-500",
-                isHigh && "bg-amber-500/10 text-amber-700 dark:text-amber-400",
-                !isUrgent && "bg-muted text-muted-foreground"
-              )}
-            >
-              {task.count}
-            </span>
+            <StatusBadge status={String(task.count)} variant={countVariant} className="leading-none" />
           )}
           {(!task.count || task.count === 0) && (
-            <span className="text-[10px] text-muted-foreground/50 font-medium">None</span>
+            <span className="text-micro text-muted-foreground/50 font-medium">None</span>
           )}
         </div>
         <p className="text-label text-muted-foreground mt-1 leading-snug">{task.description}</p>
@@ -112,7 +95,9 @@ export function DashboardActionCentre({ tasks, className }: DashboardActionCentr
           <p className="text-label text-muted-foreground mt-0.5">All Clear</p>
         </div>
         <div className="flex flex-col items-center justify-center py-8 gap-2">
-          <CheckCircle size={28} weight="duotone" className="text-emerald-500" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <CheckCircle size={28} weight="duotone" />
+          </div>
           <p className="text-label text-muted-foreground text-center">No items need your attention right now.</p>
         </div>
       </div>
@@ -129,9 +114,7 @@ export function DashboardActionCentre({ tasks, className }: DashboardActionCentr
           </p>
         </div>
         {urgentCount > 0 && (
-          <span className="inline-flex items-center rounded-full bg-rose-500/10 px-2 py-0.5 text-[11px] font-semibold text-rose-500">
-            {urgentCount} urgent
-          </span>
+          <StatusBadge status={`${urgentCount} Urgent`} variant="rose" />
         )}
       </div>
 

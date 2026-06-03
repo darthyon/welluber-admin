@@ -13,7 +13,7 @@ import {
   deactivateOrganization,
   suspendOrganization,
 } from "@/features/organizations/actions"
-import type { OrganizationStatus, OrgTierConfig, OrgDepartmentConfig, Organization } from "@/features/organizations/types"
+import type { OrganizationStatus, Organization } from "@/features/organizations/types"
 import { MOCK_ADMINS } from "./settings-mock-data"
 
 interface SettingsTabProps {

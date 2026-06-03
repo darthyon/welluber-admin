@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { CaretLeft, CaretRight, Wallet, Users, ClipboardText, Ticket } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import type { BranchAccount, OrgCoverageFunnel, VoucherCounts } from "@/lib/mock-data"
@@ -66,7 +66,7 @@ function KpiCard({
 
       {/* Value + sub */}
       <div className="py-2 relative z-10">
-        <p className="text-[28px] font-semibold tabular-nums text-foreground leading-none tracking-tight">
+        <p className="text-display font-semibold tabular-nums text-foreground leading-none">
           {value}
         </p>
         <p className="text-label text-muted-foreground mt-2 leading-snug">{sub}</p>
@@ -74,7 +74,7 @@ function KpiCard({
 
       <p
         className={cn(
-          "text-[11px] leading-none pt-3 border-t border-border/50 relative z-10",
+          "text-label leading-none pt-3 border-t border-border/50 relative z-10",
           footerVariant === "warning" && "text-amber-600 dark:text-amber-400",
           footerVariant === "muted" && "text-muted-foreground/60",
           footerVariant === "default" && "text-muted-foreground"
@@ -104,15 +104,14 @@ function AccountCard({
 }) {
   const [index, setIndex] = useState(0)
 
-  useEffect(() => { setIndex(0) }, [selectedBranch])
-
   const visibleAccounts =
     selectedBranch === "all"
       ? accounts
       : accounts.filter((a) => a.branchId === selectedBranch)
 
-  const account = visibleAccounts[index]
   const total = visibleAccounts.length
+  const safeIndex = total === 0 ? 0 : index % total
+  const account = visibleAccounts[safeIndex]
   const showNav = selectedBranch === "all" && total > 1
 
   if (!account) return null
@@ -155,26 +154,26 @@ function AccountCard({
 
       {/* Branch name */}
       {showNav && (
-        <p className="text-[11px] text-muted-foreground/60 relative z-10">{account.branchName}</p>
+        <p className="text-label text-muted-foreground/60 relative z-10">{account.branchName}</p>
       )}
 
       {/* Two-column: Cash Balance + Credit Remaining */}
       <div className="py-2 flex items-start gap-4 relative z-10">
         <div className="flex-1 min-w-0">
-          <p className="text-[10px] text-muted-foreground/60 font-medium mb-1">Cash Balance</p>
-          <p className="text-[28px] font-semibold tabular-nums text-foreground leading-none tracking-tight">
+          <p className="text-micro text-muted-foreground/60 font-medium mb-1">Cash Balance</p>
+          <p className="text-display font-semibold tabular-nums text-foreground leading-none">
             RM {fmt(account.cashBalance)}
           </p>
-          <p className="text-[11px] text-muted-foreground/70 mt-1.5 leading-snug">
+          <p className="text-label text-muted-foreground/70 mt-1.5 leading-snug">
             {fmtK(account.availableBalance)} available · {fmtK(account.reservedBalance)} on hold
           </p>
         </div>
         <div className="flex-shrink-0 text-right">
-          <p className="text-[10px] text-muted-foreground/60 font-medium mb-1">Credit Remaining</p>
-          <p className="text-[20px] font-semibold tabular-nums text-foreground leading-none tracking-tight">
+          <p className="text-micro text-muted-foreground/60 font-medium mb-1">Credit Remaining</p>
+          <p className="text-heading font-semibold tabular-nums text-foreground leading-none">
             {fmtK(creditRemaining)}
           </p>
-          <p className="text-[11px] text-muted-foreground/70 mt-1.5 leading-snug">
+          <p className="text-label text-muted-foreground/70 mt-1.5 leading-snug">
             of {fmtK(account.creditLimit)} limit
           </p>
         </div>
@@ -183,7 +182,7 @@ function AccountCard({
       {/* Footer */}
       <div className="flex items-center justify-between pt-3 border-t border-border/50 relative z-10">
         <p className={cn(
-          "text-[11px]",
+          "text-label",
           isLowRunway ? "text-amber-600 dark:text-amber-400" : "text-muted-foreground"
         )}>
           {runwayLabel(account.runwayDays)}
@@ -196,7 +195,7 @@ function AccountCard({
                 onClick={() => setIndex(i)}
                 className={cn(
                   "h-1 rounded-full transition-all",
-                  i === index ? "w-4 bg-primary" : "w-1.5 bg-border hover:bg-muted-foreground/40"
+                  i === safeIndex ? "w-4 bg-primary" : "w-1.5 bg-border hover:bg-muted-foreground/40"
                 )}
                 aria-label={`Account ${i + 1}`}
               />
@@ -222,7 +221,6 @@ export function DashboardKpiRow({
 }: DashboardKpiRowProps) {
   const scale = selectedBranch !== "all" ? (BRANCH_SCALE[selectedBranch] ?? 1) : 1
 
-  const coveredCount = Math.round(funnel.coveredCount * scale)
   const empCovered = Math.round(funnel.employeeCovered * scale)
   const depCovered = Math.round(funnel.dependentCovered * scale)
   const unassigned = Math.round(funnel.unassigned * scale)

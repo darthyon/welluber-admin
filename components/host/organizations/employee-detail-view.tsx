@@ -106,12 +106,12 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
       return next;
     });
 
-  const CLAIM_STATUS_STYLE: Record<Claim["status"], string> = {
-    "pre-auth":      "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20",
-    confirmed:       "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20",
-    cancelled:       "bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20",
-    pending_review:  "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20",
-    flagged:         "bg-destructive/10 text-destructive border border-destructive/20",
+  const CLAIM_STATUS_VARIANT: Record<Claim["status"], "amber" | "emerald" | "rose" | "primary"> = {
+    "pre-auth": "amber",
+    confirmed: "emerald",
+    cancelled: "rose",
+    pending_review: "primary",
+    flagged: "rose",
   };
 
   return (
@@ -333,7 +333,7 @@ export function EmployeeDetailView({ employeeId, onBack, onEdit }: EmployeeDetai
                         ) : policy.claims.map(claim => (
                           <div key={claim.id} className="grid grid-cols-[120px_1fr_1fr_1fr_100px_80px] gap-3 px-6 py-3 border-b border-border last:border-0 hover:bg-muted/80 transition-colors items-center">
                             <div className="flex items-center gap-1.5">
-                              <span className={cn("text-label font-medium px-1.5 py-0.5 rounded-full", CLAIM_STATUS_STYLE[claim.status])}>{claim.status}</span>
+                              <StatusBadge status={claim.status} variant={CLAIM_STATUS_VARIANT[claim.status]} />
                               <code className="text-micro font-mono text-faint truncate tracking-tighter">{claim.voucherCode}</code>
                             </div>
                             <p className="text-label text-foreground font-medium truncate">{claim.service}</p>

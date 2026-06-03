@@ -9,6 +9,7 @@ const ACME_BRANCH_KEYWORDS = ["ACME", "Acme"]
 export default function OrgVouchersPage() {
   const params = useParams()
   const orgSlug = params.orgSlug as string
+  void orgSlug
 
   const data = MOCK_EMPLOYEE_UTILISATION.filter((r) =>
     ACME_BRANCH_KEYWORDS.some((kw) => r.branch.includes(kw))

@@ -1,12 +1,10 @@
 "use client"
-
 import {
   Plus,
   Wallet as WalletIcon,
   MagnifyingGlass,
   CheckCircle,
   ArrowsClockwise,
-  Ticket,
   Buildings,
 } from "@phosphor-icons/react"
 import { Button } from "@/components/ui/button"
@@ -18,10 +16,7 @@ import { ACCOUNT_STATUS_OPTIONS } from "@/features/accounts/constants"
 import type { Account, AccountStatus } from "@/features/accounts/types"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { BentoGrid, BentoCard } from "@/components/shared/bento-grid"
-import {
-  AdvancedFilterSheet,
-  DEFAULT_ADVANCED_FILTERS,
-} from "@/components/shared/advanced-filter-sheet"
+import { AdvancedFilterSheet, DEFAULT_ADVANCED_FILTERS } from "@/components/shared/advanced-filter-sheet"
 import { ExpandableDataTable } from "@/components/shared/expandable-data-table"
 import { SharedDataTable, type Column } from "@/components/shared/data-table"
 import { useState, useMemo } from "react"

@@ -1,7 +1,6 @@
 "use client"
 
 import { DetailSection } from "@/components/shared/detail-section"
-import { FieldHelp } from "@/components/shared/field-help"
 import { Check, IdentificationCard } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { MOCK_ORGS } from "@/lib/mock-data"

@@ -131,7 +131,7 @@ export function BrandDetailView({
     {
       header: "",
       align: "right",
-      render: (sp) => (
+      render: () => (
         <ActionPopover
           actions={[
             {

@@ -5,17 +5,14 @@ import { FieldHelp } from "@/components/shared/field-help"
 import { ChoiceCard } from "@/components/shared/choice-card"
 import { FormSelect } from "@/components/shared/form-select"
 import { MonthPickerField } from "@/components/shared/month-picker-field"
-import { Check, Gear, CalendarBlank, Calendar } from "@phosphor-icons/react"
-import { cn } from "@/lib/utils"
-import { ReadField } from "../wizard-shared-ui"
+import { Gear, CalendarBlank, Calendar } from "@phosphor-icons/react"
 import {
-  DEPENDENTS_POOL_OPTIONS,
   PRORATE_UNITS,
-  MONTHS,
   getAvailableRefreshCycles,
 } from "../wizard-constants"
 import type { ProrateUnit, RefreshCycle } from "@/types/policy"
 import type { BenefitPolicyWizardCtx } from "../wizard-types"
+import { EditableDependentsSection, PoolReadOnlySections } from "../pool-step-sections"
 
 interface PoolStepProps {
   ctx: BenefitPolicyWizardCtx
@@ -30,75 +27,7 @@ export function PoolStep({ ctx }: PoolStepProps) {
   )
 
   if (isViewMode) {
-    const refreshLabels: Record<string, string> = {
-      financial_year: "Financial Year",
-      calendar_year: "Calendar Year",
-    }
-    return (
-      <div className="animate-in space-y-8 duration-300 fade-in">
-        <DetailSection
-          title="Benefit Pool Strategy"
-          icon={<Gear size={18} weight="duotone" />}
-          description="Fund allocation configuration"
-          ghost
-        >
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-            <ReadField
-              label="Pool Type"
-              value={policyData.benefitPoolType === "Shared" ? "Shared Pool" : "Individual"}
-            />
-            <ReadField
-              label="Dependents"
-              value={(policyData.dependentCoverages?.length ?? 0) > 0 ? "Covered" : "Employee Only"}
-            />
-            <ReadField
-              label="Employee Policy Amount"
-              value={policyData.totalCapAmount ? `RM ${policyData.totalCapAmount.toFixed(2)}` : "Not Set"}
-            />
-            {(policyData.dependentCoverages?.length ?? 0) > 0 && (
-              <ReadField
-                label="Dependents Pool Type"
-                value={
-                  policyData.dependentsPoolType === "SharedWithEmployee"
-                    ? "Shared with Employee"
-                    : policyData.dependentsPoolType
-                }
-              />
-            )}
-            <ReadField
-              label="Utilisation Mode"
-              value={policyData.utilisationMode === "Fixed" ? "Fixed Allocation" : "Prorated Allocation"}
-            />
-            {policyData.utilisationMode === "Prorated" && (
-              <ReadField label="Prorate Unit" value={policyData.prorateUnit} />
-            )}
-          </div>
-        </DetailSection>
-        <DetailSection
-          title="Cycle & Lifecycle"
-          icon={<Gear size={18} weight="duotone" />}
-          description="Refresh intervals"
-          ghost
-        >
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-            <ReadField label="Refresh Cycle" value={policyData.refreshCycle} />
-            <ReadField
-              label="Refresh Start Reference"
-              value={
-                refreshLabels[policyData.refreshStartReference || ""] ||
-                policyData.refreshStartReference
-              }
-            />
-            {policyData.refreshStartMonth && (
-              <ReadField
-                label="Start Month"
-                value={MONTHS[policyData.refreshStartMonth - 1]}
-              />
-            )}
-          </div>
-        </DetailSection>
-      </div>
-    )
+    return <PoolReadOnlySections policyData={policyData} />
   }
 
   return (
@@ -134,220 +63,12 @@ export function PoolStep({ ctx }: PoolStepProps) {
             </p>
           </div>
 
-          {/* Cover Dependents */}
-          <div className="space-y-3">
-            <label className="inline-flex items-center gap-1.5 text-label font-medium text-subtle">
-              Cover Dependents <FieldHelp termKey="dependentsPooling" />
-            </label>
-            <label className="inline-flex w-fit items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-body font-medium text-foreground">
-              <input
-                type="checkbox"
-                checked={(policyData.dependentCoverages?.length ?? 0) > 0}
-                onChange={(e) =>
-                  setPolicyData({
-                    ...policyData,
-                    dependentCoverages: e.target.checked
-                      ? policyData.dependentCoverages?.length
-                        ? policyData.dependentCoverages
-                        : [
-                            { type: "spouse" },
-                            { type: "child" },
-                            { type: "mother" },
-                            { type: "father" },
-                            { type: "sibling" },
-                            { type: "inlaw" },
-                          ]
-                      : [],
-                    dependentsPoolType: e.target.checked
-                      ? (policyData.dependentsPoolType ?? "SharedWithEmployee")
-                      : undefined,
-                  })
-                }
-                className="h-4 w-4 rounded border-border text-primary focus:ring-ring"
-                disabled={isViewMode}
-              />
-              Include dependents in this policy
-            </label>
-            {(policyData.dependentCoverages?.length ?? 0) > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {(() => {
-                  const DEPENDENT_TYPES = [
-                    { value: "spouse" as const, label: "Spouse" },
-                    { value: "child" as const, label: "Child" },
-                    { value: "mother" as const, label: "Mother" },
-                    { value: "father" as const, label: "Father" },
-                    { value: "sibling" as const, label: "Sibling" },
-                    { value: "inlaw" as const, label: "In-law" },
-                  ]
-                  const allSelected = DEPENDENT_TYPES.every((t) =>
-                    policyData.dependentCoverages?.some((c) => c.type === t.value)
-                  )
-                  return (
-                    <>
-                      <button
-                        type="button"
-                        disabled={isViewMode}
-                        onClick={() =>
-                          setPolicyData({
-                            ...policyData,
-                            dependentCoverages: allSelected
-                              ? []
-                              : DEPENDENT_TYPES.map((t) => ({ type: t.value })),
-                            dependentsPoolType: allSelected
-                              ? undefined
-                              : (policyData.dependentsPoolType ?? "SharedWithEmployee"),
-                          })
-                        }
-                        className={cn(
-                          "rounded-full border px-3 py-1.5 text-label font-medium transition-all",
-                          allSelected
-                            ? "border-primary bg-primary text-primary-foreground shadow-sm"
-                            : "border-border bg-background text-muted-foreground hover:border-primary/30"
-                        )}
-                      >
-                        {allSelected && <Check size={11} weight="bold" className="mr-1.5 inline" />}
-                        All
-                      </button>
-                      {DEPENDENT_TYPES.map((opt) => {
-                        const isSelected = policyData.dependentCoverages?.some((c) => c.type === opt.value) ?? false
-                        return (
-                          <button
-                            key={opt.value}
-                            type="button"
-                            disabled={isViewMode}
-                            onClick={() => {
-                              const next = isSelected
-                                ? (policyData.dependentCoverages ?? []).filter((c) => c.type !== opt.value)
-                                : [...(policyData.dependentCoverages ?? []), { type: opt.value }]
-                              setPolicyData({
-                                ...policyData,
-                                dependentCoverages: next,
-                                dependentsPoolType:
-                                  next.length > 0
-                                    ? (policyData.dependentsPoolType ?? "SharedWithEmployee")
-                                    : undefined,
-                              })
-                            }}
-                            className={cn(
-                              "rounded-full border px-3 py-1.5 text-label font-medium transition-all",
-                              isSelected
-                                ? "border-primary bg-primary text-primary-foreground shadow-sm"
-                                : "border-border bg-background text-muted-foreground hover:border-primary/30"
-                            )}
-                          >
-                            {isSelected && <Check size={11} weight="bold" className="mr-1.5 inline" />}
-                            {opt.label}
-                          </button>
-                        )
-                      })}
-                    </>
-                  )
-                })()}
-              </div>
-            )}
-          </div>
-
-          {/* Dependents Pool Type */}
-          {(policyData.dependentCoverages?.length ?? 0) > 0 && (
-            <div className="space-y-3">
-              <label className="inline-flex items-center gap-1.5 text-label font-medium text-subtle">
-                Dependents Pool Type{" "}
-                <span className="text-rose-600 dark:text-rose-400">*</span>
-                <FieldHelp termKey="dependentsPooling" />
-              </label>
-              {validationErrors.dependentsPoolType && (
-                <p className="text-label font-medium text-rose-600 dark:text-rose-400">
-                  {validationErrors.dependentsPoolType}
-                </p>
-              )}
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 md:max-w-2xl">
-                {DEPENDENTS_POOL_OPTIONS.map((opt) => (
-                  <ChoiceCard
-                    key={opt.value}
-                    title={opt.title}
-                    description={opt.description}
-                    icon={opt.icon}
-                    selected={policyData.dependentsPoolType === opt.value}
-                    onSelect={() => setPolicyData({ ...policyData, dependentsPoolType: opt.value })}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Dependent Amount (Shared pool) */}
-          {(policyData.dependentCoverages?.length ?? 0) > 0 &&
-            policyData.dependentsPoolType === "Shared" && (
-              <div className="space-y-1.5">
-                <label className="text-label font-medium text-subtle">Dependent Pool Amount</label>
-                <input
-                  type="number"
-                  min={0}
-                  placeholder="e.g. 1500"
-                  className="w-full max-w-xs rounded-lg border border-border bg-background px-4 py-2.5 text-body font-medium transition-all outline-none focus:ring-2 focus:ring-primary/10"
-                  value={policyData.dependentCapAmount ?? ""}
-                  onChange={(e) =>
-                    setPolicyData({
-                      ...policyData,
-                      dependentCapAmount: e.target.value === "" ? undefined : parseFloat(e.target.value),
-                    })
-                  }
-                  disabled={isViewMode}
-                />
-                <p className="text-micro text-faint">Total shared pool for all dependents per cycle.</p>
-              </div>
-            )}
-
-          {/* Dependent Amounts (Individual pool) */}
-          {(policyData.dependentCoverages?.length ?? 0) > 0 &&
-            policyData.dependentsPoolType === "Individual" && (
-              <div className="space-y-3">
-                <label className="text-label font-medium text-subtle">
-                  Dependent Amounts{" "}
-                  <span className="text-rose-600 dark:text-rose-400">*</span>
-                </label>
-                <div className="grid max-w-xl grid-cols-1 gap-4 sm:grid-cols-2">
-                  {(policyData.dependentCoverages ?? []).map((coverage) => (
-                    <div key={coverage.type} className="space-y-1.5">
-                      <label className="block text-label font-medium text-subtle">
-                        {coverage.type === "spouse"
-                          ? "Spouse"
-                          : coverage.type === "child"
-                            ? "Child"
-                            : coverage.type === "mother"
-                              ? "Mother"
-                              : coverage.type === "father"
-                                ? "Father"
-                                : coverage.type === "sibling"
-                                  ? "Sibling"
-                                  : "In-law"}
-                      </label>
-                      <input
-                        type="number"
-                        min={0}
-                        placeholder="e.g. 1500"
-                        className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-body font-medium transition-all outline-none focus:ring-2 focus:ring-primary/10"
-                        value={coverage.capAmount ?? ""}
-                        onChange={(e) =>
-                          setPolicyData((prev) => ({
-                            ...prev,
-                            dependentCoverages: (prev.dependentCoverages ?? []).map((c) =>
-                              c.type === coverage.type
-                                ? {
-                                    ...c,
-                                    capAmount: e.target.value === "" ? undefined : parseFloat(e.target.value),
-                                  }
-                                : c
-                            ),
-                          }))
-                        }
-                        disabled={isViewMode}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+          <EditableDependentsSection
+            policyData={policyData}
+            setPolicyData={setPolicyData}
+            validationErrors={validationErrors}
+            isViewMode={isViewMode}
+          />
 
           {/* Utilisation Mode */}
           <div className="space-y-3">

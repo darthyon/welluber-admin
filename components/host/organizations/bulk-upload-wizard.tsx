@@ -51,7 +51,6 @@ export function BulkUploadWizard({
 
   // ── Columns (rebuilt when selection / records change) ───────────────────────
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const visibleColumns = useMemo(
     () =>
       buildBulkUploadColumns({
@@ -62,7 +61,14 @@ export function BulkUploadWizard({
         handleFieldChange,
         resolveTier,
       }),
-    [wiz.records, selectedIds, allFilteredSelected, policyTierMap]
+    [
+      allFilteredSelected,
+      selectedIds,
+      toggleSelectAll,
+      toggleSelect,
+      handleFieldChange,
+      resolveTier,
+    ]
   )
 
   // ── Filter chips ────────────────────────────────────────────────────────────

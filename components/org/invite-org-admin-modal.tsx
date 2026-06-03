@@ -4,6 +4,7 @@ import { useState } from "react"
 import { X, PaperPlaneTilt, WarningCircle } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { Spinner } from "@/components/shared/spinner"
 import { SuccessCelebration } from "@/components/shared/success-celebration"
 import { inviteOrganizationAdmin } from "@/features/organizations/actions"
 import { inviteAdminSchema } from "@/features/organizations/schemas"
@@ -51,8 +52,7 @@ export function InviteOrgAdminModal({ orgId, isOpen, onClose }: Props) {
           setSuccess(null)
         }, 2000)
       }
-    } catch (e) {
-      console.error(e)
+    } catch {
     } finally {
       setIsSubmitting(false)
     }
@@ -85,7 +85,7 @@ export function InviteOrgAdminModal({ orgId, isOpen, onClose }: Props) {
           ) : (
             <form id="inviteOrgAdminForm" onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               <p className="text-body text-subtle mb-4">
-                Enter details below. They'll receive a secure invite link by email.
+                Enter details below. They&apos;ll receive a secure invite link by email.
               </p>
 
               <div className="space-y-1.5">
@@ -141,7 +141,7 @@ export function InviteOrgAdminModal({ orgId, isOpen, onClose }: Props) {
             <Button form="inviteOrgAdminForm" type="submit" disabled={isSubmitting} className="text-body font-medium flex items-center gap-2">
               {isSubmitting ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <Spinner size="sm" variant="white" />
                   Sending...
                 </>
               ) : (

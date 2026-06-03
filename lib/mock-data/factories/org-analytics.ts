@@ -149,7 +149,8 @@ function seededRand(seed: number): number {
 
 // ─── Factories ────────────────────────────────────────────────────────────────
 
-export function createClaimsTimeSeries(_orgId: string): ClaimsDataPoint[] {
+export function createClaimsTimeSeries(orgId: string): ClaimsDataPoint[] {
+  void orgId
   const today = new Date(2026, 4, 29)
   const start = subDays(today, 179)
 
@@ -166,7 +167,8 @@ export function createClaimsTimeSeries(_orgId: string): ClaimsDataPoint[] {
   })
 }
 
-export function createBenefitBreakdown(_orgId: string): BenefitCategoryBreakdown[] {
+export function createBenefitBreakdown(orgId: string): BenefitCategoryBreakdown[] {
+  void orgId
   return [
     { category: "Gym & Fitness",    color: CATEGORY_COLORS["Gym & Fitness"],    count: 148, amount: 22400 },
     { category: "Mental Health",    color: CATEGORY_COLORS["Mental Health"],    count: 97,  amount: 31200 },
@@ -178,7 +180,8 @@ export function createBenefitBreakdown(_orgId: string): BenefitCategoryBreakdown
   ]
 }
 
-export function createTopProviders(_orgId: string): TopProvider[] {
+export function createTopProviders(orgId: string): TopProvider[] {
+  void orgId
   return [
     { rank: 1,  name: "Celebrity Fitness KLCC",   category: "Gym & Fitness",    visits: 84, amount: 15120 },
     { rank: 2,  name: "Mind & Soul Clinic",        category: "Mental Health",    visits: 61, amount: 19520 },
@@ -193,7 +196,8 @@ export function createTopProviders(_orgId: string): TopProvider[] {
   ]
 }
 
-export function createBranchAccounts(_orgId: string): BranchAccount[] {
+export function createBranchAccounts(orgId: string): BranchAccount[] {
+  void orgId
   return [
     {
       branchId: "br_1",
@@ -224,7 +228,8 @@ export function createBranchAccounts(_orgId: string): BranchAccount[] {
   ]
 }
 
-export function createOrgCoverageFunnel(_orgId: string): OrgCoverageFunnel {
+export function createOrgCoverageFunnel(orgId: string): OrgCoverageFunnel {
+  void orgId
   return {
     totalHeadcount: 450,
     coveredCount: 412,
@@ -242,7 +247,8 @@ export function createOrgCoverageFunnel(_orgId: string): OrgCoverageFunnel {
   }
 }
 
-export function createBenefitGroupUsage(_orgId: string): BenefitGroupUsage[] {
+export function createBenefitGroupUsage(orgId: string): BenefitGroupUsage[] {
+  void orgId
   return [
     { groupName: "Mental Health",    color: CATEGORY_COLORS["Mental Health"],    allocatedAmount: 42000, usedAmount: 31200, utilisationPct: 74, claimsCount: 97,  beneficiaryCount: 84  },
     { groupName: "Gym & Fitness",    color: CATEGORY_COLORS["Gym & Fitness"],    allocatedAmount: 28000, usedAmount: 22400, utilisationPct: 80, claimsCount: 148, beneficiaryCount: 112 },
@@ -254,7 +260,8 @@ export function createBenefitGroupUsage(_orgId: string): BenefitGroupUsage[] {
   ]
 }
 
-export function createPolicyUtilisation(_orgId: string): PolicyUtilisation[] {
+export function createPolicyUtilisation(orgId: string): PolicyUtilisation[] {
+  void orgId
   return [
     { policyId: "POL-20260115-0001", policyName: "Acme Employee Wellness Policy FY2026",   utilisationPct: 72, claimsCount: 184, amountSpent: 38400 },
     { policyId: "POL-20260115-0002", policyName: "Acme Leadership Benefits Policy FY2026",  utilisationPct: 45, claimsCount: 61,  amountSpent: 19800 },
@@ -263,7 +270,8 @@ export function createPolicyUtilisation(_orgId: string): PolicyUtilisation[] {
   ]
 }
 
-export function createEmployeeGroupUtilisation(_orgId: string): EmployeeGroupUtilisation[] {
+export function createEmployeeGroupUtilisation(orgId: string): EmployeeGroupUtilisation[] {
+  void orgId
   return [
     { groupId: "TC-001", groupName: "Executive",       employeeCount: 18,  claimsCount: 54,  amountSpent: 18200, utilisationPct: 84 },
     { groupId: "TC-002", groupName: "Senior Manager",  employeeCount: 42,  claimsCount: 98,  amountSpent: 22400, utilisationPct: 76 },
@@ -273,7 +281,8 @@ export function createEmployeeGroupUtilisation(_orgId: string): EmployeeGroupUti
   ]
 }
 
-export function createVoucherCounts(_orgId: string): VoucherCounts {
+export function createVoucherCounts(orgId: string): VoucherCounts {
+  void orgId
   return {
     activeCount: 68,
     redeemedCount: 41,
@@ -282,7 +291,8 @@ export function createVoucherCounts(_orgId: string): VoucherCounts {
   }
 }
 
-export function createRecentActivity(_orgId: string): ActivityFeedItem[] {
+export function createRecentActivity(orgId: string): ActivityFeedItem[] {
+  void orgId
   return [
     {
       id: "act-001",
