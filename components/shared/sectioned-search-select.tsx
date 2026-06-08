@@ -18,16 +18,22 @@ interface SectionedSearchSelectProps {
   className?: string;
   clearable?: boolean;
   disabled?: boolean;
+  /**
+   * Focus the trigger on mount. Used when a new row is added so the user can
+   * act immediately without reaching for the mouse.
+   */
+  autoFocus?: boolean;
 }
 
-export function SectionedSearchSelect({ 
-  taxonomy, 
-  value, 
+export function SectionedSearchSelect({
+  taxonomy,
+  value,
   onChange,
   placeholder = "Select service...",
   className,
   clearable = true,
-  disabled = false
+  disabled = false,
+  autoFocus = false
 }: SectionedSearchSelectProps) {
   const [query, setQuery] = React.useState("");
   const [isOpen, setIsOpen] = React.useState(false);
@@ -35,6 +41,13 @@ export function SectionedSearchSelect({
   const dropdownRef = React.useRef<HTMLDivElement>(null);
   const [dropdownStyle, setDropdownStyle] = React.useState<React.CSSProperties>({});
   const searchRef = React.useRef<HTMLInputElement>(null);
+  const triggerRef = React.useRef<HTMLButtonElement>(null);
+
+  React.useEffect(() => {
+    if (autoFocus && !disabled) {
+      triggerRef.current?.focus({ preventScroll: true });
+    }
+  }, [autoFocus, disabled]);
 
   const filteredTaxonomy = taxonomy.map(cat => ({
     ...cat,
@@ -100,6 +113,7 @@ export function SectionedSearchSelect({
   return (
     <div className={cn("relative w-full", className)} ref={containerRef}>
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => !disabled && setIsOpen(!isOpen)}
         disabled={disabled}
