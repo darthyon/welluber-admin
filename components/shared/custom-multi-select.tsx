@@ -1,190 +1,252 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import { createPortal } from "react-dom";
-import { X, Check, CaretDown, Plus } from "@phosphor-icons/react";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import * as React from "react"
+import { createPortal } from "react-dom"
+import { X, Check, CaretDown, Plus } from "@phosphor-icons/react"
+import { Badge } from "@/components/ui/badge"
+import { cn } from "@/lib/utils"
 
-interface CustomMultiSelectProps {
-  options: string[];
-  selected: string[];
-  onChange: (selected: string[]) => void;
-  placeholder?: string;
-  className?: string;
-  disabled?: boolean;
+export interface CustomMultiSelectOption {
+  value: string
+  label: string
+  description?: string
+  searchText?: string
 }
 
-export function CustomMultiSelect({ 
-  options, 
-  selected, 
+interface CustomMultiSelectProps {
+  options: Array<string | CustomMultiSelectOption>
+  selected: string[]
+  onChange: (selected: string[]) => void
+  placeholder?: string
+  className?: string
+  disabled?: boolean
+  allowCustom?: boolean
+}
+
+export function CustomMultiSelect({
+  options,
+  selected,
   onChange,
   placeholder = "Select or type to add...",
   className,
-  disabled = false
+  disabled = false,
+  allowCustom = true,
 }: CustomMultiSelectProps) {
-  const [query, setQuery] = React.useState("");
-  const [isOpen, setIsOpen] = React.useState(false);
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  const dropdownRef = React.useRef<HTMLDivElement>(null);
-  const [dropdownStyle, setDropdownStyle] = React.useState<React.CSSProperties>({});
+  const [query, setQuery] = React.useState("")
+  const [isOpen, setIsOpen] = React.useState(false)
+  const containerRef = React.useRef<HTMLDivElement>(null)
+  const dropdownRef = React.useRef<HTMLDivElement>(null)
+  const [dropdownStyle, setDropdownStyle] = React.useState<React.CSSProperties>(
+    {}
+  )
 
-  const filteredOptions = options.filter(opt => 
-    opt.toLowerCase().includes(query.toLowerCase()) && !selected.includes(opt)
-  );
+  const normalizedOptions = React.useMemo<CustomMultiSelectOption[]>(
+    () =>
+      options.map((option) =>
+        typeof option === "string"
+          ? { value: option, label: option, searchText: option }
+          : {
+              ...option,
+              searchText:
+                option.searchText ??
+                `${option.label} ${option.description ?? ""}`,
+            }
+      ),
+    [options]
+  )
 
-  const exactMatch = options.some(opt => opt.toLowerCase() === query.toLowerCase());
-  const alreadySelected = selected.some(s => s.toLowerCase() === query.toLowerCase());
-  const showAddCustom = query && !exactMatch && !alreadySelected;
+  const filteredOptions = normalizedOptions.filter(
+    (option) =>
+      option.searchText?.toLowerCase().includes(query.toLowerCase()) &&
+      !selected.includes(option.value)
+  )
 
-  const toggleOption = (opt: string) => {
-    if (selected.includes(opt)) {
-      onChange(selected.filter(s => s !== opt));
+  const exactMatch = normalizedOptions.some(
+    (option) => option.label.toLowerCase() === query.toLowerCase()
+  )
+  const alreadySelected = selected.some(
+    (s) => s.toLowerCase() === query.toLowerCase()
+  )
+  const showAddCustom = allowCustom && query && !exactMatch && !alreadySelected
+
+  const toggleOption = (value: string) => {
+    if (selected.includes(value)) {
+      onChange(selected.filter((s) => s !== value))
     } else {
-      onChange([...selected, opt]);
+      onChange([...selected, value])
     }
-    setQuery("");
-  };
+    setQuery("")
+  }
 
   const addCustom = () => {
     if (query && !selected.includes(query)) {
-      onChange([...selected, query]);
-      setQuery("");
+      onChange([...selected, query])
+      setQuery("")
     }
-  };
+  }
 
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as Node;
-      if (!containerRef.current?.contains(target) && !dropdownRef.current?.contains(target)) {
-        setIsOpen(false);
+      const target = event.target as Node
+      if (
+        !containerRef.current?.contains(target) &&
+        !dropdownRef.current?.contains(target)
+      ) {
+        setIsOpen(false)
       }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
 
   React.useEffect(() => {
-    if (!isOpen || !containerRef.current) return;
+    if (!isOpen || !containerRef.current) return
     const updatePosition = () => {
-      const rect = containerRef.current?.getBoundingClientRect();
-      if (!rect) return;
+      const rect = containerRef.current?.getBoundingClientRect()
+      if (!rect) return
       setDropdownStyle({
         position: "fixed",
         top: rect.bottom + 4,
         left: rect.left,
         width: rect.width,
         minWidth: "200px",
-      });
-    };
-    updatePosition();
-    window.addEventListener("resize", updatePosition);
-    window.addEventListener("scroll", updatePosition, true);
+      })
+    }
+    updatePosition()
+    window.addEventListener("resize", updatePosition)
+    window.addEventListener("scroll", updatePosition, true)
     return () => {
-      window.removeEventListener("resize", updatePosition);
-      window.removeEventListener("scroll", updatePosition, true);
-    };
-  }, [isOpen]);
+      window.removeEventListener("resize", updatePosition)
+      window.removeEventListener("scroll", updatePosition, true)
+    }
+  }, [isOpen])
 
   return (
     <div className={cn("relative w-full", className)} ref={containerRef}>
-      <div 
+      <div
         className={cn(
-          "relative min-h-[42px] flex flex-wrap items-center gap-1.5 px-3 py-1.5 rounded-lg border bg-background/5 transition-all cursor-text pr-12",
-          isOpen ? "border-primary ring-2 ring-primary/10" : "border-border/60 hover:border-primary/30",
-          disabled && "opacity-60 cursor-not-allowed bg-muted/40"
+          "relative flex min-h-[42px] cursor-text flex-wrap items-center gap-1.5 rounded-lg border bg-background/5 px-3 py-1.5 pr-12 transition-all",
+          isOpen
+            ? "border-primary ring-2 ring-primary/10"
+            : "border-border/60 hover:border-primary/30",
+          disabled && "cursor-not-allowed bg-muted/40 opacity-60"
         )}
         onClick={() => !disabled && setIsOpen(true)}
       >
-        {selected.map((s) => (
-            <Badge 
-              key={s} 
-              variant="secondary" 
-              className="bg-primary/15 text-primary border-primary/20 px-2.5 py-1 text-label font-semibold gap-1.5 group whitespace-nowrap h-7 items-center"
+        {selected.map((selectedValue) => {
+          const matchedOption = normalizedOptions.find(
+            (option) => option.value === selectedValue
+          )
+          const displayLabel = matchedOption?.label ?? selectedValue
+
+          return (
+            <Badge
+              key={selectedValue}
+              variant="secondary"
+              className="group h-7 items-center gap-1.5 border-primary/20 bg-primary/15 px-2.5 py-1 text-label font-semibold whitespace-nowrap text-primary"
             >
-              {s}
+              {displayLabel}
               {!disabled && (
-                <button 
+                <button
                   onClick={(e) => {
-                    e.stopPropagation();
-                    toggleOption(s);
+                    e.stopPropagation()
+                    toggleOption(selectedValue)
                   }}
-                  className="hover:text-destructive transition-colors shrink-0"
+                  className="shrink-0 transition-colors hover:text-destructive"
                   type="button"
                 >
                   <X size={10} weight="bold" />
                 </button>
               )}
             </Badge>
-        ))}
-          <input 
-            type="text"
-            className="flex-1 bg-transparent border-0 outline-none text-body placeholder:text-faint min-w-[80px] h-7 px-1"
-            placeholder={selected.length === 0 ? placeholder : ""}
+          )
+        })}
+        <input
+          type="text"
+          className="h-7 min-w-[80px] flex-1 border-0 bg-transparent px-1 text-body outline-none placeholder:text-faint"
+          placeholder={selected.length === 0 ? placeholder : ""}
           value={query}
           disabled={disabled}
           onChange={(e) => {
-            if (disabled) return;
-            setQuery(e.target.value);
-            setIsOpen(true);
+            if (disabled) return
+            setQuery(e.target.value)
+            setIsOpen(true)
           }}
           onKeyDown={(e) => {
-            if (disabled) return;
+            if (disabled) return
             if (e.key === "Enter" && query) {
-              e.preventDefault();
-              if (showAddCustom) addCustom();
-              else if (filteredOptions.length > 0) toggleOption(filteredOptions[0]);
+              e.preventDefault()
+              if (showAddCustom) addCustom()
+              else if (filteredOptions.length > 0)
+                toggleOption(filteredOptions[0].value)
             }
           }}
         />
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center text-faint gap-1.5 pl-2">
+        <div className="absolute top-1/2 right-3 flex -translate-y-1/2 items-center gap-1.5 pl-2 text-faint">
           {!disabled && selected.length > 0 && (
             <button
               type="button"
               onClick={(e) => {
-                e.stopPropagation();
-                onChange([]);
+                e.stopPropagation()
+                onChange([])
               }}
-              className="p-1 rounded-md hover:bg-primary/10 hover:text-primary transition-colors"
+              className="rounded-md p-1 transition-colors hover:bg-primary/10 hover:text-primary"
               title="Clear all"
             >
               <X size={12} weight="bold" />
             </button>
           )}
-          <CaretDown size={12} className={cn("transition-transform shrink-0", isOpen && "rotate-180", disabled && "opacity-40")} />
+          <CaretDown
+            size={12}
+            className={cn(
+              "shrink-0 transition-transform",
+              isOpen && "rotate-180",
+              disabled && "opacity-40"
+            )}
+          />
         </div>
       </div>
 
-      {isOpen && (filteredOptions.length > 0 || showAddCustom) && typeof document !== "undefined" && createPortal(
-        <div
-          ref={dropdownRef}
-          className="z-[1000] overflow-y-auto max-h-[300px] rounded-lg border border-border/60 bg-popover shadow-2xl animate-in fade-in zoom-in-95 duration-100 p-1"
-          style={dropdownStyle}
-        >
-          {showAddCustom && (
-            <button
-              onClick={addCustom}
-              className="w-full text-left px-3 py-2 rounded-lg text-body bg-primary/10 text-primary font-semibold flex items-center gap-2 mb-1 border-b border-border/20"
-            >
-              <Plus size={14} weight="bold" />
-              <span>Add custom: &quot;{query}&quot;</span>
-            </button>
-          )}
+      {isOpen &&
+        (filteredOptions.length > 0 || showAddCustom) &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <div
+            ref={dropdownRef}
+            className="z-[1000] max-h-[300px] animate-in overflow-y-auto rounded-lg border border-border/60 bg-popover p-1 shadow-2xl duration-100 zoom-in-95 fade-in"
+            style={dropdownStyle}
+          >
+            {showAddCustom && (
+              <button
+                onClick={addCustom}
+                className="mb-1 flex w-full items-center gap-2 rounded-lg border-b border-border/20 bg-primary/10 px-3 py-2 text-left text-body font-semibold text-primary"
+              >
+                <Plus size={14} weight="bold" />
+                <span>Add custom: &quot;{query}&quot;</span>
+              </button>
+            )}
 
-          {filteredOptions.map((opt) => (
-            <button
-              key={opt}
-              onClick={() => toggleOption(opt)}
-              type="button"
-                className="w-full text-left px-3 py-2 rounded-lg text-body hover:bg-accent/40 text-subtle hover:text-foreground transition-colors flex items-center justify-between group font-semibold"
-            >
-              <span className="truncate">{opt}</span>
-              <Check size={14} className="opacity-0 group-hover:opacity-40" />
-            </button>
-          ))}
-        </div>,
-        document.body
-      )}
+            {filteredOptions.map((option) => (
+              <button
+                key={option.value}
+                onClick={() => toggleOption(option.value)}
+                type="button"
+                className="group flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-body font-semibold text-subtle transition-colors hover:bg-accent/40 hover:text-foreground"
+              >
+                <div className="min-w-0">
+                  <span className="truncate">{option.label}</span>
+                  {option.description ? (
+                    <p className="truncate text-label font-medium text-muted-foreground">
+                      {option.description}
+                    </p>
+                  ) : null}
+                </div>
+                <Check size={14} className="opacity-0 group-hover:opacity-40" />
+              </button>
+            ))}
+          </div>,
+          document.body
+        )}
     </div>
-  );
+  )
 }
