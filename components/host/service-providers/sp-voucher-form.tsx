@@ -5,7 +5,7 @@ import { useForm, useFieldArray, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { WarningCircle, Ticket, Buildings, MapPin } from "@phosphor-icons/react"
-import { cn } from "@/lib/utils"
+import { cn, getCurrencyLabel } from "@/lib/utils"
 import { Switch } from "@/components/shared/switch"
 import { createVoucherSchema } from "@/features/providers/schemas"
 import {
@@ -16,7 +16,6 @@ import {
 import { ChoiceCard } from "@/components/shared/choice-card"
 import { SuccessCelebration } from "@/components/shared/success-celebration"
 import { CustomMultiSelect } from "@/components/shared/custom-multi-select"
-import { LogoUpload } from "@/components/shared/logo-upload"
 import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav"
 import type { SpVoucher } from "@/types/provider"
 import {
@@ -37,10 +36,34 @@ const ANCHOR_ITEMS = [
 interface SpVoucherFormProps {
   spId: string
   spServiceCategories: string[]
-  spBranches: { id: string; name: string }[]
+  spBranches: { id: string; name: string; currency?: string }[]
   voucher?: SpVoucher
   onSuccess: () => void
   onCancel: () => void
+}
+
+function toDateTimeLocalValue(value: string | null | undefined): string {
+  if (!value) return ""
+
+  const date = new Date(value)
+
+  if (isNaN(date.getTime())) return ""
+
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, "0")
+  const day = String(date.getDate()).padStart(2, "0")
+  const hours = String(date.getHours()).padStart(2, "0")
+  const minutes = String(date.getMinutes()).padStart(2, "0")
+
+  return `${year}-${month}-${day}T${hours}:${minutes}`
+}
+
+function createDefaultDateTime(offsetMinutes = 0): string {
+  const date = new Date()
+  date.setSeconds(0, 0)
+  date.setMinutes(date.getMinutes() + offsetMinutes)
+
+  return toDateTimeLocalValue(date.toISOString())
 }
 
 export function SpVoucherForm({
@@ -70,7 +93,6 @@ export function SpVoucherForm({
       name: voucher?.name || "",
       description: voucher?.description || "",
       bookingRequired: voucher?.bookingRequired || false,
-      displayLocation: voucher?.displayLocation || { line: "" },
       photo: voucher?.photo || "",
       serviceLines: voucher?.serviceLines || [
         {
@@ -81,23 +103,25 @@ export function SpVoucherForm({
           price: 0,
         },
       ],
-      currency: voucher?.currency || "MYR",
+      currency: getCurrencyLabel(voucher?.currency),
       initialPrice: voucher?.initialPrice || 0,
       discount: voucher?.discount || { type: "amount", value: 0 },
       finalPrice: voucher?.finalPrice || 0,
       voucherCount: voucher?.voucherCount,
       maxUsagePerUser: voucher?.maxUsagePerUser ?? 1,
-      activationPeriod: voucher?.activationPeriod || {
-        startDate: new Date().toISOString().split("T")[0],
+      activationPeriod: {
+        startDate:
+          toDateTimeLocalValue(voucher?.activationPeriod.startDate) ||
+          createDefaultDateTime(60),
+        endDate:
+          toDateTimeLocalValue(voucher?.activationPeriod.endDate) ||
+          createDefaultDateTime(120),
       },
-      redemptionPeriod: voucher?.redemptionPeriod || {
-        mode: "after_purchase",
-        unit: "day",
-        value: 30,
-      },
+      displayVoucherEarly: voucher?.displayVoucherEarly || false,
+      displayVoucherEarlyAt:
+        toDateTimeLocalValue(voucher?.displayVoucherEarlyAt) || "",
       branchScope: voucher?.branchScope || "all",
       branchIds: voucher?.branchIds || [],
-      membershipStartDay: voucher?.membershipStartDay || "none",
     },
   })
 
@@ -106,9 +130,8 @@ export function SpVoucherForm({
     append: appendLine,
     remove: removeLine,
   } = useFieldArray({ control, name: "serviceLines" })
-  const redemptionMode = watch("redemptionPeriod.mode")
   const branchScope = watch("branchScope")
-  const currency = watch("currency")
+  const displayCurrency = getCurrencyLabel(watch("currency"))
 
   // Subtotal = sum of each service's price. One overall discount (amount or %)
   // is applied to the subtotal to give the Final Price, rounded to a whole number.
@@ -245,20 +268,20 @@ export function SpVoucherForm({
                           Select Branches
                         </label>
                         <CustomMultiSelect
-                          options={spBranches.map((b) => b.name)}
-                          selected={(watch("branchIds") ?? []).map(
-                            (id) =>
-                              spBranches.find((b) => b.id === id)?.name || id
-                          )}
-                          onChange={(names) => {
-                            const ids = names.map(
-                              (name) =>
-                                spBranches.find((b) => b.name === name)?.id ||
-                                name
-                            )
-                            setValue("branchIds", ids)
-                          }}
+                          options={spBranches.map((branch) => ({
+                            value: branch.id,
+                            label: `${branch.name} · ${getCurrencyLabel(
+                              branch.currency
+                            )}`,
+                            description:
+                              "Voucher pricing follows this branch currency",
+                          }))}
+                          selected={watch("branchIds") ?? []}
+                          onChange={(branchIds) =>
+                            setValue("branchIds", branchIds)
+                          }
                           placeholder="Search branches..."
+                          allowCustom={false}
                         />
                         {errors.branchIds && (
                           <p className="mt-1 flex items-center gap-1 text-label text-destructive">
@@ -268,24 +291,6 @@ export function SpVoucherForm({
                         )}
                       </div>
                     )}
-                  </div>
-
-                  {/* Currency — locked to the branch account wallet (MYR for v1). */}
-                  <div className="space-y-1.5">
-                    <label className="text-body font-medium text-foreground">
-                      Currency
-                    </label>
-                    <div className="flex w-full items-center gap-3 rounded-md border border-border bg-muted/20 px-3 py-2 text-body">
-                      <span className="flex h-5 w-8 items-center justify-center rounded-sm bg-muted text-label font-medium text-muted-foreground">
-                        {currency || "MYR"}
-                      </span>
-                      <span className="font-medium whitespace-nowrap text-foreground">
-                        Malaysian Ringgit (RM)
-                      </span>
-                      <span className="ml-auto text-label font-medium text-faint">
-                        From branch account · Locked
-                      </span>
-                    </div>
                   </div>
 
                   {isEditing && (
@@ -354,36 +359,24 @@ export function SpVoucherForm({
                     />
                   </div>
 
-                  <div className="space-y-4">
-                    <div className="space-y-0.5">
-                      <p className="text-body font-semibold text-foreground">
-                        Display Image
-                      </p>
-                      <p className="text-label text-muted-foreground">
-                        The primary image seen by users on the marketplace.
-                      </p>
-                    </div>
-                    <LogoUpload
-                      label="Display Image"
-                      value={watch("photo")}
-                      onChange={(file) => setValue("photo", file)}
-                      className="w-full"
-                    />
-                  </div>
+                  <p className="text-label text-muted-foreground">
+                    Branch currency is shown inline and applied automatically to
+                    voucher pricing.
+                  </p>
                 </div>
               </div>
             </div>
 
             <VoucherConfigurationSection
+              errors={errors}
               register={register}
-              redemptionMode={redemptionMode}
               setValue={setValue}
               watch={watch}
             />
 
             <VoucherManageServicesSection
               appendLine={appendLine}
-              currency={currency ?? "MYR"}
+              currency={displayCurrency}
               discountType={discountType ?? "amount"}
               errors={errors}
               finalPrice={finalPrice}

@@ -1,4 +1,4 @@
-import type { DurationUnit, ValidationUnit, RedemptionUnit, MembershipStartDay } from "@/types/provider";
+import type { DurationUnit, ValidationUnit } from "@/types/provider"
 
 export const SP_STATUS_OPTIONS = [
   { label: "All", value: "all" },
@@ -6,13 +6,13 @@ export const SP_STATUS_OPTIONS = [
   { label: "Pending", value: "pending" },
   { label: "Suspended", value: "suspended" },
   { label: "Removed", value: "removed" },
-];
+]
 
-export const COMMISSION_RATE_MIN = 0.10;
-export const COMMISSION_RATE_MAX = 0.30;
+export const COMMISSION_RATE_MIN = 0.1
+export const COMMISSION_RATE_MAX = 0.3
 
-export const CURRENCIES = ["MYR"] as const;
-export type Currency = typeof CURRENCIES[number];
+export const CURRENCIES = ["RM"] as const
+export type Currency = (typeof CURRENCIES)[number]
 
 export const DURATION_UNITS: { label: string; value: DurationUnit }[] = [
   { label: "Session (one-time)", value: "session" },
@@ -21,26 +21,14 @@ export const DURATION_UNITS: { label: string; value: DurationUnit }[] = [
   { label: "Days", value: "day" },
   { label: "Months", value: "month" },
   { label: "Years", value: "year" },
-];
+]
 
 export const VALIDATION_UNITS: { label: string; value: ValidationUnit }[] = [
   { label: "Days", value: "days" },
   { label: "Months", value: "months" },
   { label: "Half-year (6 months)", value: "half_year" },
   { label: "Year", value: "year" },
-];
-
-export const REDEMPTION_UNITS: { label: string; value: RedemptionUnit }[] = [
-  { label: "Hours", value: "hr" },
-  { label: "Days", value: "day" },
-  { label: "Months", value: "month" },
-];
-
-export const MEMBERSHIP_START_DAYS: { label: string; value: MembershipStartDay }[] = [
-  { label: "None", value: "none" },
-  { label: "1st of month", value: "1st" },
-  { label: "15th of month", value: "15th" },
-];
+]
 
 export const OPERATING_DAYS = [
   { key: "mon" as const, label: "Monday" },
@@ -50,15 +38,15 @@ export const OPERATING_DAYS = [
   { key: "fri" as const, label: "Friday" },
   { key: "sat" as const, label: "Saturday" },
   { key: "sun" as const, label: "Sunday" },
-] as const;
+] as const
 
-export type DayKey = typeof OPERATING_DAYS[number]["key"];
+export type DayKey = (typeof OPERATING_DAYS)[number]["key"]
 
 export const BRANCH_CONTACT_TYPES = [
   { label: "Branch Manager", value: "branch_manager" },
   { label: "Staff", value: "staff" },
   { label: "Reception", value: "reception" },
-] as const;
+] as const
 
 export const DEFAULT_OPERATING_HOURS = {
   mon: { open: "09:00", close: "18:00", isClosed: false },
@@ -68,14 +56,26 @@ export const DEFAULT_OPERATING_HOURS = {
   fri: { open: "09:00", close: "18:00", isClosed: false },
   sat: { open: "09:00", close: "13:00", isClosed: false },
   sun: { open: "09:00", close: "13:00", isClosed: true },
-};
+}
 
 export const BUSINESS_TYPES = [
   { id: "sdn_bhd", label: "Sdn Bhd", docs: "SSM Certificate, Form Section 14" },
   { id: "sole_prop", label: "Sole Proprietorship", docs: "Form D" },
   { id: "partnership_llp", label: "Partnership / LLP", docs: "Form B" },
-] as const;
+] as const
 
-export const PAYMENT_CYCLES = ["1 Month", "2 Months", "Quarterly", "Bi-Annual"] as const;
+export const PAYMENT_CYCLES = [
+  "1 Month",
+  "2 Months",
+  "Quarterly",
+  "Bi-Annual",
+] as const
 
-export const CREDIT_TERMS = ["Immediate", "7 Days", "15 Days", "30 Days", "45 Days", "60 Days"] as const;
+export const CREDIT_TERMS = [
+  "Immediate",
+  "7 Days",
+  "15 Days",
+  "30 Days",
+  "45 Days",
+  "60 Days",
+] as const

@@ -11,30 +11,31 @@ import {
   VoucherPackagesTable,
   VoucherPackageItem,
 } from "@/components/host/voucher-packages/voucher-packages-table"
+import { ServiceProviderSelectionModal } from "@/components/host/voucher-packages/service-provider-selection-modal"
 import { MOCK_SPS } from "@/lib/mock-data"
-import type { SpVoucherStatus } from "@/types/provider"
+import type { ServiceProvider, SpVoucherStatus } from "@/types/provider"
 
-const STATUS_FILTER_TABS: { label: string; value: SpVoucherStatus | "all" }[] = [
-  { label: "All", value: "all" },
-  { label: "Draft", value: "draft" },
-  { label: "Published", value: "published" },
-  { label: "Expired", value: "expired" },
-]
+const STATUS_FILTER_TABS: { label: string; value: SpVoucherStatus | "all" }[] =
+  [
+    { label: "All", value: "all" },
+    { label: "Draft", value: "draft" },
+    { label: "Published", value: "published" },
+    { label: "Expired", value: "expired" },
+  ]
 
 const ALL_VOUCHERS: VoucherPackageItem[] = MOCK_SPS.flatMap((sp) =>
   sp.vouchers.map((v) => ({
     ...v,
     providerName: sp.name,
-    redemptionCount:
-      v.id === "VCH-001" ? 124 : v.id === "VCH-002" ? 89 : 0,
+    redemptionCount: v.id === "VCH-001" ? 124 : v.id === "VCH-002" ? 89 : 0,
     totalRedemptionAmount:
       v.id === "VCH-001" ? 31250 : v.id === "VCH-002" ? 17800 : 0,
     branchNames:
       v.branchScope === "all"
         ? ["All Branches"]
-        : v.branchIds
+        : (v.branchIds
             .map((id) => sp.branches.find((b) => b.id === id)?.name)
-            .filter(Boolean) as string[],
+            .filter(Boolean) as string[]),
   }))
 )
 
@@ -51,6 +52,7 @@ export default function VoucherPackagesPage() {
   const [statusTab, setStatusTab] = useState<SpVoucherStatus | "all">("all")
   const [spFilter, setSpFilter] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
+  const [isProviderModalOpen, setIsProviderModalOpen] = useState(false)
   const selectedProvider = useMemo(
     () => MOCK_SPS.find((sp) => sp.name === spFilter),
     [spFilter]
@@ -70,12 +72,16 @@ export default function VoucherPackagesPage() {
   }, [statusTab, spFilter, searchQuery])
 
   const handleAddVoucherPackage = () => {
-    if (!selectedProvider) return
-    router.push(`/service-providers/${selectedProvider.id}?voucherView=add`)
+    setIsProviderModalOpen(true)
+  }
+
+  const handleProviderSelect = (provider: ServiceProvider) => {
+    setIsProviderModalOpen(false)
+    router.push(`/service-providers/${provider.id}?voucherView=add`)
   }
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="animate-in space-y-6 duration-500 fade-in slide-in-from-bottom-4">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-heading font-semibold text-foreground">
@@ -86,19 +92,10 @@ export default function VoucherPackagesPage() {
           </p>
         </div>
         <div className="flex flex-col items-start gap-1 sm:items-end">
-          <Button
-            onClick={handleAddVoucherPackage}
-            disabled={!selectedProvider}
-            className="gap-2"
-          >
+          <Button onClick={handleAddVoucherPackage} className="gap-2">
             <Plus size={14} weight="bold" />
             Add Voucher Package
           </Button>
-          <p className="text-label text-muted-foreground">
-            {selectedProvider
-              ? `Create a voucher package for ${selectedProvider.name}.`
-              : "Select a service provider to add a voucher package."}
-          </p>
         </div>
       </div>
 
@@ -147,7 +144,11 @@ export default function VoucherPackagesPage() {
           }
           action={
             selectedProvider ? (
-              <Button onClick={handleAddVoucherPackage} size="sm" className="gap-2">
+              <Button
+                onClick={handleAddVoucherPackage}
+                size="sm"
+                className="gap-2"
+              >
                 <Plus size={14} weight="bold" />
                 Add Voucher Package
               </Button>
@@ -172,6 +173,13 @@ export default function VoucherPackagesPage() {
           }
         />
       )}
+
+      <ServiceProviderSelectionModal
+        isOpen={isProviderModalOpen}
+        onClose={() => setIsProviderModalOpen(false)}
+        onSelect={handleProviderSelect}
+        providers={MOCK_SPS}
+      />
     </div>
   )
 }

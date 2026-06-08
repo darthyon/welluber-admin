@@ -1,7 +1,7 @@
 "use client"
 
 import { SharedDataTable } from "@/components/shared/data-table"
-import { formatDate } from "@/lib/utils"
+import { formatDateTime, getCurrencyLabel } from "@/lib/utils"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { ActionPopover } from "@/components/shared/action-popover"
 import { Badge } from "@/components/ui/badge"
@@ -21,10 +21,7 @@ interface VoucherPackagesTableProps {
   onViewGenerated?: (voucher: VoucherPackageItem) => void
 }
 
-const STATUS_VARIANT: Record<
-  SpVoucherStatus,
-  "emerald" | "zinc" | "rose"
-> = {
+const STATUS_VARIANT: Record<SpVoucherStatus, "emerald" | "zinc" | "rose"> = {
   draft: "zinc",
   published: "emerald",
   expired: "rose",
@@ -48,10 +45,10 @@ export function VoucherPackagesTable({
           sortable: true,
           render: (voucher) => (
             <div className="space-y-1">
-              <p className="text-body font-medium text-foreground leading-none">
+              <p className="text-body leading-none font-medium text-foreground">
                 {voucher.name}
               </p>
-              <p className="text-label font-mono text-subtle tracking-tight bg-muted w-fit px-1.5 py-0.5 rounded leading-none border border-border/50">
+              <p className="tracking-tight w-fit rounded border border-border/50 bg-muted px-1.5 py-0.5 font-mono text-label leading-none text-subtle">
                 {voucher.code}
               </p>
             </div>
@@ -70,9 +67,13 @@ export function VoucherPackagesTable({
         {
           header: "Branch",
           render: (voucher) => (
-            <div className="flex flex-wrap gap-1 max-w-[200px]">
+            <div className="flex max-w-[200px] flex-wrap gap-1">
               {voucher.branchNames.map((name, i) => (
-                <Badge key={i} variant="outline" className="text-label font-medium whitespace-nowrap">
+                <Badge
+                  key={i}
+                  variant="outline"
+                  className="text-label font-medium whitespace-nowrap"
+                >
                   {name}
                 </Badge>
               ))}
@@ -83,10 +84,13 @@ export function VoucherPackagesTable({
           header: "Description",
           accessorKey: "description",
           render: (voucher) => (
-            <p className="text-label text-muted-foreground leading-relaxed line-clamp-2 max-w-[300px]">
+            <p className="line-clamp-2 max-w-[300px] text-label leading-relaxed text-muted-foreground">
               {voucher.description || "—"}
               {voucher.bookingRequired && (
-                <Badge variant="outline" className="ml-2 text-label font-medium">
+                <Badge
+                  variant="outline"
+                  className="ml-2 text-label font-medium"
+                >
                   Booking Required
                 </Badge>
               )}
@@ -94,19 +98,15 @@ export function VoucherPackagesTable({
           ),
         },
         {
-          header: "Period",
+          header: "Usage Period",
           render: (voucher) => (
-            <div className="text-label space-y-0.5">
-              <p className="font-medium text-subtle whitespace-nowrap">
-                {formatDate(voucher.activationPeriod.startDate)}
+            <div className="space-y-0.5 text-label">
+              <p className="font-medium whitespace-nowrap text-subtle">
+                {formatDateTime(voucher.activationPeriod.startDate)}
               </p>
-              {voucher.activationPeriod.endDate ? (
-                <p className="text-subtle whitespace-nowrap">
-                  → {formatDate(voucher.activationPeriod.endDate)}
-                </p>
-              ) : (
-                <p className="text-faint italic">Open-ended</p>
-              )}
+              <p className="whitespace-nowrap text-subtle">
+                → {formatDateTime(voucher.activationPeriod.endDate)}
+              </p>
             </div>
           ),
         },
@@ -118,11 +118,11 @@ export function VoucherPackagesTable({
             <div className="space-y-0.5">
               {voucher.initialPrice !== voucher.finalPrice && (
                 <p className="text-label text-faint line-through">
-                  RM {voucher.initialPrice}
+                  {getCurrencyLabel(voucher.currency)} {voucher.initialPrice}
                 </p>
               )}
-              <p className="text-body font-medium text-foreground font-mono">
-                RM {voucher.finalPrice}
+              <p className="font-mono text-body font-medium text-foreground">
+                {getCurrencyLabel(voucher.currency)} {voucher.finalPrice}
               </p>
             </div>
           ),
@@ -134,8 +134,9 @@ export function VoucherPackagesTable({
               <p className="text-body font-medium text-foreground">
                 {voucher.redemptionCount.toLocaleString()}
               </p>
-              <p className="text-label text-muted-foreground font-mono">
-                RM {voucher.totalRedemptionAmount.toLocaleString()}
+              <p className="font-mono text-label text-muted-foreground">
+                {getCurrencyLabel(voucher.currency)}{" "}
+                {voucher.totalRedemptionAmount.toLocaleString()}
               </p>
             </div>
           ),
