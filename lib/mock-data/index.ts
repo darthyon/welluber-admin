@@ -35,6 +35,7 @@ export {
   MOCK_EMPLOYEE_GROUP_UTILISATION,
   MOCK_VOUCHER_COUNTS,
   MOCK_RECENT_ACTIVITY,
+  MOCK_ORG_PORTAL_ACTIVITY,
 } from "./seed"
 
 // Org analytics types + utilities
@@ -50,6 +51,7 @@ export type {
   VoucherCounts,
   ActivityFeedItem,
   ActivityEventType,
+  OrgPortalActivityItem,
 } from "./factories/org-analytics"
 export { bucketByMonth, bucketByYear } from "./factories/org-analytics"
 
@@ -86,7 +88,10 @@ export {
 
 // Factory functions (for generating additional test data)
 export { createBrand } from "./factories/brand"
-export { createOrganization, MOCK_ORG_UTILISATION } from "./factories/organization"
+export {
+  createOrganization,
+  MOCK_ORG_UTILISATION,
+} from "./factories/organization"
 export { createServiceProvider } from "./factories/service-provider"
 export { createEmployee } from "./factories/employee"
 export { createMember, createAdmin } from "./factories/user"
@@ -94,7 +99,10 @@ export { createPolicy } from "./factories/policy"
 export type { PolicyBundle } from "./factories/policy"
 export { createClaim } from "./factories/claim"
 export type { GlobalClaimRow } from "./factories/claim"
-export { createGeneratedVoucher, createTopupTransaction } from "./factories/voucher"
+export {
+  createGeneratedVoucher,
+  createTopupTransaction,
+} from "./factories/voucher"
 export { createAccount, createAccountTransactions } from "./factories/account"
 export { createAuditLog } from "./factories/audit-log"
 export { createDependent } from "./factories/dependent"
@@ -102,4 +110,9 @@ export { createEntitlement } from "./factories/entitlement"
 export type { Entitlement } from "./factories/entitlement"
 export { MOCK_LOCATION_SUGGESTIONS } from "./factories/location"
 export type { LocationSuggestion } from "./factories/location"
-export type { EmployeeDirectoryItem, AssignablePolicy, FormPolicy, VoucherRedemption } from "@/features/employees/types"
+export type {
+  EmployeeDirectoryItem,
+  AssignablePolicy,
+  FormPolicy,
+  VoucherRedemption,
+} from "@/features/employees/types"
