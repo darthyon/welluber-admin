@@ -1,4 +1,12 @@
-import { subDays, subMonths, format, eachDayOfInterval, eachMonthOfInterval, startOfMonth, endOfMonth } from "date-fns"
+import {
+  subDays,
+  subMonths,
+  format,
+  eachDayOfInterval,
+  eachMonthOfInterval,
+  startOfMonth,
+  endOfMonth,
+} from "date-fns"
 
 // ─── Claim timeseries ─────────────────────────────────────────────────────────
 
@@ -91,6 +99,7 @@ export interface PolicyUtilisation {
 export interface EmployeeGroupUtilisation {
   groupId: string
   groupName: string
+  policyNames: string[]
   employeeCount: number
   claimsCount: number
   amountSpent: number
@@ -128,16 +137,39 @@ export interface ActivityFeedItem {
   status?: string
 }
 
+export interface OrgPortalActivityItem {
+  id: string
+  title: string
+  type: "Create" | "Update" | "Approval" | "SettingChange"
+  desc: string
+  timestamp: string
+  updatedBy: {
+    name: string
+    email: string
+  }
+  entity?: {
+    id: string
+    name: string
+    type: "Organization" | "Policy" | "System"
+  }
+  requiresAction: boolean
+  notificationType: "action" | "activity"
+  notificationPriority: "critical" | "high" | "normal" | "low"
+  targetPage: "claims" | "settings" | "employees" | "policies" | "dashboard"
+  actionLabel?: string
+  read: boolean
+}
+
 // ─── Colors ───────────────────────────────────────────────────────────────────
 
 const CATEGORY_COLORS: Record<string, string> = {
-  "Mental Health":    "oklch(0.46 0.215 277)",
-  "Gym & Fitness":    "oklch(0.57 0.18 258)",
-  "Spa & Bodywork":   "oklch(0.62 0.14 235)",
+  "Mental Health": "oklch(0.46 0.215 277)",
+  "Gym & Fitness": "oklch(0.57 0.18 258)",
+  "Spa & Bodywork": "oklch(0.62 0.14 235)",
   "Nutrition & Diet": "oklch(0.65 0.13 210)",
-  "Optical":          "oklch(0.60 0.15 195)",
-  "Group Fitness":    "oklch(0.68 0.10 180)",
-  "Dental":           "oklch(0.72 0.08 175)",
+  Optical: "oklch(0.60 0.15 195)",
+  "Group Fitness": "oklch(0.68 0.10 180)",
+  Dental: "oklch(0.72 0.08 175)",
 }
 
 // ─── Seeded pseudo-random ─────────────────────────────────────────────────────
@@ -162,37 +194,144 @@ export function createClaimsTimeSeries(orgId: string): ClaimsDataPoint[] {
     const amount = count * Math.round(150 + seededRand(i + 99) * 350)
     const confirmedCount = Math.round(count * (0.5 + seededRand(i + 200) * 0.4))
     const pendingCount = count - confirmedCount
-    const uniqueClaimants = Math.min(count, Math.max(1, Math.round(seededRand(i + 300) * 5)))
-    return { date: format(day, "yyyy-MM-dd"), count, amount, confirmedCount, pendingCount, uniqueClaimants }
+    const uniqueClaimants = Math.min(
+      count,
+      Math.max(1, Math.round(seededRand(i + 300) * 5))
+    )
+    return {
+      date: format(day, "yyyy-MM-dd"),
+      count,
+      amount,
+      confirmedCount,
+      pendingCount,
+      uniqueClaimants,
+    }
   })
 }
 
-export function createBenefitBreakdown(orgId: string): BenefitCategoryBreakdown[] {
+export function createBenefitBreakdown(
+  orgId: string
+): BenefitCategoryBreakdown[] {
   void orgId
   return [
-    { category: "Gym & Fitness",    color: CATEGORY_COLORS["Gym & Fitness"],    count: 148, amount: 22400 },
-    { category: "Mental Health",    color: CATEGORY_COLORS["Mental Health"],    count: 97,  amount: 31200 },
-    { category: "Nutrition & Diet", color: CATEGORY_COLORS["Nutrition & Diet"], count: 72,  amount: 14800 },
-    { category: "Spa & Bodywork",   color: CATEGORY_COLORS["Spa & Bodywork"],   count: 64,  amount: 19600 },
-    { category: "Optical",          color: CATEGORY_COLORS["Optical"],          count: 51,  amount: 12300 },
-    { category: "Group Fitness",    color: CATEGORY_COLORS["Group Fitness"],    count: 43,  amount: 6900  },
-    { category: "Dental",           color: CATEGORY_COLORS["Dental"],           count: 38,  amount: 9500  },
+    {
+      category: "Gym & Fitness",
+      color: CATEGORY_COLORS["Gym & Fitness"],
+      count: 148,
+      amount: 22400,
+    },
+    {
+      category: "Mental Health",
+      color: CATEGORY_COLORS["Mental Health"],
+      count: 97,
+      amount: 31200,
+    },
+    {
+      category: "Nutrition & Diet",
+      color: CATEGORY_COLORS["Nutrition & Diet"],
+      count: 72,
+      amount: 14800,
+    },
+    {
+      category: "Spa & Bodywork",
+      color: CATEGORY_COLORS["Spa & Bodywork"],
+      count: 64,
+      amount: 19600,
+    },
+    {
+      category: "Optical",
+      color: CATEGORY_COLORS["Optical"],
+      count: 51,
+      amount: 12300,
+    },
+    {
+      category: "Group Fitness",
+      color: CATEGORY_COLORS["Group Fitness"],
+      count: 43,
+      amount: 6900,
+    },
+    {
+      category: "Dental",
+      color: CATEGORY_COLORS["Dental"],
+      count: 38,
+      amount: 9500,
+    },
   ]
 }
 
 export function createTopProviders(orgId: string): TopProvider[] {
   void orgId
   return [
-    { rank: 1,  name: "Celebrity Fitness KLCC",   category: "Gym & Fitness",    visits: 84, amount: 15120 },
-    { rank: 2,  name: "Mind & Soul Clinic",        category: "Mental Health",    visits: 61, amount: 19520 },
-    { rank: 3,  name: "Fitness First Subang",      category: "Gym & Fitness",    visits: 58, amount: 10440 },
-    { rank: 4,  name: "Ritual Yoga Studio",        category: "Group Fitness",    visits: 43, amount: 6890  },
-    { rank: 5,  name: "NutriCare Clinic",          category: "Nutrition & Diet", visits: 40, amount: 9200  },
-    { rank: 6,  name: "Hammam Spa & Wellness",     category: "Spa & Bodywork",   visits: 35, amount: 12250 },
-    { rank: 7,  name: "Barry's Bootcamp",          category: "Group Fitness",    visits: 31, amount: 4960  },
-    { rank: 8,  name: "Calm Studio KL",            category: "Mental Health",    visits: 28, amount: 5040  },
-    { rank: 9,  name: "Specsavers Subang",         category: "Optical",          visits: 24, amount: 7680  },
-    { rank: 10, name: "SmileCare Dental",          category: "Dental",           visits: 21, amount: 5250  },
+    {
+      rank: 1,
+      name: "Celebrity Fitness KLCC",
+      category: "Gym & Fitness",
+      visits: 84,
+      amount: 15120,
+    },
+    {
+      rank: 2,
+      name: "Mind & Soul Clinic",
+      category: "Mental Health",
+      visits: 61,
+      amount: 19520,
+    },
+    {
+      rank: 3,
+      name: "Fitness First Subang",
+      category: "Gym & Fitness",
+      visits: 58,
+      amount: 10440,
+    },
+    {
+      rank: 4,
+      name: "Ritual Yoga Studio",
+      category: "Group Fitness",
+      visits: 43,
+      amount: 6890,
+    },
+    {
+      rank: 5,
+      name: "NutriCare Clinic",
+      category: "Nutrition & Diet",
+      visits: 40,
+      amount: 9200,
+    },
+    {
+      rank: 6,
+      name: "Hammam Spa & Wellness",
+      category: "Spa & Bodywork",
+      visits: 35,
+      amount: 12250,
+    },
+    {
+      rank: 7,
+      name: "Barry's Bootcamp",
+      category: "Group Fitness",
+      visits: 31,
+      amount: 4960,
+    },
+    {
+      rank: 8,
+      name: "Calm Studio KL",
+      category: "Mental Health",
+      visits: 28,
+      amount: 5040,
+    },
+    {
+      rank: 9,
+      name: "Specsavers Subang",
+      category: "Optical",
+      visits: 24,
+      amount: 7680,
+    },
+    {
+      rank: 10,
+      name: "SmileCare Dental",
+      category: "Dental",
+      visits: 21,
+      amount: 5250,
+    },
   ]
 }
 
@@ -250,42 +389,176 @@ export function createOrgCoverageFunnel(orgId: string): OrgCoverageFunnel {
 export function createBenefitGroupUsage(orgId: string): BenefitGroupUsage[] {
   void orgId
   return [
-    { groupName: "Mental Health",    color: CATEGORY_COLORS["Mental Health"],    allocatedAmount: 42000, usedAmount: 31200, utilisationPct: 74, claimsCount: 97,  beneficiaryCount: 84  },
-    { groupName: "Gym & Fitness",    color: CATEGORY_COLORS["Gym & Fitness"],    allocatedAmount: 28000, usedAmount: 22400, utilisationPct: 80, claimsCount: 148, beneficiaryCount: 112 },
-    { groupName: "Spa & Bodywork",   color: CATEGORY_COLORS["Spa & Bodywork"],   allocatedAmount: 24000, usedAmount: 19600, utilisationPct: 82, claimsCount: 64,  beneficiaryCount: 52  },
-    { groupName: "Nutrition & Diet", color: CATEGORY_COLORS["Nutrition & Diet"], allocatedAmount: 22000, usedAmount: 14800, utilisationPct: 67, claimsCount: 72,  beneficiaryCount: 60  },
-    { groupName: "Optical",          color: CATEGORY_COLORS["Optical"],          allocatedAmount: 18000, usedAmount: 12300, utilisationPct: 68, claimsCount: 51,  beneficiaryCount: 48  },
-    { groupName: "Dental",           color: CATEGORY_COLORS["Dental"],           allocatedAmount: 14000, usedAmount: 9500,  utilisationPct: 68, claimsCount: 38,  beneficiaryCount: 36  },
-    { groupName: "Group Fitness",    color: CATEGORY_COLORS["Group Fitness"],    allocatedAmount: 10000, usedAmount: 6900,  utilisationPct: 69, claimsCount: 43,  beneficiaryCount: 38  },
+    {
+      groupName: "Mental Health",
+      color: CATEGORY_COLORS["Mental Health"],
+      allocatedAmount: 42000,
+      usedAmount: 31200,
+      utilisationPct: 74,
+      claimsCount: 97,
+      beneficiaryCount: 84,
+    },
+    {
+      groupName: "Gym & Fitness",
+      color: CATEGORY_COLORS["Gym & Fitness"],
+      allocatedAmount: 28000,
+      usedAmount: 22400,
+      utilisationPct: 80,
+      claimsCount: 148,
+      beneficiaryCount: 112,
+    },
+    {
+      groupName: "Spa & Bodywork",
+      color: CATEGORY_COLORS["Spa & Bodywork"],
+      allocatedAmount: 24000,
+      usedAmount: 19600,
+      utilisationPct: 82,
+      claimsCount: 64,
+      beneficiaryCount: 52,
+    },
+    {
+      groupName: "Nutrition & Diet",
+      color: CATEGORY_COLORS["Nutrition & Diet"],
+      allocatedAmount: 22000,
+      usedAmount: 14800,
+      utilisationPct: 67,
+      claimsCount: 72,
+      beneficiaryCount: 60,
+    },
+    {
+      groupName: "Optical",
+      color: CATEGORY_COLORS["Optical"],
+      allocatedAmount: 18000,
+      usedAmount: 12300,
+      utilisationPct: 68,
+      claimsCount: 51,
+      beneficiaryCount: 48,
+    },
+    {
+      groupName: "Dental",
+      color: CATEGORY_COLORS["Dental"],
+      allocatedAmount: 14000,
+      usedAmount: 9500,
+      utilisationPct: 68,
+      claimsCount: 38,
+      beneficiaryCount: 36,
+    },
+    {
+      groupName: "Group Fitness",
+      color: CATEGORY_COLORS["Group Fitness"],
+      allocatedAmount: 10000,
+      usedAmount: 6900,
+      utilisationPct: 69,
+      claimsCount: 43,
+      beneficiaryCount: 38,
+    },
   ]
 }
 
 export function createPolicyUtilisation(orgId: string): PolicyUtilisation[] {
   void orgId
   return [
-    { policyId: "POL-20260115-0001", policyName: "Acme Employee Wellness Policy FY2026",   utilisationPct: 72, claimsCount: 184, amountSpent: 38400 },
-    { policyId: "POL-20260115-0002", policyName: "Acme Leadership Benefits Policy FY2026",  utilisationPct: 45, claimsCount: 61,  amountSpent: 19800 },
-    { policyId: "POL-20260115-0003", policyName: "Global Tech Core Benefits Policy FY2026", utilisationPct: 31, claimsCount: 28,  amountSpent: 8700  },
-    { policyId: "POL-20260115-0004", policyName: "Basic Health Support",                    utilisationPct: 18, claimsCount: 14,  amountSpent: 3200  },
+    {
+      policyId: "POL-20260115-0001",
+      policyName: "Acme Employee Wellness Policy FY2026",
+      utilisationPct: 72,
+      claimsCount: 184,
+      amountSpent: 38400,
+    },
+    {
+      policyId: "POL-20260115-0002",
+      policyName: "Acme Leadership Benefits Policy FY2026",
+      utilisationPct: 45,
+      claimsCount: 61,
+      amountSpent: 19800,
+    },
+    {
+      policyId: "POL-20260115-0003",
+      policyName: "Global Tech Core Benefits Policy FY2026",
+      utilisationPct: 31,
+      claimsCount: 28,
+      amountSpent: 8700,
+    },
+    {
+      policyId: "POL-20260115-0004",
+      policyName: "Basic Health Support",
+      utilisationPct: 18,
+      claimsCount: 14,
+      amountSpent: 3200,
+    },
   ]
 }
 
-export function createEmployeeGroupUtilisation(orgId: string): EmployeeGroupUtilisation[] {
+export function createEmployeeGroupUtilisation(
+  orgId: string
+): EmployeeGroupUtilisation[] {
   void orgId
   return [
-    { groupId: "TC-001", groupName: "Executive",       employeeCount: 18,  claimsCount: 54,  amountSpent: 18200, utilisationPct: 84 },
-    { groupId: "TC-002", groupName: "Senior Manager",  employeeCount: 42,  claimsCount: 98,  amountSpent: 22400, utilisationPct: 76 },
-    { groupId: "TC-003", groupName: "Manager",         employeeCount: 86,  claimsCount: 141, amountSpent: 28900, utilisationPct: 68 },
-    { groupId: "TC-004", groupName: "Associate",       employeeCount: 174, claimsCount: 187, amountSpent: 31200, utilisationPct: 52 },
-    { groupId: "TC-005", groupName: "Intern / Contract", employeeCount: 92, claimsCount: 47, amountSpent: 6900,  utilisationPct: 31 },
+    {
+      groupId: "TC-001",
+      groupName: "Executive",
+      employeeCount: 18,
+      claimsCount: 54,
+      amountSpent: 18200,
+      utilisationPct: 84,
+      policyNames: [
+        "Acme Leadership Benefits Policy FY2026",
+        "Acme Employee Wellness Policy FY2026",
+      ],
+    },
+    {
+      groupId: "TC-002",
+      groupName: "Senior Manager",
+      employeeCount: 42,
+      claimsCount: 98,
+      amountSpent: 22400,
+      utilisationPct: 76,
+      policyNames: [
+        "Acme Leadership Benefits Policy FY2026",
+        "Acme Lifestyle Flex Policy FY2026",
+      ],
+    },
+    {
+      groupId: "TC-003",
+      groupName: "Manager",
+      employeeCount: 86,
+      claimsCount: 141,
+      amountSpent: 28900,
+      utilisationPct: 68,
+      policyNames: [
+        "Acme Employee Wellness Policy FY2026",
+        "Acme Lifestyle Flex Policy FY2026",
+      ],
+    },
+    {
+      groupId: "TC-004",
+      groupName: "Associate",
+      employeeCount: 174,
+      claimsCount: 187,
+      amountSpent: 31200,
+      utilisationPct: 52,
+      policyNames: [
+        "Acme Employee Wellness Policy FY2026",
+        "Basic Health Support",
+      ],
+    },
+    {
+      groupId: "TC-005",
+      groupName: "Intern / Contract",
+      employeeCount: 92,
+      claimsCount: 47,
+      amountSpent: 6900,
+      utilisationPct: 31,
+      policyNames: ["Acme Lifestyle Flex Policy FY2026"],
+    },
   ]
 }
 
 export function createVoucherCounts(orgId: string): VoucherCounts {
   void orgId
   return {
-    activeCount: 68,
-    redeemedCount: 41,
+    activeCount: 100,
+    redeemedCount: 18,
     expiringSoon: 9,
     totalIssued: 118,
   }
@@ -376,9 +649,137 @@ export function createRecentActivity(orgId: string): ActivityFeedItem[] {
   ]
 }
 
+export function createOrgPortalActivity(
+  orgId: string
+): OrgPortalActivityItem[] {
+  void orgId
+  return [
+    {
+      id: "ACT-001",
+      title: "Benefit Policy Assigned",
+      type: "Update",
+      desc: "Acme Employee Wellness Policy FY2026 assigned to all branches.",
+      timestamp: "2026-04-06 14:20",
+      updatedBy: { name: "Yon Yusuf", email: "yon@acme.com" },
+      entity: {
+        id: "POL-20260115-0001",
+        name: "Acme Employee Wellness Policy FY2026",
+        type: "Policy",
+      },
+      requiresAction: false,
+      notificationType: "activity",
+      notificationPriority: "normal",
+      targetPage: "policies",
+      read: true,
+    },
+    {
+      id: "ACT-002",
+      title: "Admin Invite Pending",
+      type: "Create",
+      desc: "Khairul Anwar was invited as Org Admin and has not activated the account yet.",
+      timestamp: "2026-04-10 09:30",
+      updatedBy: { name: "Yon Yusuf", email: "yon@acme.com" },
+      requiresAction: true,
+      notificationType: "action",
+      notificationPriority: "high",
+      targetPage: "settings",
+      actionLabel: "Manage Admins",
+      read: false,
+    },
+    {
+      id: "ACT-003",
+      title: "Employee Status Updated",
+      type: "Update",
+      desc: "Robert Fox status changed from Unlinked to Linked.",
+      timestamp: "2026-04-08 11:15",
+      updatedBy: { name: "Amira Rahman", email: "amira@acme.com" },
+      requiresAction: false,
+      notificationType: "activity",
+      notificationPriority: "low",
+      targetPage: "employees",
+      read: true,
+    },
+    {
+      id: "ACT-004",
+      title: "Branch Created",
+      type: "Create",
+      desc: "ACME Subang Jaya branch was added to the organisation structure.",
+      timestamp: "2026-03-15 10:00",
+      updatedBy: { name: "Yon Yusuf", email: "yon@acme.com" },
+      requiresAction: false,
+      notificationType: "activity",
+      notificationPriority: "normal",
+      targetPage: "dashboard",
+      read: true,
+    },
+    {
+      id: "ACT-005",
+      title: "Organisation Structure Updated",
+      type: "SettingChange",
+      desc: "A new employee group, Associate, was added to the organisation setup.",
+      timestamp: "2026-03-20 14:45",
+      updatedBy: { name: "Yon Yusuf", email: "yon@acme.com" },
+      requiresAction: false,
+      notificationType: "activity",
+      notificationPriority: "low",
+      targetPage: "employees",
+      read: true,
+    },
+    {
+      id: "ACT-006",
+      title: "Pre-Authorised Claim Awaiting Confirmation",
+      type: "Approval",
+      desc: "A Lifestyle Pocket voucher claim for RM 800 is waiting for confirmation before settlement.",
+      timestamp: "2026-04-10 10:15",
+      updatedBy: { name: "System", email: "system@welluber.com" },
+      requiresAction: true,
+      notificationType: "action",
+      notificationPriority: "critical",
+      targetPage: "claims",
+      actionLabel: "Review Claims",
+      read: false,
+    },
+    {
+      id: "ACT-007",
+      title: "Low Account Warning",
+      type: "Approval",
+      desc: "The Subang shared pool is below the preferred runway threshold and should be topped up soon.",
+      timestamp: "2026-04-09 08:40",
+      updatedBy: { name: "System", email: "system@welluber.com" },
+      requiresAction: true,
+      notificationType: "action",
+      notificationPriority: "high",
+      targetPage: "dashboard",
+      actionLabel: "Top Up Account",
+      read: false,
+    },
+    {
+      id: "ACT-008",
+      title: "Leadership Policy Assigned",
+      type: "Update",
+      desc: "Acme Leadership Benefits Policy FY2026 was assigned to the Subang Jaya branch.",
+      timestamp: "2026-04-02 10:30",
+      updatedBy: { name: "Amira Rahman", email: "amira@acme.com" },
+      entity: {
+        id: "POL-20260115-0002",
+        name: "Acme Leadership Benefits Policy FY2026",
+        type: "Policy",
+      },
+      requiresAction: false,
+      notificationType: "activity",
+      notificationPriority: "normal",
+      targetPage: "policies",
+      read: true,
+    },
+  ]
+}
+
 // ─── Bucket daily timeseries into monthly aggregates ─────────────────────────
 
-export function bucketByYear(series: ClaimsDataPoint[], year: string): ClaimsDataPoint[] {
+export function bucketByYear(
+  series: ClaimsDataPoint[],
+  year: string
+): ClaimsDataPoint[] {
   const y = parseInt(year)
   const months = eachMonthOfInterval({
     start: new Date(y, 0, 1),

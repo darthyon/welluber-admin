@@ -1,44 +1,46 @@
-"use client";
+"use client"
 
-import { useState, useEffect, useMemo } from "react";
-import { useForm, useFieldArray, useWatch } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { useState, useEffect, useMemo } from "react"
+import { useForm, useFieldArray, useWatch } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod"
+import { WarningCircle, Ticket, Buildings, MapPin } from "@phosphor-icons/react"
+import { cn } from "@/lib/utils"
+import { Switch } from "@/components/shared/switch"
+import { createVoucherSchema } from "@/features/providers/schemas"
 import {
-  WarningCircle,
-  Ticket,
-  Buildings,
-  MapPin,
-} from "@phosphor-icons/react";
-import { cn } from "@/lib/utils";
-import { Switch } from "@/components/shared/switch";
-import { createVoucherSchema } from "@/features/providers/schemas";
-import { createVoucher, updateVoucher, publishVoucher } from "@/features/providers/actions";
-import { ChoiceCard } from "@/components/shared/choice-card";
-import { SuccessCelebration } from "@/components/shared/success-celebration";
-import { CustomMultiSelect } from "@/components/shared/custom-multi-select";
-import { LogoUpload } from "@/components/shared/logo-upload";
-import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav";
-import type { SpVoucher } from "@/types/provider";
-import { VoucherFormActionBar, VoucherFormHeader } from "@/components/host/service-providers/sp-voucher-form-frame";
+  createVoucher,
+  updateVoucher,
+  publishVoucher,
+} from "@/features/providers/actions"
+import { ChoiceCard } from "@/components/shared/choice-card"
+import { SuccessCelebration } from "@/components/shared/success-celebration"
+import { CustomMultiSelect } from "@/components/shared/custom-multi-select"
+import { LogoUpload } from "@/components/shared/logo-upload"
+import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav"
+import type { SpVoucher } from "@/types/provider"
+import {
+  VoucherFormActionBar,
+  VoucherFormHeader,
+} from "@/components/host/service-providers/sp-voucher-form-frame"
 import {
   VoucherConfigurationSection,
   VoucherManageServicesSection,
-} from "@/components/host/service-providers/sp-voucher-form-sections";
+} from "@/components/host/service-providers/sp-voucher-form-sections"
 
 const ANCHOR_ITEMS = [
   { id: "details", label: "Details" },
   { id: "voucher-configuration", label: "Voucher Configuration" },
   { id: "manage-services", label: "Manage Services" },
-];
+]
 
 interface SpVoucherFormProps {
-  spId: string;
-  spServiceCategories: string[];
-  spBranches: { id: string; name: string }[];
-  voucher?: SpVoucher;
-  onSuccess: () => void;
-  onCancel: () => void;
+  spId: string
+  spServiceCategories: string[]
+  spBranches: { id: string; name: string }[]
+  voucher?: SpVoucher
+  onSuccess: () => void
+  onCancel: () => void
 }
 
 export function SpVoucherForm({
@@ -49,13 +51,20 @@ export function SpVoucherForm({
   onSuccess,
   onCancel,
 }: SpVoucherFormProps) {
-  const isEditing = !!voucher;
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isPublishing, setIsPublishing] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
+  const isEditing = !!voucher
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isPublishing, setIsPublishing] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
+  const [successMessage, setSuccessMessage] = useState("")
 
-  const { register, handleSubmit, control, setValue, watch, formState: { errors, isSubmitting: formIsSubmitting } } = useForm<z.input<typeof createVoucherSchema>>({
+  const {
+    register,
+    handleSubmit,
+    control,
+    setValue,
+    watch,
+    formState: { errors, isSubmitting: formIsSubmitting },
+  } = useForm<z.input<typeof createVoucherSchema>>({
     resolver: zodResolver(createVoucherSchema),
     defaultValues: {
       name: voucher?.name || "",
@@ -64,7 +73,13 @@ export function SpVoucherForm({
       displayLocation: voucher?.displayLocation || { line: "" },
       photo: voucher?.photo || "",
       serviceLines: voucher?.serviceLines || [
-        { service: "", subServices: [], description: "", descriptionList: "", price: 0 },
+        {
+          service: "",
+          subServices: [],
+          description: "",
+          descriptionList: "",
+          price: 0,
+        },
       ],
       currency: voucher?.currency || "MYR",
       initialPrice: voucher?.initialPrice || 0,
@@ -84,85 +99,98 @@ export function SpVoucherForm({
       branchIds: voucher?.branchIds || [],
       membershipStartDay: voucher?.membershipStartDay || "none",
     },
-  });
+  })
 
-  const { fields: serviceLineFields, append: appendLine, remove: removeLine } = useFieldArray({ control, name: "serviceLines" });
-  const redemptionMode = watch("redemptionPeriod.mode");
-  const branchScope = watch("branchScope");
-  const currency = watch("currency");
+  const {
+    fields: serviceLineFields,
+    append: appendLine,
+    remove: removeLine,
+  } = useFieldArray({ control, name: "serviceLines" })
+  const redemptionMode = watch("redemptionPeriod.mode")
+  const branchScope = watch("branchScope")
+  const currency = watch("currency")
 
   // Subtotal = sum of each service's price. One overall discount (amount or %)
   // is applied to the subtotal to give the Final Price, rounded to a whole number.
-  const serviceLinesWatch = useWatch({ control, name: "serviceLines" });
-  const discountType = useWatch({ control, name: "discount.type" });
-  const discountValue = Number(useWatch({ control, name: "discount.value" })) || 0;
+  const serviceLinesWatch = useWatch({ control, name: "serviceLines" })
+  const discountType = useWatch({ control, name: "discount.type" })
+  const discountValue =
+    Number(useWatch({ control, name: "discount.value" })) || 0
   const subtotal = useMemo(
-    () => (serviceLinesWatch || []).reduce((sum, l) => sum + (Number(l?.price) || 0), 0),
+    () =>
+      (serviceLinesWatch || []).reduce(
+        (sum, l) => sum + (Number(l?.price) || 0),
+        0
+      ),
     [serviceLinesWatch]
-  );
+  )
   const finalPrice = useMemo(() => {
     const raw =
       discountType === "percent"
         ? subtotal * (1 - discountValue / 100)
-        : subtotal - discountValue;
-    return Math.max(0, Math.round(raw));
-  }, [subtotal, discountType, discountValue]);
+        : subtotal - discountValue
+    return Math.max(0, Math.round(raw))
+  }, [subtotal, discountType, discountValue])
 
   useEffect(() => {
-    setValue("initialPrice", subtotal);
-    setValue("finalPrice", finalPrice);
-  }, [subtotal, finalPrice, setValue]);
+    setValue("initialPrice", subtotal)
+    setValue("finalPrice", finalPrice)
+  }, [subtotal, finalPrice, setValue])
 
   const onSave = async (data: z.input<typeof createVoucherSchema>) => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
-      const payload = createVoucherSchema.parse(data);
+      const payload = createVoucherSchema.parse(data)
       const res = isEditing
         ? await updateVoucher(spId, voucher!.id, payload)
-        : await createVoucher(spId, payload);
+        : await createVoucher(spId, payload)
       if (res.success) {
-        setSuccessMessage(isEditing ? "Voucher updated successfully." : "A new voucher has been added to your draft.");
-        setIsSuccess(true);
-        setTimeout(onSuccess, 2000);
+        setSuccessMessage(
+          isEditing
+            ? "Voucher updated successfully."
+            : "A new voucher has been added to your draft."
+        )
+        setIsSuccess(true)
+        setTimeout(onSuccess, 2000)
       }
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const onPublish = async () => {
-    if (!isEditing) return;
-    setIsPublishing(true);
-    const res = await publishVoucher(spId, voucher!.id);
+    if (!isEditing) return
+    setIsPublishing(true)
+    const res = await publishVoucher(spId, voucher!.id)
     if (res.success) {
-      setSuccessMessage("Voucher published successfully and is now active.");
-      setIsSuccess(true);
-      setTimeout(onSuccess, 2000);
+      setSuccessMessage("Voucher published successfully and is now active.")
+      setIsSuccess(true)
+      setTimeout(onSuccess, 2000)
     }
-    setIsPublishing(false);
-  };
+    setIsPublishing(false)
+  }
 
   if (isSuccess) {
     return (
-      <div className="bg-card rounded-lg border border-border py-20 animate-in zoom-in-95 duration-300">
+      <div className="animate-in rounded-lg border border-border bg-card py-20 duration-300 zoom-in-95">
         <SuccessCelebration
           title={isEditing ? "Changes Saved!" : "Voucher Added!"}
           message={successMessage}
         />
       </div>
-    );
+    )
   }
 
   return (
     <form
       onSubmit={handleSubmit(onSave)}
-      className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500"
+      className="animate-in space-y-8 duration-500 fade-in slide-in-from-bottom-4"
     >
       <VoucherFormHeader isEditing={isEditing} onCancel={onCancel} />
 
-      <div className="flex flex-col xl:flex-row gap-8 items-start relative">
+      <div className="relative flex flex-col items-start gap-8 xl:flex-row">
         {/* Left Column: Jump-to-section Navigation */}
-        <aside className="hidden xl:block w-52 shrink-0 sticky top-20 self-start">
+        <aside className="sticky top-20 hidden w-52 shrink-0 self-start xl:block">
           <FloatingAnchorNav items={ANCHOR_ITEMS} />
         </aside>
 
@@ -170,28 +198,35 @@ export function SpVoucherForm({
         <div className="flex-1">
           <div className="flex flex-col gap-6">
             {/* Details */}
-            <div id="details" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
-              <div className="p-6 space-y-6">
+            <div
+              id="details"
+              className="scroll-mt-32 overflow-hidden rounded-lg border border-border bg-card shadow-sm"
+            >
+              <div className="space-y-6 p-6">
                 <div className="flex items-center gap-2 pb-2">
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
                     <Ticket size={16} weight="fill" />
                   </div>
-                  <h3 className="text-lead font-semibold text-foreground">Details</h3>
+                  <h3 className="text-lead font-semibold text-foreground">
+                    Details
+                  </h3>
                 </div>
 
                 <div className="space-y-5">
                   {/* Branch — chosen first; its account wallet sets the currency that scopes line-item pricing. */}
                   <div className="space-y-3">
-                    <label className="text-body font-medium text-foreground">Branch Assignment</label>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <label className="text-body font-medium text-foreground">
+                      Branch Assignment
+                    </label>
+                    <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                       <ChoiceCard
                         title="All Branches"
                         description=""
                         icon={Buildings}
                         selected={branchScope === "all"}
                         onSelect={() => {
-                          setValue("branchScope", "all");
-                          setValue("branchIds", []);
+                          setValue("branchScope", "all")
+                          setValue("branchIds", [])
                         }}
                         className="p-3"
                       />
@@ -205,24 +240,30 @@ export function SpVoucherForm({
                       />
                     </div>
                     {branchScope === "specific" && (
-                      <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                        <label className="text-label font-medium text-subtle">Select Branches</label>
+                      <div className="animate-in space-y-2 duration-300 fade-in slide-in-from-top-2">
+                        <label className="text-label font-medium text-subtle">
+                          Select Branches
+                        </label>
                         <CustomMultiSelect
                           options={spBranches.map((b) => b.name)}
                           selected={(watch("branchIds") ?? []).map(
-                            (id) => spBranches.find((b) => b.id === id)?.name || id
+                            (id) =>
+                              spBranches.find((b) => b.id === id)?.name || id
                           )}
                           onChange={(names) => {
                             const ids = names.map(
-                              (name) => spBranches.find((b) => b.name === name)?.id || name
-                            );
-                            setValue("branchIds", ids);
+                              (name) =>
+                                spBranches.find((b) => b.name === name)?.id ||
+                                name
+                            )
+                            setValue("branchIds", ids)
                           }}
                           placeholder="Search branches..."
                         />
                         {errors.branchIds && (
-                          <p className="text-label text-destructive flex items-center gap-1 mt-1">
-                            <WarningCircle size={12} /> {errors.branchIds.message}
+                          <p className="mt-1 flex items-center gap-1 text-label text-destructive">
+                            <WarningCircle size={12} />{" "}
+                            {errors.branchIds.message}
                           </p>
                         )}
                       </div>
@@ -231,21 +272,33 @@ export function SpVoucherForm({
 
                   {/* Currency — locked to the branch account wallet (MYR for v1). */}
                   <div className="space-y-1.5">
-                    <label className="text-body font-medium text-foreground">Currency</label>
-                    <div className="flex items-center gap-3 w-full px-3 py-2 bg-muted/20 border border-border rounded-md text-body">
-                      <span className="w-8 h-5 bg-muted rounded-sm flex items-center justify-center text-label font-medium text-muted-foreground">{currency || "MYR"}</span>
-                      <span className="text-foreground font-medium whitespace-nowrap">Malaysian Ringgit (RM)</span>
-                      <span className="ml-auto text-label text-faint font-medium">From branch account · Locked</span>
+                    <label className="text-body font-medium text-foreground">
+                      Currency
+                    </label>
+                    <div className="flex w-full items-center gap-3 rounded-md border border-border bg-muted/20 px-3 py-2 text-body">
+                      <span className="flex h-5 w-8 items-center justify-center rounded-sm bg-muted text-label font-medium text-muted-foreground">
+                        {currency || "MYR"}
+                      </span>
+                      <span className="font-medium whitespace-nowrap text-foreground">
+                        Malaysian Ringgit (RM)
+                      </span>
+                      <span className="ml-auto text-label font-medium text-faint">
+                        From branch account · Locked
+                      </span>
                     </div>
                   </div>
 
                   {isEditing && (
                     <div className="space-y-1.5">
-                      <label className="text-body font-medium text-foreground">Package ID</label>
-                      <div className="w-full px-3 py-2 bg-muted/10 border border-border rounded-md text-body font-mono text-faint cursor-not-allowed">
+                      <label className="text-body font-medium text-foreground">
+                        Package ID
+                      </label>
+                      <div className="w-full cursor-not-allowed rounded-md border border-border bg-muted/10 px-3 py-2 font-mono text-body text-faint">
                         {voucher?.code}
                       </div>
-                      <p className="text-label text-faint italic">Auto-generated format. Cannot be changed.</p>
+                      <p className="text-label text-faint italic">
+                        Auto-generated format. Cannot be changed.
+                      </p>
                     </div>
                   )}
 
@@ -256,7 +309,7 @@ export function SpVoucherForm({
                     <input
                       {...register("name")}
                       className={cn(
-                        "w-full px-3 py-2 bg-background border rounded-md text-body outline-none transition-colors",
+                        "w-full rounded-md border bg-background px-3 py-2 text-body transition-colors outline-none",
                         errors.name
                           ? "border-destructive ring-1 ring-destructive/20"
                           : "border-border focus:border-foreground/30 focus:bg-muted/30"
@@ -264,40 +317,54 @@ export function SpVoucherForm({
                       placeholder="e.g. Monthly Yoga Pass"
                     />
                     {errors.name && (
-                      <p className="text-label text-destructive flex items-center gap-1 mt-1">
+                      <p className="mt-1 flex items-center gap-1 text-label text-destructive">
                         <WarningCircle size={12} /> {errors.name.message}
                       </p>
                     )}
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-body font-medium text-foreground">Description</label>
+                    <label className="text-body font-medium text-foreground">
+                      Description
+                    </label>
                     <textarea
                       {...register("description")}
                       rows={4}
                       className={cn(
-                        "w-full px-3 py-2 bg-background border rounded-md text-body outline-none transition-colors resize-none",
+                        "w-full resize-none rounded-md border bg-background px-3 py-2 text-body transition-colors outline-none",
                         "border-border focus:border-foreground/30 focus:bg-muted/30"
                       )}
                       placeholder="Detailed breakdown of what's included..."
                     />
                   </div>
 
-                  <div className="flex items-center justify-between p-4 bg-primary/5 rounded-lg border border-primary/10">
+                  <div className="flex items-center justify-between rounded-lg border border-primary/10 bg-primary/5 p-4">
                     <div className="space-y-0.5">
-                      <p className="text-body font-semibold text-foreground">Booking Required</p>
-                      <p className="text-label text-faint">Enable this if members must book a slot before redemption.</p>
+                      <p className="text-body font-semibold text-foreground">
+                        Booking Required
+                      </p>
+                      <p className="text-label text-faint">
+                        Enable this if members must book a slot before
+                        redemption.
+                      </p>
                     </div>
-                    <Switch checked={watch("bookingRequired")} onCheckedChange={(v) => setValue("bookingRequired", v)} />
+                    <Switch
+                      checked={watch("bookingRequired")}
+                      onCheckedChange={(v) => setValue("bookingRequired", v)}
+                    />
                   </div>
 
                   <div className="space-y-4">
                     <div className="space-y-0.5">
-                      <p className="text-body font-semibold text-foreground">Display Image</p>
-                      <p className="text-label text-muted-foreground">The primary image seen by users on the marketplace.</p>
+                      <p className="text-body font-semibold text-foreground">
+                        Display Image
+                      </p>
+                      <p className="text-label text-muted-foreground">
+                        The primary image seen by users on the marketplace.
+                      </p>
                     </div>
                     <LogoUpload
-                      label="Search Result / Hero Image"
+                      label="Display Image"
                       value={watch("photo")}
                       onChange={(file) => setValue("photo", file)}
                       className="w-full"
@@ -342,5 +409,5 @@ export function SpVoucherForm({
         voucher={voucher}
       />
     </form>
-  );
+  )
 }

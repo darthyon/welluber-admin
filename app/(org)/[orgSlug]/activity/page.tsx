@@ -16,77 +16,11 @@ import { DataFilterBar } from "@/components/shared/data-filter-bar"
 import { FilterItem } from "@/components/shared/filter-item"
 import { EmptyState } from "@/components/shared/empty-state"
 import { StatusBadge, type StatusColor } from "@/components/shared/status-badge"
-import type { AuditLogEntry, AuditLogType } from "@/features/audit-log/types"
-
-// Org-scoped activity — only events relevant to this org
-const ACME_ACTIVITY: AuditLogEntry[] = [
-  {
-    id: "ACT-001",
-    title: "Benefit Policy Assigned",
-    type: "Update",
-    desc: "Acme Employee Wellness Policy FY2026 assigned to All Branches.",
-    timestamp: "2026-04-06 14:20",
-    updatedBy: { name: "Yon Yusuf", email: "yon@acme.com" },
-    entity: { id: "POL-20260115-0001", name: "Acme Employee Wellness Policy FY2026", type: "Policy" },
-  },
-  {
-    id: "ACT-002",
-    title: "Admin Invited",
-    type: "Create",
-    desc: "Khairul Anwar invited as Org Admin. Pending activation.",
-    timestamp: "2026-04-10 09:30",
-    updatedBy: { name: "Yon Yusuf", email: "yon@acme.com" },
-  },
-  {
-    id: "ACT-003",
-    title: "Employee Status Updated",
-    type: "Update",
-    desc: "Robert Fox status changed from Unlinked to Linked.",
-    timestamp: "2026-04-08 11:15",
-    updatedBy: { name: "Amira Rahman", email: "amira@acme.com" },
-  },
-  {
-    id: "ACT-004",
-    title: "Branch Created",
-    type: "Create",
-    desc: "ACME Subang Jaya branch added to organisation structure.",
-    timestamp: "2026-03-15 10:00",
-    updatedBy: { name: "Yon Yusuf", email: "yon@acme.com" },
-  },
-  {
-    id: "ACT-005",
-    title: "Org Structure Updated",
-    type: "SettingChange",
-    desc: "New tier 'Associate' added to organisation tier configuration.",
-    timestamp: "2026-03-20 14:45",
-    updatedBy: { name: "Yon Yusuf", email: "yon@acme.com" },
-  },
-  {
-    id: "ACT-006",
-    title: "Benefit Policy Assigned",
-    type: "Update",
-    desc: "Acme Leadership Benefits Policy FY2026 assigned to Subang Jaya branch.",
-    timestamp: "2026-04-02 10:30",
-    updatedBy: { name: "Amira Rahman", email: "amira@acme.com" },
-    entity: { id: "POL-20260115-0002", name: "Acme Leadership Benefits Policy FY2026", type: "Policy" },
-  },
-  {
-    id: "ACT-007",
-    title: "Employee Deactivated",
-    type: "Update",
-    desc: "Marvin McKinney account deactivated — resigned.",
-    timestamp: "2026-04-12 16:00",
-    updatedBy: { name: "Amira Rahman", email: "amira@acme.com" },
-  },
-  {
-    id: "ACT-008",
-    title: "Admin Activated",
-    type: "Approval",
-    desc: "Amira Rahman completed account setup and is now active.",
-    timestamp: "2026-02-03 09:00",
-    updatedBy: { name: "System", email: "system@welluber.com" },
-  },
-]
+import {
+  MOCK_ORG_PORTAL_ACTIVITY,
+  type OrgPortalActivityItem,
+} from "@/lib/mock-data"
+import type { AuditLogType } from "@/features/audit-log/types"
 
 const TYPE_ICON: Record<AuditLogType, React.ReactNode> = {
   Create: <PlusCircle size={16} weight="duotone" />,
@@ -125,9 +59,10 @@ export default function OrgActivityPage() {
 
   const [search, setSearch] = useState("")
   const [typeFilter, setTypeFilter] = useState("all")
+  const [activeTab, setActiveTab] = useState<"all" | "action">("all")
 
   const filtered = useMemo(() => {
-    return ACME_ACTIVITY.filter((entry) => {
+    return MOCK_ORG_PORTAL_ACTIVITY.filter((entry) => {
       const q = search.toLowerCase()
       const matchSearch =
         !search ||
@@ -135,15 +70,50 @@ export default function OrgActivityPage() {
         entry.desc.toLowerCase().includes(q) ||
         entry.updatedBy.name.toLowerCase().includes(q)
       const matchType = typeFilter === "all" || entry.type === typeFilter
-      return matchSearch && matchType
+      const matchesTab = activeTab === "all" || entry.requiresAction === true
+      return matchSearch && matchType && matchesTab
     })
-  }, [search, typeFilter])
+  }, [activeTab, search, typeFilter])
+
+  const actionsRequiredCount = MOCK_ORG_PORTAL_ACTIVITY.filter(
+    (entry) => entry.requiresAction
+  ).length
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-title font-semibold text-foreground">Activity Log</h1>
-        <p className="text-muted-foreground mt-0.5 text-body">History of changes across your organisation</p>
+        <h1 className="text-title font-semibold text-foreground">Activity</h1>
+        <p className="mt-0.5 text-body text-muted-foreground">
+          History of changes across your organisation
+        </p>
+      </div>
+
+      <div className="flex w-fit items-center gap-0.5 rounded-lg border border-border bg-muted/40 p-0.5">
+        <button
+          type="button"
+          onClick={() => setActiveTab("all")}
+          className={
+            activeTab === "all"
+              ? "rounded-md bg-background px-3 py-1.5 text-label font-medium text-foreground shadow-sm"
+              : "rounded-md px-3 py-1.5 text-label font-medium text-muted-foreground transition-colors hover:text-foreground"
+          }
+        >
+          All Activity
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab("action")}
+          className={
+            activeTab === "action"
+              ? "rounded-md bg-background px-3 py-1.5 text-label font-medium text-foreground shadow-sm"
+              : "rounded-md px-3 py-1.5 text-label font-medium text-muted-foreground transition-colors hover:text-foreground"
+          }
+        >
+          Actions Required
+          <span className="ml-2 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-primary/10 px-1.5 text-micro font-medium text-primary">
+            {actionsRequiredCount}
+          </span>
+        </button>
       </div>
 
       <DataFilterBar
@@ -163,12 +133,14 @@ export default function OrgActivityPage() {
       {filtered.length === 0 ? (
         <EmptyState
           icon={<ClockCounterClockwise size={32} weight="duotone" />}
-          title="No activity found"
+          title={
+            activeTab === "all" ? "No Activity Found" : "No Actions Required"
+          }
           description="Try adjusting your search or filters."
         />
       ) : (
         <div className="space-y-2">
-          {filtered.map((entry) => (
+          {filtered.map((entry: OrgPortalActivityItem) => (
             <div
               key={entry.id}
               className="flex items-start gap-4 rounded-lg border border-border/60 bg-card px-4 py-3"
@@ -176,20 +148,30 @@ export default function OrgActivityPage() {
               <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-border/50 bg-muted/40 text-muted-foreground">
                 {TYPE_ICON[entry.type]}
               </div>
-              <div className="flex-1 min-w-0">
+              <div className="min-w-0 flex-1">
                 <div className="flex items-start justify-between gap-4">
                   <div className="space-y-1">
-                    <p className="text-body font-semibold text-foreground leading-tight">{entry.title}</p>
+                    <p className="text-body leading-tight font-semibold text-foreground">
+                      {entry.title}
+                    </p>
                     <StatusBadge
-                      status={entry.type === "SettingChange" ? "Setting Change" : entry.type}
+                      status={
+                        entry.type === "SettingChange"
+                          ? "Setting Change"
+                          : entry.type
+                      }
                       variant={TYPE_VARIANT[entry.type]}
                       className="w-fit"
                     />
                   </div>
-                  <span className="text-label text-faint shrink-0 tabular-nums">{entry.timestamp}</span>
+                  <span className="shrink-0 text-label text-faint tabular-nums">
+                    {entry.timestamp}
+                  </span>
                 </div>
-                <p className="text-body text-subtle mt-0.5">{entry.desc}</p>
-                <p className="text-label text-faint mt-1">by {entry.updatedBy.name}</p>
+                <p className="mt-0.5 text-body text-subtle">{entry.desc}</p>
+                <p className="mt-1 text-label text-faint">
+                  by {entry.updatedBy.name}
+                </p>
               </div>
             </div>
           ))}
