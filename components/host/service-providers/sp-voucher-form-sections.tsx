@@ -1,5 +1,6 @@
 "use client"
 
+import * as React from "react"
 import {
   type FieldArrayWithId,
   type FieldErrors,
@@ -17,16 +18,10 @@ import {
   WarningCircle,
 } from "@phosphor-icons/react"
 import { Button } from "@/components/ui/button"
-import { CustomMultiSelect } from "@/components/shared/custom-multi-select"
 import { DateTimePickerField } from "@/components/shared/date-time-picker-field"
 import { FormSelect } from "@/components/shared/form-select"
-import { ItemSection } from "@/components/shared/item-section"
-import { SectionedSearchSelect } from "@/components/shared/sectioned-search-select"
 import { Switch } from "@/components/shared/switch"
-import {
-  SERVICE_SPEC_TAXONOMY,
-  SERVICE_TAXONOMY,
-} from "@/features/organizations/constants"
+import { ServiceLineRow } from "@/components/host/service-providers/sp-voucher-service-line-row"
 import { createVoucherSchema } from "@/features/providers/schemas"
 import { cn } from "@/lib/utils"
 
@@ -247,6 +242,78 @@ export function VoucherManageServicesSection({
   subtotal,
   watch,
 }: VoucherManageServicesSectionProps) {
+  const [expandedIds, setExpandedIds] = React.useState<Set<string>>(() => {
+    const ids = new Set<string>()
+    serviceLineFields.forEach((field, i) => {
+      if (!watch(`serviceLines.${i}.service`)) ids.add(field.id)
+    })
+    return ids
+  })
+  const [autoFocusId, setAutoFocusId] = React.useState<string | null>(null)
+  const prevCount = React.useRef(serviceLineFields.length)
+
+  // A newly appended row opens expanded and grabs focus.
+  React.useEffect(() => {
+    if (serviceLineFields.length > prevCount.current) {
+      const newField = serviceLineFields[serviceLineFields.length - 1]
+      if (newField) {
+        setExpandedIds((prev) => new Set(prev).add(newField.id))
+        setAutoFocusId(newField.id)
+      }
+    }
+    prevCount.current = serviceLineFields.length
+  }, [serviceLineFields.length, serviceLineFields])
+
+  // Surface hidden problems: expand any line that fails validation on submit.
+  React.useEffect(() => {
+    const lineErrors = errors.serviceLines as unknown as
+      | Array<unknown>
+      | undefined
+    if (!Array.isArray(lineErrors)) return
+    setExpandedIds((prev) => {
+      const next = new Set(prev)
+      serviceLineFields.forEach((field, i) => {
+        if (lineErrors[i]) next.add(field.id)
+      })
+      return next
+    })
+  }, [errors.serviceLines, serviceLineFields])
+
+  const toggleRow = (id: string) =>
+    setExpandedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+
+  const handleAddService = () => {
+    // Collapse completed rows so the list stays short by default.
+    setExpandedIds((prev) => {
+      const next = new Set(prev)
+      serviceLineFields.forEach((field, i) => {
+        const svc = watch(`serviceLines.${i}.service`)
+        const linePrice = Number(watch(`serviceLines.${i}.price`))
+        if (svc && linePrice > 0) next.delete(field.id)
+      })
+      return next
+    })
+    appendLine({
+      service: "",
+      subServices: [],
+      description: "",
+      descriptionList: "",
+      price: 0,
+    })
+  }
+
+  const lineHasError = (i: number) => {
+    const lineErrors = errors.serviceLines as unknown as
+      | Array<unknown>
+      | undefined
+    return Array.isArray(lineErrors) ? Boolean(lineErrors[i]) : false
+  }
+
   return (
     <div
       id="manage-services"
@@ -276,103 +343,36 @@ export function VoucherManageServicesSection({
             </p>
           )}
 
-          <div className="space-y-4">
+          <div className="space-y-3">
             {serviceLineFields.map((field, index) => (
-              <ItemSection
+              <ServiceLineRow
                 key={field.id}
-                index={index + 1}
-                label="Service"
+                index={index}
+                currency={currency}
+                spServiceCategories={spServiceCategories}
+                expanded={expandedIds.has(field.id)}
+                hasError={lineHasError(index)}
+                autoFocus={autoFocusId === field.id}
+                onToggle={() => toggleRow(field.id)}
                 onRemove={
                   serviceLineFields.length > 1
                     ? () => removeLine(index)
                     : undefined
                 }
-              >
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div className="space-y-1.5">
-                    <label className="text-label font-medium text-subtle">
-                      Service
-                    </label>
-                    <SectionedSearchSelect
-                      taxonomy={SERVICE_TAXONOMY.filter((category) =>
-                        spServiceCategories.includes(category.category)
-                      )}
-                      value={watch(`serviceLines.${index}.service`)}
-                      onChange={(value) => {
-                        setValue(`serviceLines.${index}.service`, value)
-                        setValue(`serviceLines.${index}.subServices`, [])
-                      }}
-                      placeholder="Search service..."
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-label font-medium text-subtle">
-                      Sub-services
-                    </label>
-                    <CustomMultiSelect
-                      options={
-                        SERVICE_SPEC_TAXONOMY[
-                          watch(`serviceLines.${index}.service`)
-                        ] || []
-                      }
-                      selected={
-                        watch(`serviceLines.${index}.subServices`) || []
-                      }
-                      onChange={(value) =>
-                        setValue(`serviceLines.${index}.subServices`, value)
-                      }
-                      placeholder="Select or type custom..."
-                    />
-                  </div>
-                  <div className="space-y-1.5 sm:col-span-2">
-                    <label className="text-label font-medium text-subtle">
-                      Price ({currency || "RM"})
-                    </label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      min={0}
-                      {...register(`serviceLines.${index}.price`, {
-                        valueAsNumber: true,
-                      })}
-                      className="w-full rounded-md border border-border bg-background px-3 py-2 font-mono text-body transition-colors outline-none focus:border-foreground/30 focus:bg-muted/30"
-                      placeholder="0.00"
-                    />
-                  </div>
-                  <div className="space-y-1.5 sm:col-span-2">
-                    <label className="text-label font-medium text-subtle">
-                      Voucher Features
-                    </label>
-                    <textarea
-                      {...register(`serviceLines.${index}.descriptionList`)}
-                      rows={3}
-                      className="w-full resize-none rounded-md border border-border bg-background px-3 py-2 font-mono text-body transition-colors outline-none focus:border-foreground/30 focus:bg-muted/30"
-                      placeholder={`List features separated by lines, e.g.
-\u2022 Includes 5 sessions
-\u2022 Peak hours access
-\u2022 Valid at KL branches`}
-                    />
-                  </div>
-                </div>
-              </ItemSection>
+                register={register}
+                setValue={setValue}
+                watch={watch}
+              />
             ))}
 
             <Button
               type="button"
-              variant="outline"
-              className="h-14 w-full rounded-lg border-dashed border-border bg-card font-semibold text-muted-foreground shadow-sm transition-all hover:border-primary/30 hover:text-primary"
-              onClick={() =>
-                appendLine({
-                  service: "",
-                  subServices: [],
-                  description: "",
-                  descriptionList: "",
-                  price: 0,
-                })
-              }
+              variant="ghost"
+              onClick={handleAddService}
+              className="h-9 w-auto gap-2 px-2 font-semibold text-primary hover:bg-primary/5 hover:text-primary"
             >
-              <Plus size={18} weight="bold" className="mr-2" />
-              <span>Add Service</span>
+              <Plus size={16} weight="bold" />
+              <span>Add service</span>
             </Button>
           </div>
 
