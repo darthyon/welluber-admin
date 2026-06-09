@@ -33,7 +33,7 @@ import {
   createPolicyUtilisation,
   createOrgCoverageFunnel,
   createBenefitGroupUsage,
-  createEmployeeGroupUtilisation,
+  createEmployeeTierUtilisation,
   createVoucherCounts,
   createRecentActivity,
   createOrgPortalActivity,
@@ -1015,8 +1015,8 @@ export const MOCK_BRANCH_ACCOUNTS = createBranchAccounts(ACME_ORG_ID)
 export const MOCK_POLICY_UTILISATION = createPolicyUtilisation(ACME_ORG_ID)
 export const MOCK_COVERAGE_FUNNEL = createOrgCoverageFunnel(ACME_ORG_ID)
 export const MOCK_BENEFIT_GROUP_USAGE = createBenefitGroupUsage(ACME_ORG_ID)
-export const MOCK_EMPLOYEE_GROUP_UTILISATION =
-  createEmployeeGroupUtilisation(ACME_ORG_ID)
+export const MOCK_EMPLOYEE_TIER_UTILISATION =
+  createEmployeeTierUtilisation(ACME_ORG_ID)
 export const MOCK_VOUCHER_COUNTS = createVoucherCounts(ACME_ORG_ID)
 export const MOCK_RECENT_ACTIVITY = createRecentActivity(ACME_ORG_ID)
 export const MOCK_ORG_PORTAL_ACTIVITY = createOrgPortalActivity(ACME_ORG_ID)
