@@ -24,7 +24,7 @@ import {
   MOCK_BRANCH_ACCOUNTS,
   MOCK_POLICY_UTILISATION,
   MOCK_COVERAGE_FUNNEL,
-  MOCK_EMPLOYEE_GROUP_UTILISATION,
+  MOCK_EMPLOYEE_TIER_UTILISATION,
   MOCK_VOUCHER_COUNTS,
 } from "@/lib/mock-data"
 
@@ -138,15 +138,15 @@ export default function OrgDashboardPage() {
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         <DashboardTopPolicies
           policies={MOCK_POLICY_UTILISATION}
-          employeeGroups={MOCK_EMPLOYEE_GROUP_UTILISATION}
+          employeeTiers={MOCK_EMPLOYEE_TIER_UTILISATION}
           selectedBranch={selectedBranch}
           mode="policy"
         />
         <DashboardTopPolicies
           policies={MOCK_POLICY_UTILISATION}
-          employeeGroups={MOCK_EMPLOYEE_GROUP_UTILISATION}
+          employeeTiers={MOCK_EMPLOYEE_TIER_UTILISATION}
           selectedBranch={selectedBranch}
-          mode="group"
+          mode="tier"
         />
         <DashboardTopCentres
           providers={MOCK_TOP_PROVIDERS}

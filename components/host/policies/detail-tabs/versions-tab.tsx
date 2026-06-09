@@ -47,7 +47,7 @@ export function VersionsTab({
             {versions.length > 0 ? `Versions (${versions.length})` : "Versions"}
           </h3>
           <p className="mt-1 text-body text-muted-foreground">
-            Override benefit amounts for specific employee groups and individuals.
+            Override benefit amounts for specific employee tiers and individuals.
           </p>
         </div>
         {canCreateVersion && (
