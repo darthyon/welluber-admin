@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   serverExternalPackages: ['lightningcss'],
-  turbopack: {},
+  turbopack: { root: import.meta.dirname },
   webpack: (config) => {
     config.watchOptions = {
       ...config.watchOptions,
