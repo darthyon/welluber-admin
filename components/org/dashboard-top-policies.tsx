@@ -12,17 +12,17 @@ import {
 } from "@/components/ui/tooltip"
 import type {
   PolicyUtilisation,
-  EmployeeGroupUtilisation,
+  EmployeeTierUtilisation,
 } from "@/lib/mock-data"
 
-type DashboardMode = "policy" | "group"
+type DashboardMode = "policy" | "tier"
 
 const BRANCH_SCALE: Record<string, number> = { br_1: 0.6, br_2: 0.4 }
 const PAGE_SIZE = 5
 
 interface DashboardTopPoliciesProps {
   policies: PolicyUtilisation[]
-  employeeGroups: EmployeeGroupUtilisation[]
+  employeeTiers: EmployeeTierUtilisation[]
   selectedBranch: string | "all"
   mode: DashboardMode
   className?: string
@@ -90,7 +90,7 @@ function PaginationBar({
 
 export function DashboardTopPolicies({
   policies,
-  employeeGroups,
+  employeeTiers,
   selectedBranch,
   mode,
   className,
@@ -107,32 +107,34 @@ export function DashboardTopPolicies({
           ...p,
           claimsCount: Math.round(p.claimsCount * scale),
           amountSpent: Math.round(p.amountSpent * scale),
-          utilisationPct: Math.round(p.utilisationPct * scale),
         }))
-        .sort((a, b) => b.utilisationPct - a.utilisationPct),
+        .sort((a, b) => b.amountSpent - a.amountSpent),
     [policies, scale]
   )
 
-  const scaledGroups = useMemo(
+  const scaledTiers = useMemo(
     () =>
-      employeeGroups
-        .map((g) => ({
-          ...g,
-          claimsCount: Math.round(g.claimsCount * scale),
-          amountSpent: Math.round(g.amountSpent * scale),
+      employeeTiers
+        .map((t) => ({
+          ...t,
+          claimsCount: Math.round(t.claimsCount * scale),
+          amountSpent: Math.round(t.amountSpent * scale),
         }))
-        .sort((a, b) => b.utilisationPct - a.utilisationPct),
-    [employeeGroups, scale]
+        .sort((a, b) => b.amountSpent - a.amountSpent),
+    [employeeTiers, scale]
   )
 
-  const items = mode === "policy" ? scaledPolicies : scaledGroups
+  const items = mode === "policy" ? scaledPolicies : scaledTiers
+  const totalAmount = items.reduce((sum, item) => sum + item.amountSpent, 0)
+  const sharePct = (amount: number) =>
+    totalAmount > 0 ? Math.round((amount / totalAmount) * 100) : 0
   const pageItems = items.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE)
   const title =
-    mode === "policy" ? "Usage By Policy" : "Usage By Employee Groups"
+    mode === "policy" ? "Usage By Policy" : "Usage By Employee Tiers"
   const subtitle =
     mode === "policy"
-      ? "Allocated spend and claims volume by policy"
-      : "Employee groups, usage, and linked policies"
+      ? "Share of claim amount and claims volume by policy"
+      : "Employee tiers, usage, and linked policies"
 
   return (
     <Card className={cn("flex flex-col overflow-hidden", className)}>
@@ -164,17 +166,17 @@ export function DashboardTopPolicies({
                     {(pp.amountSpent / 1000).toFixed(1)}k
                   </p>
                 </div>
-                <UtilisationBar pct={pp.utilisationPct} />
+                <UtilisationBar pct={sharePct(pp.amountSpent)} />
               </div>
             )
           })}
 
-        {mode === "group" &&
+        {mode === "tier" &&
           pageItems.map((g, i) => {
-            const gg = g as (typeof scaledGroups)[0]
+            const gg = g as (typeof scaledTiers)[0]
             return (
               <div
-                key={gg.groupId}
+                key={gg.tierId}
                 className="flex items-center gap-2.5 border-b border-border/40 py-2.5 last:border-0"
               >
                 <span className="w-4 flex-shrink-0 text-right text-label font-semibold text-muted-foreground/50 tabular-nums">
@@ -182,7 +184,7 @@ export function DashboardTopPolicies({
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-label font-medium text-foreground">
-                    {gg.groupName}
+                    {gg.tierName}
                   </p>
                   <div className="flex flex-wrap items-center gap-2 text-label leading-tight text-muted-foreground">
                     <span>{gg.employeeCount} employees assigned</span>
@@ -217,7 +219,7 @@ export function DashboardTopPolicies({
                     </TooltipProvider>
                   </div>
                 </div>
-                <UtilisationBar pct={gg.utilisationPct} />
+                <UtilisationBar pct={sharePct(gg.amountSpent)} />
               </div>
             )
           })}

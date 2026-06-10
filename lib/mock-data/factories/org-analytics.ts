@@ -89,21 +89,19 @@ export interface BenefitGroupUsage {
 export interface PolicyUtilisation {
   policyId: string
   policyName: string
-  utilisationPct: number
   claimsCount: number
   amountSpent: number
 }
 
-// ─── Employee group utilisation ───────────────────────────────────────────────
+// ─── Employee tier utilisation ────────────────────────────────────────────────
 
-export interface EmployeeGroupUtilisation {
-  groupId: string
-  groupName: string
+export interface EmployeeTierUtilisation {
+  tierId: string
+  tierName: string
   policyNames: string[]
   employeeCount: number
   claimsCount: number
   amountSpent: number
-  utilisationPct: number
 }
 
 // ─── Voucher counts ───────────────────────────────────────────────────────────
@@ -461,94 +459,85 @@ export function createPolicyUtilisation(orgId: string): PolicyUtilisation[] {
     {
       policyId: "POL-20260115-0001",
       policyName: "Acme Employee Wellness Policy FY2026",
-      utilisationPct: 72,
       claimsCount: 184,
       amountSpent: 38400,
     },
     {
       policyId: "POL-20260115-0002",
       policyName: "Acme Leadership Benefits Policy FY2026",
-      utilisationPct: 45,
       claimsCount: 61,
       amountSpent: 19800,
     },
     {
       policyId: "POL-20260115-0003",
       policyName: "Global Tech Core Benefits Policy FY2026",
-      utilisationPct: 31,
       claimsCount: 28,
       amountSpent: 8700,
     },
     {
       policyId: "POL-20260115-0004",
       policyName: "Basic Health Support",
-      utilisationPct: 18,
       claimsCount: 14,
       amountSpent: 3200,
     },
   ]
 }
 
-export function createEmployeeGroupUtilisation(
+export function createEmployeeTierUtilisation(
   orgId: string
-): EmployeeGroupUtilisation[] {
+): EmployeeTierUtilisation[] {
   void orgId
   return [
     {
-      groupId: "TC-001",
-      groupName: "Executive",
+      tierId: "TC-001",
+      tierName: "Executive",
       employeeCount: 18,
       claimsCount: 54,
       amountSpent: 18200,
-      utilisationPct: 84,
       policyNames: [
         "Acme Leadership Benefits Policy FY2026",
         "Acme Employee Wellness Policy FY2026",
       ],
     },
     {
-      groupId: "TC-002",
-      groupName: "Senior Manager",
+      tierId: "TC-002",
+      tierName: "Senior Manager",
       employeeCount: 42,
       claimsCount: 98,
       amountSpent: 22400,
-      utilisationPct: 76,
       policyNames: [
         "Acme Leadership Benefits Policy FY2026",
         "Acme Lifestyle Flex Policy FY2026",
       ],
     },
     {
-      groupId: "TC-003",
-      groupName: "Manager",
+      tierId: "TC-003",
+      tierName: "Manager",
       employeeCount: 86,
       claimsCount: 141,
       amountSpent: 28900,
-      utilisationPct: 68,
       policyNames: [
         "Acme Employee Wellness Policy FY2026",
         "Acme Lifestyle Flex Policy FY2026",
       ],
     },
     {
-      groupId: "TC-004",
-      groupName: "Associate",
+      tierId: "TC-004",
+      tierName: "Associate",
       employeeCount: 174,
       claimsCount: 187,
       amountSpent: 31200,
-      utilisationPct: 52,
       policyNames: [
         "Acme Employee Wellness Policy FY2026",
         "Basic Health Support",
       ],
     },
     {
-      groupId: "TC-005",
-      groupName: "Intern / Contract",
+      tierId: "TC-005",
+      tierName: "Intern / Contract",
       employeeCount: 92,
       claimsCount: 47,
       amountSpent: 6900,
-      utilisationPct: 31,
       policyNames: ["Acme Lifestyle Flex Policy FY2026"],
     },
   ]
@@ -716,7 +705,7 @@ export function createOrgPortalActivity(
       id: "ACT-005",
       title: "Organisation Structure Updated",
       type: "SettingChange",
-      desc: "A new employee group, Associate, was added to the organisation setup.",
+      desc: "A new employee tier, Associate, was added to the organisation setup.",
       timestamp: "2026-03-20 14:45",
       updatedBy: { name: "Yon Yusuf", email: "yon@acme.com" },
       requiresAction: false,
