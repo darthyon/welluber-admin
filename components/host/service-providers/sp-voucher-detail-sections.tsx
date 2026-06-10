@@ -34,7 +34,7 @@ export function SpVoucherDetailHeader({ onBack, onEdit, voucher }: { onBack: () 
         statusVariant={SP_VOUCHER_STATUS_VARIANT[voucher.status]}
         icon={<Ticket size={24} weight="fill" />}
         actions={
-          <Button variant="secondary" size="lg" className="gap-2 rounded-full text-body font-medium transition-all shadow-sm" onClick={onEdit}>
+          <Button variant="secondary" size="lg" className="gap-2 rounded-full text-body font-medium transition-all" onClick={onEdit}>
             <PencilSimpleLine size={16} weight="bold" />
             Edit Voucher Package
           </Button>

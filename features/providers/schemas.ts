@@ -128,7 +128,6 @@ export const createVoucherSchema = z
   .object({
     name: z.string().min(1, "Voucher name is required"),
     description: z.string().optional(),
-    photo: z.any().optional(),
     bookingRequired: z.boolean().default(false),
     serviceLines: z
       .array(serviceLineSchema)
@@ -160,8 +159,13 @@ export const createVoucherSchema = z
       startDate: z.string().min(1, "Start date is required"),
       endDate: z.string().min(1, "End date is required"),
     }),
-    displayVoucherEarly: z.boolean().default(false),
-    displayVoucherEarlyAt: z.string().optional(),
+    expiryMode: z.enum(["days", "date"]).default("days"),
+    expiryDays: z.coerce
+      .number()
+      .int()
+      .min(1, "Must be at least 1 day")
+      .optional(),
+    expiryDate: z.string().optional(),
     branchScope: z.enum(["all", "specific"]).default("all"),
     branchIds: z.array(z.string()).default([]),
   })
@@ -197,33 +201,43 @@ export const createVoucherSchema = z
       })
     }
 
-    if (!value.displayVoucherEarly) return
+    if (value.expiryMode === "days") {
+      if (value.expiryDays == null) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Number of days is required",
+          path: ["expiryDays"],
+        })
+      }
+      return
+    }
 
-    if (!value.displayVoucherEarlyAt) {
+    // expiryMode === "date"
+    if (!value.expiryDate) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Display date is required when early display is enabled",
-        path: ["displayVoucherEarlyAt"],
+        message: "Expiry date is required",
+        path: ["expiryDate"],
       })
       return
     }
 
-    const earlyDisplayDate = new Date(value.displayVoucherEarlyAt)
+    const expiryDate = new Date(value.expiryDate)
 
-    if (isNaN(earlyDisplayDate.getTime())) {
+    if (isNaN(expiryDate.getTime())) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Display date is invalid",
-        path: ["displayVoucherEarlyAt"],
+        message: "Expiry date is invalid",
+        path: ["expiryDate"],
       })
       return
     }
 
-    if (!isNaN(usageStart.getTime()) && earlyDisplayDate >= usageStart) {
+    if (!isNaN(usageEnd.getTime()) && expiryDate <= usageEnd) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Display date must be before the voucher usage start",
-        path: ["displayVoucherEarlyAt"],
+        message: "Expiry date must be after the listing period ends",
+        path: ["expiryDate"],
       })
     }
   })

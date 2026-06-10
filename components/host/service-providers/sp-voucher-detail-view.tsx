@@ -10,7 +10,6 @@ import {
 import { DetailField } from "@/components/shared/detail-field"
 import { Badge } from "@/components/ui/badge"
 import { StatusBadge } from "@/components/shared/status-badge"
-import Image from "next/image"
 import {
   SP_VOUCHER_STATUS_VARIANT,
   SpVoucherDetailHeader,
@@ -99,22 +98,6 @@ export function SpVoucherDetailView({
                     variant={SP_VOUCHER_STATUS_VARIANT[voucher.status]}
                   />
                 </div>
-                {voucher.photo ? (
-                  <div className="space-y-2">
-                    <p className="text-label font-medium text-subtle">
-                      Display Image
-                    </p>
-                    <div className="relative h-24 w-40 overflow-hidden rounded-lg border border-border bg-muted/30">
-                      <Image
-                        src={voucher.photo}
-                        alt={voucher.name}
-                        fill
-                        className="object-cover"
-                        sizes="160px"
-                      />
-                    </div>
-                  </div>
-                ) : null}
               </div>
             </div>
 
@@ -179,7 +162,7 @@ export function SpVoucherDetailView({
 
                 <div className="space-y-3">
                   <p className="text-body font-semibold text-foreground">
-                    Voucher Usage Period
+                    Listing Period
                   </p>
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <DetailField
@@ -193,26 +176,24 @@ export function SpVoucherDetailView({
                   </div>
                 </div>
 
-                {voucher.displayVoucherEarly ? (
-                  <>
-                    <div className="h-px bg-border/40" />
-                    <div className="space-y-3">
-                      <p className="text-body font-semibold text-foreground">
-                        Display Timing
-                      </p>
-                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                        <DetailField
-                          label="Display Voucher Early"
-                          value="Enabled"
-                        />
-                        <DetailField
-                          label="Display Start Date & Time"
-                          value={formatDateTime(voucher.displayVoucherEarlyAt)}
-                        />
-                      </div>
-                    </div>
-                  </>
-                ) : null}
+                <div className="h-px bg-border/40" />
+                <div className="space-y-3">
+                  <p className="text-body font-semibold text-foreground">
+                    Expiry
+                  </p>
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <DetailField
+                      label="Expires"
+                      value={
+                        voucher.expiryMode === "date"
+                          ? formatDateTime(voucher.expiryDate)
+                          : voucher.expiryDays
+                            ? `${voucher.expiryDays} days after purchase`
+                            : "—"
+                      }
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 

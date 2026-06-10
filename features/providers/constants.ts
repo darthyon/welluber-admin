@@ -1,4 +1,4 @@
-import type { DurationUnit, ValidationUnit } from "@/types/provider"
+import type { DurationUnit } from "@/types/provider"
 
 export const SP_STATUS_OPTIONS = [
   { label: "All", value: "all" },
@@ -21,13 +21,6 @@ export const DURATION_UNITS: { label: string; value: DurationUnit }[] = [
   { label: "Days", value: "day" },
   { label: "Months", value: "month" },
   { label: "Years", value: "year" },
-]
-
-export const VALIDATION_UNITS: { label: string; value: ValidationUnit }[] = [
-  { label: "Days", value: "days" },
-  { label: "Months", value: "months" },
-  { label: "Half-year (6 months)", value: "half_year" },
-  { label: "Year", value: "year" },
 ]
 
 export const OPERATING_DAYS = [
