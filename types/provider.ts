@@ -12,7 +12,6 @@ export type SpAdminStatus = "active" | "pending_activation"
 export type SpVoucherStatus = "draft" | "published" | "expired"
 export type SpBranchContactType = "branch_manager" | "staff" | "reception"
 export type DurationUnit = "session" | "min" | "hr" | "day" | "month" | "year"
-export type ValidationUnit = "days" | "months" | "half_year" | "year"
 
 // ─── Tax Profile ──────────────────────────────────────────────────────────────
 
@@ -119,7 +118,6 @@ export interface SpVoucher {
   name: string
   description: string
   summary?: string
-  photo?: string
   bookingRequired: boolean
   serviceLines: ServiceLine[]
   status: SpVoucherStatus
@@ -128,20 +126,15 @@ export interface SpVoucher {
     startDate: ISODate
     endDate: ISODate
   }
-  displayVoucherEarly?: boolean
-  displayVoucherEarlyAt?: ISODate
   currency: string // "RM" for v1; derived from the selected branch's account wallet
   initialPrice: number
   discount?: { type: "amount" | "percent"; value: number } // drives finalPrice
   finalPrice: number // computed from initialPrice − discount; integer, rounded
   voucherCount?: number // number of vouchers to generate
   maxUsagePerUser?: number // how many times one member can redeem this voucher
-  validationDuration?: {
-    unit: ValidationUnit
-    value: number
-    startDate?: ISODate
-    endDate?: ISODate
-  }
+  expiryMode?: "days" | "date" // how a purchased voucher expires
+  expiryDays?: number // when expiryMode === "days" — days after purchase
+  expiryDate?: ISODate // when expiryMode === "date" — fixed cutoff for all buyers
   branchScope: "all" | "specific"
   branchIds: string[] // empty means all
   createdAt: ISODate

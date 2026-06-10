@@ -93,7 +93,6 @@ export function SpVoucherForm({
       name: voucher?.name || "",
       description: voucher?.description || "",
       bookingRequired: voucher?.bookingRequired || false,
-      photo: voucher?.photo || "",
       serviceLines: voucher?.serviceLines || [
         {
           service: "",
@@ -117,9 +116,9 @@ export function SpVoucherForm({
           toDateTimeLocalValue(voucher?.activationPeriod.endDate) ||
           createDefaultDateTime(120),
       },
-      displayVoucherEarly: voucher?.displayVoucherEarly || false,
-      displayVoucherEarlyAt:
-        toDateTimeLocalValue(voucher?.displayVoucherEarlyAt) || "",
+      expiryMode: voucher?.expiryMode ?? "days",
+      expiryDays: voucher?.expiryDays,
+      expiryDate: toDateTimeLocalValue(voucher?.expiryDate) || "",
       branchScope: voucher?.branchScope || "all",
       branchIds: voucher?.branchIds || [],
     },

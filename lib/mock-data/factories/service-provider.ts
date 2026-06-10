@@ -166,8 +166,6 @@ export function createServiceProvider(index: number): ServiceProvider {
           name: "Monthly Yoga Pass",
           description:
             "Unlimited yoga classes for one month at any Zenith branch.",
-          photo:
-            "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=800",
           bookingRequired: true,
           serviceLines: [
             {
@@ -183,12 +181,11 @@ export function createServiceProvider(index: number): ServiceProvider {
             startDate: "2026-06-05T14:05:00+08:00",
             endDate: "2026-12-31T15:05:00+08:00",
           },
-          displayVoucherEarly: true,
-          displayVoucherEarlyAt: "2026-06-05T13:55:00+08:00",
           currency: "RM",
           initialPrice: 280,
           finalPrice: 250,
-          validationDuration: { unit: "months", value: 1 },
+          expiryMode: "days",
+          expiryDays: 30,
           branchScope: "all",
           branchIds: [],
           createdAt: "2026-02-01T00:00:00Z",
@@ -275,8 +272,6 @@ export function createServiceProvider(index: number): ServiceProvider {
           name: "Individual Therapy Session",
           description:
             "One 60-minute individual therapy session with a licensed therapist.",
-          photo:
-            "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&q=80&w=800",
           bookingRequired: true,
           serviceLines: [
             {
@@ -292,11 +287,11 @@ export function createServiceProvider(index: number): ServiceProvider {
             startDate: "2026-06-05T14:05:00+08:00",
             endDate: "2026-10-05T15:05:00+08:00",
           },
-          displayVoucherEarly: false,
           currency: "RM",
           initialPrice: 220,
           finalPrice: 200,
-          validationDuration: { unit: "months", value: 3 },
+          expiryMode: "date",
+          expiryDate: "2026-12-31T23:59:00+08:00",
           branchScope: "all",
           branchIds: [],
           createdAt: "2026-02-01T00:00:00Z",

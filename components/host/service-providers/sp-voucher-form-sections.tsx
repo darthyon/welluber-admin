@@ -12,15 +12,17 @@ import {
 } from "react-hook-form"
 import { z } from "zod"
 import {
+  CalendarBlank,
+  Clock,
   ListBullets,
   Plus,
   Stack,
   WarningCircle,
 } from "@phosphor-icons/react"
 import { Button } from "@/components/ui/button"
+import { ChoiceCard } from "@/components/shared/choice-card"
 import { DateTimePickerField } from "@/components/shared/date-time-picker-field"
 import { FormSelect } from "@/components/shared/form-select"
-import { Switch } from "@/components/shared/switch"
 import { ServiceLineRow } from "@/components/host/service-providers/sp-voucher-service-line-row"
 import { createVoucherSchema } from "@/features/providers/schemas"
 import { cn } from "@/lib/utils"
@@ -40,8 +42,8 @@ export function VoucherConfigurationSection({
   setValue,
   watch,
 }: VoucherConfigurationSectionProps) {
-  const displayVoucherEarly = watch("displayVoucherEarly")
   const usageStartDate = watch("activationPeriod.startDate")
+  const expiryMode = watch("expiryMode")
 
   return (
     <div
@@ -95,10 +97,10 @@ export function VoucherConfigurationSection({
           <div className="space-y-4">
             <div className="space-y-0.5">
               <h4 className="text-body font-semibold text-foreground">
-                Voucher Usage Period
+                Listing Period
               </h4>
               <p className="text-label text-muted-foreground">
-                Set the display and usage window members will see in the
+                Set the window when this voucher is visible and buyable in the
                 marketplace.
               </p>
             </div>
@@ -158,54 +160,80 @@ export function VoucherConfigurationSection({
               </div>
             </div>
 
-            <div className="flex items-center justify-between rounded-lg border border-primary/10 bg-primary/5 p-4">
-              <div className="space-y-0.5">
-                <p className="text-body font-semibold text-foreground">
-                  Display Voucher Early
-                </p>
-                <p className="text-label text-faint">
-                  Show this voucher before the usage window begins.
-                </p>
-              </div>
-              <Switch
-                checked={displayVoucherEarly}
-                onCheckedChange={(isEnabled) => {
-                  setValue("displayVoucherEarly", isEnabled)
+          </div>
 
-                  if (!isEnabled) {
-                    setValue("displayVoucherEarlyAt", "")
-                    return
-                  }
+          <div className="space-y-4">
+            <div className="space-y-0.5">
+              <h4 className="text-body font-semibold text-foreground">
+                Voucher Expiry
+              </h4>
+              <p className="text-label text-muted-foreground">
+                When a purchased voucher expires and can no longer be redeemed.
+              </p>
+            </div>
 
-                  if (!watch("displayVoucherEarlyAt")) {
-                    setValue("displayVoucherEarlyAt", usageStartDate)
-                  }
-                }}
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+              <ChoiceCard
+                title="Days After Purchase"
+                description="Expires a set number of days after each member buys it."
+                icon={Clock}
+                selected={expiryMode === "days"}
+                onSelect={() => setValue("expiryMode", "days")}
+                className="p-3"
+              />
+              <ChoiceCard
+                title="Fixed Date"
+                description="Expires on one calendar date for all buyers."
+                icon={CalendarBlank}
+                selected={expiryMode === "date"}
+                onSelect={() => setValue("expiryMode", "date")}
+                className="p-3"
               />
             </div>
 
-            {displayVoucherEarly ? (
+            {expiryMode === "date" ? (
               <div className="animate-in space-y-2 duration-300 fade-in slide-in-from-top-2">
                 <label className="text-label font-medium text-subtle">
-                  Display Start Date & Time
+                  Expiry Date & Time
                 </label>
                 <DateTimePickerField
-                  value={watch("displayVoucherEarlyAt") ?? ""}
-                  onChange={(value) => setValue("displayVoucherEarlyAt", value)}
-                  placeholder="Select display start date & time"
+                  value={watch("expiryDate") ?? ""}
+                  min={watch("activationPeriod.endDate") || undefined}
+                  onChange={(value) => setValue("expiryDate", value)}
+                  placeholder="Select expiry date & time"
                 />
-                {errors.displayVoucherEarlyAt ? (
+                {errors.expiryDate ? (
                   <p className="flex items-center gap-1 text-label text-destructive">
                     <WarningCircle size={12} />
-                    {errors.displayVoucherEarlyAt.message}
+                    {errors.expiryDate.message}
                   </p>
                 ) : null}
-                <p className="text-body text-muted-foreground">
-                  Once voucher starts displaying, this section can no longer be
-                  edited.
-                </p>
               </div>
-            ) : null}
+            ) : (
+              <div className="animate-in space-y-1.5 duration-300 fade-in slide-in-from-top-2">
+                <label className="text-label font-medium text-subtle">
+                  Days After Purchase
+                </label>
+                <div className="relative max-w-[220px]">
+                  <input
+                    type="number"
+                    min={1}
+                    {...register("expiryDays", { valueAsNumber: true })}
+                    className="w-full rounded-md border border-border bg-background px-3 py-2 pr-14 font-mono text-body transition-colors outline-none focus:border-foreground/30 focus:bg-muted/30"
+                    placeholder="e.g. 30"
+                  />
+                  <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-label text-faint">
+                    days
+                  </span>
+                </div>
+                {errors.expiryDays ? (
+                  <p className="flex items-center gap-1 text-label text-destructive">
+                    <WarningCircle size={12} />
+                    {errors.expiryDays.message}
+                  </p>
+                ) : null}
+              </div>
+            )}
           </div>
         </div>
       </div>
