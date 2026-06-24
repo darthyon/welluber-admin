@@ -11,12 +11,12 @@ import {
   TABS,
   EMPLOYMENT_TYPE_LABELS,
   formatDependentLabel,
-  formatEmploymentChip,
   formatRefreshChip,
   formatUtilisationChip,
   formatCoverageChip,
   formatAmountChip,
 } from "./detail-tabs/policy-detail-helpers"
+import { getOrgName } from "./policy-datapoint-helpers"
 export type { TabId } from "./detail-tabs/policy-detail-helpers"
 import type { TabId } from "./detail-tabs/policy-detail-helpers"
 import { PolicyDetailHeader } from "./policy-detail-header"
@@ -97,7 +97,6 @@ export function PolicyDetailView({
         : "rose"
   const canEdit = policy.status !== "deactivated"
 
-  const employmentChip = formatEmploymentChip(policy)
   const refreshChip = formatRefreshChip(policy)
   const utilisationChip = formatUtilisationChip(policy)
   const coverageChip = formatCoverageChip(policy)
@@ -118,30 +117,37 @@ export function PolicyDetailView({
         canEdit={canEdit}
         coverageChip={coverageChip}
         dependentsLabel={dependentsLabel}
-        employmentChip={employmentChip}
         employmentList={employmentList}
         hasDependents={hasDependents}
         headerVariant={headerVariant}
         isVersion={isVersion}
         onEdit={onEdit}
         onGoToParent={() =>
-          router.push(`/policies?policyId=${policy.parentPolicyId}&mode=view&wizard=open`)
+          router.push(
+            `/policies?policyId=${policy.parentPolicyId}&mode=view&wizard=open`
+          )
         }
         onSelectTab={setSelectedTab}
         parentLabel={parentPolicyName || policy.parentPolicyId}
         policyCode={policy.code}
+        policyCreatedAt={policy.createdAt}
+        policyGroupCount={groups.length}
         policyName={policy.name}
+        policyOrgName={getOrgName(policy)}
         policyStatus={policy.status}
+        policyVersion={policy.version}
         refreshChip={refreshChip}
         statusVariant={statusVariant}
         utilisationChip={utilisationChip}
       />
 
       {/* Content */}
-      <div className={cn(
-        "flex-1 overflow-x-hidden overflow-y-auto",
-        headerVariant === "standalone" ? "pt-6" : "pt-4"
-      )}>
+      <div
+        className={cn(
+          "flex-1 overflow-x-hidden overflow-y-auto",
+          headerVariant === "standalone" ? "p-6 lg:p-8" : "pt-4"
+        )}
+      >
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}

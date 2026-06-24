@@ -51,7 +51,7 @@ export function PolicyLaunchConfirmModal({
   const reassignmentSummary = uniquePolicyNames.length > 0 ? uniquePolicyNames.join(", ") : "None";
 
   return (
-    <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/60 p-4 backdrop-blur-[2px]">
+    <div className="fixed inset-0 z-[120] flex items-center justify-center bg-muted-foreground/40 p-4 backdrop-blur-[2px]">
       <div className="w-full max-w-lg rounded-lg border border-border bg-card shadow-2xl">
         <div className="border-b border-border p-5">
           <div className="flex items-start gap-3">

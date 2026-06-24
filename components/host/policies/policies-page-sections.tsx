@@ -63,7 +63,7 @@ export function ClonePolicyDialog({ isOpen, original, onClose, onConfirm }: Clon
 function ClonePolicyDialogInner({ defaultName, original, onClose, onConfirm }: { defaultName: string; original: PolicyListItem; onClose: () => void; onConfirm: (name: string) => void; }) {
   const [name, setName] = React.useState(defaultName);
   return (
-    <div className="fixed inset-0 z-[100] flex animate-in items-center justify-center bg-black/60 p-4 backdrop-blur-[2px] duration-300 fade-in">
+    <div className="fixed inset-0 z-[100] flex animate-in items-center justify-center bg-muted-foreground/40 p-4 backdrop-blur-[2px] duration-300 fade-in">
       <div className="w-full max-w-md animate-in overflow-hidden rounded-[24px] border border-border bg-card shadow-2xl duration-300 zoom-in-95">
         <div className="p-8 pb-4">
           <h3 className="text-heading font-semibold text-foreground text-balance">Clone Policy</h3>
@@ -92,7 +92,7 @@ function ClonePolicyDialogInner({ defaultName, original, onClose, onConfirm }: {
 export function ConfirmDialog({ isOpen, title, description, warning, confirmLabel, isDanger, onClose, onConfirm }: ConfirmDialogProps) {
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 z-[100] flex animate-in items-center justify-center bg-black/60 p-4 backdrop-blur-[2px] duration-300 fade-in">
+    <div className="fixed inset-0 z-[100] flex animate-in items-center justify-center bg-muted-foreground/40 p-4 backdrop-blur-[2px] duration-300 fade-in">
       <div className="w-full max-w-md animate-in overflow-hidden rounded-[24px] border border-border bg-card shadow-2xl duration-300 zoom-in-95">
         <div className="p-8 pb-4">
           <h3 className="text-heading font-semibold text-foreground text-balance">{title}</h3>
