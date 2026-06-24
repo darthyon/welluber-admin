@@ -111,7 +111,7 @@ export function DirectorySubTab({ orgId, onBulkUpload }: DirectorySubTabProps) {
             <EmployeeCard
               key={emp.id}
               employee={emp}
-              onView={(id) => router.push(`/employees/${id}`)}
+              onView={(id) => router.push(`/employees/${id}?from=${orgId}`)}
               onEdit={(id) => router.push(`/employees/${id}/edit`)}
             />
           ))}
@@ -121,7 +121,7 @@ export function DirectorySubTab({ orgId, onBulkUpload }: DirectorySubTabProps) {
           <SharedDataTable
             freezeFirst
             freezeLast
-            onRowClick={(emp) => router.push(`/employees/${emp.id}`)}
+            onRowClick={(emp) => router.push(`/employees/${emp.id}?from=${orgId}`)}
             columns={[
               {
                 header: "Employee",
@@ -331,7 +331,7 @@ export function DirectorySubTab({ orgId, onBulkUpload }: DirectorySubTabProps) {
                 render: (emp) => (
                   <ActionPopover
                     actions={[
-                      { label: "View Employee", onClick: () => router.push(`/employees/${emp.id}`) },
+                      { label: "View Employee", onClick: () => router.push(`/employees/${emp.id}?from=${orgId}`) },
                       { label: "Edit Employee", onClick: () => router.push(`/employees/${emp.id}/edit`) },
                       { label: "Terminate Link", isDanger: true },
                     ]}

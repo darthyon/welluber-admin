@@ -29,6 +29,30 @@ export interface EmployeeDirectoryItem {
   }[]
 }
 
+export interface EmployeeDependent {
+  id: string
+  relationship: string
+  name: string
+  email: string
+  phone: string
+}
+
+/** Full employee record for the detail view — extends the directory row with
+ *  personal, employment, and household fields the list does not carry. */
+export interface EmployeeDetailRecord extends EmployeeDirectoryItem {
+  dateOfBirth: string
+  idType: string
+  idNumber: string
+  mobile: string
+  nationality: string
+  designation: string
+  gender?: string
+  residencyStatus?: string
+  isProbation?: boolean
+  probationEndDate?: string
+  dependents: EmployeeDependent[]
+}
+
 export interface AssignablePolicy {
   id: string
   name: string

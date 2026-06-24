@@ -1,7 +1,7 @@
 "use client"
 
 import { useQueryState } from "@/hooks/use-tab-persistence"
-import { VerticalTabs } from "@/components/shared/vertical-tabs"
+import { SegmentedTabs } from "@/components/shared/segmented-tabs"
 import { BulkUploadWizard } from "@/components/host/organizations/bulk-upload-wizard"
 import { DirectorySubTab } from "./employees/directory-sub-tab"
 import { DependentsSubTab } from "./employees/dependents-sub-tab"
@@ -26,6 +26,8 @@ export function EmployeesTab({
   onBulkUploadChange,
 }: EmployeesTabProps) {
   const [activeSubTab, setActiveSubTab] = useQueryState("subTab", "directory")
+  const validSubTabs = new Set<string>(EMPLOYEE_SUB_TABS.map((t) => t.id))
+  const currentSubTab = validSubTabs.has(activeSubTab || "") ? (activeSubTab as string) : "directory"
 
   if (isBulkUploading === "true") {
     return (
@@ -43,32 +45,31 @@ export function EmployeesTab({
   }
 
   return (
-    <div className="animate-in flex flex-col gap-8 transition-all duration-300 fade-in lg:flex-row">
-      <aside className="w-full flex-shrink-0 lg:w-64">
-        <VerticalTabs
-          tabs={EMPLOYEE_SUB_TABS}
-          activeTab={activeSubTab || "directory"}
-          onChange={setActiveSubTab}
-        />
-      </aside>
+    <div className="animate-in flex flex-col gap-6 transition-all duration-300 fade-in">
+      <SegmentedTabs
+        tabs={EMPLOYEE_SUB_TABS}
+        activeTab={currentSubTab}
+        onChange={setActiveSubTab}
+        className="self-start"
+      />
 
-      <div className="min-w-0 flex-1">
-        {activeSubTab === "directory" && (
+      <div className="min-w-0">
+        {currentSubTab === "directory" && (
           <DirectorySubTab
             orgId={orgId}
             onBulkUpload={() => onBulkUploadChange("true")}
           />
         )}
-        {activeSubTab === "dependents" && (
+        {currentSubTab === "dependents" && (
           <DependentsSubTab
             orgId={orgId}
             onNavigateToDirectory={() => setActiveSubTab("directory")}
           />
         )}
-        {activeSubTab === "entitlements" && (
+        {currentSubTab === "entitlements" && (
           <EntitlementsSubTab orgId={orgId} />
         )}
-        {activeSubTab === "claims" && (
+        {currentSubTab === "claims" && (
           <ClaimsSubTab orgId={orgId} />
         )}
       </div>
