@@ -242,7 +242,7 @@ export function PolicyDependentCoverageModal({
   const allSelected = DEP_TYPES.every((type) => current.some((coverage) => coverage.type === type.value))
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4 backdrop-blur-[2px]">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-muted-foreground/40 p-4 backdrop-blur-[2px]">
       <div className="w-full max-w-sm rounded-2xl border border-border bg-card shadow-2xl">
         <div className="space-y-1 p-6 pb-4">
           <p className="text-body font-semibold text-foreground">Add Dependent Coverage</p>

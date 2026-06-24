@@ -45,7 +45,7 @@ export function PolicyCreationLauncher({ onManual, onTemplate, preselectedOrgId,
       </Button>
 
       {open && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4 backdrop-blur-[2px]">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-muted-foreground/40 p-4 backdrop-blur-[2px]">
           <div className="w-full max-w-2xl overflow-hidden rounded-[24px] border border-border bg-card shadow-2xl">
             <div className="p-8 pb-4">
               <h3 className="text-heading font-semibold text-foreground">Add Benefit Policy</h3>
