@@ -41,6 +41,7 @@ interface PolicyDatapointContractProps {
   groups: BenefitGroup[]
   benefits: Benefit[]
   className?: string
+  showBenefitGroups?: boolean
 }
 
 export function PolicyDatapointContract({
@@ -48,6 +49,7 @@ export function PolicyDatapointContract({
   groups,
   benefits,
   className,
+  showBenefitGroups = true,
 }: PolicyDatapointContractProps) {
   const hasDependents = (policy.dependentCoverages?.length ?? 0) > 0
   const dependentCapAmount = getDependentCapAmount(policy)
@@ -258,11 +260,13 @@ export function PolicyDatapointContract({
         </DataGrid>
       </ContractSection>
 
-      <BenefitGroupsContractSection
-        policy={policy}
-        groups={groups}
-        benefits={benefits}
-      />
+      {showBenefitGroups ? (
+        <BenefitGroupsContractSection
+          policy={policy}
+          groups={groups}
+          benefits={benefits}
+        />
+      ) : null}
     </div>
   )
 }

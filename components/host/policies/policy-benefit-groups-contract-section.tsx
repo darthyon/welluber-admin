@@ -49,7 +49,7 @@ export function BenefitGroupsContractSection({
           No benefit groups configured.
         </p>
       ) : (
-        <div className="space-y-4">
+        <div className="divide-y divide-border">
           {groups.map((group) => (
             <BenefitGroupContract
               key={group.id}
@@ -80,8 +80,8 @@ function BenefitGroupContract({
   const dependentCap = getGroupCap(group, "dependent")
 
   return (
-    <div className="overflow-hidden rounded-lg border border-border bg-card/40">
-      <div className="space-y-3 border-b border-border bg-muted/20 p-4">
+    <div className="py-5 first:pt-0 last:pb-0">
+      <div className="space-y-3">
         <div className="flex flex-col justify-between gap-3 md:flex-row md:items-start">
           <div>
             <h4 className="text-lead font-semibold text-foreground">
@@ -117,7 +117,7 @@ function BenefitGroupContract({
         </div>
       </div>
 
-      <div className="space-y-4 p-4">
+      <div className="mt-4 space-y-5">
         <DataGrid>
           <DataPoint
             label="Employee Coverage"
@@ -193,8 +193,8 @@ function ServiceAmountGrid({
   scope: BenefitGroup["coverageScope"]
 }) {
   return (
-    <div className="overflow-hidden rounded-lg border border-border">
-      <div className="grid grid-cols-12 gap-3 border-b border-border bg-muted/30 px-3 py-2 text-label font-medium text-muted-foreground">
+    <div>
+      <div className="grid grid-cols-12 gap-3 border-y border-border py-2 text-label font-medium text-muted-foreground">
         <span className="col-span-4">Service</span>
         <span className="col-span-2">Employee Amount</span>
         <span className="col-span-2">Dependent Amount</span>
@@ -203,7 +203,7 @@ function ServiceAmountGrid({
       </div>
       <div className="divide-y divide-border/50">
         {benefits.length === 0 ? (
-          <p className="px-3 py-5 text-center text-label text-faint">
+          <p className="py-5 text-center text-label text-faint">
             No services configured.
           </p>
         ) : (
@@ -233,7 +233,7 @@ function ServiceAmountRow({
   const serviceCode = resolveMainServiceId(benefit.serviceId)
 
   return (
-    <div className="grid grid-cols-12 items-center gap-3 px-3 py-3">
+    <div className="grid grid-cols-12 items-center gap-3 py-3">
       <div className="col-span-4 min-w-0">
         <p className="truncate text-body font-medium text-foreground">
           {getMainServiceName(benefit.serviceId)}

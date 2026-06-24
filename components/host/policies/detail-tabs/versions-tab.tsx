@@ -47,7 +47,8 @@ export function VersionsTab({
             {versions.length > 0 ? `Versions (${versions.length})` : "Versions"}
           </h3>
           <p className="mt-1 text-body text-muted-foreground">
-            Override benefit amounts for specific employee tiers and individuals.
+            Override benefit amounts for specific employee tiers and
+            individuals.
           </p>
         </div>
         {canCreateVersion && (
@@ -66,13 +67,19 @@ export function VersionsTab({
           <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-lg border border-violet-200 bg-violet-50 text-violet-500 dark:border-violet-500/20 dark:bg-violet-500/10">
             <TreeStructure size={28} weight="duotone" />
           </div>
-          <p className="text-body font-semibold text-foreground">No versions yet</p>
+          <p className="text-body font-semibold text-foreground">
+            No versions yet
+          </p>
           <p className="mt-1 max-w-sm text-label text-faint">
             Create a version to tailor benefit amounts for a specific tier,
             department, or individual employee without changing the base policy.
           </p>
           {canCreateVersion && (
-            <Button onClick={onCreateVersion} size="sm" className="mt-6 text-label font-medium">
+            <Button
+              onClick={onCreateVersion}
+              size="sm"
+              className="mt-6 text-label font-medium"
+            >
               <Plus size={14} weight="bold" className="mr-1.5" />
               Create Version
             </Button>
@@ -101,9 +108,13 @@ export function VersionsTab({
               accessorKey: "name",
               render: (row) => (
                 <div>
-                  <p className="text-body font-semibold text-foreground">{row.name}</p>
+                  <p className="text-body font-semibold text-foreground">
+                    {row.name}
+                  </p>
                   {row.code && (
-                    <p className="mt-0.5 font-mono text-label text-faint">{row.code}</p>
+                    <p className="mt-0.5 font-mono text-label text-faint">
+                      {row.code}
+                    </p>
                   )}
                 </div>
               ),
@@ -143,7 +154,10 @@ export function VersionsTab({
               render: (row) => {
                 const oc = overrideCounts[row.id] ?? 0
                 return oc > 0 ? (
-                  <Badge variant="secondary" className="inline-flex items-center gap-1">
+                  <Badge
+                    variant="secondary"
+                    className="inline-flex items-center gap-1"
+                  >
                     <ArrowsDownUp size={10} weight="bold" />
                     {oc}
                   </Badge>
@@ -182,7 +196,10 @@ export function VersionsTab({
                   },
                 ]
                 return (
-                  <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>
+                  <div
+                    className="flex justify-end"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <ActionPopover actions={actions} />
                   </div>
                 )
@@ -191,7 +208,6 @@ export function VersionsTab({
           ]}
           onRowClick={(row) => onViewVersion(row.id)}
           rowsPerPage={10}
-          ghost
         />
       )}
     </div>

@@ -16,6 +16,7 @@ export function OverviewTab({ policy, groups, benefits }: OverviewTabProps) {
       policy={policy}
       groups={groups}
       benefits={benefits}
+      showBenefitGroups={false}
     />
   )
 }

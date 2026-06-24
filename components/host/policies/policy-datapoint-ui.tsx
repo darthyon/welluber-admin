@@ -2,6 +2,13 @@
 
 import type React from "react"
 import { Badge } from "@/components/ui/badge"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { Info } from "@phosphor-icons/react"
 
 export function ContractSection({
   children,
@@ -36,7 +43,7 @@ export function ContractSection({
 
 export function DataGrid({ children }: { children: React.ReactNode }) {
   return (
-    <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+    <div className="grid grid-cols-1 gap-x-8 gap-y-4 md:grid-cols-2 xl:grid-cols-3">
       {children}
     </div>
   )
@@ -52,14 +59,29 @@ export function DataPoint({
   value: React.ReactNode
 }) {
   return (
-    <div className="rounded-lg border border-border/70 bg-muted/10 px-3 py-2.5">
+    <div className="min-w-0">
       <p className="text-label font-medium text-muted-foreground">{label}</p>
-      <div className="mt-1 text-body leading-tight font-medium text-foreground">
-        {value || "—"}
+      <div className="mt-1 flex min-w-0 items-center gap-1.5 text-body leading-tight font-medium text-foreground">
+        <span className="min-w-0">{value || "—"}</span>
+        {helper ? (
+          <TooltipProvider delayDuration={150}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  aria-label={`${label} Details`}
+                  className="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-4xl text-faint transition-colors hover:text-primary focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none"
+                >
+                  <Info size={13} weight="regular" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="max-w-64 text-label">
+                {helper}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        ) : null}
       </div>
-      {helper ? (
-        <p className="mt-1 text-label leading-snug text-faint">{helper}</p>
-      ) : null}
     </div>
   )
 }
