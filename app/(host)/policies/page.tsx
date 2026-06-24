@@ -42,9 +42,17 @@ function PoliciesContent() {
   }>({ open: false, title: "", description: "", confirmLabel: "", onConfirm: () => {} });
   const [toast, setToast] = useState<string | null>(null);
 
+  // The list shows parent/standalone policies only. Versions (parentPolicyId set)
+  // live under their parent's Versions tab, so they are excluded here. The full
+  // `policies` set is still used for detail lookups (version lineage, parent name).
+  const parentPolicies = useMemo(
+    () => policies.filter((policy) => !policy.parentPolicyId),
+    [policies]
+  );
+
   const filteredPolicies = useMemo(
     () =>
-      policies.filter((policy) => {
+      parentPolicies.filter((policy) => {
         const matchesSearch =
           !searchQuery ||
           policy.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -53,7 +61,7 @@ function PoliciesContent() {
         const matchesOrg = orgFilter === "all" || policy.orgName === orgFilter || policy.organizationId === orgFilter;
         return matchesSearch && matchesStatus && matchesOrg;
       }),
-    [orgFilter, policies, searchQuery, statusFilter]
+    [orgFilter, parentPolicies, searchQuery, statusFilter]
   );
 
   const orgFilterOptions = useMemo(() => {
@@ -66,12 +74,12 @@ function PoliciesContent() {
 
   const statusCounts = useMemo(
     () => ({
-      all: policies.length,
-      draft: policies.filter((policy) => policy.status === "draft").length,
-      active: policies.filter((policy) => policy.status === "active").length,
-      deactivated: policies.filter((policy) => policy.status === "deactivated").length,
+      all: parentPolicies.length,
+      draft: parentPolicies.filter((policy) => policy.status === "draft").length,
+      active: parentPolicies.filter((policy) => policy.status === "active").length,
+      deactivated: parentPolicies.filter((policy) => policy.status === "deactivated").length,
     }),
-    [policies]
+    [parentPolicies]
   );
 
   const showToast = (message: string) => {

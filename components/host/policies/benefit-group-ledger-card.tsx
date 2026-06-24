@@ -53,8 +53,6 @@ export function BenefitGroupLedgerCard({
   benefits,
 }: BenefitGroupLedgerCardProps) {
   const coverageScope = group.coverageScope ?? "Employee"
-  const employeeCap = getGroupCap(group, "employee")
-  const dependentCap = getGroupCap(group, "dependent")
 
   return (
     <ContractSection
@@ -66,34 +64,6 @@ export function BenefitGroupLedgerCard({
         {group.description ? (
           <p className="max-w-3xl text-label text-faint">{group.description}</p>
         ) : null}
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
-          <RuleSummaryItem
-            label="Employee Group Cap"
-            value={
-              hasEmployeeSide(coverageScope)
-                ? employeeCap.value
-                : "Not Applicable"
-            }
-            helper={hasEmployeeSide(coverageScope) ? employeeCap.helper : null}
-          />
-          <RuleSummaryItem
-            label="Dependent Group Cap"
-            value={
-              hasDependentSide(coverageScope)
-                ? dependentCap.value
-                : "Not Applicable"
-            }
-            helper={hasDependentSide(coverageScope) ? dependentCap.helper : null}
-          />
-          <RuleSummaryItem
-            label="Utilisation"
-            value={getEffectiveUtilisation(policy, group)}
-          />
-          <RuleSummaryItem
-            label="Refresh"
-            value={`${getEffectiveRefresh(policy, group)} Refresh`}
-          />
-        </div>
 
         <ServiceGrid
           benefits={benefits}
@@ -107,22 +77,28 @@ export function BenefitGroupLedgerCard({
               variant="ghost"
               className="group flex h-auto w-full items-center justify-between rounded-none px-4 py-3 text-label font-medium text-muted-foreground hover:bg-muted/40 hover:text-foreground"
             >
-              <span className="flex items-center gap-2">
-                <TreeStructure size={14} weight="duotone" />
-                Additional Details
+              <span className="flex items-start gap-2">
+                <TreeStructure size={14} weight="duotone" className="mt-0.5" />
+                <span>Benefit Group Details</span>
               </span>
               <CaretDown
                 size={14}
-                className="transition-transform group-data-[state=open]:rotate-180"
+                className="shrink-0 transition-transform group-data-[state=open]:rotate-180"
               />
             </Button>
           </CollapsibleTrigger>
           <CollapsibleContent>
-            <div className="border-t border-border px-4 pt-4 pb-4">
-              <p className="mb-4 text-label text-faint">
-                Inherited from this benefit group. Individual services can
-                override amounts and co-pays.
-              </p>
+            <div className="space-y-5 border-t border-border px-4 pt-4 pb-4">
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+                <RuleSummaryItem
+                  label="Utilisation"
+                  value={getEffectiveUtilisation(policy, group)}
+                />
+                <RuleSummaryItem
+                  label="Refresh"
+                  value={`${getEffectiveRefresh(policy, group)} Refresh`}
+                />
+              </div>
               <BenefitGroupDatapoints
                 group={group}
                 serviceCount={benefits.length}
@@ -147,7 +123,7 @@ function ServiceGrid({
 }) {
   return (
     <div>
-      <p className="mb-3 border-b border-border pb-2 text-label font-semibold tracking-wide text-muted-foreground uppercase">
+      <p className="mb-3 text-label font-semibold text-muted-foreground">
         Services
       </p>
       {benefits.length === 0 ? (
@@ -155,9 +131,9 @@ function ServiceGrid({
           No benefits configured for this group.
         </p>
       ) : (
-        <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+        <div className="divide-y divide-border overflow-hidden rounded-lg border border-border">
           {benefits.map((benefit) => (
-            <ServiceCard
+            <ServiceRow
               key={benefit.id}
               benefit={benefit}
               group={group}
@@ -170,7 +146,7 @@ function ServiceGrid({
   )
 }
 
-function ServiceCard({
+function ServiceRow({
   benefit,
   coverageScope,
   group,
@@ -185,50 +161,57 @@ function ServiceCard({
   const dependentCoPay = getServiceCopay(group, benefit, "dependent")
 
   return (
-    <div className="rounded-lg border border-border bg-muted/20 p-4">
-      <div className="flex min-w-0 items-start gap-3">
-        <div className="mt-0.5 shrink-0">
-          {getMainServiceIcon(benefit.serviceId)}
-        </div>
-        <div className="flex min-w-0 items-center gap-2">
-          <p className="truncate text-body font-semibold text-foreground">
+    <Collapsible className="bg-card">
+      <CollapsibleTrigger asChild>
+        <button className="group flex w-full min-w-0 items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted/30">
+          <span className="shrink-0">{getMainServiceIcon(benefit.serviceId)}</span>
+          <span className="truncate text-body font-semibold text-foreground">
             {getMainServiceName(benefit.serviceId)}
-          </p>
-          <TechnicalBadge>
-            {resolveMainServiceId(benefit.serviceId)}
-          </TechnicalBadge>
+          </span>
+          <span className="ml-auto shrink-0">
+            <TechnicalBadge>
+              {resolveMainServiceId(benefit.serviceId)}
+            </TechnicalBadge>
+          </span>
+          <CaretDown
+            size={14}
+            className="shrink-0 text-faint transition-transform group-data-[state=open]:rotate-180"
+          />
+        </button>
+      </CollapsibleTrigger>
+      <CollapsibleContent>
+        <div className="grid grid-cols-1 gap-3 border-t border-border bg-muted/20 px-4 py-4 sm:grid-cols-2">
+          <EntitlementMetric
+            label="Employee"
+            helper="Benefit amount allocated to the employee for this service per cycle."
+            value={
+              hasEmployeeSide(coverageScope)
+                ? formatRM(employeeAmount)
+                : "Not Applicable"
+            }
+            coPay={
+              hasEmployeeSide(coverageScope) && employeeCoPay?.required
+                ? formatCopay(employeeCoPay)
+                : null
+            }
+          />
+          <EntitlementMetric
+            label="Dependent"
+            helper="Benefit amount allocated to each covered dependent for this service per cycle."
+            value={
+              hasDependentSide(coverageScope)
+                ? formatRM(dependentAmount)
+                : "Not Applicable"
+            }
+            coPay={
+              hasDependentSide(coverageScope) && dependentCoPay?.required
+                ? formatCopay(dependentCoPay)
+                : null
+            }
+          />
         </div>
-      </div>
-
-      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <EntitlementMetric
-          label="Employee"
-          value={
-            hasEmployeeSide(coverageScope)
-              ? formatRM(employeeAmount)
-              : "Not Applicable"
-          }
-          coPay={
-            hasEmployeeSide(coverageScope) && employeeCoPay?.required
-              ? formatCopay(employeeCoPay)
-              : null
-          }
-        />
-        <EntitlementMetric
-          label="Dependent"
-          value={
-            hasDependentSide(coverageScope)
-              ? formatRM(dependentAmount)
-              : "Not Applicable"
-          }
-          coPay={
-            hasDependentSide(coverageScope) && dependentCoPay?.required
-              ? formatCopay(dependentCoPay)
-              : null
-          }
-        />
-      </div>
-    </div>
+      </CollapsibleContent>
+    </Collapsible>
   )
 }
 
@@ -289,18 +272,20 @@ function formatGroupMeta(
     group.distributionType === "SharedAmount"
       ? "Shared Amount"
       : "Individual Benefit Amount"
-  return [
-    formatCoverageScope(coverageScope),
+
+  const segments: string[] = []
+  if (hasEmployeeSide(coverageScope)) {
+    segments.push(`Employee Group Cap: ${getGroupCap(group, "employee").value}`)
+  }
+  if (hasDependentSide(coverageScope)) {
+    segments.push(`Dependent Group Cap: ${getGroupCap(group, "dependent").value}`)
+  }
+  segments.push(
     distribution,
     group.isTaxable ? "Taxable" : "Not Taxable",
-    `${serviceCount} ${serviceCount === 1 ? "Service" : "Services"}`,
-  ].join(" · ")
-}
-
-function formatCoverageScope(scope: BenefitGroupCoverageScope) {
-  if (scope === "Both") return "Employee + Dependent"
-  if (scope === "Dependent") return "Dependent Only"
-  return "Employee Only"
+    `${serviceCount} ${serviceCount === 1 ? "Service" : "Services"}`
+  )
+  return segments.join(" · ")
 }
 
 function RuleSummaryItem({
@@ -342,16 +327,38 @@ function RuleSummaryItem({
 
 function EntitlementMetric({
   coPay,
+  helper,
   label,
   value,
 }: {
   coPay: string | null
+  helper?: string | null
   label: string
   value: string
 }) {
   return (
     <div>
-      <p className="text-label font-medium text-muted-foreground">{label}</p>
+      <div className="flex items-center gap-1.5">
+        <p className="text-label font-medium text-muted-foreground">{label}</p>
+        {helper ? (
+          <TooltipProvider delayDuration={150}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  aria-label={`${label} Details`}
+                  className="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-4xl text-faint transition-colors hover:text-primary focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none"
+                >
+                  <Info size={13} weight="regular" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="max-w-64 text-label">
+                {helper}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        ) : null}
+      </div>
       <div className="mt-0.5 flex flex-wrap items-center gap-2">
         <p className="text-body font-semibold text-foreground tabular-nums">
           {value}

@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import { BenefitGroupLedgerCard } from "../benefit-group-ledger-card"
 import { NotePencil, TreeStructure } from "@phosphor-icons/react"
 import type { Benefit, BenefitGroup, BenefitPolicy } from "@/types/policy"
@@ -33,12 +34,17 @@ export function BenefitGroupsTab({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-heading font-semibold text-foreground">
-            Benefit Groups
-          </h3>
-          <p className="mt-1 text-body text-muted-foreground">
-            {groups.length} group{groups.length !== 1 ? "s" : ""} configured
-            with {benefits.length} service{benefits.length !== 1 ? "s" : ""}.
+          <div className="flex items-center gap-3">
+            <h3 className="text-heading font-semibold text-foreground">
+              Benefit Groups
+            </h3>
+            <Badge variant="secondary" className="text-label font-medium">
+              {groups.length} Group{groups.length !== 1 ? "s" : ""} ·{" "}
+              {benefits.length} Service{benefits.length !== 1 ? "s" : ""}
+            </Badge>
+          </div>
+          <p className="mt-0.5 text-label text-faint">
+            Inherited from this benefit group. Individual services can override amounts and co-pays.
           </p>
         </div>
         <Button
