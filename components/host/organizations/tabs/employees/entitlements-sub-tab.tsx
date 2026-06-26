@@ -5,7 +5,27 @@ import { FilterItem } from "@/components/shared/filter-item"
 import { DataFilterBar } from "@/components/shared/data-filter-bar"
 import { SharedDataTable } from "@/components/shared/data-table"
 import { StatusBadge } from "@/components/shared/status-badge"
+import { Badge } from "@/components/ui/badge"
 import { useOrgWorkforce } from "@/hooks/use-org-workforce"
+import type { EntitlementPoolType } from "@/lib/mock-data/factories/entitlement"
+
+const POOL_BADGE: Record<EntitlementPoolType, { label: string; className: string }> = {
+  SharedWithEmployee: {
+    label: "Combined",
+    className:
+      "border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-800 dark:bg-violet-950 dark:text-violet-300",
+  },
+  Shared: {
+    label: "Shared",
+    className:
+      "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-300",
+  },
+  Individual: {
+    label: "Dedicated",
+    className:
+      "border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-800 dark:bg-sky-950 dark:text-sky-300",
+  },
+}
 
 interface EntitlementsSubTabProps {
   orgId: string
@@ -88,6 +108,18 @@ export function EntitlementsSubTab({ orgId }: EntitlementsSubTabProps) {
                 {ent.policy}
               </span>
             ),
+          },
+          {
+            header: "Pool",
+            accessorKey: "poolType",
+            render: (ent) => {
+              const { label, className } = POOL_BADGE[ent.poolType]
+              return (
+                <Badge variant="outline" className={`text-label font-medium ${className}`}>
+                  {label}
+                </Badge>
+              )
+            },
           },
           {
             header: "Claims Usage",

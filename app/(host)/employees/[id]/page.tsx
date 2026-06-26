@@ -65,7 +65,7 @@ export default function EmployeePage() {
   return (
     <div className="p-6 pb-12 lg:p-8">
       <EmployeeDetail
-        employee={mockEmployee}
+        employee={{ ...mockEmployee, id: employeeId }}
         backLabel={backLabel}
         onBack={() => router.push(backHref)}
         onEdit={() => router.push(`/employees/${employeeId}/edit`)}
