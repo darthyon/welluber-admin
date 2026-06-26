@@ -1,5 +1,6 @@
 "use client"
 
+import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Info } from "@phosphor-icons/react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
@@ -22,7 +23,13 @@ const generateHeatmapData = (weeks: number, daysPerWeek: number) => {
 export function ActivityHeatmap() {
   const weeks = 12
   const daysPerWeek = 7
-  const data = generateHeatmapData(weeks, daysPerWeek)
+  const [data, setData] = React.useState<number[][]>(() =>
+    Array.from({ length: weeks }, () => Array(daysPerWeek).fill(0))
+  )
+
+  React.useEffect(() => {
+    setData(generateHeatmapData(weeks, daysPerWeek))
+  }, [])
 
   const getIntensityClass = (level: number) => {
     switch (level) {
