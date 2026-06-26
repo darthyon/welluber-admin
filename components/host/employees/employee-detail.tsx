@@ -28,7 +28,7 @@ import type { EmployeeDetailRecord } from "@/features/employees/types";
 
 const DETAIL_TABS = [
   { id: "profile", label: "Profile", icon: User },
-  { id: "benefits", label: "Benefits", icon: Shield },
+  { id: "benefits", label: "Entitlement", icon: Shield },
   { id: "claims", label: "Claims", icon: SealCheck },
   { id: "vouchers", label: "Vouchers", icon: Ticket },
   { id: "dependents", label: "Dependents", icon: Users },

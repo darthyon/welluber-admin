@@ -73,6 +73,23 @@ export interface FormPolicy {
   groups: { id: string; name: string }[]
 }
 
+/** Runtime entitlement consumption for one beneficiary against one benefit.
+ *  The only datapoint the policy model doesn't carry — caps/scope/pool semantics
+ *  are read off BenefitPolicy / BenefitGroup / Benefit + policy-datapoint-helpers. */
+export interface BeneficiaryUsage {
+  /** employeeId, or a dependent id */
+  beneficiaryId: string
+  /** display name for dependent rows ("Siti Rahmah"); omitted for the employee */
+  beneficiaryName?: string
+  /** dependent relationship label ("Spouse"); omitted for the employee */
+  relationship?: string
+  /** FK -> Benefit.id */
+  benefitId: string
+  allocated: number
+  balance: number
+  spent: number
+}
+
 export interface VoucherRedemption {
   id: string
   voucherCode: string
