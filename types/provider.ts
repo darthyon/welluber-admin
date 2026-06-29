@@ -12,6 +12,11 @@ export type SpAdminStatus = "active" | "pending_activation"
 export type SpVoucherStatus = "draft" | "published" | "expired"
 export type SpBranchContactType = "branch_manager" | "staff" | "reception"
 export type DurationUnit = "session" | "min" | "hr" | "day" | "month" | "year"
+export type SpBranchBookingChannel =
+  | "whatsapp"
+  | "email"
+  | "phone"
+  | "booking_website"
 
 // ─── Tax Profile ──────────────────────────────────────────────────────────────
 
@@ -63,6 +68,22 @@ export interface SpBranchAdmin {
   designateAsPic: boolean
 }
 
+export interface SpBranchBookingSettings {
+  channels: SpBranchBookingChannel[]
+  whatsapp?: {
+    phoneNumber: string
+  }
+  email?: {
+    email: string
+  }
+  phone?: {
+    phoneNumber: string
+  }
+  link?: {
+    url: string
+  }
+}
+
 export interface DayHours {
   open: string // "09:00"
   close: string // "18:00"
@@ -95,6 +116,7 @@ export interface SpBranch {
   }
   contacts: SpBranchContact[] // Used for PICs (Public Contacts)
   administrators: SpBranchAdmin[] // Governance/Access
+  booking: SpBranchBookingSettings
   isActive: boolean
   operatingHours: OperatingHours
   benefits: string[]

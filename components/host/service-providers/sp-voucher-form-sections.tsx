@@ -46,10 +46,7 @@ export function VoucherConfigurationSection({
   const expiryMode = watch("expiryMode")
 
   return (
-    <div
-      id="voucher-configuration"
-      className="scroll-mt-32 overflow-hidden rounded-lg border border-border bg-card shadow-sm"
-    >
+    <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
       <div className="space-y-6 p-6">
         <div className="flex items-center gap-2 pb-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
@@ -343,10 +340,7 @@ export function VoucherManageServicesSection({
   }
 
   return (
-    <div
-      id="manage-services"
-      className="scroll-mt-32 overflow-hidden rounded-lg border border-border bg-card shadow-sm"
-    >
+    <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
       <div className="space-y-6 p-6">
         <div className="flex items-center gap-2 pb-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500/10 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400">
