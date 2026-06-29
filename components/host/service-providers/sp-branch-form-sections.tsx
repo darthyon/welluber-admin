@@ -95,9 +95,9 @@ export function BranchGovernanceSection({
                 <Plus size={14} weight="bold" />
                 Add
                 <CaretDown
-                  size={12}
+                  size={14}
                   weight="bold"
-                  className="text-muted-foreground"
+                  className="shrink-0 opacity-70"
                 />
               </Button>
             </DropdownMenuTrigger>

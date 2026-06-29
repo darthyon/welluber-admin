@@ -1,78 +1,85 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { Plus, GitBranch } from "@phosphor-icons/react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { EmptyState } from "@/components/shared/empty-state";
-import { useQueryState, useUpdateQueryParams } from "@/hooks/use-tab-persistence";
-import { FilterItem } from "@/components/shared/filter-item";
-import { DataFilterBar } from "@/components/shared/data-filter-bar";
-import { ViewToggle, type ViewMode } from "@/components/shared/view-toggle";
-import { SpBranchCard } from "./sp-branch-card";
-import { SpBranchDetailView } from "./sp-branch-detail-view";
-import { SpBranchForm } from "./sp-branch-form";
-import type { ServiceProvider, SpBranch } from "@/types/provider";
-import { StatusBadge } from "@/components/shared/status-badge";
-import { ActionPopover } from "@/components/shared/action-popover";
-import { SharedDataTable } from "@/components/shared/data-table";
+import { useState } from "react"
+import { Plus, GitBranch } from "@phosphor-icons/react"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { EmptyState } from "@/components/shared/empty-state"
+import {
+  useQueryState,
+  useUpdateQueryParams,
+} from "@/hooks/use-tab-persistence"
+import { FilterItem } from "@/components/shared/filter-item"
+import { DataFilterBar } from "@/components/shared/data-filter-bar"
+import { ViewToggle, type ViewMode } from "@/components/shared/view-toggle"
+import { SpBranchCard } from "./sp-branch-card"
+import { SpBranchDetailView } from "./sp-branch-detail-view"
+import { SpBranchForm } from "./sp-branch-form"
+import type { ServiceProvider, SpBranch } from "@/types/provider"
+import { StatusBadge } from "@/components/shared/status-badge"
+import { ActionPopover } from "@/components/shared/action-popover"
+import { SharedDataTable } from "@/components/shared/data-table"
 
 interface SpBranchesTabProps {
-  sp: ServiceProvider;
+  sp: ServiceProvider
 }
 
-type BranchStatusFilter = "all" | "active" | "inactive";
+type BranchStatusFilter = "all" | "active" | "inactive"
 
 export function SpBranchesTab({ sp }: SpBranchesTabProps) {
-  const [view, setView] = useQueryState("branchView", "list");
-  const [selectedBranchId] = useQueryState("branchId");
-  const updateQueryParams = useUpdateQueryParams();
-  const [branchesView, setBranchesView] = useState<ViewMode>("list");
-  const [branchSearch, setBranchSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<BranchStatusFilter>("all");
+  const [view, setView] = useQueryState("branchView", "list")
+  const [selectedBranchId] = useQueryState("branchId")
+  const updateQueryParams = useUpdateQueryParams()
+  const [branchesView, setBranchesView] = useState<ViewMode>("list")
+  const [branchSearch, setBranchSearch] = useState("")
+  const [statusFilter, setStatusFilter] = useState<BranchStatusFilter>("all")
 
-  const selectedBranch = sp.branches.find((b) => b.id === selectedBranchId);
+  const selectedBranch = sp.branches.find((b) => b.id === selectedBranchId)
   const filteredBranches = sp.branches.filter((branch) => {
-    const matchesSearch =
-      [branch.name, branch.address.city, branch.address.state, branch.services.map(s => s.service).join(" ")]
-        .join(" ")
-        .toLowerCase()
-        .includes(branchSearch.toLowerCase());
+    const matchesSearch = [
+      branch.name,
+      branch.address.city,
+      branch.address.state,
+      branch.services.map((s) => s.service).join(" "),
+    ]
+      .join(" ")
+      .toLowerCase()
+      .includes(branchSearch.toLowerCase())
     const matchesStatus =
       statusFilter === "all" ||
       (statusFilter === "active" && branch.isActive) ||
-      (statusFilter === "inactive" && !branch.isActive);
+      (statusFilter === "inactive" && !branch.isActive)
 
-    return matchesSearch && matchesStatus;
-  });
+    return matchesSearch && matchesStatus
+  })
 
   const handleView = (branch: SpBranch) => {
     updateQueryParams({
       branchView: "detail",
-      branchId: branch.id
-    });
-  };
+      branchId: branch.id,
+    })
+  }
 
   const handleEdit = (branch: SpBranch) => {
     updateQueryParams({
       branchView: "edit",
-      branchId: branch.id
-    });
-  };
+      branchId: branch.id,
+    })
+  }
 
   const handleAdd = () => {
     updateQueryParams({
       branchView: "add",
-      branchId: null
-    });
-  };
+      branchId: null,
+    })
+  }
 
   const handleBack = () => {
     updateQueryParams({
       branchView: "list",
-      branchId: null
-    });
-  };
+      branchId: null,
+    })
+  }
 
   if (view === "detail" && selectedBranch) {
     return (
@@ -82,7 +89,7 @@ export function SpBranchesTab({ sp }: SpBranchesTabProps) {
         onBack={handleBack}
         onEdit={() => setView("edit")}
       />
-    );
+    )
   }
 
   if (view === "add" || (view === "edit" && selectedBranch)) {
@@ -91,13 +98,14 @@ export function SpBranchesTab({ sp }: SpBranchesTabProps) {
         <SpBranchForm
           spId={sp.id}
           serviceCategories={sp.serviceCategories}
+          mainServices={sp.mainServices}
           portfolio={sp.commissionSchema}
           branch={view === "edit" ? selectedBranch : undefined}
           onSuccess={handleBack}
           onCancel={handleBack}
         />
       </div>
-    );
+    )
   }
 
   // List view
@@ -105,142 +113,163 @@ export function SpBranchesTab({ sp }: SpBranchesTabProps) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-heading font-semibold text-foreground">Branches</h2>
-          <p className="text-body text-subtle">Manage branch locations, services, and local administrators.</p>
+          <h2 className="text-heading font-semibold text-foreground">
+            Branches
+          </h2>
+          <p className="text-body text-subtle">
+            Manage branch locations, services, and local administrators.
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <Button
             onClick={handleAdd}
             variant="secondary"
             size="sm"
-            className="flex items-center gap-2 text-label font-medium rounded-full h-8"
+            className="flex h-8 items-center gap-2 rounded-full text-label font-medium"
           >
             <Plus size={14} weight="bold" /> Add Branch
           </Button>
-          <div className="h-4 w-[1px] bg-border mx-1" />
+          <div className="mx-1 h-4 w-[1px] bg-border" />
           <ViewToggle mode={branchesView} onChange={setBranchesView} />
         </div>
       </div>
-        <DataFilterBar
-          searchQuery={branchSearch}
-          onSearchChange={setBranchSearch}
-          searchPlaceholder="Search branches..."
-          className="mb-6"
-          filters={
-            <FilterItem
-              label="Status"
-              value={statusFilter}
-              onChange={(value) => setStatusFilter(value as BranchStatusFilter)}
-              options={[
-                { label: "All Status", value: "all" },
-                { label: "Active", value: "active" },
-                { label: "Inactive", value: "inactive" },
-              ]}
-            />
-          }
-        />
-
-        {filteredBranches.length === 0 ? (
-          <EmptyState
-            icon={<GitBranch size={32} weight="light" />}
-            title={sp.branches.length === 0 ? "No branches yet" : "No branches match your filters"}
-            description={
-              sp.branches.length === 0
-                ? "Add branches to configure operating hours, administrators, and services at each location."
-                : "Try a different search or clear the status filter."
-            }
-            action={
-              sp.branches.length === 0 ? (
-                <Button onClick={handleAdd} size="sm" className="gap-2">
-                  <Plus size={14} /> Add First Branch
-                </Button>
-              ) : undefined
-            }
-          />
-        ) : branchesView === "grid" ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {filteredBranches.map((branch) => (
-              <SpBranchCard
-                key={branch.id}
-                branch={branch}
-                onView={() => handleView(branch)}
-                onEdit={() => handleEdit(branch)}
-              />
-            ))}
-          </div>
-        ) : (
-          <SharedDataTable
-            data={filteredBranches}
-            freezeFirst
-            freezeLast
-            onRowClick={handleView}
-            columns={[
-              {
-                header: "Branch",
-                accessorKey: "name",
-                sortable: true,
-                render: (branch) => (
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-muted/60 border border-border/60 text-muted-foreground flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary transition-all duration-300">
-                      <GitBranch size={18} weight="fill" />
-                    </div>
-                    <div>
-                      <p className="text-body font-medium text-foreground group-hover:text-primary transition-colors whitespace-nowrap">{branch.name}</p>
-                      <p className="text-label font-medium text-subtle">{branch.isActive ? "Active branch" : "Inactive branch"}</p>
-                    </div>
-                  </div>
-                ),
-              },
-              {
-                header: "Location",
-                render: (branch) => (
-                  <span className="text-body text-subtle whitespace-nowrap">
-                    {branch.address.city}, {branch.address.state}
-                  </span>
-                ),
-              },
-              {
-                header: "Services",
-                render: (branch) => (
-                  <div className="flex flex-wrap gap-1.5">
-                    {branch.services.slice(0, 2).map((service) => (
-                      <Badge key={service.service} variant="secondary">
-                        {service.service}
-                      </Badge>
-                    ))}
-                    {branch.services.length > 2 && (
-                      <Badge variant="outline" className="text-label font-medium">
-                        +{branch.services.length - 2} more
-                      </Badge>
-                    )}
-                  </div>
-                ),
-              },
-              {
-                header: "Status",
-                accessorKey: "isActive",
-                sortable: true,
-                render: (branch) => (
-                  <StatusBadge status={branch.isActive ? "Active" : "Inactive"} variant={branch.isActive ? "emerald" : "zinc"} />
-                ),
-              },
-              {
-                header: "",
-                align: "right",
-                render: (branch) => (
-                  <div onClick={(e) => e.stopPropagation()}>
-                    <ActionPopover
-                      actions={[
-                        { label: "View Details", onClick: () => handleView(branch) },
-                        { label: "Edit Branch", onClick: () => handleEdit(branch) },
-                      ]}
-                    />
-                  </div>
-                ),
-              },
+      <DataFilterBar
+        searchQuery={branchSearch}
+        onSearchChange={setBranchSearch}
+        searchPlaceholder="Search branches..."
+        className="mb-6"
+        filters={
+          <FilterItem
+            label="Status"
+            value={statusFilter}
+            onChange={(value) => setStatusFilter(value as BranchStatusFilter)}
+            options={[
+              { label: "All Status", value: "all" },
+              { label: "Active", value: "active" },
+              { label: "Inactive", value: "inactive" },
             ]}
           />
-        )}
+        }
+      />
+
+      {filteredBranches.length === 0 ? (
+        <EmptyState
+          icon={<GitBranch size={32} weight="light" />}
+          title={
+            sp.branches.length === 0
+              ? "No branches yet"
+              : "No branches match your filters"
+          }
+          description={
+            sp.branches.length === 0
+              ? "Add branches to configure operating hours, administrators, and services at each location."
+              : "Try a different search or clear the status filter."
+          }
+          action={
+            sp.branches.length === 0 ? (
+              <Button onClick={handleAdd} size="sm" className="gap-2">
+                <Plus size={14} /> Add First Branch
+              </Button>
+            ) : undefined
+          }
+        />
+      ) : branchesView === "grid" ? (
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          {filteredBranches.map((branch) => (
+            <SpBranchCard
+              key={branch.id}
+              branch={branch}
+              onView={() => handleView(branch)}
+              onEdit={() => handleEdit(branch)}
+            />
+          ))}
+        </div>
+      ) : (
+        <SharedDataTable
+          data={filteredBranches}
+          freezeFirst
+          freezeLast
+          onRowClick={handleView}
+          columns={[
+            {
+              header: "Branch",
+              accessorKey: "name",
+              sortable: true,
+              render: (branch) => (
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-border/60 bg-muted/60 text-muted-foreground transition-all duration-300 group-hover:bg-primary/10 group-hover:text-primary">
+                    <GitBranch size={18} weight="fill" />
+                  </div>
+                  <div>
+                    <p className="text-body font-medium whitespace-nowrap text-foreground transition-colors group-hover:text-primary">
+                      {branch.name}
+                    </p>
+                    <p className="text-label font-medium text-subtle">
+                      {branch.isActive ? "Active branch" : "Inactive branch"}
+                    </p>
+                  </div>
+                </div>
+              ),
+            },
+            {
+              header: "Location",
+              render: (branch) => (
+                <span className="text-body whitespace-nowrap text-subtle">
+                  {branch.address.city}, {branch.address.state}
+                </span>
+              ),
+            },
+            {
+              header: "Services",
+              render: (branch) => (
+                <div className="flex flex-wrap gap-1.5">
+                  {branch.services.slice(0, 2).map((service) => (
+                    <Badge key={service.service} variant="secondary">
+                      {service.service}
+                    </Badge>
+                  ))}
+                  {branch.services.length > 2 && (
+                    <Badge variant="outline" className="text-label font-medium">
+                      +{branch.services.length - 2} more
+                    </Badge>
+                  )}
+                </div>
+              ),
+            },
+            {
+              header: "Status",
+              accessorKey: "isActive",
+              sortable: true,
+              render: (branch) => (
+                <StatusBadge
+                  status={branch.isActive ? "Active" : "Inactive"}
+                  variant={branch.isActive ? "emerald" : "zinc"}
+                />
+              ),
+            },
+            {
+              header: "",
+              align: "right",
+              render: (branch) => (
+                <div onClick={(e) => e.stopPropagation()}>
+                  <ActionPopover
+                    actions={[
+                      {
+                        label: "View Details",
+                        onClick: () => handleView(branch),
+                      },
+                      {
+                        label: "Edit Branch",
+                        onClick: () => handleEdit(branch),
+                      },
+                    ]}
+                  />
+                </div>
+              ),
+            },
+          ]}
+        />
+      )}
     </div>
-  );
+  )
 }

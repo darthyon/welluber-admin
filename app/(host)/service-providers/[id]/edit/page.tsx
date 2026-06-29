@@ -185,6 +185,16 @@ export default function EditServiceProviderPage() {
     }
   }
 
+  const handleFinalStepSave = async () => {
+    const isValid = await validateStep(3)
+
+    if (!isValid) {
+      return
+    }
+
+    void handleSubmit(onSubmit)()
+  }
+
   const handleServicesChange = (services: string[]) => {
     setSelectedMainServices(services)
     setValue("mainServices", services)
@@ -265,6 +275,9 @@ export default function EditServiceProviderPage() {
                 setCurrentStep((step) => Math.max(1, step - 1) as 1 | 2 | 3)
               }
               onNext={goNext}
+              onSave={() => {
+                void handleFinalStepSave()
+              }}
               saveLabel="Save Changes"
               totalSteps={3}
             />

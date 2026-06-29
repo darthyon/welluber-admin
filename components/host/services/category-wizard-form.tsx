@@ -1,7 +1,6 @@
 "use client"
 
 import { useId, useState } from "react"
-import { useRouter } from "next/navigation"
 import { Plus, Trash, X, Check } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -71,7 +70,6 @@ export function CategoryWizardForm({
   validateCategoryName,
   onSave,
 }: CategoryWizardFormProps) {
-  const router = useRouter()
   const uid = useId()
   const [currentStep, setCurrentStep] = useState<1 | 2>(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -87,6 +85,7 @@ export function CategoryWizardForm({
     initialCategory?.color ?? ""
   )
   const [nameError, setNameError] = useState("")
+  const [servicesError, setServicesError] = useState("")
 
   const [services, setServices] = useState<ServiceItem[]>(() =>
     buildInitialServices(initialCategory, initialSpecs)
@@ -106,6 +105,9 @@ export function CategoryWizardForm({
   }
 
   const updateService = (localId: string, updates: Partial<ServiceItem>) => {
+    if (servicesError) {
+      setServicesError("")
+    }
     setServices((prev) =>
       prev.map((s) => (s.localId === localId ? { ...s, ...updates } : s))
     )
@@ -178,9 +180,25 @@ export function CategoryWizardForm({
     }
   }
 
+  const validateServicesStep = () => {
+    const hasCompletedService = services.some((service) => service.name.trim())
+
+    if (!hasCompletedService) {
+      setServicesError("Add at least one main service before saving.")
+      return false
+    }
+
+    setServicesError("")
+    return true
+  }
+
   const handleSave = () => {
     if (!validateDetailsStep()) {
       setCurrentStep(1)
+      return
+    }
+
+    if (!validateServicesStep()) {
       return
     }
 
@@ -473,6 +491,9 @@ export function CategoryWizardForm({
                     </div>
                   </div>
                 ))}
+                {servicesError && (
+                  <p className="text-label text-destructive">{servicesError}</p>
+                )}
               </div>
             )}
           </div>
@@ -486,6 +507,7 @@ export function CategoryWizardForm({
         isSubmitting={isSubmitting}
         onBack={() => setCurrentStep(1)}
         onNext={goNext}
+        onSave={handleSave}
         saveLabel="Save Category"
         totalSteps={2}
       />

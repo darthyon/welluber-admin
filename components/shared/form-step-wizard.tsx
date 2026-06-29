@@ -85,6 +85,7 @@ interface WizardActionBarProps<TStep extends number = number> {
   isSubmitting: boolean
   onBack: () => void
   onNext: () => void
+  onSave?: () => void
   saveLabel: string
   totalSteps: number
 }
@@ -96,6 +97,7 @@ export function WizardActionBar<TStep extends number = number>({
   isSubmitting,
   onBack,
   onNext,
+  onSave,
   saveLabel,
   totalSteps,
 }: WizardActionBarProps<TStep>) {
@@ -121,7 +123,8 @@ export function WizardActionBar<TStep extends number = number>({
 
           {isLastStep ? (
             <Button
-              type="submit"
+              type={onSave ? "button" : "submit"}
+              onClick={onSave}
               disabled={isSubmitting}
               size="lg"
               className="flex items-center gap-2 px-8 text-body font-semibold"

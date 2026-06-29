@@ -72,6 +72,7 @@ const STEP_FIELDS: Record<1 | 2 | 3, SpBranchFieldPath[]> = {
 interface SpBranchFormProps {
   spId: string
   serviceCategories: string[] // SP-level categories for grouping
+  mainServices: string[] // SP-level selected main services
   portfolio: CommissionSchemaRow[] // The defined service portfolio
   branch?: SpBranch // if editing
   onSuccess: () => void
@@ -81,6 +82,7 @@ interface SpBranchFormProps {
 export function SpBranchForm({
   spId,
   serviceCategories,
+  mainServices,
   portfolio,
   branch,
   onSuccess,
@@ -92,7 +94,6 @@ export function SpBranchForm({
   const [benefits, setBenefits] = useState<string[]>(branch?.benefits ?? [])
   const [benefitInput, setBenefitInput] = useState("")
   const [, setHasAdminChanges] = useState(false)
-  const [, setCustomServiceInputs] = useState<Record<string, string>>({})
 
   const {
     register,
@@ -191,7 +192,8 @@ export function SpBranchForm({
 
   const serviceCatalog = useMemo(() => {
     const fullCatalog = buildBranchServiceCatalog(serviceCategories)
-    const portfolioServiceNames = portfolio.map((r) => r.mainService)
+    const portfolioServiceNames =
+      portfolio.length > 0 ? portfolio.map((r) => r.mainService) : mainServices
 
     // Filter the catalog to only include Main Services in the portfolio
     return fullCatalog
@@ -202,7 +204,7 @@ export function SpBranchForm({
         ),
       }))
       .filter((category) => category.services.length > 0)
-  }, [serviceCategories, portfolio])
+  }, [mainServices, portfolio, serviceCategories])
 
   const onSubmit = async (data: z.input<typeof createBranchSchema>) => {
     // Determine if admins changed or were added
@@ -271,6 +273,31 @@ export function SpBranchForm({
     if (isValid && currentStep < 3) {
       setCurrentStep((step) => (step + 1) as 1 | 2 | 3)
     }
+  }
+
+  const updateSelectedServices = (
+    nextServices: z.input<typeof createBranchSchema>["services"]
+  ) => {
+    setValue("services", nextServices, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    })
+  }
+
+  const handleFinalStepSave = async () => {
+    const isValid = await validateStep(3)
+
+    if (!isValid) {
+      return
+    }
+
+    void handleSubmit(onSubmit, (errors) => {
+      const errorFields = Object.keys(errors)
+      toast.error(
+        `Form incomplete: Missing or invalid data in ${errorFields.join(", ")}.`
+      )
+    })()
   }
 
   const inputCls = (hasError?: boolean) =>
@@ -512,24 +539,33 @@ export function SpBranchForm({
                   <div className="space-y-6">
                     <div className="space-y-8">
                       {serviceCatalog.map((group) => (
-                        <div key={group.category} className="space-y-3">
+                        <div
+                          key={group.category}
+                          className="space-y-3 rounded-lg border border-border bg-muted/10 p-4"
+                        >
                           <div className="flex items-center justify-between px-1">
-                            <h4 className="text-label font-semibold tracking-wider text-muted-foreground uppercase">
+                            <h4 className="text-label font-semibold text-muted-foreground">
                               {group.category}
                             </h4>
-                            <span className="rounded-full bg-muted px-2 py-0.5 text-micro font-medium text-muted-foreground">
-                              {
-                                group.services.filter((s) =>
-                                  selectedServices.some(
-                                    (ls) => ls.service === s.name
-                                  )
-                                ).length
-                              }{" "}
-                              Main Services
+                            <span className="rounded-4xl border border-border bg-background px-2 py-0.5 text-micro font-medium text-muted-foreground">
+                              {(() => {
+                                const selectedMainServiceCount =
+                                  group.services.filter((service) =>
+                                    selectedServices.some(
+                                      (line) => line.service === service.name
+                                    )
+                                  ).length
+
+                                return `${selectedMainServiceCount} ${
+                                  selectedMainServiceCount === 1
+                                    ? "Main Service"
+                                    : "Main Services"
+                                }`
+                              })()}
                             </span>
                           </div>
 
-                          <div className="space-y-2 pt-1">
+                          <div className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-card">
                             {group.services.map((service) => {
                               const line = selectedServices.find(
                                 (ls) => ls.service === service.name
@@ -543,14 +579,13 @@ export function SpBranchForm({
                                   isSelected={isSelected}
                                   onToggle={(checked) => {
                                     if (!checked) {
-                                      setValue(
-                                        "services",
+                                      updateSelectedServices(
                                         selectedServices.filter(
                                           (ls) => ls.service !== service.name
                                         )
                                       )
                                     } else {
-                                      setValue("services", [
+                                      updateSelectedServices([
                                         ...selectedServices,
                                         {
                                           service: service.name,
@@ -561,50 +596,24 @@ export function SpBranchForm({
                                   }}
                                   selectedSubServices={line?.subServices || []}
                                   masterlistSubServices={service.subServices}
-                                  onAddSubService={(val) => {
-                                    if (
-                                      line &&
-                                      !line.subServices.includes(val)
-                                    ) {
-                                      setValue(
-                                        "services",
-                                        selectedServices.map((ls) =>
-                                          ls.service === service.name
-                                            ? {
-                                                ...ls,
-                                                subServices: [
-                                                  ...ls.subServices,
-                                                  val,
-                                                ],
-                                              }
-                                            : ls
-                                        )
-                                      )
-                                      setCustomServiceInputs((prev) => ({
-                                        ...prev,
-                                        [service.name]: "",
-                                      }))
+                                  onSelectedSubServicesChange={(
+                                    nextSubServices
+                                  ) => {
+                                    if (!line) {
+                                      return
                                     }
-                                  }}
-                                  onRemoveSubService={(val) => {
-                                    if (line) {
-                                      setValue(
-                                        "services",
-                                        selectedServices.map((ls) =>
-                                          ls.service === service.name
-                                            ? {
-                                                ...ls,
-                                                subServices:
-                                                  ls.subServices.filter(
-                                                    (s) => s !== val
-                                                  ),
-                                              }
-                                            : ls
-                                        )
+
+                                    updateSelectedServices(
+                                      selectedServices.map((ls) =>
+                                        ls.service === service.name
+                                          ? {
+                                              ...ls,
+                                              subServices: nextSubServices,
+                                            }
+                                          : ls
                                       )
-                                    }
+                                    )
                                   }}
-                                  placeholder={`Add custom ${service.name} sub-service...`}
                                 />
                               )
                             })}
@@ -644,6 +653,9 @@ export function SpBranchForm({
           setCurrentStep((step) => Math.max(1, step - 1) as 1 | 2 | 3)
         }
         onNext={goNext}
+        onSave={() => {
+          void handleFinalStepSave()
+        }}
         saveLabel="Save Branch"
         totalSteps={3}
       />

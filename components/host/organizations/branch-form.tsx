@@ -41,6 +41,12 @@ interface BranchFormProps {
   onSubmit: (data: BranchFormData) => void
 }
 
+interface ConfigurationErrors {
+  accountName?: string
+  creditLimit?: string
+  existingAccountId?: string
+}
+
 const BRANCH_WIZARD_STEPS = [
   { id: 1, label: "Details" },
   { id: 2, label: "Configuration" },
@@ -70,6 +76,8 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
   const [accountName, setAccountName] = useState("")
   const [creditLimit, setCreditLimit] = useState("")
   const [existingAccountId, setExistingAccountId] = useState("")
+  const [configurationErrors, setConfigurationErrors] =
+    useState<ConfigurationErrors>({})
 
   const defaultValues: BranchFormData = {
     name: branchId
@@ -121,7 +129,34 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
     }
   }
 
+  const validateConfigurationStep = () => {
+    const nextErrors: ConfigurationErrors = {}
+
+    if (accountType === "new") {
+      if (!accountName.trim()) {
+        nextErrors.accountName = "Enter an account name."
+      }
+
+      if (!creditLimit.trim()) {
+        nextErrors.creditLimit = "Enter a credit limit."
+      } else if (Number.isNaN(Number(creditLimit)) || Number(creditLimit) < 0) {
+        nextErrors.creditLimit = "Enter a valid non-negative credit limit."
+      }
+    }
+
+    if (accountType === "existing" && !existingAccountId) {
+      nextErrors.existingAccountId = "Select an existing account."
+    }
+
+    setConfigurationErrors(nextErrors)
+    return Object.keys(nextErrors).length === 0
+  }
+
   const onFormSubmit = async (data: BranchFormData) => {
+    if (!validateConfigurationStep()) {
+      return
+    }
+
     setIsSubmitting(true)
     await new Promise((resolve) => setTimeout(resolve, 1500))
     setIsSubmitting(false)
@@ -130,6 +165,14 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
     setTimeout(() => {
       onSubmit(data)
     }, 2500)
+  }
+
+  const handleFinalStepSave = () => {
+    if (!validateConfigurationStep()) {
+      return
+    }
+
+    void handleSubmit(onFormSubmit)()
   }
 
   if (isSuccess) {
@@ -356,14 +399,20 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
                     title="New Account"
                     description="Create a dedicated standalone account for this branch. Funds are isolated."
                     selected={accountType === "new"}
-                    onSelect={() => setAccountType("new")}
+                    onSelect={() => {
+                      setAccountType("new")
+                      setConfigurationErrors({})
+                    }}
                     icon={Wallet}
                   />
                   <ChoiceCard
                     title="Existing Account"
                     description="Link this branch to an existing account (e.g. Shared with HQ or another cluster)."
                     selected={accountType === "existing"}
-                    onSelect={() => setAccountType("existing")}
+                    onSelect={() => {
+                      setAccountType("existing")
+                      setConfigurationErrors({})
+                    }}
                     icon={IdentificationCard}
                   />
                 </div>
@@ -377,10 +426,23 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
                         </label>
                         <input
                           value={accountName}
-                          onChange={(e) => setAccountName(e.target.value)}
+                          onChange={(e) => {
+                            setAccountName(e.target.value)
+                            if (configurationErrors.accountName) {
+                              setConfigurationErrors((prev) => ({
+                                ...prev,
+                                accountName: undefined,
+                              }))
+                            }
+                          }}
                           placeholder="e.g. PJ Ops Account"
                           className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-body font-semibold text-foreground transition-all outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
                         />
+                        {configurationErrors.accountName && (
+                          <p className="text-label text-destructive">
+                            {configurationErrors.accountName}
+                          </p>
+                        )}
                       </div>
 
                       <div className="space-y-1.5">
@@ -390,10 +452,23 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
                         <input
                           type="number"
                           value={creditLimit}
-                          onChange={(e) => setCreditLimit(e.target.value)}
+                          onChange={(e) => {
+                            setCreditLimit(e.target.value)
+                            if (configurationErrors.creditLimit) {
+                              setConfigurationErrors((prev) => ({
+                                ...prev,
+                                creditLimit: undefined,
+                              }))
+                            }
+                          }}
                           placeholder="0.00"
                           className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-body font-semibold text-foreground transition-all outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
                         />
+                        {configurationErrors.creditLimit && (
+                          <p className="text-label text-destructive">
+                            {configurationErrors.creditLimit}
+                          </p>
+                        )}
                         <p className="text-label font-medium text-faint">
                           Max overdraft this branch may use beyond its balance.
                         </p>
@@ -423,7 +498,15 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
                       </label>
                       <FormSelect
                         value={existingAccountId}
-                        onChange={(value) => setExistingAccountId(value)}
+                        onChange={(value) => {
+                          setExistingAccountId(value)
+                          if (configurationErrors.existingAccountId) {
+                            setConfigurationErrors((prev) => ({
+                              ...prev,
+                              existingAccountId: undefined,
+                            }))
+                          }
+                        }}
                         options={[
                           { label: "Select an account...", value: "" },
                           ...MOCK_ACCOUNTS.map((acc) => ({
@@ -433,6 +516,11 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
                         ]}
                         placeholder="Select an account..."
                       />
+                      {configurationErrors.existingAccountId && (
+                        <p className="text-label text-destructive">
+                          {configurationErrors.existingAccountId}
+                        </p>
+                      )}
                       <p className="mt-1.5 text-label font-medium text-faint italic">
                         * This branch will consume funds from the selected
                         centralized liquidity pool.
@@ -481,6 +569,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
         isSubmitting={isSubmitting}
         onBack={() => setCurrentStep(1)}
         onNext={goNext}
+        onSave={handleFinalStepSave}
         saveLabel="Save Changes"
         totalSteps={2}
       />
