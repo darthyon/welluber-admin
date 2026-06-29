@@ -9,7 +9,10 @@ import { Badge } from "@/components/ui/badge"
 import { useOrgWorkforce } from "@/hooks/use-org-workforce"
 import type { EntitlementPoolType } from "@/lib/mock-data/factories/entitlement"
 
-const POOL_BADGE: Record<EntitlementPoolType, { label: string; className: string }> = {
+const POOL_BADGE: Record<
+  EntitlementPoolType,
+  { label: string; className: string }
+> = {
   SharedWithEmployee: {
     label: "Combined",
     className:
@@ -22,8 +25,7 @@ const POOL_BADGE: Record<EntitlementPoolType, { label: string; className: string
   },
   Individual: {
     label: "Dedicated",
-    className:
-      "border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-800 dark:bg-sky-950 dark:text-sky-300",
+    className: "border-primary/20 bg-primary/10 text-primary",
   },
 }
 
@@ -115,7 +117,10 @@ export function EntitlementsSubTab({ orgId }: EntitlementsSubTabProps) {
             render: (ent) => {
               const { label, className } = POOL_BADGE[ent.poolType]
               return (
-                <Badge variant="outline" className={`text-label font-medium ${className}`}>
+                <Badge
+                  variant="outline"
+                  className={`text-label font-medium ${className}`}
+                >
                   {label}
                 </Badge>
               )
