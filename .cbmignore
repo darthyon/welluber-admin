@@ -1,0 +1,15 @@
+node_modules/
+.pnpm-store/
+.next/
+dist/
+build/
+out/
+coverage/
+.vercel/
+.cache/
+*.log
+*.map
+.DS_Store
+.env
+.env.*
+.claude/

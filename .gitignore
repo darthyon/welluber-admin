@@ -48,6 +48,9 @@ next-env.d.ts
 # claude local
 .claude/
 
+# codebase memory
+.codebase-memory/
+
 # graphify — commit GRAPH_REPORT.md, graph.json, cost.json; ignore the rest
 graphify-out/graph.html
 graphify-out/manifest.json

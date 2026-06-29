@@ -175,49 +175,33 @@ Before every PR or agent session output, verify:
 
 ---
 
-## 9. Knowledge Graph
+## 9. Codebase Memory Scout Workflow
 
-A live knowledge graph of this codebase lives in `graphify-out/`.
+Use `codebase-memory-mcp` first for structural repo discovery: locating files,
+components, routes, hooks, stores, utilities, data sources, callers,
+dependencies, impact, architecture, and the smallest safe patch scope.
 
-**Before analyzing structure, imports, dependencies, or component relationships — query the graph first.**
-It is faster and more accurate than reading files cold.
+Default workflow:
+1. Scout with `codebase-memory-mcp`.
+2. Return the MCP tool/query used, smallest relevant file set, why each file matters, and a minimal patch plan.
+3. Wait for approval before editing.
+4. Read only the relevant snippets from approved files.
+5. Patch only the approved scope.
+6. Run targeted verification.
+7. Summarize changed files, diff intent, and verification result.
 
-### Quick reference
-- `graphify-out/GRAPH_REPORT.md` — god nodes, community map, surprising connections
-- `graphify-out/graph.json` — raw graph data (nodes, edges, communities)
+Fallback rules:
+- If MCP is unavailable, say so before using `grep`, `rg`, `find`, or file reads.
+- If the repo is not indexed, ask to index or use the CLI/index tool before falling back.
+- If MCP results are irrelevant, incomplete, or stale, explain why and then use targeted rg or file reads.
+- For exact string searches, CSS classes, copy text, config keys, error messages, or build logs, targeted rg is allowed after stating why MCP is not the right tool.
 
-### God nodes (highest connectivity — touch carefully)
-
-| Node | Edges | Location |
-|------|-------|----------|
-| `cn()` | 300 | `lib/utils.ts` |
-| `Button` | 89 | `components/ui/button.tsx` |
-| `OrganizationDetailContent` | 47 | `app/(host)/organizations/[id]/page.tsx` |
-| `StatusBadge` | 41 | `components/shared/status-badge.tsx` |
-| `ActionPopover` | 33 | `components/shared/action-popover.tsx` |
-| `BenefitPolicyWizard` | 23 | `components/host/policies/benefit-policy-wizard.tsx` |
-
-### How to query
-```bash
-graphify query "how does BenefitPolicyWizard relate to org context?"
-graphify query "what components consume StatusBadge?"
-graphify path "EmployeeForm" "BenefitPolicy"
-graphify explain "OrganizationDetailContent"
-```
-
-### Key findings
-- `OrganizationDetailContent` is a god component — branch, employee, policy, accounts, vouchers, manual topup, and audit log all wire through it. Candidate for splitting.
-- `ClaimStatus` is shared between claims and voucher redemptions — changes ripple both domains.
-- `POLICY_SERVICE_CATALOG` derives from `MASTER_SERVICE_TAXONOMY` (provider domain). Policy coverage options are downstream of SP taxonomy — not a separate config.
-- `BenefitPolicyWizard` is entered from two paths: standalone `/policies/new` and org-scoped `/organizations/[id]/policies/new`. Draft state persists via `usePolicyDraft`.
-
-### Keeping it current
-After adding or significantly modifying files, run:
-```bash
-/graphify --update   # incremental re-extraction, skips unchanged files
-```
-
----
+Hard rules:
+- Do not edit during scouting.
+- Do not read broad files unless MCP is insufficient.
+- Do not paste full files in responses.
+- Do not refactor unrelated code or make "while I'm here" changes.
+- Never rely on MCP alone for final proof; inspect relevant snippets and run targeted verification when applicable.
 
 *Last updated: 2026-05-18*
 *Primary source: `docs/design.md` (reconciled with `app/globals.css`)*
