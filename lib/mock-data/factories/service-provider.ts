@@ -168,6 +168,94 @@ export function createServiceProvider(index: number): ServiceProvider {
           operatingHours: DEFAULT_HOURS,
           benefits: ["Changing Room", "Shower", "Locker", "Free WiFi"],
         },
+        {
+          id: "SPB-002",
+          spId: "SP-20260101-0001",
+          name: "Zenith Bangsar",
+          services: [
+            {
+              service: "Yoga",
+              subServices: ["Yin Yoga", "Power Yoga", "Breathwork"],
+            },
+          ],
+          address: {
+            line: "G-05, Bangsar Village II",
+            city: "Kuala Lumpur",
+            state: "Wilayah Persekutuan",
+            country: "Malaysia",
+            postalCode: "59000",
+            lat: 3.1301,
+            lon: 101.6726,
+          },
+          contacts: [
+            {
+              name: "Siti Nabilah",
+              email: "nabilah@zenithyoga.my",
+              type: "branch_manager",
+              phone: "+60123456789",
+              isPublic: true,
+            },
+          ],
+          administrators: [
+            {
+              id: "SPA-BGS-001",
+              name: "Siti Nabilah",
+              email: "nabilah@zenithyoga.my",
+              role: "Branch Manager",
+              designateAsPic: true,
+            },
+          ],
+          booking: {
+            channels: ["email", "phone"],
+            whatsapp: { phoneNumber: "" },
+            email: { email: "bangsar@zenithyoga.my" },
+            phone: { phoneNumber: "+60323456789" },
+            link: { url: "" },
+          },
+          isActive: true,
+          operatingHours: DEFAULT_HOURS,
+          benefits: ["Changing Room", "Shower", "Free WiFi", "Cafe"],
+        },
+        {
+          id: "SPB-005",
+          spId: "SP-20260101-0001",
+          name: "Zenith Mont Kiara",
+          services: [
+            {
+              service: "Yoga",
+              subServices: ["Aerial Yoga", "Hot Yoga", "Pilates"],
+            },
+          ],
+          address: {
+            line: "B-2-5, Solaris Mont Kiara",
+            city: "Kuala Lumpur",
+            state: "Wilayah Persekutuan",
+            country: "Malaysia",
+            postalCode: "50480",
+            lat: 3.1719,
+            lon: 101.6502,
+          },
+          contacts: [
+            {
+              name: "Kevin Loh",
+              email: "kevin@zenithyoga.my",
+              type: "reception",
+              phone: "+60198887766",
+              isPublic: false,
+            },
+          ],
+          administrators: [],
+          booking: {
+            channels: [],
+            whatsapp: { phoneNumber: "" },
+            email: { email: "" },
+            phone: { phoneNumber: "" },
+            link: { url: "" },
+          },
+          isActive: true,
+          operatingHours: DEFAULT_HOURS,
+          benefits: ["Heated Studio", "Changing Room", "Shower", "Parking"],
+        },
       ],
       vouchers: [
         {

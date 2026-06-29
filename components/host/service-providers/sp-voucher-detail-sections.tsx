@@ -3,19 +3,9 @@
 import { ListBullets, PencilSimpleLine, Ticket } from "@phosphor-icons/react";
 import { BackButton } from "@/components/shared/back-button";
 import { EntityHeader } from "@/components/shared/entity-header";
-import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { SpVoucher, SpVoucherStatus } from "@/types/provider";
-
-export const SP_VOUCHER_ANCHOR_ITEMS = [
-  { id: "voucher-details", label: "Voucher Details" },
-  { id: "commercials", label: "Commercials" },
-  { id: "service-lines", label: "Service Line Items" },
-  { id: "lifecycle", label: "Lifecycle & Validity" },
-  { id: "branch-assignment", label: "Branch Assignment" },
-  { id: "booking", label: "Booking & Display" },
-];
 
 export const SP_VOUCHER_STATUS_VARIANT: Record<SpVoucherStatus, "emerald" | "zinc" | "rose"> = {
   draft: "zinc",
@@ -44,17 +34,10 @@ export function SpVoucherDetailHeader({ onBack, onEdit, voucher }: { onBack: () 
   );
 }
 
-export function SpVoucherDetailSidebar() {
-  return (
-    <aside className="sticky top-20 hidden w-52 shrink-0 self-start xl:block">
-      <FloatingAnchorNav items={SP_VOUCHER_ANCHOR_ITEMS} />
-    </aside>
-  );
-}
 
 export function SpVoucherServiceLinesSection({ customServices, groups }: { customServices: string[]; groups: Array<{ category: string; services: Array<{ name: string; subServices: string[] }> }>; }) {
   return (
-    <div id="service-lines" className="scroll-mt-32 overflow-hidden rounded-lg border border-border bg-card shadow-sm">
+    <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
       <div className="space-y-6 p-6">
         <div className="flex items-center gap-2 pb-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary"><ListBullets size={16} weight="fill" /></div>

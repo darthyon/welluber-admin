@@ -9,7 +9,6 @@ import {
   Ticket,
   Buildings,
   MapPin,
-  CheckCircle,
 } from "@phosphor-icons/react"
 import { cn, getCurrencyLabel } from "@/lib/utils"
 import { Switch } from "@/components/shared/switch"
@@ -22,28 +21,24 @@ import {
 import { ChoiceCard } from "@/components/shared/choice-card"
 import { SuccessCelebration } from "@/components/shared/success-celebration"
 import { CustomMultiSelect } from "@/components/shared/custom-multi-select"
-import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav"
-import { StatusBadge } from "@/components/shared/status-badge"
 import { toast } from "sonner"
-import type {
-  SpBranchBookingChannel,
-  SpBranchBookingSettings,
-  SpVoucher,
-} from "@/types/provider"
+import type { SpBranchBookingSettings, SpVoucher } from "@/types/provider"
 import {
-  VoucherFormActionBar,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import {
   VoucherFormHeader,
+  VoucherStepIndicator,
+  VoucherWizardActionBar,
 } from "@/components/host/service-providers/sp-voucher-form-frame"
 import {
   VoucherConfigurationSection,
   VoucherManageServicesSection,
 } from "@/components/host/service-providers/sp-voucher-form-sections"
-
-const ANCHOR_ITEMS = [
-  { id: "details", label: "Details" },
-  { id: "voucher-configuration", label: "Voucher Configuration" },
-  { id: "manage-services", label: "Manage Services" },
-]
 
 interface SpVoucherFormProps {
   spId: string
@@ -59,12 +54,12 @@ interface SpVoucherFormProps {
   onCancel: () => void
 }
 
-const BOOKING_CHANNEL_LABELS: Record<SpBranchBookingChannel, string> = {
+const BOOKING_CHANNEL_LABELS = {
   whatsapp: "WhatsApp",
   email: "Email",
   phone: "Phone Number",
   booking_website: "Booking Website",
-}
+} as const
 
 function toDateTimeLocalValue(value: string | null | undefined): string {
   if (!value) return ""
@@ -99,6 +94,7 @@ export function SpVoucherForm({
   onCancel,
 }: SpVoucherFormProps) {
   const isEditing = !!voucher
+  const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isPublishing, setIsPublishing] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
@@ -110,6 +106,7 @@ export function SpVoucherForm({
     control,
     setValue,
     watch,
+    trigger,
     formState: { errors, isSubmitting: formIsSubmitting },
   } = useForm<z.input<typeof createVoucherSchema>>({
     resolver: zodResolver(createVoucherSchema),
@@ -166,21 +163,6 @@ export function SpVoucherForm({
           ),
     [branchScope, selectedBranchIds, spBranches]
   )
-  const branchesWithoutBooking = useMemo(
-    () =>
-      applicableBranches.filter(
-        (branch) => (branch.booking.channels?.length ?? 0) === 0
-      ),
-    [applicableBranches]
-  )
-  const bookingSummary = useMemo(() => {
-    return applicableBranches.map((branch) => ({
-      id: branch.id,
-      name: branch.name,
-      channels: branch.booking.channels ?? [],
-    }))
-  }, [applicableBranches])
-
   // Subtotal = sum of each service's price. One overall discount (amount or %)
   // is applied to the subtotal to give the Final Price, rounded to a whole number.
   const serviceLinesWatch = useWatch({ control, name: "serviceLines" })
@@ -208,30 +190,29 @@ export function SpVoucherForm({
     setValue("finalPrice", finalPrice)
   }, [subtotal, finalPrice, setValue])
 
+  const STEP_FIELDS: Record<1 | 2 | 3, string[]> = {
+    1: ["name", "branchScope", "branchIds"],
+    2: [
+      "activationPeriod.startDate",
+      "activationPeriod.endDate",
+      "expiryMode",
+      "expiryDays",
+      "expiryDate",
+    ],
+    3: ["serviceLines"],
+  }
+
+  const goNext = async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const valid = await trigger(STEP_FIELDS[currentStep] as any)
+    if (valid) setCurrentStep((s) => (s + 1) as 1 | 2 | 3)
+  }
+
+  const goPrev = () => setCurrentStep((s) => (s - 1) as 1 | 2 | 3)
+
   const onSave = async (data: z.input<typeof createVoucherSchema>) => {
     setIsSubmitting(true)
     try {
-      if (data.bookingRequired) {
-        const targetBranches =
-          data.branchScope === "all"
-            ? spBranches
-            : spBranches.filter((branch) =>
-                (data.branchIds ?? []).includes(branch.id)
-              )
-
-        const missingBooking = targetBranches.filter(
-          (branch) => (branch.booking.channels?.length ?? 0) === 0
-        )
-
-        if (missingBooking.length > 0) {
-          throw new Error(
-            `Booking settings are missing for: ${missingBooking
-              .map((branch) => branch.name)
-              .join(", ")}`
-          )
-        }
-      }
-
       const payload = createVoucherSchema.parse(data)
       const res = isEditing
         ? await updateVoucher(spId, voucher!.id, payload)
@@ -286,149 +267,189 @@ export function SpVoucherForm({
     >
       <VoucherFormHeader isEditing={isEditing} onCancel={onCancel} />
 
-      <div className="relative flex flex-col items-start gap-8 xl:flex-row">
-        {/* Left Column: Jump-to-section Navigation */}
-        <aside className="sticky top-20 hidden w-52 shrink-0 self-start xl:block">
-          <FloatingAnchorNav items={ANCHOR_ITEMS} />
-        </aside>
+      <VoucherStepIndicator currentStep={currentStep} onStepClick={setCurrentStep} />
 
-        {/* Right Column: Form Sections */}
-        <div className="flex-1">
-          <div className="flex flex-col gap-6">
-            {/* Details */}
-            <div
-              id="details"
-              className="scroll-mt-32 overflow-hidden rounded-lg border border-border bg-card shadow-sm"
-            >
-              <div className="space-y-6 p-6">
-                <div className="flex items-center gap-2 pb-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
-                    <Ticket size={16} weight="fill" />
-                  </div>
-                  <h3 className="text-lead font-semibold text-foreground">
-                    Details
-                  </h3>
+      <div className="min-w-0">
+        {/* Step 1 — Details */}
+        {currentStep === 1 && (
+          <div className="animate-in fade-in slide-in-from-right-4 overflow-hidden rounded-lg border border-border bg-card shadow-sm duration-300">
+            <div className="space-y-6 p-6">
+              <div className="flex items-center gap-2 pb-2">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <Ticket size={16} weight="fill" />
                 </div>
+                <h3 className="text-lead font-semibold text-foreground">
+                  Details
+                </h3>
+              </div>
 
-                <div className="space-y-5">
-                  {/* Branch — chosen first; its account wallet sets the currency that scopes line-item pricing. */}
-                  <div className="space-y-3">
-                    <label className="text-body font-medium text-foreground">
-                      Branch Assignment
-                    </label>
-                    <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                      <ChoiceCard
-                        title="All Branches"
-                        description=""
-                        icon={Buildings}
-                        selected={branchScope === "all"}
-                        onSelect={() => {
-                          setValue("branchScope", "all")
-                          setValue("branchIds", [])
-                        }}
-                        className="p-3"
-                      />
-                      <ChoiceCard
-                        title="Specific Branches"
-                        description=""
-                        icon={MapPin}
-                        selected={branchScope === "specific"}
-                        onSelect={() => setValue("branchScope", "specific")}
-                        className="p-3"
-                      />
-                    </div>
-                    {branchScope === "specific" && (
-                      <div className="animate-in space-y-2 duration-300 fade-in slide-in-from-top-2">
-                        <label className="text-label font-medium text-subtle">
-                          Select Branches
-                        </label>
-                        <CustomMultiSelect
-                          options={spBranches.map((branch) => ({
-                            value: branch.id,
-                            label: `${branch.name} · ${getCurrencyLabel(
-                              branch.currency
-                            )}`,
-                            description:
-                              "Voucher pricing follows this branch currency",
-                          }))}
-                          selected={watch("branchIds") ?? []}
-                          onChange={(branchIds) =>
-                            setValue("branchIds", branchIds)
-                          }
-                          placeholder="Search branches..."
-                          allowCustom={false}
-                        />
-                        {errors.branchIds && (
-                          <p className="mt-1 flex items-center gap-1 text-label text-destructive">
-                            <WarningCircle size={12} />{" "}
-                            {errors.branchIds.message}
-                          </p>
-                        )}
-                      </div>
-                    )}
+              <div className="space-y-5">
+                {/* Branch — chosen first; its account wallet sets the currency that scopes line-item pricing. */}
+                <div className="space-y-3">
+                  <label className="text-body font-medium text-foreground">
+                    Branch Assignment
+                  </label>
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                    <ChoiceCard
+                      title="All Branches"
+                      description=""
+                      icon={Buildings}
+                      selected={branchScope === "all"}
+                      onSelect={() => {
+                        setValue("branchScope", "all")
+                        setValue("branchIds", [])
+                      }}
+                      className="p-3"
+                    />
+                    <ChoiceCard
+                      title="Specific Branches"
+                      description=""
+                      icon={MapPin}
+                      selected={branchScope === "specific"}
+                      onSelect={() => setValue("branchScope", "specific")}
+                      className="p-3"
+                    />
                   </div>
-
-                  {isEditing && (
-                    <div className="space-y-1.5">
-                      <label className="text-body font-medium text-foreground">
-                        Package ID
+                  {branchScope === "specific" && (
+                    <div className="animate-in space-y-2 duration-300 fade-in slide-in-from-top-2">
+                      <label className="text-label font-medium text-subtle">
+                        Select Branches
                       </label>
-                      <div className="w-full cursor-not-allowed rounded-md border border-border bg-muted/10 px-3 py-2 font-mono text-body text-faint">
-                        {voucher?.code}
-                      </div>
-                      <p className="text-label text-faint italic">
-                        Auto-generated format. Cannot be changed.
-                      </p>
+                      <CustomMultiSelect
+                        options={spBranches.map((branch) => ({
+                          value: branch.id,
+                          label: `${branch.name} · ${getCurrencyLabel(branch.currency)}`,
+                          description: "Voucher pricing follows this branch currency",
+                        }))}
+                        selected={watch("branchIds") ?? []}
+                        onChange={(branchIds) => setValue("branchIds", branchIds)}
+                        placeholder="Search branches..."
+                        allowCustom={false}
+                      />
+                      {errors.branchIds && (
+                        <p className="mt-1 flex items-center gap-1 text-label text-destructive">
+                          <WarningCircle size={12} /> {errors.branchIds.message}
+                        </p>
+                      )}
                     </div>
                   )}
+                </div>
 
+                {isEditing && (
                   <div className="space-y-1.5">
                     <label className="text-body font-medium text-foreground">
-                      Voucher Name <span className="text-destructive">*</span>
+                      Package ID
                     </label>
-                    <input
-                      {...register("name")}
-                      className={cn(
-                        "w-full rounded-md border bg-background px-3 py-2 text-body transition-colors outline-none",
-                        errors.name
-                          ? "border-destructive ring-1 ring-destructive/20"
-                          : "border-border focus:border-foreground/30 focus:bg-muted/30"
-                      )}
-                      placeholder="e.g. Monthly Yoga Pass"
-                    />
-                    {errors.name && (
-                      <p className="mt-1 flex items-center gap-1 text-label text-destructive">
-                        <WarningCircle size={12} /> {errors.name.message}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-body font-medium text-foreground">
-                      Description
-                    </label>
-                    <textarea
-                      {...register("description")}
-                      rows={4}
-                      className={cn(
-                        "w-full resize-none rounded-md border bg-background px-3 py-2 text-body transition-colors outline-none",
-                        "border-border focus:border-foreground/30 focus:bg-muted/30"
-                      )}
-                      placeholder="Detailed breakdown of what's included..."
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between rounded-lg border border-primary/10 bg-primary/5 p-4">
-                    <div className="space-y-0.5">
-                      <p className="text-body font-semibold text-foreground">
-                        Booking Required
-                      </p>
-                      <p className="text-label text-faint">
-                        Enable this if members must book a slot before
-                        redemption. Booking instructions are inherited from the
-                        selected branch settings.
-                      </p>
+                    <div className="w-full cursor-not-allowed rounded-md border border-border bg-muted/10 px-3 py-2 font-mono text-body text-faint">
+                      {voucher?.code}
                     </div>
+                    <p className="text-label text-faint italic">
+                      Auto-generated format. Cannot be changed.
+                    </p>
+                  </div>
+                )}
+
+                <div className="space-y-1.5">
+                  <label className="text-body font-medium text-foreground">
+                    Voucher Name <span className="text-destructive">*</span>
+                  </label>
+                  <input
+                    {...register("name")}
+                    className={cn(
+                      "w-full rounded-md border bg-background px-3 py-2 text-body transition-colors outline-none",
+                      errors.name
+                        ? "border-destructive ring-1 ring-destructive/20"
+                        : "border-border focus:border-foreground/30 focus:bg-muted/30"
+                    )}
+                    placeholder="e.g. Monthly Yoga Pass"
+                  />
+                  {errors.name && (
+                    <p className="mt-1 flex items-center gap-1 text-label text-destructive">
+                      <WarningCircle size={12} /> {errors.name.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-body font-medium text-foreground">
+                    Description
+                  </label>
+                  <textarea
+                    {...register("description")}
+                    rows={4}
+                    className={cn(
+                      "w-full resize-none rounded-md border bg-background px-3 py-2 text-body transition-colors outline-none",
+                      "border-border focus:border-foreground/30 focus:bg-muted/30"
+                    )}
+                    placeholder="Detailed breakdown of what's included..."
+                  />
+                </div>
+
+                <div className="flex items-center justify-between rounded-lg border border-primary/10 bg-primary/5 p-4">
+                  <p className="text-body font-semibold text-foreground">
+                    Booking Required
+                  </p>
+                  <div className="flex items-center gap-3">
+                    {bookingRequired && applicableBranches.length > 0 && (
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <button
+                            type="button"
+                            className="text-label font-medium text-primary underline-offset-2 hover:underline"
+                          >
+                            View Booking Info
+                          </button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-md">
+                          <DialogHeader>
+                            <DialogTitle>Branch Booking Info</DialogTitle>
+                          </DialogHeader>
+                          <div className="divide-y divide-border pt-1">
+                            {applicableBranches.map((branch) => (
+                              <div
+                                key={branch.id}
+                                className="space-y-3 py-4 first:pt-0 last:pb-0"
+                              >
+                                <p className="text-body font-semibold text-foreground">
+                                  {branch.name}
+                                </p>
+                                {(branch.booking.channels?.length ?? 0) === 0 ? (
+                                  <p className="text-label text-destructive">
+                                    No booking channels configured.
+                                  </p>
+                                ) : (
+                                  <div className="space-y-2">
+                                    {branch.booking.channels.map((channel) => {
+                                      const value =
+                                        channel === "whatsapp"
+                                          ? branch.booking.whatsapp?.phoneNumber
+                                          : channel === "email"
+                                            ? branch.booking.email?.email
+                                            : channel === "phone"
+                                              ? branch.booking.phone?.phoneNumber
+                                              : branch.booking.link?.url
+                                      return (
+                                        <div
+                                          key={channel}
+                                          className="flex items-center justify-between gap-4"
+                                        >
+                                          <span className="text-label text-muted-foreground">
+                                            {BOOKING_CHANNEL_LABELS[channel]}
+                                          </span>
+                                          <span className="font-mono text-label font-medium text-foreground">
+                                            {value || "—"}
+                                          </span>
+                                        </div>
+                                      )
+                                    })}
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    )}
                     <Switch
                       checked={watch("bookingRequired")}
                       onCheckedChange={(v: boolean) =>
@@ -436,98 +457,32 @@ export function SpVoucherForm({
                       }
                     />
                   </div>
-
-                  {bookingRequired ? (
-                    <div className="space-y-3 rounded-lg border border-border bg-muted/10 p-4">
-                      <div className="flex items-start gap-3">
-                        <div className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
-                          <CheckCircle size={16} weight="fill" />
-                        </div>
-                        <div className="space-y-1">
-                          <p className="text-body font-medium text-foreground">
-                            Branch Booking Channels
-                          </p>
-                          <p className="text-label text-muted-foreground">
-                            Vouchers do not collect booking details directly.
-                            They use the booking methods configured on each
-                            branch.
-                          </p>
-                        </div>
-                      </div>
-
-                      {applicableBranches.length > 0 ? (
-                        <div className="space-y-2">
-                          {bookingSummary.map((branch) => (
-                            <div
-                              key={branch.id}
-                              className="flex flex-col gap-2 rounded-lg border border-border bg-card px-3 py-3 md:flex-row md:items-center md:justify-between"
-                            >
-                              <p className="text-body font-medium text-foreground">
-                                {branch.name}
-                              </p>
-                              {branch.channels.length > 0 ? (
-                                <p className="text-label text-muted-foreground">
-                                  {branch.channels
-                                    .map(
-                                      (channel) =>
-                                        BOOKING_CHANNEL_LABELS[channel]
-                                    )
-                                    .join(" · ")}
-                                </p>
-                              ) : (
-                                <p className="text-label text-destructive">
-                                  No booking channels configured
-                                </p>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-label text-muted-foreground">
-                          Select at least one branch to review inherited booking
-                          channels.
-                        </p>
-                      )}
-
-                      {branchesWithoutBooking.length > 0 ? (
-                        <div className="rounded-lg border border-border bg-muted/20 px-3 py-3">
-                          <p className="flex items-start gap-2 text-label text-muted-foreground">
-                            <WarningCircle
-                              size={14}
-                              className="mt-0.5 shrink-0"
-                            />
-                            <StatusBadge
-                              status="Action Required"
-                              variant="rose"
-                            />
-                            <span>
-                              Add booking settings to{" "}
-                              {branchesWithoutBooking
-                                .map((branch) => branch.name)
-                                .join(", ")}{" "}
-                              before saving a booking-required voucher.
-                            </span>
-                          </p>
-                        </div>
-                      ) : null}
-                    </div>
-                  ) : null}
-
-                  <p className="text-label text-muted-foreground">
-                    Branch currency is shown inline and applied automatically to
-                    voucher pricing.
-                  </p>
                 </div>
+
+                <p className="text-label text-muted-foreground">
+                  Branch currency is shown inline and applied automatically to
+                  voucher pricing.
+                </p>
               </div>
             </div>
+          </div>
+        )}
 
+        {/* Step 2 — Voucher Configuration */}
+        {currentStep === 2 && (
+          <div className="animate-in fade-in slide-in-from-right-4 duration-300">
             <VoucherConfigurationSection
               errors={errors}
               register={register}
               setValue={setValue}
               watch={watch}
             />
+          </div>
+        )}
 
+        {/* Step 3 — Manage Services */}
+        {currentStep === 3 && (
+          <div className="animate-in fade-in slide-in-from-right-4 duration-300">
             <VoucherManageServicesSection
               appendLine={appendLine}
               currency={displayCurrency}
@@ -543,15 +498,18 @@ export function SpVoucherForm({
               watch={watch}
             />
           </div>
-        </div>
+        )}
       </div>
 
-      <VoucherFormActionBar
+      <VoucherWizardActionBar
+        currentStep={currentStep}
         formIsSubmitting={formIsSubmitting}
         isEditing={isEditing}
         isPublishing={isPublishing}
         isSubmitting={isSubmitting}
+        onBack={goPrev}
         onCancel={onCancel}
+        onNext={goNext}
         onPublish={onPublish}
         voucher={voucher}
       />
