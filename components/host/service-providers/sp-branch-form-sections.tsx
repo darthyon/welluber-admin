@@ -68,10 +68,7 @@ export function BranchGovernanceSection({
   removeContact,
 }: BranchGovernanceSectionProps) {
   return (
-    <div
-      id="governance"
-      className="scroll-mt-32 overflow-hidden rounded-lg border border-border bg-card shadow-sm"
-    >
+    <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
       <div className="space-y-6 p-6">
         <div className="flex items-center justify-between pb-2">
           <div className="flex items-center gap-2">
@@ -381,10 +378,7 @@ export function BranchBookingSection({
   }
 
   return (
-    <div
-      id="booking-settings"
-      className="scroll-mt-32 overflow-hidden rounded-lg border border-border bg-card shadow-sm"
-    >
+    <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
       <div className="space-y-6 p-6">
         <div className="flex items-center gap-2 pb-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
@@ -573,10 +567,7 @@ export function BranchOperatingHoursSection({
   setValue,
 }: BranchOperatingHoursSectionProps) {
   return (
-    <div
-      id="operating-hours"
-      className="scroll-mt-32 overflow-hidden rounded-lg border border-border bg-card shadow-sm"
-    >
+    <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
       <div className="space-y-6 p-6">
         <div className="flex items-center gap-2 pb-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
@@ -662,10 +653,7 @@ export function BranchBenefitsSection({
   removeBenefit,
 }: BranchBenefitsSectionProps) {
   return (
-    <div
-      id="benefits"
-      className="scroll-mt-32 overflow-hidden rounded-lg border border-border bg-card shadow-sm"
-    >
+    <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
       <div className="space-y-6 p-6">
         <div className="flex items-center gap-2 pb-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted/10 text-muted-foreground">
