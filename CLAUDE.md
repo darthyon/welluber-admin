@@ -5,35 +5,35 @@ shared components, constraints, and verification commands.
 
 This file adds Claude Code–specific guidance only.
 
----
-
-## Knowledge Graph
-
-Before analyzing code structure, run `/graphify query "<question>"` in this session,
-or read `graphify-out/GRAPH_REPORT.md` for the prebuilt summary.
-
-The graph has 1,679 nodes, 4,111 edges, 118 communities. Built from:
-`app/`, `components/`, `features/`, `lib/`, `hooks/`, `types/`.
-
-Key god nodes to be aware of when making changes:
-
-| Node | Edges | Location |
-|------|-------|----------|
-| `cn()` | 300 | `lib/utils.ts` |
-| `Button` | 89 | `components/ui/button.tsx` |
-| `OrganizationDetailContent` | 47 | `app/(host)/organizations/[id]/page.tsx` |
-| `StatusBadge` | 41 | `components/shared/status-badge.tsx` |
-| `ActionPopover` | 33 | `components/shared/action-popover.tsx` |
-| `BenefitPolicyWizard` | 23 | `components/host/policies/benefit-policy-wizard.tsx` |
-
-Use `/graphify query` to traverse the graph, `/graphify explain` for node deep-dives,
-`/graphify path` to find connections between two concepts.
-
-After significant changes: `/graphify --update` to refresh incrementally.
-
----
-
 ## Memory
 
 Project memory lives in `.claude/projects/…/memory/`. Check it for context on
 prior decisions before starting new work.
+
+## Codebase Memory Scout Workflow
+
+Use `codebase-memory-mcp` first for structural repo discovery: locating files,
+components, routes, hooks, stores, utilities, data sources, callers,
+dependencies, impact, architecture, and the smallest safe patch scope.
+
+Default workflow:
+1. Scout with `codebase-memory-mcp`.
+2. Return the MCP tool/query used, smallest relevant file set, why each file matters, and a minimal patch plan.
+3. Wait for approval before editing.
+4. Read only the relevant snippets from approved files.
+5. Patch only the approved scope.
+6. Run targeted verification.
+7. Summarize changed files, diff intent, and verification result.
+
+Fallback rules:
+- If MCP is unavailable, say so before using `grep`, `rg`, `find`, or file reads.
+- If the repo is not indexed, ask to index or use the CLI/index tool before falling back.
+- If MCP results are irrelevant, incomplete, or stale, explain why and then use targeted rg or file reads.
+- For exact string searches, CSS classes, copy text, config keys, error messages, or build logs, targeted rg is allowed after stating why MCP is not the right tool.
+
+Hard rules:
+- Do not edit during scouting.
+- Do not read broad files unless MCP is insufficient.
+- Do not paste full files in responses.
+- Do not refactor unrelated code or make "while I'm here" changes.
+- Never rely on MCP alone for final proof; inspect relevant snippets and run targeted verification when applicable.
