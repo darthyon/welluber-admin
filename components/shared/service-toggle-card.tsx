@@ -1,44 +1,46 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import { Plus, Trash } from "@phosphor-icons/react";
-import { cn } from "@/lib/utils";
-import { Switch } from "@/components/shared/switch";
-import { Button } from "@/components/ui/button";
+import * as React from "react"
+import { CaretDown, Plus, Trash } from "@phosphor-icons/react"
+import { cn } from "@/lib/utils"
+import { Switch } from "@/components/shared/switch"
+import { SearchableMultiSelect } from "@/components/shared/searchable-multi-select"
+import { Button } from "@/components/ui/button"
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
 
 interface ServiceToggleCardProps {
   /**
    * The name of the service.
    */
-  name: string;
+  name: string
   /**
    * Whether the service is currently selected/active.
    */
-  isSelected: boolean;
+  isSelected: boolean
   /**
    * Callback for toggling the selection state.
    */
-  onToggle: (checked: boolean) => void;
+  onToggle: (checked: boolean) => void
   /**
    * List of active sub-services for this selection.
    */
-  selectedSubServices: string[];
+  selectedSubServices: string[]
   /**
    * List of predefined sub-services in the masterlist (for styling).
    */
-  masterlistSubServices?: string[];
+  masterlistSubServices?: string[]
   /**
-   * Callback for adding a sub-service.
+   * Callback for updating the selected sub-services.
    */
-  onAddSubService: (val: string) => void;
-  /**
-   * Callback for removing a sub-service.
-   */
-  onRemoveSubService: (val: string) => void;
+  onSelectedSubServicesChange: (val: string[]) => void
   /**
    * Placeholder for the custom sub-service input.
    */
-  placeholder?: string;
+  placeholder?: string
 }
 
 /**
@@ -51,101 +53,180 @@ export function ServiceToggleCard({
   onToggle,
   selectedSubServices,
   masterlistSubServices = [],
-  onAddSubService,
-  onRemoveSubService,
-  placeholder
+  onSelectedSubServicesChange,
+  placeholder,
 }: ServiceToggleCardProps) {
-  const [inputValue, setInputValue] = React.useState("");
+  const [customInput, setCustomInput] = React.useState("")
+  const [isExpanded, setIsExpanded] = React.useState(isSelected)
 
-  const handleAdd = () => {
-    const val = inputValue.trim();
-    if (val) {
-      onAddSubService(val);
-      setInputValue("");
+  React.useEffect(() => {
+    if (isSelected) {
+      setIsExpanded(true)
+      return
     }
-  };
+
+    setIsExpanded(false)
+  }, [isSelected])
+
+  const standardSubServices = selectedSubServices.filter((subService) =>
+    masterlistSubServices.includes(subService)
+  )
+  const customSubServices = selectedSubServices.filter(
+    (subService) => !masterlistSubServices.includes(subService)
+  )
+
+  const handleStandardSubServicesChange = (
+    nextStandardSubServices: string[]
+  ) => {
+    onSelectedSubServicesChange([
+      ...nextStandardSubServices,
+      ...customSubServices,
+    ])
+  }
+
+  const handleAddCustomSubService = () => {
+    const nextCustomSubService = customInput.trim()
+    if (
+      !nextCustomSubService ||
+      selectedSubServices.includes(nextCustomSubService)
+    ) {
+      return
+    }
+
+    onSelectedSubServicesChange([...selectedSubServices, nextCustomSubService])
+    setCustomInput("")
+  }
+
+  const handleRemoveCustomSubService = (subServiceToRemove: string) => {
+    onSelectedSubServicesChange(
+      selectedSubServices.filter(
+        (subService) => subService !== subServiceToRemove
+      )
+    )
+  }
 
   return (
-    <div 
-      className={cn(
-        "group p-4 rounded-lg border transition-all duration-300",
-        isSelected 
-          ? "bg-primary/[0.02] border-primary/20" 
-          : "bg-transparent border-border/50 hover:bg-muted/30 hover:border-primary/30"
-      )}
-    >
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3.5">
-          <Switch 
-            checked={isSelected} 
-            onCheckedChange={onToggle} 
-          />
-          <span className={cn(
-            "text-body font-semibold transition-colors duration-300",
-            isSelected ? "text-foreground" : "text-muted-foreground"
-          )}>
+    <Collapsible open={isExpanded && isSelected} className="bg-card/40">
+      <CollapsibleTrigger asChild>
+        <button
+          type="button"
+          onClick={() => {
+            if (!isSelected) {
+              return
+            }
+
+            setIsExpanded((current) => !current)
+          }}
+          className="group flex w-full min-w-0 items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted/30"
+        >
+          <span
+            className="shrink-0"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <Switch
+              checked={isSelected}
+              onCheckedChange={(checked) => {
+                onToggle(checked)
+
+                if (checked) {
+                  setIsExpanded(true)
+                }
+              }}
+            />
+          </span>
+          <span
+            className={cn(
+              "truncate text-body font-semibold transition-colors",
+              isSelected ? "text-foreground" : "text-muted-foreground"
+            )}
+          >
             {name}
           </span>
-        </div>
-      </div>
+          <CaretDown
+            size={14}
+            className={cn(
+              "ml-auto shrink-0 text-faint transition-transform",
+              isExpanded && isSelected && "rotate-180"
+            )}
+          />
+        </button>
+      </CollapsibleTrigger>
 
-      {isSelected && (
-        <div className="mt-4 pl-11 space-y-4 animate-in slide-in-from-top-2 duration-300 ease-out">
-          {/* Badge Cloud */}
-          <div className="flex flex-wrap gap-2">
-            {selectedSubServices.map((sub) => {
-              const isMasterlist = masterlistSubServices.includes(sub);
-              return (
-                <span 
-                  key={sub} 
-                  className={cn(
-                    "inline-flex items-center gap-1.5 text-label px-2.5 py-1 rounded-lg font-medium border transition-all duration-200 group/badge",
-                    isMasterlist 
-                      ? "bg-muted text-muted-foreground border-border hover:border-muted-foreground/30" 
-                      : "bg-primary/[0.04] text-primary border-primary/20 hover:bg-primary/10"
-                  )}
-                >
-                  {sub}
-                  {!isMasterlist && (
-                    <button 
-                      type="button" 
-                      onClick={() => onRemoveSubService(sub)}
-                      className="text-faint hover:text-destructive transition-colors ml-0.5"
+      <CollapsibleContent>
+        <div className="animate-in space-y-4 border-t border-border bg-muted/20 px-4 py-4 duration-200 fade-in slide-in-from-top-1">
+          <div className="space-y-2">
+            <p className="text-label font-medium text-muted-foreground">
+              Sub-services
+            </p>
+            <SearchableMultiSelect
+              taxonomy={[
+                {
+                  category: "Sub-services",
+                  services: masterlistSubServices,
+                },
+              ]}
+              selected={standardSubServices}
+              onChange={handleStandardSubServicesChange}
+              placeholder={placeholder || "Select sub-services..."}
+              title="Available Sub-services"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <p className="text-label font-medium text-muted-foreground">
+              Add Custom Sub-service
+            </p>
+            <div className="flex max-w-sm gap-2">
+              <input
+                value={customInput}
+                onChange={(event) => setCustomInput(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    event.preventDefault()
+                    handleAddCustomSubService()
+                  }
+                }}
+                className="h-8 w-full rounded-lg border border-border bg-background px-3 py-1 text-label transition-all outline-none placeholder:text-faint focus:border-primary/30 focus:shadow-[0_0_10px_-4px_rgba(var(--primary-rgb),0.1)]"
+                placeholder="Type a custom sub-service"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 shrink-0 px-0 text-faint transition-all hover:text-primary"
+                onClick={handleAddCustomSubService}
+              >
+                <Plus size={14} weight="bold" />
+              </Button>
+            </div>
+          </div>
+
+          {customSubServices.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-label font-medium text-muted-foreground">
+                Custom Sub-services
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {customSubServices.map((subService) => (
+                  <span
+                    key={subService}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-primary/20 bg-primary/[0.04] px-2.5 py-1 text-label font-medium text-primary"
+                  >
+                    {subService}
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveCustomSubService(subService)}
+                      className="text-faint transition-colors hover:text-destructive"
                     >
                       <Trash size={12} weight="bold" />
                     </button>
-                  )}
-                </span>
-              );
-            })}
-          </div>
-
-          {/* Quick Input Row */}
-          <div className="flex gap-2 max-w-sm mt-3 group/input">
-            <input
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  handleAdd();
-                }
-              }}
-              className="h-8 w-full px-3 py-1 bg-background border border-border rounded-lg text-label outline-none transition-all placeholder:text-faint focus:border-primary/30 focus:shadow-[0_0_10px_-4px_rgba(var(--primary-rgb),0.1)]"
-              placeholder={placeholder || `Add custom sub-service...`}
-            />
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 px-0 text-faint hover:text-primary transition-all shrink-0"
-              onClick={handleAdd}
-            >
-              <Plus size={14} weight="bold" />
-            </Button>
-          </div>
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-      )}
-    </div>
-  );
+      </CollapsibleContent>
+    </Collapsible>
+  )
 }

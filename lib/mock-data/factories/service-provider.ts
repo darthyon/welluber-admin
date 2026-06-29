@@ -96,6 +96,22 @@ export function createServiceProvider(index: number): ServiceProvider {
           subsequentLevelRate: 0.2,
           lastUpdated: "2026-01-10T00:00:00Z",
         },
+        {
+          mainService: "Life & Executive Coaching",
+          firstLevelQty: 0,
+          firstLevelRate: 0.22,
+          subsequentLevelQty: 1,
+          subsequentLevelRate: 0.18,
+          lastUpdated: "2026-01-10T00:00:00Z",
+        },
+        {
+          mainService: "Meditation",
+          firstLevelQty: 0,
+          firstLevelRate: 0.14,
+          subsequentLevelQty: 1,
+          subsequentLevelRate: 0.1,
+          lastUpdated: "2026-01-10T00:00:00Z",
+        },
       ],
       bankInfo: {
         bankName: "Maybank",
@@ -133,6 +149,14 @@ export function createServiceProvider(index: number): ServiceProvider {
           name: "Zenith KLCC",
           services: [
             { service: "Yoga", subServices: ["Vinyasa Flow", "Hatha Yoga"] },
+            {
+              service: "Therapy & Counselling",
+              subServices: ["Individual Therapy"],
+            },
+            {
+              service: "Life & Executive Coaching",
+              subServices: ["Executive Coaching"],
+            },
           ],
           address: {
             line: "Lot 5, Suria KLCC",

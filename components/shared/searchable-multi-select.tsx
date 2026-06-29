@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Checks, X } from "@phosphor-icons/react"
+import { Checks, Plus, X } from "@phosphor-icons/react"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import {
@@ -34,20 +34,26 @@ interface SearchableMultiSelectProps {
   taxonomy: TaxonomyCategory[]
   selected: string[]
   onChange: (selected: string[]) => void
+  onCreateOption?: (value: string) => void
   placeholder?: string
   isInline?: boolean
   staticOptions?: string[]
   title?: string
+  createOptionLabel?: (value: string) => string
+  emptyCreateOptionLabel?: string
 }
 
 export function SearchableMultiSelect({
   taxonomy,
   selected,
   onChange,
+  onCreateOption,
   placeholder = "Search services...",
   isInline = false,
   staticOptions = [],
   title = "Available Options",
+  createOptionLabel = (value) => `Create "${value}"`,
+  emptyCreateOptionLabel = "Type to create a custom option",
 }: SearchableMultiSelectProps) {
   const [query, setQuery] = React.useState("")
   const [isOpen, setIsOpen] = React.useState(false)
@@ -84,6 +90,27 @@ export function SearchableMultiSelect({
     return opts
   }, [filteredStaticOptions, filteredTaxonomy])
 
+  const normalizedExistingOptions = React.useMemo(() => {
+    const allKnownOptions = [
+      ...staticOptions,
+      ...taxonomy.flatMap((group) => group.services),
+      ...selected,
+    ]
+
+    return new Set(
+      allKnownOptions
+        .map((option) => option.trim().toLowerCase())
+        .filter(Boolean)
+    )
+  }, [selected, staticOptions, taxonomy])
+
+  const creatableQuery = query.trim()
+  const showCreateSection = Boolean(onCreateOption)
+  const canCreateOption =
+    showCreateSection &&
+    creatableQuery.length > 0 &&
+    !normalizedExistingOptions.has(creatableQuery.toLowerCase())
+
   const toggleOption = (opt: string) => {
     if (selected.includes(opt)) {
       onChange(selected.filter((s) => s !== opt))
@@ -109,6 +136,18 @@ export function SearchableMultiSelect({
     if (isInline) return
     setIsOpen(false)
     setQuery("")
+  }
+
+  const createOption = () => {
+    if (!onCreateOption || !canCreateOption) {
+      return
+    }
+
+    onCreateOption(creatableQuery)
+    setQuery("")
+    if (!isInline) {
+      setIsOpen(true)
+    }
   }
 
   const SelectedBadges = (
@@ -182,7 +221,7 @@ export function SearchableMultiSelect({
       />
 
       <CommandList id={`${id}-listbox`} className="max-h-[360px]">
-        {allOptions.length === 0 ? (
+        {allOptions.length === 0 && !showCreateSection ? (
           <CommandEmpty className="text-label text-muted-foreground">
             {query
               ? `No results found matching "${query}"`
@@ -231,6 +270,37 @@ export function SearchableMultiSelect({
                 ))}
               </CommandGroup>
             ))}
+
+            {showCreateSection && (
+              <CommandGroup heading="Custom">
+                <CommandItem
+                  value={
+                    canCreateOption
+                      ? `create-${creatableQuery}`
+                      : "create-option-hint"
+                  }
+                  onSelect={createOption}
+                  disabled={!canCreateOption}
+                  className={cn(
+                    "text-body font-medium",
+                    canCreateOption
+                      ? "text-foreground"
+                      : "text-muted-foreground"
+                  )}
+                >
+                  <Plus
+                    size={14}
+                    weight="bold"
+                    className={cn(
+                      canCreateOption ? "text-primary" : "text-muted-foreground"
+                    )}
+                  />
+                  {canCreateOption
+                    ? createOptionLabel(creatableQuery)
+                    : emptyCreateOptionLabel}
+                </CommandItem>
+              </CommandGroup>
+            )}
           </>
         )}
       </CommandList>
