@@ -153,6 +153,17 @@ export function createServiceProvider(index: number): ServiceProvider {
             },
           ],
           administrators: [],
+          booking: {
+            channels: ["whatsapp", "booking_website"],
+            whatsapp: {
+              phoneNumber: "+60112345678",
+            },
+            email: { email: "" },
+            phone: { phoneNumber: "" },
+            link: {
+              url: "https://book.zenithyoga.my/klcc",
+            },
+          },
           isActive: true,
           operatingHours: DEFAULT_HOURS,
           benefits: ["Changing Room", "Shower", "Locker", "Free WiFi"],
@@ -259,6 +270,13 @@ export function createServiceProvider(index: number): ServiceProvider {
             },
           ],
           administrators: [],
+          booking: {
+            channels: ["email", "phone"],
+            whatsapp: { phoneNumber: "" },
+            email: { email: "bookings@agilemind.my" },
+            phone: { phoneNumber: "+60376234567" },
+            link: { url: "" },
+          },
           isActive: true,
           operatingHours: DEFAULT_HOURS,
           benefits: ["Private Consultation Room", "Free WiFi"],
@@ -410,6 +428,17 @@ export function createServiceProvider(index: number): ServiceProvider {
             },
           ],
           administrators: [],
+          booking: {
+            channels: ["whatsapp", "phone", "booking_website"],
+            whatsapp: {
+              phoneNumber: "+60161234567",
+            },
+            email: { email: "" },
+            phone: { phoneNumber: "+60321488888" },
+            link: {
+              url: "https://appointments.serenityspa.my/pavilion",
+            },
+          },
           isActive: false,
           operatingHours: DEFAULT_HOURS,
           benefits: ["Private Rooms", "Steam Room", "Free WiFi"],

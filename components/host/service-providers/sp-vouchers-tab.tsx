@@ -54,6 +54,7 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
     id: b.id,
     name: b.name,
     currency: "RM",
+    booking: b.booking,
   }))
 
   const filteredVouchers = sp.vouchers.filter(

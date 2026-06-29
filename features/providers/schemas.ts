@@ -85,6 +85,79 @@ const branchAdminSchema = z.object({
   designateAsPic: z.boolean().default(false),
 })
 
+const branchBookingSchema = z
+  .object({
+    channels: z
+      .array(z.enum(["whatsapp", "email", "phone", "booking_website"]))
+      .default([]),
+    whatsapp: z
+      .object({
+        phoneNumber: z.string().optional(),
+      })
+      .default({ phoneNumber: "" }),
+    email: z
+      .object({
+        email: z.string().optional(),
+      })
+      .default({ email: "" }),
+    phone: z
+      .object({
+        phoneNumber: z.string().optional(),
+      })
+      .default({ phoneNumber: "" }),
+    link: z
+      .object({
+        url: z.string().url("Enter a valid URL").optional().or(z.literal("")),
+      })
+      .default({ url: "" }),
+  })
+  .superRefine((value, context) => {
+    if (
+      value.channels.includes("whatsapp") &&
+      !value.whatsapp.phoneNumber?.trim()
+    ) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "WhatsApp phone number is required",
+        path: ["whatsapp", "phoneNumber"],
+      })
+    }
+
+    if (value.channels.includes("email")) {
+      const email = value.email.email?.trim()
+
+      if (!email) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Booking email is required",
+          path: ["email", "email"],
+        })
+      } else if (!z.string().email().safeParse(email).success) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Enter a valid email address",
+          path: ["email", "email"],
+        })
+      }
+    }
+
+    if (value.channels.includes("phone") && !value.phone.phoneNumber?.trim()) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Booking phone number is required",
+        path: ["phone", "phoneNumber"],
+      })
+    }
+
+    if (value.channels.includes("booking_website") && !value.link.url?.trim()) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Link URL is required",
+        path: ["link", "url"],
+      })
+    }
+  })
+
 const dayHoursSchema = z.object({
   open: z.string(),
   close: z.string(),
@@ -115,6 +188,7 @@ export const createBranchSchema = z.object({
   }),
   contacts: z.array(branchContactSchema).min(1, "Add at least one PIC"),
   administrators: z.array(branchAdminSchema).default([]),
+  booking: branchBookingSchema,
   isActive: z.boolean().default(true),
   operatingHours: operatingHoursSchema,
   benefits: z.array(z.string()).default([]),

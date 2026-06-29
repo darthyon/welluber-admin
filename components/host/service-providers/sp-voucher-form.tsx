@@ -4,7 +4,13 @@ import { useState, useEffect, useMemo } from "react"
 import { useForm, useFieldArray, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { WarningCircle, Ticket, Buildings, MapPin } from "@phosphor-icons/react"
+import {
+  WarningCircle,
+  Ticket,
+  Buildings,
+  MapPin,
+  CheckCircle,
+} from "@phosphor-icons/react"
 import { cn, getCurrencyLabel } from "@/lib/utils"
 import { Switch } from "@/components/shared/switch"
 import { createVoucherSchema } from "@/features/providers/schemas"
@@ -17,7 +23,13 @@ import { ChoiceCard } from "@/components/shared/choice-card"
 import { SuccessCelebration } from "@/components/shared/success-celebration"
 import { CustomMultiSelect } from "@/components/shared/custom-multi-select"
 import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav"
-import type { SpVoucher } from "@/types/provider"
+import { StatusBadge } from "@/components/shared/status-badge"
+import { toast } from "sonner"
+import type {
+  SpBranchBookingChannel,
+  SpBranchBookingSettings,
+  SpVoucher,
+} from "@/types/provider"
 import {
   VoucherFormActionBar,
   VoucherFormHeader,
@@ -36,10 +48,22 @@ const ANCHOR_ITEMS = [
 interface SpVoucherFormProps {
   spId: string
   spServiceCategories: string[]
-  spBranches: { id: string; name: string; currency?: string }[]
+  spBranches: {
+    id: string
+    name: string
+    currency?: string
+    booking: SpBranchBookingSettings
+  }[]
   voucher?: SpVoucher
   onSuccess: () => void
   onCancel: () => void
+}
+
+const BOOKING_CHANNEL_LABELS: Record<SpBranchBookingChannel, string> = {
+  whatsapp: "WhatsApp",
+  email: "Email",
+  phone: "Phone Number",
+  booking_website: "Booking Website",
 }
 
 function toDateTimeLocalValue(value: string | null | undefined): string {
@@ -130,7 +154,32 @@ export function SpVoucherForm({
     remove: removeLine,
   } = useFieldArray({ control, name: "serviceLines" })
   const branchScope = watch("branchScope")
+  const bookingRequired = watch("bookingRequired")
+  const selectedBranchIds = useWatch({ control, name: "branchIds" })
   const displayCurrency = getCurrencyLabel(watch("currency"))
+  const applicableBranches = useMemo(
+    () =>
+      branchScope === "all"
+        ? spBranches
+        : spBranches.filter((branch) =>
+            (selectedBranchIds ?? []).includes(branch.id)
+          ),
+    [branchScope, selectedBranchIds, spBranches]
+  )
+  const branchesWithoutBooking = useMemo(
+    () =>
+      applicableBranches.filter(
+        (branch) => (branch.booking.channels?.length ?? 0) === 0
+      ),
+    [applicableBranches]
+  )
+  const bookingSummary = useMemo(() => {
+    return applicableBranches.map((branch) => ({
+      id: branch.id,
+      name: branch.name,
+      channels: branch.booking.channels ?? [],
+    }))
+  }, [applicableBranches])
 
   // Subtotal = sum of each service's price. One overall discount (amount or %)
   // is applied to the subtotal to give the Final Price, rounded to a whole number.
@@ -162,6 +211,27 @@ export function SpVoucherForm({
   const onSave = async (data: z.input<typeof createVoucherSchema>) => {
     setIsSubmitting(true)
     try {
+      if (data.bookingRequired) {
+        const targetBranches =
+          data.branchScope === "all"
+            ? spBranches
+            : spBranches.filter((branch) =>
+                (data.branchIds ?? []).includes(branch.id)
+              )
+
+        const missingBooking = targetBranches.filter(
+          (branch) => (branch.booking.channels?.length ?? 0) === 0
+        )
+
+        if (missingBooking.length > 0) {
+          throw new Error(
+            `Booking settings are missing for: ${missingBooking
+              .map((branch) => branch.name)
+              .join(", ")}`
+          )
+        }
+      }
+
       const payload = createVoucherSchema.parse(data)
       const res = isEditing
         ? await updateVoucher(spId, voucher!.id, payload)
@@ -175,6 +245,12 @@ export function SpVoucherForm({
         setIsSuccess(true)
         setTimeout(onSuccess, 2000)
       }
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Unable to save the voucher right now."
+      )
     } finally {
       setIsSubmitting(false)
     }
@@ -349,14 +425,93 @@ export function SpVoucherForm({
                       </p>
                       <p className="text-label text-faint">
                         Enable this if members must book a slot before
-                        redemption.
+                        redemption. Booking instructions are inherited from the
+                        selected branch settings.
                       </p>
                     </div>
                     <Switch
                       checked={watch("bookingRequired")}
-                      onCheckedChange={(v) => setValue("bookingRequired", v)}
+                      onCheckedChange={(v: boolean) =>
+                        setValue("bookingRequired", v)
+                      }
                     />
                   </div>
+
+                  {bookingRequired ? (
+                    <div className="space-y-3 rounded-lg border border-border bg-muted/10 p-4">
+                      <div className="flex items-start gap-3">
+                        <div className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
+                          <CheckCircle size={16} weight="fill" />
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-body font-medium text-foreground">
+                            Branch Booking Channels
+                          </p>
+                          <p className="text-label text-muted-foreground">
+                            Vouchers do not collect booking details directly.
+                            They use the booking methods configured on each
+                            branch.
+                          </p>
+                        </div>
+                      </div>
+
+                      {applicableBranches.length > 0 ? (
+                        <div className="space-y-2">
+                          {bookingSummary.map((branch) => (
+                            <div
+                              key={branch.id}
+                              className="flex flex-col gap-2 rounded-lg border border-border bg-card px-3 py-3 md:flex-row md:items-center md:justify-between"
+                            >
+                              <p className="text-body font-medium text-foreground">
+                                {branch.name}
+                              </p>
+                              {branch.channels.length > 0 ? (
+                                <p className="text-label text-muted-foreground">
+                                  {branch.channels
+                                    .map(
+                                      (channel) =>
+                                        BOOKING_CHANNEL_LABELS[channel]
+                                    )
+                                    .join(" · ")}
+                                </p>
+                              ) : (
+                                <p className="text-label text-destructive">
+                                  No booking channels configured
+                                </p>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-label text-muted-foreground">
+                          Select at least one branch to review inherited booking
+                          channels.
+                        </p>
+                      )}
+
+                      {branchesWithoutBooking.length > 0 ? (
+                        <div className="rounded-lg border border-border bg-muted/20 px-3 py-3">
+                          <p className="flex items-start gap-2 text-label text-muted-foreground">
+                            <WarningCircle
+                              size={14}
+                              className="mt-0.5 shrink-0"
+                            />
+                            <StatusBadge
+                              status="Action Required"
+                              variant="rose"
+                            />
+                            <span>
+                              Add booking settings to{" "}
+                              {branchesWithoutBooking
+                                .map((branch) => branch.name)
+                                .join(", ")}{" "}
+                              before saving a booking-required voucher.
+                            </span>
+                          </p>
+                        </div>
+                      ) : null}
+                    </div>
+                  ) : null}
 
                   <p className="text-label text-muted-foreground">
                     Branch currency is shown inline and applied automatically to
