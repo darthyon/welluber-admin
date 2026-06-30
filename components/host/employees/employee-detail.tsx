@@ -134,7 +134,7 @@ export function EmployeeDetail({ employee, onBack, onEdit, backLabel = "Back" }:
 
         {activeTab === "benefits" && (
           <div className="space-y-10">
-            <EmployeePolicyTab employeeId={employee.id} />
+            <EmployeePolicyTab employeeId={employee.id} employeeName={employee.name} />
             <EmployeeEntitlementsTab employeeId={employee.id} />
           </div>
         )}

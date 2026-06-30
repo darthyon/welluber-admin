@@ -27,7 +27,7 @@ export function StackedPoolBar({
   className,
 }: StackedPoolBarProps) {
   const totalSpent = segments.reduce((s, seg) => s + seg.spent, 0)
-  const pct = allocated > 0 ? Math.round((totalSpent / allocated) * 100) : 0
+  const pct = allocated > 0 ? Math.min(Math.round((totalSpent / allocated) * 100), 100) : 0
   const legend = showLegend ?? segments.length > 1
 
   return (
@@ -47,11 +47,11 @@ export function StackedPoolBar({
         </div>
         <span
           className={cn(
-            "w-9 shrink-0 text-right text-label font-semibold tabular-nums",
+            "shrink-0 whitespace-nowrap pl-1 text-right text-micro font-medium tabular-nums",
             pct > 80 ? "text-rose-600 dark:text-rose-400" : "text-foreground"
           )}
         >
-          {pct}%
+          {pct}% Utilised
         </span>
       </div>
       {legend && (
