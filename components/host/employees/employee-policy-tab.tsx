@@ -18,34 +18,74 @@ import { getEmployeeEntitlement } from "./employee-entitlements-mock";
 
 interface EmployeePolicyTabProps {
   employeeId: string;
+  employeeName: string;
 }
 
-const POOL_LABEL: Record<string, string> = {
-  SharedWithEmployee: "Combined",
-  Shared: "Shared Dependent",
-  Individual: "Dedicated",
+const EMPLOYEE_POOL_LABEL: Record<string, string> = {
+  SharedWithEmployee: "Combined Pool",
+  Shared: "Individual Pool",
+  Individual: "Individual Pool",
 };
 
-export function EmployeePolicyTab({ employeeId }: EmployeePolicyTabProps) {
+const DEPENDENT_POOL_LABEL: Record<string, string> = {
+  SharedWithEmployee: "Combined Pool",
+  Shared: "Shared Pool",
+  Individual: "Individual Pools",
+};
+
+function formatUtilisationMode(mode?: string, prorateUnit?: string) {
+  if (mode === "Prorated") {
+    return prorateUnit ? `Prorated Allocation (${prorateUnit})` : "Prorated Allocation";
+  }
+
+  return "Fixed Allocation";
+}
+
+function formatRefreshCycle(refreshCycle?: string) {
+  return refreshCycle ? `${refreshCycle} Refresh` : "Refresh Not Set";
+}
+
+function formatPoolSummary(policy: ReturnType<typeof getEmployeeEntitlement>["policy"]) {
+  if (!policy.dependentCoverages?.length) {
+    return {
+      label: "Employee",
+      badge: "Individual Pool",
+    };
+  }
+
+  const dependentType = policy.dependentsPoolType ?? "Individual";
+  const badge = DEPENDENT_POOL_LABEL[dependentType] ?? "Individual Pools";
+
+  return {
+    label: "Employee + Dependents",
+    badge,
+  };
+}
+
+function formatPoolStructure(policy: ReturnType<typeof getEmployeeEntitlement>["policy"]) {
+  const summary = formatPoolSummary(policy);
+  return `${summary.label} · ${summary.badge}`;
+}
+
+export function EmployeePolicyTab({ employeeId, employeeName }: EmployeePolicyTabProps) {
   const [hasPolicy, setHasPolicy] = useState(true);
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [showUnassignModal, setShowUnassignModal] = useState(false);
   const [showPolicyModal, setShowPolicyModal] = useState(false);
-  const employeeName = "Robert Fox";
 
   // Summary reads the same source as the Usage section so the two never drift.
   const { policy, groups } = getEmployeeEntitlement(employeeId);
-  const poolLabel = policy.dependentsPoolType
-    ? POOL_LABEL[policy.dependentsPoolType]
-    : policy.benefitPoolType;
+  const poolSummary = formatPoolSummary(policy);
   const summary = {
     name: policy.name,
     code: policy.code ?? policy.id,
     orgName: "Acme Corporation Sdn Bhd",
     version: policy.version ?? "V1.0",
     status: "Active",
-    refreshCycle: policy.refreshCycle,
-    poolType: poolLabel,
+    refreshCycle: formatRefreshCycle(policy.refreshCycle),
+    utilisationMode: formatUtilisationMode(policy.utilisationMode, policy.prorateUnit),
+    poolLabel: poolSummary.label,
+    poolBadge: poolSummary.badge,
     groupCount: groups.length,
   };
 
@@ -82,7 +122,7 @@ export function EmployeePolicyTab({ employeeId }: EmployeePolicyTabProps) {
       </div>
 
       {hasPolicy ? (
-        <Card className="border-primary/20 bg-primary/[0.03]">
+        <Card className="border-primary/20 bg-primary/[0.03] shadow-none">
           <CardContent className="p-5">
             <div className="flex items-center justify-between gap-4">
               <div className="space-y-1.5">
@@ -94,9 +134,14 @@ export function EmployeePolicyTab({ employeeId }: EmployeePolicyTabProps) {
                   <span>·</span>
                   <span>{summary.version}</span>
                   <span>·</span>
+                  <span>{summary.utilisationMode}</span>
+                  <span>·</span>
                   <span>{summary.refreshCycle}</span>
                   <span>·</span>
-                  <span>{summary.poolType} Pool</span>
+                  <span>{summary.poolLabel}</span>
+                  <span className="rounded-4xl border border-primary/15 bg-primary/8 px-2 py-0.5 text-micro font-medium text-primary">
+                    {summary.poolBadge}
+                  </span>
                 </div>
                 <p className="text-label font-medium text-subtle">
                   {summary.orgName} · {summary.code} · {summary.groupCount} benefit{" "}
@@ -144,9 +189,14 @@ export function EmployeePolicyTab({ employeeId }: EmployeePolicyTabProps) {
               <span>·</span>
               <span>{summary.version}</span>
               <span>·</span>
+              <span>{summary.utilisationMode}</span>
+              <span>·</span>
               <span>{summary.refreshCycle}</span>
               <span>·</span>
-              <span>{summary.poolType} Pool</span>
+              <span>{summary.poolLabel}</span>
+              <span className="rounded-4xl border border-primary/15 bg-primary/8 px-2 py-0.5 text-micro font-medium text-primary">
+                {summary.poolBadge}
+              </span>
             </div>
             <p className="mt-0.5 text-label text-subtle">
               {summary.orgName} · {summary.code}
@@ -160,18 +210,20 @@ export function EmployeePolicyTab({ employeeId }: EmployeePolicyTabProps) {
               <div>
                 <p className="text-micro font-medium text-muted-foreground">Pool Type</p>
                 <p className="mt-0.5 text-label font-semibold text-foreground">
-                  {policy.benefitPoolType ?? "—"}
+                  {EMPLOYEE_POOL_LABEL[policy.dependentsPoolType ?? policy.benefitPoolType] ?? "Individual Pool"}
                 </p>
               </div>
               <div>
                 <p className="text-micro font-medium text-muted-foreground">Utilisation Mode</p>
                 <p className="mt-0.5 text-label font-semibold text-foreground">
-                  {policy.utilisationMode === "Prorated" ? "Prorated" : "Fixed"}
+                  {formatUtilisationMode(policy.utilisationMode, policy.prorateUnit)}
                 </p>
               </div>
               <div>
                 <p className="text-micro font-medium text-muted-foreground">Refresh Cycle</p>
-                <p className="mt-0.5 text-label font-semibold text-foreground">{policy.refreshCycle ?? "—"}</p>
+                <p className="mt-0.5 text-label font-semibold text-foreground">
+                  {formatRefreshCycle(policy.refreshCycle)}
+                </p>
               </div>
               <div>
                 <p className="text-micro font-medium text-muted-foreground">Employee Cap</p>
@@ -198,7 +250,7 @@ export function EmployeePolicyTab({ employeeId }: EmployeePolicyTabProps) {
                 <p className="text-micro font-medium text-muted-foreground">Dependents Pool Type</p>
                 <p className="mt-0.5 text-label font-semibold text-foreground">
                   {(policy.dependentCoverages?.length ?? 0) > 0
-                    ? (POOL_LABEL[policy.dependentsPoolType ?? ""] ?? "—")
+                    ? formatPoolStructure(policy)
                     : "Not Applicable"}
                 </p>
               </div>
@@ -251,7 +303,7 @@ export function EmployeePolicyTab({ employeeId }: EmployeePolicyTabProps) {
         onOpenChange={setShowAssignModal}
         employeeId={employeeId}
         employeeName={employeeName}
-        onAssign={() => setHasPolicy(true)}
+        onAssign={(_policyId) => setHasPolicy(true)}
       />
       <UnassignPolicyModal
         open={showUnassignModal}
