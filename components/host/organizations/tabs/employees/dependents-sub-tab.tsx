@@ -2,8 +2,10 @@
 
 import { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
+import { UsersThree } from "@phosphor-icons/react"
 import { useQueryState } from "@/hooks/use-tab-persistence"
 import { Badge } from "@/components/ui/badge"
+import { EmptyState } from "@/components/shared/empty-state"
 import { ViewToggle, type ViewMode } from "@/components/shared/view-toggle"
 import { DependentCard } from "@/components/host/organizations/dependent-card"
 import { DataFilterBar } from "@/components/shared/data-filter-bar"
@@ -17,7 +19,10 @@ interface DependentsSubTabProps {
   onNavigateToDirectory: () => void
 }
 
-export function DependentsSubTab({ orgId, onNavigateToDirectory }: DependentsSubTabProps) {
+export function DependentsSubTab({
+  orgId,
+  onNavigateToDirectory,
+}: DependentsSubTabProps) {
   const router = useRouter()
   const { dependents } = useOrgWorkforce(orgId)
   const [view, setView] = useState<ViewMode>("list")
@@ -54,19 +59,31 @@ export function DependentsSubTab({ orgId, onNavigateToDirectory }: DependentsSub
       />
 
       {view === "grid" ? (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          {filtered.map((dep) => (
-            <DependentCard
-              key={dep.id}
-              dependent={dep}
-              onViewEmployee={(employeeId) => {
-                onNavigateToDirectory()
-                router.push(`/employees/${employeeId}`)
-              }}
-              onEdit={() => {}}
-            />
-          ))}
-        </div>
+        filtered.length === 0 ? (
+          <EmptyState
+            icon={<UsersThree size={32} weight="light" />}
+            title="No Dependents Found"
+            description={
+              search
+                ? "Try another search term to find a linked dependent."
+                : "Dependents linked to employees will appear here once added."
+            }
+          />
+        ) : (
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            {filtered.map((dep) => (
+              <DependentCard
+                key={dep.id}
+                dependent={dep}
+                onViewEmployee={(employeeId) => {
+                  onNavigateToDirectory()
+                  router.push(`/employees/${employeeId}`)
+                }}
+                onEdit={() => {}}
+              />
+            ))}
+          </div>
+        )
       ) : (
         <SharedDataTable
           freezeFirst
@@ -100,7 +117,10 @@ export function DependentsSubTab({ orgId, onNavigateToDirectory }: DependentsSub
               header: "Relationship",
               accessorKey: "relationship",
               render: (dep) => (
-                <Badge variant="outline" className="text-label font-medium capitalize">
+                <Badge
+                  variant="outline"
+                  className="text-label font-medium capitalize"
+                >
                   {dep.relationship}
                 </Badge>
               ),
@@ -136,6 +156,17 @@ export function DependentsSubTab({ orgId, onNavigateToDirectory }: DependentsSub
             },
           ]}
           data={filtered}
+          emptyState={
+            <EmptyState
+              icon={<UsersThree size={32} weight="light" />}
+              title="No Dependents Found"
+              description={
+                search
+                  ? "Try another search term to find a linked dependent."
+                  : "Dependents linked to employees will appear here once added."
+              }
+            />
+          }
         />
       )}
     </div>

@@ -6,6 +6,7 @@ import { useState } from "react"
 import { Plus, Info } from "@phosphor-icons/react"
 import { useQueryState } from "@/hooks/use-tab-persistence"
 import { Button } from "@/components/ui/button"
+import { EmptyState } from "@/components/shared/empty-state"
 import { ViewToggle, type ViewMode } from "@/components/shared/view-toggle"
 import { BranchCard } from "@/components/host/organizations/branch-card"
 import { BranchDetailView } from "@/components/host/organizations/branch-detail-view"
@@ -31,6 +32,11 @@ export function BranchesTab({ orgId }: BranchesTabProps) {
   const [branchesView, setBranchesView] = useState<ViewMode>("list")
   const [branchSearch, setBranchSearch] = useQueryState("branchSearch", "")
   const [viewBranchId, setViewBranchId] = useQueryState("branchId")
+  const filteredBranches = MOCK_BRANCHES.filter((branch) =>
+    [branch.name, branch.type, branch.accountName].some((value) =>
+      value.toLowerCase().includes(branchSearch.toLowerCase())
+    )
+  )
 
   if (viewBranchId) {
     return (
@@ -38,9 +44,7 @@ export function BranchesTab({ orgId }: BranchesTabProps) {
         branchId={viewBranchId}
         onBack={() => setViewBranchId(null)}
         onEdit={() =>
-          router.push(
-            `/organizations/${orgId}/branches/${viewBranchId}/edit`
-          )
+          router.push(`/organizations/${orgId}/branches/${viewBranchId}/edit`)
         }
       />
     )
@@ -105,20 +109,32 @@ export function BranchesTab({ orgId }: BranchesTabProps) {
       />
 
       {branchesView === "grid" ? (
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {MOCK_BRANCHES.map((branch) => (
-            <BranchCard
-              key={branch.id}
-              branch={branch}
-              onView={() => setViewBranchId(branch.id)}
-              onEdit={() =>
-                router.push(
-                  `/organizations/${orgId}/branches/${branch.id}/edit`
-                )
-              }
-            />
-          ))}
-        </div>
+        filteredBranches.length === 0 ? (
+          <EmptyState
+            icon={<Info size={32} weight="light" />}
+            title="No Branches Found"
+            description={
+              branchSearch
+                ? "Try another search term to find the branch you need."
+                : "Add a branch to start organizing locations and account setup."
+            }
+          />
+        ) : (
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {filteredBranches.map((branch) => (
+              <BranchCard
+                key={branch.id}
+                branch={branch}
+                onView={() => setViewBranchId(branch.id)}
+                onEdit={() =>
+                  router.push(
+                    `/organizations/${orgId}/branches/${branch.id}/edit`
+                  )
+                }
+              />
+            ))}
+          </div>
+        )
       ) : (
         <TooltipProvider>
           <SharedDataTable
@@ -180,7 +196,7 @@ export function BranchesTab({ orgId }: BranchesTabProps) {
                         <span className="truncate text-body font-semibold text-foreground">
                           {branch.accountName}
                         </span>
-                        <span className="tracking-tight mt-0.5 font-mono text-label text-subtle">
+                        <span className="mt-0.5 font-mono text-label tracking-tight text-subtle">
                           {branch.accountId}
                         </span>
                       </div>
@@ -286,7 +302,18 @@ export function BranchesTab({ orgId }: BranchesTabProps) {
                 ),
               },
             ]}
-            data={MOCK_BRANCHES}
+            data={filteredBranches}
+            emptyState={
+              <EmptyState
+                icon={<Info size={32} weight="light" />}
+                title="No Branches Found"
+                description={
+                  branchSearch
+                    ? "Try another search term to find the branch you need."
+                    : "Add a branch to start organizing locations and account setup."
+                }
+              />
+            }
           />
         </TooltipProvider>
       )}

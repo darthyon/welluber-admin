@@ -1,6 +1,7 @@
 "use client"
 
 import { Badge } from "@/components/ui/badge"
+import { EmptyState } from "@/components/shared/empty-state"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { Users } from "@phosphor-icons/react"
 import type { BenefitPolicy } from "@/types/policy"
@@ -29,16 +30,11 @@ export function AssignedEmployeesTab({ employees }: AssignedEmployeesTabProps) {
       </div>
 
       {employeeList.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border/60 bg-muted/10 py-20 text-center">
-          <Users size={36} weight="duotone" className="mb-3 text-faint" />
-          <p className="text-body font-medium text-muted-foreground">
-            No assigned employees
-          </p>
-          <p className="mt-1 max-w-xs text-label text-faint">
-            Employees matching the policy eligibility criteria will appear here
-            once assigned.
-          </p>
-        </div>
+        <EmptyState
+          icon={<Users size={32} weight="light" />}
+          title="No Assigned Employees"
+          description="Employees matching the policy eligibility criteria will appear here once assigned."
+        />
       ) : (
         <div className="overflow-hidden rounded-lg border border-border bg-card">
           <div className="border-b border-border bg-muted/30 px-4 py-3">
@@ -57,11 +53,17 @@ export function AssignedEmployeesTab({ employees }: AssignedEmployeesTabProps) {
                 className="grid grid-cols-12 items-center px-4 py-3 transition-colors hover:bg-muted/20"
               >
                 <div className="col-span-3">
-                  <p className="text-body font-semibold text-foreground">{emp.name}</p>
-                  <p className="font-mono text-label text-faint">{emp.empCode}</p>
+                  <p className="text-body font-semibold text-foreground">
+                    {emp.name}
+                  </p>
+                  <p className="font-mono text-label text-faint">
+                    {emp.empCode}
+                  </p>
                 </div>
                 <div className="col-span-3">
-                  <span className="text-body text-subtle">{emp.department}</span>
+                  <span className="text-body text-subtle">
+                    {emp.department}
+                  </span>
                 </div>
                 <div className="col-span-2">
                   <Badge variant="secondary">{emp.tier}</Badge>
