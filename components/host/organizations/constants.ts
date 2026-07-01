@@ -39,6 +39,8 @@ export const TABS = [
 
 export type TabId = (typeof TABS)[number]["id"]
 
+export const ORG_FTU_ORG_ID = "ORG-20260401-0004"
+
 export const OTHER_ORGS = [
   {
     label: "Acme Corporation Sdn Bhd",

@@ -24,9 +24,14 @@ function NewPolicyForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { templates: policyTemplates, isLoading: templatesLoading } = usePolicyTemplates()
+  const source = searchParams.get("source") ?? (searchParams.get("orgId") ? "org" : "global")
   const templateId = searchParams.get("template")
   const cloneId = searchParams.get("clone")
   const paramOrgId = searchParams.get("orgId")
+  const backHref =
+    source === "org" && paramOrgId
+      ? `/organizations/${paramOrgId}?tab=policies`
+      : "/policies"
 
   const [sectionErrors, setSectionErrors] = useState<Record<string, number>>({})
   const [resumePromptOpen, setResumePromptOpen] = useState(false)
@@ -214,7 +219,10 @@ function NewPolicyForm() {
       if (paramOrgId) sessionStorage.setItem("policy-org-context", paramOrgId)
       else sessionStorage.removeItem("policy-org-context")
     }
-    router.push("/policies/new/review")
+    const nextParams = new URLSearchParams()
+    nextParams.set("source", source)
+    if (paramOrgId) nextParams.set("orgId", paramOrgId)
+    router.push(`/policies/new/review?${nextParams.toString()}`)
   }
 
   if (templateId && templatesLoading) {
@@ -234,7 +242,7 @@ function NewPolicyForm() {
         <div className="w-full min-w-0 flex-1">
           <div className="flex flex-col gap-6">
             <NewPolicyPageHeader
-              onBack={() => guardedLeave(() => paramOrgId ? router.push(`/organizations/${paramOrgId}?tab=policies`) : router.back())}
+              onBack={() => guardedLeave(() => router.push(backHref))}
               paramOrgId={paramOrgId}
               saveState={saveState}
               savedAgo={savedAgo}
@@ -262,7 +270,7 @@ function NewPolicyForm() {
             ) : null}
 
             <NewPolicyPageActionBar
-              onCancel={() => guardedLeave(() => paramOrgId ? router.push(`/organizations/${paramOrgId}?tab=policies`) : router.back())}
+              onCancel={() => guardedLeave(() => router.push(backHref))}
               onReview={() => undefined}
             />
           </div>

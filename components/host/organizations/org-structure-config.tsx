@@ -201,6 +201,24 @@ export function OrgStructureConfig({
     if (deptEditing !== null) deptNameRef.current?.focus();
   }, [deptEditing]);
 
+  useEffect(() => {
+    const syncHash = () => {
+      if (window.location.hash === "#employee-tiers") {
+        setActiveTab("tiers");
+        requestAnimationFrame(() => {
+          document.getElementById("employee-tiers")?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        });
+      }
+    };
+
+    syncHash();
+    window.addEventListener("hashchange", syncHash);
+    return () => window.removeEventListener("hashchange", syncHash);
+  }, []);
+
   const handleTierAdd = () => setTierEditing(EMPTY_EDIT);
   const handleTierEdit = (tier: OrgTierConfig) =>
     setTierEditing({ id: tier.id, name: tier.name, code: tier.code ?? "" });
@@ -306,25 +324,27 @@ export function OrgStructureConfig({
       </div>
 
       {activeTab === "tiers" && (
-        <StructurePanel<OrgTierConfig>
-          items={tiers}
-          editing={tierEditing}
-          codePlaceholder="CODE"
-          namePlaceholder="Tier name (e.g. Senior Manager)"
-          emptyTitle="No tiers defined yet"
-          emptyDescription="Add position levels to enable tier-based policies."
-          emptyCtaLabel="Add first tier"
-          addLabel="Add tier"
-          employeeCounts={employeesByTier}
-          nameRef={tierNameRef}
-          onAdd={handleTierAdd}
-          onEdit={handleTierEdit}
-          onDelete={handleTierDelete}
-          onConfirm={handleTierConfirm}
-          onCancel={() => setTierEditing(null)}
-          onEditingChange={setTierEditing}
-          onKeyDown={handleTierKeyDown}
-        />
+        <div id="employee-tiers">
+          <StructurePanel<OrgTierConfig>
+            items={tiers}
+            editing={tierEditing}
+            codePlaceholder="CODE"
+            namePlaceholder="Tier name (e.g. Senior Manager)"
+            emptyTitle="No tiers defined yet"
+            emptyDescription="Add position levels to enable tier-based policies."
+            emptyCtaLabel="Add first tier"
+            addLabel="Add tier"
+            employeeCounts={employeesByTier}
+            nameRef={tierNameRef}
+            onAdd={handleTierAdd}
+            onEdit={handleTierEdit}
+            onDelete={handleTierDelete}
+            onConfirm={handleTierConfirm}
+            onCancel={() => setTierEditing(null)}
+            onEditingChange={setTierEditing}
+            onKeyDown={handleTierKeyDown}
+          />
+        </div>
       )}
 
       {activeTab === "departments" && (

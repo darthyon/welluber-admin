@@ -9,6 +9,7 @@ import {
 } from "@phosphor-icons/react"
 import { OrgSetupChecklist } from "@/components/host/organizations/org-setup-checklist"
 import { OrgSetupGuide } from "@/components/host/organizations/org-setup-guide"
+import { ORG_FTU_ORG_ID } from "@/components/host/organizations/constants"
 import { DetailSection } from "@/components/shared/detail-section"
 import { DetailField } from "@/components/shared/detail-field"
 import { ORG_TYPE_LABELS, type AssignedPolicy } from "@/components/host/organizations/constants"
@@ -32,6 +33,13 @@ export function ProfileTab({
   orgForSetup,
   mockOrg,
 }: ProfileTabProps) {
+  const formattedFinancialYearStart = mockOrg?.financialYearStart
+    ? new Date(mockOrg.financialYearStart).toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "long",
+      })
+    : "—"
+
   return (
     <div className="animate-in space-y-6 fade-in">
       <OrgSetupChecklist
@@ -42,7 +50,7 @@ export function ProfileTab({
         policyCount={assignedPolicies.length}
         employeesWithoutPolicy={orgForSetup.employeesWithoutPolicy ?? 0}
       />
-      {orgStatus !== "inactive" && (
+      {orgStatus !== "inactive" && orgId === ORG_FTU_ORG_ID && (
         <OrgSetupGuide organization={orgForSetup} />
       )}
 
@@ -52,10 +60,10 @@ export function ProfileTab({
         description="Basic information about the organisation"
       >
         <div className="grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-4">
-          <DetailField label="Name" value="Acme Corporation Sdn Bhd" />
-          <DetailField label="Industry" value="Technology" />
-          <DetailField label="Sub-industry" value="Software Development" />
-          <DetailField label="Financial Year Start" value="01 January" />
+          <DetailField label="Name" value={mockOrg?.name ?? "—"} />
+          <DetailField label="Industry" value={mockOrg?.industry ?? "—"} />
+          <DetailField label="Sub-industry" value={mockOrg?.subIndustry ?? "—"} />
+          <DetailField label="Financial Year Start" value={formattedFinancialYearStart} />
         </div>
       </DetailSection>
 
@@ -65,8 +73,8 @@ export function ProfileTab({
         description="Statutory identifiers and entity classification"
       >
         <div className="grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-4">
-          <DetailField label="Registration No." value="1234567-T" />
-          <DetailField label="TIN No." value="TR-882910-01" />
+          <DetailField label="Registration No." value={mockOrg?.registrationNumber ?? "—"} />
+          <DetailField label="TIN No." value={mockOrg?.tinNumber ?? "—"} />
           <DetailField
             label="Organisation Type"
             value={
@@ -101,9 +109,9 @@ export function ProfileTab({
         description="Settlement bank account"
       >
         <div className="grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-4">
-          <DetailField label="Bank Name" value="Maybank Berhad" />
-          <DetailField label="Account Number" value="5140 1234 5678" />
-          <DetailField label="Account Name" value="Acme Corporation Sdn Bhd" />
+          <DetailField label="Bank Name" value={mockOrg?.bankAccountDetails.bankName ?? "—"} />
+          <DetailField label="Account Number" value={mockOrg?.bankAccountDetails.accountNumber ?? "—"} />
+          <DetailField label="Account Name" value={mockOrg?.bankAccountDetails.accountName ?? "—"} />
         </div>
       </DetailSection>
 

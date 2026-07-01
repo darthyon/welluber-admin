@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Plus, Upload } from "@phosphor-icons/react"
 import { useQueryState } from "@/hooks/use-tab-persistence"
@@ -13,13 +13,12 @@ import { FilterItem } from "@/components/shared/filter-item"
 import { SharedDataTable } from "@/components/shared/data-table"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { ActionPopover } from "@/components/shared/action-popover"
+import { TooltipProvider } from "@/components/ui/tooltip"
+import { getMockEmployeeGrid, getMockEmployeeTable } from "./mock-data"
 import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-  TooltipProvider,
-} from "@/components/ui/tooltip"
-import { MOCK_EMPLOYEE_GRID, MOCK_EMPLOYEE_TABLE } from "./mock-data"
+  EmployeeDirectoryEmptyState,
+  EmployeePoliciesCell,
+} from "./directory-sub-tab-parts"
 
 interface DirectorySubTabProps {
   orgId: string
@@ -30,6 +29,22 @@ export function DirectorySubTab({ orgId, onBulkUpload }: DirectorySubTabProps) {
   const router = useRouter()
   const [view, setView] = useState<ViewMode>("list")
   const [search, setSearch] = useQueryState("employeeSearch", "")
+  const [filter] = useQueryState("filter", "")
+  const employeeGrid = useMemo(() => getMockEmployeeGrid(orgId), [orgId])
+  const employeeTable = useMemo(() => getMockEmployeeTable(orgId), [orgId])
+  const showMissingPolicyOnly = filter === "missing-policy"
+  const filterMissingPolicy = <T extends { benefitPolicies?: unknown[] }>(
+    employees: T[]
+  ) =>
+    showMissingPolicyOnly
+      ? employees.filter(
+          (employee) => (employee.benefitPolicies?.length ?? 0) === 0
+        )
+      : employees
+
+  const filteredEmployeeGrid = filterMissingPolicy(employeeGrid)
+  const filteredEmployeeTable = filterMissingPolicy(employeeTable)
+  const hasSearchOrFilter = Boolean(search || showMissingPolicyOnly)
 
   return (
     <div className="animate-in space-y-6 transition-all duration-300 fade-in">
@@ -106,22 +121,28 @@ export function DirectorySubTab({ orgId, onBulkUpload }: DirectorySubTabProps) {
       />
 
       {view === "grid" ? (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          {MOCK_EMPLOYEE_GRID.map((emp) => (
-            <EmployeeCard
-              key={emp.id}
-              employee={emp}
-              onView={(id) => router.push(`/employees/${id}?from=${orgId}`)}
-              onEdit={(id) => router.push(`/employees/${id}/edit`)}
-            />
-          ))}
-        </div>
+        filteredEmployeeGrid.length === 0 ? (
+          <EmployeeDirectoryEmptyState hasSearchOrFilter={hasSearchOrFilter} />
+        ) : (
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            {filteredEmployeeGrid.map((emp) => (
+              <EmployeeCard
+                key={emp.id}
+                employee={emp}
+                onView={(id) => router.push(`/employees/${id}?from=${orgId}`)}
+                onEdit={(id) => router.push(`/employees/${id}/edit`)}
+              />
+            ))}
+          </div>
+        )
       ) : (
         <TooltipProvider>
           <SharedDataTable
             freezeFirst
             freezeLast
-            onRowClick={(emp) => router.push(`/employees/${emp.id}?from=${orgId}`)}
+            onRowClick={(emp) =>
+              router.push(`/employees/${emp.id}?from=${orgId}`)
+            }
             columns={[
               {
                 header: "Employee",
@@ -153,7 +174,10 @@ export function DirectorySubTab({ orgId, onBulkUpload }: DirectorySubTabProps) {
                 accessorKey: "branch",
                 sortable: true,
                 render: (emp) => (
-                  <Badge variant="outline" className="text-label font-medium whitespace-nowrap">
+                  <Badge
+                    variant="outline"
+                    className="text-label font-medium whitespace-nowrap"
+                  >
                     {emp.branch}
                   </Badge>
                 ),
@@ -173,7 +197,10 @@ export function DirectorySubTab({ orgId, onBulkUpload }: DirectorySubTabProps) {
                 accessorKey: "tier",
                 sortable: true,
                 render: (emp) => (
-                  <Badge variant="secondary" className="text-label font-medium whitespace-nowrap">
+                  <Badge
+                    variant="secondary"
+                    className="text-label font-medium whitespace-nowrap"
+                  >
                     {emp.tier || "—"}
                   </Badge>
                 ),
@@ -193,7 +220,9 @@ export function DirectorySubTab({ orgId, onBulkUpload }: DirectorySubTabProps) {
                 accessorKey: "joinDate",
                 sortable: true,
                 render: (emp) => (
-                  <span className="text-label font-medium text-subtle">{emp.joinDate}</span>
+                  <span className="text-label font-medium text-subtle">
+                    {emp.joinDate}
+                  </span>
                 ),
               },
               {
@@ -201,117 +230,15 @@ export function DirectorySubTab({ orgId, onBulkUpload }: DirectorySubTabProps) {
                 accessorKey: "lastActive",
                 sortable: true,
                 render: (emp) => (
-                  <span className="text-label font-medium text-subtle">{emp.lastActive}</span>
+                  <span className="text-label font-medium text-subtle">
+                    {emp.lastActive}
+                  </span>
                 ),
               },
               {
                 header: "Policies",
                 render: (emp) => (
-                  <div className="flex max-w-[280px] flex-wrap items-center gap-1 overflow-visible">
-                    {emp.benefitPolicies && emp.benefitPolicies.length > 0 ? (
-                      <>
-                        {emp.benefitPolicies.slice(0, 2).map(
-                          (
-                            policy: { policyName: string; benefitGroups?: string[]; utilisation?: number },
-                            idx: number
-                          ) => (
-                            <Tooltip key={idx}>
-                              <TooltipTrigger asChild>
-                                <div className="flex cursor-help items-center">
-                                  <Badge
-                                    variant="secondary"
-                                    className="text-label font-medium whitespace-nowrap transition-colors hover:bg-secondary/80"
-                                  >
-                                    {policy.policyName}
-                                    {policy.benefitGroups && policy.benefitGroups.length > 0 && (
-                                      <span className="ml-1 max-w-[80px] truncate font-medium text-subtle">
-                                        ({policy.benefitGroups.length})
-                                      </span>
-                                    )}
-                                  </Badge>
-                                </div>
-                              </TooltipTrigger>
-                              <TooltipContent side="top" className="z-[200] w-56 p-2">
-                                <div className="flex flex-col gap-1.5">
-                                  <div className="text-label font-semibold text-foreground">
-                                    {policy.policyName}
-                                  </div>
-                                  {policy.benefitGroups && policy.benefitGroups.length > 0 ? (
-                                    <div className="text-label leading-snug text-muted-foreground">
-                                      {policy.benefitGroups.join(", ")}
-                                    </div>
-                                  ) : (
-                                    <div className="text-label text-muted-foreground italic">
-                                      No specific groups.
-                                    </div>
-                                  )}
-                                  {policy.utilisation !== undefined && (
-                                    <StatusBadge
-                                      status={`${policy.utilisation}% Utilized`}
-                                      variant="emerald"
-                                      className="mt-0.5"
-                                    />
-                                  )}
-                                </div>
-                              </TooltipContent>
-                            </Tooltip>
-                          )
-                        )}
-                        {emp.benefitPolicies.length > 2 && (
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <button
-                                onClick={(e) => e.stopPropagation()}
-                                className="cursor-help px-1 text-label font-medium text-subtle transition-colors hover:text-primary"
-                              >
-                                +{emp.benefitPolicies.length - 2}
-                              </button>
-                            </TooltipTrigger>
-                            <TooltipContent side="right" className="z-[200] flex w-56 flex-col gap-2 p-2">
-                              <div className="px-1 text-label font-semibold text-muted-foreground opacity-60">
-                                Other policies
-                              </div>
-                              {emp.benefitPolicies.slice(2).map(
-                                (
-                                  policy: { policyName: string; benefitGroups?: string[]; utilisation?: number },
-                                  i: number
-                                ) => (
-                                  <div
-                                    key={i}
-                                    className="flex flex-col gap-1.5 border-b border-border/50 px-1 pb-2.5 last:border-0 last:pb-0"
-                                  >
-                                    <div className="mt-1 text-label font-semibold text-foreground">
-                                      {policy.policyName}
-                                    </div>
-                                    {policy.benefitGroups && policy.benefitGroups.length > 0 ? (
-                                      <div className="text-label leading-snug text-muted-foreground">
-                                        {policy.benefitGroups.join(", ")}
-                                      </div>
-                                    ) : (
-                                      <div className="text-label text-muted-foreground italic">
-                                        No specific groups.
-                                      </div>
-                                    )}
-                                    {policy.utilisation !== undefined && (
-                                      <StatusBadge
-                                        status={`${policy.utilisation}% Utilized`}
-                                        variant="emerald"
-                                        className="mt-0.5"
-                                      />
-                                    )}
-                                  </div>
-                                )
-                              )}
-                            </TooltipContent>
-                          </Tooltip>
-                        )}
-                      </>
-                    ) : (
-                      <Badge variant="outline" className="text-label font-medium">
-                        None
-                      </Badge>
-                    )}
-                  </div>
+                  <EmployeePoliciesCell policies={emp.benefitPolicies} />
                 ),
               },
               {
@@ -331,15 +258,27 @@ export function DirectorySubTab({ orgId, onBulkUpload }: DirectorySubTabProps) {
                 render: (emp) => (
                   <ActionPopover
                     actions={[
-                      { label: "View Employee", onClick: () => router.push(`/employees/${emp.id}?from=${orgId}`) },
-                      { label: "Edit Employee", onClick: () => router.push(`/employees/${emp.id}/edit`) },
+                      {
+                        label: "View Employee",
+                        onClick: () =>
+                          router.push(`/employees/${emp.id}?from=${orgId}`),
+                      },
+                      {
+                        label: "Edit Employee",
+                        onClick: () => router.push(`/employees/${emp.id}/edit`),
+                      },
                       { label: "Terminate Link", isDanger: true },
                     ]}
                   />
                 ),
               },
             ]}
-            data={MOCK_EMPLOYEE_TABLE}
+            data={filteredEmployeeTable}
+            emptyState={
+              <EmployeeDirectoryEmptyState
+                hasSearchOrFilter={hasSearchOrFilter}
+              />
+            }
           />
         </TooltipProvider>
       )}

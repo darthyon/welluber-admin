@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, use } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { CaretLeft, NavigationArrow, Check, Users, CaretDown, PencilSimpleLine } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -85,6 +85,17 @@ const employeeColumns: Column<EmployeeDirectoryItem>[] = [
 export default function EditPolicyReviewPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const source = searchParams.get("source") ?? "global";
+  const orgId = searchParams.get("orgId");
+  const editHref =
+    source === "org" && orgId
+      ? `/policies/${id}/edit?source=org&orgId=${orgId}`
+      : `/policies/${id}/edit?source=global`;
+  const doneHref =
+    source === "org" && orgId
+      ? `/organizations/${orgId}?tab=policies`
+      : "/policies";
   const draftKey = `policy-draft-edit-${id}`;
   const [draft, setDraft] = useState<Draft | null>(() => {
     if (typeof window === "undefined") return null;
@@ -97,8 +108,8 @@ export default function EditPolicyReviewPage({ params }: { params: Promise<{ id:
   const [updatedPolicyName, setUpdatedPolicyName] = useState("");
 
   useEffect(() => {
-    if (!draft) { router.replace(`/policies/${id}/edit`); return; }
-  }, [draft, router, id]);
+    if (!draft) { router.replace(editHref); return; }
+  }, [draft, editHref, router]);
 
   const tierOptions = getTierOptions(draft?.policy.organizationId);
   const departmentOptions = getDepartmentOptions(draft?.policy.organizationId);
@@ -168,7 +179,7 @@ export default function EditPolicyReviewPage({ params }: { params: Promise<{ id:
         <div className="flex flex-col gap-4">
           <button
             type="button"
-            onClick={() => router.push(`/policies/${id}/edit`)}
+            onClick={() => router.push(editHref)}
             className="inline-flex items-center gap-1.5 text-body font-medium text-subtle hover:text-foreground transition-colors w-fit"
           >
             <CaretLeft size={16} /> Back to Edit
@@ -256,7 +267,7 @@ export default function EditPolicyReviewPage({ params }: { params: Promise<{ id:
         </section>
 
         <div className="sticky bottom-8 z-50 mx-auto flex items-center gap-4 p-2 px-6 bg-background/80 backdrop-blur-2xl border border-border shadow-lg rounded-full animate-in slide-in-from-bottom-10 duration-700 ease-out w-fit">
-          <Button type="button" variant="ghost" size="lg" className="text-body font-medium px-6 transition-colors" onClick={() => router.push(`/policies/${id}/edit`)}>
+          <Button type="button" variant="ghost" size="lg" className="text-body font-medium px-6 transition-colors" onClick={() => router.push(editHref)}>
             Back to Edit
           </Button>
           <div className="w-px h-6 bg-border/40" />
@@ -294,8 +305,8 @@ export default function EditPolicyReviewPage({ params }: { params: Promise<{ id:
         onClose={() => setShowSuccess(false)}
         title="Policy Updated"
         message={`${updatedPolicyName} has been updated successfully.`}
-        primaryAction={{ label: "View Policies", onClick: () => { setShowSuccess(false); router.push("/policies"); } }}
-        secondaryAction={{ label: "Done", onClick: () => { setShowSuccess(false); router.push("/policies"); } }}
+        primaryAction={{ label: source === "org" ? "Back to Organisation" : "View Policies", onClick: () => { setShowSuccess(false); router.push(doneHref); } }}
+        secondaryAction={{ label: "Done", onClick: () => { setShowSuccess(false); router.push(doneHref); } }}
       />
     </div>
   );

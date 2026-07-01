@@ -137,7 +137,7 @@ export default function ServiceProviderDetailPage() {
               </div>
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
-                  <h1 className="text-display font-semibold tracking-tight text-foreground">{sp.name}</h1>
+                  <h1 className="text-title font-semibold tracking-tight text-foreground">{sp.name}</h1>
                   <StatusBadge
                     status={currentStatus}
                     variant={

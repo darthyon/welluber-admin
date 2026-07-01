@@ -1,6 +1,6 @@
-"use client";
+"use client"
 
-import { useState, useMemo } from "react";
+import { useState, useMemo } from "react"
 import {
   Ticket,
   Calendar,
@@ -8,35 +8,36 @@ import {
   Buildings,
   MapPin,
   Eye,
-  Download
-} from "@phosphor-icons/react";
-import { SharedDataTable, type Column } from "@/components/shared/data-table";
-import { DataFilterBar } from "@/components/shared/data-filter-bar";
-import { FilterItem } from "@/components/shared/filter-item";
-import { ActionPopover } from "@/components/shared/action-popover";
-import { StatusBadge } from "@/components/shared/status-badge";
-import type { EmployeeUtilisationRow, ClaimStatus } from "@/types/claims";
+  Download,
+} from "@phosphor-icons/react"
+import { SharedDataTable, type Column } from "@/components/shared/data-table"
+import { DataFilterBar } from "@/components/shared/data-filter-bar"
+import { FilterItem } from "@/components/shared/filter-item"
+import { ActionPopover } from "@/components/shared/action-popover"
+import { StatusBadge } from "@/components/shared/status-badge"
+import { EmptyState } from "@/components/shared/empty-state"
+import type { EmployeeUtilisationRow, ClaimStatus } from "@/types/claims"
 
 // ─── Derived redemption row ───────────────────────────────────────────────────
 
 interface RedemptionRow {
-  id: string;
-  voucherCode: string;
-  voucherName: string;
-  date: string;
-  employeeName: string;
-  empCode: string;
-  redeemedBy: string;
-  redeemedByType: string;
-  amount: number;
-  provider: string;
-  branch: string;
-  city: string;
-  status: ClaimStatus;
+  id: string
+  voucherCode: string
+  voucherName: string
+  date: string
+  employeeName: string
+  empCode: string
+  redeemedBy: string
+  redeemedByType: string
+  amount: number
+  provider: string
+  branch: string
+  city: string
+  status: ClaimStatus
 }
 
 function deriveRedemptions(data: EmployeeUtilisationRow[]): RedemptionRow[] {
-  const rows: RedemptionRow[] = [];
+  const rows: RedemptionRow[] = []
   data.forEach((emp) => {
     emp.claims.forEach((claim) => {
       rows.push({
@@ -53,24 +54,24 @@ function deriveRedemptions(data: EmployeeUtilisationRow[]): RedemptionRow[] {
         branch: emp.branch,
         city: claim.location,
         status: claim.status,
-      });
-    });
-  });
-  return rows;
+      })
+    })
+  })
+  return rows
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
 interface Props {
-  data: EmployeeUtilisationRow[];
-  onViewVoucher?: (redemption: RedemptionRow) => void;
+  data: EmployeeUtilisationRow[]
+  onViewVoucher?: (redemption: RedemptionRow) => void
 }
 
 export function VouchersTable({ data, onViewVoucher }: Props) {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<ClaimStatus | "all">("all");
+  const [searchQuery, setSearchQuery] = useState("")
+  const [statusFilter, setStatusFilter] = useState<ClaimStatus | "all">("all")
 
-  const redemptions = useMemo(() => deriveRedemptions(data), [data]);
+  const redemptions = useMemo(() => deriveRedemptions(data), [data])
 
   const filtered = redemptions.filter((r) => {
     const matchesSearch =
@@ -83,20 +84,20 @@ export function VouchersTable({ data, onViewVoucher }: Props) {
         r.provider,
         r.city,
         r.redeemedBy,
-      ].some((f) => String(f).toLowerCase().includes(searchQuery.toLowerCase()));
-    const matchesStatus = statusFilter === "all" || r.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+      ].some((f) => String(f).toLowerCase().includes(searchQuery.toLowerCase()))
+    const matchesStatus = statusFilter === "all" || r.status === statusFilter
+    return matchesSearch && matchesStatus
+  })
 
   const columns: Column<RedemptionRow>[] = [
     {
       header: "Voucher",
       render: (row) => (
         <div className="flex flex-col gap-0.5">
-          <p className="text-body font-semibold text-primary cursor-pointer hover:underline underline-offset-2">
+          <p className="cursor-pointer text-body font-semibold text-primary underline-offset-2 hover:underline">
             {row.voucherName}
           </p>
-          <code className="text-label font-mono text-muted-foreground">
+          <code className="font-mono text-label text-muted-foreground">
             {row.voucherCode}
           </code>
         </div>
@@ -107,8 +108,8 @@ export function VouchersTable({ data, onViewVoucher }: Props) {
       accessorKey: "date",
       render: (row) => (
         <div className="flex items-center gap-1.5">
-          <Calendar size={11} className="text-faint shrink-0" />
-          <p className="text-label text-muted-foreground font-medium whitespace-nowrap">
+          <Calendar size={11} className="shrink-0 text-faint" />
+          <p className="text-label font-medium whitespace-nowrap text-muted-foreground">
             {row.date}
           </p>
         </div>
@@ -121,7 +122,7 @@ export function VouchersTable({ data, onViewVoucher }: Props) {
           <p className="text-body font-medium text-foreground">
             {row.employeeName}
           </p>
-          <p className="text-label text-muted-foreground font-medium mt-0.5">
+          <p className="mt-0.5 text-label font-medium text-muted-foreground">
             {row.empCode}
           </p>
         </div>
@@ -134,7 +135,7 @@ export function VouchersTable({ data, onViewVoucher }: Props) {
           <p className="text-body font-medium text-foreground">
             {row.redeemedBy}
           </p>
-          <p className="text-label text-muted-foreground font-medium mt-0.5">
+          <p className="mt-0.5 text-label font-medium text-muted-foreground">
             {row.redeemedByType}
           </p>
         </div>
@@ -145,7 +146,7 @@ export function VouchersTable({ data, onViewVoucher }: Props) {
       accessorKey: "amount",
       align: "right",
       render: (row) => (
-        <p className="text-body font-semibold font-mono text-foreground">
+        <p className="font-mono text-body font-semibold text-foreground">
           RM {row.amount.toFixed(2)}
         </p>
       ),
@@ -153,9 +154,9 @@ export function VouchersTable({ data, onViewVoucher }: Props) {
     {
       header: "Service Provider",
       render: (row) => (
-        <div className="flex items-center gap-1.5 min-w-0">
-          <Storefront size={11} className="text-faint shrink-0" />
-          <p className="text-body text-subtle font-medium truncate">
+        <div className="flex min-w-0 items-center gap-1.5">
+          <Storefront size={11} className="shrink-0 text-faint" />
+          <p className="truncate text-body font-medium text-subtle">
             {row.provider}
           </p>
         </div>
@@ -166,12 +167,12 @@ export function VouchersTable({ data, onViewVoucher }: Props) {
       render: (row) => (
         <div className="flex flex-col gap-0.5">
           <div className="flex items-center gap-1.5">
-            <Buildings size={11} className="text-faint shrink-0" />
-            <p className="text-body font-medium text-foreground truncate">
+            <Buildings size={11} className="shrink-0 text-faint" />
+            <p className="truncate text-body font-medium text-foreground">
               {row.branch}
             </p>
           </div>
-          <div className="flex items-center gap-1.5 text-label text-muted-foreground font-medium">
+          <div className="flex items-center gap-1.5 text-label font-medium text-muted-foreground">
             <MapPin size={11} className="shrink-0" />
             {row.city}
           </div>
@@ -215,7 +216,7 @@ export function VouchersTable({ data, onViewVoucher }: Props) {
         />
       ),
     },
-  ];
+  ]
 
   return (
     <div className="space-y-4">
@@ -239,16 +240,11 @@ export function VouchersTable({ data, onViewVoucher }: Props) {
       />
 
       {filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-center rounded-lg border border-dashed border-border">
-          <Ticket
-            size={36}
-            weight="duotone"
-            className="text-faint mb-3"
-          />
-          <p className="text-muted-foreground font-medium text-body">
-            No vouchers found.
-          </p>
-        </div>
+        <EmptyState
+          icon={<Ticket size={32} weight="light" />}
+          title="No Voucher Redemptions Yet"
+          description="Voucher redemption activity will appear here once employees start using benefits."
+        />
       ) : (
         <SharedDataTable
           data={filtered}
@@ -260,6 +256,5 @@ export function VouchersTable({ data, onViewVoucher }: Props) {
         />
       )}
     </div>
-  );
+  )
 }
-

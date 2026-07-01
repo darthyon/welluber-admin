@@ -58,7 +58,7 @@ export default function EditBrandPage() {
         </button>
 
         <div>
-          <h1 className="tracking-tight text-display font-semibold text-foreground">
+          <h1 className="tracking-tight text-title font-semibold text-foreground">
             Edit Brand
           </h1>
           <p className="mt-1 text-body font-normal text-subtle opacity-80">

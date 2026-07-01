@@ -34,9 +34,9 @@ export function OrgSetupChecklist({
 
   const steps: ChecklistStep[] = [
     { key: "details", label: "Organization Details", href: `/organizations/${orgId}?tab=profile`, completed: true },
-    { key: "tiers", label: "Tier Configs", href: `/organizations/${orgId}?tab=employees&subTab=tiers`, completed: tierCount > 0 },
+    { key: "tiers", label: "Tier Configs", href: `/organizations/${orgId}?tab=settings#employee-tiers`, completed: tierCount > 0 },
     { key: "employees", label: "Employees", href: `/organizations/${orgId}?tab=employees`, completed: employeeCount > 0 },
-    { key: "policies", label: "Policies Assigned", href: `/organizations/${orgId}?tab=policies`, completed: policyCount > 0 },
+    { key: "policies", label: "Policies Assigned", href: `/organizations/${orgId}/policies/new`, completed: policyCount > 0 },
     { key: "activated", label: "Activated", href: `/organizations/${orgId}?tab=settings`, completed: false },
   ]
 

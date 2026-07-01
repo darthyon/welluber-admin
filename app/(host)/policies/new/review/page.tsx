@@ -51,6 +51,8 @@ function NewPolicyReviewPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const simulateError = searchParams.get("simulate");
+  const source = searchParams.get("source") ?? "global";
+  const orgIdFromQuery = searchParams.get("orgId");
   const [draft, setDraft] = useState<Draft | null>(() => {
     if (typeof window === "undefined") return null;
     const stored = sessionStorage.getItem("policy-draft");
@@ -84,12 +86,21 @@ function NewPolicyReviewPageContent() {
   });
   const [bypassModalOpen, setBypassModalOpen] = useState(false);
   const [pendingIncludeEmp, setPendingIncludeEmp] = useState<EmployeeDirectoryItem | null>(null);
+  const effectiveOrgContext = orgIdFromQuery ?? orgContext;
+  const reviewBackHref =
+    source === "org" && effectiveOrgContext
+      ? `/policies/new?source=org&orgId=${effectiveOrgContext}`
+      : "/policies/new?source=global";
+  const doneHref =
+    source === "org" && effectiveOrgContext
+      ? `/organizations/${effectiveOrgContext}?tab=policies`
+      : "/policies";
 
   useEffect(() => {
     if (!draft) {
-      router.replace("/policies/new");
+      router.replace(reviewBackHref);
     }
-  }, [draft, router]);
+  }, [draft, reviewBackHref, router]);
 
   const tierOptions = getTierOptions(draft?.policy.organizationId);
   const departmentOptions = getDepartmentOptions(draft?.policy.organizationId);
@@ -231,7 +242,7 @@ function NewPolicyReviewPageContent() {
         );
       }
       toast.error("Name already in use", { description: "Pick a different name and try again." });
-      router.push(orgContext ? `/policies/new?orgId=${orgContext}` : "/policies/new");
+      router.push(reviewBackHref);
       return;
     }
 
@@ -261,7 +272,7 @@ function NewPolicyReviewPageContent() {
     <div className="animate-in pb-24 duration-500 fade-in slide-in-from-bottom-4">
       <div className="mx-auto flex max-w-[1280px] flex-col gap-8">
         <PolicyReviewHeader
-          onBack={() => router.push(orgContext ? `/policies/new?orgId=${orgContext}` : "/policies/new")}
+          onBack={() => router.push(reviewBackHref)}
         />
 
         <PolicyReviewAssignmentSection
@@ -290,8 +301,8 @@ function NewPolicyReviewPageContent() {
           onToggleSelect={toggleSelect}
           onToggleSelectAll={toggleSelectAll}
           onToggleTier={toggleTier}
-          orgContext={orgContext}
-          routerBack={() => router.push(orgContext ? `/policies/new?orgId=${orgContext}` : "/policies/new")}
+          orgContext={effectiveOrgContext}
+          routerBack={() => router.push(reviewBackHref)}
           searchQuery={searchQuery}
           searchResults={searchResults}
           selectedIds={selectedIds}
@@ -322,10 +333,10 @@ function NewPolicyReviewPageContent() {
           },
         }}
         secondaryAction={{
-          label: orgContext ? "Back to Organisation" : "Done",
+          label: source === "org" ? "Back to Organisation" : "Done",
           onClick: () => {
             setShowSuccess(false);
-            router.push(orgContext ? `/organizations/${orgContext}?tab=policies` : "/policies");
+            router.push(doneHref);
           },
         }}
       />

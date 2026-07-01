@@ -73,7 +73,7 @@ export function EmployeeDetail({ employee, onBack, onEdit, backLabel = "Back" }:
             </div>
             <div>
               <div className="flex items-center gap-3">
-                <h2 className="text-display font-semibold tracking-tight text-foreground">{employee.name}</h2>
+                <h2 className="text-title font-semibold tracking-tight text-foreground">{employee.name}</h2>
                 <StatusBadge status={employee.status} variant="emerald" />
               </div>
               <p className="mt-1 text-body font-medium text-muted-foreground">
@@ -81,13 +81,12 @@ export function EmployeeDetail({ employee, onBack, onEdit, backLabel = "Back" }:
               </p>
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 {employee.isProbation && <StatusBadge status="Probation" variant="amber" />}
-                {employee.residencyStatus && <Badge variant="outline">{employee.residencyStatus}</Badge>}
               </div>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" className="h-10 px-4 font-semibold hover:bg-muted" onClick={onEdit}>
+            <Button variant="secondary" size="lg" className="gap-2 text-body font-medium" onClick={onEdit}>
               <PencilSimpleLine size={18} weight="bold" className="mr-2" />
               Edit Employee
             </Button>
