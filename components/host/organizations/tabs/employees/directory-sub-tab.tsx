@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Plus, Upload } from "@phosphor-icons/react"
 import { useQueryState } from "@/hooks/use-tab-persistence"
@@ -19,7 +19,7 @@ import {
   TooltipContent,
   TooltipProvider,
 } from "@/components/ui/tooltip"
-import { MOCK_EMPLOYEE_GRID, MOCK_EMPLOYEE_TABLE } from "./mock-data"
+import { getMockEmployeeGrid, getMockEmployeeTable } from "./mock-data"
 
 interface DirectorySubTabProps {
   orgId: string
@@ -30,6 +30,17 @@ export function DirectorySubTab({ orgId, onBulkUpload }: DirectorySubTabProps) {
   const router = useRouter()
   const [view, setView] = useState<ViewMode>("list")
   const [search, setSearch] = useQueryState("employeeSearch", "")
+  const [filter] = useQueryState("filter", "")
+  const employeeGrid = useMemo(() => getMockEmployeeGrid(orgId), [orgId])
+  const employeeTable = useMemo(() => getMockEmployeeTable(orgId), [orgId])
+  const showMissingPolicyOnly = filter === "missing-policy"
+  const filterMissingPolicy = <T extends { benefitPolicies?: unknown[] }>(employees: T[]) =>
+    showMissingPolicyOnly
+      ? employees.filter((employee) => (employee.benefitPolicies?.length ?? 0) === 0)
+      : employees
+
+  const filteredEmployeeGrid = filterMissingPolicy(employeeGrid)
+  const filteredEmployeeTable = filterMissingPolicy(employeeTable)
 
   return (
     <div className="animate-in space-y-6 transition-all duration-300 fade-in">
@@ -107,7 +118,7 @@ export function DirectorySubTab({ orgId, onBulkUpload }: DirectorySubTabProps) {
 
       {view === "grid" ? (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          {MOCK_EMPLOYEE_GRID.map((emp) => (
+          {filteredEmployeeGrid.map((emp) => (
             <EmployeeCard
               key={emp.id}
               employee={emp}
@@ -339,7 +350,7 @@ export function DirectorySubTab({ orgId, onBulkUpload }: DirectorySubTabProps) {
                 ),
               },
             ]}
-            data={MOCK_EMPLOYEE_TABLE}
+            data={filteredEmployeeTable}
           />
         </TooltipProvider>
       )}

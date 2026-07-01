@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, use } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { CaretLeft, NavigationArrow, CaretDown, IdentificationCard } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav";
@@ -18,6 +18,13 @@ const ANCHOR_ITEMS = [
 export default function EditPolicyPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const source = searchParams.get("source") ?? "global";
+  const orgId = searchParams.get("orgId");
+  const backHref =
+    source === "org" && orgId
+      ? `/organizations/${orgId}?tab=policies`
+      : "/policies";
   const draftKey = `policy-draft-edit-${id}`;
 
   const initialData = useMemo<{ policy: Partial<BenefitPolicy>; groups: BenefitGroup[]; benefits: Benefit[] } | undefined>(() => {
@@ -32,7 +39,10 @@ export default function EditPolicyPage({ params }: { params: Promise<{ id: strin
     if (typeof window !== "undefined") {
       sessionStorage.setItem(draftKey, JSON.stringify(data));
     }
-    router.push(`/policies/${id}/edit/review`);
+    const nextParams = new URLSearchParams();
+    nextParams.set("source", source);
+    if (orgId) nextParams.set("orgId", orgId);
+    router.push(`/policies/${id}/edit/review?${nextParams.toString()}`);
   };
 
   return (
@@ -69,7 +79,7 @@ export default function EditPolicyPage({ params }: { params: Promise<{ id: strin
             {/* Header */}
             <div className="flex flex-col gap-4">
               <button
-                onClick={() => router.back()}
+                onClick={() => router.push(backHref)}
                 className="inline-flex items-center gap-1.5 text-body font-medium text-subtle hover:text-foreground transition-colors w-fit"
               >
                 <CaretLeft size={16} /> Back
@@ -97,7 +107,7 @@ export default function EditPolicyPage({ params }: { params: Promise<{ id: strin
                 variant="ghost"
                 size="lg"
                 className="text-body font-medium px-6 transition-colors"
-                onClick={() => router.back()}
+                onClick={() => router.push(backHref)}
               >
                 Cancel
               </Button>

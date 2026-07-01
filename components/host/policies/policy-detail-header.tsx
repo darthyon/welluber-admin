@@ -264,7 +264,7 @@ export function PolicyDetailHeader({
             </div>
             <div className="space-y-2">
               <div className="flex items-center gap-3">
-                <h1 className="tracking-tight text-display font-semibold text-foreground">
+                <h1 className="tracking-tight text-title font-semibold text-foreground">
                   {policyName}
                 </h1>
                 <StatusBadge

@@ -250,7 +250,7 @@ export function CategoryWizardForm({
             }
           />
           <div>
-            <h1 className="text-display font-semibold tracking-tight text-balance text-foreground">
+            <h1 className="text-title font-semibold tracking-tight text-balance text-foreground">
               {mode === "create"
                 ? "New Service Category"
                 : "Edit Service Category"}

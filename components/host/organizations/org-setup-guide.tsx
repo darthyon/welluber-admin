@@ -32,7 +32,7 @@ export function OrgSetupGuide({ organization: org, className, compact = false }:
         : "Set position levels (like Executive, Manager, Associate) used for benefit policy targeting.",
       complete: (org.tierConfigs?.length ?? 0) > 0,
       locked: false,
-      href: `/organizations/${org.id}?tab=employees&subTab=tiers`,
+      href: `/organizations/${org.id}?tab=settings#employee-tiers`,
       cta: "Set up tiers",
     },
     {
@@ -54,7 +54,7 @@ export function OrgSetupGuide({ organization: org, className, compact = false }:
         : "Build at least one policy with benefit groups, services, and coverage amounts.",
       complete: org.policies.length > 0,
       locked: false,
-      href: `/organizations/${org.id}?tab=policies&addPolicy=true`,
+      href: `/organizations/${org.id}/policies/new`,
       cta: "Create policy",
     },
     {

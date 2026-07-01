@@ -168,7 +168,7 @@ export function BrandDetailView({
             <EntityAvatar name={brand.name} size="xl" />
             <div>
               <div className="flex items-center gap-3">
-                <h2 className="tracking-tight text-display font-semibold text-foreground">
+                <h2 className="tracking-tight text-title font-semibold text-foreground">
                   {brand.name}
                 </h2>
                 <StatusBadge

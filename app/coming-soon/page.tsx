@@ -11,7 +11,7 @@ export default function ComingSoonPage() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6 text-center">
       <WelluberLogo width={160} height={42} className="mb-10 text-primary" />
 
-      <h1 className="text-display font-semibold text-foreground">
+      <h1 className="text-title font-semibold text-foreground">
         We&apos;re working on it.
       </h1>
       <p className="mt-3 max-w-sm text-body text-subtle">

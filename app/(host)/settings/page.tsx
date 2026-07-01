@@ -2,7 +2,7 @@ export default function SettingsPage() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-display font-semibold tracking-tight">Settings</h1>
+        <h1 className="text-title font-semibold tracking-tight">Settings</h1>
         <p className="text-muted-foreground text-body mt-1">
           Platform-wide configuration and system settings
         </p>
