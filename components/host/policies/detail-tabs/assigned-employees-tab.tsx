@@ -1,7 +1,7 @@
 "use client"
 
 import { Badge } from "@/components/ui/badge"
-import { StatusBadge } from "@/components/shared/status-badge"
+import { EmptyState } from "@/components/shared/empty-state"
 import { Users } from "@phosphor-icons/react"
 import type { BenefitPolicy } from "@/types/policy"
 import type { EmployeeDirectoryItem } from "@/features/employees/types"
@@ -29,25 +29,19 @@ export function AssignedEmployeesTab({ employees }: AssignedEmployeesTabProps) {
       </div>
 
       {employeeList.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border/60 bg-muted/10 py-20 text-center">
-          <Users size={36} weight="duotone" className="mb-3 text-faint" />
-          <p className="text-body font-medium text-muted-foreground">
-            No assigned employees
-          </p>
-          <p className="mt-1 max-w-xs text-label text-faint">
-            Employees matching the policy eligibility criteria will appear here
-            once assigned.
-          </p>
-        </div>
+        <EmptyState
+          icon={<Users size={32} weight="light" />}
+          title="No Assigned Employees"
+          description="Employees matching the policy eligibility criteria will appear here once assigned."
+        />
       ) : (
         <div className="overflow-hidden rounded-lg border border-border bg-card">
           <div className="border-b border-border bg-muted/30 px-4 py-3">
             <div className="grid grid-cols-12 text-label font-semibold text-muted-foreground">
-              <span className="col-span-3">Employee</span>
+              <span className="col-span-4">Employee</span>
               <span className="col-span-3">Department</span>
               <span className="col-span-2">Tier</span>
-              <span className="col-span-2">Join Date</span>
-              <span className="col-span-2">Status</span>
+              <span className="col-span-3">Join Date</span>
             </div>
           </div>
           <div className="divide-y divide-border/50">
@@ -56,36 +50,24 @@ export function AssignedEmployeesTab({ employees }: AssignedEmployeesTabProps) {
                 key={emp.id}
                 className="grid grid-cols-12 items-center px-4 py-3 transition-colors hover:bg-muted/20"
               >
-                <div className="col-span-3">
-                  <p className="text-body font-semibold text-foreground">{emp.name}</p>
-                  <p className="font-mono text-label text-faint">{emp.empCode}</p>
+                <div className="col-span-4">
+                  <p className="text-body font-semibold text-foreground">
+                    {emp.name}
+                  </p>
+                  <p className="font-mono text-label text-faint">
+                    {emp.empCode}
+                  </p>
                 </div>
                 <div className="col-span-3">
-                  <span className="text-body text-subtle">{emp.department}</span>
+                  <span className="text-body text-subtle">
+                    {emp.department}
+                  </span>
                 </div>
                 <div className="col-span-2">
                   <Badge variant="secondary">{emp.tier}</Badge>
                 </div>
-                <div className="col-span-2">
+                <div className="col-span-3">
                   <span className="text-body text-subtle">{emp.joinDate}</span>
-                </div>
-                <div className="col-span-2">
-                  <StatusBadge
-                    status={
-                      emp.status === "active"
-                        ? "Active"
-                        : emp.status === "on-leave"
-                          ? "On Leave"
-                          : "Inactive"
-                    }
-                    variant={
-                      emp.status === "active"
-                        ? "emerald"
-                        : emp.status === "on-leave"
-                          ? "amber"
-                          : "zinc"
-                    }
-                  />
                 </div>
               </div>
             ))}

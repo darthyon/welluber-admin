@@ -1,9 +1,9 @@
-"use client";
+"use client"
 
-import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { EmployeeDetail } from "@/components/host/employees/employee-detail";
-import { MOCK_EMPLOYEES } from "@/lib/mock-data";
-import type { EmployeeDetailRecord } from "@/features/employees/types";
+import { useParams, useRouter } from "next/navigation"
+import { EmployeeDetail } from "@/components/host/employees/employee-detail"
+import { MOCK_EMPLOYEES } from "@/lib/mock-data"
+import type { EmployeeDetailRecord } from "@/features/employees/types"
 
 const EMPLOYEE_DETAIL_OVERRIDES: Record<
   string,
@@ -34,8 +34,20 @@ const EMPLOYEE_DETAIL_OVERRIDES: Record<
     isProbation: false,
     probationEndDate: "05 Jun 2026",
     dependents: [
-      { id: "dep_0002_1", relationship: "Spouse", name: "Daniel Wilson", email: "daniel.wilson@email.com", phone: "+60 12-555 1843" },
-      { id: "dep_0002_2", relationship: "Child", name: "Emma Wilson", email: "", phone: "+60 12-555 1844" },
+      {
+        id: "dep_0002_1",
+        relationship: "Spouse",
+        name: "Daniel Wilson",
+        email: "daniel.wilson@email.com",
+        phone: "+60 12-555 1843",
+      },
+      {
+        id: "dep_0002_2",
+        relationship: "Child",
+        name: "Emma Wilson",
+        email: "",
+        phone: "+60 12-555 1844",
+      },
     ],
   },
   "EMP-20260115-0003": {
@@ -50,8 +62,20 @@ const EMPLOYEE_DETAIL_OVERRIDES: Record<
     isProbation: false,
     probationEndDate: "20 Aug 2026",
     dependents: [
-      { id: "dep_0003_1", relationship: "Spouse", name: "Siti Rahmah", email: "siti.rahmah@email.com", phone: "+60 12-610 1453" },
-      { id: "dep_0003_2", relationship: "Child", name: "Adam Faizal", email: "", phone: "+60 12-610 1454" },
+      {
+        id: "dep_0003_1",
+        relationship: "Spouse",
+        name: "Siti Rahmah",
+        email: "siti.rahmah@email.com",
+        phone: "+60 12-610 1453",
+      },
+      {
+        id: "dep_0003_2",
+        relationship: "Child",
+        name: "Adam Faizal",
+        email: "",
+        phone: "+60 12-610 1454",
+      },
     ],
   },
   "EMP-20260115-0004": {
@@ -79,8 +103,20 @@ const EMPLOYEE_DETAIL_OVERRIDES: Record<
     isProbation: false,
     probationEndDate: "15 Apr 2026",
     dependents: [
-      { id: "dep_0006_1", relationship: "Spouse", name: "Nadia Faizal", email: "nadia.faizal@email.com", phone: "+60 12-700 2302" },
-      { id: "dep_0006_2", relationship: "Child", name: "Aisyah Faizal", email: "", phone: "+60 12-700 2303" },
+      {
+        id: "dep_0006_1",
+        relationship: "Spouse",
+        name: "Nadia Faizal",
+        email: "nadia.faizal@email.com",
+        phone: "+60 12-700 2302",
+      },
+      {
+        id: "dep_0006_2",
+        relationship: "Child",
+        name: "Aisyah Faizal",
+        email: "",
+        phone: "+60 12-700 2303",
+      },
     ],
   },
 }
@@ -97,42 +133,48 @@ const DEFAULT_EMPLOYEE_DETAILS = {
   isProbation: false,
   probationEndDate: "12 Jan 2024",
   dependents: [
-    { id: "dep_1", relationship: "Spouse", name: "Siti Rahmah", email: "siti.rahmah@email.com", phone: "+60 12-345 6790" },
-    { id: "dep_2", relationship: "Child", name: "Adam Faizal", email: "", phone: "+60 12-345 6791" },
+    {
+      id: "dep_1",
+      relationship: "Spouse",
+      name: "Siti Rahmah",
+      email: "siti.rahmah@email.com",
+      phone: "+60 12-345 6790",
+    },
+    {
+      id: "dep_2",
+      relationship: "Child",
+      name: "Adam Faizal",
+      email: "",
+      phone: "+60 12-345 6791",
+    },
   ],
-} satisfies Omit<EmployeeDetailRecord, keyof (typeof MOCK_EMPLOYEES)[number]>;
+} satisfies Omit<EmployeeDetailRecord, keyof (typeof MOCK_EMPLOYEES)[number]>
 
 function buildEmployeeDetail(employeeId: string): EmployeeDetailRecord {
   const baseEmployee =
-    MOCK_EMPLOYEES.find((employee) => employee.id === employeeId) ?? MOCK_EMPLOYEES[0];
-  const override = EMPLOYEE_DETAIL_OVERRIDES[baseEmployee.id] ?? DEFAULT_EMPLOYEE_DETAILS;
+    MOCK_EMPLOYEES.find((employee) => employee.id === employeeId) ??
+    MOCK_EMPLOYEES[0]
+  const override =
+    EMPLOYEE_DETAIL_OVERRIDES[baseEmployee.id] ?? DEFAULT_EMPLOYEE_DETAILS
 
   return {
     ...baseEmployee,
     ...override,
-  };
+  }
 }
 
 export default function EmployeePage() {
-  const params = useParams();
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const employeeId = params.id as string;
-  const employee = buildEmployeeDetail(employeeId);
-
-  // When opened from an org's Employees tab, return there instead of the global directory.
-  const fromOrgId = searchParams.get("from");
-  const backLabel = fromOrgId ? "Back to Employees" : "Back to Employee Directory";
-  const backHref = fromOrgId ? `/organizations/${fromOrgId}?tab=employees` : "/employees";
+  const params = useParams()
+  const router = useRouter()
+  const employeeId = params.id as string
+  const employee = buildEmployeeDetail(employeeId)
 
   return (
     <div className="p-6 pb-12 lg:p-8">
       <EmployeeDetail
         employee={employee}
-        backLabel={backLabel}
-        onBack={() => router.push(backHref)}
         onEdit={() => router.push(`/employees/${employeeId}/edit`)}
       />
     </div>
-  );
+  )
 }

@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod"
 
 export const createOrganizationSchema = z.object({
   logo: z.string().optional(),
@@ -6,22 +6,36 @@ export const createOrganizationSchema = z.object({
   registrationNumber: z.string().min(4, "Registration number is required"),
   industry: z.string().min(1, "Please select an industry"),
   subIndustry: z.string().optional(),
-  type: z.enum(["sole_proprietorship", "partnership", "sdn_bhd", "llp", "bhd", "clbg"] as const, {
-    message: "Please select an organization type",
-  }),
+  type: z.enum(
+    [
+      "sole_proprietorship",
+      "partnership",
+      "sdn_bhd",
+      "llp",
+      "bhd",
+      "clbg",
+    ] as const,
+    {
+      message: "Please select an organization type",
+    }
+  ),
   financialYearStart: z.string().optional(),
   financialYearMode: z.enum(["calendar", "follow_month"]).optional(),
   financialYearMonth: z.number().min(1).max(12).optional(),
-  subscription: z.object({
-    plan: z.enum(["standard", "premium", "enterprise"] as const, {
-      message: "Please select a subscription plan",
-    }),
-    billingInformation: z.string().optional(),
-    paymentMethod: z.string().optional(),
-    startDate: z.date().optional(),
-    endDate: z.date().optional(),
-    status: z.enum(["active", "inactive", "draft", "deactivated", "suspended"]).default("inactive"),
-  }).optional(),
+  subscription: z
+    .object({
+      plan: z.enum(["standard", "premium", "enterprise"] as const, {
+        message: "Please select a subscription plan",
+      }),
+      billingInformation: z.string().optional(),
+      paymentMethod: z.string().optional(),
+      startDate: z.date().optional(),
+      endDate: z.date().optional(),
+      status: z
+        .enum(["active", "inactive", "draft", "deactivated", "suspended"])
+        .default("inactive"),
+    })
+    .optional(),
   tinNumber: z.string().min(4, "TIN Number is required"),
   creditLimit: z.number().min(0).optional(),
   address: z.object({
@@ -37,9 +51,9 @@ export const createOrganizationSchema = z.object({
     accountName: z.string().min(2, "Account name is required"),
   }),
   documents: z.array(z.string()).optional(),
-});
+})
 
-export type CreateOrganizationData = z.infer<typeof createOrganizationSchema>;
+export type CreateOrganizationData = z.infer<typeof createOrganizationSchema>
 
 export const hqBranchSchema = z.object({
   name: z.string().min(2, "Branch name is required"),
@@ -50,27 +64,26 @@ export const hqBranchSchema = z.object({
     country: z.string().min(2, "Country is required"),
     postalCode: z.string().min(5, "Postal code is required"),
   }),
-  accountType: z.enum(["new", "existing"]),
+  // HQ branch always gets its own dedicated account — linking to an
+  // existing wallet is intentionally not offered at org creation.
   accountName: z.string().optional(),
   creditLimit: z.number().optional(),
-  existingAccountId: z.string().optional(),
-});
+})
 
-export type HqBranchData = z.infer<typeof hqBranchSchema>;
+export type HqBranchData = z.infer<typeof hqBranchSchema>
 
 export const inviteAdminSchema = z.object({
   name: z.string().min(2, "Admin name is required"),
   email: z.string().email("Please enter a valid email address"),
   position: z.string().min(2, "Position is required"),
-});
+})
 
-export type InviteAdminData = z.infer<typeof inviteAdminSchema>;
-
+export type InviteAdminData = z.infer<typeof inviteAdminSchema>
 
 export const configureAccountSchema = z.object({
   model: z.enum(["cash_balance", "credit_limit"] as const, {
     message: "Please select an account model",
   }),
-});
+})
 
-export type ConfigureAccountData = z.infer<typeof configureAccountSchema>;
+export type ConfigureAccountData = z.infer<typeof configureAccountSchema>

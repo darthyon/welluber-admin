@@ -33,31 +33,26 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "relative flex flex-col items-center justify-center overflow-hidden rounded-[32px] border border-dashed border-border/40 bg-muted/5 text-center transition-all duration-500",
-        isPageLevel ? "min-h-[520px] p-24" : "p-12",
-        "animate-in duration-700 ease-out zoom-in-95 fade-in",
+        "flex flex-col items-center justify-center text-center",
+        isPageLevel ? "min-h-[520px] px-8 py-24" : "px-6 py-12",
+        "animate-in duration-500 ease-out fade-in",
         className
       )}
     >
-      {/* Premium Background Accent */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(var(--primary-rgb),0.03),transparent_70%)]" />
-
       {icon && (
         <div
           className={cn(
-            "relative z-10 mb-8 flex items-center justify-center rounded-lg border border-border/40 bg-background text-primary/80 shadow-xl shadow-black/5",
-            "bg-background/50 backdrop-blur-sm",
-            isPageLevel ? "size-24 p-6" : "size-16 p-4"
+            "mb-6 flex items-center justify-center text-primary/45",
+            isPageLevel ? "size-16" : "size-12"
           )}
         >
-          <div className="absolute inset-0 animate-pulse rounded-lg bg-primary/5" />
-          <div className="relative z-10">{icon}</div>
+          {icon}
         </div>
       )}
 
       <h3
         className={cn(
-          "relative z-10 font-semibold tracking-tight text-foreground text-balance",
+          "font-semibold text-balance text-foreground",
           isPageLevel ? "mb-3 text-heading" : "mb-1.5 text-lead"
         )}
       >
@@ -67,10 +62,10 @@ export function EmptyState({
       {description && (
         <p
           className={cn(
-            "relative z-10 leading-relaxed font-normal text-subtle text-pretty",
+            "leading-relaxed font-normal text-pretty text-subtle",
             isPageLevel
-              ? "mb-10 max-w-sm text-body"
-              : "mb-8 max-w-[260px] text-body"
+              ? "mb-8 max-w-md text-body"
+              : "mb-6 max-w-[320px] text-body"
           )}
         >
           {description}
@@ -78,9 +73,7 @@ export function EmptyState({
       )}
 
       {action && (
-        <div className="relative z-10 flex animate-in items-center justify-center delay-300 duration-1000 fill-mode-both slide-in-from-bottom-4">
-          {action}
-        </div>
+        <div className="flex items-center justify-center">{action}</div>
       )}
     </div>
   )

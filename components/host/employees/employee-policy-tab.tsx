@@ -1,81 +1,95 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { Shield, ArrowSquareOut, Warning, TreeStructure } from "@phosphor-icons/react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { StatusBadge } from "@/components/shared/status-badge";
+import { useState } from "react"
+import {
+  Shield,
+  ArrowSquareOut,
+  Warning,
+  TreeStructure,
+} from "@phosphor-icons/react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { StatusBadge } from "@/components/shared/status-badge"
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { AssignPolicyModal } from "./assign-policy-modal";
-import { UnassignPolicyModal } from "./unassign-policy-modal";
-import { getEmployeeEntitlement } from "./employee-entitlements-mock";
+} from "@/components/ui/dialog"
+import { AssignPolicyModal } from "./assign-policy-modal"
+import { UnassignPolicyModal } from "./unassign-policy-modal"
+import { getEmployeeEntitlement } from "./employee-entitlements-mock"
 
 interface EmployeePolicyTabProps {
-  employeeId: string;
-  employeeName: string;
+  employeeId: string
+  employeeName: string
 }
 
 const EMPLOYEE_POOL_LABEL: Record<string, string> = {
-  SharedWithEmployee: "Combined Pool",
-  Shared: "Individual Pool",
-  Individual: "Individual Pool",
-};
+  SharedWithEmployee: "Combined",
+  Shared: "Individual",
+  Individual: "Individual",
+}
 
 const DEPENDENT_POOL_LABEL: Record<string, string> = {
-  SharedWithEmployee: "Combined Pool",
-  Shared: "Shared Pool",
-  Individual: "Individual Pools",
-};
+  SharedWithEmployee: "Combined",
+  Shared: "Shared",
+  Individual: "Individual",
+}
 
 function formatUtilisationMode(mode?: string, prorateUnit?: string) {
   if (mode === "Prorated") {
-    return prorateUnit ? `Prorated Allocation (${prorateUnit})` : "Prorated Allocation";
+    return prorateUnit
+      ? `Prorated Allocation (${prorateUnit})`
+      : "Prorated Allocation"
   }
 
-  return "Fixed Allocation";
+  return "Fixed Allocation"
 }
 
 function formatRefreshCycle(refreshCycle?: string) {
-  return refreshCycle ? `${refreshCycle} Refresh` : "Refresh Not Set";
+  return refreshCycle ? `${refreshCycle} Refresh` : "Refresh Not Set"
 }
 
-function formatPoolSummary(policy: ReturnType<typeof getEmployeeEntitlement>["policy"]) {
+function formatPoolSummary(
+  policy: ReturnType<typeof getEmployeeEntitlement>["policy"]
+) {
   if (!policy.dependentCoverages?.length) {
     return {
       label: "Employee",
-      badge: "Individual Pool",
-    };
+      badge: "Individual",
+    }
   }
 
-  const dependentType = policy.dependentsPoolType ?? "Individual";
-  const badge = DEPENDENT_POOL_LABEL[dependentType] ?? "Individual Pools";
+  const dependentType = policy.dependentsPoolType ?? "Individual"
+  const badge = DEPENDENT_POOL_LABEL[dependentType] ?? "Individual"
 
   return {
     label: "Employee + Dependents",
     badge,
-  };
+  }
 }
 
-function formatPoolStructure(policy: ReturnType<typeof getEmployeeEntitlement>["policy"]) {
-  const summary = formatPoolSummary(policy);
-  return `${summary.label} · ${summary.badge}`;
+function formatPoolStructure(
+  policy: ReturnType<typeof getEmployeeEntitlement>["policy"]
+) {
+  const summary = formatPoolSummary(policy)
+  return `${summary.label} · ${summary.badge}`
 }
 
-export function EmployeePolicyTab({ employeeId, employeeName }: EmployeePolicyTabProps) {
-  const [hasPolicy, setHasPolicy] = useState(true);
-  const [showAssignModal, setShowAssignModal] = useState(false);
-  const [showUnassignModal, setShowUnassignModal] = useState(false);
-  const [showPolicyModal, setShowPolicyModal] = useState(false);
+export function EmployeePolicyTab({
+  employeeId,
+  employeeName,
+}: EmployeePolicyTabProps) {
+  const [hasPolicy, setHasPolicy] = useState(true)
+  const [showAssignModal, setShowAssignModal] = useState(false)
+  const [showUnassignModal, setShowUnassignModal] = useState(false)
+  const [showPolicyModal, setShowPolicyModal] = useState(false)
 
   // Summary reads the same source as the Usage section so the two never drift.
-  const { policy, groups } = getEmployeeEntitlement(employeeId);
-  const poolSummary = formatPoolSummary(policy);
+  const { policy, groups } = getEmployeeEntitlement(employeeId)
+  const poolSummary = formatPoolSummary(policy)
   const summary = {
     name: policy.name,
     code: policy.code ?? policy.id,
@@ -83,19 +97,25 @@ export function EmployeePolicyTab({ employeeId, employeeName }: EmployeePolicyTa
     version: policy.version ?? "V1.0",
     status: "Active",
     refreshCycle: formatRefreshCycle(policy.refreshCycle),
-    utilisationMode: formatUtilisationMode(policy.utilisationMode, policy.prorateUnit),
+    utilisationMode: formatUtilisationMode(
+      policy.utilisationMode,
+      policy.prorateUnit
+    ),
     poolLabel: poolSummary.label,
     poolBadge: poolSummary.badge,
     groupCount: groups.length,
-  };
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-title font-semibold text-foreground">Entitlement</h2>
+          <h2 className="text-title font-semibold text-foreground">
+            Entitlement
+          </h2>
           <p className="mt-1 text-body text-muted-foreground">
-            View assigned benefit policy, policy details, entitlement, and pool management.
+            View assigned benefit policy, policy details, entitlement, and pool
+            management.
           </p>
         </div>
         {hasPolicy && (
@@ -144,8 +164,8 @@ export function EmployeePolicyTab({ employeeId, employeeName }: EmployeePolicyTa
                   </span>
                 </div>
                 <p className="text-label font-medium text-subtle">
-                  {summary.orgName} · {summary.code} · {summary.groupCount} benefit{" "}
-                  {summary.groupCount === 1 ? "group" : "groups"}
+                  {summary.orgName} · {summary.code} · {summary.groupCount}{" "}
+                  benefit {summary.groupCount === 1 ? "group" : "groups"}
                 </p>
               </div>
               <Button
@@ -161,17 +181,22 @@ export function EmployeePolicyTab({ employeeId, employeeName }: EmployeePolicyTa
           </CardContent>
         </Card>
       ) : (
-        <Card className="border-border border-dashed">
+        <Card className="border-dashed border-border">
           <CardContent className="p-12 text-center">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-border bg-muted/50 text-faint">
               <Shield size={32} />
             </div>
-            <h3 className="mt-6 text-heading font-semibold text-foreground">No Policy Assigned</h3>
+            <h3 className="mt-6 text-heading font-semibold text-foreground">
+              No Policy Assigned
+            </h3>
             <p className="mx-auto mt-2 max-w-md text-body text-muted-foreground">
-              This employee doesn&apos;t have a benefit policy assigned yet. Assign a policy to
-              provide benefits.
+              This employee doesn&apos;t have a benefit policy assigned yet.
+              Assign a policy to provide benefits.
             </p>
-            <Button className="mt-6 gap-2" onClick={() => setShowAssignModal(true)}>
+            <Button
+              className="mt-6 gap-2"
+              onClick={() => setShowAssignModal(true)}
+            >
               <Shield size={18} />
               Assign Benefit Policy
             </Button>
@@ -205,30 +230,47 @@ export function EmployeePolicyTab({ employeeId, employeeName }: EmployeePolicyTa
 
           {/* Employee pool */}
           <div>
-            <p className="mb-2 text-label font-semibold text-muted-foreground">Employee Pool</p>
+            <p className="mb-2 text-label font-semibold text-muted-foreground">
+              Employee Pool
+            </p>
             <div className="grid grid-cols-2 gap-3 rounded-lg border border-border bg-muted/30 p-4">
               <div>
-                <p className="text-micro font-medium text-muted-foreground">Pool Type</p>
+                <p className="text-micro font-medium text-muted-foreground">
+                  Pool Type
+                </p>
                 <p className="mt-0.5 text-label font-semibold text-foreground">
-                  {EMPLOYEE_POOL_LABEL[policy.dependentsPoolType ?? policy.benefitPoolType] ?? "Individual Pool"}
+                  {EMPLOYEE_POOL_LABEL[
+                    policy.dependentsPoolType ?? policy.benefitPoolType
+                  ] ?? "Individual"}
                 </p>
               </div>
               <div>
-                <p className="text-micro font-medium text-muted-foreground">Utilisation Mode</p>
+                <p className="text-micro font-medium text-muted-foreground">
+                  Utilisation Mode
+                </p>
                 <p className="mt-0.5 text-label font-semibold text-foreground">
-                  {formatUtilisationMode(policy.utilisationMode, policy.prorateUnit)}
+                  {formatUtilisationMode(
+                    policy.utilisationMode,
+                    policy.prorateUnit
+                  )}
                 </p>
               </div>
               <div>
-                <p className="text-micro font-medium text-muted-foreground">Refresh Cycle</p>
+                <p className="text-micro font-medium text-muted-foreground">
+                  Refresh Cycle
+                </p>
                 <p className="mt-0.5 text-label font-semibold text-foreground">
                   {formatRefreshCycle(policy.refreshCycle)}
                 </p>
               </div>
               <div>
-                <p className="text-micro font-medium text-muted-foreground">Employee Cap</p>
+                <p className="text-micro font-medium text-muted-foreground">
+                  Employee Cap
+                </p>
                 <p className="mt-0.5 text-label font-semibold text-foreground">
-                  {policy.totalCapAmount != null ? `RM ${policy.totalCapAmount.toLocaleString()} / Cycle` : "Not Set"}
+                  {policy.totalCapAmount != null
+                    ? `RM ${policy.totalCapAmount.toLocaleString()} / Cycle`
+                    : "Not Set"}
                 </p>
               </div>
             </div>
@@ -236,18 +278,29 @@ export function EmployeePolicyTab({ employeeId, employeeName }: EmployeePolicyTa
 
           {/* Dependent coverage */}
           <div>
-            <p className="mb-2 text-label font-semibold text-muted-foreground">Dependent Coverage</p>
+            <p className="mb-2 text-label font-semibold text-muted-foreground">
+              Dependent Coverage
+            </p>
             <div className="grid grid-cols-2 gap-3 rounded-lg border border-border bg-muted/30 p-4">
               <div>
-                <p className="text-micro font-medium text-muted-foreground">Covered Types</p>
+                <p className="text-micro font-medium text-muted-foreground">
+                  Covered Types
+                </p>
                 <p className="mt-0.5 text-label font-semibold text-foreground">
                   {(policy.dependentCoverages?.length ?? 0) > 0
-                    ? policy.dependentCoverages!.map((c) => c.type.charAt(0).toUpperCase() + c.type.slice(1)).join(", ")
+                    ? policy
+                        .dependentCoverages!.map(
+                          (c) =>
+                            c.type.charAt(0).toUpperCase() + c.type.slice(1)
+                        )
+                        .join(", ")
                     : "Employee Only"}
                 </p>
               </div>
               <div>
-                <p className="text-micro font-medium text-muted-foreground">Dependents Pool Type</p>
+                <p className="text-micro font-medium text-muted-foreground">
+                  Dependents Pool Type
+                </p>
                 <p className="mt-0.5 text-label font-semibold text-foreground">
                   {(policy.dependentCoverages?.length ?? 0) > 0
                     ? formatPoolStructure(policy)
@@ -256,7 +309,9 @@ export function EmployeePolicyTab({ employeeId, employeeName }: EmployeePolicyTa
               </div>
               {policy.dependentCapAmount != null && (
                 <div>
-                  <p className="text-micro font-medium text-muted-foreground">Dependent Cap</p>
+                  <p className="text-micro font-medium text-muted-foreground">
+                    Dependent Cap
+                  </p>
                   <p className="mt-0.5 text-label font-semibold text-foreground">
                     RM {policy.dependentCapAmount.toLocaleString()} / Cycle
                   </p>
@@ -277,9 +332,14 @@ export function EmployeePolicyTab({ employeeId, employeeName }: EmployeePolicyTa
                     <TreeStructure size={14} weight="duotone" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-label font-semibold text-foreground">{g.name}</p>
+                    <p className="truncate text-label font-semibold text-foreground">
+                      {g.name}
+                    </p>
                     <p className="text-micro text-muted-foreground">
-                      {g.coverageScope ?? "Employee"} · {g.distributionType === "SharedAmount" ? "Shared Amount" : "Individual Amount"}
+                      {g.coverageScope ?? "Employee"} ·{" "}
+                      {g.distributionType === "SharedAmount"
+                        ? "Shared Amount"
+                        : "Individual Amount"}
                     </p>
                   </div>
                 </div>
@@ -313,10 +373,10 @@ export function EmployeePolicyTab({ employeeId, employeeName }: EmployeePolicyTa
         policyName={summary.name}
         hasActiveClaims={false}
         onUnassign={() => {
-          setHasPolicy(false);
-          setShowUnassignModal(false);
+          setHasPolicy(false)
+          setShowUnassignModal(false)
         }}
       />
     </div>
-  );
+  )
 }

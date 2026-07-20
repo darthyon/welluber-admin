@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { EmptyState } from "@/components/shared/empty-state"
 import { BenefitGroupLedgerCard } from "../benefit-group-ledger-card"
 import { NotePencil, TreeStructure } from "@phosphor-icons/react"
 import type { Benefit, BenefitGroup, BenefitPolicy } from "@/types/policy"
@@ -44,7 +45,8 @@ export function BenefitGroupsTab({
             </Badge>
           </div>
           <p className="mt-0.5 text-label text-faint">
-            Inherited from this benefit group. Individual services can override amounts and co-pays.
+            Inherited from this benefit group. Individual services can override
+            amounts and co-pays.
           </p>
         </div>
         <Button
@@ -80,23 +82,21 @@ export function BenefitGroupsTab({
 
 function EmptyBenefitGroups({ onAdd }: { onAdd: () => void }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border/60 bg-muted/10 py-16">
-      <TreeStructure size={36} weight="duotone" className="mb-3 text-faint" />
-      <p className="text-body font-medium text-muted-foreground">
-        No benefit groups configured.
-      </p>
-      <p className="mt-1 text-label text-faint">
-        Add groups to define which benefits are available.
-      </p>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={onAdd}
-        className="mt-3 font-semibold text-primary"
-      >
-        <NotePencil size={14} weight="bold" className="mr-1.5" />
-        Add Groups
-      </Button>
-    </div>
+    <EmptyState
+      icon={<TreeStructure size={32} weight="light" />}
+      title="No Benefit Groups Configured"
+      description="Add groups to define which services and benefit rules are available."
+      action={
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onAdd}
+          className="rounded-4xl px-4 text-label font-medium text-primary"
+        >
+          <NotePencil size={14} weight="bold" className="mr-1.5" />
+          Add Groups
+        </Button>
+      }
+    />
   )
 }

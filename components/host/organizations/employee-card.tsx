@@ -1,142 +1,138 @@
-"use client";
+"use client"
 
-import { 
-  Buildings, 
-  Shield, 
+import {
+  Buildings,
+  Shield,
   Calendar,
   Clock,
-  UserCircle
-} from "@phosphor-icons/react";
-import { StatusBadge } from "@/components/shared/status-badge";
-import { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ActionPopover } from "@/components/shared/action-popover";
+  UserCircle,
+} from "@phosphor-icons/react"
+import { useState, useRef, useEffect } from "react"
+import { motion } from "framer-motion"
+import { ActionPopover } from "@/components/shared/action-popover"
 
 export type EmployeeBenefitPolicy = {
-  policyName: string;
-  benefitGroups: string[];
-  utilisation: number; // 0-100
-};
+  policyName: string
+  benefitGroups: string[]
+  utilisation: number // 0-100
+}
 
 export interface EmployeeCardEmployee {
-  id: string;
-  name: string;
-  email: string;
-  organization?: string;
-  branch: string;
-  status: string;
-  empCode: string;
-  joinDate: string;
-  lastActive?: string;
-  department?: string;
-  tier?: string;
-  employmentType?: string;
-  benefitPolicies: EmployeeBenefitPolicy[];
-  dependentsCount: number;
+  id: string
+  name: string
+  email: string
+  organization?: string
+  branch: string
+  empCode: string
+  joinDate: string
+  lastActive?: string
+  department?: string
+  tier?: string
+  employmentType?: string
+  benefitPolicies: EmployeeBenefitPolicy[]
+  dependentsCount: number
 }
 
 interface EmployeeCardProps {
-  employee: EmployeeCardEmployee;
-  onEdit?: (id: string) => void;
-  onView?: (id: string) => void;
+  employee: EmployeeCardEmployee
+  onEdit?: (id: string) => void
+  onView?: (id: string) => void
 }
 
 export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
-  const [policyIndex] = useState(0);
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const innerRef = useRef<HTMLDivElement>(null);
-  const [dragConstraints, setDragConstraints] = useState({ left: 0, right: 0 });
-  
-  const initials = employee.name.split(" ").map(n => n[0]).join("");
-  const currentItem = employee.benefitPolicies[policyIndex] || employee.benefitPolicies[0];
+  const [policyIndex] = useState(0)
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const innerRef = useRef<HTMLDivElement>(null)
+  const [dragConstraints, setDragConstraints] = useState({ left: 0, right: 0 })
+
+  const initials = employee.name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+  const currentItem =
+    employee.benefitPolicies[policyIndex] || employee.benefitPolicies[0]
 
   useEffect(() => {
     const calculateConstraints = () => {
       if (scrollRef.current && innerRef.current) {
-        const outerWidth = scrollRef.current.offsetWidth;
-        const innerWidth = innerRef.current.scrollWidth;
+        const outerWidth = scrollRef.current.offsetWidth
+        const innerWidth = innerRef.current.scrollWidth
         setDragConstraints({
           left: outerWidth > innerWidth ? 0 : outerWidth - innerWidth,
-          right: 0
-        });
+          right: 0,
+        })
       }
-    };
+    }
 
     // Use ResizeObserver to avoid layout thrashing
     const observer = new ResizeObserver(() => {
-      requestAnimationFrame(calculateConstraints);
-    });
+      requestAnimationFrame(calculateConstraints)
+    })
 
     if (scrollRef.current) {
-      observer.observe(scrollRef.current);
+      observer.observe(scrollRef.current)
     }
     if (innerRef.current) {
-      observer.observe(innerRef.current);
+      observer.observe(innerRef.current)
     }
 
     // Initial calculation
-    const timer = setTimeout(calculateConstraints, 100);
+    const timer = setTimeout(calculateConstraints, 100)
 
     return () => {
-      clearTimeout(timer);
-      observer.disconnect();
-    };
-  }, [currentItem]);
+      clearTimeout(timer)
+      observer.disconnect()
+    }
+  }, [currentItem])
 
   return (
     <div
-      className="group glass-card rounded-lg p-5 relative flex flex-col h-full overflow-hidden cursor-pointer"
+      className="group glass-card relative flex h-full cursor-pointer flex-col overflow-hidden rounded-lg p-5"
       onClick={() => onView?.(employee.id)}
     >
       {/* Decorative Accent */}
-      <div className="absolute -right-8 -bottom-8 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all duration-500 pointer-events-none" />
+      <div className="pointer-events-none absolute -right-8 -bottom-8 h-24 w-24 rounded-full bg-primary/5 blur-2xl transition-all duration-500 group-hover:bg-primary/10" />
 
       {/* Upper Section (Compact) */}
-      <div className="flex items-start justify-between mb-4 relative z-10">
+      <div className="relative z-10 mb-4 flex items-start justify-between">
         <div className="flex items-center gap-3">
           <div className="relative">
-            <div className="w-10 h-10 rounded-lg border border-border/40 flex items-center justify-center bg-muted/30 text-primary font-semibold text-label group-hover:scale-105 transition-all duration-500 shadow-sm overflow-hidden">
-               <div className="bg-primary/10 w-full h-full flex items-center justify-center font-mono tracking-tighter">
-                  {initials}
-               </div>
+            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg border border-border/40 bg-muted/30 text-label font-semibold text-primary shadow-sm transition-all duration-500 group-hover:scale-105">
+              <div className="flex h-full w-full items-center justify-center bg-primary/10 font-mono tracking-tighter">
+                {initials}
+              </div>
             </div>
-            {employee.status === "Linked" && (
-              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 dark:bg-emerald-500/20 border-2 border-white rounded-full shadow-sm" />
-            )}
           </div>
 
           <div className="space-y-1.5">
             <div className="flex items-center gap-2">
-              <h4 className="font-semibold text-body text-foreground group-hover:text-primary transition-colors truncate tracking-tight max-w-[140px]">
+              <h4 className="max-w-[140px] truncate text-body font-semibold tracking-tight text-foreground transition-colors group-hover:text-primary">
                 {employee.name}
               </h4>
             </div>
             <div className="flex items-center gap-2">
-              <StatusBadge 
-                status={employee.status} 
-                variant={employee.status === "Linked" ? "emerald" : "amber"} 
-                className="px-1.5 py-0.5 rounded-md text-micro"
-              />
-              <span className="text-micro text-faint font-mono bg-background/50 px-1.5 py-0.5 rounded border border-border/40 tracking-tight">{employee.empCode}</span>
+              <span className="rounded border border-border/40 bg-background/50 px-1.5 py-0.5 font-mono text-micro tracking-tight text-faint">
+                {employee.empCode}
+              </span>
             </div>
-            <div className="flex items-center gap-1.5 flex-wrap">
+            <div className="flex flex-wrap items-center gap-1.5">
               {employee.organization && (
-                <span className="text-micro font-medium px-1.5 py-0.5 rounded bg-muted text-subtle border border-border/40">
+                <span className="rounded border border-border/40 bg-muted px-1.5 py-0.5 text-micro font-medium text-subtle">
                   {employee.organization}
                 </span>
               )}
               {employee.department && (
-                <span className="text-micro font-semibold px-1.5 py-0.5 rounded bg-muted text-muted-foreground border border-border/40">
+                <span className="rounded border border-border/40 bg-muted px-1.5 py-0.5 text-micro font-semibold text-muted-foreground">
                   {employee.department}
                 </span>
               )}
               {employee.tier && (
-                <span className="text-micro font-semibold px-1.5 py-0.5 rounded bg-primary/5 text-primary border border-primary/10">
+                <span className="rounded border border-primary/10 bg-primary/5 px-1.5 py-0.5 text-micro font-semibold text-primary">
                   {employee.tier}
                 </span>
               )}
               {employee.employmentType && (
-                <span className="text-micro font-semibold px-1.5 py-0.5 rounded bg-muted text-muted-foreground border border-border/40 capitalize">
+                <span className="rounded border border-border/40 bg-muted px-1.5 py-0.5 text-micro font-semibold text-muted-foreground capitalize">
                   {employee.employmentType.replace("-", " ")}
                 </span>
               )}
@@ -144,7 +140,7 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
           </div>
         </div>
 
-        <ActionPopover 
+        <ActionPopover
           align="end"
           actions={[
             { label: "View employee", onClick: () => onView?.(employee.id) },
@@ -155,16 +151,20 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
       </div>
 
       {/* Info Section */}
-      <div className="flex-1 space-y-6 relative z-10">
-        
+      <div className="relative z-10 flex-1 space-y-6">
         {/* Row 1: Branch & Email */}
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2.5">
             <div className="flex items-center gap-1.5 text-faint">
               <Buildings size={14} weight="bold" />
-              <span className="text-label font-semibold text-faint">Branch</span>
+              <span className="text-label font-semibold text-faint">
+                Branch
+              </span>
             </div>
-            <span className="text-body font-medium text-foreground block truncate" title={employee.branch}>
+            <span
+              className="block truncate text-body font-medium text-foreground"
+              title={employee.branch}
+            >
               {employee.branch}
             </span>
           </div>
@@ -173,81 +173,91 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
               <UserCircle size={14} weight="bold" />
               <span className="text-label font-semibold text-faint">Email</span>
             </div>
-            <span className="text-label font-semibold text-subtle block truncate" title={employee.email}>
+            <span
+              className="block truncate text-label font-semibold text-subtle"
+              title={employee.email}
+            >
               {employee.email}
             </span>
           </div>
         </div>
-          
+
         {/* Policy Carousel Section */}
-        <div className="bg-muted/30 rounded-lg px-4 py-4 border border-border/60 relative overflow-hidden group/policy min-h-[140px]">
-          <div className="flex items-center gap-1.5 text-faint mb-3">
+        <div className="group/policy relative min-h-[140px] overflow-hidden rounded-lg border border-border/60 bg-muted/30 px-4 py-4">
+          <div className="mb-3 flex items-center gap-1.5 text-faint">
             <Shield size={14} weight="bold" />
-            <span className="text-label font-semibold text-faint">Benefit Policy</span>
+            <span className="text-label font-semibold text-faint">
+              Benefit Policy
+            </span>
           </div>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={policyIndex}
-              initial={{ x: 10, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: -10, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="space-y-3.5"
-            >
-              <div className="flex flex-col gap-2.5 overflow-hidden flex-1">
-                <span className="text-body font-medium text-foreground truncate" title={currentItem.policyName}>
-                  {currentItem.policyName}
-                </span>
-                
-                {/* Benefit Groups (Allocations) - Grab-to-Scroll interaction */}
-                <div className="relative group/scroll px-0.5 overflow-hidden active:cursor-grabbing" ref={scrollRef}>
-                  <motion.div 
-                    ref={innerRef}
-                    className="flex items-center gap-1.5 py-1 px-0.5 cursor-grab active:cursor-grabbing w-max pr-2"
-                    drag="x"
-                    dragConstraints={dragConstraints}
-                    dragElastic={0.05}
-                    whileTap={{ cursor: "grabbing" }}
-                  >
-                    {currentItem.benefitGroups.map((group: string, idx: number) => (
-                      <div 
+          <div
+            key={policyIndex}
+            className="animate-in space-y-3.5 duration-200 fade-in slide-in-from-right-1"
+          >
+            <div className="flex flex-1 flex-col gap-2.5 overflow-hidden">
+              <span
+                className="truncate text-body font-medium text-foreground"
+                title={currentItem.policyName}
+              >
+                {currentItem.policyName}
+              </span>
+
+              {/* Benefit Groups (Allocations) - Grab-to-Scroll interaction */}
+              <div
+                className="group/scroll relative overflow-hidden px-0.5 active:cursor-grabbing"
+                ref={scrollRef}
+              >
+                <motion.div
+                  ref={innerRef}
+                  className="flex w-max cursor-grab items-center gap-1.5 px-0.5 py-1 pr-2 active:cursor-grabbing"
+                  drag="x"
+                  dragConstraints={dragConstraints}
+                  dragElastic={0.05}
+                  whileTap={{ cursor: "grabbing" }}
+                >
+                  {currentItem.benefitGroups.map(
+                    (group: string, idx: number) => (
+                      <div
                         key={idx}
-                        className="bg-background/40 border border-border/60 text-subtle px-2.5 py-1 rounded-full text-label font-medium shadow-sm whitespace-nowrap shrink-0 hover:border-primary/40 hover:text-primary transition-all duration-300 pointer-events-none"
+                        className="pointer-events-none shrink-0 rounded-full border border-border/60 bg-background/40 px-2.5 py-1 text-label font-medium whitespace-nowrap text-subtle shadow-sm transition-all duration-300 hover:border-primary/40 hover:text-primary"
                       >
                         {group}
                       </div>
-                    ))}
-                  </motion.div>
-                </div>
+                    )
+                  )}
+                </motion.div>
               </div>
-
-            </motion.div>
-          </AnimatePresence>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Footer Metadata */}
-      <div className="mt-5 pt-4 border-t border-border/40 grid grid-cols-2 gap-4">
+      <div className="mt-5 grid grid-cols-2 gap-4 border-t border-border/40 pt-4">
         <div className="space-y-1.5">
           <div className="flex items-center gap-1.5 text-faint">
             <Calendar size={14} weight="bold" />
-            <span className="text-label font-semibold text-faint">Joined Date</span>
+            <span className="text-label font-semibold text-faint">
+              Joined Date
+            </span>
           </div>
-          <span className="text-label font-semibold text-subtle block">
+          <span className="block text-label font-semibold text-subtle">
             {employee.joinDate}
           </span>
         </div>
-        
+
         <div className="space-y-1.5">
           <div className="flex items-center gap-1.5 text-faint">
             <Clock size={14} weight="bold" />
-            <span className="text-label font-semibold text-faint">Last Active</span>
+            <span className="text-label font-semibold text-faint">
+              Last Active
+            </span>
           </div>
-          <span className="text-label font-semibold text-subtle block">
+          <span className="block text-label font-semibold text-subtle">
             {employee.lastActive || "—"}
           </span>
         </div>
       </div>
     </div>
-  );
+  )
 }

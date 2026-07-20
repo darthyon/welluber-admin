@@ -34,7 +34,6 @@ interface EmployeeDetailsTabProps {
     department: string;
     designation: string;
     tier?: string;
-    status?: string;
     isProbation?: boolean;
   };
 }
@@ -143,11 +142,6 @@ export function EmployeeDetailsTab({ employee }: EmployeeDetailsTabProps) {
         icon={<Shield size={18} weight="bold" className="text-primary" />}
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-y-8 gap-x-12">
-          <DetailField 
-            label="Status" 
-            value={employee.status || "Active"} 
-            icon={<Shield size={16} />}
-          />
           <DetailField 
             label="Is Probation" 
             value={employee.isProbation ? "Yes" : "No"} 

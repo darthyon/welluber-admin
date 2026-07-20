@@ -1,38 +1,39 @@
-"use client";
+"use client"
 
-import { useState } from "react";
+import { useState } from "react"
 import {
   MapPin,
   Calendar,
   Receipt,
   Eye,
   Download,
-  Ticket
-} from "@phosphor-icons/react";
-import { SharedDataTable, type Column } from "@/components/shared/data-table";
-import { DataFilterBar } from "@/components/shared/data-filter-bar";
-import { FilterItem } from "@/components/shared/filter-item";
-import { ActionPopover } from "@/components/shared/action-popover";
-import { StatusBadge } from "@/components/shared/status-badge";
+  Ticket,
+} from "@phosphor-icons/react"
+import { SharedDataTable, type Column } from "@/components/shared/data-table"
+import { DataFilterBar } from "@/components/shared/data-filter-bar"
+import { FilterItem } from "@/components/shared/filter-item"
+import { ActionPopover } from "@/components/shared/action-popover"
+import { StatusBadge } from "@/components/shared/status-badge"
+import { EmptyState } from "@/components/shared/empty-state"
 import type {
   ClaimStatus,
   TransactionType,
   EmployeeUtilisationRow,
   FlatClaimRow,
-} from "@/types/claims";
+} from "@/types/claims"
 
 const TXN_LABEL: Record<TransactionType, string> = {
   redemption: "Voucher Redemption",
   reimbursement: "Reimbursement",
   refund: "Refund",
-};
+}
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
 interface Props {
-  data: EmployeeUtilisationRow[];
-  onViewVoucher?: (claim: FlatClaimRow) => void;
-  onViewDetails?: (claim: FlatClaimRow) => void;
+  data: EmployeeUtilisationRow[]
+  onViewVoucher?: (claim: FlatClaimRow) => void
+  onViewDetails?: (claim: FlatClaimRow) => void
 }
 
 export function OrganizationClaimsTable({
@@ -40,9 +41,9 @@ export function OrganizationClaimsTable({
   onViewVoucher,
   onViewDetails,
 }: Props) {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<ClaimStatus | "all">("all");
-  const [txnFilter, setTxnFilter] = useState<TransactionType | "all">("all");
+  const [searchQuery, setSearchQuery] = useState("")
+  const [statusFilter, setStatusFilter] = useState<ClaimStatus | "all">("all")
+  const [txnFilter, setTxnFilter] = useState<TransactionType | "all">("all")
 
   const flatData: FlatClaimRow[] = data.flatMap((emp) =>
     emp.claims.map((claim) => ({
@@ -52,7 +53,7 @@ export function OrganizationClaimsTable({
       empCode: emp.empCode,
       branch: emp.branch,
     }))
-  );
+  )
 
   const filteredData = flatData.filter((row) => {
     const matchesSearch =
@@ -65,18 +66,18 @@ export function OrganizationClaimsTable({
         row.location,
         row.voucherCode,
         row.voucherName,
-      ].some((f) => String(f).toLowerCase().includes(searchQuery.toLowerCase()));
-    const matchesStatus = statusFilter === "all" || row.status === statusFilter;
-    const matchesTxn = txnFilter === "all" || row.transactionType === txnFilter;
-    return matchesSearch && matchesStatus && matchesTxn;
-  });
+      ].some((f) => String(f).toLowerCase().includes(searchQuery.toLowerCase()))
+    const matchesStatus = statusFilter === "all" || row.status === statusFilter
+    const matchesTxn = txnFilter === "all" || row.transactionType === txnFilter
+    return matchesSearch && matchesStatus && matchesTxn
+  })
 
   const columns: Column<FlatClaimRow>[] = [
     {
       header: "Claim ID",
       accessorKey: "id",
       render: (row) => (
-        <code className="text-label font-mono text-muted-foreground">
+        <code className="font-mono text-label text-muted-foreground">
           {row.id}
         </code>
       ),
@@ -84,11 +85,11 @@ export function OrganizationClaimsTable({
     {
       header: "Claim Title",
       render: (row) => (
-        <div className="flex flex-col gap-0.5 min-w-0">
-          <p className="text-body font-medium text-foreground truncate">
+        <div className="flex min-w-0 flex-col gap-0.5">
+          <p className="truncate text-body font-medium text-foreground">
             {TXN_LABEL[row.transactionType]} at {row.provider}
           </p>
-          <p className="text-label text-muted-foreground font-medium truncate">
+          <p className="truncate text-label font-medium text-muted-foreground">
             {row.location}
           </p>
         </div>
@@ -98,9 +99,9 @@ export function OrganizationClaimsTable({
       header: "City",
       accessorKey: "location",
       render: (row) => (
-        <div className="flex items-center gap-1.5 min-w-0">
-          <MapPin size={11} className="text-faint shrink-0" />
-          <p className="text-body text-subtle font-medium truncate">
+        <div className="flex min-w-0 items-center gap-1.5">
+          <MapPin size={11} className="shrink-0 text-faint" />
+          <p className="truncate text-body font-medium text-subtle">
             {row.location}
           </p>
         </div>
@@ -111,8 +112,8 @@ export function OrganizationClaimsTable({
       accessorKey: "date",
       render: (row) => (
         <div className="flex items-center gap-1.5">
-          <Calendar size={11} className="text-faint shrink-0" />
-          <p className="text-label text-muted-foreground font-medium whitespace-nowrap">
+          <Calendar size={11} className="shrink-0 text-faint" />
+          <p className="text-label font-medium whitespace-nowrap text-muted-foreground">
             {row.date}
           </p>
         </div>
@@ -126,7 +127,7 @@ export function OrganizationClaimsTable({
           <p className="text-body font-medium text-foreground">
             {row.employeeName}
           </p>
-          <p className="text-label text-muted-foreground font-medium mt-0.5">
+          <p className="mt-0.5 text-label font-medium text-muted-foreground">
             {row.empCode}
           </p>
         </div>
@@ -137,7 +138,7 @@ export function OrganizationClaimsTable({
       accessorKey: "amount",
       align: "right",
       render: (row) => (
-        <p className="text-body font-semibold font-mono text-foreground">
+        <p className="font-mono text-body font-semibold text-foreground">
           RM {row.amount.toFixed(2)}
         </p>
       ),
@@ -163,13 +164,13 @@ export function OrganizationClaimsTable({
       render: (row) => (
         <button
           onClick={(e) => {
-            e.stopPropagation();
-            onViewVoucher?.(row);
+            e.stopPropagation()
+            onViewVoucher?.(row)
           }}
-          className="flex items-center gap-1.5 text-primary hover:text-primary/80 transition-colors cursor-pointer"
+          className="flex cursor-pointer items-center gap-1.5 text-primary transition-colors hover:text-primary/80"
         >
           <Ticket size={14} weight="bold" />
-          <span className="text-label font-semibold hover:underline underline-offset-2">
+          <span className="text-label font-semibold underline-offset-2 hover:underline">
             {row.voucherName || row.voucherCode}
           </span>
         </button>
@@ -201,7 +202,7 @@ export function OrganizationClaimsTable({
         />
       ),
     },
-  ];
+  ]
 
   return (
     <div className="space-y-4">
@@ -238,16 +239,11 @@ export function OrganizationClaimsTable({
       />
 
       {filteredData.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-center rounded-lg border border-dashed border-border">
-          <Receipt
-            size={36}
-            weight="duotone"
-            className="text-faint mb-3"
-          />
-          <p className="text-muted-foreground font-medium text-body">
-            No claims recorded yet.
-          </p>
-        </div>
+        <EmptyState
+          icon={<Receipt size={32} weight="light" />}
+          title="No Claims Recorded Yet"
+          description="Claims will appear here once employees start redeeming or reimbursing benefits."
+        />
       ) : (
         <SharedDataTable
           data={filteredData}
@@ -259,6 +255,5 @@ export function OrganizationClaimsTable({
         />
       )}
     </div>
-  );
+  )
 }
-

@@ -1,13 +1,13 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Plus } from "@phosphor-icons/react"
 import { useQueryState, useUpdateQueryParams } from "@/hooks/use-tab-persistence"
+import { Spinner } from "@/components/shared/spinner"
 import { Button } from "@/components/ui/button"
 import { AssignedPolicyList } from "@/components/host/organizations/assigned-policy-list"
 import { AssignPolicyModal } from "@/components/host/organizations/assign-policy-modal"
-import { BenefitPolicyWizard } from "@/components/host/policies/benefit-policy-wizard"
 import { PolicyDetailView } from "@/components/host/policies/policy-detail-view"
 import { PolicyCreationLauncher } from "@/components/host/policies/policy-creation-launcher"
 import { DataFilterBar } from "@/components/shared/data-filter-bar"
@@ -39,9 +39,9 @@ export function PoliciesTab({
   const [policySearch, setPolicySearch] = useQueryState("policySearch", "")
   const [policyStatusFilter, setPolicyStatusFilter] = useQueryState("policyStatus", "all")
   const [isAssignPolicyModalOpen, setIsAssignPolicyModalOpen] = useQueryState("assignPolicy")
-  const [isAddingPolicy, setIsAddingPolicy] = useQueryState("addPolicy")
+  const [isAddingPolicy] = useQueryState("addPolicy")
   const [viewingPolicyId, setViewingPolicyId] = useQueryState("viewingPolicyId")
-  const [editingPolicyId, setEditingPolicyId] = useQueryState("editingPolicyId")
+  const [editingPolicyId] = useQueryState("editingPolicyId")
 
   const [policyFilters, setPolicyFilters] = useState({
     department: "all",
@@ -79,6 +79,22 @@ export function PoliciesTab({
     })
   }, [assignedPolicies, policySearch, policyStatusFilter, policyFilters])
 
+  useEffect(() => {
+    if (isAddingPolicy === "true") {
+      router.replace(
+        `/policies/new?source=org&orgId=${encodeURIComponent(orgId)}`
+      )
+    }
+  }, [isAddingPolicy, orgId, router])
+
+  useEffect(() => {
+    if (editingPolicyId) {
+      router.replace(
+        `/policies/${encodeURIComponent(editingPolicyId)}/edit?source=org&orgId=${encodeURIComponent(orgId)}`
+      )
+    }
+  }, [editingPolicyId, orgId, router])
+
   if (viewingPolicyId) {
     return (
       <div className="animate-in transition-all duration-300 fade-in">
@@ -93,7 +109,11 @@ export function PoliciesTab({
             )
           )}
           employees={employees}
-          onEdit={() => setEditingPolicyId(viewingPolicyId)}
+          onEdit={() =>
+            router.push(
+              `/policies/${encodeURIComponent(viewingPolicyId)}/edit?source=org&orgId=${encodeURIComponent(orgId)}`
+            )
+          }
           onClone={() => {
             const p = assignedPolicies.find((p) => p.id === viewingPolicyId)
             if (p) {
@@ -118,42 +138,18 @@ export function PoliciesTab({
 
   if (isAddingPolicy || editingPolicyId) {
     return (
-      <div className="animate-in transition-all duration-300 fade-in">
-        <BenefitPolicyWizard
-          mode={editingPolicyId ? "edit" : "create"}
-          orgId={orgId}
-          initialData={
-            editingPolicyId
-              ? {
-                  policy: assignedPolicies.find((p) => p.id === editingPolicyId)!,
-                  groups: mockGroups.filter((g) => g.policyId === editingPolicyId),
-                  benefits: mockBenefits.filter((b) =>
-                    mockGroups.some(
-                      (g) => g.id === b.groupId && g.policyId === editingPolicyId
-                    )
-                  ),
-                }
-              : undefined
-          }
-          onCancel={() => {
-            setIsAddingPolicy(null)
-            setEditingPolicyId(null)
-          }}
-          onSaveDraft={() => {
-            onToast("Policy saved as draft")
-            setIsAddingPolicy(null)
-            setEditingPolicyId(null)
-          }}
-          onSuccess={(data) => {
-            if (editingPolicyId) {
-              onToast("Policy updated successfully")
-            } else {
-              onAssign(data.policy.id || "new_pol")
-            }
-            setIsAddingPolicy(null)
-            setEditingPolicyId(null)
-          }}
-        />
+      <div className="flex min-h-64 items-center justify-center rounded-lg border border-border bg-card px-6 py-12">
+        <div className="flex flex-col items-center gap-3 text-center">
+          <Spinner className="h-5 w-5" />
+          <div className="space-y-1">
+            <p className="text-body font-semibold text-foreground">
+              Opening Policy Builder
+            </p>
+            <p className="text-label text-muted-foreground">
+              Redirecting to the updated benefit policy flow.
+            </p>
+          </div>
+        </div>
       </div>
     )
   }
@@ -192,9 +188,15 @@ export function PoliciesTab({
             <PolicyCreationLauncher
               preselectedOrgId={orgId}
               hideOrgPicker
-              onManual={(oid) => router.push(`/policies/new?orgId=${oid}`)}
+              onManual={(oid) =>
+                router.push(
+                  `/policies/new?source=org&orgId=${encodeURIComponent(oid ?? orgId)}`
+                )
+              }
               onTemplate={(tid, oid) =>
-                router.push(`/policies/new?template=${tid}&orgId=${oid}`)
+                router.push(
+                  `/policies/new?source=org&template=${encodeURIComponent(tid)}&orgId=${encodeURIComponent(oid ?? orgId)}`
+                )
               }
             />
           </div>
@@ -275,11 +277,9 @@ export function PoliciesTab({
             })
           }}
           onEdit={(id) => {
-            updateQueryParams({
-              editingPolicyId: id,
-              viewingPolicyId: null,
-              addPolicy: null,
-            })
+            router.push(
+              `/policies/${encodeURIComponent(id)}/edit?source=org&orgId=${encodeURIComponent(orgId)}`
+            )
           }}
         />
       </div>

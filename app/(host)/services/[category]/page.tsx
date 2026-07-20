@@ -82,7 +82,7 @@ function ServiceCategoryContent({ categoryName }: { categoryName: string }) {
               </div>
 
               <div className="space-y-1">
-                <h1 className="tracking-tight text-display font-semibold text-foreground">
+                <h1 className="tracking-tight text-title font-semibold text-foreground">
                   {category.category}
                 </h1>
                 <p className="text-body text-subtle">

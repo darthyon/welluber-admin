@@ -31,6 +31,8 @@ export const TABS = [
   { id: "profile", label: "Org Details", icon: Buildings },
   { id: "branches", label: "Branches", icon: Buildings },
   { id: "employees", label: "Employees", icon: Users },
+  { id: "dependents", label: "Dependents", icon: IdentificationCard },
+  { id: "entitlements", label: "Entitlements", icon: Scroll },
   { id: "policies", label: "Benefit Policy", icon: Shield },
   { id: "claims", label: "Claims", icon: SealCheck },
   { id: "vouchers", label: "Vouchers", icon: Ticket },
@@ -38,6 +40,8 @@ export const TABS = [
 ] as const
 
 export type TabId = (typeof TABS)[number]["id"]
+
+export const ORG_FTU_ORG_ID = "ORG-20260401-0004"
 
 export const OTHER_ORGS = [
   {
@@ -47,10 +51,3 @@ export const OTHER_ORGS = [
   { label: "Global Tech Solutions", href: "/organizations/ORG-20260301-0002" },
   { label: "Nexus Innovations", href: "/organizations/ORG-20260310-0003" },
 ]
-
-export const EMPLOYEE_SUB_TABS = [
-  { id: "directory", label: "Employee Directory", icon: Users },
-  { id: "dependents", label: "Dependent Directory", icon: IdentificationCard },
-  { id: "entitlements", label: "Entitlements", icon: Scroll },
-  { id: "claims", label: "Claims", icon: SealCheck },
-] as const

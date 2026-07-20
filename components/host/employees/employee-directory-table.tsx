@@ -212,17 +212,6 @@ export function EmployeeDirectoryTable({
             ),
           },
           {
-            header: "Status",
-            accessorKey: "status",
-            sortable: true,
-            render: (emp) => (
-              <StatusBadge
-                status={emp.status}
-                variant={emp.status === "Linked" ? "emerald" : "amber"}
-              />
-            ),
-          },
-          {
             header: "Actions",
             align: "right",
             render: (emp) => (

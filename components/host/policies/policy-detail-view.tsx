@@ -2,7 +2,6 @@
 
 import { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
-import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 import type { BenefitPolicy, BenefitGroup, Benefit } from "@/types/policy"
 import type { PolicyListItem } from "@/features/policies/types"
@@ -148,61 +147,56 @@ export function PolicyDetailView({
           headerVariant === "standalone" ? "p-6 lg:p-8" : "pt-4"
         )}
       >
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.18, ease: "easeOut" }}
-          >
-            {activeTab === "overview" &&
-              (isVersion ? (
-                <VersionOverviewTab
-                  policy={policy}
-                  groups={groups}
-                  benefits={benefits}
-                  parentBenefits={parentBenefits}
-                  parentPolicyName={parentPolicyName}
-                />
-              ) : (
-                <OverviewTab
-                  policy={policy}
-                  groups={groups}
-                  benefits={benefits}
-                  onEdit={onEdit}
-                />
-              ))}
-            {activeTab === "benefit-groups" && (
-              <BenefitGroupsTab
+        <div
+          key={activeTab}
+          className="animate-in duration-200 fade-in slide-in-from-bottom-1"
+        >
+          {activeTab === "overview" &&
+            (isVersion ? (
+              <VersionOverviewTab
                 policy={policy}
                 groups={groups}
                 benefits={benefits}
+                parentBenefits={parentBenefits}
+                parentPolicyName={parentPolicyName}
               />
-            )}
-            {!isVersion && activeTab === "versions" && (
-              <VersionsTab
+            ) : (
+              <OverviewTab
                 policy={policy}
-                versions={versions}
-                overrideCounts={versionOverrideCounts}
-                onCreateVersion={() =>
-                  router.push(`/policies/${policy.id}/versions/new`)
-                }
-                onViewVersion={(id) =>
-                  router.push(`/policies?policyId=${id}&mode=view&wizard=open`)
-                }
-                onEditVersion={
-                  onEditVersion ?? ((id) => router.push(`/policies/${id}/edit`))
-                }
-                onRemoveVersion={onRemoveVersion ?? (() => {})}
+                groups={groups}
+                benefits={benefits}
+                onEdit={onEdit}
               />
-            )}
-            {activeTab === "employees" && (
-              <AssignedEmployeesTab policy={policy} employees={employees} />
-            )}
-            {activeTab === "audit" && <AuditLogTab />}
-          </motion.div>
-        </AnimatePresence>
+            ))}
+          {activeTab === "benefit-groups" && (
+            <BenefitGroupsTab
+              policy={policy}
+              groups={groups}
+              benefits={benefits}
+            />
+          )}
+          {!isVersion && activeTab === "versions" && (
+            <VersionsTab
+              policy={policy}
+              versions={versions}
+              overrideCounts={versionOverrideCounts}
+              onCreateVersion={() =>
+                router.push(`/policies/${policy.id}/versions/new`)
+              }
+              onViewVersion={(id) =>
+                router.push(`/policies?policyId=${id}&mode=view&wizard=open`)
+              }
+              onEditVersion={
+                onEditVersion ?? ((id) => router.push(`/policies/${id}/edit`))
+              }
+              onRemoveVersion={onRemoveVersion ?? (() => {})}
+            />
+          )}
+          {activeTab === "employees" && (
+            <AssignedEmployeesTab policy={policy} employees={employees} />
+          )}
+          {activeTab === "audit" && <AuditLogTab />}
+        </div>
       </div>
     </div>
   )

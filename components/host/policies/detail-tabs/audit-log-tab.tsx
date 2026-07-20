@@ -1,6 +1,7 @@
 "use client"
 
 import { ClockCounterClockwise } from "@phosphor-icons/react"
+import { EmptyState } from "@/components/shared/empty-state"
 
 type PolicyAuditEvent = {
   id: string
@@ -66,34 +67,40 @@ export function AuditLogTab() {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-heading font-semibold text-foreground">Audit Log</h3>
+        <h3 className="text-heading font-semibold text-foreground">
+          Audit Log
+        </h3>
         <p className="mt-1 text-body text-muted-foreground">
           Track changes to this policy over time.
         </p>
       </div>
       {events.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border/60 bg-muted/10 py-20">
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-lg border border-border bg-card text-muted/30">
-            <ClockCounterClockwise size={32} weight="duotone" />
-          </div>
-          <p className="text-body font-medium text-muted-foreground">No audit events yet.</p>
-          <p className="mt-1 text-label text-faint">
-            Policy changes will be logged here once activity begins.
-          </p>
-        </div>
+        <EmptyState
+          icon={<ClockCounterClockwise size={32} weight="light" />}
+          title="No Audit Events Yet"
+          description="Policy changes will be logged here once activity begins."
+        />
       ) : (
         <div className="overflow-hidden rounded-lg border border-border bg-card">
           <div className="divide-y divide-border/60">
             {events.map((e) => (
               <div key={e.id} className="flex items-start gap-4 px-5 py-4">
                 <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border bg-muted/30">
-                  <ClockCounterClockwise size={13} weight="duotone" className="text-faint" />
+                  <ClockCounterClockwise
+                    size={13}
+                    weight="duotone"
+                    className="text-faint"
+                  />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-body font-semibold text-foreground">{e.action}</span>
+                    <span className="text-body font-semibold text-foreground">
+                      {e.action}
+                    </span>
                     <span className="text-label text-faint">by {e.actor}</span>
-                    <span className="ml-auto shrink-0 text-label text-faint">{e.at}</span>
+                    <span className="ml-auto shrink-0 text-label text-faint">
+                      {e.at}
+                    </span>
                   </div>
                   <p className="mt-0.5 text-body text-subtle">{e.summary}</p>
                   {e.meta && e.meta.length > 0 && (
@@ -103,7 +110,8 @@ export function AuditLogTab() {
                           key={m.label}
                           className="rounded border border-border bg-muted/40 px-2 py-0.5 text-label text-muted-foreground"
                         >
-                          <span className="font-semibold">{m.label}:</span> {m.value}
+                          <span className="font-semibold">{m.label}:</span>{" "}
+                          {m.value}
                         </span>
                       ))}
                     </div>

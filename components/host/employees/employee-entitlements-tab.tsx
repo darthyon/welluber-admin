@@ -1,22 +1,35 @@
-"use client";
+"use client"
 
+import { useState } from "react"
 import {
   ArrowClockwise,
   CaretDown,
   TreeStructure,
   User,
   UsersThree,
-} from "@phosphor-icons/react";
-import { Button } from "@/components/ui/button";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { cn } from "@/lib/utils";
-import { StackedPoolBar, type PoolSegment } from "@/components/shared/stacked-pool-bar";
+} from "@phosphor-icons/react"
+import { Button } from "@/components/ui/button"
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { cn } from "@/lib/utils"
+import {
+  StackedPoolBar,
+  type PoolSegment,
+} from "@/components/shared/stacked-pool-bar"
 import {
   ContractSection,
   DataGrid,
   DataPoint,
   TechnicalBadge,
-} from "@/components/host/policies/policy-datapoint-ui";
+} from "@/components/host/policies/policy-datapoint-ui"
 import {
   formatCopay,
   formatRM,
@@ -24,131 +37,205 @@ import {
   getGroupCap,
   hasDependentSide,
   hasEmployeeSide,
-} from "@/components/host/policies/policy-datapoint-helpers";
-import { getMainServiceIcon } from "@/components/host/policies/detail-tabs/policy-detail-helpers";
-import { getMainServiceName, resolveMainServiceId } from "@/lib/mock-data/service-catalog";
-import type { Benefit, BenefitGroup, BenefitPolicy } from "@/types/policy";
-import type { BeneficiaryUsage } from "@/features/employees/types";
+} from "@/components/host/policies/policy-datapoint-helpers"
+import { getMainServiceIcon } from "@/components/host/policies/detail-tabs/policy-detail-helpers"
+import {
+  getMainServiceName,
+  resolveMainServiceId,
+} from "@/lib/mock-data/service-catalog"
+import type { Benefit, BenefitGroup, BenefitPolicy } from "@/types/policy"
+import type { BeneficiaryUsage } from "@/features/employees/types"
 import {
   getEmployeeEntitlement,
   type AssignedPolicyEntitlement,
-} from "./employee-entitlements-mock";
+} from "./employee-entitlements-mock"
 
-const EMP_FILL = "bg-primary";
-const DEP_FILL = "bg-violet-500";
+const EMP_FILL = "bg-primary"
+const DEP_FILL = "bg-teal-500"
+const DEPENDENT_FILL_CLASSES = [
+  "bg-teal-700 dark:bg-teal-300",
+  "bg-teal-500 dark:bg-teal-400",
+  "bg-teal-300 dark:bg-teal-600",
+]
+const OTHER_DEPENDENTS_FILL = "bg-teal-900 dark:bg-teal-200"
 
 /** A single rendered pool bar for one benefit (employee, a dependent, or combined). */
 interface PoolBar {
-  key: string;
-  label: string;
-  icon: "employee" | "dependent" | "combined";
-  allocated: number;
-  spent: number;
-  balance: number;
-  segments: PoolSegment[];
-  details?: PoolDetailRow[];
+  key: string
+  label: string
+  icon: "employee" | "dependent" | "combined"
+  allocated: number
+  spent: number
+  balance: number
+  segments: PoolSegment[]
+  details?: PoolDetailRow[]
 }
 
 /** Aggregated summary row across all benefits for one pool lane. */
 interface PoolSummaryRow {
-  key: string;
-  label: string;
-  icon: "employee" | "dependent" | "combined";
-  totalAllocated: number;
-  totalSpent: number;
-  totalBalance: number;
-  segments: PoolSegment[];
-  details?: PoolDetailRow[];
+  key: string
+  allocationGroup: string
+  label: string
+  icon: "employee" | "dependent" | "combined"
+  totalAllocated: number
+  totalSpent: number
+  totalBalance: number
+  segments: PoolSegment[]
+  details?: PoolDetailRow[]
 }
 
 interface PoolDetailRow {
-  key: string;
-  label: string;
-  relationshipLabel?: string;
-  allocated: number;
-  spent: number;
-  balance: number;
+  key: string
+  label: string
+  relationshipLabel?: string
+  allocated: number
+  spent: number
+  balance: number
 }
 
 function SummaryStat({
   label,
   value,
+  compact = false,
 }: {
-  label: string;
-  value: string;
+  label: string
+  value: string
+  compact?: boolean
 }) {
   return (
     <div className="min-w-0">
       <p className="text-label font-medium text-muted-foreground">{label}</p>
-      <p className="mt-1 text-heading font-semibold tabular-nums text-foreground">{value}</p>
+      <p
+        className={cn(
+          "mt-1 font-semibold text-foreground tabular-nums",
+          compact ? "text-lead" : "text-heading"
+        )}
+      >
+        {value}
+      </p>
     </div>
-  );
+  )
 }
 
-function PoolStat({
-  label,
-  value,
-}: {
-  label: string;
-  value: string;
-}) {
+function PoolStat({ label, value }: { label: string; value: string }) {
   return (
     <div className="min-w-[6rem]">
       <p className="text-label font-medium text-muted-foreground">{label}</p>
-      <p className="mt-1 text-lead font-semibold tabular-nums text-foreground">{value}</p>
+      <p className="mt-1 text-lead font-semibold text-foreground tabular-nums">
+        {value}
+      </p>
     </div>
-  );
+  )
 }
 
-function UtilisationRail({
-  allocated,
-  spent,
-  color = "employee",
-}: {
-  allocated: number;
-  spent: number;
-  color?: "employee" | "dependent";
-}) {
-  const pct = allocated > 0 ? Math.min(Math.round((spent / allocated) * 100), 100) : 0;
+function getDependentFillClass(index: number) {
+  return DEPENDENT_FILL_CLASSES[index] ?? OTHER_DEPENDENTS_FILL
+}
 
-  return (
-    <div className="flex items-center gap-3">
-      <span className="w-10 shrink-0 text-label font-semibold tabular-nums text-foreground">
-        {pct}%
-      </span>
-      <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-muted">
-        <div
-          className={cn("h-full rounded-full", color === "dependent" ? DEP_FILL : EMP_FILL)}
-          style={{ width: `${pct}%` }}
-        />
-      </div>
-    </div>
-  );
+function getUtilisationPercentage(allocated: number, spent: number) {
+  return allocated > 0
+    ? Math.min(Math.round((spent / allocated) * 100), 100)
+    : 0
+}
+
+function buildDependentSegments(details: PoolDetailRow[]): PoolSegment[] {
+  const visibleDetails = details.slice(0, 3)
+  const otherDetails = details.slice(3)
+  const segments = visibleDetails.map((detail, index) => ({
+    label: detail.label,
+    spent: detail.spent,
+    className: getDependentFillClass(index),
+  }))
+
+  if (otherDetails.length) {
+    segments.push({
+      label: "Others",
+      spent: otherDetails.reduce((sum, detail) => sum + detail.spent, 0),
+      className: OTHER_DEPENDENTS_FILL,
+    })
+  }
+
+  return segments.filter((segment) => segment.spent > 0)
+}
+
+function buildSharedSegments(
+  employeeSpent: number,
+  dependentSpent: number,
+  primary: "employee" | "dependent" = "employee"
+) {
+  const orderedEntries =
+    primary === "employee"
+      ? [
+          { label: "Employee", spent: employeeSpent, className: EMP_FILL },
+          { label: "Dependents", spent: dependentSpent, className: DEP_FILL },
+        ]
+      : [
+          { label: "Dependents", spent: dependentSpent, className: DEP_FILL },
+          { label: "Employee", spent: employeeSpent, className: EMP_FILL },
+        ]
+
+  return orderedEntries.filter((segment) => segment.spent > 0)
 }
 
 function SummaryLegend({
   allocated,
   segments,
+  compact = false,
 }: {
-  allocated: number;
-  segments: PoolSegment[];
+  allocated: number
+  segments: PoolSegment[]
+  compact?: boolean
 }) {
   return (
-    <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+    <div
+      className={cn(
+        "flex flex-wrap items-center",
+        compact ? "gap-x-4 gap-y-1" : "gap-x-6 gap-y-2"
+      )}
+    >
       {segments.map((segment, index) => {
-        const pct = allocated > 0 ? Math.min(Math.round((segment.spent / allocated) * 100), 100) : 0;
+        const pct =
+          allocated > 0
+            ? Math.min(Math.round((segment.spent / allocated) * 100), 100)
+            : 0
         return (
-          <div key={index} className="flex items-center gap-2 text-label text-muted-foreground">
-            <span className={cn("h-2.5 w-2.5 rounded-full", segment.className)} />
+          <div
+            key={index}
+            className={cn(
+              "flex items-center text-muted-foreground",
+              compact ? "gap-1.5 text-micro" : "gap-2 text-label"
+            )}
+          >
+            <span
+              className={cn(
+                "rounded-full",
+                compact ? "h-2 w-2" : "h-2.5 w-2.5",
+                segment.className
+              )}
+            />
             <span>{segment.label}</span>
-            <span className="tabular-nums text-foreground">
+            <span className="text-foreground tabular-nums">
               {formatRM(segment.spent)} ({pct}%)
             </span>
           </div>
-        );
+        )
       })}
     </div>
-  );
+  )
+}
+
+function buildAllocationSummarySegments(rows: PoolSummaryRow[]) {
+  const employeeSpent = rows
+    .filter((row) => row.icon === "employee")
+    .reduce((sum, row) => sum + row.totalSpent, 0)
+  const dependentDetails = mergeDetailRows(
+    ...rows.filter((row) => row.icon === "dependent").map((row) => row.details)
+  )
+
+  return [
+    { label: "Employee", spent: employeeSpent, className: EMP_FILL },
+    ...buildDependentSegments(dependentDetails),
+  ].filter((segment) => segment.spent > 0)
 }
 
 function PoolIdentity({
@@ -157,11 +244,13 @@ function PoolIdentity({
   tone,
   subtitle,
 }: {
-  icon: PoolBar["icon"] | PoolSummaryRow["icon"];
-  label: string;
-  tone?: string;
-  subtitle: string;
+  icon: PoolBar["icon"] | PoolSummaryRow["icon"]
+  label: string
+  tone?: string
+  subtitle: string
 }) {
+  const toneDescription = getPoolToneDescription(tone)
+
   return (
     <div className="flex min-w-0 items-center gap-3">
       <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-4xl border border-border bg-muted/30">
@@ -169,51 +258,70 @@ function PoolIdentity({
       </span>
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
-          <p className="truncate text-lead font-semibold text-foreground">{label}</p>
+          <p className="truncate text-lead font-semibold text-foreground">
+            {label}
+          </p>
           {tone ? (
-            <span className="rounded-4xl border border-primary/15 bg-primary/8 px-2 py-0.5 text-label font-medium text-primary">
-              {tone}
-            </span>
+            <Tooltip delayDuration={200}>
+              <TooltipTrigger asChild>
+                <span className="rounded-4xl border border-primary/15 bg-primary/8 px-2 py-0.5 text-label font-medium text-primary">
+                  {tone}
+                </span>
+              </TooltipTrigger>
+              {toneDescription ? (
+                <TooltipContent
+                  side="top"
+                  className="max-w-[240px] text-label text-muted-foreground"
+                >
+                  {toneDescription}
+                </TooltipContent>
+              ) : null}
+            </Tooltip>
           ) : null}
         </div>
-        <p className="mt-0.5 text-label text-muted-foreground">{subtitle}</p>
+        {subtitle && subtitle !== label ? (
+          <p className="mt-0.5 text-label text-muted-foreground">{subtitle}</p>
+        ) : null}
       </div>
     </div>
-  );
+  )
 }
 
-function PoolIcon({ icon }: { icon: PoolBar["icon"] | PoolSummaryRow["icon"] }) {
+function PoolIcon({
+  icon,
+}: {
+  icon: PoolBar["icon"] | PoolSummaryRow["icon"]
+}) {
   if (icon === "combined") {
-    return <UsersThree size={14} weight="fill" className="text-muted-foreground" />;
+    return (
+      <UsersThree size={14} weight="fill" className="text-muted-foreground" />
+    )
   }
   if (icon === "dependent") {
-    return <User size={14} weight="fill" className="text-violet-500" />;
+    return <User size={14} weight="fill" className="text-teal-500" />
   }
-  return <User size={14} weight="fill" className="text-primary" />;
+  return <User size={14} weight="fill" className="text-primary" />
 }
 
-function buildEmployeeDetail(row: BeneficiaryUsage, label = "Employee"): PoolDetailRow {
-  return {
-    key: row.beneficiaryId,
-    label,
-    allocated: row.allocated,
-    spent: row.spent,
-    balance: row.balance,
-  };
-}
-
-function formatDependentLabel(name?: string, relationship?: string) {
-  if (relationship && name) return `${relationship} · ${name}`;
-  if (name) return name;
-  return relationship ?? "Dependent";
+function getPoolToneDescription(tone?: string) {
+  switch (tone) {
+    case "Individual":
+      return "Each beneficiary allocation is tracked separately and is not shared with other covered members."
+    case "Shared":
+      return "All covered dependents draw from the same dependent allocation."
+    case "Combined":
+      return "The employee and covered dependents share one allocation limit."
+    default:
+      return null
+  }
 }
 
 function buildDependentDetails(rows: BeneficiaryUsage[]): PoolDetailRow[] {
-  const detailMap = new Map<string, PoolDetailRow>();
+  const detailMap = new Map<string, PoolDetailRow>()
 
   for (const row of rows) {
-    const key = row.beneficiaryId;
-    const existing = detailMap.get(key);
+    const key = row.beneficiaryId
+    const existing = detailMap.get(key)
     if (!existing) {
       detailMap.set(key, {
         key,
@@ -222,55 +330,55 @@ function buildDependentDetails(rows: BeneficiaryUsage[]): PoolDetailRow[] {
         allocated: row.allocated,
         spent: row.spent,
         balance: row.balance,
-      });
-      continue;
+      })
+      continue
     }
 
-    existing.allocated += row.allocated;
-    existing.spent += row.spent;
-    existing.balance += row.balance;
+    existing.allocated += row.allocated
+    existing.spent += row.spent
+    existing.balance += row.balance
   }
 
-  return Array.from(detailMap.values());
+  return Array.from(detailMap.values())
 }
 
 function mergeDetailRows(...detailGroups: Array<PoolDetailRow[] | undefined>) {
-  const merged = new Map<string, PoolDetailRow>();
+  const merged = new Map<string, PoolDetailRow>()
 
   for (const group of detailGroups) {
     for (const detail of group ?? []) {
-      const existing = merged.get(detail.key);
+      const existing = merged.get(detail.key)
       if (!existing) {
-        merged.set(detail.key, { ...detail });
-        continue;
+        merged.set(detail.key, { ...detail })
+        continue
       }
 
-      existing.allocated += detail.allocated;
-      existing.spent += detail.spent;
-      existing.balance += detail.balance;
+      existing.allocated += detail.allocated
+      existing.spent += detail.spent
+      existing.balance += detail.balance
     }
   }
 
-  return Array.from(merged.values());
+  return Array.from(merged.values())
 }
 
 function toCoverageKey(relationship?: string) {
-  return relationship?.trim().toLowerCase();
+  return relationship?.trim().toLowerCase()
 }
 
 function getIndividualDependentCapMap(policy: BenefitPolicy) {
-  const caps = new Map<string, number>();
+  const caps = new Map<string, number>()
 
   for (const coverage of policy.dependentCoverages ?? []) {
-    const key = toCoverageKey(coverage.type);
+    const key = toCoverageKey(coverage.type)
     if (!key || typeof coverage.capAmount !== "number") {
-      continue;
+      continue
     }
 
-    caps.set(key, coverage.capAmount);
+    caps.set(key, coverage.capAmount)
   }
 
-  return caps;
+  return caps
 }
 
 function getSharedDependentPoolAllocated(
@@ -278,53 +386,71 @@ function getSharedDependentPoolAllocated(
   groups: BenefitGroup[],
   fallback: number
 ) {
-  const groupCap = groups.reduce((sum, group) => sum + (group.dependentGroupCap ?? 0), 0);
+  const groupCap = groups.reduce(
+    (sum, group) => sum + (group.dependentGroupCap ?? 0),
+    0
+  )
 
   if (typeof policy.dependentCapAmount === "number") {
-    return policy.dependentCapAmount;
+    return policy.dependentCapAmount
   }
 
   if (groupCap > 0) {
-    return groupCap;
+    return groupCap
   }
 
-  return fallback;
+  return fallback
 }
 
 function normaliseSummaryRows(
   entitlement: AssignedPolicyEntitlement,
-  rows: PoolSummaryRow[]
+  rows: PoolSummaryRow[],
+  applyPolicyCaps = true
 ) {
   const employeeSpent = entitlement.usage
     .filter((row) => !row.relationship)
-    .reduce((sum, row) => sum + row.spent, 0);
+    .reduce((sum, row) => sum + row.spent, 0)
   const dependentSpent = entitlement.usage
     .filter((row) => row.relationship)
-    .reduce((sum, row) => sum + row.spent, 0);
-  const dependentCaps = getIndividualDependentCapMap(entitlement.policy);
+    .reduce((sum, row) => sum + row.spent, 0)
+  const dependentCaps = getIndividualDependentCapMap(entitlement.policy)
 
   return rows.map((row) => {
-    if (row.key === "combined") {
-      const allocated = entitlement.policy.totalCapAmount ?? row.totalAllocated;
-      const totalSpent = employeeSpent + dependentSpent;
+    if (row.allocationGroup === "combined") {
+      const allocated = applyPolicyCaps
+        ? (entitlement.policy.totalCapAmount ?? row.totalAllocated)
+        : row.totalAllocated
+      const sharedBalance = Math.max(
+        allocated - (employeeSpent + dependentSpent),
+        0
+      )
+      const isDependentRow = row.key === "combined-dep"
 
       return {
         ...row,
         totalAllocated: allocated,
-        totalSpent,
-        totalBalance: Math.max(allocated - totalSpent, 0),
-      };
+        totalSpent: isDependentRow ? dependentSpent : employeeSpent,
+        totalBalance: sharedBalance,
+        label: isDependentRow ? "Dependents" : "Employee",
+        segments: buildSharedSegments(
+          employeeSpent,
+          dependentSpent,
+          isDependentRow ? "dependent" : "employee"
+        ),
+      }
     }
 
     if (row.key === "emp") {
-      const allocated = entitlement.policy.totalCapAmount ?? row.totalAllocated;
+      const allocated = applyPolicyCaps
+        ? (entitlement.policy.totalCapAmount ?? row.totalAllocated)
+        : row.totalAllocated
 
       return {
         ...row,
         totalAllocated: allocated,
         totalSpent: employeeSpent,
         totalBalance: Math.max(allocated - employeeSpent, 0),
-      };
+      }
     }
 
     if (row.key === "dep-shared") {
@@ -332,175 +458,222 @@ function normaliseSummaryRows(
         entitlement.policy,
         entitlement.groups,
         row.totalAllocated
-      );
+      )
 
       return {
         ...row,
         totalAllocated: allocated,
         totalBalance: Math.max(allocated - row.totalSpent, 0),
-      };
+        segments: buildSharedSegments(0, row.totalSpent, "dependent"),
+      }
     }
 
     if (row.key === "dep-individual") {
-      const details = row.details?.map((detail) => {
-        const relationshipKey = toCoverageKey(detail.relationshipLabel);
-        const allocated = relationshipKey
-          ? (dependentCaps.get(relationshipKey) ?? detail.allocated)
-          : detail.allocated;
-        return {
-          ...detail,
-          allocated,
-          balance: Math.max(allocated - detail.spent, 0),
-        };
-      });
-      const totalAllocated = details?.reduce((sum, detail) => sum + detail.allocated, 0) ?? row.totalAllocated;
+      const details = applyPolicyCaps
+        ? row.details?.map((detail) => {
+            const relationshipKey = toCoverageKey(detail.relationshipLabel)
+            const allocated = relationshipKey
+              ? (dependentCaps.get(relationshipKey) ?? detail.allocated)
+              : detail.allocated
+            return {
+              ...detail,
+              allocated,
+              balance: Math.max(allocated - detail.spent, 0),
+            }
+          })
+        : row.details
+      const totalAllocated =
+        details?.reduce((sum, detail) => sum + detail.allocated, 0) ??
+        row.totalAllocated
 
       return {
         ...row,
         totalAllocated,
         totalBalance: Math.max(totalAllocated - row.totalSpent, 0),
         details,
-        label: `Dependents (${details?.length ?? 0})`,
-      };
+        label: "Dependents",
+      }
     }
 
-    return row;
-  });
+    return row
+  })
 }
 
 /** Roll up all benefit usage into one PoolSummaryRow per pool lane.
  *  Mirrors buildBenefitBars gating logic so numbers always match the bars below. */
-function buildSummaryRows(entitlement: AssignedPolicyEntitlement): PoolSummaryRow[] {
-  const { policy, groups, benefits, usage } = entitlement;
-  const poolType = policy.dependentsPoolType;
-  const depsCovered = (policy.dependentCoverages?.length ?? 0) > 0;
+function buildSummaryRows(
+  entitlement: AssignedPolicyEntitlement,
+  applyPolicyCaps = true
+): PoolSummaryRow[] {
+  const { policy, groups, benefits, usage } = entitlement
+  const poolType = policy.dependentsPoolType
+  const depsCovered = (policy.dependentCoverages?.length ?? 0) > 0
 
-  const rowMap = new Map<string, PoolSummaryRow>();
-  // Separate emp/dep spend accumulators for SharedWithEmployee (one shared ceiling)
-  const combinedSpend = { emp: 0, dep: 0 };
-  const combinedDetails = new Map<string, PoolDetailRow>();
+  const rowMap = new Map<string, PoolSummaryRow>()
+  const combinedDetails = new Map<string, PoolDetailRow>()
 
   for (const group of groups) {
-    const scope = group.coverageScope ?? "Employee";
-    const groupBenefits = benefits.filter((b) => b.groupId === group.id);
+    const scope = group.coverageScope ?? "Employee"
+    const groupBenefits = benefits.filter((b) => b.groupId === group.id)
 
     for (const benefit of groupBenefits) {
-      const rows = usage.filter((u) => u.benefitId === benefit.id);
-      const emp = rows.find((u) => !u.relationship);
-      const deps = rows.filter((u) => u.relationship);
-      const showDeps = depsCovered && hasDependentSide(scope) && deps.length > 0;
+      const rows = usage.filter((u) => u.benefitId === benefit.id)
+      const emp = rows.find((u) => !u.relationship)
+      const deps = rows.filter((u) => u.relationship)
+      const showDeps = depsCovered && hasDependentSide(scope) && deps.length > 0
 
       if (poolType === "SharedWithEmployee" && emp) {
-        const existing = rowMap.get("combined");
-        if (!existing) {
-          rowMap.set("combined", {
-            key: "combined",
-            label: "Employee + Dependents",
-            icon: "combined",
+        const existingEmployee = rowMap.get("combined-emp")
+        if (!existingEmployee) {
+          rowMap.set("combined-emp", {
+            key: "combined-emp",
+            allocationGroup: "combined",
+            label: "Employee",
+            icon: "employee",
             totalAllocated: emp.allocated,
-            totalSpent: 0,
+            totalSpent: emp.spent,
             totalBalance: 0,
-            segments: [],
-          });
+            segments: [
+              { label: "Employee", spent: emp.spent, className: EMP_FILL },
+            ],
+          })
         } else {
-          existing.totalAllocated += emp.allocated;
-        }
-        combinedSpend.emp += emp.spent;
-        const employeeDetail = combinedDetails.get(emp.beneficiaryId);
-        if (!employeeDetail) {
-          combinedDetails.set(emp.beneficiaryId, buildEmployeeDetail(emp));
-        } else {
-          employeeDetail.spent += emp.spent;
-          employeeDetail.balance += emp.balance;
+          existingEmployee.totalAllocated += emp.allocated
+          existingEmployee.totalSpent += emp.spent
+          existingEmployee.segments[0].spent += emp.spent
         }
         if (showDeps) {
-          combinedSpend.dep += deps.reduce((s, d) => s + d.spent, 0);
+          const depSpent = deps.reduce((s, d) => s + d.spent, 0)
+          const dependentDetails = buildDependentDetails(deps)
+          const existingDependent = rowMap.get("combined-dep")
+          if (!existingDependent) {
+            rowMap.set("combined-dep", {
+              key: "combined-dep",
+              allocationGroup: "combined",
+              label: "Dependents",
+              icon: "dependent",
+              totalAllocated: emp.allocated,
+              totalSpent: depSpent,
+              totalBalance: 0,
+              segments: [
+                { label: "Dependents", spent: depSpent, className: DEP_FILL },
+              ],
+              details: dependentDetails,
+            })
+          } else {
+            existingDependent.totalAllocated += emp.allocated
+            existingDependent.totalSpent += depSpent
+            existingDependent.segments[0].spent += depSpent
+            existingDependent.details = mergeDetailRows(
+              existingDependent.details,
+              dependentDetails
+            )
+            existingDependent.label = "Dependents"
+          }
           for (const dep of deps) {
-            const existing = combinedDetails.get(dep.beneficiaryId);
+            const existing = combinedDetails.get(dep.beneficiaryId)
             if (!existing) {
               combinedDetails.set(dep.beneficiaryId, {
                 key: dep.beneficiaryId,
-                label: formatDependentLabel(dep.beneficiaryName, dep.relationship),
+                label: dep.beneficiaryName ?? dep.relationship ?? "Dependent",
                 relationshipLabel: dep.relationship,
                 allocated: dep.allocated,
                 spent: dep.spent,
                 balance: dep.balance,
-              });
-              continue;
+              })
+              continue
             }
 
-            existing.allocated += dep.allocated;
-            existing.spent += dep.spent;
-            existing.balance += dep.balance;
+            existing.allocated += dep.allocated
+            existing.spent += dep.spent
+            existing.balance += dep.balance
           }
         }
       } else {
         if (hasEmployeeSide(scope) && emp) {
-          const existing = rowMap.get("emp");
+          const existing = rowMap.get("emp")
           if (!existing) {
             rowMap.set("emp", {
               key: "emp",
+              allocationGroup: "emp",
               label: "Employee",
               icon: "employee",
               totalAllocated: emp.allocated,
               totalSpent: emp.spent,
               totalBalance: emp.balance,
-              segments: [{ label: "Employee", spent: emp.spent, className: EMP_FILL }],
-            });
+              segments: [
+                { label: "Employee", spent: emp.spent, className: EMP_FILL },
+              ],
+            })
           } else {
-            existing.totalAllocated += emp.allocated;
-            existing.totalSpent += emp.spent;
-            existing.totalBalance += emp.balance;
-            existing.segments[0].spent += emp.spent;
+            existing.totalAllocated += emp.allocated
+            existing.totalSpent += emp.spent
+            existing.totalBalance += emp.balance
+            existing.segments[0].spent += emp.spent
           }
         }
 
         if (showDeps) {
           if (poolType === "Shared") {
-            const depSpent = deps.reduce((s, d) => s + d.spent, 0);
-            const depAlloc = deps[0]?.allocated ?? 0;
-            const existing = rowMap.get("dep-shared");
+            const depSpent = deps.reduce((s, d) => s + d.spent, 0)
+            const depAlloc = deps[0]?.allocated ?? 0
+            const existing = rowMap.get("dep-shared")
             if (!existing) {
               rowMap.set("dep-shared", {
                 key: "dep-shared",
+                allocationGroup: "dep-shared",
                 label: "Dependents",
                 icon: "dependent",
                 totalAllocated: depAlloc,
                 totalSpent: depSpent,
                 totalBalance: Math.max(depAlloc - depSpent, 0),
-                segments: [{ label: "Dependents", spent: depSpent, className: DEP_FILL }],
+                segments: [
+                  { label: "Dependents", spent: depSpent, className: DEP_FILL },
+                ],
                 details: buildDependentDetails(deps),
-              });
+              })
             } else {
-              existing.totalAllocated += depAlloc;
-              existing.totalSpent += depSpent;
-              existing.totalBalance = Math.max(existing.totalAllocated - existing.totalSpent, 0);
-              existing.segments[0].spent += depSpent;
-              existing.details = mergeDetailRows(existing.details, buildDependentDetails(deps));
+              existing.totalAllocated += depAlloc
+              existing.totalSpent += depSpent
+              existing.totalBalance = Math.max(
+                existing.totalAllocated - existing.totalSpent,
+                0
+              )
+              existing.segments[0].spent += depSpent
+              existing.details = mergeDetailRows(
+                existing.details,
+                buildDependentDetails(deps)
+              )
             }
           } else {
-            const depSpent = deps.reduce((s, d) => s + d.spent, 0);
-            const depAllocated = deps.reduce((s, d) => s + d.allocated, 0);
-            const depBalance = deps.reduce((s, d) => s + d.balance, 0);
-            const existing = rowMap.get("dep-individual");
+            const depSpent = deps.reduce((s, d) => s + d.spent, 0)
+            const depAllocated = deps.reduce((s, d) => s + d.allocated, 0)
+            const depBalance = deps.reduce((s, d) => s + d.balance, 0)
+            const existing = rowMap.get("dep-individual")
             if (!existing) {
               rowMap.set("dep-individual", {
                 key: "dep-individual",
-                label: `Dependents (${buildDependentDetails(deps).length})`,
+                allocationGroup: "dep-individual",
+                label: "Dependents",
                 icon: "dependent",
                 totalAllocated: depAllocated,
                 totalSpent: depSpent,
                 totalBalance: depBalance,
-                segments: [{ label: "Dependents", spent: depSpent, className: DEP_FILL }],
+                segments: [
+                  { label: "Dependents", spent: depSpent, className: DEP_FILL },
+                ],
                 details: buildDependentDetails(deps),
-              });
+              })
             } else {
-              existing.totalAllocated += depAllocated;
-              existing.totalSpent += depSpent;
-              existing.totalBalance += depBalance;
-              existing.segments[0].spent += depSpent;
-              existing.details = mergeDetailRows(existing.details, buildDependentDetails(deps));
-              existing.label = `Dependents (${existing.details.length})`;
+              existing.totalAllocated += depAllocated
+              existing.totalSpent += depSpent
+              existing.totalBalance += depBalance
+              existing.segments[0].spent += depSpent
+              existing.details = mergeDetailRows(
+                existing.details,
+                buildDependentDetails(deps)
+              )
+              existing.label = "Dependents"
             }
           }
         }
@@ -508,117 +681,146 @@ function buildSummaryRows(entitlement: AssignedPolicyEntitlement): PoolSummaryRo
     }
   }
 
-  const combined = rowMap.get("combined");
-  if (combined) {
-    const totalSpent = combinedSpend.emp + combinedSpend.dep;
-    combined.totalSpent = totalSpent;
-    combined.totalBalance = Math.max(combined.totalAllocated - totalSpent, 0);
-    combined.segments = [
-      { label: "Employee", spent: combinedSpend.emp, className: EMP_FILL },
-      { label: "Dependents", spent: combinedSpend.dep, className: DEP_FILL },
-    ];
-    combined.details = Array.from(combinedDetails.values());
+  const combinedDependents = rowMap.get("combined-dep")
+  if (combinedDependents) {
+    combinedDependents.details = Array.from(combinedDetails.values())
+    combinedDependents.label = "Dependents"
   }
 
-  return normaliseSummaryRows(entitlement, Array.from(rowMap.values()));
+  return normaliseSummaryRows(
+    entitlement,
+    Array.from(rowMap.values()),
+    applyPolicyCaps
+  )
 }
 
-function renderPoolDetails(
-  details?: PoolDetailRow[],
-  utilisationAllocated?: number
-) {
-  if (!details?.length) return null;
-  const hasEmployeeRow = details.some((detail) => !detail.relationshipLabel);
-  const heading = hasEmployeeRow ? "Usage By Beneficiary" : "Usage By Dependents";
-  const firstColumnLabel = hasEmployeeRow ? "Beneficiary" : "Dependent";
-
-  return (
-    <div className="mt-4 rounded-lg border border-border bg-background/70 px-4 py-4">
-      <div className="mb-3">
-        <p className="text-body font-semibold text-foreground">{heading}</p>
-      </div>
-      <div className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(12rem,1.2fr)] gap-4 border-b border-border pb-3 text-label font-medium text-muted-foreground">
-        <span>{firstColumnLabel}</span>
-        <span>Relationship</span>
-        <span>Allocated</span>
-        <span>Used</span>
-        <span>Left</span>
-        <span>Utilisation</span>
-      </div>
-      <div className="divide-y divide-border">
-        {details.map((detail) => {
-          const utilisationBase = utilisationAllocated ?? detail.allocated;
-          const balance = detail.balance;
-
-          return (
-            <div
-              key={detail.key}
-              className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(12rem,1.2fr)] items-center gap-4 py-4 text-body"
-            >
-              <div className="min-w-0">
-                <p className="truncate font-medium text-foreground">{detail.label}</p>
-              </div>
-              <span className="text-foreground">{detail.relationshipLabel ?? "Employee"}</span>
-              <span className="tabular-nums text-foreground">{formatRM(detail.allocated)}</span>
-              <span className="tabular-nums text-foreground">{formatRM(detail.spent)}</span>
-              <span className="tabular-nums text-foreground">{formatRM(balance)}</span>
-              <UtilisationRail
-                allocated={utilisationBase}
-                spent={detail.spent}
-                color={detail.relationshipLabel ? "dependent" : "employee"}
-              />
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-function OverallSummaryCard({
+function PoolSummaryRows({
   rows,
+  testId,
 }: {
-  rows: PoolSummaryRow[];
+  rows: PoolSummaryRow[]
+  testId?: string
 }) {
-  const totalAllocated = rows.reduce((s, r) => s + r.totalAllocated, 0);
-  const totalSpent = rows.reduce((s, r) => s + r.totalSpent, 0);
-  const totalBalance = rows.reduce((s, r) => s + r.totalBalance, 0);
-  const utilPct = totalAllocated > 0 ? (totalSpent / totalAllocated) * 100 : 0;
+  return (
+    <div className="space-y-4" data-testid={testId}>
+      {rows.map((row) => {
+        const isCombined = row.allocationGroup === "combined"
+        const isDependent = row.icon === "dependent"
+        const poolTone = isCombined
+          ? "Combined"
+          : isDependent
+            ? row.allocationGroup === "dep-individual"
+              ? "Individual"
+              : "Shared"
+            : "Individual"
+        const subtitle = isCombined
+          ? isDependent
+            ? "Covered Dependents"
+            : "Employee"
+          : isDependent
+            ? ""
+            : "Employee"
 
-  let empSpent = 0;
-  let depSpent = 0;
+        return (
+          <div
+            key={row.key}
+            className="rounded-lg border border-border bg-background"
+          >
+            <div className="grid grid-cols-[minmax(0,2fr)_minmax(6rem,1fr)_minmax(6rem,1fr)_minmax(6rem,1fr)] items-center gap-4 px-4 py-4">
+              <PoolIdentity
+                icon={row.icon}
+                label={row.label}
+                tone={poolTone}
+                subtitle={subtitle}
+              />
+              <PoolStat
+                label="Allocated"
+                value={formatRM(row.totalAllocated)}
+              />
+              <PoolStat label="Used" value={formatRM(row.totalSpent)} />
+              <PoolStat label="Left" value={formatRM(row.totalBalance)} />
+            </div>
+            {isDependent ? <SummaryDependentBreakdown row={row} /> : null}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+function OverallSummaryCard({ rows }: { rows: PoolSummaryRow[] }) {
+  const totalSpent = rows.reduce((s, r) => s + r.totalSpent, 0)
+  const allocationGroups = new Map<
+    string,
+    { allocated: number; balance: number }
+  >()
   for (const row of rows) {
-    for (const seg of row.segments) {
-      if (seg.className === EMP_FILL) empSpent += seg.spent;
-      else depSpent += seg.spent;
+    const existing = allocationGroups.get(row.allocationGroup)
+    if (!existing) {
+      allocationGroups.set(row.allocationGroup, {
+        allocated: row.totalAllocated,
+        balance: row.totalBalance,
+      })
+      continue
     }
+
+    allocationGroups.set(row.allocationGroup, {
+      allocated: Math.max(existing.allocated, row.totalAllocated),
+      balance: Math.max(existing.balance, row.totalBalance),
+    })
   }
-  const segments: PoolSegment[] = [{ label: "Employee", spent: empSpent, className: EMP_FILL }];
-  if (depSpent > 0) segments.push({ label: "Dependents", spent: depSpent, className: DEP_FILL });
+  const totalAllocated = Array.from(allocationGroups.values()).reduce(
+    (sum, group) => sum + group.allocated,
+    0
+  )
+  const totalBalance = Array.from(allocationGroups.values()).reduce(
+    (sum, group) => sum + group.balance,
+    0
+  )
+
+  const segments = buildAllocationSummarySegments(rows)
 
   return (
     <div className="space-y-4">
       <div className="rounded-lg border border-border bg-card p-4">
         <div className="mb-3">
-          <p className="text-heading font-semibold text-foreground">Allocation Summary</p>
+          <p className="text-heading font-semibold text-foreground">
+            Allocation Summary
+          </p>
         </div>
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_32rem] lg:items-center">
-          <div className="grid grid-cols-3 gap-6">
-            <SummaryStat label="Total Allocated" value={formatRM(totalAllocated)} />
-            <SummaryStat label="Used" value={formatRM(totalSpent)} />
-            <SummaryStat label="Left" value={formatRM(totalBalance)} />
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-center">
+          <div className="grid grid-cols-3 gap-4">
+            <SummaryStat
+              label="Total Allocated"
+              value={formatRM(totalAllocated)}
+              compact
+            />
+            <SummaryStat
+              label="Total Used"
+              value={formatRM(totalSpent)}
+              compact
+            />
+            <SummaryStat
+              label="Total Left"
+              value={formatRM(totalBalance)}
+              compact
+            />
           </div>
-          <div className="space-y-3">
+          <div className="space-y-2">
             <StackedPoolBar
               allocated={totalAllocated}
               segments={segments}
               showLegend={false}
               className="self-center"
             />
-            <SummaryLegend allocated={totalAllocated} segments={segments} />
+            <SummaryLegend
+              allocated={totalAllocated}
+              segments={segments}
+              compact
+            />
           </div>
         </div>
-        <Collapsible className="-mx-4 -mb-4 mt-6 border-t border-border bg-muted/20">
+        <Collapsible className="-mx-4 mt-6 -mb-4 border-t border-border bg-muted/20">
           <CollapsibleTrigger asChild>
             <Button
               variant="ghost"
@@ -632,70 +834,173 @@ function OverallSummaryCard({
             </Button>
           </CollapsibleTrigger>
           <CollapsibleContent>
-            <div className="space-y-4 border-t border-border px-4 pb-4 pt-4">
+            <div className="space-y-4 border-t border-border px-4 pt-4 pb-4">
               {rows.map((row) => {
-                const isDependent = row.icon === "dependent";
-                const hasDetails = (row.details?.length ?? 0) > 0;
-                const poolTone =
-                  row.icon === "combined"
-                    ? "Combined Pool"
-                    : isDependent
-                      ? row.label.startsWith("Dependents (")
-                        ? "Individual Pools"
-                        : "Shared Pool"
-                      : "Individual Pool";
-                const subtitle =
-                  row.icon === "combined"
-                    ? "Employee + Dependents"
-                    : isDependent
-                      ? row.label.startsWith("Dependents (")
-                        ? `${row.details?.length ?? 0} Dependents`
-                        : "Covered Dependents"
-                      : "Employee";
+                const isCombined = row.allocationGroup === "combined"
+                const isDependent = row.icon === "dependent"
+                const poolTone = isCombined
+                  ? "Combined"
+                  : isDependent
+                    ? row.key === "dep-individual"
+                      ? "Individual"
+                      : "Shared"
+                    : "Individual"
+                const subtitle = isCombined
+                  ? isDependent
+                    ? "Covered Dependents"
+                    : "Employee"
+                  : isDependent
+                    ? ""
+                    : "Employee"
 
                 return (
-                  <div key={row.key} className="rounded-lg border border-border bg-background">
-                    <div className="grid grid-cols-[minmax(0,2fr)_minmax(6rem,1fr)_minmax(6rem,1fr)_minmax(6rem,1fr)_minmax(12rem,1.2fr)_auto] items-center gap-4 px-4 py-4">
+                  <div
+                    key={row.key}
+                    className="rounded-lg border border-border bg-background"
+                  >
+                    <div className="grid grid-cols-[minmax(0,2fr)_minmax(6rem,1fr)_minmax(6rem,1fr)_minmax(6rem,1fr)] items-center gap-4 px-4 py-4">
                       <PoolIdentity
                         icon={row.icon}
                         label={row.label}
                         tone={poolTone}
                         subtitle={subtitle}
                       />
-                      <PoolStat label="Allocated" value={formatRM(row.totalAllocated)} />
+                      <PoolStat
+                        label="Allocated"
+                        value={formatRM(row.totalAllocated)}
+                      />
                       <PoolStat label="Used" value={formatRM(row.totalSpent)} />
-                      <PoolStat label="Left" value={formatRM(row.totalBalance)} />
-                      <div>
-                        <p className="text-label font-medium text-muted-foreground">Utilisation</p>
-                        <div className="mt-2">
-                          <UtilisationRail
-                            allocated={row.totalAllocated}
-                            spent={row.totalSpent}
-                            color={isDependent ? "dependent" : "employee"}
-                          />
-                        </div>
-                      </div>
-                      <span className="shrink-0" aria-hidden="true" />
+                      <PoolStat
+                        label="Left"
+                        value={formatRM(row.totalBalance)}
+                      />
                     </div>
-                    {hasDetails ? (
-                      <div className="px-4 pb-4">
-                        {renderPoolDetails(
-                          row.details,
-                          row.icon === "combined" || row.icon === "dependent"
-                            ? row.totalAllocated
-                            : undefined
-                        )}
-                      </div>
+                    {isDependent ? (
+                      <SummaryDependentBreakdown row={row} />
                     ) : null}
                   </div>
-                );
+                )
               })}
             </div>
           </CollapsibleContent>
         </Collapsible>
       </div>
     </div>
-  );
+  )
+}
+
+function SummaryDependentBreakdown({ row }: { row: PoolSummaryRow }) {
+  const details = row.details ?? []
+  const isIndividual = row.allocationGroup === "dep-individual"
+  const [showAllDependents, setShowAllDependents] = useState(false)
+  const visibleDetails = showAllDependents ? details : details.slice(0, 3)
+
+  if (!details.length) return null
+
+  return (
+    <div
+      className="border-t border-border px-4 pt-4 pb-4"
+      data-testid={`entitlement-summary-dependent-breakdown-${row.key}`}
+    >
+      <div className="mb-2">
+        <p className="text-body font-semibold text-foreground">
+          {isIndividual ? "Dependent Allocations" : "Dependent Breakdown"}
+        </p>
+      </div>
+      <div
+        className={cn(
+          "hidden gap-4 border-b border-border pb-3 text-label font-medium text-muted-foreground md:grid",
+          isIndividual
+            ? "grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(12rem,1.2fr)]"
+            : "grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(12rem,1.2fr)]"
+        )}
+      >
+        <span>Beneficiary</span>
+        <span>Relationship</span>
+        {isIndividual ? <span>Allocated</span> : null}
+        <span>Used</span>
+        {isIndividual ? <span>Left</span> : null}
+        <span>Utilisation</span>
+      </div>
+      <div className="divide-y divide-border">
+        {visibleDetails.map((detail) => (
+          <div
+            key={detail.key}
+            className={cn(
+              "grid gap-x-4 gap-y-2 py-3 text-body md:items-center",
+              isIndividual
+                ? "md:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(12rem,1.2fr)]"
+                : "md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(12rem,1.2fr)]"
+            )}
+          >
+            <div className="min-w-0">
+              <p className="truncate font-medium text-foreground">
+                {detail.label}
+              </p>
+            </div>
+            <div>
+              <p className="text-label text-muted-foreground md:hidden">
+                Relationship
+              </p>
+              <span className="text-foreground">
+                {detail.relationshipLabel}
+              </span>
+            </div>
+            {isIndividual ? (
+              <div>
+                <p className="text-label text-muted-foreground md:hidden">
+                  Allocated
+                </p>
+                <span className="text-foreground tabular-nums">
+                  {formatRM(detail.allocated)}
+                </span>
+              </div>
+            ) : null}
+            <div>
+              <p className="text-label text-muted-foreground md:hidden">Used</p>
+              <span className="text-foreground tabular-nums">
+                {formatRM(detail.spent)}
+              </span>
+            </div>
+            {isIndividual ? (
+              <div>
+                <p className="text-label text-muted-foreground md:hidden">
+                  Left
+                </p>
+                <span className="text-foreground tabular-nums">
+                  {formatRM(detail.balance)}
+                </span>
+              </div>
+            ) : null}
+            <div>
+              <p className="text-label text-muted-foreground md:hidden">
+                Utilisation
+              </p>
+              <span className="text-foreground tabular-nums">
+                {getUtilisationPercentage(
+                  isIndividual ? detail.allocated : row.totalAllocated,
+                  detail.spent
+                )}
+                %
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+      {details.length > 3 ? (
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={() => setShowAllDependents((shown) => !shown)}
+          className="mt-2 h-auto rounded-4xl px-0 py-1 text-label font-medium text-primary hover:bg-transparent hover:text-primary"
+        >
+          {showAllDependents
+            ? "Show Fewer Dependents"
+            : `View All Dependents (${details.length})`}
+        </Button>
+      ) : null}
+    </div>
+  )
 }
 
 /** Build the pool bar(s) for one benefit, applying coverageScope (which sides show)
@@ -706,33 +1011,45 @@ function buildBenefitBars(
   benefit: Benefit,
   usage: BeneficiaryUsage[]
 ): PoolBar[] {
-  const scope = group.coverageScope ?? "Employee";
-  const rows = usage.filter((u) => u.benefitId === benefit.id);
-  const emp = rows.find((u) => !u.relationship);
-  const deps = rows.filter((u) => u.relationship);
-  const depsCovered = (policy.dependentCoverages?.length ?? 0) > 0;
-  const showDeps = depsCovered && hasDependentSide(scope) && deps.length > 0;
-  const poolType = policy.dependentsPoolType;
-  const bars: PoolBar[] = [];
+  const scope = group.coverageScope ?? "Employee"
+  const rows = usage.filter((u) => u.benefitId === benefit.id)
+  const emp = rows.find((u) => !u.relationship)
+  const deps = rows.filter((u) => u.relationship)
+  const depsCovered = (policy.dependentCoverages?.length ?? 0) > 0
+  const showDeps = depsCovered && hasDependentSide(scope) && deps.length > 0
+  const poolType = policy.dependentsPoolType
+  const bars: PoolBar[] = []
 
   // Combined pool — employee + dependents share one ceiling
-  if (hasEmployeeSide(scope) && showDeps && poolType === "SharedWithEmployee" && emp) {
-    const depSpent = deps.reduce((s, d) => s + d.spent, 0);
-    const spent = emp.spent + depSpent;
+  if (
+    hasEmployeeSide(scope) &&
+    showDeps &&
+    poolType === "SharedWithEmployee" &&
+    emp
+  ) {
+    const depSpent = deps.reduce((s, d) => s + d.spent, 0)
+    const sharedBalance = Math.max(emp.allocated - (emp.spent + depSpent), 0)
+    const details = buildDependentDetails(deps)
     bars.push({
-      key: `${benefit.id}-combined`,
-      label: "Employee + Dependents",
-      icon: "combined",
+      key: `${benefit.id}-combined-emp`,
+      label: "Employee",
+      icon: "employee",
       allocated: emp.allocated,
-      spent,
-      balance: Math.max(emp.allocated - spent, 0),
-      segments: [
-        { label: "Employee", spent: emp.spent, className: EMP_FILL },
-        { label: "Dependents", spent: depSpent, className: DEP_FILL },
-      ],
-      details: [buildEmployeeDetail(emp), ...buildDependentDetails(deps)],
-    });
-    return bars;
+      spent: emp.spent,
+      balance: sharedBalance,
+      segments: buildSharedSegments(emp.spent, depSpent, "employee"),
+    })
+    bars.push({
+      key: `${benefit.id}-combined-dep`,
+      label: "Dependents",
+      icon: "dependent",
+      allocated: emp.allocated,
+      spent: depSpent,
+      balance: sharedBalance,
+      segments: buildSharedSegments(emp.spent, depSpent, "dependent"),
+      details,
+    })
+    return bars
   }
 
   // Employee bar
@@ -745,14 +1062,14 @@ function buildBenefitBars(
       spent: emp.spent,
       balance: emp.balance,
       segments: [{ label: "Employee", spent: emp.spent, className: EMP_FILL }],
-    });
+    })
   }
 
   // Dependent side
   if (showDeps) {
     if (poolType === "Shared") {
-      const spent = deps.reduce((s, d) => s + d.spent, 0);
-      const allocated = deps[0]?.allocated ?? 0;
+      const spent = deps.reduce((s, d) => s + d.spent, 0)
+      const allocated = deps[0]?.allocated ?? 0
       bars.push({
         key: `${benefit.id}-dep-shared`,
         label: "Dependents",
@@ -760,28 +1077,28 @@ function buildBenefitBars(
         allocated,
         spent,
         balance: Math.max(allocated - spent, 0),
-        segments: [{ label: "Dependents", spent, className: DEP_FILL }],
+        segments: buildSharedSegments(0, spent, "dependent"),
         details: buildDependentDetails(deps),
-      });
+      })
     } else {
-      const details = buildDependentDetails(deps);
-      const allocated = deps.reduce((sum, dep) => sum + dep.allocated, 0);
-      const spent = deps.reduce((sum, dep) => sum + dep.spent, 0);
-      const balance = deps.reduce((sum, dep) => sum + dep.balance, 0);
+      const details = buildDependentDetails(deps)
+      const allocated = deps.reduce((sum, dep) => sum + dep.allocated, 0)
+      const spent = deps.reduce((sum, dep) => sum + dep.spent, 0)
+      const balance = deps.reduce((sum, dep) => sum + dep.balance, 0)
       bars.push({
         key: `${benefit.id}-deps-individual`,
-        label: `Dependents (${details.length})`,
+        label: "Dependents",
         icon: "dependent",
         allocated,
         spent,
         balance,
         segments: [{ label: "Dependents", spent, className: DEP_FILL }],
         details,
-      });
+      })
     }
   }
 
-  return bars;
+  return bars
 }
 
 function BenefitRow({
@@ -790,23 +1107,43 @@ function BenefitRow({
   benefit,
   usage,
 }: {
-  policy: BenefitPolicy;
-  group: BenefitGroup;
-  benefit: Benefit;
-  usage: BeneficiaryUsage[];
+  policy: BenefitPolicy
+  group: BenefitGroup
+  benefit: Benefit
+  usage: BeneficiaryUsage[]
 }) {
-  const bars = buildBenefitBars(policy, group, benefit, usage);
+  const rows = buildBenefitBars(policy, group, benefit, usage).map((bar) => ({
+    key: bar.key,
+    allocationGroup: bar.key.includes("combined")
+      ? "combined"
+      : bar.key.endsWith("-deps-individual")
+        ? "dep-individual"
+        : bar.key.endsWith("-dep-shared")
+          ? "dep-shared"
+          : `${benefit.id}-employee`,
+    label: bar.label,
+    icon: bar.icon,
+    totalAllocated: bar.allocated,
+    totalSpent: bar.spent,
+    totalBalance: bar.balance,
+    segments: bar.segments,
+    details: bar.details,
+  }))
 
   return (
     <Collapsible>
       <CollapsibleTrigger asChild>
         <button className="group flex w-full min-w-0 items-center gap-2 px-4 py-3 text-left transition-colors hover:bg-muted/30">
-          <span className="shrink-0">{getMainServiceIcon(benefit.serviceId)}</span>
+          <span className="shrink-0">
+            {getMainServiceIcon(benefit.serviceId)}
+          </span>
           <span className="truncate text-body font-semibold text-foreground">
             {getMainServiceName(benefit.serviceId)}
           </span>
           <span className="ml-auto shrink-0">
-            <TechnicalBadge>{resolveMainServiceId(benefit.serviceId)}</TechnicalBadge>
+            <TechnicalBadge>
+              {resolveMainServiceId(benefit.serviceId)}
+            </TechnicalBadge>
           </span>
           <CaretDown
             size={12}
@@ -817,61 +1154,41 @@ function BenefitRow({
       </CollapsibleTrigger>
 
       <CollapsibleContent>
-        <div className="space-y-3 border-t border-border bg-muted/10 px-4 pb-3 pt-3">
-          {bars.map((bar) => {
-            const isDependent = bar.icon === "dependent";
-            return (
-              <div key={bar.key} className="rounded-lg border border-border bg-background">
-                <div className="grid grid-cols-[minmax(0,2fr)_minmax(6rem,1fr)_minmax(6rem,1fr)_minmax(6rem,1fr)_minmax(12rem,1.2fr)_auto] items-center gap-4 px-4 py-4">
-                  <PoolIdentity
-                    icon={bar.icon}
-                    label={bar.label}
-                    subtitle={bar.icon === "combined" ? "Employee + Dependents" : bar.icon === "dependent" ? "Covered Dependents" : "Employee"}
-                  />
-                  <PoolStat label="Allocated" value={formatRM(bar.allocated)} />
-                  <PoolStat label="Used" value={formatRM(bar.spent)} />
-                  <PoolStat label="Left" value={formatRM(bar.balance)} />
-                  <div>
-                    <p className="text-label font-medium text-muted-foreground">Utilisation</p>
-                    <div className="mt-2">
-                      <UtilisationRail
-                        allocated={bar.allocated}
-                        spent={bar.spent}
-                        color={isDependent ? "dependent" : "employee"}
-                      />
-                    </div>
-                  </div>
-                  <span className="shrink-0" aria-hidden="true" />
-                </div>
-                <div className="px-4 pb-4">
-                  {renderPoolDetails(
-                    bar.details,
-                    bar.icon === "combined" || bar.icon === "dependent"
-                      ? bar.allocated
-                      : undefined
-                  )}
-                </div>
-              </div>
-            );
-          })}
+        <div className="border-t border-border bg-muted/10 px-4 py-3">
+          <PoolSummaryRows
+            rows={rows}
+            testId={`entitlement-benefit-summary-${benefit.id}`}
+          />
         </div>
       </CollapsibleContent>
     </Collapsible>
-  );
+  )
 }
 
-function GroupCard({ entitlement, group }: { entitlement: AssignedPolicyEntitlement; group: BenefitGroup }) {
-  const { policy, benefits, usage } = entitlement;
-  const scope = group.coverageScope ?? "Employee";
-  const depsCovered = (policy.dependentCoverages?.length ?? 0) > 0;
-  const groupBenefits = benefits.filter((b) => b.groupId === group.id);
+function GroupCard({
+  entitlement,
+  group,
+}: {
+  entitlement: AssignedPolicyEntitlement
+  group: BenefitGroup
+}) {
+  const { policy, benefits, usage } = entitlement
+  const scope = group.coverageScope ?? "Employee"
+  const depsCovered = (policy.dependentCoverages?.length ?? 0) > 0
+  const groupBenefits = benefits.filter((b) => b.groupId === group.id)
 
   const distribution =
-    group.distributionType === "SharedAmount" ? "Shared Amount" : "Individual Amount";
-  const meta = [scope, distribution, group.isTaxable ? "Taxable" : "Not Taxable"].join(" · ");
+    group.distributionType === "SharedAmount"
+      ? "Shared Amount"
+      : "Individual Amount"
+  const meta = [
+    scope,
+    distribution,
+    group.isTaxable ? "Taxable" : "Not Taxable",
+  ].join(" · ")
 
-  const empCap = getGroupCap(group, "employee");
-  const depCap = getGroupCap(group, "dependent");
+  const empCap = getGroupCap(group, "employee")
+  const depCap = getGroupCap(group, "dependent")
 
   return (
     <ContractSection
@@ -881,7 +1198,9 @@ function GroupCard({ entitlement, group }: { entitlement: AssignedPolicyEntitlem
     >
       <div className="space-y-5">
         <div>
-          <p className="mb-3 text-label font-semibold text-muted-foreground">Pool Usage</p>
+          <p className="mb-3 text-label font-semibold text-muted-foreground">
+            Benefit Usage
+          </p>
           {groupBenefits.length === 0 ? (
             <p className="rounded-lg border border-dashed border-border bg-muted/10 py-6 text-center text-label text-faint">
               No benefits configured for this group.
@@ -918,33 +1237,49 @@ function GroupCard({ entitlement, group }: { entitlement: AssignedPolicyEntitlem
             </Button>
           </CollapsibleTrigger>
           <CollapsibleContent>
-            <div className="border-t border-border px-4 pb-4 pt-4">
+            <div className="border-t border-border px-4 pt-4 pb-4">
               <DataGrid>
                 {hasEmployeeSide(scope) && (
-                  <DataPoint label="Employee Cap" value={empCap.value} helper={empCap.helper} />
+                  <DataPoint
+                    label="Employee Cap"
+                    value={empCap.value}
+                    helper={empCap.helper}
+                  />
                 )}
                 {depsCovered && hasDependentSide(scope) && (
-                  <DataPoint label="Dependent Cap" value={depCap.value} helper={depCap.helper} />
+                  <DataPoint
+                    label="Dependent Cap"
+                    value={depCap.value}
+                    helper={depCap.helper}
+                  />
                 )}
-                <DataPoint label="Co-pay" value={formatCopay(group.coPayment)} />
-                <DataPoint label="Refresh" value={`${getEffectiveRefresh(policy, group)} Refresh`} />
+                <DataPoint
+                  label="Co-pay"
+                  value={formatCopay(group.coPayment)}
+                />
+                <DataPoint
+                  label="Refresh"
+                  value={`${getEffectiveRefresh(policy, group)} Refresh`}
+                />
               </DataGrid>
             </div>
           </CollapsibleContent>
         </Collapsible>
       </div>
     </ContractSection>
-  );
+  )
 }
 
 interface EmployeeEntitlementsTabProps {
-  employeeId: string;
+  employeeId: string
 }
 
-export function EmployeeEntitlementsTab({ employeeId }: EmployeeEntitlementsTabProps) {
-  const entitlement = getEmployeeEntitlement(employeeId);
+export function EmployeeEntitlementsTab({
+  employeeId,
+}: EmployeeEntitlementsTabProps) {
+  const entitlement = getEmployeeEntitlement(employeeId)
 
-  const summaryRows = buildSummaryRows(entitlement);
+  const summaryRows = buildSummaryRows(entitlement)
 
   return (
     <div className="space-y-6">
@@ -966,5 +1301,5 @@ export function EmployeeEntitlementsTab({ employeeId }: EmployeeEntitlementsTabP
         ))}
       </div>
     </div>
-  );
+  )
 }

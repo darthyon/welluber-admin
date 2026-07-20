@@ -87,9 +87,18 @@ function PoliciesContent() {
     setTimeout(() => setToast(null), 3000);
   };
 
-  const handleCreateNew = (orgId?: string) => router.push(orgId ? `/policies/new?orgId=${orgId}` : "/policies/new");
+  const handleCreateNew = (orgId?: string) =>
+    router.push(
+      orgId
+        ? `/policies/new?source=org&orgId=${encodeURIComponent(orgId)}`
+        : "/policies/new?source=global"
+    );
   const handleCreateFromTemplate = (templateId: string, orgId?: string) =>
-    router.push(orgId ? `/policies/new?template=${templateId}&orgId=${orgId}` : `/policies/new?template=${templateId}`);
+    router.push(
+      orgId
+        ? `/policies/new?source=org&template=${encodeURIComponent(templateId)}&orgId=${encodeURIComponent(orgId)}`
+        : `/policies/new?source=global&template=${encodeURIComponent(templateId)}`
+    );
 
   const handleClone = (policy: PolicyListItem) => setCloneTarget(policy);
 
@@ -155,7 +164,7 @@ function PoliciesContent() {
     onClone: handleClone,
     onDeactivate: handleDeactivate,
     onDelete: handleDelete,
-    onEdit: (policy) => router.push(`/policies/${policy.id}/edit`),
+    onEdit: (policy) => router.push(`/policies/${policy.id}/edit?source=global`),
     onView: (policy) => updateQueryParams({ policyId: policy.id, mode: "view", wizard: "open" }),
   });
 
@@ -187,11 +196,13 @@ function PoliciesContent() {
             parentPolicyName={parentPolicyName}
             parentBenefits={parentBenefits}
             initialTab={(activeTabParam as TabId | null) ?? "overview"}
-            onEdit={() => router.push(`/policies/${policy.id}/edit`)}
+            onEdit={() => router.push(`/policies/${policy.id}/edit?source=global`)}
             onClone={() => handleClone(policy)}
             onDeactivate={() => handleDeactivate(policy)}
             onDelete={() => handleDelete(policy)}
-            onEditVersion={(versionId) => router.push(`/policies/${versionId}/edit`)}
+            onEditVersion={(versionId) =>
+              router.push(`/policies/${versionId}/edit?source=global`)
+            }
             onRemoveVersion={(versionId) =>
               setConfirmDialog({
                 open: true,

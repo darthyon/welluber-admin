@@ -677,9 +677,9 @@ export function createOrgPortalActivity(
     },
     {
       id: "ACT-003",
-      title: "Employee Status Updated",
+      title: "Employee Profile Updated",
       type: "Update",
-      desc: "Robert Fox status changed from Unlinked to Linked.",
+      desc: "Robert Fox's employee profile was updated.",
       timestamp: "2026-04-08 11:15",
       updatedBy: { name: "Amira Rahman", email: "amira@acme.com" },
       requiresAction: false,

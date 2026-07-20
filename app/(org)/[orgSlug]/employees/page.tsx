@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button"
 import { BulkUploadWizard } from "@/components/host/organizations/bulk-upload-wizard"
 import { SharedDataTable, type Column } from "@/components/shared/data-table"
 import { DataFilterBar } from "@/components/shared/data-filter-bar"
-import { FilterItem } from "@/components/shared/filter-item"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { EmptyState } from "@/components/shared/empty-state"
 import { MOCK_EMPLOYEES, MOCK_DEPENDENTS } from "@/lib/mock-data"
@@ -29,7 +28,6 @@ export default function OrgEmployeesPage() {
   const [showBulkUpload, setShowBulkUpload] = useState(false)
   const [activeTab, setActiveTab] = useState<"directory" | "dependents">("directory")
   const [search, setSearch] = useState("")
-  const [statusFilter, setStatusFilter] = useState("all")
 
   const employees = useMemo(
     () => MOCK_EMPLOYEES.filter((e) => e.orgId === orgId),
@@ -44,10 +42,9 @@ export default function OrgEmployeesPage() {
         e.name.toLowerCase().includes(q) ||
         e.email.toLowerCase().includes(q) ||
         e.empCode.toLowerCase().includes(q)
-      const matchStatus = statusFilter === "all" || e.status.toLowerCase() === statusFilter
-      return matchSearch && matchStatus
+      return matchSearch
     })
-  }, [employees, search, statusFilter])
+  }, [employees, search])
 
   const dependents = useMemo(
     () => MOCK_DEPENDENTS.filter((d) => employees.some((e) => e.id === d.employeeId)),
@@ -89,15 +86,6 @@ export default function OrgEmployeesPage() {
     {
       header: "Tier",
       render: (e) => <span className="text-body text-subtle">{e.tier}</span>,
-    },
-    {
-      header: "Status",
-      render: (e) => (
-        <StatusBadge
-          status={e.status}
-          variant={e.status === "Linked" ? "emerald" : "amber"}
-        />
-      ),
     },
     {
       header: "Joined Date",
@@ -190,20 +178,7 @@ export default function OrgEmployeesPage() {
         searchQuery={search}
         onSearchChange={setSearch}
         searchPlaceholder={activeTab === "directory" ? "Search employees..." : "Search dependents..."}
-        filters={
-          activeTab === "directory" ? (
-            <FilterItem
-              label="Status"
-              value={statusFilter}
-              onChange={setStatusFilter}
-              options={[
-                { label: "All Status", value: "all" },
-                { label: "Linked", value: "linked" },
-                { label: "Pending", value: "pending" },
-              ]}
-            />
-          ) : null
-        }
+        filters={null}
       />
 
       {activeTab === "directory" ? (

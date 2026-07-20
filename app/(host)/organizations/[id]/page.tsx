@@ -23,14 +23,26 @@ import { TabErrorState } from "@/components/shared/tab-error-state"
 import { ProfileTab } from "@/components/host/organizations/tabs/profile-tab"
 import { BranchesTab } from "@/components/host/organizations/tabs/branches-tab"
 import { EmployeesTab } from "@/components/host/organizations/tabs/employees-tab"
+import { DependentsSubTab } from "@/components/host/organizations/tabs/employees/dependents-sub-tab"
+import { EntitlementsSubTab } from "@/components/host/organizations/tabs/employees/entitlements-sub-tab"
 import { PoliciesTab } from "@/components/host/organizations/tabs/policies-tab"
 import { ClaimsTab } from "@/components/host/organizations/tabs/claims-tab"
 import { VouchersTab } from "@/components/host/organizations/tabs/vouchers-tab"
 import { SettingsTab } from "@/components/host/organizations/tabs/settings-tab"
-import { TABS, OTHER_ORGS, type TabId, type AssignedPolicy } from "@/components/host/organizations/constants"
-import { MOCK_ORGS, ACME_POLICIES } from "@/lib/mock-data"
+import {
+  TABS,
+  OTHER_ORGS,
+  ORG_FTU_ORG_ID,
+  type TabId,
+  type AssignedPolicy,
+} from "@/components/host/organizations/constants"
+import { ACME_POLICIES } from "@/lib/mock-data"
+import { useOrganizations } from "@/hooks/data-hooks"
 import type { FlatClaimRow } from "@/types/claims"
-import type { OrganizationStatus } from "@/features/organizations/types"
+import type {
+  Organization,
+  OrganizationStatus,
+} from "@/features/organizations/types"
 
 // Shared base fields (id/name/code/version/status/assignedTo/employeeCount/lastUpdated)
 // come from the centralised Acme seed so host + org portal never drift.
@@ -39,7 +51,8 @@ const INITIAL_POLICIES: AssignedPolicy[] = [
   {
     ...ACME_POLICIES[0],
     organizationId: "org-123",
-    description: "Standard wellness benefits for HQ staff including gym and mental health support.",
+    description:
+      "Standard wellness benefits for HQ staff including gym and mental health support.",
     eligibleEmploymentTypes: ["full-time"],
     dependentCoverages: [],
     benefitPoolType: "Individual" as const,
@@ -52,7 +65,8 @@ const INITIAL_POLICIES: AssignedPolicy[] = [
   {
     ...ACME_POLICIES[1],
     organizationId: "org-123",
-    description: "Flexible lifestyle benefits for travel, food, and personal development.",
+    description:
+      "Flexible lifestyle benefits for travel, food, and personal development.",
     eligibleEmploymentTypes: ["full-time", "part-time"],
     dependentCoverages: [],
     benefitPoolType: "Shared" as const,
@@ -64,10 +78,64 @@ const INITIAL_POLICIES: AssignedPolicy[] = [
   },
 ]
 
+const POLICY_NAMES: Record<string, string> = {
+  "POL-20260115-0001": "Acme Employee Wellness Policy FY2026",
+  "POL-20260115-0002": "Acme Leadership Benefits Policy FY2026",
+  "POL-20260115-0003": "Global Tech Core Benefits Policy FY2026",
+}
+
+function buildAssignedPoliciesForOrg(
+  orgId: string,
+  mockOrg?: Organization
+): AssignedPolicy[] {
+  if (orgId === "ORG-20260115-0001") {
+    return INITIAL_POLICIES
+  }
+
+  if (!mockOrg || orgId === ORG_FTU_ORG_ID) {
+    return []
+  }
+
+  return (mockOrg.policies ?? []).map((policyId, index) => ({
+    id: policyId,
+    organizationId: orgId,
+    name: POLICY_NAMES[policyId] ?? `${mockOrg.name} Policy ${index + 1}`,
+    code: `BEN-${String(index + 1).padStart(2, "0")}`,
+    version: "V1.0",
+    description: "Assigned benefit policy for this organisation.",
+    eligibleEmploymentTypes: ["full-time"],
+    dependentCoverages: [],
+    benefitPoolType: "Individual",
+    utilisationMode: "Fixed",
+    refreshCycle: "Yearly",
+    refreshStartReference: "financial_year",
+    status: "active",
+    assignedTo: "All Branches",
+    employeeCount: Math.max(
+      Math.floor(
+        (mockOrg.employeeCount ?? 0) /
+          Math.max(mockOrg.policies?.length ?? 1, 1)
+      ),
+      0
+    ),
+    lastUpdated: new Date(mockOrg.updatedAt).toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    }),
+    categories: [],
+    groups: [],
+  }))
+}
+
 function OrganizationDetailContent() {
   const params = useParams()
   const router = useRouter()
   const orgId = params.id as string
+  const { organizations } = useOrganizations()
+  const mockOrg = organizations.find((o) => o.id === orgId)
+  const orgName = mockOrg?.name ?? orgId
+  const orgTierConfigs = mockOrg?.tierConfigs ?? []
 
   const [activeTab, setActiveTab] = useTabPersistence<TabId>("profile")
   const [isInviteModalOpen, setIsInviteModalOpen] = useQueryState("inviteAdmin")
@@ -77,15 +145,16 @@ function OrganizationDetailContent() {
   const updateQueryParams = useUpdateQueryParams()
 
   const [toastMessage, setToastMessage] = useState<string | null>(null)
-  const [orgStatus, setOrgStatus] = useState<OrganizationStatus>("active")
-  const [assignedPolicies, setAssignedPolicies] = useState<AssignedPolicy[]>(INITIAL_POLICIES)
+  const [orgStatus, setOrgStatus] = useState<OrganizationStatus>(
+    mockOrg?.status ?? "active"
+  )
+  const [assignedPolicies, setAssignedPolicies] = useState<AssignedPolicy[]>(
+    buildAssignedPoliciesForOrg(orgId, mockOrg)
+  )
   const [showPostAssignModal, setShowPostAssignModal] = useState(false)
   const [lastAssignedPolicyName, setLastAssignedPolicyName] = useState("")
-  const [selectedVoucherClaim, setSelectedVoucherClaim] = useState<FlatClaimRow | null>(null)
-
-  const mockOrg = MOCK_ORGS.find((o) => o.id === orgId)
-  const orgName = mockOrg?.name ?? orgId
-  const orgTierConfigs = mockOrg?.tierConfigs ?? []
+  const [selectedVoucherClaim, setSelectedVoucherClaim] =
+    useState<FlatClaimRow | null>(null)
 
   const orgForSetup = {
     ...(mockOrg ?? {}),
@@ -94,15 +163,10 @@ function OrganizationDetailContent() {
   } as import("@/features/organizations/types").Organization
 
   const handleAssignPolicy = (policyId: string) => {
-    const policyNames: Record<string, string> = {
-      "POL-20260115-0001": "Acme Employee Wellness Policy FY2026",
-      "POL-20260115-0002": "Acme Leadership Benefits Policy FY2026",
-      "POL-20260115-0003": "Global Tech Core Benefits Policy FY2026",
-    }
     const newPolicy: AssignedPolicy = {
       id: policyId,
-      organizationId: "org-123",
-      name: policyNames[policyId] || "Selected Policy",
+      organizationId: orgId,
+      name: POLICY_NAMES[policyId] || "Selected Policy",
       code: `WP-${policyId.split("_")[1]?.toUpperCase() ?? "NEW"}-2026`,
       description: "Automatically assigned benefit policy.",
       eligibleEmploymentTypes: ["full-time"],
@@ -140,7 +204,9 @@ function OrganizationDetailContent() {
           setShowPostAssignModal(false)
           setActiveTab("employees")
           setIsBulkUploading("true")
-          setToastMessage("Opened employee import with policy auto-match suggestion")
+          setToastMessage(
+            "Opened employee import with policy auto-match suggestion"
+          )
         }}
         onManual={() => {
           setShowPostAssignModal(false)
@@ -181,7 +247,7 @@ function OrganizationDetailContent() {
               <EntityAvatar name={orgName} size="xl" />
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
-                  <h1 className="tracking-tight text-display font-semibold text-foreground">
+                  <h1 className="text-title font-semibold tracking-tight text-foreground">
                     {orgName}
                   </h1>
                   <StatusBadge
@@ -197,7 +263,7 @@ function OrganizationDetailContent() {
                 </div>
                 <div className="flex items-center gap-3 text-body text-subtle">
                   <span className="rounded border border-border bg-background px-2 py-0.5 font-mono text-label tracking-widest text-faint uppercase">
-                    ORG-20260115-0001
+                    {orgId}
                   </span>
                 </div>
               </div>
@@ -211,7 +277,11 @@ function OrganizationDetailContent() {
                 className="rounded-full text-body font-medium transition-all"
               >
                 <Link href={`/organizations/${orgId}/edit`}>
-                  <PencilSimpleLine size={16} weight="bold" className="mr-1.5" />
+                  <PencilSimpleLine
+                    size={16}
+                    weight="bold"
+                    className="mr-1.5"
+                  />
                   Edit Organisation
                 </Link>
               </Button>
@@ -233,6 +303,7 @@ function OrganizationDetailContent() {
                       branchName: null,
                       employeeId: null,
                       bulkUpload: null,
+                      subTab: null,
                       assignPolicy: null,
                       addPolicy: null,
                       viewingPolicyId: null,
@@ -255,7 +326,10 @@ function OrganizationDetailContent() {
                   <Icon
                     size={16}
                     weight={isActive ? "fill" : "regular"}
-                    className={cn("transition-colors", isActive && "text-primary")}
+                    className={cn(
+                      "transition-colors",
+                      isActive && "text-primary"
+                    )}
                   />
                   {tab.label}
                 </button>
@@ -293,6 +367,19 @@ function OrganizationDetailContent() {
               isBulkUploading={isBulkUploading}
               onBulkUploadChange={setIsBulkUploading}
             />
+          </ErrorBoundary>
+        )}
+        {activeTab === "dependents" && (
+          <ErrorBoundary fallback={<TabErrorState />}>
+            <DependentsSubTab
+              orgId={orgId}
+              onNavigateToDirectory={() => setActiveTab("employees")}
+            />
+          </ErrorBoundary>
+        )}
+        {activeTab === "entitlements" && (
+          <ErrorBoundary fallback={<TabErrorState />}>
+            <EntitlementsSubTab orgId={orgId} />
           </ErrorBoundary>
         )}
         {activeTab === "policies" && (

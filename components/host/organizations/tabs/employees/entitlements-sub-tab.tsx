@@ -1,9 +1,11 @@
 "use client"
 
+import { Wallet } from "@phosphor-icons/react"
 import { useQueryState } from "@/hooks/use-tab-persistence"
 import { FilterItem } from "@/components/shared/filter-item"
 import { DataFilterBar } from "@/components/shared/data-filter-bar"
 import { SharedDataTable } from "@/components/shared/data-table"
+import { EmptyState } from "@/components/shared/empty-state"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { Badge } from "@/components/ui/badge"
 import { useOrgWorkforce } from "@/hooks/use-org-workforce"
@@ -173,6 +175,17 @@ export function EntitlementsSubTab({ orgId }: EntitlementsSubTabProps) {
           },
         ]}
         data={filtered}
+        emptyState={
+          <EmptyState
+            icon={<Wallet size={32} weight="light" />}
+            title="No Entitlements Found"
+            description={
+              search || typeFilter !== "all"
+                ? "Try adjusting the beneficiary search or type filter."
+                : "Assigned benefit allocations will appear here once employees or dependents are enrolled."
+            }
+          />
+        }
       />
     </div>
   )

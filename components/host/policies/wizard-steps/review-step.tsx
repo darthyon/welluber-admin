@@ -79,7 +79,7 @@ export function ReviewStep({ ctx }: ReviewStepProps) {
             <ShieldCheck size={22} weight="duotone" />
           </div>
           <div>
-            <h3 className="tracking-tight text-display font-semibold text-foreground">
+            <h3 className="tracking-tight text-title font-semibold text-foreground">
               Review &amp; Finalize
             </h3>
             <p className="mt-0.5 text-subtle">

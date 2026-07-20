@@ -147,6 +147,14 @@ pnpm format       # Prettier formatting
 
 Run **all** of these before submitting changes.
 
+## GitHub CLI Authentication
+
+- If `gh auth status` reports an invalid token together with an API or network connection error, retry the same read-only check outside the sandbox before asking the user to reauthenticate.
+- Do not treat a sandboxed `gh` network failure as proof that the saved GitHub credential is invalid.
+- Keep GitHub CLI credentials in macOS Keychain. Never work around sandboxed Keychain access with plaintext tokens, `GH_TOKEN` files, or repository-stored credentials.
+- Never require or recommend Full Access solely for GitHub CLI authentication. Keep the workspace sandbox in place.
+- For GitHub CLI actions that need Keychain or network access, request approval for the exact `gh` command with scoped elevation. Do not request a blanket `gh` approval; use read-only commands where possible.
+
 ---
 
 ## 7. Pre-Submit Checklist
@@ -202,6 +210,17 @@ Hard rules:
 - Do not paste full files in responses.
 - Do not refactor unrelated code or make "while I'm here" changes.
 - Never rely on MCP alone for final proof; inspect relevant snippets and run targeted verification when applicable.
+
+---
+
+## Testing
+
+- Write tests in Playwright (E2E) + Vitest (unit).
+- Never run tests during chat. Output terminal command for me to run.
+- When I paste failure output, diagnose and fix only what's broken.
+- No screenshot-based visual testing. No browser preview.
+- Playwright MCP only when I explicitly ask. Never fire it proactively.
+- After every completed task, list test cases for me to check manually. Cover happy path + edge cases + error states.
 
 *Last updated: 2026-05-18*
 *Primary source: `docs/design.md` (reconciled with `app/globals.css`)*

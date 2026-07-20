@@ -11,7 +11,6 @@ import {
 } from "@phosphor-icons/react"
 import { DetailSection } from "@/components/shared/detail-section"
 import { DetailField } from "@/components/shared/detail-field"
-import { StatusBadge } from "@/components/shared/status-badge"
 import { BackButton } from "@/components/shared/back-button"
 import { UtilisationClaimsTable } from "@/components/shared/utilisation-claims-table"
 import { Badge } from "@/components/ui/badge"
@@ -51,10 +50,6 @@ export default function EmployeeDetailPage() {
           <h1 className="text-2xl font-semibold text-foreground">{employee.name}</h1>
           <div className="flex items-center gap-2 mt-1">
             <span className="text-label font-mono text-faint">{employee.empCode}</span>
-            <StatusBadge
-              status={employee.status}
-              variant={employee.status === "Linked" ? "emerald" : "amber"}
-            />
           </div>
         </div>
       </div>

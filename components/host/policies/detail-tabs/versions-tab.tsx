@@ -4,6 +4,7 @@ import { useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { SharedDataTable } from "@/components/shared/data-table"
+import { EmptyState } from "@/components/shared/empty-state"
 import { StatusBadge } from "@/components/shared/status-badge"
 import {
   ActionPopover,
@@ -63,33 +64,24 @@ export function VersionsTab({
       </div>
 
       {versions.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border/60 bg-muted/10 py-20 text-center">
-          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-lg border border-violet-200 bg-violet-50 text-violet-500 dark:border-violet-500/20 dark:bg-violet-500/10">
-            <TreeStructure size={28} weight="duotone" />
-          </div>
-          <p className="text-body font-semibold text-foreground">
-            No versions yet
-          </p>
-          <p className="mt-1 max-w-sm text-label text-faint">
-            Create a version to tailor benefit amounts for a specific tier,
-            department, or individual employee without changing the base policy.
-          </p>
-          {canCreateVersion && (
-            <Button
-              onClick={onCreateVersion}
-              size="sm"
-              className="mt-6 text-label font-medium"
-            >
-              <Plus size={14} weight="bold" className="mr-1.5" />
-              Create Version
-            </Button>
-          )}
-          {!canCreateVersion && policy.parentPolicyId && (
-            <p className="mt-4 text-label text-faint italic">
-              Versions can only be created from parent policies.
-            </p>
-          )}
-        </div>
+        <EmptyState
+          icon={<TreeStructure size={32} weight="light" />}
+          title="No Versions Yet"
+          description="Create a version to tailor benefit amounts for a specific tier, department, or individual employee without changing the base policy."
+          action={
+            canCreateVersion ? (
+              <Button
+                onClick={onCreateVersion}
+                size="sm"
+                variant="ghost"
+                className="rounded-4xl px-4 text-label font-medium text-primary"
+              >
+                <Plus size={14} weight="bold" className="mr-1.5" />
+                Create Version
+              </Button>
+            ) : undefined
+          }
+        />
       ) : (
         <SharedDataTable
           data={versionRows}
@@ -210,6 +202,11 @@ export function VersionsTab({
           rowsPerPage={10}
         />
       )}
+      {!canCreateVersion && policy.parentPolicyId && versions.length === 0 ? (
+        <p className="text-center text-label text-faint italic">
+          Versions can only be created from parent policies.
+        </p>
+      ) : null}
     </div>
   )
 }
