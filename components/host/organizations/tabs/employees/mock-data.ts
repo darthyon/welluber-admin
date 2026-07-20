@@ -5,7 +5,6 @@ type EmployeeDirectoryMock = {
   name: string
   email: string
   branch: string
-  status: string
   empCode: string
   joinDate: string
   lastActive: string
@@ -26,7 +25,6 @@ const ACME_EMPLOYEE_GRID: EmployeeDirectoryMock[] = [
     name: "Robert Fox",
     email: "robert.f@acme.com",
     branch: "ACME HQ",
-    status: "Linked",
     empCode: "ACM-001",
     joinDate: "12 Oct 2023",
     lastActive: "09 Apr 2026, 17:15",
@@ -47,7 +45,6 @@ const ACME_EMPLOYEE_GRID: EmployeeDirectoryMock[] = [
     name: "Jenny Wilson",
     email: "jenny.w@acme.com",
     branch: "ACME Subang Jaya",
-    status: "Linked",
     empCode: "ACM-042",
     joinDate: "05 Mar 2024",
     lastActive: "09 Apr 2026, 16:45",
@@ -68,7 +65,6 @@ const ACME_EMPLOYEE_GRID: EmployeeDirectoryMock[] = [
     name: "Michael Tan",
     email: "michael.t@acme.com",
     branch: "ACME HQ",
-    status: "Linked",
     empCode: "ACM-156",
     joinDate: "20 May 2026",
     lastActive: "09 Apr 2026, 10:20",
@@ -89,7 +85,6 @@ const ACME_EMPLOYEE_GRID: EmployeeDirectoryMock[] = [
     name: "Marvin McKinney",
     email: "marvin.m@acme.com",
     branch: "ACME HQ",
-    status: "Linked",
     empCode: "ACM-089",
     joinDate: "12 Jan 2026",
     lastActive: "08 Apr 2026, 14:30",
@@ -110,7 +105,6 @@ const ACME_EMPLOYEE_GRID: EmployeeDirectoryMock[] = [
     name: "Ahmad Faizal",
     email: "ahmad.f@acme.com",
     branch: "ACME Subang Jaya",
-    status: "Linked",
     empCode: "ACM-301",
     joinDate: "15 Jan 2026",
     lastActive: "07 May 2026, 08:45",
@@ -134,7 +128,6 @@ const BRIGHTPATH_EMPLOYEE_GRID: EmployeeDirectoryMock[] = [
     name: "Alicia Tan",
     email: "alicia.t@brightpath.com",
     branch: "BrightPath HQ",
-    status: "Linked",
     empCode: "BPT-001",
     joinDate: "14 Feb 2026",
     lastActive: "30 Jun 2026, 16:10",
@@ -155,7 +148,6 @@ const BRIGHTPATH_EMPLOYEE_GRID: EmployeeDirectoryMock[] = [
     name: "Marcus Lee",
     email: "marcus.l@brightpath.com",
     branch: "BrightPath HQ",
-    status: "Linked",
     empCode: "BPT-014",
     joinDate: "03 Mar 2026",
     lastActive: "30 Jun 2026, 15:42",
@@ -170,7 +162,6 @@ const BRIGHTPATH_EMPLOYEE_GRID: EmployeeDirectoryMock[] = [
     name: "Nur Iman",
     email: "nur.i@brightpath.com",
     branch: "BrightPath HQ",
-    status: "Linked",
     empCode: "BPT-021",
     joinDate: "18 Apr 2026",
     lastActive: "29 Jun 2026, 11:08",

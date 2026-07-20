@@ -7,7 +7,6 @@ import {
   Clock,
   UserCircle,
 } from "@phosphor-icons/react"
-import { StatusBadge } from "@/components/shared/status-badge"
 import { useState, useRef, useEffect } from "react"
 import { motion } from "framer-motion"
 import { ActionPopover } from "@/components/shared/action-popover"
@@ -24,7 +23,6 @@ export interface EmployeeCardEmployee {
   email: string
   organization?: string
   branch: string
-  status: string
   empCode: string
   joinDate: string
   lastActive?: string
@@ -104,9 +102,6 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
                 {initials}
               </div>
             </div>
-            {employee.status === "Linked" && (
-              <div className="absolute -right-0.5 -bottom-0.5 h-3 w-3 rounded-full border-2 border-white bg-emerald-500/10 text-emerald-600 shadow-sm dark:bg-emerald-500/20 dark:text-emerald-400" />
-            )}
           </div>
 
           <div className="space-y-1.5">
@@ -116,11 +111,6 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
               </h4>
             </div>
             <div className="flex items-center gap-2">
-              <StatusBadge
-                status={employee.status}
-                variant={employee.status === "Linked" ? "emerald" : "amber"}
-                className="rounded-md px-1.5 py-0.5 text-micro"
-              />
               <span className="rounded border border-border/40 bg-background/50 px-1.5 py-0.5 font-mono text-micro tracking-tight text-faint">
                 {employee.empCode}
               </span>

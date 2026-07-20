@@ -9,7 +9,6 @@ export interface EmployeeDirectoryItem {
   branch: string
   joinDate: string
   lastActive: string
-  status: string
   empCode: string
   departmentId?: string
   department?: string

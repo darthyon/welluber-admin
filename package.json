@@ -11,6 +11,7 @@
     "lint": "eslint",
     "lint:design": "node .agents/scripts/design-lint.js",
     "format": "prettier --write \"**/*.{ts,tsx}\"",
+    "test:unit": "vitest run",
     "typecheck": "tsc --noEmit",
     "check:policy": "tsx scripts/check-policy-integrity.ts",
     "setup:worktree": "bash scripts/worktree-setup.sh"
@@ -60,6 +61,7 @@
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "2.1.9"
   }
 }

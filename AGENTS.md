@@ -147,6 +147,14 @@ pnpm format       # Prettier formatting
 
 Run **all** of these before submitting changes.
 
+## GitHub CLI Authentication
+
+- If `gh auth status` reports an invalid token together with an API or network connection error, retry the same read-only check outside the sandbox before asking the user to reauthenticate.
+- Do not treat a sandboxed `gh` network failure as proof that the saved GitHub credential is invalid.
+- Keep GitHub CLI credentials in macOS Keychain. Never work around sandboxed Keychain access with plaintext tokens, `GH_TOKEN` files, or repository-stored credentials.
+- Never require or recommend Full Access solely for GitHub CLI authentication. Keep the workspace sandbox in place.
+- For GitHub CLI actions that need Keychain or network access, request approval for the exact `gh` command with scoped elevation. Do not request a blanket `gh` approval; use read-only commands where possible.
+
 ---
 
 ## 7. Pre-Submit Checklist

@@ -30,8 +30,8 @@ export const ORG_TYPE_LABELS: Record<string, string> = {
 export const TABS = [
   { id: "profile", label: "Org Details", icon: Buildings },
   { id: "branches", label: "Branches", icon: Buildings },
-  { id: "employees", label: "Employee Directory", icon: Users },
-  { id: "dependents", label: "Dependent Directory", icon: IdentificationCard },
+  { id: "employees", label: "Employees", icon: Users },
+  { id: "dependents", label: "Dependents", icon: IdentificationCard },
   { id: "entitlements", label: "Entitlements", icon: Scroll },
   { id: "policies", label: "Benefit Policy", icon: Shield },
   { id: "claims", label: "Claims", icon: SealCheck },

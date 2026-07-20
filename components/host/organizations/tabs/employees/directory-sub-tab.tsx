@@ -11,7 +11,6 @@ import { EmployeeCard } from "@/components/host/organizations/employee-card"
 import { DataFilterBar } from "@/components/shared/data-filter-bar"
 import { FilterItem } from "@/components/shared/filter-item"
 import { SharedDataTable } from "@/components/shared/data-table"
-import { StatusBadge } from "@/components/shared/status-badge"
 import { ActionPopover } from "@/components/shared/action-popover"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { getMockEmployeeGrid, getMockEmployeeTable } from "./mock-data"
@@ -87,16 +86,6 @@ export function DirectorySubTab({ orgId, onBulkUpload }: DirectorySubTabProps) {
         searchPlaceholder="Search employees..."
         filters={
           <>
-            <FilterItem
-              label="Status"
-              value="all"
-              onChange={() => {}}
-              options={[
-                { label: "All Status", value: "all" },
-                { label: "Linked", value: "linked" },
-                { label: "Pending", value: "pending" },
-              ]}
-            />
             <FilterItem
               label="Needs Action"
               value="all"
@@ -239,17 +228,6 @@ export function DirectorySubTab({ orgId, onBulkUpload }: DirectorySubTabProps) {
                 header: "Policies",
                 render: (emp) => (
                   <EmployeePoliciesCell policies={emp.benefitPolicies} />
-                ),
-              },
-              {
-                header: "Status",
-                accessorKey: "status",
-                sortable: true,
-                render: (emp) => (
-                  <StatusBadge
-                    status={emp.status}
-                    variant={emp.status === "Linked" ? "emerald" : "amber"}
-                  />
                 ),
               },
               {

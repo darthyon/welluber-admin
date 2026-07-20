@@ -5,6 +5,7 @@ import {
   Breadcrumbs,
   type BreadcrumbItem,
 } from "@/components/shared/breadcrumbs"
+import { MOCK_EMPLOYEES } from "@/lib/mock-data"
 
 type Portal = "host" | "org" | "serviceprovider"
 
@@ -18,7 +19,7 @@ const SEGMENT_LABELS: Record<string, string> = {
   claims: "Claims",
   dashboard: "Dashboard",
   edit: "Edit",
-  employees: "Employee Directory",
+  employees: "Employees",
   groups: "Benefit Groups",
   members: "Members",
   new: "New",
@@ -48,15 +49,14 @@ const DETAIL_LABELS: Record<string, string> = {
   "voucher-packages": "Voucher Package",
 }
 
-const MANUAL_BREADCRUMB_PATHS = [
-  /^\/accounts\/[^/]+$/,
-  /^\/organizations\/[^/]+$/,
-  /^\/service-providers\/[^/]+$/,
-  /^\/services\/[^/]+$/,
-  /^\/voucher-packages\/[^/]+\/vouchers$/,
-]
-
 function getSegmentLabel(segment: string, previousSegment?: string) {
+  if (previousSegment === "employees") {
+    return (
+      MOCK_EMPLOYEES.find((employee) => employee.id === segment)?.name ??
+      "Employee Details"
+    )
+  }
+
   return (
     SEGMENT_LABELS[segment] ??
     (previousSegment ? DETAIL_LABELS[previousSegment] : undefined) ??
@@ -71,18 +71,15 @@ export function PortalBreadcrumbs({ portal }: { portal: Portal }) {
   const pathname = usePathname()
   const params = useParams<{ orgSlug?: string }>()
 
-  if (
-    portal === "host" &&
-    MANUAL_BREADCRUMB_PATHS.some((path) => path.test(pathname))
-  ) {
-    return null
-  }
-
   const segments = pathname.split("/").filter(Boolean)
   const isOrgPortal = portal === "org" && params.orgSlug === segments[0]
   const routeSegments = isOrgPortal ? segments.slice(1) : segments
   const pathPrefix = isOrgPortal ? `/${params.orgSlug}` : ""
   const items: BreadcrumbItem[] = []
+
+  if (routeSegments.length <= 1) {
+    return null
+  }
 
   if (isOrgPortal) {
     items.push({

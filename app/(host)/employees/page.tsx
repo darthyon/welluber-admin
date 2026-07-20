@@ -137,7 +137,6 @@ export default function EmployeesPage() {
                 email: emp.email,
                 organization: emp.organization,
                 branch: emp.branch,
-                status: emp.status,
                 empCode: emp.empCode,
                 joinDate: emp.joinDate,
                 lastActive: emp.lastActive,
