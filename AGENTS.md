@@ -203,5 +203,16 @@ Hard rules:
 - Do not refactor unrelated code or make "while I'm here" changes.
 - Never rely on MCP alone for final proof; inspect relevant snippets and run targeted verification when applicable.
 
+---
+
+## Testing
+
+- Write tests in Playwright (E2E) + Vitest (unit).
+- Never run tests during chat. Output terminal command for me to run.
+- When I paste failure output, diagnose and fix only what's broken.
+- No screenshot-based visual testing. No browser preview.
+- Playwright MCP only when I explicitly ask. Never fire it proactively.
+- After every completed task, list test cases for me to check manually. Cover happy path + edge cases + error states.
+
 *Last updated: 2026-05-18*
 *Primary source: `docs/design.md` (reconciled with `app/globals.css`)*
