@@ -13,7 +13,7 @@ import {
   WORKFORCE_RANGES,
   INDUSTRIES,
 } from "@/features/organizations/constants"
-import { MOCK_ORGS } from "@/lib/mock-data"
+import { useOrganizations } from "@/hooks/data-hooks"
 import { DataFilterBar } from "@/components/shared/data-filter-bar"
 import { FilterItem } from "@/components/shared/filter-item"
 import { EmptyState } from "@/components/shared/empty-state"
@@ -24,6 +24,7 @@ import {
 } from "@/components/shared/advanced-filter-sheet"
 
 export default function OrganizationsPage() {
+  const { organizations } = useOrganizations()
   const [viewMode, setViewMode] = useState<ViewMode>("list")
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
@@ -40,7 +41,7 @@ export default function OrganizationsPage() {
     (advancedFilters.industry !== "all" ? 1 : 0) +
     (advancedFilters.accountModel !== "all" ? 1 : 0)
 
-  const filteredOrgs = MOCK_ORGS.filter((org) => {
+  const filteredOrgs = organizations.filter((org) => {
     // 1. Search
     const matchesSearch =
       (org.name?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||

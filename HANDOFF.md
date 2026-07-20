@@ -9,8 +9,10 @@
   4. Mobile nav: `SidebarTrigger` added to `TopBar` (`md:hidden`), covers both portals.
 - `pnpm typecheck` + `pnpm lint:design` clean; changed files prettier-formatted.
 
+- P1 "org create lands on empty page" fixed: created org + dedicated HQ account now registered in `orgStore`/`accountStore` + `Registry` maps; detail and list pages read from `useOrganizations()`. Org ids now `ORG-NEW-YYYYMMDD-XXXX`. "Link to existing wallet" removed from org creation — HQ account is always new (schema, step-2 UI, and page state simplified). Note: created orgs live in the in-memory mock store — they survive client-side navigation but reset on full page reload (same convention as the service-taxonomy store).
+
 ## Next
-- P1s from the audit report, in order: remove/stub `/invoices` + `/settlements` sidebar links; consolidate parallel mock datasets (root cause of most data contradictions); fix SP coming-soon ↔ login loop; role/slug guards; claim detail sheet.
+- Remaining P1s from the audit report: remove/stub `/invoices` + `/settlements` sidebar links; consolidate parallel mock datasets (root cause of most data contradictions); fix SP coming-soon ↔ login loop; role/slug guards; claim detail sheet.
 - Check remaining `AnimatePresence` (no `mode="wait"`) sites for hung exit animations — e.g. post-create modal in `benefit-policy-wizard` may linger on close.
 
 ## Blockers / decisions
