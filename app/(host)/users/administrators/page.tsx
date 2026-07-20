@@ -1,47 +1,56 @@
-"use client";
+"use client"
 
-import React, { useState, useMemo } from "react";
-import { Plus, Shield, Buildings, Storefront, MagnifyingGlass, DownloadSimple, Clock } from "@phosphor-icons/react";
-import { Button } from "@/components/ui/button";
-import { SharedDataTable, Column } from "@/components/shared/data-table";
-import { StatusBadge } from "@/components/shared/status-badge";
-import { MOCK_ADMINS } from "@/lib/mock-data";
-import { Administrator } from "@/features/users/types";
-import { DataFilterBar } from "@/components/shared/data-filter-bar";
-import { FilterItem } from "@/components/shared/filter-item";
-import { SearchableFilterItem } from "@/components/shared/searchable-filter-item";
-import { ViewToggle, ViewMode } from "@/components/shared/view-toggle";
-import { AdminCard } from "@/components/host/users/admin-card";
-import { motion, AnimatePresence } from "framer-motion";
-import Link from "next/link";
-import { EmptyState } from "@/components/shared/empty-state";
-import { InviteAdministratorDialog } from "@/components/host/users/invite-administrator-dialog";
-import { ActionPopover } from "@/components/shared/action-popover";
-import { Eye, PencilSimple, LockKey } from "@phosphor-icons/react";
-import { useRouter } from "next/navigation";
+import React, { useState, useMemo } from "react"
+import {
+  Plus,
+  Shield,
+  Buildings,
+  Storefront,
+  MagnifyingGlass,
+  DownloadSimple,
+  Clock,
+} from "@phosphor-icons/react"
+import { Button } from "@/components/ui/button"
+import { SharedDataTable, Column } from "@/components/shared/data-table"
+import { StatusBadge } from "@/components/shared/status-badge"
+import { MOCK_ADMINS } from "@/lib/mock-data"
+import { Administrator } from "@/features/users/types"
+import { DataFilterBar } from "@/components/shared/data-filter-bar"
+import { FilterItem } from "@/components/shared/filter-item"
+import { SearchableFilterItem } from "@/components/shared/searchable-filter-item"
+import { ViewToggle, ViewMode } from "@/components/shared/view-toggle"
+import { AdminCard } from "@/components/host/users/admin-card"
+import Link from "next/link"
+import { EmptyState } from "@/components/shared/empty-state"
+import { InviteAdministratorDialog } from "@/components/host/users/invite-administrator-dialog"
+import { ActionPopover } from "@/components/shared/action-popover"
+import { Eye, PencilSimple, LockKey } from "@phosphor-icons/react"
+import { useRouter } from "next/navigation"
 
 export default function AdministratorsPage() {
-  const router = useRouter();
-  const [viewMode, setViewMode] = useState<ViewMode>("list");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [entityFilter, setEntityFilter] = useState("all");
-  const [isInviteOpen, setIsInviteOpen] = useState(false);
+  const router = useRouter()
+  const [viewMode, setViewMode] = useState<ViewMode>("list")
+  const [searchQuery, setSearchQuery] = useState("")
+  const [statusFilter, setStatusFilter] = useState("all")
+  const [entityFilter, setEntityFilter] = useState("all")
+  const [isInviteOpen, setIsInviteOpen] = useState(false)
 
   const filteredAdmins = useMemo(() => {
     return MOCK_ADMINS.filter((admin) => {
-      const matchesSearch = 
+      const matchesSearch =
         admin.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        admin.email.toLowerCase().includes(searchQuery.toLowerCase());
-      
-      const matchesStatus = statusFilter === "all" || admin.status === statusFilter;
-      const matchesEntity = entityFilter === "all" || 
-        (admin.entity?.name === entityFilter) || 
-        (entityFilter === "Welluber Team" && !admin.entity);
+        admin.email.toLowerCase().includes(searchQuery.toLowerCase())
 
-      return matchesSearch && matchesStatus && matchesEntity;
-    });
-  }, [searchQuery, statusFilter, entityFilter]);
+      const matchesStatus =
+        statusFilter === "all" || admin.status === statusFilter
+      const matchesEntity =
+        entityFilter === "all" ||
+        admin.entity?.name === entityFilter ||
+        (entityFilter === "Welluber Team" && !admin.entity)
+
+      return matchesSearch && matchesStatus && matchesEntity
+    })
+  }, [searchQuery, statusFilter, entityFilter])
 
   const columns: Column<Administrator>[] = [
     {
@@ -50,10 +59,14 @@ export default function AdministratorsPage() {
       sortable: true,
       render: (row) => (
         <div className="flex flex-col">
-          <span className="font-medium text-foreground text-body">{row.name}</span>
-          <span className="text-label text-subtle font-medium">{row.email}</span>
+          <span className="text-body font-medium text-foreground">
+            {row.name}
+          </span>
+          <span className="text-label font-medium text-subtle">
+            {row.email}
+          </span>
         </div>
-      )
+      ),
     },
     {
       header: "Assigned Entity",
@@ -68,16 +81,20 @@ export default function AdministratorsPage() {
               ) : (
                 <Storefront size={16} className="text-faint" />
               )}
-              <span className="text-body font-medium text-foreground">{row.entity.name}</span>
+              <span className="text-body font-medium text-foreground">
+                {row.entity.name}
+              </span>
             </>
           ) : (
-             <div className="flex items-center gap-2">
-               <Shield size={16} className="text-primary/60" />
-               <span className="text-body font-medium text-primary">Welluber Team</span>
-             </div>
+            <div className="flex items-center gap-2">
+              <Shield size={16} className="text-primary/60" />
+              <span className="text-body font-medium text-primary">
+                Welluber Team
+              </span>
+            </div>
           )}
         </div>
-      )
+      ),
     },
     {
       header: "Joined Date",
@@ -87,7 +104,7 @@ export default function AdministratorsPage() {
         <span className="text-label font-medium text-subtle">
           {row.joinedDate}
         </span>
-      )
+      ),
     },
     {
       header: "Last Active",
@@ -98,18 +115,18 @@ export default function AdministratorsPage() {
           <Clock size={14} />
           {row.lastActive}
         </div>
-      )
+      ),
     },
     {
       header: "Status",
       accessorKey: "status",
       sortable: true,
       render: (row) => (
-        <StatusBadge 
-          status={row.status} 
-          variant={row.status === "Active" ? "emerald" : "rose"} 
+        <StatusBadge
+          status={row.status}
+          variant={row.status === "Active" ? "emerald" : "rose"}
         />
-      )
+      ),
     },
     {
       header: "",
@@ -138,32 +155,43 @@ export default function AdministratorsPage() {
           />
         </div>
       ),
-    }
-  ];
+    },
+  ]
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-heading font-semibold text-foreground text-balance">Administrators</h1>
-          <p className="text-subtle text-body mt-1 font-normal">
-            Configure system access for host, organization, and service provider administrative staff. Define ownership and audit access logs.
+          <h1 className="text-heading font-semibold text-balance text-foreground">
+            Administrators
+          </h1>
+          <p className="mt-1 text-body font-normal text-subtle">
+            Configure system access for host, organization, and service provider
+            administrative staff. Define ownership and audit access logs.
           </p>
         </div>
         <div className="flex items-center gap-2">
           <ViewToggle mode={viewMode} onChange={setViewMode} />
-          
-          <Button asChild variant="ghost" size="sm" className="h-9 text-body font-medium hover:bg-muted/50">
+
+          <Button
+            asChild
+            variant="ghost"
+            size="sm"
+            className="h-9 text-body font-medium hover:bg-muted/50"
+          >
             <Link href="/audit-log">
               <DownloadSimple size={16} className="mr-1.5 opacity-60" />
               Audit Logs
             </Link>
           </Button>
 
-          <div className="h-4 w-[1px] bg-border mx-1" />
+          <div className="mx-1 h-4 w-[1px] bg-border" />
 
-          <Button onClick={() => setIsInviteOpen(true)} className="h-9 text-body font-medium shadow-sm">
+          <Button
+            onClick={() => setIsInviteOpen(true)}
+            className="h-9 text-body font-medium shadow-sm"
+          >
             <Plus size={16} weight="bold" className="mr-1.5" />
             Invite Administrator
           </Button>
@@ -177,7 +205,7 @@ export default function AdministratorsPage() {
         searchPlaceholder="Search administrators..."
         filters={
           <>
-            <SearchableFilterItem 
+            <SearchableFilterItem
               label="Assigned Entity"
               value={entityFilter}
               onChange={setEntityFilter}
@@ -186,7 +214,10 @@ export default function AdministratorsPage() {
                 { label: "All Entities", value: "all" },
                 { label: "Welluber Team", value: "Welluber Team" },
                 { label: "Acme Corporation", value: "Acme Corporation" },
-                { label: "Global Tech Solutions", value: "Global Tech Solutions" },
+                {
+                  label: "Global Tech Solutions",
+                  value: "Global Tech Solutions",
+                },
                 { label: "Nexus Innovations", value: "Nexus Innovations" },
               ]}
             />
@@ -206,60 +237,59 @@ export default function AdministratorsPage() {
 
       {/* Content */}
       <div className="min-h-[400px]">
-        <AnimatePresence mode="wait">
-          {viewMode === "grid" ? (
-            <motion.div 
-              key="grid"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-            >
-              {filteredAdmins.map((admin) => (
-                <AdminCard key={admin.id} admin={admin} />
-              ))}
-              {filteredAdmins.length === 0 && (
-                <div className="col-span-full py-12">
-                  <EmptyState 
-                    icon={<MagnifyingGlass size={32} weight="light" />}
-                    title="No administrators match your filters"
-                    description="Try adjusting your search or filters to find what you're looking for."
-                    action={
-                      <Button variant="ghost" onClick={() => {
-                        setSearchQuery("");
-                        setStatusFilter("all");
-                        setEntityFilter("all");
-                      }}>
-                        Clear All Filters
-                      </Button>
-                    }
-                  />
-                </div>
-              )}
-            </motion.div>
-          ) : (
-            <motion.div
-              key="table"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-            >
-              <SharedDataTable
-                freezeFirst
-                freezeLast
-                rowsPerPage={10}
-                data={filteredAdmins}
-                columns={columns}
-                onRowClick={(row) => router.push(`/users/administrators/${row.id}`)}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {viewMode === "grid" ? (
+          <div
+            key="grid"
+            className="grid animate-in grid-cols-1 gap-6 duration-200 fade-in slide-in-from-bottom-2 md:grid-cols-2 lg:grid-cols-3"
+          >
+            {filteredAdmins.map((admin) => (
+              <AdminCard key={admin.id} admin={admin} />
+            ))}
+            {filteredAdmins.length === 0 && (
+              <div className="col-span-full py-12">
+                <EmptyState
+                  icon={<MagnifyingGlass size={32} weight="light" />}
+                  title="No administrators match your filters"
+                  description="Try adjusting your search or filters to find what you're looking for."
+                  action={
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        setSearchQuery("")
+                        setStatusFilter("all")
+                        setEntityFilter("all")
+                      }}
+                    >
+                      Clear All Filters
+                    </Button>
+                  }
+                />
+              </div>
+            )}
+          </div>
+        ) : (
+          <div
+            key="table"
+            className="animate-in duration-200 fade-in slide-in-from-bottom-2"
+          >
+            <SharedDataTable
+              freezeFirst
+              freezeLast
+              rowsPerPage={10}
+              data={filteredAdmins}
+              columns={columns}
+              onRowClick={(row) =>
+                router.push(`/users/administrators/${row.id}`)
+              }
+            />
+          </div>
+        )}
       </div>
 
-      <InviteAdministratorDialog open={isInviteOpen} onOpenChange={setIsInviteOpen} />
+      <InviteAdministratorDialog
+        open={isInviteOpen}
+        onOpenChange={setIsInviteOpen}
+      />
     </div>
-  );
+  )
 }

@@ -16,7 +16,12 @@ import { PolicyLaunchConfirmModal } from "@/components/host/policies/policy-laun
 import { UtilisationClaimsTable } from "@/components/shared/utilisation-claims-table"
 import { cn } from "@/lib/utils"
 import { motion, AnimatePresence } from "framer-motion"
-import { type BenefitPolicy, type BenefitGroup, type Benefit, type PolicyStatus } from "@/types/policy"
+import {
+  type BenefitPolicy,
+  type BenefitGroup,
+  type Benefit,
+  type PolicyStatus,
+} from "@/types/policy"
 import { MOCK_EMPLOYEE_UTILISATION } from "@/lib/mock-data"
 import { useBenefitPolicyWizard } from "@/hooks/use-benefit-policy-wizard"
 import { CONTENT_TABS, CREATE_STEPS } from "./wizard-constants"
@@ -65,7 +70,13 @@ export function BenefitPolicyWizard({
 }: BenefitPolicyWizardProps) {
   const isViewMode = mode === "view"
 
-  const wiz = useBenefitPolicyWizard({ mode, orgId, initialData, onSuccess, onSaveDraft })
+  const wiz = useBenefitPolicyWizard({
+    mode,
+    orgId,
+    initialData,
+    onSuccess,
+    onSaveDraft,
+  })
 
   // Build ctx object for step components
   const ctx = {
@@ -103,7 +114,9 @@ export function BenefitPolicyWizard({
     return (
       <div className="py-12">
         <SuccessCelebration
-          title={mode === "edit" ? "Policy Updated!" : "Benefit Policy Created!"}
+          title={
+            mode === "edit" ? "Policy Updated!" : "Benefit Policy Created!"
+          }
           message="The policy details have been saved and applied."
         />
       </div>
@@ -170,7 +183,11 @@ export function BenefitPolicyWizard({
                   </Button>
                 ) : (
                   <Button
-                    onClick={mode === "create" ? wiz.handleLaunchClick : () => void wiz.handleSubmit()}
+                    onClick={
+                      mode === "create"
+                        ? wiz.handleLaunchClick
+                        : () => void wiz.handleSubmit()
+                    }
                     disabled={wiz.isSubmitting}
                     className="min-w-[140px] rounded-full bg-primary px-8 text-primary-foreground shadow-none"
                   >
@@ -187,32 +204,40 @@ export function BenefitPolicyWizard({
         </div>
 
         {/* Active policy edit banner */}
-        {mode === "edit" && wiz.policyData.status === "active" && wiz.policyData.organizationId && (
-          <div className="mb-3 flex items-start gap-2.5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2.5 dark:border-amber-500/20 dark:bg-amber-500/10">
-            <Warning size={16} className="mt-0.5 shrink-0 text-amber-600 dark:text-amber-400" />
-            <p className="text-label font-medium text-amber-700 dark:text-amber-300">
-              Changes apply to future assignments only. Existing employee assignments are unaffected.
-            </p>
-          </div>
-        )}
+        {mode === "edit" &&
+          wiz.policyData.status === "active" &&
+          wiz.policyData.organizationId && (
+            <div className="mb-3 flex items-start gap-2.5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2.5 dark:border-amber-500/20 dark:bg-amber-500/10">
+              <Warning
+                size={16}
+                className="mt-0.5 shrink-0 text-amber-600 dark:text-amber-400"
+              />
+              <p className="text-label font-medium text-amber-700 dark:text-amber-300">
+                Changes apply to future assignments only. Existing employee
+                assignments are unaffected.
+              </p>
+            </div>
+          )}
 
         {/* Underline tabs — view & edit */}
         {(isViewMode || mode === "edit") && (
           <div className="flex">
-            {CONTENT_TABS.filter((t) => !("viewOnly" in t) || isViewMode).map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => wiz.goToStep(tab.id)}
-                className={cn(
-                  "-mb-px border-b-2 px-5 py-3 text-body font-semibold transition-all",
-                  wiz.currentStep === tab.id
-                    ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:border-border hover:text-foreground"
-                )}
-              >
-                {tab.title}
-              </button>
-            ))}
+            {CONTENT_TABS.filter((t) => !("viewOnly" in t) || isViewMode).map(
+              (tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => wiz.goToStep(tab.id)}
+                  className={cn(
+                    "-mb-px border-b-2 px-5 py-3 text-body font-semibold transition-all",
+                    wiz.currentStep === tab.id
+                      ? "border-primary text-primary"
+                      : "border-transparent text-muted-foreground hover:border-border hover:text-foreground"
+                  )}
+                >
+                  {tab.title}
+                </button>
+              )
+            )}
           </div>
         )}
 
@@ -225,7 +250,9 @@ export function BenefitPolicyWizard({
                 onClick={() => wiz.goToStep(step.id)}
                 className={cn(
                   "group flex shrink-0 cursor-pointer items-center gap-2 transition-all",
-                  wiz.currentStep === step.id ? "opacity-100" : "opacity-40 hover:opacity-100"
+                  wiz.currentStep === step.id
+                    ? "opacity-100"
+                    : "opacity-40 hover:opacity-100"
                 )}
               >
                 <div
@@ -272,62 +299,75 @@ export function BenefitPolicyWizard({
                 : ""}
             </p>
             <div className="flex items-center gap-2">
-              <Button size="sm" variant="ghost" onClick={wiz.clearDraft} className="rounded-4xl px-4">
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={wiz.clearDraft}
+                className="rounded-4xl px-4"
+              >
                 Discard
               </Button>
-              <Button size="sm" onClick={wiz.handleRestoreDraft} className="rounded-4xl px-4">
+              <Button
+                size="sm"
+                onClick={wiz.handleRestoreDraft}
+                className="rounded-4xl px-4"
+              >
                 Resume
               </Button>
             </div>
           </div>
         )}
 
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={wiz.currentStep}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-          >
-            {wiz.currentStep === 1 && (
-              <>
-                <BasicsStep ctx={ctx} mode={mode} />
-                {(isViewMode || mode === "edit") && (
-                  <div className="mt-10 border-t border-border pt-6">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h4 className="text-body font-medium text-foreground">Policy Status</h4>
-                        <p className="mt-0.5 text-label text-faint">
-                          Control the visibility and lifecycle state of this policy.
-                        </p>
-                      </div>
-                      <StatusPicker
-                        value={(wiz.policyData.status as PolicyStatus) || "draft"}
-                        onChange={(s) => wiz.setPolicyData({ ...wiz.policyData, status: s })}
-                        disabled={isViewMode}
-                      />
+        <div
+          key={wiz.currentStep}
+          className="animate-in duration-200 fade-in slide-in-from-bottom-1"
+        >
+          {wiz.currentStep === 1 && (
+            <>
+              <BasicsStep ctx={ctx} mode={mode} />
+              {(isViewMode || mode === "edit") && (
+                <div className="mt-10 border-t border-border pt-6">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h4 className="text-body font-medium text-foreground">
+                        Policy Status
+                      </h4>
+                      <p className="mt-0.5 text-label text-faint">
+                        Control the visibility and lifecycle state of this
+                        policy.
+                      </p>
                     </div>
+                    <StatusPicker
+                      value={(wiz.policyData.status as PolicyStatus) || "draft"}
+                      onChange={(s) =>
+                        wiz.setPolicyData({ ...wiz.policyData, status: s })
+                      }
+                      disabled={isViewMode}
+                    />
                   </div>
-                )}
-              </>
-            )}
-            {wiz.currentStep === 2 && <PoolStep ctx={ctx} />}
-            {wiz.currentStep === 3 && <GroupsStep ctx={ctx} />}
-            {wiz.currentStep === 4 && mode === "create" && <AssignStep ctx={ctx} />}
-            {wiz.currentStep === 5 && mode === "create" && <ReviewStep ctx={ctx} />}
-            {wiz.currentStep === 4 && isViewMode && (
-              <DetailSection
-                title="Claims Usage"
-                icon={<Receipt size={18} weight="duotone" />}
-                description="Benefit usage and claim history for all employees on this policy"
-                ghost
-              >
-                <UtilisationClaimsTable data={MOCK_EMPLOYEE_UTILISATION} />
-              </DetailSection>
-            )}
-          </motion.div>
-        </AnimatePresence>
+                </div>
+              )}
+            </>
+          )}
+          {wiz.currentStep === 2 && <PoolStep ctx={ctx} />}
+          {wiz.currentStep === 3 && <GroupsStep ctx={ctx} />}
+          {wiz.currentStep === 4 && mode === "create" && (
+            <AssignStep ctx={ctx} />
+          )}
+          {wiz.currentStep === 5 && mode === "create" && (
+            <ReviewStep ctx={ctx} />
+          )}
+          {wiz.currentStep === 4 && isViewMode && (
+            <DetailSection
+              title="Claims Usage"
+              icon={<Receipt size={18} weight="duotone" />}
+              description="Benefit usage and claim history for all employees on this policy"
+              ghost
+            >
+              <UtilisationClaimsTable data={MOCK_EMPLOYEE_UTILISATION} />
+            </DetailSection>
+          )}
+        </div>
       </div>
 
       {/* Launch confirm modal */}
@@ -367,8 +407,12 @@ export function BenefitPolicyWizard({
                     <ShieldCheck size={20} weight="duotone" />
                   </div>
                   <div>
-                    <h3 className="text-heading font-semibold text-foreground">Policy Created</h3>
-                    <p className="text-label text-muted-foreground">{wiz.policyData.name}</p>
+                    <h3 className="text-heading font-semibold text-foreground">
+                      Policy Created
+                    </h3>
+                    <p className="text-label text-muted-foreground">
+                      {wiz.policyData.name}
+                    </p>
                   </div>
                 </div>
                 <div className="mt-4 flex items-center gap-3">
@@ -383,7 +427,8 @@ export function BenefitPolicyWizard({
                     Draft
                   </span>
                   <span className="text-label text-faint">
-                    {wiz.groups.length} group{wiz.groups.length !== 1 ? "s" : ""}
+                    {wiz.groups.length} group
+                    {wiz.groups.length !== 1 ? "s" : ""}
                   </span>
                 </div>
               </div>

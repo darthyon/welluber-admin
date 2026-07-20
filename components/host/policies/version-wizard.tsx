@@ -3,7 +3,6 @@
 import { CaretLeft, CaretRight } from "@phosphor-icons/react"
 import { Button } from "@/components/ui/button"
 import { SuccessCelebration } from "@/components/shared/success-celebration"
-import { motion, AnimatePresence } from "framer-motion"
 import { useVersionWizard } from "@/hooks/use-version-wizard"
 import { StepIndicator } from "./version-wizard-steps/step-indicator"
 import { OverridesStep } from "./version-wizard-steps/overrides-step"
@@ -12,7 +11,11 @@ import { ReviewStep } from "./version-wizard-steps/review-step"
 import type { VersionWizardProps } from "./version-wizard-types"
 
 // Re-export types for consumers
-export type { VersionWizardProps, VersionResult, BenefitOverride } from "./version-wizard-types"
+export type {
+  VersionWizardProps,
+  VersionResult,
+  BenefitOverride,
+} from "./version-wizard-types"
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -36,26 +39,21 @@ export function VersionWizard(props: VersionWizardProps) {
       </div>
 
       {/* Step content */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={wiz.currentStep}
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -6 }}
-          transition={{ duration: 0.18, ease: "easeOut" }}
-        >
-          {wiz.currentStep === 1 && <OverridesStep ctx={wiz.ctx} />}
-          {wiz.currentStep === 2 && <TargetingStep ctx={wiz.ctx} />}
-          {wiz.currentStep === 3 && <ReviewStep ctx={wiz.ctx} />}
-        </motion.div>
-      </AnimatePresence>
+      <div
+        key={wiz.currentStep}
+        className="animate-in duration-200 fade-in slide-in-from-bottom-1"
+      >
+        {wiz.currentStep === 1 && <OverridesStep ctx={wiz.ctx} />}
+        {wiz.currentStep === 2 && <TargetingStep ctx={wiz.ctx} />}
+        {wiz.currentStep === 3 && <ReviewStep ctx={wiz.ctx} />}
+      </div>
 
       {/* Navigation */}
-      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4 p-2 px-6 bg-background/80 backdrop-blur-2xl border border-border shadow-lg rounded-full animate-in slide-in-from-bottom-10 duration-700 ease-out">
+      <div className="fixed bottom-8 left-1/2 z-50 flex -translate-x-1/2 animate-in items-center gap-4 rounded-full border border-border bg-background/80 p-2 px-6 shadow-lg backdrop-blur-2xl duration-700 ease-out slide-in-from-bottom-10">
         <Button
           variant="ghost"
           size="lg"
-          className="text-body font-medium px-6 transition-colors"
+          className="px-6 text-body font-medium transition-colors"
           onClick={wiz.currentStep === 1 ? props.onCancel : wiz.goPrev}
         >
           {wiz.currentStep === 1 ? (
@@ -67,11 +65,11 @@ export function VersionWizard(props: VersionWizardProps) {
             </span>
           )}
         </Button>
-        <div className="w-px h-6 bg-border/40" />
+        <div className="h-6 w-px bg-border/40" />
         {wiz.currentStep < 3 ? (
           <Button
             size="lg"
-            className="text-body font-medium px-8 flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
+            className="flex items-center gap-2 px-8 text-body font-medium transition-all hover:scale-[1.02] active:scale-[0.98]"
             onClick={wiz.goNext}
           >
             Continue
@@ -81,12 +79,12 @@ export function VersionWizard(props: VersionWizardProps) {
           <Button
             size="lg"
             disabled={wiz.isSubmitting}
-            className="text-body font-medium px-8 flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
+            className="flex items-center gap-2 px-8 text-body font-medium transition-all hover:scale-[1.02] active:scale-[0.98]"
             onClick={wiz.handleSubmit}
           >
             {wiz.isSubmitting ? (
               <>
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
                 Creating…
               </>
             ) : (
