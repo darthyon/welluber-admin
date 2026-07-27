@@ -51,13 +51,13 @@ import {
 } from "./employee-entitlements-mock"
 
 const EMP_FILL = "bg-primary"
-const DEP_FILL = "bg-teal-500"
+const DEP_FILL = "bg-teal-500 dark:bg-teal-400"
 const DEPENDENT_FILL_CLASSES = [
-  "bg-teal-700 dark:bg-teal-300",
+  "bg-teal-600 dark:bg-teal-400",
   "bg-teal-500 dark:bg-teal-400",
-  "bg-teal-300 dark:bg-teal-600",
+  "bg-teal-400 dark:bg-teal-500",
 ]
-const OTHER_DEPENDENTS_FILL = "bg-teal-900 dark:bg-teal-200"
+const OTHER_DEPENDENTS_FILL = "bg-teal-700 dark:bg-teal-300"
 
 /** A single rendered pool bar for one benefit (employee, a dependent, or combined). */
 interface PoolBar {
@@ -228,13 +228,13 @@ function buildAllocationSummarySegments(rows: PoolSummaryRow[]) {
   const employeeSpent = rows
     .filter((row) => row.icon === "employee")
     .reduce((sum, row) => sum + row.totalSpent, 0)
-  const dependentDetails = mergeDetailRows(
-    ...rows.filter((row) => row.icon === "dependent").map((row) => row.details)
-  )
+  const dependentSpent = rows
+    .filter((row) => row.icon === "dependent")
+    .reduce((sum, row) => sum + row.totalSpent, 0)
 
   return [
     { label: "Employee", spent: employeeSpent, className: EMP_FILL },
-    ...buildDependentSegments(dependentDetails),
+    { label: "Dependents Combined", spent: dependentSpent, className: DEP_FILL },
   ].filter((segment) => segment.spent > 0)
 }
 
@@ -472,8 +472,9 @@ function normaliseSummaryRows(
       const details = applyPolicyCaps
         ? row.details?.map((detail) => {
             const relationshipKey = toCoverageKey(detail.relationshipLabel)
-            const allocated = relationshipKey
-              ? (dependentCaps.get(relationshipKey) ?? detail.allocated)
+            const cap = relationshipKey ? dependentCaps.get(relationshipKey) : undefined
+            const allocated = typeof cap === "number"
+              ? Math.min(detail.allocated, cap)
               : detail.allocated
             return {
               ...detail,
@@ -521,8 +522,10 @@ function buildSummaryRows(
       const emp = rows.find((u) => !u.relationship)
       const deps = rows.filter((u) => u.relationship)
       const showDeps = depsCovered && hasDependentSide(scope) && deps.length > 0
+      const isCombined =
+        poolType === "SharedWithEmployee" || policy.benefitPoolType === "Shared"
 
-      if (poolType === "SharedWithEmployee" && emp) {
+      if (isCombined && emp) {
         const existingEmployee = rowMap.get("combined-emp")
         if (!existingEmployee) {
           rowMap.set("combined-emp", {
@@ -702,48 +705,60 @@ function PoolSummaryRows({
   testId?: string
 }) {
   return (
-    <div className="space-y-4" data-testid={testId}>
-      {rows.map((row) => {
-        const isCombined = row.allocationGroup === "combined"
-        const isDependent = row.icon === "dependent"
-        const poolTone = isCombined
-          ? "Combined"
-          : isDependent
-            ? row.allocationGroup === "dep-individual"
-              ? "Individual"
-              : "Shared"
-            : "Individual"
-        const subtitle = isCombined
-          ? isDependent
-            ? "Covered Dependents"
-            : "Employee"
-          : isDependent
-            ? ""
-            : "Employee"
-
-        return (
-          <div
-            key={row.key}
-            className="rounded-lg border border-border bg-background"
-          >
-            <div className="grid grid-cols-[minmax(0,2fr)_minmax(6rem,1fr)_minmax(6rem,1fr)_minmax(6rem,1fr)] items-center gap-4 px-4 py-4">
-              <PoolIdentity
-                icon={row.icon}
-                label={row.label}
-                tone={poolTone}
-                subtitle={subtitle}
-              />
-              <PoolStat
-                label="Allocated"
-                value={formatRM(row.totalAllocated)}
-              />
-              <PoolStat label="Used" value={formatRM(row.totalSpent)} />
-              <PoolStat label="Left" value={formatRM(row.totalBalance)} />
+    <div className="space-y-3" data-testid={testId}>
+      <div className="grid grid-cols-4 pb-2.5 text-body font-semibold text-muted-foreground border-b border-border/60">
+        <span>Beneficiary Name</span>
+        <span>Allocated Quota</span>
+        <span>Spent</span>
+        <span className="text-right">Balance Left</span>
+      </div>
+      <div className="divide-y divide-border/40 text-body">
+        {rows.map((row) => (
+          <div key={row.key} className="py-3 space-y-2">
+            <div className="grid grid-cols-4 items-center">
+              <div className="flex items-center gap-2.5">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full border border-border bg-muted/40 text-muted-foreground">
+                  {row.icon === "employee" ? (
+                    <User size={14} weight="bold" />
+                  ) : (
+                    <UsersThree size={14} weight="bold" />
+                  )}
+                </span>
+                <span className="font-semibold text-foreground">{row.label}</span>
+              </div>
+              <span className="text-foreground font-medium">
+                {row.allocationGroup === "combined" ? "Combined Pool" : formatRM(row.totalAllocated)}
+              </span>
+              <span className="text-foreground font-medium">{formatRM(row.totalSpent)}</span>
+              <span className="text-right font-semibold text-primary">
+                {row.allocationGroup === "combined" ? "Shared" : formatRM(row.totalBalance)}
+              </span>
             </div>
-            {isDependent ? <SummaryDependentBreakdown row={row} /> : null}
+            {row.details && row.details.length > 0 && (
+              <div className="pl-9 pt-1.5 space-y-2">
+                {row.details.map((dep, dIdx) => {
+                  const isIndividual = row.allocationGroup === "dep-individual"
+                  return (
+                    <div key={dIdx} className="grid grid-cols-4 items-center text-body text-muted-foreground">
+                      <div className="flex items-center gap-2">
+                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-muted/30">
+                          <User size={12} />
+                        </span>
+                        <span>{dep.label} ({dep.relationshipLabel})</span>
+                      </div>
+                      <span>{isIndividual ? formatRM(dep.allocated) : "—"}</span>
+                      <span>{formatRM(dep.spent)}</span>
+                      <span className={isIndividual ? "text-right font-medium text-foreground" : "text-right font-medium text-primary"}>
+                        {isIndividual ? formatRM(dep.balance) : "—"}
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
           </div>
-        )
-      })}
+        ))}
+      </div>
     </div>
   )
 }
@@ -782,105 +797,111 @@ function OverallSummaryCard({ rows }: { rows: PoolSummaryRow[] }) {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-lg border border-border bg-card p-4">
-        <div className="mb-3">
-          <p className="text-heading font-semibold text-foreground">
+      <div className="rounded-lg border border-border bg-card p-5 space-y-5">
+        <div>
+          <h3 className="text-heading font-semibold text-foreground">
             Allocation Summary
+          </h3>
+          <p className="text-body text-muted-foreground mt-0.5">
+            Individual allocations and real-time usage per person
           </p>
         </div>
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-center">
+
+        {/* Totals & Progress Bar in Same Row */}
+        <div className="grid gap-6 border-t border-border/40 pt-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] lg:items-center">
           <div className="grid grid-cols-3 gap-4">
             <SummaryStat
               label="Total Allocated"
               value={formatRM(totalAllocated)}
-              compact
             />
             <SummaryStat
               label="Total Used"
               value={formatRM(totalSpent)}
-              compact
             />
             <SummaryStat
-              label="Total Left"
+              label="Total Balance Left"
               value={formatRM(totalBalance)}
-              compact
             />
           </div>
+
+          {/* 2-Tone Purple (Emp) & Teal (Deps) Stacked Progress Bar */}
           <div className="space-y-2">
             <StackedPoolBar
               allocated={totalAllocated}
               segments={segments}
               showLegend={false}
-              className="self-center"
             />
             <SummaryLegend
               allocated={totalAllocated}
               segments={segments}
-              compact
             />
           </div>
         </div>
-        <Collapsible className="-mx-4 mt-6 -mb-4 border-t border-border bg-muted/20">
+
+        {/* Collapsible Accordion Person Table */}
+        <Collapsible defaultOpen className="-mx-5 mt-4 -mb-5 border-t border-border bg-muted/10">
           <CollapsibleTrigger asChild>
             <Button
               variant="ghost"
-              className="group flex h-auto w-full items-center justify-between rounded-none px-4 py-3 text-label font-medium text-muted-foreground hover:bg-muted/40 hover:text-foreground"
+              className="group flex h-auto w-full items-center justify-between rounded-none px-5 py-3.5 text-body font-semibold text-foreground hover:bg-muted/30"
             >
-              <span>View Breakdown</span>
+              <span>Breakdown</span>
               <CaretDown
-                size={14}
+                size={16}
                 className="shrink-0 transition-transform group-data-[state=open]:rotate-180"
               />
             </Button>
           </CollapsibleTrigger>
           <CollapsibleContent>
-            <div className="space-y-4 border-t border-border px-4 pt-4 pb-4">
-              {rows.map((row) => {
-                const isCombined = row.allocationGroup === "combined"
-                const isDependent = row.icon === "dependent"
-                const poolTone = isCombined
-                  ? "Combined"
-                  : isDependent
-                    ? row.key === "dep-individual"
-                      ? "Individual"
-                      : "Shared"
-                    : "Individual"
-                const subtitle = isCombined
-                  ? isDependent
-                    ? "Covered Dependents"
-                    : "Employee"
-                  : isDependent
-                    ? ""
-                    : "Employee"
-
-                return (
-                  <div
-                    key={row.key}
-                    className="rounded-lg border border-border bg-background"
-                  >
-                    <div className="grid grid-cols-[minmax(0,2fr)_minmax(6rem,1fr)_minmax(6rem,1fr)_minmax(6rem,1fr)] items-center gap-4 px-4 py-4">
-                      <PoolIdentity
-                        icon={row.icon}
-                        label={row.label}
-                        tone={poolTone}
-                        subtitle={subtitle}
-                      />
-                      <PoolStat
-                        label="Allocated"
-                        value={formatRM(row.totalAllocated)}
-                      />
-                      <PoolStat label="Used" value={formatRM(row.totalSpent)} />
-                      <PoolStat
-                        label="Left"
-                        value={formatRM(row.totalBalance)}
-                      />
+            <div className="border-t border-border p-5 space-y-3">
+              <div className="grid grid-cols-4 pb-2.5 text-body font-semibold text-muted-foreground border-b border-border/60">
+                <span>Beneficiary Name</span>
+                <span>Allocated Quota</span>
+                <span>Spent</span>
+                <span className="text-right">Balance Left</span>
+              </div>
+              <div className="divide-y divide-border/40 text-body">
+                {rows.map((row) => (
+                  <div key={row.key} className="py-3 space-y-2">
+                    <div className="grid grid-cols-4 items-center">
+                      <div className="flex items-center gap-2.5">
+                        <span className="flex h-7 w-7 items-center justify-center rounded-full border border-border bg-muted/40 text-muted-foreground">
+                          {row.icon === "employee" ? (
+                            <User size={14} weight="bold" />
+                          ) : (
+                            <UsersThree size={14} weight="bold" />
+                          )}
+                        </span>
+                        <span className="font-semibold text-foreground">{row.label}</span>
+                      </div>
+                      <span className="text-foreground font-medium">
+                        {row.allocationGroup === "combined" ? "Combined Pool" : formatRM(row.totalAllocated)}
+                      </span>
+                      <span className="text-foreground font-medium">{formatRM(row.totalSpent)}</span>
+                      <span className="text-right font-semibold text-primary">
+                        {row.allocationGroup === "combined" ? "Shared" : formatRM(row.totalBalance)}
+                      </span>
                     </div>
-                    {isDependent ? (
-                      <SummaryDependentBreakdown row={row} />
-                    ) : null}
+                    {row.details && row.details.length > 0 && (
+                      <div className="pl-9 pt-1.5 space-y-2">
+                        {row.details.map((dep, dIdx) => (
+                          <div key={dIdx} className="grid grid-cols-4 items-center text-body text-muted-foreground">
+                            <div className="flex items-center gap-2">
+                              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-muted/30">
+                                <User size={12} />
+                              </span>
+                              <span>{dep.label} ({dep.relationshipLabel})</span>
+                            </div>
+                            <span>—</span>
+                            <span>{formatRM(dep.spent)}</span>
+                            <span className="text-right font-medium text-primary">—</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                )
-              })}
+                ))}
+              </div>
             </div>
           </CollapsibleContent>
         </Collapsible>
@@ -892,8 +913,7 @@ function OverallSummaryCard({ rows }: { rows: PoolSummaryRow[] }) {
 function SummaryDependentBreakdown({ row }: { row: PoolSummaryRow }) {
   const details = row.details ?? []
   const isIndividual = row.allocationGroup === "dep-individual"
-  const [showAllDependents, setShowAllDependents] = useState(false)
-  const visibleDetails = showAllDependents ? details : details.slice(0, 3)
+  const visibleDetails = details
 
   if (!details.length) return null
 
@@ -987,18 +1007,6 @@ function SummaryDependentBreakdown({ row }: { row: PoolSummaryRow }) {
           </div>
         ))}
       </div>
-      {details.length > 3 ? (
-        <Button
-          type="button"
-          variant="ghost"
-          onClick={() => setShowAllDependents((shown) => !shown)}
-          className="mt-2 h-auto rounded-4xl px-0 py-1 text-label font-medium text-primary hover:bg-transparent hover:text-primary"
-        >
-          {showAllDependents
-            ? "Show Fewer Dependents"
-            : `View All Dependents (${details.length})`}
-        </Button>
-      ) : null}
     </div>
   )
 }
@@ -1020,11 +1028,14 @@ function buildBenefitBars(
   const poolType = policy.dependentsPoolType
   const bars: PoolBar[] = []
 
+  const isCombined =
+    poolType === "SharedWithEmployee" || policy.benefitPoolType === "Shared"
+
   // Combined pool — employee + dependents share one ceiling
   if (
     hasEmployeeSide(scope) &&
     showDeps &&
-    poolType === "SharedWithEmployee" &&
+    isCombined &&
     emp
   ) {
     const depSpent = deps.reduce((s, d) => s + d.spent, 0)
@@ -1130,6 +1141,20 @@ function BenefitRow({
     details: bar.details,
   }))
 
+  // Calculate remaining balance at the benefit level
+  const totalAllocatedForBenefit = rows.reduce((sum, r) => sum + r.totalAllocated, 0)
+  const totalSpentForBenefit = rows.reduce((sum, r) => sum + r.totalSpent, 0)
+  // For combined/shared family pots, the allocation in rows is duplicated across employee and dependent rows,
+  // so we check if the benefit uses a combined pool and resolve the correct balance from the employee usage details.
+  const remainingForBenefit = (() => {
+    const isCombinedPool = policy.dependentsPoolType === "SharedWithEmployee" || policy.benefitPoolType === "Shared"
+    if (isCombinedPool) {
+      const empRow = rows.find((r) => r.icon === "employee")
+      return empRow ? empRow.totalBalance : Math.max(totalAllocatedForBenefit - totalSpentForBenefit, 0)
+    }
+    return Math.max(totalAllocatedForBenefit - totalSpentForBenefit, 0)
+  })()
+
   return (
     <Collapsible>
       <CollapsibleTrigger asChild>
@@ -1140,11 +1165,14 @@ function BenefitRow({
           <span className="truncate text-body font-semibold text-foreground">
             {getMainServiceName(benefit.serviceId)}
           </span>
-          <span className="ml-auto shrink-0">
+          <div className="ml-auto flex items-center gap-3 shrink-0">
+            <span className="text-body font-semibold text-primary">
+              {formatRM(remainingForBenefit)} left
+            </span>
             <TechnicalBadge>
               {resolveMainServiceId(benefit.serviceId)}
             </TechnicalBadge>
-          </span>
+          </div>
           <CaretDown
             size={12}
             weight="bold"

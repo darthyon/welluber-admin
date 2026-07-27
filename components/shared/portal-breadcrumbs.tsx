@@ -1,11 +1,12 @@
 "use client"
 
-import { useParams, usePathname } from "next/navigation"
+import { Suspense } from "react"
+import { useParams, usePathname, useSearchParams } from "next/navigation"
 import {
   Breadcrumbs,
   type BreadcrumbItem,
 } from "@/components/shared/breadcrumbs"
-import { MOCK_EMPLOYEES } from "@/lib/mock-data"
+import { MOCK_EMPLOYEES, MOCK_ORGS } from "@/lib/mock-data"
 
 type Portal = "host" | "org" | "serviceprovider"
 
@@ -57,6 +58,13 @@ function getSegmentLabel(segment: string, previousSegment?: string) {
     )
   }
 
+  if (previousSegment === "organizations") {
+    return (
+      MOCK_ORGS.find((org) => org.id === segment)?.name ??
+      "Organization Details"
+    )
+  }
+
   return (
     SEGMENT_LABELS[segment] ??
     (previousSegment ? DETAIL_LABELS[previousSegment] : undefined) ??
@@ -67,9 +75,10 @@ function getSegmentLabel(segment: string, previousSegment?: string) {
   )
 }
 
-export function PortalBreadcrumbs({ portal }: { portal: Portal }) {
+function PortalBreadcrumbsInner({ portal }: { portal: Portal }) {
   const pathname = usePathname()
   const params = useParams<{ orgSlug?: string }>()
+  const searchParams = useSearchParams()
 
   const segments = pathname.split("/").filter(Boolean)
   const isOrgPortal = portal === "org" && params.orgSlug === segments[0]
@@ -83,8 +92,22 @@ export function PortalBreadcrumbs({ portal }: { portal: Portal }) {
 
   if (isOrgPortal) {
     items.push({
-      label: "Organization Portal",
+      label: "Organisation",
       href: `${pathPrefix}/dashboard`,
+    })
+  }
+
+  // Check if navigating to an employee from a Host Organization context (?from=ORG-123)
+  const fromOrgId = searchParams?.get("from")
+  if (portal === "host" && routeSegments[0] === "employees" && fromOrgId) {
+    const org = MOCK_ORGS.find((o) => o.id === fromOrgId)
+    items.push({
+      label: "Organizations",
+      href: "/organizations",
+    })
+    items.push({
+      label: org?.name ?? "Organization Details",
+      href: `/organizations/${fromOrgId}?tab=employees`,
     })
   }
 
@@ -99,4 +122,12 @@ export function PortalBreadcrumbs({ portal }: { portal: Portal }) {
   return items.length > 0 ? (
     <Breadcrumbs items={items} className="mb-6" />
   ) : null
+}
+
+export function PortalBreadcrumbs({ portal }: { portal: Portal }) {
+  return (
+    <Suspense fallback={null}>
+      <PortalBreadcrumbsInner portal={portal} />
+    </Suspense>
+  )
 }

@@ -20,6 +20,7 @@ import {
 import { AssignPolicyModal } from "./assign-policy-modal"
 import { UnassignPolicyModal } from "./unassign-policy-modal"
 import { getEmployeeEntitlement } from "./employee-entitlements-mock"
+import { getEmployeeEntitlements } from "@/lib/mock-data/factories/entitlement"
 
 interface EmployeePolicyTabProps {
   employeeId: string
@@ -28,7 +29,7 @@ interface EmployeePolicyTabProps {
 
 const EMPLOYEE_POOL_LABEL: Record<string, string> = {
   SharedWithEmployee: "Combined",
-  Shared: "Individual",
+  Shared: "Shared",
   Individual: "Individual",
 }
 
@@ -55,6 +56,13 @@ function formatRefreshCycle(refreshCycle?: string) {
 function formatPoolSummary(
   policy: ReturnType<typeof getEmployeeEntitlement>["policy"]
 ) {
+  if (policy.benefitPoolType === "Shared") {
+    return {
+      label: "Employee + Dependents",
+      badge: "Shared",
+    }
+  }
+
   if (!policy.dependentCoverages?.length) {
     return {
       label: "Employee",
@@ -89,6 +97,7 @@ export function EmployeePolicyTab({
 
   // Summary reads the same source as the Usage section so the two never drift.
   const { policy, groups } = getEmployeeEntitlement(employeeId)
+  const entitlementsSummary = getEmployeeEntitlements(employeeId)
   const poolSummary = formatPoolSummary(policy)
   const summary = {
     name: policy.name,
@@ -149,7 +158,7 @@ export function EmployeePolicyTab({
                 <h3 className="text-heading font-semibold text-foreground">
                   {summary.name}
                 </h3>
-                <div className="flex items-center gap-2 text-label font-medium text-muted-foreground">
+                <div className="flex flex-wrap items-center gap-2 text-label font-medium text-muted-foreground">
                   <StatusBadge status={summary.status} variant="emerald" />
                   <span>·</span>
                   <span>{summary.version}</span>
