@@ -580,7 +580,15 @@ export const MOCK_EMPLOYEES: EmployeeDirectoryItem[] = [
     tierId: "TC-001",
     tier: "Executive",
     employmentType: "full-time",
-    benefitPolicies: [],
+    benefitPolicies: [
+      {
+        policyId: "POL-20260115-0012",
+        policyName: "Acme Lifestyle & Wellness 2026",
+        assignedGroupIds: ["POL-20260115-0012-G1"],
+        benefitGroups: ["Lifestyle & Wellness"],
+        utilisation: 30,
+      },
+    ],
   },
   {
     id: "EMP-20260115-0006",

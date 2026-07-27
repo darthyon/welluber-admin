@@ -108,3 +108,37 @@ describe("entitlement pool display model", () => {
     })
   })
 })
+
+describe("employee entitlement summary segments across all profiles", () => {
+  it("builds correct segments for Robert Fox (EMP-0001: Employee Only)", () => {
+    const entitlement = getEmployeeEntitlement("EMP-20260115-0001")
+    const employeeSpent = entitlement.usage.filter(u => !u.relationship).reduce((s, u) => s + u.spent, 0)
+    const dependentSpent = entitlement.usage.filter(u => u.relationship).reduce((s, u) => s + u.spent, 0)
+    expect(employeeSpent).toBeGreaterThan(0)
+    expect(dependentSpent).toBe(0)
+  })
+
+  it("builds correct 2-tone segments for Jenny Wilson (EMP-0002: Combined Family Pool)", () => {
+    const entitlement = getEmployeeEntitlement("EMP-20260115-0002")
+    const employeeSpent = entitlement.usage.filter(u => !u.relationship).reduce((s, u) => s + u.spent, 0)
+    const dependentSpent = entitlement.usage.filter(u => u.relationship).reduce((s, u) => s + u.spent, 0)
+    expect(employeeSpent).toBe(420)
+    expect(dependentSpent).toBe(30)
+  })
+
+  it("builds correct 2-tone segments for Michael Scott (EMP-0003: Shared Dependent Pool)", () => {
+    const entitlement = getEmployeeEntitlement("EMP-20260115-0003")
+    const employeeSpent = entitlement.usage.filter(u => !u.relationship).reduce((s, u) => s + u.spent, 0)
+    const dependentSpent = entitlement.usage.filter(u => u.relationship).reduce((s, u) => s + u.spent, 0)
+    expect(employeeSpent).toBe(500)
+    expect(dependentSpent).toBe(250)
+  })
+
+  it("builds correct 2-tone segments for Ahmad Faizal (EMP-0006: 6 Dependents)", () => {
+    const entitlement = getEmployeeEntitlement("EMP-20260115-0006")
+    const employeeSpent = entitlement.usage.filter(u => !u.relationship).reduce((s, u) => s + u.spent, 0)
+    const dependentSpent = entitlement.usage.filter(u => u.relationship).reduce((s, u) => s + u.spent, 0)
+    expect(employeeSpent).toBe(1220)
+    expect(dependentSpent).toBe(1270)
+  })
+})

@@ -19,6 +19,11 @@ const MICHAEL = "EMP-20260115-0003"
 const MICHAEL_SPOUSE = "DEP-0003-1"
 const MICHAEL_CHILD = "DEP-0003-2"
 const MARVIN = "EMP-20260115-0004"
+const MARVIN_SPOUSE = "DEP-0004-1"
+const MARVIN_CHILD = "DEP-0004-2"
+const JASON = "EMP-20260115-0005"
+const JASON_SPOUSE = "DEP-0005-1"
+const JASON_CHILD = "DEP-0005-2"
 const AHMAD = "EMP-20260115-0006"
 const AHMAD_SPOUSE = "DEP-0006-1"
 const AHMAD_CHILD = "DEP-0006-2"
@@ -103,7 +108,7 @@ const policyA: AssignedPolicyEntitlement = {
   ],
 }
 
-// ── Policy B — Employee pool + dependent cover shared with employee for one group ──
+// ── Policy B — C2: Individual pool + Individual dependent wallets (Jenny Wilson) ──
 const B = "POL-20260115-0002"
 const policyB: AssignedPolicyEntitlement = {
   policy: {
@@ -114,13 +119,13 @@ const policyB: AssignedPolicyEntitlement = {
     organizationId: "ORG-20260115-0001",
     eligibleEmploymentTypes: ["full-time"],
     dependentCoverages: [{ type: "spouse" }, { type: "child" }],
-    dependentsPoolType: "SharedWithEmployee",
+    dependentsPoolType: "Individual",
     benefitPoolType: "Individual",
     utilisationMode: "Fixed",
     refreshCycle: "Yearly",
     refreshStartReference: "financial_year",
     status: "active",
-    totalCapAmount: 3000,
+    totalCapAmount: 1500,
     groupCount: 2,
   },
   groups: [
@@ -147,8 +152,8 @@ const policyB: AssignedPolicyEntitlement = {
       id: `${B}-B1`,
       groupId: `${B}-G1`,
       serviceId: "FX-GYM",
-      amount: 200,
-      employeeAmount: 200,
+      amount: 300,
+      employeeAmount: 300,
       dependantAmount: 200,
       coPayment: { required: false, type: "Percentage", value: 0 },
     },
@@ -156,8 +161,8 @@ const policyB: AssignedPolicyEntitlement = {
       id: `${B}-B2`,
       groupId: `${B}-G1`,
       serviceId: "FX-PT",
-      amount: 150,
-      employeeAmount: 150,
+      amount: 200,
+      employeeAmount: 200,
       dependantAmount: 150,
       coPayment: { required: false, type: "Percentage", value: 0 },
     },
@@ -165,49 +170,32 @@ const policyB: AssignedPolicyEntitlement = {
       id: `${B}-B3`,
       groupId: `${B}-G2`,
       serviceId: "MH-THR",
-      amount: 300,
+      amount: 400,
       coPayment: { required: true, type: "Percentage", value: 10 },
     },
     {
       id: `${B}-B4`,
       groupId: `${B}-G2`,
       serviceId: "MH-MED",
-      amount: 300,
+      amount: 400,
       coPayment: { required: true, type: "Percentage", value: 10 },
     },
   ],
   usage: [
-    {
-      beneficiaryId: JENNY,
-      benefitId: `${B}-B1`,
-      allocated: 200,
-      balance: 20,
-      spent: 180,
-    },
+    // Employee — her own dedicated wallet
+    { beneficiaryId: JENNY, benefitId: `${B}-B1`, allocated: 300, balance: 120, spent: 180 },
+    { beneficiaryId: JENNY, benefitId: `${B}-B2`, allocated: 200, balance: 160, spent: 40 },
+    { beneficiaryId: JENNY, benefitId: `${B}-B3`, allocated: 400, balance: 280, spent: 120 },
+    { beneficiaryId: JENNY, benefitId: `${B}-B4`, allocated: 400, balance: 320, spent: 80 },
+    // Spouse — own dedicated wallet (Individual dep pool)
     {
       beneficiaryId: JENNY_SPOUSE,
       beneficiaryName: "Daniel Wilson",
       relationship: "Spouse",
       benefitId: `${B}-B1`,
       allocated: 200,
-      balance: 20,
+      balance: 200,
       spent: 0,
-    },
-    {
-      beneficiaryId: JENNY_CHILD,
-      beneficiaryName: "Emma Wilson",
-      relationship: "Child",
-      benefitId: `${B}-B1`,
-      allocated: 200,
-      balance: 20,
-      spent: 0,
-    },
-    {
-      beneficiaryId: JENNY,
-      benefitId: `${B}-B2`,
-      allocated: 150,
-      balance: 80,
-      spent: 40,
     },
     {
       beneficiaryId: JENNY_SPOUSE,
@@ -215,36 +203,32 @@ const policyB: AssignedPolicyEntitlement = {
       relationship: "Spouse",
       benefitId: `${B}-B2`,
       allocated: 150,
-      balance: 80,
+      balance: 130,
       spent: 20,
     },
+    // Child — own dedicated wallet (Individual dep pool)
     {
       beneficiaryId: JENNY_CHILD,
       beneficiaryName: "Emma Wilson",
       relationship: "Child",
-      benefitId: `${B}-B2`,
-      allocated: 150,
-      balance: 80,
+      benefitId: `${B}-B1`,
+      allocated: 200,
+      balance: 190,
       spent: 10,
     },
     {
-      beneficiaryId: JENNY,
-      benefitId: `${B}-B3`,
-      allocated: 300,
-      balance: 180,
-      spent: 120,
-    },
-    {
-      beneficiaryId: JENNY,
-      benefitId: `${B}-B4`,
-      allocated: 300,
-      balance: 220,
-      spent: 80,
+      beneficiaryId: JENNY_CHILD,
+      beneficiaryName: "Emma Wilson",
+      relationship: "Child",
+      benefitId: `${B}-B2`,
+      allocated: 150,
+      balance: 150,
+      spent: 0,
     },
   ],
 }
 
-// ── Policy C — Shared dependent pool (Shared), Both group ──
+// ── Policy C — C3: Individual pool + SharedWithEmployee (Combined Pool) (Michael Tan) ──
 const C = "POL-20260115-0009"
 const policyC: AssignedPolicyEntitlement = {
   policy: {
@@ -255,14 +239,13 @@ const policyC: AssignedPolicyEntitlement = {
     organizationId: "ORG-20260115-0001",
     eligibleEmploymentTypes: ["full-time"],
     dependentCoverages: [{ type: "spouse" }, { type: "child" }],
-    dependentsPoolType: "Shared",
+    dependentsPoolType: "SharedWithEmployee",
     benefitPoolType: "Individual",
     utilisationMode: "Fixed",
     refreshCycle: "Quarterly",
     refreshStartReference: "financial_year",
     status: "active",
     totalCapAmount: 800,
-    dependentCapAmount: 600,
     groupCount: 1,
   },
   groups: [
@@ -296,46 +279,36 @@ const policyC: AssignedPolicyEntitlement = {
     },
   ],
   usage: [
-    {
-      beneficiaryId: MICHAEL,
-      benefitId: `${C}-B1`,
-      allocated: 800,
-      balance: 300,
-      spent: 500,
-    },
-    // Dependents share one pool (allocated repeated; spend aggregated across deps)
+    // Employee — individual wallet
+    { beneficiaryId: MICHAEL, benefitId: `${C}-B1`, allocated: 800, balance: 300, spent: 500 },
+    { beneficiaryId: MICHAEL, benefitId: `${C}-B2`, allocated: 800, balance: 800, spent: 0 },
+    // Dependents — share employee's pool (SharedWithEmployee = Combined Pool)
+    // allocated/balance shown as 0; UI renders these as "—"
     {
       beneficiaryId: MICHAEL_SPOUSE,
       beneficiaryName: "Siti Rahmah",
       relationship: "Spouse",
       benefitId: `${C}-B1`,
-      allocated: 600,
-      balance: 350,
+      allocated: 0,
+      balance: 0,
       spent: 150,
     },
     {
       beneficiaryId: MICHAEL_CHILD,
-      beneficiaryName: "Adam Faizal",
+      beneficiaryName: "Adam Tan",
       relationship: "Child",
       benefitId: `${C}-B1`,
-      allocated: 600,
-      balance: 350,
+      allocated: 0,
+      balance: 0,
       spent: 100,
-    },
-    {
-      beneficiaryId: MICHAEL,
-      benefitId: `${C}-B2`,
-      allocated: 800,
-      balance: 800,
-      spent: 0,
     },
     {
       beneficiaryId: MICHAEL_SPOUSE,
       beneficiaryName: "Siti Rahmah",
       relationship: "Spouse",
       benefitId: `${C}-B2`,
-      allocated: 600,
-      balance: 600,
+      allocated: 0,
+      balance: 0,
       spent: 0,
     },
   ],
@@ -603,36 +576,36 @@ const policyD: AssignedPolicyEntitlement = {
   ],
 }
 
-// ── Policy E — Contract employee monthly essentials ──
+// ── Policy E — C4: Individual pool + Shared dependent pool (Marvin McKinney) ──
 const E = "POL-20260115-0011"
 const policyE: AssignedPolicyEntitlement = {
   policy: {
     id: E,
     code: "BEN-CON-26",
     name: "Contract Staff Essentials 2026",
-    version: "V1.0",
+    version: "V1.1",
     organizationId: "ORG-20260115-0001",
-    eligibleEmploymentTypes: ["contract"],
+    eligibleEmploymentTypes: ["contract", "full-time"],
+    dependentCoverages: [{ type: "spouse" }, { type: "child" }],
+    dependentsPoolType: "Shared",
     benefitPoolType: "Individual",
-    utilisationMode: "Prorated",
-    prorateUnit: "Monthly",
+    utilisationMode: "Fixed",
     refreshCycle: "Yearly",
     refreshStartReference: "calendar_year",
     status: "active",
-    totalCapAmount: 100,
+    totalCapAmount: 600,
+    dependentCapAmount: 400,
     groupCount: 1,
   },
   groups: [
     {
       id: `${E}-G1`,
       policyId: E,
-      name: "Basic Medical",
-      coverageScope: "Employee",
-      distributionType: "IndividualBenefitAmount",
+      name: "General Medical",
+      coverageScope: "Both",
+      distributionType: "SharedAmount",
+      dependentGroupCap: 400,
       isTaxable: false,
-      utilisationMode: "Prorated",
-      prorateUnit: "Monthly",
-      refreshCycle: "Yearly",
     },
   ],
   benefits: [
@@ -640,43 +613,122 @@ const policyE: AssignedPolicyEntitlement = {
       id: `${E}-B1`,
       groupId: `${E}-G1`,
       serviceId: "MD-GPV",
-      amount: 60,
+      amount: 300,
       coPayment: { required: false, type: "Percentage", value: 0 },
     },
     {
       id: `${E}-B2`,
       groupId: `${E}-G1`,
-      serviceId: "MD-RX",
-      amount: 40,
+      serviceId: "MD-SCR",
+      amount: 300,
       coPayment: { required: false, type: "Percentage", value: 0 },
     },
   ],
   usage: [
+    // Employee — individual wallet
+    { beneficiaryId: MARVIN, benefitId: `${E}-B1`, allocated: 300, balance: 180, spent: 120 },
+    { beneficiaryId: MARVIN, benefitId: `${E}-B2`, allocated: 300, balance: 300, spent: 0 },
+    // Dependents — share one pool separately from employee (Shared dep pool)
+    // allocated reflects the shared dep cap (400); UI renders sub-rows as "—"
     {
-      beneficiaryId: MARVIN,
+      beneficiaryId: MARVIN_SPOUSE,
+      beneficiaryName: "Linda McKinney",
+      relationship: "Spouse",
       benefitId: `${E}-B1`,
-      allocated: 60,
-      balance: 20,
-      spent: 40,
+      allocated: 400,
+      balance: 250,
+      spent: 80,
     },
     {
-      beneficiaryId: MARVIN,
-      benefitId: `${E}-B2`,
-      allocated: 40,
-      balance: 40,
-      spent: 0,
+      beneficiaryId: MARVIN_CHILD,
+      beneficiaryName: "Tyler McKinney",
+      relationship: "Child",
+      benefitId: `${E}-B1`,
+      allocated: 400,
+      balance: 250,
+      spent: 70,
     },
   ],
 }
 
-/** One employee → one assigned policy. The three pool-type cases live on different
- *  employees as test fixtures (combined / dedicated / shared). */
+// ── Policy F — C5: Shared family pot — employee + dependents share one pool (Jason Teh) ──
+const F = "POL-20260115-0012"
+const policyF: AssignedPolicyEntitlement = {
+  policy: {
+    id: F,
+    code: "BEN-SCR-26",
+    name: "Acme Health Screening Programme 2026",
+    version: "V1.0",
+    organizationId: "ORG-20260115-0001",
+    eligibleEmploymentTypes: ["full-time"],
+    dependentCoverages: [{ type: "spouse" }, { type: "child" }],
+    benefitPoolType: "Shared",
+    utilisationMode: "Fixed",
+    refreshCycle: "Yearly",
+    refreshStartReference: "financial_year",
+    status: "active",
+    totalCapAmount: 2000,
+    groupCount: 1,
+  },
+  groups: [
+    {
+      id: `${F}-G1`,
+      policyId: F,
+      name: "Lifestyle & Wellness",
+      coverageScope: "Both",
+      distributionType: "SharedAmount",
+      isTaxable: false,
+    },
+  ],
+  benefits: [
+    {
+      id: `${F}-B1`,
+      groupId: `${F}-G1`,
+      serviceId: "FX-GYM",
+      amount: 1000,
+      coPayment: { required: false, type: "Percentage", value: 0 },
+    },
+    {
+      id: `${F}-B2`,
+      groupId: `${F}-G1`,
+      serviceId: "MH-THR",
+      amount: 1000,
+      coPayment: { required: false, type: "Percentage", value: 0 },
+    },
+  ],
+  usage: [
+    // All draw from one shared family pot — allocated = total family ceiling
+    { beneficiaryId: JASON, benefitId: `${F}-B1`, allocated: 2000, balance: 1350, spent: 350 },
+    { beneficiaryId: JASON, benefitId: `${F}-B2`, allocated: 2000, balance: 1350, spent: 200 },
+    {
+      beneficiaryId: JASON_SPOUSE,
+      beneficiaryName: "Mei Teh",
+      relationship: "Spouse",
+      benefitId: `${F}-B1`,
+      allocated: 2000,
+      balance: 1350,
+      spent: 50,
+    },
+    {
+      beneficiaryId: JASON_CHILD,
+      beneficiaryName: "Ryan Teh",
+      relationship: "Child",
+      benefitId: `${F}-B1`,
+      allocated: 2000,
+      balance: 1350,
+      spent: 50,
+    },
+  ],
+}
+
+/** One employee → one assigned policy. C1–C5 on rows 1–5 + Ahmad Faizal as extended case. */
 const BY_EMPLOYEE: Record<string, AssignedPolicyEntitlement> = {
-  "EMP-20260115-0001": policyA, // Employee-only dedicated pool
-  "EMP-20260115-0002": policyB, // SharedWithEmployee (combined)
-  "EMP-20260115-0003": policyC, // Shared (shared dependent pool)
-  "EMP-20260115-0004": policyE, // Contract essentials
-  "EMP-20260115-0006": policyD, // Executive family programme
+  "EMP-20260115-0001": policyA, // C1 — Individual pool, no deps (Robert Fox)
+  "EMP-20260115-0002": policyB, // C2 — Individual pool, Individual deps (Jenny Wilson)
+  "EMP-20260115-0003": policyC, // C3 — Individual pool, SharedWithEmployee / Combined Pool (Michael Tan)
+  "EMP-20260115-0004": policyE, // C4 — Individual pool, Shared dep pool (Marvin McKinney)
+  "EMP-20260115-0005": policyF, // C5 — Shared family pot, emp + deps share one pool (Jason Teh)
+  "EMP-20260115-0006": policyD, // Extended — Individual pool, Individual deps, split amounts (Ahmad Faizal)
 }
 
 export function getEmployeeEntitlement(
@@ -684,3 +736,7 @@ export function getEmployeeEntitlement(
 ): AssignedPolicyEntitlement {
   return BY_EMPLOYEE[employeeId] ?? policyA
 }
+
+// ── REMOVED (invalid cases): policyG, policyH, policyI (EMP-0007–0009) ──
+// UC6–UC8 (benefitPoolType:"Shared" + dependentsPoolType combinations) are not
+// valid product combinations in this codebase.
