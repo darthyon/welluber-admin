@@ -32,7 +32,6 @@ export interface CommissionSchemaRow {
   mainService: string
   firstLevelQty: number
   firstLevelRate: number
-  subsequentLevelQty: number
   subsequentLevelRate: number
   effectiveFrom?: ISODate
   lastUpdated?: ISODate

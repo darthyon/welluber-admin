@@ -10,7 +10,6 @@ import {
 } from "@/hooks/use-tab-persistence"
 import { PencilSimpleLine, Plus } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
-import { Breadcrumbs } from "@/components/shared/breadcrumbs"
 import { BranchSheet } from "@/components/host/organizations/branch-sheet"
 import { InviteAdminModal } from "@/components/host/organizations/invite-admin-modal"
 import { Button } from "@/components/ui/button"
@@ -31,7 +30,6 @@ import { VouchersTab } from "@/components/host/organizations/tabs/vouchers-tab"
 import { SettingsTab } from "@/components/host/organizations/tabs/settings-tab"
 import {
   TABS,
-  OTHER_ORGS,
   ORG_FTU_ORG_ID,
   type TabId,
   type AssignedPolicy,
@@ -231,17 +229,6 @@ function OrganizationDetailContent() {
       {/* Header Banner */}
       <div className="relative z-30 -mx-6 -mt-6 bg-card px-6 pt-6">
         <div className="py-6 lg:px-2">
-          <Breadcrumbs
-            items={[
-              { label: "Organisations", href: "/organizations" },
-              {
-                label: orgName,
-                options: OTHER_ORGS.filter((o) => o.label !== orgName),
-              },
-            ]}
-            className="mb-4"
-          />
-
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
             <div className="flex items-start gap-5">
               <EntityAvatar name={orgName} size="xl" />

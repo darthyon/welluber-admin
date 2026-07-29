@@ -46,7 +46,6 @@ export function ServicePortfolioSection({
           mainService: service,
           firstLevelQty: 0,
           firstLevelRate: 0.1,
-          subsequentLevelQty: 1,
           subsequentLevelRate: 0.1,
         });
       });
@@ -104,11 +103,10 @@ export function ServicePortfolioSection({
           <div className="space-y-3 pt-2">
             <p className="text-label font-medium text-faint uppercase tracking-wider">Commission Rates</p>
             <div className="border border-border rounded-lg overflow-hidden bg-background">
-              <div className="grid grid-cols-[1fr_100px_100px_100px_100px_48px] gap-3 px-4 py-2.5 bg-muted/20 border-b border-border items-center">
+              <div className="grid grid-cols-[1fr_100px_100px_100px_48px] gap-3 px-4 py-2.5 bg-muted/20 border-b border-border items-center">
                 <p className="text-label font-semibold text-faint">Main Service</p>
                 <p className="text-label font-semibold text-faint text-right">First Level Qty</p>
                 <p className="text-label font-semibold text-faint text-right">First Level Rate</p>
-                <p className="text-label font-semibold text-faint text-right">Subsequent Qty</p>
                 <p className="text-label font-semibold text-faint text-right">Subsequent Rate</p>
                 <div />
               </div>
@@ -116,7 +114,7 @@ export function ServicePortfolioSection({
                 {fields.map((field, index) => {
                   const rowError = errors.commissionSchema?.[index];
                   return (
-                    <div key={field.id} className="grid grid-cols-[1fr_100px_100px_100px_100px_48px] gap-3 px-4 py-3 items-center">
+                    <div key={field.id} className="grid grid-cols-[1fr_100px_100px_100px_48px] gap-3 px-4 py-3 items-center">
                       <p className="text-body font-medium text-foreground truncate">{field.mainService}</p>
                       <div className="space-y-1">
                         <input
@@ -138,16 +136,6 @@ export function ServicePortfolioSection({
                         <span className="absolute right-2 top-1/2 -translate-y-1/2 text-label text-muted-foreground pointer-events-none">%</span>
                         {rowError?.firstLevelRate && (
                           <p className="text-label text-destructive text-right">{rowError.firstLevelRate.message}</p>
-                        )}
-                      </div>
-                      <div className="space-y-1">
-                        <input
-                          type="number"
-                          {...control.register(`commissionSchema.${index}.subsequentLevelQty`, { valueAsNumber: true })}
-                          className="w-full h-9 px-2 text-right text-body font-mono bg-background border border-border rounded-md focus:border-primary/40 focus:ring-1 focus:ring-primary/10 outline-none"
-                        />
-                        {rowError?.subsequentLevelQty && (
-                          <p className="text-label text-destructive text-right">{rowError.subsequentLevelQty.message}</p>
                         )}
                       </div>
                       <div className="space-y-1 relative">

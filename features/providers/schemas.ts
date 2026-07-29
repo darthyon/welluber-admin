@@ -45,7 +45,6 @@ export const createSpSchema = z.object({
           .number()
           .min(0, "Rate must be 0 or more")
           .max(1, "Rate cannot exceed 100%"),
-        subsequentLevelQty: z.number().min(0, "Quantity must be 0 or more"),
         subsequentLevelRate: z
           .number()
           .min(0, "Rate must be 0 or more")
@@ -326,7 +325,6 @@ export const commissionSchemaSchema = z.object({
       mainService: z.string(),
       firstLevelQty: z.number().min(0),
       firstLevelRate: z.number().min(0).max(1),
-      subsequentLevelQty: z.number().min(0),
       subsequentLevelRate: z.number().min(0).max(1),
       effectiveFrom: z.string().optional(),
     })

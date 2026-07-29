@@ -9,7 +9,6 @@ import { DataFilterBar } from "@/components/shared/data-filter-bar"
 import { SharedDataTable } from "@/components/shared/data-table"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { EmptyState } from "@/components/shared/empty-state"
-import { Breadcrumbs } from "@/components/shared/breadcrumbs"
 import { formatDate } from "@/lib/utils"
 import { MOCK_GENERATED_VOUCHERS } from "@/lib/mock-data"
 import { MOCK_SPS } from "@/lib/mock-data"
@@ -71,14 +70,6 @@ export default function GeneratedVouchersPage() {
 
   return (
     <div className="space-y-6">
-      <Breadcrumbs
-        items={[
-          { label: "Voucher Packages", href: "/voucher-packages" },
-          { label: voucherPackage.name, href: `/voucher-packages/${packageId}/vouchers` },
-          { label: "Generated Vouchers" },
-        ]}
-      />
-
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-3">

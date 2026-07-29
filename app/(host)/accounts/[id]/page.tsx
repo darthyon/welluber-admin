@@ -5,7 +5,6 @@ import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { useAccounts, useAccountTransactions } from "@/features/accounts/hooks";
-import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { useQueryState } from "@/hooks/use-tab-persistence";
 import { ConfirmationModal } from "@/components/shared/confirmation-modal";
 import { useState, Suspense } from "react";
@@ -56,10 +55,6 @@ function AccountDetailContent() {
     t.id.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const OTHER_ACCOUNTS = accounts
-    .filter(w => w.id !== accountId)
-    .map(w => ({ label: `${w.name} (${w.orgName})`, href: `/accounts/${w.id}` }));
-
   const openDangerAction = (action: "suspend" | "terminate") => {
     setDangerAction(action);
     setIsDangerModalOpen(true);
@@ -102,17 +97,6 @@ function AccountDetailContent() {
     <div className="pb-12">
       <div className="bg-card border-border border-b -mx-6 -mt-6 px-6 pt-6 relative z-30">
         <div className="py-6 lg:px-2">
-          <Breadcrumbs
-            items={[
-              { label: "Accounts", href: "/accounts" },
-              {
-                label: `${wallet.name}`,
-                options: OTHER_ACCOUNTS
-              }
-            ]}
-            className="mb-4"
-          />
-
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
             <div className="flex items-start gap-5">
               <div className="w-15 h-15 rounded-lg bg-muted/80 flex items-center justify-center text-muted-foreground border border-border/60 transition-all">
