@@ -2,9 +2,7 @@
 
 import { useState } from "react"
 import {
-  Shield,
   ArrowSquareOut,
-  Warning,
   TreeStructure,
 } from "@phosphor-icons/react"
 import { Button } from "@/components/ui/button"
@@ -17,8 +15,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog"
-import { AssignPolicyModal } from "./assign-policy-modal"
-import { UnassignPolicyModal } from "./unassign-policy-modal"
 import { getEmployeeEntitlement } from "./employee-entitlements-mock"
 import { getEmployeeEntitlements } from "@/lib/mock-data/factories/entitlement"
 
@@ -90,9 +86,6 @@ export function EmployeePolicyTab({
   employeeId,
   employeeName,
 }: EmployeePolicyTabProps) {
-  const [hasPolicy, setHasPolicy] = useState(true)
-  const [showAssignModal, setShowAssignModal] = useState(false)
-  const [showUnassignModal, setShowUnassignModal] = useState(false)
   const [showPolicyModal, setShowPolicyModal] = useState(false)
 
   // Summary reads the same source as the Usage section so the two never drift.
@@ -117,101 +110,54 @@ export function EmployeePolicyTab({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h2 className="text-title font-semibold text-foreground">
-            Entitlement
-          </h2>
-          <p className="mt-1 text-body text-muted-foreground">
-            View assigned benefit policy, policy details, entitlement, and pool
-            management.
-          </p>
-        </div>
-        {hasPolicy && (
-          <div className="flex shrink-0 items-center gap-2">
+      <div>
+        <h2 className="text-title font-semibold text-foreground">
+          Entitlement
+        </h2>
+        <p className="mt-1 text-body text-muted-foreground">
+          View assigned benefit policy, policy details, entitlement, and pool
+          management.
+        </p>
+      </div>
+
+      <Card className="border-primary/20 bg-primary/[0.03] shadow-none">
+        <CardContent className="p-5">
+          <div className="flex items-center justify-between gap-4">
+            <div className="space-y-1.5">
+              <h3 className="text-heading font-semibold text-foreground">
+                {summary.name}
+              </h3>
+              <div className="flex flex-wrap items-center gap-2 text-label font-medium text-muted-foreground">
+                <StatusBadge status={summary.status} variant="emerald" />
+                <span>·</span>
+                <span>{summary.version}</span>
+                <span>·</span>
+                <span>{summary.utilisationMode}</span>
+                <span>·</span>
+                <span>{summary.refreshCycle}</span>
+                <span>·</span>
+                <span>{summary.poolLabel}</span>
+                <span className="rounded-4xl border border-primary/15 bg-primary/8 px-2 py-0.5 text-micro font-medium text-primary">
+                  {summary.poolBadge}
+                </span>
+              </div>
+              <p className="text-label font-medium text-subtle">
+                {summary.orgName} · {summary.code} · {summary.groupCount}{" "}
+                benefit {summary.groupCount === 1 ? "group" : "groups"}
+              </p>
+            </div>
             <Button
               variant="ghost"
               size="sm"
-              className="h-9 gap-2 font-medium"
-              onClick={() => setShowAssignModal(true)}
+              className="shrink-0 gap-1.5 font-medium text-primary hover:text-primary"
+              onClick={() => setShowPolicyModal(true)}
             >
-              Change Policy
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-9 gap-2 border-destructive/30 font-medium text-destructive hover:bg-destructive/10 hover:text-destructive"
-              onClick={() => setShowUnassignModal(true)}
-            >
-              <Warning size={14} weight="bold" />
-              Unassign Policy
+              View Policy Details
+              <ArrowSquareOut size={14} />
             </Button>
           </div>
-        )}
-      </div>
-
-      {hasPolicy ? (
-        <Card className="border-primary/20 bg-primary/[0.03] shadow-none">
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between gap-4">
-              <div className="space-y-1.5">
-                <h3 className="text-heading font-semibold text-foreground">
-                  {summary.name}
-                </h3>
-                <div className="flex flex-wrap items-center gap-2 text-label font-medium text-muted-foreground">
-                  <StatusBadge status={summary.status} variant="emerald" />
-                  <span>·</span>
-                  <span>{summary.version}</span>
-                  <span>·</span>
-                  <span>{summary.utilisationMode}</span>
-                  <span>·</span>
-                  <span>{summary.refreshCycle}</span>
-                  <span>·</span>
-                  <span>{summary.poolLabel}</span>
-                  <span className="rounded-4xl border border-primary/15 bg-primary/8 px-2 py-0.5 text-micro font-medium text-primary">
-                    {summary.poolBadge}
-                  </span>
-                </div>
-                <p className="text-label font-medium text-subtle">
-                  {summary.orgName} · {summary.code} · {summary.groupCount}{" "}
-                  benefit {summary.groupCount === 1 ? "group" : "groups"}
-                </p>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="shrink-0 gap-1.5 font-medium text-primary hover:text-primary"
-                onClick={() => setShowPolicyModal(true)}
-              >
-                View Policy Details
-                <ArrowSquareOut size={14} />
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      ) : (
-        <Card className="border-dashed border-border">
-          <CardContent className="p-12 text-center">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-border bg-muted/50 text-faint">
-              <Shield size={32} />
-            </div>
-            <h3 className="mt-6 text-heading font-semibold text-foreground">
-              No Policy Assigned
-            </h3>
-            <p className="mx-auto mt-2 max-w-md text-body text-muted-foreground">
-              This employee doesn&apos;t have a benefit policy assigned yet.
-              Assign a policy to provide benefits.
-            </p>
-            <Button
-              className="mt-6 gap-2"
-              onClick={() => setShowAssignModal(true)}
-            >
-              <Shield size={18} />
-              Assign Benefit Policy
-            </Button>
-          </CardContent>
-        </Card>
-      )}
+        </CardContent>
+      </Card>
 
       {/* Policy summary modal */}
       <Dialog open={showPolicyModal} onOpenChange={setShowPolicyModal}>
@@ -366,26 +312,6 @@ export function EmployeePolicyTab({
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      <AssignPolicyModal
-        open={showAssignModal}
-        onOpenChange={setShowAssignModal}
-        employeeId={employeeId}
-        employeeName={employeeName}
-        onAssign={(_policyId) => setHasPolicy(true)}
-      />
-      <UnassignPolicyModal
-        open={showUnassignModal}
-        onOpenChange={setShowUnassignModal}
-        employeeId={employeeId}
-        employeeName={employeeName}
-        policyName={summary.name}
-        hasActiveClaims={false}
-        onUnassign={() => {
-          setHasPolicy(false)
-          setShowUnassignModal(false)
-        }}
-      />
     </div>
   )
 }

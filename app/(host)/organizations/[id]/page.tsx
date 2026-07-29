@@ -16,7 +16,6 @@ import { Button } from "@/components/ui/button"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { VoucherDetailSheet } from "@/components/shared/voucher-detail-sheet"
 import { EntityAvatar } from "@/components/shared/entity-avatar"
-import { PostAssignPolicyModal } from "@/components/host/organizations/post-assign-policy-modal"
 import { ErrorBoundary } from "@/components/shared/error-boundary"
 import { TabErrorState } from "@/components/shared/tab-error-state"
 import { ProfileTab } from "@/components/host/organizations/tabs/profile-tab"
@@ -149,8 +148,6 @@ function OrganizationDetailContent() {
   const [assignedPolicies, setAssignedPolicies] = useState<AssignedPolicy[]>(
     buildAssignedPoliciesForOrg(orgId, mockOrg)
   )
-  const [showPostAssignModal, setShowPostAssignModal] = useState(false)
-  const [lastAssignedPolicyName, setLastAssignedPolicyName] = useState("")
   const [selectedVoucherClaim, setSelectedVoucherClaim] =
     useState<FlatClaimRow | null>(null)
 
@@ -160,60 +157,8 @@ function OrganizationDetailContent() {
     policies: assignedPolicies.map((p) => p.name),
   } as import("@/features/organizations/types").Organization
 
-  const handleAssignPolicy = (policyId: string) => {
-    const newPolicy: AssignedPolicy = {
-      id: policyId,
-      organizationId: orgId,
-      name: POLICY_NAMES[policyId] || "Selected Policy",
-      code: `WP-${policyId.split("_")[1]?.toUpperCase() ?? "NEW"}-2026`,
-      description: "Automatically assigned benefit policy.",
-      eligibleEmploymentTypes: ["full-time"],
-      dependentCoverages: [],
-      benefitPoolType: "Individual" as const,
-      utilisationMode: "Fixed" as const,
-      refreshCycle: "Yearly" as const,
-      refreshStartReference: "financial_year" as const,
-      status: "active" as const,
-      assignedTo: "All Branches",
-      employeeCount: 0,
-      lastUpdated: new Date().toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      }),
-    }
-    setAssignedPolicies((prev) => [...prev, newPolicy])
-    setToastMessage("Policy assigned successfully")
-    setLastAssignedPolicyName(newPolicy.name)
-    setShowPostAssignModal(true)
-  }
-
-  const handleUnassignPolicy = (id: string) => {
-    setAssignedPolicies((prev) => prev.filter((p) => p.id !== id))
-    setToastMessage("Policy unassigned from organisation")
-  }
-
   return (
     <div className="pb-12">
-      <PostAssignPolicyModal
-        isOpen={showPostAssignModal}
-        policyName={lastAssignedPolicyName}
-        onAutoMatch={() => {
-          setShowPostAssignModal(false)
-          setActiveTab("employees")
-          setIsBulkUploading("true")
-          setToastMessage(
-            "Opened employee import with policy auto-match suggestion"
-          )
-        }}
-        onManual={() => {
-          setShowPostAssignModal(false)
-          setActiveTab("employees")
-          setToastMessage("Open Employees to assign this policy manually")
-        }}
-        onLater={() => setShowPostAssignModal(false)}
-      />
-
       <BranchSheet
         isOpen={isBranchSheetOpen === "true"}
         onClose={() => setIsBranchSheetOpen(null)}
@@ -291,7 +236,6 @@ function OrganizationDetailContent() {
                       employeeId: null,
                       bulkUpload: null,
                       subTab: null,
-                      assignPolicy: null,
                       addPolicy: null,
                       viewingPolicyId: null,
                       editingPolicyId: null,
@@ -374,8 +318,6 @@ function OrganizationDetailContent() {
             <PoliciesTab
               orgId={orgId}
               assignedPolicies={assignedPolicies}
-              onAssign={handleAssignPolicy}
-              onUnassign={handleUnassignPolicy}
               onToast={setToastMessage}
             />
           </ErrorBoundary>

@@ -2,12 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Plus } from "@phosphor-icons/react"
 import { useQueryState, useUpdateQueryParams } from "@/hooks/use-tab-persistence"
 import { Spinner } from "@/components/shared/spinner"
-import { Button } from "@/components/ui/button"
 import { AssignedPolicyList } from "@/components/host/organizations/assigned-policy-list"
-import { AssignPolicyModal } from "@/components/host/organizations/assign-policy-modal"
 import { PolicyDetailView } from "@/components/host/policies/policy-detail-view"
 import { PolicyCreationLauncher } from "@/components/host/policies/policy-creation-launcher"
 import { DataFilterBar } from "@/components/shared/data-filter-bar"
@@ -20,16 +17,12 @@ import { INITIAL_MOCK_GROUPS, INITIAL_MOCK_BENEFITS } from "./policies-mock-data
 interface PoliciesTabProps {
   orgId: string
   assignedPolicies: AssignedPolicy[]
-  onAssign: (policyId: string) => void
-  onUnassign: (id: string) => void
   onToast: (msg: string) => void
 }
 
 export function PoliciesTab({
   orgId,
   assignedPolicies,
-  onAssign,
-  onUnassign,
   onToast,
 }: PoliciesTabProps) {
   const router = useRouter()
@@ -38,7 +31,6 @@ export function PoliciesTab({
 
   const [policySearch, setPolicySearch] = useQueryState("policySearch", "")
   const [policyStatusFilter, setPolicyStatusFilter] = useQueryState("policyStatus", "all")
-  const [isAssignPolicyModalOpen, setIsAssignPolicyModalOpen] = useQueryState("assignPolicy")
   const [isAddingPolicy] = useQueryState("addPolicy")
   const [viewingPolicyId, setViewingPolicyId] = useQueryState("viewingPolicyId")
   const [editingPolicyId] = useQueryState("editingPolicyId")
@@ -121,16 +113,6 @@ export function PoliciesTab({
               setViewingPolicyId(null)
             }
           }}
-          onDeactivate={() => {
-            onUnassign(viewingPolicyId)
-            onToast("Policy deactivated")
-            setViewingPolicyId(null)
-          }}
-          onDelete={() => {
-            onUnassign(viewingPolicyId)
-            onToast("Policy unassigned from organisation")
-            setViewingPolicyId(null)
-          }}
         />
       </div>
     )
@@ -156,15 +138,6 @@ export function PoliciesTab({
 
   return (
     <div className="animate-in transition-all duration-300 fade-in">
-      <AssignPolicyModal
-        isOpen={isAssignPolicyModalOpen === "true"}
-        onClose={() => setIsAssignPolicyModalOpen(null)}
-        onAssign={(id) => {
-          onAssign(id)
-          setIsAssignPolicyModalOpen(null)
-        }}
-      />
-
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -177,14 +150,6 @@ export function PoliciesTab({
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Button
-              onClick={() => setIsAssignPolicyModalOpen("true")}
-              variant="secondary"
-              size="sm"
-              className="flex h-8 items-center gap-2 rounded-full px-4 text-label font-medium"
-            >
-              <Plus size={14} weight="bold" /> Assign Policy
-            </Button>
             <PolicyCreationLauncher
               preselectedOrgId={orgId}
               hideOrgPicker
@@ -268,7 +233,6 @@ export function PoliciesTab({
             version: policy.version,
             type: policy.benefitPoolType,
           }))}
-          onUnassign={onUnassign}
           onView={(id) => {
             updateQueryParams({
               viewingPolicyId: id,

@@ -46,8 +46,6 @@ interface PolicyDetailViewProps {
   headerVariant?: "standalone" | "embedded"
   onEdit: () => void
   onClone: () => void
-  onDeactivate: () => void
-  onDelete: () => void
   onEditVersion?: (id: string) => void
   onRemoveVersion?: (id: string) => void
 }
@@ -67,14 +65,10 @@ export function PolicyDetailView({
   headerVariant = "standalone",
   onEdit,
   onClone,
-  onDeactivate,
-  onDelete,
   onEditVersion,
   onRemoveVersion,
 }: PolicyDetailViewProps) {
   void onClone
-  void onDeactivate
-  void onDelete
   const router = useRouter()
   const isVersion = Boolean(policy.parentPolicyId)
   const availableTabs = useMemo(

@@ -11,11 +11,13 @@ import {
 import { Info } from "@phosphor-icons/react"
 
 export function ContractSection({
+  action,
   children,
   description,
   icon,
   title,
 }: {
+  action?: React.ReactNode
   children: React.ReactNode
   description?: string
   icon: React.ReactNode
@@ -27,14 +29,15 @@ export function ContractSection({
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-primary/20 bg-primary/10 text-primary">
           {icon}
         </div>
-        <div>
+        <div className="min-w-0 flex-1">
           <h3 className="text-lead font-semibold text-foreground">{title}</h3>
           {description ? (
-            <p className="mt-0.5 text-label text-muted-foreground">
+            <p className="mt-0.5 truncate text-label text-muted-foreground">
               {description}
             </p>
           ) : null}
         </div>
+        {action ? <div className="shrink-0">{action}</div> : null}
       </div>
       <div className="p-4">{children}</div>
     </section>
