@@ -49,6 +49,9 @@ next-env.d.ts
 # claude local
 .claude/
 
+# qwen local (machine-specific MCP paths)
+.qwen/
+
 # codebase memory
 .codebase-memory/
 
