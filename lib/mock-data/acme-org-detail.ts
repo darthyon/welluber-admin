@@ -2,6 +2,8 @@
 // Single source shared by the host org-detail tabs and the org portal so the
 // two never drift — edit here and both surfaces reflect it.
 
+import type { Address } from "@/types/address";
+
 export interface AcmeBranchRow {
   id: string;
   name: string;
@@ -15,7 +17,7 @@ export interface AcmeBranchRow {
   claimsCount: number;
   employees: number; // host tab field name
   employeesCount: number; // org portal field name (kept in sync with employees)
-  address: { city: string; state: string };
+  address: Address;
 }
 
 export const ACME_BRANCHES: AcmeBranchRow[] = [
@@ -32,7 +34,7 @@ export const ACME_BRANCHES: AcmeBranchRow[] = [
     claimsCount: 12,
     employees: 1240,
     employeesCount: 1240,
-    address: { city: "Kuala Lumpur", state: "Wilayah Persekutuan" },
+    address: { line: "Level 12, Menara South", city: "Kuala Lumpur", state: "Wilayah Persekutuan", postalCode: "50450", country: "Malaysia", lat: 3.1390, lon: 101.7036 },
   },
   {
     id: "br_2",
@@ -47,7 +49,7 @@ export const ACME_BRANCHES: AcmeBranchRow[] = [
     claimsCount: 5,
     employees: 450,
     employeesCount: 450,
-    address: { city: "Subang Jaya", state: "Selangor" },
+    address: { line: "No. 5, Jalan SS 15/8", city: "Subang Jaya", state: "Selangor", postalCode: "47500", country: "Malaysia", lat: 3.0733, lon: 101.6072 },
   },
 ];
 

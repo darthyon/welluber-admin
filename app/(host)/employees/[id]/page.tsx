@@ -10,7 +10,6 @@ const EMPLOYEE_DETAIL_OVERRIDES: Record<
   Omit<EmployeeDetailRecord, keyof (typeof MOCK_EMPLOYEES)[number]>
 > = {
   "EMP-20260115-0001": {
-    designation: "Senior Software Engineer",
     dateOfBirth: "12 May 1990",
     idType: "IC",
     idNumber: "900512-14-5231",
@@ -23,7 +22,6 @@ const EMPLOYEE_DETAIL_OVERRIDES: Record<
     dependents: [],
   },
   "EMP-20260115-0002": {
-    designation: "Product Manager",
     dateOfBirth: "18 Aug 1992",
     idType: "Passport",
     idNumber: "A45823917",
@@ -51,7 +49,6 @@ const EMPLOYEE_DETAIL_OVERRIDES: Record<
     ],
   },
   "EMP-20260115-0003": {
-    designation: "Marketing Associate",
     dateOfBirth: "09 Sep 1996",
     idType: "IC",
     idNumber: "960909-08-3812",
@@ -79,7 +76,6 @@ const EMPLOYEE_DETAIL_OVERRIDES: Record<
     ],
   },
   "EMP-20260115-0004": {
-    designation: "Operations Coordinator",
     dateOfBirth: "04 Nov 1991",
     idType: "Passport",
     idNumber: "C99231485",
@@ -92,7 +88,6 @@ const EMPLOYEE_DETAIL_OVERRIDES: Record<
     dependents: [],
   },
   "EMP-20260115-0006": {
-    designation: "Operations Lead",
     dateOfBirth: "22 Feb 1988",
     idType: "IC",
     idNumber: "880222-10-4421",
@@ -122,7 +117,6 @@ const EMPLOYEE_DETAIL_OVERRIDES: Record<
 }
 
 const DEFAULT_EMPLOYEE_DETAILS = {
-  designation: "Senior Software Engineer",
   dateOfBirth: "12 May 1990",
   idType: "IC",
   idNumber: "900512-14-5231",

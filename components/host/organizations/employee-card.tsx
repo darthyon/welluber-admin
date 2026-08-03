@@ -28,6 +28,7 @@ export interface EmployeeCardEmployee {
   lastActive?: string
   department?: string
   tier?: string
+  role?: string
   employmentType?: string
   benefitPolicies: EmployeeBenefitPolicy[]
   dependentsCount: number
@@ -129,6 +130,11 @@ export function EmployeeCard({ employee, onEdit, onView }: EmployeeCardProps) {
               {employee.tier && (
                 <span className="rounded border border-primary/10 bg-primary/5 px-1.5 py-0.5 text-micro font-semibold text-primary">
                   {employee.tier}
+                </span>
+              )}
+              {employee.role && (
+                <span className="rounded border border-border/40 bg-muted px-1.5 py-0.5 text-micro font-semibold text-muted-foreground">
+                  {employee.role}
                 </span>
               )}
               {employee.employmentType && (

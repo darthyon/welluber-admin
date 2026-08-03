@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { addressFormSchema } from "@/types/address"
 
 export const createOrganizationSchema = z.object({
   logo: z.string().optional(),
@@ -38,13 +39,7 @@ export const createOrganizationSchema = z.object({
     .optional(),
   tinNumber: z.string().min(4, "TIN Number is required"),
   creditLimit: z.number().min(0).optional(),
-  address: z.object({
-    line: z.string().min(5, "Address line is required"),
-    city: z.string().min(2, "City is required"),
-    state: z.string().min(2, "State is required"),
-    country: z.string().min(2, "Country is required"),
-    postalCode: z.string().min(5, "Postal code is required"),
-  }),
+  address: addressFormSchema,
   bankAccountDetails: z.object({
     bankName: z.string().min(2, "Bank name is required"),
     accountNumber: z.string().min(8, "Account number is required"),
@@ -57,13 +52,7 @@ export type CreateOrganizationData = z.infer<typeof createOrganizationSchema>
 
 export const hqBranchSchema = z.object({
   name: z.string().min(2, "Branch name is required"),
-  address: z.object({
-    line: z.string().min(5, "Address line is required"),
-    city: z.string().min(2, "City is required"),
-    state: z.string().min(2, "State is required"),
-    country: z.string().min(2, "Country is required"),
-    postalCode: z.string().min(5, "Postal code is required"),
-  }),
+  address: addressFormSchema,
   // HQ branch always gets its own dedicated account — linking to an
   // existing wallet is intentionally not offered at org creation.
   accountName: z.string().optional(),

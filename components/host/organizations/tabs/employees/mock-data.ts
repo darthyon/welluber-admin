@@ -10,6 +10,7 @@ type EmployeeDirectoryMock = {
   lastActive: string
   department: string
   tier: string
+  role?: string
   employmentType: string
   dependentsCount: number
   benefitPolicies: Array<{
@@ -30,6 +31,7 @@ const ACME_EMPLOYEE_GRID: EmployeeDirectoryMock[] = [
     lastActive: "09 Apr 2026, 17:15",
     department: "Engineering",
     tier: "Manager",
+    role: "Team Lead",
     employmentType: "full-time",
     dependentsCount: 0,
     benefitPolicies: [
@@ -50,6 +52,7 @@ const ACME_EMPLOYEE_GRID: EmployeeDirectoryMock[] = [
     lastActive: "09 Apr 2026, 16:45",
     department: "Product",
     tier: "Senior Manager",
+    role: "Product Manager",
     employmentType: "full-time",
     dependentsCount: 2,
     benefitPolicies: [
@@ -70,6 +73,7 @@ const ACME_EMPLOYEE_GRID: EmployeeDirectoryMock[] = [
     lastActive: "09 Apr 2026, 10:20",
     department: "Marketing",
     tier: "Associate",
+    role: "Marketing Specialist",
     employmentType: "full-time",
     dependentsCount: 2,
     benefitPolicies: [
@@ -90,6 +94,7 @@ const ACME_EMPLOYEE_GRID: EmployeeDirectoryMock[] = [
     lastActive: "08 Apr 2026, 14:30",
     department: "Operations",
     tier: "Manager",
+    role: "Project Manager",
     employmentType: "contract",
     dependentsCount: 0,
     benefitPolicies: [
@@ -110,6 +115,7 @@ const ACME_EMPLOYEE_GRID: EmployeeDirectoryMock[] = [
     lastActive: "07 May 2026, 08:45",
     department: "Operations",
     tier: "Senior Manager",
+    role: "Operations Manager",
     employmentType: "full-time",
     dependentsCount: 2,
     benefitPolicies: [
@@ -133,6 +139,7 @@ const BRIGHTPATH_EMPLOYEE_GRID: EmployeeDirectoryMock[] = [
     lastActive: "30 Jun 2026, 16:10",
     department: "Security Operations",
     tier: "Senior",
+    role: "Senior Analyst",
     employmentType: "full-time",
     dependentsCount: 1,
     benefitPolicies: [
@@ -153,6 +160,7 @@ const BRIGHTPATH_EMPLOYEE_GRID: EmployeeDirectoryMock[] = [
     lastActive: "30 Jun 2026, 15:42",
     department: "Client Success",
     tier: "Manager",
+    role: "Account Manager",
     employmentType: "full-time",
     dependentsCount: 0,
     benefitPolicies: [],
@@ -167,6 +175,7 @@ const BRIGHTPATH_EMPLOYEE_GRID: EmployeeDirectoryMock[] = [
     lastActive: "29 Jun 2026, 11:08",
     department: "Platform",
     tier: "Associate",
+    role: "Software Engineer",
     employmentType: "full-time",
     dependentsCount: 0,
     benefitPolicies: [],

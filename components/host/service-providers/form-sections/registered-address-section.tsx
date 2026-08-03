@@ -4,6 +4,7 @@ import { MapPin } from "@phosphor-icons/react";
 import { Controller } from "react-hook-form";
 import type { Control, FieldErrors } from "react-hook-form";
 import { LocationPicker } from "@/components/shared/location-picker";
+import type { Address } from "@/types/address";
 import { z } from "zod";
 import { createSpSchema } from "@/features/providers/schemas";
 
@@ -37,7 +38,7 @@ export function RegisteredAddressSection({
             name="address"
             render={({ field }) => (
               <LocationPicker
-                value={field.value ?? { line: "", city: "", state: "", country: "Malaysia", postalCode: "" }}
+                value={(field.value ?? { line: "", city: "", state: "", country: "Malaysia", postalCode: "" }) as Address}
                 onChange={(val) => field.onChange(val)}
                 errors={errors.address}
               />

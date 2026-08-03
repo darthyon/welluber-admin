@@ -28,6 +28,7 @@ interface FormFields {
   employmentType: string
   endDate: string
   department: string
+  tier: string
   role: string
   isProbation: boolean
 }
@@ -37,7 +38,7 @@ interface EmploymentDetailsSectionProps {
   setFormData: (patch: Partial<FormFields>) => void
   idTypes: IdTypeOption[]
   resolvedDepts: { id: string; name: string }[]
-  resolvedTiers: { id: string; name: string }[]
+  resolvedTiers: { id: string; name: string; roles?: string[] }[]
   isContractType: boolean
   generateEmpCode: () => void
 }
@@ -139,14 +140,38 @@ export function EmploymentDetailsSection({
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-label font-medium text-subtle">Position</label>
+              <label className="text-label font-medium text-subtle">
+                Tier <span className="text-destructive">*</span>
+              </label>
+              <FormSelect
+                value={formData.tier}
+                onChange={(v) => {
+                  const selectedTier = resolvedTiers.find((t) => t.name === v)
+                  setFormData({
+                    tier: v,
+                    role: "", // Reset role when tier changes
+                  })
+                }}
+                options={[
+                  { label: "Select tier", value: "" },
+                  ...resolvedTiers.map((t) => ({ label: t.name, value: t.name })),
+                ]}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-label font-medium text-subtle">Role</label>
               <FormSelect
                 value={formData.role}
                 onChange={(v) => setFormData({ role: v })}
                 options={[
-                  { label: "Select position", value: "" },
-                  ...resolvedTiers.map((t) => ({ label: t.name, value: t.name })),
+                  { label: "Select role", value: "" },
+                  ...(resolvedTiers.find((t) => t.name === formData.tier)?.roles ?? []).map((r) => ({
+                    label: r,
+                    value: r,
+                  })),
                 ]}
+                disabled={!formData.tier}
               />
             </div>
 

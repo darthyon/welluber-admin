@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { addressFormSchema } from "@/types/address"
 
 // ─── SP Account ───────────────────────────────────────────────────────────────
 
@@ -22,15 +23,7 @@ export const createSpSchema = z.object({
       accountName: z.string().min(1, "Account name is required"),
     })
     .optional(),
-  address: z
-    .object({
-      line: z.string().min(1, "Address is required"),
-      city: z.string().min(1, "City is required"),
-      state: z.string().min(1, "State is required"),
-      country: z.string().min(1, "Country is required"),
-      postalCode: z.string().min(1, "Postal code is required"),
-    })
-    .optional(),
+  address: addressFormSchema.optional(),
   needsEInvoiceSubmission: z.boolean().default(false),
   appointedForEInvoice: z.boolean().default(false),
   expiredCommissionFee: z.number().min(0).default(0),
@@ -176,15 +169,7 @@ const operatingHoursSchema = z.object({
 export const createBranchSchema = z.object({
   name: z.string().min(1, "Branch name is required"),
   services: z.array(serviceLineSchema).min(1, "Select at least one service"),
-  address: z.object({
-    line: z.string().min(1, "Address is required"),
-    city: z.string().min(1, "City is required"),
-    state: z.string().min(1, "State is required"),
-    country: z.string().min(1, "Country is required"),
-    postalCode: z.string().min(1, "Postal code is required"),
-    lat: z.coerce.number().optional(),
-    lon: z.coerce.number().optional(),
-  }),
+  address: addressFormSchema,
   contacts: z.array(branchContactSchema).min(1, "Add at least one PIC"),
   administrators: z.array(branchAdminSchema).default([]),
   booking: branchBookingSchema,

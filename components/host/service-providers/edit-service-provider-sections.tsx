@@ -21,6 +21,7 @@ import { z } from "zod"
 import { DocumentUploadSection } from "@/components/shared/document-upload-section"
 import { FormSelect } from "@/components/shared/form-select"
 import { LocationPicker } from "@/components/shared/location-picker"
+import type { Address } from "@/types/address"
 import { Switch } from "@/components/shared/switch"
 import {
   BUSINESS_TYPES,
@@ -146,15 +147,13 @@ export function EditServiceProviderCoreSections({
                   name="address"
                   render={({ field }) => (
                     <LocationPicker
-                      value={
-                        field.value ?? {
-                          line: "",
-                          city: "",
-                          state: "",
-                          country: "Malaysia",
-                          postalCode: "",
-                        }
-                      }
+                      value={(field.value ?? {
+                        line: "",
+                        city: "",
+                        state: "",
+                        country: "Malaysia",
+                        postalCode: "",
+                      }) as Address}
                       onChange={(value) => field.onChange(value)}
                       errors={errors.address}
                     />

@@ -1,6 +1,8 @@
 // ISO 8601 Date String
 type ISODate = string
 
+import type { Address } from "@/types/address"
+
 // ─── Status ───────────────────────────────────────────────────────────────────
 
 export type ServiceProviderStatus =
@@ -104,15 +106,7 @@ export interface SpBranch {
   spId: string
   name: string
   services: ServiceLine[] // hierarchical services
-  address: {
-    line: string
-    city: string
-    state: string
-    country: string
-    postalCode: string
-    lat?: number
-    lon?: number
-  }
+  address: Address
   contacts: SpBranchContact[] // Used for PICs (Public Contacts)
   administrators: SpBranchAdmin[] // Governance/Access
   booking: SpBranchBookingSettings
@@ -192,15 +186,7 @@ export interface ServiceProvider {
     accountNumber: string
     accountName: string
   }
-  address?: {
-    line: string
-    city: string
-    state: string
-    country: string
-    postalCode: string
-    lat?: number
-    lon?: number
-  }
+  address?: Address
   needsEInvoiceSubmission?: boolean
   appointedForEInvoice?: boolean
   expiredCommissionFee?: number

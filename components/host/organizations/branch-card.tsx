@@ -4,6 +4,7 @@ import { Buildings, Wallet, Users, Info } from "@phosphor-icons/react";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ActionPopover } from "@/components/shared/action-popover";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
+import type { Address } from "@/types/address";
 
 interface BranchCardProps {
   branch: {
@@ -13,10 +14,7 @@ interface BranchCardProps {
     accountModel: string;
     accountName?: string;
     accountId?: string;
-    address?: {
-      city: string;
-      state: string;
-    };
+    address?: Address;
     employeesCount?: number;
     status?: string;
     cashBalance?: number;
@@ -34,7 +32,8 @@ export function BranchCard({ branch, onView, onEdit }: BranchCardProps) {
                     branch.accountModel;
 
   return (
-    <div 
+    <div
+      data-testid="branch-card"
       className="group bg-card border border-border rounded-lg p-5 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-500 cursor-pointer overflow-hidden relative flex flex-col h-full"
       onClick={() => onView?.(branch.id)}
     >

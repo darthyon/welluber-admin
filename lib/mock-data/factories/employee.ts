@@ -75,56 +75,56 @@ const DEPARTMENTS_BY_ORG: Record<string, { id: string; name: string }[]> = {
   ],
 }
 
-const TIERS_BY_ORG: Record<string, { id: string; name: string }[]> = {
+const TIERS_BY_ORG: Record<string, { id: string; name: string; roles: string[] }[]> = {
   "ORG-20260115-0001": [
-    { id: "TC-001", name: "Executive" },
-    { id: "TC-002", name: "Senior Manager" },
-    { id: "TC-003", name: "Manager" },
-    { id: "TC-004", name: "Associate" },
+    { id: "TC-001", name: "Executive", roles: ["CEO", "CTO", "CFO", "COO"] },
+    { id: "TC-002", name: "Senior Manager", roles: ["Engineering Manager", "Product Manager", "Marketing Manager", "Operations Manager"] },
+    { id: "TC-003", name: "Manager", roles: ["Team Lead", "Project Manager", "Account Manager", "Sales Manager"] },
+    { id: "TC-004", name: "Associate", roles: ["Software Engineer", "Product Designer", "Marketing Specialist", "Business Analyst"] },
   ],
   "ORG-20260301-0002": [
-    { id: "TC-005", name: "Director" },
-    { id: "TC-006", name: "Associate" },
+    { id: "TC-005", name: "Director", roles: ["Engineering Director", "Product Director", "Sales Director"] },
+    { id: "TC-006", name: "Associate", roles: ["Analyst", "Coordinator", "Specialist"] },
   ],
   "ORG-20260310-0003": [
-    { id: "TC-007", name: "VP" },
-    { id: "TC-008", name: "Senior" },
-    { id: "TC-009", name: "Analyst" },
+    { id: "TC-007", name: "VP", roles: ["VP Engineering", "VP Product", "VP Sales", "VP Marketing"] },
+    { id: "TC-008", name: "Senior", roles: ["Senior Analyst", "Senior Consultant", "Senior Advisor"] },
+    { id: "TC-009", name: "Analyst", roles: ["Junior Analyst", "Research Analyst", "Data Analyst"] },
   ],
   "ORG-20260401-0004": [
-    { id: "TC-010", name: "Consultant" },
-    { id: "TC-011", name: "Specialist" },
-    { id: "TC-012", name: "Resident" },
+    { id: "TC-010", name: "Consultant", roles: ["Management Consultant", "Strategy Consultant", "IT Consultant"] },
+    { id: "TC-011", name: "Specialist", roles: ["HR Specialist", "Finance Specialist", "Marketing Specialist"] },
+    { id: "TC-012", name: "Resident", roles: ["Medical Resident", "Research Resident"] },
   ],
   "ORG-20260401-0005": [
-    { id: "TC-013", name: "Lead" },
-    { id: "TC-014", name: "Buyer" },
-    { id: "TC-015", name: "Coordinator" },
+    { id: "TC-013", name: "Lead", roles: ["Team Lead", "Technical Lead", "Project Lead"] },
+    { id: "TC-014", name: "Buyer", roles: ["Procurement Buyer", "Strategic Buyer", "Commodity Buyer"] },
+    { id: "TC-015", name: "Coordinator", roles: ["Logistics Coordinator", "Operations Coordinator", "Event Coordinator"] },
   ],
   "ORG-20260401-0006": [
-    { id: "TC-016", name: "Project Director" },
-    { id: "TC-017", name: "Engineer" },
-    { id: "TC-018", name: "Site Supervisor" },
+    { id: "TC-016", name: "Project Director", roles: ["Construction Director", "Infrastructure Director"] },
+    { id: "TC-017", name: "Engineer", roles: ["Civil Engineer", "Structural Engineer", "MEP Engineer", "Site Engineer"] },
+    { id: "TC-018", name: "Site Supervisor", roles: ["Site Supervisor", "Safety Supervisor"] },
   ],
   "ORG-20260401-0007": [
-    { id: "TC-019", name: "Principal" },
-    { id: "TC-020", name: "Senior Tutor" },
-    { id: "TC-021", name: "Tutor" },
+    { id: "TC-019", name: "Principal", roles: ["School Principal", "Academic Director"] },
+    { id: "TC-020", name: "Senior Tutor", roles: ["Senior Math Tutor", "Senior Science Tutor", "Senior English Tutor"] },
+    { id: "TC-021", name: "Tutor", roles: ["Math Tutor", "Science Tutor", "English Tutor", "Art Tutor"] },
   ],
   "ORG-20260401-0008": [
-    { id: "TC-022", name: "Head Scientist" },
-    { id: "TC-023", name: "Technician" },
-    { id: "TC-024", name: "Operator" },
+    { id: "TC-022", name: "Head Scientist", roles: ["Research Director", "Lab Director"] },
+    { id: "TC-023", name: "Technician", roles: ["Lab Technician", "Field Technician", "Research Technician"] },
+    { id: "TC-024", name: "Operator", roles: ["Plant Operator", "Equipment Operator"] },
   ],
   "ORG-20260401-0009": [
-    { id: "TC-025", name: "GM" },
-    { id: "TC-026", name: "Supervisor" },
-    { id: "TC-027", name: "Associate" },
+    { id: "TC-025", name: "GM", roles: ["General Manager", "Operations GM"] },
+    { id: "TC-026", name: "Supervisor", roles: ["Floor Supervisor", "Shift Supervisor", "Warehouse Supervisor"] },
+    { id: "TC-027", name: "Associate", roles: ["Retail Associate", "Customer Service Associate", "Stock Associate"] },
   ],
   "ORG-20260401-0010": [
-    { id: "TC-028", name: "Creative Lead" },
-    { id: "TC-029", name: "Strategist" },
-    { id: "TC-030", name: "Executive" },
+    { id: "TC-028", name: "Creative Lead", roles: ["Art Director", "Design Lead", "Creative Director"] },
+    { id: "TC-029", name: "Strategist", roles: ["Brand Strategist", "Content Strategist", "Digital Strategist"] },
+    { id: "TC-030", name: "Executive", roles: ["Account Executive", "Creative Executive", "Media Executive"] },
   ],
 }
 
@@ -155,6 +155,7 @@ export function createEmployee(index: number): Employee {
   const orgTiers = TIERS_BY_ORG[orgId] ?? []
   const dept = orgDepts.length > 0 ? orgDepts[index % orgDepts.length]! : undefined
   const tier = orgTiers.length > 0 ? orgTiers[index % orgTiers.length]! : undefined
+  const role = tier?.roles?.length ? tier.roles[index % tier.roles.length] : undefined
   return {
     id: `EMP-20260115-${String(n).padStart(4, "0")}`,
     orgId,
@@ -164,7 +165,7 @@ export function createEmployee(index: number): Employee {
     empCode: `EMP-${String(n).padStart(3, "0")}`,
     departmentId: dept?.id,
     department: dept?.name,
-    role: tier?.name,
+    role,
     tierId: tier?.id,
     tier: tier?.name,
     dateOfBirth: `${1985 + (index % 15)}-0${(index % 9) + 1}-15T00:00:00Z`,

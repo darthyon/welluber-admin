@@ -479,6 +479,7 @@ export const MOCK_EMPLOYEES: EmployeeDirectoryItem[] = [
     department: "Tech",
     tierId: "TC-003",
     tier: "Manager",
+    role: "Team Lead",
     employmentType: "full-time",
     benefitPolicies: [
       {
@@ -504,6 +505,7 @@ export const MOCK_EMPLOYEES: EmployeeDirectoryItem[] = [
     department: "Marketing",
     tierId: "TC-002",
     tier: "Senior Manager",
+    role: "Marketing Manager",
     employmentType: "full-time",
     benefitPolicies: [
       {
@@ -529,6 +531,7 @@ export const MOCK_EMPLOYEES: EmployeeDirectoryItem[] = [
     department: "Marketing",
     tierId: "TC-001",
     tier: "Associate",
+    role: "Business Analyst",
     employmentType: "full-time",
     benefitPolicies: [
       {
@@ -554,6 +557,7 @@ export const MOCK_EMPLOYEES: EmployeeDirectoryItem[] = [
     department: "Operations",
     tierId: "TC-003",
     tier: "Manager",
+    role: "Project Manager",
     employmentType: "contract",
     benefitPolicies: [
       {
@@ -579,6 +583,7 @@ export const MOCK_EMPLOYEES: EmployeeDirectoryItem[] = [
     department: "Finance",
     tierId: "TC-001",
     tier: "Executive",
+    role: "CFO",
     employmentType: "full-time",
     benefitPolicies: [
       {
@@ -604,6 +609,7 @@ export const MOCK_EMPLOYEES: EmployeeDirectoryItem[] = [
     department: "Operations",
     tierId: "TC-002",
     tier: "Senior Manager",
+    role: "Operations Manager",
     employmentType: "full-time",
     benefitPolicies: [
       {
@@ -629,6 +635,7 @@ export const MOCK_EMPLOYEES: EmployeeDirectoryItem[] = [
     department: "HR",
     tierId: "TC-003",
     tier: "Manager",
+    role: "Account Manager",
     employmentType: "full-time",
     benefitPolicies: [],
   },
@@ -646,6 +653,7 @@ export const MOCK_EMPLOYEES: EmployeeDirectoryItem[] = [
     department: "Tech",
     tierId: "TC-004",
     tier: "Associate",
+    role: "Software Engineer",
     employmentType: "full-time",
     benefitPolicies: [],
   },
@@ -663,6 +671,7 @@ export const MOCK_EMPLOYEES: EmployeeDirectoryItem[] = [
     department: "HR",
     tierId: "TC-005",
     tier: "Director",
+    role: "Engineering Director",
     employmentType: "full-time",
     benefitPolicies: [
       {
@@ -688,6 +697,7 @@ export const MOCK_EMPLOYEES: EmployeeDirectoryItem[] = [
     department: "Marketing",
     tierId: "TC-004",
     tier: "Associate",
+    role: "Marketing Specialist",
     employmentType: "part-time",
     benefitPolicies: [],
   },
@@ -705,6 +715,7 @@ export const MOCK_EMPLOYEES: EmployeeDirectoryItem[] = [
     department: "Tech",
     tierId: "TC-004",
     tier: "Associate",
+    role: "Product Designer",
     employmentType: "full-time",
     benefitPolicies: [],
   },
@@ -722,6 +733,7 @@ export const MOCK_EMPLOYEES: EmployeeDirectoryItem[] = [
     department: "HR",
     tierId: "TC-003",
     tier: "Manager",
+    role: "Sales Manager",
     employmentType: "contract",
     benefitPolicies: [],
   },
