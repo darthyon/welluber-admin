@@ -2,7 +2,8 @@
 
 This document serves as the **authoritative structural specification** for the **Employee Entitlements View** (`app/(org)/[orgSlug]/employees/[employeeId]/page.tsx` and Host Employee View).
 
-It enforces a **person-first structural hierarchy** and **scalable 2-tone progress bar design** that applies consistently across **all 12 pool combinations**.
+It enforces a **person-first structural hierarchy** and a **scalable 2-tone progress bar** that applies consistently across all pool combinations.
+Those combinations collapse to **four pool kinds** (§2), all rendered by one component: `components/shared/entitlement-pools.tsx`.
 
 ---
 
@@ -43,40 +44,100 @@ Every employee detail view follows a strict 3-tier layout:
 > 1. **Canonical Pool Terminology (`Combined Pool`)**: Shared family allocations are canonically termed **`Combined Pool`** in the Allocated Quota column across all views.
 > 2. **Shared Dependent Quota Column Rule**: When a dependent shares in a `Combined Pool`, their **Allocated Quota** cell MUST NOT show individual numbers (like RM 100). It MUST render as **`—`** (dash).
 > 3. **Primary Color Palette (Primary Purple & Teal)**:
->    * 🟣 **Primary Purple** (`bg-primary` / `--primary`): **Employee Spend & Shared Elements**.
->    * 🟢 **Teal** (`bg-teal-500` / `--teal`): **Dependents Combined Spend**.
+>    * 🟣 **Primary Purple** (`bg-primary`): **Employee Spend & Shared Elements**.
+>    * 🟢 **Teal** (`bg-teal-500`): **Dependents Combined Spend**.
+>    * Colour works on two tiers: **hue** separates employee from dependent;
+>      **shade within teal** separates individual dependents (`DEPENDENT_FILL_CLASSES`),
+>      collapsing past four into one "N other dependents" band. Tokens only — the org
+>      portal previously hardcoded `#0d9488` on the employee segment and `#8b5cf6` on
+>      dependents, i.e. the hues inverted against this rule.
 > 4. **No Redundant Badges**: Do not render duplicate pill badges next to beneficiary labels. The Allocated Quota column directly conveys the pool structure.
 
 ---
 
-## 2. Validation Across All 12 Combinations
+## 2. Four Pool Kinds — The Only Thing The UI Branches On
 
-Let's validate whether this 3-tier structure gracefully handles all 12 matrix combinations:
+The 12 combinations this document used to enumerate are **policy shapes**, not
+layouts. Every one of them renders the same two elements — a stacked bar and a
+beneficiary table — and differs only in the *Allocated Quota* cell. The code
+resolves each shape to one of **four pool kinds**, in
+`buildEntitlementGroupPoolDisplay()`
+(`features/employees/entitlement-pool-display.ts`), which is the only place in the
+codebase that makes this decision.
 
-| Combo ID | Combination Scenario | Tier 1: Assigned Policy Link | Tier 2: Allocation Summary (Employee & Dependents) | Tier 3: Benefit Group Wallets Breakdown | Does Structure Fit 100%? |
-|---|---|---|---|---|---|
-| **C-01** | **Individual Solo Wallet** | Links to Policy | Employee row only (`Emp: RM 500 allocated / RM 150 used / RM 350 balance`). Primary Purple bar only. | 1 Group card (*Gym: RM 500*). | ✅ **100% Fit** |
-| **C-02** | **Sub-Capped Solo Wallet** | Links to Policy | Employee row only (`Emp: RM 1,000 allocated / RM 200 used`). | 1 Group card (*Massage Sub-cap: RM 200* with cap warning badge). | ✅ **100% Fit** |
-| **C-03** | **Separate Emp & Dep Wallets** | Links to Policy | Separate person rows: `Emp: RM 500`, `Spouse: —`, `Child: —`. Primary Purple (Emp) + Teal (All Deps). | 2 Group cards (*Emp Dental*, *Child Dental*). | ✅ **100% Fit** |
-| **C-04** | **Role-Differentiated Rates** | Links to Policy | Differentiated rows: `Emp (RM 500 rate)`, `Child (— override)`. Primary Purple + Teal bar. | Group cards displaying role rate tags. | ✅ **100% Fit** |
-| **C-05** | **Solo + Family Shared Pot** | Links to Policy | Beneficiary summary aggregates person totals. Primary Purple (Emp) + Teal (All Deps). | Group 1 (*Solo Gym: RM 350*), Group 2 (*Family Therapy: Combined Pool*). | ✅ **100% Fit** |
-| **C-06** | **Sub-Capped Family Shared Pot** | Links to Policy | Beneficiary summary shows combined family quota & spend. | Group card showing *Combined Pool* with Sub-cap alert. | ✅ **100% Fit** |
-| **C-07** | **Policy Shared Pool** (Uncapped) | Links to Policy | Beneficiary summary shows employee's draw down against policy pool. | Group card showing *Combined Pool* (Policy budget: RM 3,000). | ✅ **100% Fit** |
-| **C-08** | **Policy Shared Pool** (+ Per-Emp Cap) | Links to Policy | Beneficiary summary displays employee's cap (`Emp: RM 500 cap / RM 500 spent`). | Group card showing *Combined Pool* with per-emp cap badge. | ✅ **100% Fit** |
-| **C-09** | **Policy Shared Dependent Pool** | Links to Policy | `Emp: RM 0` (no dep), `Child 1: —`, `Child 2: —`. Teal bar only. | Group card (*Combined Pool Pediatric*). | ✅ **100% Fit** |
-| **C-10** | **Policy Shared Pool + Family Pot** | Links to Policy | Family rows showing spouse/child emergency draw downs. Primary Purple + Teal bar. | Group card (*Emergency Medical Combined Pool*). | ✅ **100% Fit** |
-| **C-11** | **Hybrid** (Solo + Shared Dep Pool) | Links to Policy | `Emp: RM 500 (Gym)`, `Child: — (Combined Pool)`. Primary Purple + Teal bar. | 2 Group cards (*Solo Gym*, *Combined Pediatric*). | ✅ **100% Fit** |
-| **C-12** | **Multi-Group Flexi Master** | Links to Policy | Complete family summary rows. Primary Purple + Teal bar. | Multiple group cards combining solo, Combined Pools, and sub-caps. | ✅ **100% Fit** |
+| Pool kind | When | Employee quota cell | Dependent quota cell | Dependent balance |
+|---|---|---|---|---|
+| `employee` | Group has no dependent rows | RM amount | *(no rows)* | — |
+| `individual` | `dependentsPoolType: "Individual"` | RM amount | per-person RM amount | per-person RM amount |
+| `combined` | `dependentsPoolType: "SharedWithEmployee"` **or** `benefitPoolType: "Shared"` | RM amount | `Combined Pool`, sub-rows `—` | `Shared`, sub-rows `—` |
+| `shared` | `dependentsPoolType: "Shared"` | RM amount | `Combined Pool`, sub-rows `—` | `Shared`, sub-rows `—` |
+
+> [!IMPORTANT]
+> **One component renders all four.** `components/shared/entitlement-pools.tsx`
+> is used by both the host console and the org portal. Before consolidation there
+> were three separate implementations of this view and three separate
+> calculations, so the same employee showed different numbers depending on which
+> console you opened. Do not add a fifth kind or a case-specific component
+> without changing the resolver first.
+
+### 2.1 Ceiling Precedence
+
+Two different rules apply at two different scopes. This is deliberate, not a bug:
+
+| Scope | Function | Order |
+|---|---|---|
+| One group's dependent pool | `sharedAllocated()` | `group.dependentGroupCap` → `policy.dependentCapAmount` → sum of benefit allocations |
+| All groups (allocation summary) | `getSharedDependentPoolCeiling()` | `policy.dependentCapAmount` → sum of group caps → fallback |
+
+At group scope the group's own cap is the more specific rule, so it wins. At
+policy scope `dependentCapAmount` **is** the total dependent ceiling, so it wins
+over summing per-group caps — summing them over-reports whenever several groups
+draw on one policy-wide pot.
+
+A single group can never report an allocation above `policy.totalCapAmount`
+(`capToPolicyCeiling()`). Without that clamp a combined pool reported the sum of
+its benefits (e.g. RM 1,600) while the summary reported the cap (RM 800) — on the
+same screen.
 
 ---
+
+## 2A. Appendix — The Original 12 Combinations
+
+Retained for traceability. Each maps to one of the four kinds above; none needs
+its own layout.
+
+| Combo | Scenario | Pool kind |
+|---|---|---|
+| **C-01** | Individual Solo Wallet | `employee` |
+| **C-02** | Sub-Capped Solo Wallet | `employee` |
+| **C-03** | Separate Emp & Dep Wallets | `individual` |
+| **C-04** | Role-Differentiated Rates | `individual` |
+| **C-05** | Solo + Family Shared Pot | `combined` |
+| **C-06** | Sub-Capped Family Shared Pot | `combined` |
+| **C-07** | Policy Shared Pool (uncapped) | `combined` |
+| **C-08** | Policy Shared Pool + Per-Emp Cap | `combined` |
+| **C-09** | Policy Shared Dependent Pool | `shared` |
+| **C-10** | Policy Shared Pool + Family Pot | `combined` |
+| **C-11** | Hybrid: Solo + Shared Dep Pool | `shared` |
+| **C-12** | Multi-Group Flexi Master | mixed — one kind per group |
+
+> [!WARNING]
+> Combinations pairing `benefitPoolType: "Shared"` with an explicit
+> `dependentsPoolType` are **invalid product states** and are not represented
+> above. When the employee pool is shared, dependents are already in it. The
+> matching fixtures (`policyG`/`policyH`/`policyI`) and the corresponding UC6–UC8
+> wireframes were deleted for this reason — do not re-add them.
+
+---
+
 
 ## 3. Detailed Wireframe: Employee Details Page (`/employees/[id]?tab=benefits`)
 
 ```
 =================================================================================================================
- WELLUBER ADMIN  │  Acme Corporation (ORG-20260115-0001)                                       [Host Admin] 👤 
+ WELLUBER ADMIN  │  Acme Corporation Sdn Bhd (ORG-20260115-0001)                                       [Host Admin] 👤 
 -----------------------------------------------------------------------------------------------------------------
-  👤 Ahmad Faizal  (EMP-20260115-0006)  │  Lead Architect  │  Engineering                     [ Edit Employee ]
+  👤 Ahmad Faizal  (EMP-20260115-0006)  │  Operations Manager  │  Operations                     [ Edit Employee ]
 =================================================================================================================
 
  [ Profile ] [ 🛡️ Entitlement* ] [ 💳 Claims ] [ 🎫 Vouchers ] [ 👥 Dependents ]

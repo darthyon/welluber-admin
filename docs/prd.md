@@ -2,11 +2,22 @@
 
 > **Status:** Active
 > **Version:** 2.2
-> **Last Updated:** 2026-04-03
+> **Last Updated:** 2026-04-03 · *terminology note added 2026-08-05*
 > **Owner:** Welluber Sdn Bhd
 > **Classification:** Internal Use Only
 
 ---
+
+
+> [!NOTE]
+> **Terminology — code vs product.** This document says **"wallet"** for the
+> org/branch funding balance. In code that entity is **`Account`**
+> (`features/accounts/`, route `/accounts`); the Wallet→Account rename is complete
+> and `totalWalletBalance` / `walletLimit` no longer exist. Read "Branch Wallet"
+> here as `Account`.
+>
+> "Benefit wallet" in the member context is a **different** concept — that is
+> entitlement, modelled as pools. See `docs/ENTITLEMENT_PAGE_STRUCTURE_SPEC.md`.
 
 ## 1. What WellUber Is
 
@@ -306,24 +317,28 @@ Configured per SP, per service category by Host Admin. Fields: sp_id (FK), servi
 
 ## 11. Cross-References
 
+> **Corrected 5 Aug 2026.** This table previously listed 20 paths under
+> `docs/flows/`, `docs/personas/` and `docs/decisions/` — all deleted in `5711ca0`
+> for describing product surfaces this repo does not contain. Every link was dead.
+> Replaced with what exists.
+
+### In this repo
+
 | Document | Path | Description |
 |---|---|---|
-| Flows Summary | `docs/flows/FLOWS_SUMMARY.md` | Master index of all flows with status |
-| Screen Inventory | `docs/flows/SCREEN_INVENTORY_HOST_PORTAL.md` | Host portal screen-by-screen spec |
-| Flow 00 | `docs/flows/FLOW_00_HOST_ADMIN_CONFIGURATION.md` | Taxonomy + Policy + Commission + Cron |
-| Flow 01 | `docs/flows/FLOW_01_HOST_ADMIN_ACCOUNT_MANAGEMENT.md` | Host team account management |
-| Flow 02 | `docs/flows/FLOW_02_ORG_SETUP.md` | Organization onboarding |
-| Flow 03 | `docs/flows/FLOW_03_SP_SETUP.md` | Service Provider setup |
-| Flow 05 | `docs/flows/FLOW_05_MEMBER_ACTIVATION.md` | Member account activation |
-| Flow 06 | `docs/flows/FLOW_06_EMPLOYEE_MANAGEMENT.md` | HR employee + benefit management |
-| Flow 07 | `docs/flows/FLOW_07_SP_VOUCHER_CREATION.md` | SP voucher creation + lifecycle |
-| Flow 08 | `docs/flows/FLOW_08_ONLINE_PURCHASE.md` | Member online voucher purchase |
-| Flow 09 | `docs/flows/FLOW_09_VOUCHER_REDEMPTION.md` | SP voucher redemption |
-| Flow 10 | `docs/flows/FLOW_10_WALK_IN_CLAIM.md` | SP walk-in claim |
-| Flow 12 | `docs/flows/FLOW_12_SETTLEMENT_PAYOUT.md` | Settlement & payout |
-| Mermaid Diagrams | `docs/flows/MERMAID_WORKFLOW_*.md` | Visual workflow diagrams |
-| Host Persona | `docs/personas/host.md` | Host Admin capability matrix |
-| Org Persona | `docs/personas/org.md` | Org Admin capability matrix |
-| SP Persona | `docs/personas/serviceprovider.md` | Service Provider capability matrix |
-| Design System | `docs/design.md` | UI tokens, layout, component patterns |
-| ADRs | `docs/decisions/adr-*.md` | Architecture decisions |
+| Module flows | `docs/flows/README.md` | Index + system map. Flows for implemented modules only, with mermaid diagrams |
+| System snapshot | `docs/SNAPSHOT-2026-08.md` | Point-in-time state: what works, gaps, plan |
+| Entitlement structure | `docs/ENTITLEMENT_PAGE_STRUCTURE_SPEC.md` | 4 pool kinds, page hierarchy, ceiling precedence |
+| Entitlement use cases | `docs/ENTITLEMENT_POOLS_USECASES.md` | 5 valid pool combinations + wireframes |
+| Tables | `docs/TABLES_AUDIT.md` | Data-table conventions |
+| Design system | `docs/design.md` | Tokens, layout, component patterns |
+| Agent instructions | `AGENTS.md` | Stack, constraints, shared components |
+| Session handoff | `HANDOFF.md` | Current working state |
+
+### Not in this repo
+
+Flows 05, 08, 09, 10, 12 and the persona docs cover the **member app** and
+**Service Provider portal**. Neither exists here — `app/(serviceprovider)/` is a
+layout with no pages. The epics in §8 that cite those flows are product scope,
+not implemented behaviour. Recoverable from git history at `5711ca0^` if the
+originals are wanted.

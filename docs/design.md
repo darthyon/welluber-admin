@@ -1,7 +1,7 @@
 # DESIGN.md — WellUber Admin
 
 > **Status:** Active
-> **Last Updated:** 2026-04-30
+> **Last Updated:** 2026-08-05
 > **Design Source:** shadcn/ui Luma preset + custom refinements
 > **Inspiration:** Linear, Vercel, Supabase, Midday
 > **Format:** [VoltAgent DESIGN.md](https://github.com/VoltAgent/awesome-design-md)
@@ -93,17 +93,22 @@ WellUber Admin is a **B2B SaaS admin console** for managing corporate wellness b
 
 ### Hierarchy
 
-| Role | Size | Weight | Tracking | Usage |
-|---|---|---|---|---|
-| **Page Title** | `1.125rem` (18px) | 600 (semibold) | `tracking-tight` | Page headings |
-| **Subtitle** | `0.9375rem` (15px) | 600 (semibold) | normal | Form section headers, modal titles, sub-page headings |
-| **Section Title** | `0.8125rem` (13px) | 600 (semibold) | normal | Card/panel headings |
-| **Body** | `0.875rem` (14px) | 400 | normal | Standard content |
-| **Nav Item** | `0.8125rem` (13px) | 500 (medium) | normal | Sidebar navigation links |
-| **Label** | `0.75rem` (12px) | 500 (medium) | normal | Stat card labels, metadata |
-| **Section Label** | `0.625rem` (10px) | 600 (semibold) | `tracking-[0.08em]` | Sidebar section titles, uppercase |
-| **Caption** | `0.6875rem` (11px) | 400 | normal | Timestamps, footnotes |
-| **Micro** | `0.5625rem` (9px) | 500 (medium) | normal | Keyboard shortcut hints only |
+> **Updated 5 Aug 2026.** The role-based scale that used to sit here (18/15/13/11/9px)
+> no longer exists. The scale is now **seven closed token utilities** defined in
+> `app/globals.css` — use the token name, never a raw `text-[13px]` or a Tailwind
+> default like `text-sm`. `pnpm lint:design` enforces this.
+
+| Token | Size | Usage |
+|---|---|---|
+| `text-micro` | `0.625rem` (10px) | Badges, timestamps only |
+| `text-label` | `0.75rem` (12px) | Labels, captions, table headers |
+| `text-body` | `0.875rem` (14px) | Body, nav, inputs, table cells |
+| `text-lead` | `1rem` (16px) | Section titles, card headers |
+| `text-heading` | `1.25rem` (20px) | Page titles, modal titles |
+| `text-title` | `1.5rem` (24px) | Major page headers |
+| `text-display` | `2rem` (32px) | KPIs, hero values |
+
+Line-height and letter-spacing are baked into each token — do not override them.
 
 ### Principles
 - **Three weights only:** 400 (read), 500 (navigate/interact), 600 (announce/title). **Never use `font-bold` (700)**. If you find yourself reaching for 700, use 600 (`font-semibold`) instead — this applies to headings, card titles, table headers, badges, and dialog titles without exception.
@@ -168,7 +173,7 @@ WellUber Admin is a **B2B SaaS admin console** for managing corporate wellness b
 - **Utilization Ring Chart:**
   - Background track: `stroke-muted/40` or light-gray for visibility.
   - Active segment: `stroke-primary` (brand indigo).
-  - Center label: `text-[10px] font-bold` for percentage.
+  - Center label: `text-micro font-semibold` for percentage. (Was `text-[10px] font-bold` — contradicted the no-bold rule and the token scale.)
   - Sizing: Compact (32-48px) for cards, standard (120px+) for dashboards.
 
 ### Filtering & Search
@@ -334,6 +339,7 @@ Use this 5-point check before submitting any UI change:
 | 2026-04-03 | Initial scaffold — shadcn Luma preset, Geist font | All |
 | 2026-04-03 | Theme default to light, add toggle, Linear/Vercel polish | Shell, sidebar, top bar, dashboard |
 | 2026-04-03 | Organization Directory UI Refinement — Triage toolbar, Ring charts, Sectioned taxonomy | Organization List |
+| 2026-08-05 | Typography section rewritten to the 7 token utilities actually defined in `app/globals.css` — the old role-based px scale (18/15/13/11/9px) had no corresponding tokens. Fixed donut center-label rule that specified `font-bold` in violation of this document's own no-bold policy. | All |
 | 2026-04-10 | Typography audit — Added "Subtitle" (15px) and "Micro" (9px) roles, standardized Title Case rule, added Technical ID exception for uppercase, documented semantic color convention, reinforced `font-bold` prohibition | All |
 | 2026-04-22 | Service Provider Unification — Documented "Quiet Success" pattern, International Phone Input, Floating Anchor Nav, and Floating Action Bar | Service Provider, Forms |
 | 2026-04-27 | Token overhaul — primary to `oklch(0.457 0.24 277.023)` / dark `oklch(0.585 0.233 277.117)`, sidebar to dark frosted blue both modes, typography to rem, button variant clarification (ghost vs outline vs default) | All |

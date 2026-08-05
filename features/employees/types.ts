@@ -93,6 +93,9 @@ export interface VoucherRedemption {
   id: string
   voucherCode: string
   voucherName: string
+  /** Whose vouchers these are. Required — without it the employee Vouchers tab
+   *  cannot filter, and every employee shows the same rows. */
+  employeeId: string
   category: string
   benefitType: string
   date: string

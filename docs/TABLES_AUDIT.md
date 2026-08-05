@@ -3,6 +3,17 @@
 Audit of all data tables against the `OrganizationsDataTable` gold standard.
 Completed: 2026-05-26.
 
+> **Freshness check — 5 Aug 2026.** The gold-standard patterns below are still
+> current and still enforced by `pnpm lint:design`. The score card has **not** been
+> re-run since May; treat it as a record of what was fixed then, not proof of
+> today's state.
+>
+> Known changes since: `employee-claims-tab.tsx` and `employee-vouchers-tab.tsx`
+> gained per-employee filtering (behaviour only — cell styling untouched), and
+> `components/shared/entitlement-pools.tsx` was added. That component renders a
+> beneficiary table which was **not** part of this audit and should be checked
+> against the patterns below on the next pass.
+
 ---
 
 ## Gold Standard Patterns
@@ -145,6 +156,7 @@ Replaced with `<SharedDataTable ghost>` using standard `Column<Account>[]` defin
 
 ## Scope Not Covered
 
+- **`entitlement-pools.tsx` beneficiary table** — added Aug 2026, never audited.
 - **Admin detail page** — `/users/administrators/[id]` should be a page (not modal). Post-invite avatar upload. Tracked separately.
 - **Dashboard TopList** — custom component, not a table.
 - **Audit Log timeline** — not a table.

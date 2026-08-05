@@ -1,7 +1,8 @@
 # WellUber Admin — Entitlement Pools: Use Cases, UX Audit & Full Page Wireframes
 
 This document is the **single source of truth** for all entitlement pool combinations in WellUber Admin.
-It covers the full **2×4 matrix** of pool types and documents wireframes for every case grounded in real mock data.
+It covers every **valid** pool combination and documents wireframes for each, grounded in real mock data.
+The five cases resolve to **four pool kinds** — see §1A. Invalid combinations are listed in §3 and must not be re-added.
 
 ---
 
@@ -17,13 +18,39 @@ It covers the full **2×4 matrix** of pool types and documents wireframes for ev
 
 ---
 
-## 2. Complete Use Case Matrix (8 Base Cases)
+## 1A. Five Use Cases, Four Pool Kinds
+
+The use cases below describe **policy shapes**. The UI does not branch on them —
+it branches on the **pool kind** each shape resolves to, of which there are four.
+`buildEntitlementGroupPoolDisplay()` in
+`features/employees/entitlement-pool-display.ts` performs that resolution, and it
+is the only place in the codebase that does.
+
+| Pool kind | Meaning | Dependent quota cell | Reached by |
+|---|---|---|---|
+| `employee` | No dependents on the group | *(no dependent rows)* | UC1, UC-P |
+| `individual` | Each dependent has their own wallet | per-person amount | UC2 |
+| `combined` | Employee + dependents share one pot | `Combined Pool`, sub-rows `—` | UC3, UC5 |
+| `shared` | Dependents share a pot, separate from the employee | `Combined Pool`, sub-rows `—` | UC4 |
+
+Two things follow, and they are why this document is shorter than it used to be:
+
+1. **UC3 and UC5 render identically.** Different policy shapes
+   (`dependentsPoolType: "SharedWithEmployee"` vs `benefitPoolType: "Shared"`),
+   same pool kind, so one layout serves both. Do not write a second layout.
+2. **Every case is one stacked bar plus one beneficiary table.** Only the
+   *Allocated Quota* cell varies. If you find yourself adding a case-specific
+   component, you are re-introducing the drift this consolidation removed.
+
+---
+
+## 2. Complete Use Case Matrix (5 Valid Cases)
 
 > [!IMPORTANT]
 > **Authoritative UX & Display Standards**:
 > 1. **3-Tier Page Hierarchy**: Assigned Policy Header → Allocation Summary → Benefit Group Wallets.
 > 2. **Canonical Pool Term**: Shared family allocations display as **`Combined Pool`** in the Allocated Quota column.
-> 3. **Org-Wide Shared Pool Banner**: When `benefitPoolType: "Shared"`, show an org pool banner above Allocation Summary: `🏢 Org Pool: RM 10,000 total | RM 7,250 remaining`.
+> 3. **Org-Wide Shared Pool Banner**: When `benefitPoolType: "Shared"` (UC5), an org pool banner may sit above the Allocation Summary. Not currently implemented — `<EntitlementPools>` renders the summary card only.
 > 4. **Shared Dependent Dash Rule**: When deps share a Combined Pool, Allocated Quota and Balance Left cells for individual dep sub-rows render as **`—`**.
 > 5. **2-Tone Progress Bar**: 🟣 Primary Purple = Employee Spend · 🟢 Teal = All Deps Combined · ⚪ Gray = Balance Left.
 
@@ -62,9 +89,9 @@ It covers the full **2×4 matrix** of pool types and documents wireframes for ev
 
 ```
 =================================================================================================================
- WELLUBER ADMIN  |  Acme Corporation (ORG-20260115-0001)
+ WELLUBER ADMIN  |  Acme Corporation Sdn Bhd (ORG-20260115-0001)
 -----------------------------------------------------------------------------------------------------------------
-  Robert Fox  (EMP-20260115-0001)  |  Operations Manager  |  Operations          [ Edit Employee ]
+  Robert Fox  (EMP-20260115-0001)  |  Team Lead  |  Tech          [ Edit Employee ]
 =================================================================================================================
  [ Profile ] [ Entitlement* ] [ Claims ] [ Vouchers ] [ Dependents ]
 
@@ -92,6 +119,10 @@ It covers the full **2×4 matrix** of pool types and documents wireframes for ev
 
 ### UC2: Individual Pool + Individual Dependent Wallets
 **Ahmad Faizal** · `EMP-20260115-0006` · Executive Benefits Programme 2026
+
+> The matrix assigns UC2 to Jenny Wilson; Ahmad is wireframed here instead because
+> his six dependents exercise the same pool kind (`individual`) under load — he is
+> the case that stresses the per-dependent colour ramp and the overflow band.
 *Live: `/employees/EMP-20260115-0006?from=ORG-20260115-0001&tab=benefits`*
 
 > [!NOTE]
@@ -99,9 +130,9 @@ It covers the full **2×4 matrix** of pool types and documents wireframes for ev
 
 ```
 =================================================================================================================
- WELLUBER ADMIN  |  Acme Corporation (ORG-20260115-0001)
+ WELLUBER ADMIN  |  Acme Corporation Sdn Bhd (ORG-20260115-0001)
 -----------------------------------------------------------------------------------------------------------------
-  Ahmad Faizal  (EMP-20260115-0006)  |  Lead Architect  |  Engineering          [ Edit Employee ]
+  Ahmad Faizal  (EMP-20260115-0006)  |  Operations Manager  |  Operations          [ Edit Employee ]
 =================================================================================================================
  [ Profile ] [ Entitlement* ] [ Claims ] [ Vouchers ] [ Dependents ]
 
@@ -157,7 +188,7 @@ It covers the full **2×4 matrix** of pool types and documents wireframes for ev
 
 ```
 =================================================================================================================
- WELLUBER ADMIN  |  Acme Corporation (ORG-20260115-0001)
+ WELLUBER ADMIN  |  Acme Corporation Sdn Bhd (ORG-20260115-0001)
 -----------------------------------------------------------------------------------------------------------------
   Jenny Wilson  (EMP-20260115-0002)  |  Senior Software Engineer  |  Engineering  [ Edit Employee ]
 =================================================================================================================
@@ -206,7 +237,7 @@ It covers the full **2×4 matrix** of pool types and documents wireframes for ev
 
 ```
 =================================================================================================================
- WELLUBER ADMIN  |  Acme Corporation (ORG-20260115-0001)
+ WELLUBER ADMIN  |  Acme Corporation Sdn Bhd (ORG-20260115-0001)
 -----------------------------------------------------------------------------------------------------------------
   Michael Scott  (EMP-20260115-0003)  |  Account Manager  |  Commercial          [ Edit Employee ]
 =================================================================================================================
@@ -241,199 +272,43 @@ It covers the full **2×4 matrix** of pool types and documents wireframes for ev
 
 ---
 
-### UC5: Org Shared Pool — No Dependents
-**Sarah Lim** · `EMP-20260115-0005` · Acme Health Screening Programme 2026
-*Live: `/employees/EMP-20260115-0005?from=ORG-20260115-0001&tab=benefits`*
+### UC5: Shared Family Pot — Employee + Dependents Share One Pool
 
-> [!NOTE]
-> **UC5 Key**: `benefitPoolType: "Shared"` — the **org owns a central budget pool** (RM 10,000). Sarah is drawing down RM 1,500 against that pool. Show an **Org Pool Banner** above Allocation Summary so the admin sees the macro context. Sarah's personal view shows only her draw-down, not the full pool.
+**Employee:** Jason Teh (`EMP-20260115-0005`) · Policy `POL-20260115-0012` · `benefitPoolType: "Shared"`
 
-```
-=================================================================================================================
- WELLUBER ADMIN  |  Acme Corporation (ORG-20260115-0001)
------------------------------------------------------------------------------------------------------------------
-  Sarah Lim  (EMP-20260115-0005)  |  HR Executive  |  Human Resources             [ Edit Employee ]
-=================================================================================================================
- [ Profile ] [ Entitlement* ] [ Claims ] [ Vouchers ] [ Dependents ]
-
- ASSIGNED BENEFIT POLICY
- Policy: Acme Health Screening Programme 2026 (BEN-SCR-26)
-         Active · V1.0 · Fixed · Yearly · Employee  [ View Policy Details ]
-
- ORG POOL BANNER
- ┌─────────────────────────────────────────────────────────────────────────────────┐
- │ 🏢 Org Shared Pool · Health Screening · RM 10,000 total · RM 7,250 remaining  │
- │ Sarah's draw-down counts against this shared org budget.                        │
- └─────────────────────────────────────────────────────────────────────────────────┘
-
- ALLOCATION SUMMARY  (Sarah's draw-down cap)
- Total Allocated: RM 1,500.00     Total Used: RM 500.00     Total Balance Left: RM 1,000.00
- [ Primary Purple: Employee (RM 500) ][ Gray: Balance Left (RM 1,000) ]
-
- BREAKDOWN
- Beneficiary Name              Allocated Quota      Spent        Balance Left
- ─────────────────────────────────────────────────────────────────────────────
- Employee                      RM 1,500.00          RM 500.00    RM 1,000.00
-
- BENEFIT GROUP WALLETS
- Health Screening (Employee · Shared Amount · Not Taxable)
- Beneficiary Name              Allocated Quota      Spent        Balance Left
- ─────────────────────────────────────────────────────────────────────────────
- Employee                      RM 1,500.00          RM 500.00    RM 1,000.00
-=================================================================================================================
-```
-
----
-
-### UC6: Org Shared Pool + Individual Dependent Wallets
-**David Park** · `EMP-20260115-0007` · Acme Central Dental Programme 2026
-*Live: `/employees/EMP-20260115-0007?from=ORG-20260115-0001&tab=benefits`*
-
-> [!NOTE]
-> **UC6 Key**: `benefitPoolType: "Shared"` + `dependentsPoolType: "Individual"` — org has a central dental budget (RM 20,000). David draws RM 500 from it; each of his dependents also gets their own dedicated quota drawn from the same org pool. No Combined Pool label — each dep shows their own RM amount.
+Pool kind: **`combined`**. Employee and dependents draw on one ceiling, so every
+dependent sub-row shows `—` in Allocated Quota and Balance Left. Wireframe is
+identical to UC3 — same pool kind, reached by a different policy shape. That is
+the point of collapsing to four kinds: one layout serves both.
 
 ```
-=================================================================================================================
- WELLUBER ADMIN  |  Acme Corporation (ORG-20260115-0001)
------------------------------------------------------------------------------------------------------------------
-  David Park  (EMP-20260115-0007)  |  Finance Manager  |  Finance                 [ Edit Employee ]
-=================================================================================================================
- [ Profile ] [ Entitlement* ] [ Claims ] [ Vouchers ] [ Dependents ]
-
- ASSIGNED BENEFIT POLICY
- Policy: Acme Central Dental Programme 2026 (BEN-DEN-26)
-         Active · V1.0 · Fixed · Yearly · Employee + Dependents  [ View Policy Details ]
-
- ORG POOL BANNER
- ┌──────────────────────────────────────────────────────────────────────────────────────┐
- │ 🏢 Org Shared Pool · Dental Care · RM 20,000 total · RM 14,500 remaining           │
- │ David and dependents' allocations all draw against this shared org budget.           │
- └──────────────────────────────────────────────────────────────────────────────────────┘
-
- ALLOCATION SUMMARY  (David's draw-down + his dependents' individual quotas)
- Total Allocated: RM 500.00 (Emp) + RM 300.00 × 2 (Deps)
- Total Used: RM 350.00    Total Balance Left: RM 450.00
- [ Primary Purple: Employee (RM 200) ][ Teal: Dependents Combined (RM 150) ][ Gray: Balance (RM 450) ]
-
- BREAKDOWN
- Beneficiary Name              Allocated Quota      Spent        Balance Left
- ─────────────────────────────────────────────────────────────────────────────
- Employee                      RM   500.00          RM 200.00    RM  300.00
- Dependents
-    Priya Park (Spouse)         RM   300.00          RM   0.00    RM  300.00
-    Leo Park (Child)            RM   300.00          RM 150.00    RM  150.00
-
- BENEFIT GROUP WALLETS
- Dental Care (Both · Individual Amount · Not Taxable)
- Beneficiary Name              Allocated Quota      Spent        Balance Left
- ─────────────────────────────────────────────────────────────────────────────
- Employee                      RM   500.00          RM 200.00    RM  300.00
-    Priya Park (Spouse)         RM   300.00          RM   0.00    RM  300.00
-    Leo Park (Child)            RM   300.00          RM 150.00    RM  150.00
-=================================================================================================================
-```
-
----
-
-### UC7: Org Shared Pool + Combined Family Pool (SharedWithEmployee)
-**Nurul Huda** · `EMP-20260115-0008` · Acme Mental Health Fund 2026
-*Live: `/employees/EMP-20260115-0008?from=ORG-20260115-0001&tab=benefits`*
-
-> [!NOTE]
-> **UC7 Key**: `benefitPoolType: "Shared"` + `dependentsPoolType: "SharedWithEmployee"` — org owns a central MH budget (RM 15,000). Nurul's family draws against a RM 2,000 ceiling from that pool, and family shares one Combined Pool for therapy. Dep sub-rows show **—** for Allocated Quota and Balance Left.
-
-```
-=================================================================================================================
- WELLUBER ADMIN  |  Acme Corporation (ORG-20260115-0001)
------------------------------------------------------------------------------------------------------------------
-  Nurul Huda  (EMP-20260115-0008)  |  Talent Acquisition Lead  |  HR               [ Edit Employee ]
-=================================================================================================================
- [ Profile ] [ Entitlement* ] [ Claims ] [ Vouchers ] [ Dependents ]
-
- ASSIGNED BENEFIT POLICY
- Policy: Acme Mental Health Fund 2026 (BEN-MH-26)
-         Active · V1.0 · Fixed · Yearly · Employee + Dependents  [ View Policy Details ]
-
- ORG POOL BANNER
- ┌──────────────────────────────────────────────────────────────────────────────────────┐
- │ 🏢 Org Shared Pool · Mental Health & Therapy · RM 15,000 total · RM 9,800 remaining│
- │ Nurul's family draws against a RM 2,000 ceiling from this shared org budget.         │
- └──────────────────────────────────────────────────────────────────────────────────────┘
-
- ALLOCATION SUMMARY  (Family ceiling: RM 2,000 from org pool)
- Total Allocated: RM 2,000.00    Total Used: RM 700.00    Total Balance Left: RM 1,300.00
- [ Primary Purple: Employee (RM 400) ][ Teal: Deps Combined (RM 300) ][ Gray: Balance (RM 1,300) ]
-
- BREAKDOWN
- Beneficiary Name              Allocated Quota      Spent        Balance Left
- ─────────────────────────────────────────────────────────────────────────────
- Employee                      RM 2,000.00          RM  400.00   RM 1,600.00
- Dependents                    Combined Pool        RM  300.00   Shared
-    Hafiz Rahman (Spouse)       —                    RM  200.00   —
-    Zahra Rahman (Child)        —                    RM  100.00   —
-
- BENEFIT GROUP WALLETS
- Mental Health & Therapy (Both · Shared Amount · Not Taxable)
- Beneficiary Name              Allocated Quota      Spent        Balance Left
- ─────────────────────────────────────────────────────────────────────────────
- Employee                      RM 2,000.00          RM  400.00   RM 1,600.00
- Dependents                    Combined Pool        RM  300.00   Shared
-    Hafiz Rahman (Spouse)       —                    RM  200.00   —
-    Zahra Rahman (Child)        —                    RM  100.00   —
-=================================================================================================================
-```
-
----
-
-### UC8: Org Shared Pool + Shared Dependent Pool
-**James Wong** · `EMP-20260115-0009` · Acme Central Optical Fund 2026
-*Live: `/employees/EMP-20260115-0009?from=ORG-20260115-0001&tab=benefits`*
-
-> [!NOTE]
-> **UC8 Key**: `benefitPoolType: "Shared"` + `dependentsPoolType: "Shared"` — org owns a central optical budget (RM 12,000). James draws RM 600 from it for himself. His dependents share a **separate** Combined Pool (ceiling RM 1,000) also from the org budget. Two layers of sharing: emp draw-down + dep sub-pool.
-
-```
-=================================================================================================================
- WELLUBER ADMIN  |  Acme Corporation (ORG-20260115-0001)
------------------------------------------------------------------------------------------------------------------
-  James Wong  (EMP-20260115-0009)  |  Operations Analyst  |  Operations            [ Edit Employee ]
-=================================================================================================================
- [ Profile ] [ Entitlement* ] [ Claims ] [ Vouchers ] [ Dependents ]
-
- ASSIGNED BENEFIT POLICY
- Policy: Acme Central Optical Fund 2026 (BEN-OPT-26)
-         Active · V1.0 · Fixed · Yearly · Employee + Dependents  [ View Policy Details ]
-
- ORG POOL BANNER
- ┌──────────────────────────────────────────────────────────────────────────────────────┐
- │ 🏢 Org Shared Pool · Optical Care · RM 12,000 total · RM 8,750 remaining           │
- │ James: RM 600 cap · Dependents: RM 1,000 shared cap — both from this org budget.    │
- └──────────────────────────────────────────────────────────────────────────────────────┘
-
  ALLOCATION SUMMARY
- Total Allocated: RM 1,600.00    Total Used: RM 500.00    Total Balance Left: RM 1,050.00
- [ Primary Purple: Employee (RM 250) ][ Teal: Deps Combined (RM 250) ][ Gray: Balance (RM 1,050) ]
+ Total Allocated: RM 2,000.00     Total Used: RM 650.00     Total Balance Left: RM 1,350.00
+ [ Purple: Employee (RM 550) ][ Teal: Dependents (RM 100) ][ Gray: Balance (RM 1,350) ]
 
- BREAKDOWN
- Beneficiary Name              Allocated Quota      Spent        Balance Left
- ─────────────────────────────────────────────────────────────────────────────
- Employee                      RM   600.00          RM 250.00    RM  350.00
- Dependents                    Combined Pool        RM 250.00    Shared
-    Mei Wong (Spouse)           —                    RM 150.00    —
-    Kai Wong (Child)            —                    RM 100.00    —
-
- BENEFIT GROUP WALLETS
- Optical Care (Both · Shared Amount · Not Taxable)
- Beneficiary Name              Allocated Quota      Spent        Balance Left
- ─────────────────────────────────────────────────────────────────────────────
- Employee                      RM   600.00          RM 250.00    RM  350.00
- Dependents                    Combined Pool        RM 250.00    Shared
-    Mei Wong (Spouse)           —                    RM 150.00    —
-    Kai Wong (Child)            —                    RM 100.00    —
-=================================================================================================================
+ Beneficiary                 Allocated Quota   Spent        Balance Left
+ Employee                    RM 2,000.00       RM 550.00    RM 1,350.00
+ Dependents                  Combined Pool     RM 100.00    Shared
+   Mei Teh (Spouse)          —                 RM  50.00    —
+   Ryan Teh (Child)          —                 RM  50.00    —
 ```
 
 ---
+
+> [!WARNING]
+> **UC6, UC7 and UC8 were removed — they documented invalid product states.**
+>
+> They described `benefitPoolType: "Shared"` combined with an explicit
+> `dependentsPoolType`. That combination is not supported: when the employee
+> pool is shared, dependents are already in it, so a separate dependent pool
+> type is meaningless. `components/host/employees/employee-entitlements-mock.ts`
+> records the matching fixtures (`policyG`/`policyH`/`policyI`, `EMP-0007`–`0009`)
+> as deliberately deleted for the same reason.
+>
+> They are not "not yet built" — do not re-add branches for them.
+
+---
+
 
 ### UC-P: Prorated Individual — No Dependents
 **Marvin McKinney** · `EMP-20260115-0004` · Contract Staff Essentials 2026
@@ -444,7 +319,7 @@ It covers the full **2×4 matrix** of pool types and documents wireframes for ev
 
 ```
 =================================================================================================================
- WELLUBER ADMIN  |  Acme Corporation (ORG-20260115-0001)
+ WELLUBER ADMIN  |  Acme Corporation Sdn Bhd (ORG-20260115-0001)
 -----------------------------------------------------------------------------------------------------------------
   Marvin McKinney  (EMP-20260115-0004)  |  Sales Lead  |  Commercial              [ Edit Employee ]
 =================================================================================================================

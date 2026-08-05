@@ -1,24 +1,43 @@
 # Session Handoff
 
 ## State
-- Address model consolidated (`4599222`): shared `Address` type in `types/address.ts` (line/city/state/postalCode/country + flat lat/lon) adopted across orgs, branches, service providers, employees. Also employee tier roles.
-- `Organization.address` migration now committed on top: type went `address?: Address` + legacy flat `state`/`country` → `address: Address` required; factory/seed populate it; readers updated (`settings/page.tsx`, `organization-card`, `organizations-data-table`); org wizard seeds an empty `address` in `defaultValues`. `pnpm typecheck` + `pnpm lint:design` both clean.
-- E2E suite: `tests/e2e/address-model-verification.spec.ts`, 14 tests. Last full run **12/14 green** — not re-run since the wizard fix.
-- Test setup notes: `proxy.ts` (Next 16's renamed middleware) guards every route — Playwright's `webServer` blanks the Supabase env vars to take the built-in no-credentials bypass. `pnpm dev` and `pnpm test:e2e` cannot run together (both want `.next/dev/lock`). Every test fails its first attempt on a cold Turbopack compile and passes on retry, hence `timeout: 120s`.
-- Entitlement UI is done and shipped (`2590ee5`). Audit's sub-tab nesting P2 and label drift are both resolved — org `TABS` is flat, one Claims surface.
+- Branch `playground`, 2 new commits, **unpushed**: `b22fc73` entitlement consolidation
+  (24 files, −529 net), `e97a4f5` docs (19 files).
+- Entitlement is done: one identity source (`lib/mock-data/employee-identity.ts`), spend
+  derived from claims (`lib/entitlement/derive-usage.ts`), one calculation
+  (`features/employees/entitlement-pool-display.ts`) reached via `entitlement-resolver.ts`,
+  one component (`components/shared/entitlement-pools.tsx`) shared by host + org portal.
+  `employee-entitlements-tab.tsx` 1346 → 52 lines.
+- Docs: `docs/SNAPSHOT-2026-08.md` (system state, gaps, plan) and `docs/flows/`
+  (7 module flows + index, 24 mermaid). `pnpm typecheck` / `lint:design` / `build` clean.
 
 ## Next
-- Re-run `pnpm test:e2e`. ADDRESS-08-01 should pass now; 08-02 / 08-03 have never run (serial mode blocks them).
-- **Mock data identity collision (real, unfixed)**: `EMP-20260115-0001` is Robert Fox in `seed.ts` (`MOCK_EMPLOYEE_UTILISATION`, `MOCK_EMPLOYEES`) but Ahmad Faizal in `factories/organization.ts` (`MOCK_ORG_UTILISATION`), `factories/claim.ts`, `factories/voucher.ts`. Same drift on 0002 / 0004 / 0005. Five parallel datasets, no shared employee identity.
-- `employee-claims-tab.tsx` does `void employeeId` — every employee shows the same 12 claims (RM 3,370). `MOCK_EMPLOYEE_CLAIMS` has no `employeeId` to filter on. Contradicts Robert's RM 300 entitlement spend.
-- `LocationPicker` renders an error message for `line` only — city/postalCode/state/country get a red border and no text. Unfixed.
-- Acme's `"Wilayah Persekutuan"` is not in `LocationPicker`'s state list, so it renders blank if loaded into that form. Unreconciled.
-- Other 4 e2e specs predate the auth bypass and likely still fail in `beforeEach`. Untouched.
+1. **BLOCKED — rotate the Mapbox token before any push.** `gitleaks` found it hardcoded
+   in 5 places in history (`ba26ba5` 2026-04-03, `09d9071` 2026-04-05, +3). Current tree
+   is clean (all four call sites use `process.env.NEXT_PUBLIC_MAPBOX_TOKEN`); history is
+   not. Revoke at account.mapbox.com, reissue URL-restricted. Then decide whether to
+   scrub history (`git filter-repo`) or leave it — dead token is acceptable.
+2. **Restore the gitleaks pre-push hook.** Added in `2ba6f97`, now gone — no `.husky`, no
+   `.git/hooks`, nothing in `package.json`. Binary is installed. This is why the leak
+   surfaced only on a manual check.
+3. **Run `pnpm test:unit` and `pnpm test:e2e` — neither ran this session.** Unit
+   expectations changed: the first `describe` in `entitlement-pool-display.test.ts`
+   asserted against a fixture set that no longer existed and was rewritten per pool kind.
+4. PR target agreed: **whole `playground` branch** (25 commits, 192 files) → `main`.
 
 ## Blockers / decisions
-- Address migration chosen over the smaller "just populate `address`" option to kill the dual source of truth — the compiler immediately found the org wizard writing both shapes.
-- Mock-data consolidation deliberately deferred: it is a large job across seed + 3 factories + `employee-entitlements-mock.ts`. Phase it and get sign-off before editing.
-- Do NOT rename "Benefit Policy" terminology (standing rule).
-- `components/ui/` is shadcn-managed, never edit.
-- Demo logins: `scripts/create-demo-accounts.ts`. Claims/Vouchers tabs stay separate by design.
-- Mock data: no healthcare domains — Retail/Tech/Logistics, flexi benefits.
+- **Open product question**: for `individual` dependent wallets, `summary.allocated`
+  counts only the employee ceiling while `summary.used` includes dependent spend. Ahmad
+  reads 5000/2490/2510 (matches the spec wireframe) but his groups allocate 8600. Needs a
+  decision, not a code fix.
+- **Two dependent ID schemes, unreconciled**: `factories/dependent.ts` emits
+  `DEP-20260115-0001`; entitlement fixtures use `DEP-0002-1`. Biggest remaining data gap.
+- 12 pool combos collapse to **4 kinds**; `benefitPoolType:"Shared"` + explicit
+  `dependentsPoolType` is invalid — UC6–UC8 deleted, do not re-add.
+- Canonical employee identity = `seed.ts` `MOCK_EMPLOYEES`; org names come from the
+  `Organization` entity. Guarded by `tests/unit/mock-identity.test.ts`.
+- Still open: `LocationPicker` error text (only `line` shows a message); Acme's
+  `"Wilayah Persekutuan"` missing from its state list; `entitlements-sub-tab.tsx` bypasses
+  the resolver; employee create + account top-up validate but never persist.
+- Don't rename "Benefit Policy". Never edit `components/ui/`. Claims/Vouchers tabs stay
+  separate. Mock data: Retail/Tech/Logistics, flexi benefits, no healthcare.

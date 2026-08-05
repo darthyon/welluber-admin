@@ -106,13 +106,80 @@ Status colors use Tailwind utilities with `dark:` variants. Never use them for s
 | `AppSidebar` | `components/shared/app-sidebar.tsx` | 240px frosted glass sidebar |
 | `TopBar` | `components/shared/top-bar.tsx` | h-14 frosted glass top bar |
 
+**Layout & detail pages**
+
+| Component | Path | Purpose |
+|---|---|---|
+| `DetailSection` | `components/shared/detail-section.tsx` | Titled section block on detail pages |
+| `DetailField` | `components/shared/detail-field.tsx` | Label + value pair inside a DetailSection |
+| `EntityHeader` | `components/shared/entity-header.tsx` | Detail page header with entity identity |
+| `EntityAvatar` | `components/shared/entity-avatar.tsx` | Avatar/initials for brands, members, orgs |
+| `PortalBreadcrumbs` | `components/shared/portal-breadcrumbs.tsx` | Portal-aware breadcrumb trail |
+| `SegmentedTabs` / `VerticalTabs` | `components/shared/` | Horizontal / vertical tab shells |
+
+**Tables, filtering, lists**
+
+| Component | Path | Purpose |
+|---|---|---|
+| `SharedDataTable` | `components/shared/data-table.tsx` | The table. See `docs/TABLES_AUDIT.md` for cell conventions |
+| `ExpandableDataTable` | `components/shared/expandable-data-table.tsx` | Table with expandable child rows |
+| `DataFilterBar` | `components/shared/data-filter-bar.tsx` | Search + filter row above a table |
+| `FilterItem` / `SearchableFilterItem` / `MultiSelectFilter` | `components/shared/` | Individual filter controls |
+| `AdvancedFilterSheet` | `components/shared/advanced-filter-sheet.tsx` | Slide-over for complex filters |
+| `ViewToggle` | `components/shared/view-toggle.tsx` | Cards ↔ List switch |
+| `ActionPopover` | `components/shared/action-popover.tsx` | Row action menu — table action column header must be `""` |
+| `OverflowTags` | `components/shared/overflow-tags.tsx` | Tag list with "+N more" collapse |
+
+**Forms & inputs**
+
+| Component | Path | Purpose |
+|---|---|---|
+| `FormStepWizard` | `components/shared/form-step-wizard.tsx` | Multi-step form shell |
+| `FormSelect` / `SearchableSelect` / `SearchableMultiSelect` / `SectionedSearchSelect` | `components/shared/` | Select family — pick the narrowest that fits |
+| `CustomCombobox` / `CustomMultiSelect` | `components/shared/` | Free-text combobox variants |
+| `DatePickerField` / `DateTimePickerField` / `MonthPickerField` / `DateRangePicker` | `components/shared/` | Date inputs — do not hand-roll |
+| `IdentificationInput` | `components/shared/identification-input.tsx` | NRIC / passport input |
+| `LogoUpload` / `DocumentUploadSection` | `components/shared/` | File upload patterns |
+| `UnsavedChangesDialog` | `components/shared/unsaved-changes-dialog.tsx` | Guard on navigating away from a dirty form |
+| `ConfirmationModal` | `components/shared/confirmation-modal.tsx` | Destructive/irreversible action confirm |
+
+**Entitlement & utilisation**
+
+| Component | Path | Purpose |
+|---|---|---|
+| `EntitlementPools` | `components/shared/entitlement-pools.tsx` | **The** entitlement view — allocation summary + per-group pools. Used by BOTH host and org portal |
+| `StackedPoolBar` | `components/shared/stacked-pool-bar.tsx` | Segmented pool utilisation bar |
+| `UtilisationClaimsTable` | `components/shared/utilisation-claims-table.tsx` | Allocated/used drill-down with claims |
+| `OrganizationClaimsTable` / `VouchersTable` / `VoucherDetailSheet` | `components/shared/` | Claims and voucher surfaces |
+
 > **Rule:** Before creating a new component, check if a shared one already exists. Before hardcoding a spinner, use `<Spinner>`. Before inline status colors, use `<StatusBadge>`.
+>
+> There are **70 components** in `components/shared/` — the table above is the
+> commonly-needed subset, not the full list. Run `ls components/shared/` before
+> concluding something does not exist.
+
+### 3.1 Entitlement — Read Before Touching
+
+Entitlement was consolidated from 3 calculations and 3 renderers into one of each.
+Do not add a fourth.
+
+- **One calculation:** `features/employees/entitlement-pool-display.ts`. Every
+  pool ceiling and balance is decided here.
+- **One entry point:** `features/employees/entitlement-resolver.ts` —
+  `resolveEmployeeEntitlement(employeeId)`, returns `null` when unassigned.
+- **One view:** `components/shared/entitlement-pools.tsx`, shared by host and org
+  portal so the two cannot disagree.
+- **Spend is derived** from `MOCK_EMPLOYEE_CLAIMS` via
+  `lib/entitlement/derive-usage.ts`. Never hand-type a `spent` or `balance`.
+- **Four pool kinds only** — `employee` / `individual` / `combined` / `shared`.
+  Details in `docs/ENTITLEMENT_PAGE_STRUCTURE_SPEC.md`.
 
 ---
 
 ## 4. File Organization
 
-- Route pages: `app/(host)/`, `app/(org)/`, `app/(serviceprovider)/` — keep thin
+- Route pages: `app/(host)/`, `app/(org)/` — keep thin.
+  `app/(serviceprovider)/` exists but holds only a layout; there is no SP portal yet
 - Business logic: `features/[domain]/`
 - Shared UI: `components/shared/`
 - Persona-specific UI: `components/[persona]/`
