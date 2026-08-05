@@ -57,9 +57,7 @@ export interface Organization {
   };
   status: OrganizationStatus;
   tinNumber: string;
-  address?: Address;
-  state: string;
-  country: string;
+  address: Address;
   bankAccountDetails: {
     bankName: string;
     accountNumber: string;

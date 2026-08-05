@@ -166,15 +166,15 @@ export function OrganizationCard({ org }: OrganizationCardProps) {
                     onClick={(e) => e.stopPropagation()}
                     className="text-body font-semibold text-foreground hover:text-primary transition-colors"
                   >
-                    {formatStateCountry(org.state, org.country)}
+                    {formatStateCountry(org.address.state, org.address.country)}
                   </button>
                 </TooltipTrigger>
                 <TooltipContent className="w-52 bg-card rounded-lg border-border shadow-2xl z-[200] p-2">
                   <div className="flex flex-col gap-0.5">
                     <span className="text-label font-medium text-subtle px-1">State</span>
-                    <span className="text-label text-foreground font-medium px-1 pb-1">{org.state}</span>
+                    <span className="text-label text-foreground font-medium px-1 pb-1">{org.address.state}</span>
                     <span className="text-label font-medium text-subtle px-1">Country</span>
-                    <span className="text-label text-foreground font-medium px-1">{org.country}</span>
+                    <span className="text-label text-foreground font-medium px-1">{org.address.country}</span>
                   </div>
                 </TooltipContent>
               </Tooltip>

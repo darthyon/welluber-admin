@@ -111,7 +111,14 @@ export default function NewOrganizationPage() {
     resolver: zodResolver(
       createOrganizationSchema
     ) as Resolver<CreateOrganizationData>,
-    defaultValues: { type: "sdn_bhd", documents: [] },
+    // address must be seeded: left undefined, zod reports one object-level
+    // error instead of per-field ones, and LocationPicker renders nothing —
+    // the step silently refuses to advance with no visible reason.
+    defaultValues: {
+      type: "sdn_bhd",
+      documents: [],
+      address: { line: "", city: "", state: "", postalCode: "", country: "Malaysia" },
+    },
   })
 
   const industryValue = watch("industry")
@@ -177,17 +184,7 @@ export default function NewOrganizationPage() {
         },
         status: "active",
         tinNumber: pendingOrgData.tinNumber,
-        address: {
-          line: pendingOrgData.address.line,
-          city: pendingOrgData.address.city,
-          state: pendingOrgData.address.state,
-          postalCode: pendingOrgData.address.postalCode,
-          country: pendingOrgData.address.country,
-          lat: pendingOrgData.address.lat,
-          lon: pendingOrgData.address.lon,
-        },
-        state: pendingOrgData.address.state,
-        country: pendingOrgData.address.country,
+        address: { ...pendingOrgData.address },
         bankAccountDetails: pendingOrgData.bankAccountDetails,
         employeeCount: 0,
         picId: null,
