@@ -7,9 +7,13 @@ description: How to scaffold a new feature module
 ## Steps
 
 1. **Create the docs first**
-   - Add or update `docs/flows/flows_[feature].md`
-   - Define the user flow, happy/unhappy paths
-   - Reference `docs/personas/host.md` for permission scope
+   - Add or update `docs/flows/FLOW-[feature].md`, and list it in
+     `docs/flows/README.md`
+   - Define the user flow, happy/unhappy paths, with a mermaid diagram
+   - Mark anything that does not persist — most prototype forms validate but do
+     not write to a store, and the flow doc must say so
+   - For permission scope see `AGENTS.md` (the old `docs/personas/` set was
+     deleted in `5711ca0`)
 
 2. **Create the feature module**
    ```

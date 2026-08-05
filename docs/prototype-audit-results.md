@@ -1,5 +1,13 @@
 # WellUber Admin Console — Prototype Audit Results
 
+> [!NOTE]
+> **Superseded in part — 5 Aug 2026.** This is the July audit's findings and
+> remains the best record of the `framer-motion mode="wait"` investigation.
+> For the current system-wide picture — flows, UI/UX, mock data, plan — read
+> **`docs/SNAPSHOT-2026-08.md`**. Entitlement findings here predate the Aug consolidation
+> (one identity source, one calculation, one component) and are out of date.
+
+
 > **Update (2026-07-20, same session):** the four P0s were fixed and runtime-verified after this audit was written.
 > 1. Policy detail tabs — root cause was `AnimatePresence mode="wait"`: framer-motion exit callbacks never complete in this app, so every keyed swap froze on its first child. The same defect was found and fixed in **8 files**: policy detail view, benefit-policy wizard steps, version wizard steps, employee-card policy carousel, and the Cards/List view toggles on organisations, service-providers, members, and administrators pages (all swapped to CSS `animate-in` keyed divs; verified: all 5 policy tabs, version-wizard step 1→2, org Cards↔List).
 > 2. Policy edit now hydrates from `MOCK_POLICIES` + `MOCK_POLICY_DATA_MAP` when no sessionStorage draft exists (verified prefilled).
