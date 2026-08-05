@@ -293,13 +293,13 @@ interface EmployeeVouchersTabProps {
 }
 
 export function EmployeeVouchersTab({ employeeId }: EmployeeVouchersTabProps) {
-  void employeeId;
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<ClaimStatus | "all">("all");
   const [viewMode, setViewMode] = useState<ViewMode>("list");
 
   const filtered = useMemo(() => {
     return MOCK_EMPLOYEE_VOUCHERS.filter((v) => {
+      if (v.employeeId !== employeeId) return false;
       const matchesSearch =
         !searchQuery ||
         [
@@ -316,7 +316,7 @@ export function EmployeeVouchersTab({ employeeId }: EmployeeVouchersTabProps) {
       const matchesStatus = statusFilter === "all" || v.status === statusFilter;
       return matchesSearch && matchesStatus;
     });
-  }, [searchQuery, statusFilter]);
+  }, [employeeId, searchQuery, statusFilter]);
 
   return (
     <div className="space-y-8">

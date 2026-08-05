@@ -92,6 +92,15 @@ function combinedAllocated(rows: BeneficiaryUsage[]) {
   )
 }
 
+/**
+ * Ceiling for ONE group's shared dependent pool.
+ *
+ * Most specific cap wins: a cap declared on the group beats the policy-wide
+ * dependent ceiling, which beats simply summing what the benefits allocate.
+ *
+ * This is deliberately NOT the same order as
+ * `getSharedDependentPoolCeiling()` below — see the note there.
+ */
 function sharedAllocated(
   policy: BenefitPolicy,
   group: BenefitGroup,
@@ -110,6 +119,60 @@ function sharedAllocated(
     (sum, allocation) => sum + allocation,
     0
   )
+}
+
+/**
+ * Ceiling for the dependent pool ACROSS ALL GROUPS — the figure the allocation
+ * summary shows, not a single group's.
+ *
+ * The precedence inverts on purpose. At group scope the group's own cap is the
+ * more specific rule, so it wins. At policy scope `dependentCapAmount` IS the
+ * total dependent ceiling, so it wins over the sum of the per-group caps —
+ * summing them would over-report whenever groups share one policy-wide pot.
+ */
+export function getSharedDependentPoolCeiling(
+  policy: BenefitPolicy,
+  groups: BenefitGroup[],
+  fallback: number
+) {
+  if (typeof policy.dependentCapAmount === "number")
+    return policy.dependentCapAmount
+
+  const groupCapTotal = groups.reduce(
+    (sum, group) => sum + (group.dependentGroupCap ?? 0),
+    0
+  )
+  if (groupCapTotal > 0) return groupCapTotal
+
+  return fallback
+}
+
+/**
+ * A single group can never allocate more than the policy's own ceiling.
+ *
+ * Only ever lowers the figure, so groups that sit under the cap are untouched.
+ * Without it a combined pool reported the sum of its benefits (e.g. 1,600)
+ * while the policy summary reported the cap (800) — on the same screen.
+ */
+function capToPolicyCeiling(policy: BenefitPolicy, allocated: number) {
+  return typeof policy.totalCapAmount === "number"
+    ? Math.min(allocated, policy.totalCapAmount)
+    : allocated
+}
+
+function coverageKey(relationship?: string) {
+  return relationship?.trim().toLowerCase()
+}
+
+/** Per-dependent-type ceilings from `policy.dependentCoverages[].capAmount`. */
+export function getIndividualDependentCaps(policy: BenefitPolicy) {
+  const caps = new Map<string, number>()
+  for (const coverage of policy.dependentCoverages ?? []) {
+    const key = coverageKey(coverage.type)
+    if (!key || typeof coverage.capAmount !== "number") continue
+    caps.set(key, coverage.capAmount)
+  }
+  return caps
 }
 
 export function buildEntitlementGroupPoolDisplay({
@@ -135,7 +198,7 @@ export function buildEntitlementGroupPoolDisplay({
   const dependentUsed = sumUsage(dependentRows)
 
   if (!dependentRows.length) {
-    const allocated = combinedAllocated(employeeRows)
+    const allocated = capToPolicyCeiling(policy, combinedAllocated(employeeRows))
     return {
       kind: "employee",
       allocated,
@@ -151,8 +214,15 @@ export function buildEntitlementGroupPoolDisplay({
     }
   }
 
-  if (policy.dependentsPoolType === "SharedWithEmployee") {
-    const allocated = combinedAllocated(rows)
+  // `benefitPoolType: "Shared"` is the org-level shared pot: employee and
+  // dependents draw on ONE pool, same as SharedWithEmployee at the group level.
+  // Omitting it made a shared-pot policy fall through to `individual` and
+  // report each beneficiary's share as a separate allocation.
+  if (
+    policy.dependentsPoolType === "SharedWithEmployee" ||
+    policy.benefitPoolType === "Shared"
+  ) {
+    const allocated = capToPolicyCeiling(policy, combinedAllocated(rows))
     const used = employeeUsed + dependentUsed
     return {
       kind: "combined",
@@ -182,7 +252,23 @@ export function buildEntitlementGroupPoolDisplay({
     }
   }
 
-  const beneficiaries = aggregateBeneficiaries(dependentRows, 0, employeeId)
+  // Individual dependent wallets — clamp each beneficiary to the ceiling its
+  // dependent type declares, so a spouse cap cannot be exceeded by summing the
+  // per-benefit allocations.
+  const caps = getIndividualDependentCaps(policy)
+  const beneficiaries = aggregateBeneficiaries(dependentRows, 0, employeeId).map(
+    (beneficiary) => {
+      const cap = caps.get(coverageKey(beneficiary.relationship) ?? "")
+      if (typeof cap !== "number") return beneficiary
+      const allocated = Math.min(beneficiary.allocated, cap)
+      return {
+        ...beneficiary,
+        allocated,
+        left: Math.max(allocated - beneficiary.used, 0),
+      }
+    }
+  )
+
   return {
     kind: "individual",
     allocated: beneficiaries.reduce(

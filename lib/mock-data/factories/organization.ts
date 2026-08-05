@@ -1,6 +1,7 @@
 import type { Organization } from "@/features/organizations/types"
 import type { Address } from "@/types/address"
 import { MALAYSIAN_BANKS } from "@/lib/constants/banks"
+import { requireEmployeeIdentity } from "../employee-identity"
 
 const GENERATED_ORGS = [
   { name: "BrightPath Technologies Sdn Bhd", industry: "Technology", subIndustry: "Cybersecurity", type: "sdn_bhd" as const, plan: "standard" as const, status: "active" as const, empCount: 85, util: 42, state: "Selangor", country: "Malaysia" },
@@ -255,13 +256,12 @@ export function createNewOrganization(overrides: NewOrganizationOverrides = {}):
   }
 }
 
-// Org utilisation rows for detail view
-export const MOCK_ORG_UTILISATION = [
+// Org utilisation rows for detail view.
+// Identity (name / empCode / branch) is resolved from `employee-identity.ts`;
+// only the allocation and claim facts are declared here.
+const ORG_UTILISATION_ROWS = [
   {
-    id: "EMP-20260115-0001",
-    name: "Ahmad Faizal",
-    empCode: "ACM-001",
-    branch: "Kuala Lumpur HQ",
+    employeeId: "EMP-20260115-0001",
     allocated: 650,
     used: 420,
     claims: [
@@ -270,10 +270,7 @@ export const MOCK_ORG_UTILISATION = [
     ],
   },
   {
-    id: "EMP-20260115-0002",
-    name: "Sarah Lim",
-    empCode: "ACM-042",
-    branch: "Subang Jaya",
+    employeeId: "EMP-20260115-0002",
     allocated: 650,
     used: 200,
     claims: [
@@ -281,12 +278,22 @@ export const MOCK_ORG_UTILISATION = [
     ],
   },
   {
-    id: "EMP-20260115-0003",
-    name: "Michael Tan",
-    empCode: "ACM-156",
-    branch: "Penang Office",
+    employeeId: "EMP-20260115-0003",
     allocated: 650,
     used: 0,
     claims: [],
   },
 ]
+
+export const MOCK_ORG_UTILISATION = ORG_UTILISATION_ROWS.map(
+  ({ employeeId, ...row }) => {
+    const identity = requireEmployeeIdentity(employeeId)
+    return {
+      id: identity.id,
+      name: identity.name,
+      empCode: identity.empCode,
+      branch: identity.branch ?? identity.branchId,
+      ...row,
+    }
+  }
+)

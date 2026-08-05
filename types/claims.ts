@@ -16,6 +16,13 @@ export interface Claim {
 
 export interface EmployeeClaim extends Claim {
   benefitGroup: string;
+  /** Whose entitlement this draws from. Required — without it the employee
+   *  Claims tab cannot filter, and every employee shows the same rows. */
+  employeeId: string;
+  /** The employee id, or one of their dependents' (`DEP-…`). */
+  beneficiaryId: string;
+  /** FK -> Benefit.id. Ties the claim to the pool it consumes. */
+  benefitId: string;
 }
 
 export interface EmployeeUtilisationRow {

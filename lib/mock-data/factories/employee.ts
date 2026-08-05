@@ -1,20 +1,5 @@
 import type { Employee, EmploymentType } from "@/features/organizations/types"
-
-const NAMES = [
-  "Ahmad Faizal", "Sarah Lim", "Michael Tan", "Nurul Huda",
-  "Kevin Tan", "Priya Raj", "Robert Fox", "Jenny Wilson",
-  "David Lee", "Aisha Karim", "Chen Wei", "Amir Hassan",
-  "Lisa Wong", "Rajesh Kumar", "Emily Chen", "Faisal Ibrahim",
-  "Siti Aminah", "Jason Ong", "Mei Ling", "Ravi Shankar",
-  "Hannah Park", "Imran Shah", "Yasmin Abdullah", "Daniel Lim",
-  "Natasha Singh", "Omar Hassan", "Chloe Tan", "Vikram Patel",
-  "Sofia Reyes", "Arif Rahman", "Zara Malik", "Benjamin Cho",
-  "Farah Nazri", "Kumar Selvaraj", "Isabella Goh", "Hafizuddin",
-  "Lina Kow", "Ramesh Nair", "Nadia Aziz", "Tariq Jamil",
-  "Grace Ho", "Syed Abbas", "Maya Krishnan", "Fong Wai",
-  "Diana Lee", "Anwar Mokhtar", "Jasmine Teoh", "Sanjay Menon",
-  "Alyssa Tan", "Irfan Yusof",
-]
+import { getEmployeeIdentityByIndex } from "../employee-identity"
 
 // Department + tier configs mirror all MOCK_ORGS
 const DEPARTMENTS_BY_ORG: Record<string, { id: string; name: string }[]> = {
@@ -128,20 +113,6 @@ const TIERS_BY_ORG: Record<string, { id: string; name: string; roles: string[] }
   ],
 }
 
-const ORG_IDS = [
-  "ORG-20260115-0001", "ORG-20260301-0002", "ORG-20260310-0003",
-  "ORG-20260401-0004", "ORG-20260401-0005", "ORG-20260401-0006",
-  "ORG-20260401-0007", "ORG-20260401-0008", "ORG-20260401-0009",
-  "ORG-20260401-0010",
-]
-
-const BRANCH_IDS = [
-  "BR-20260115-0001", "BR-20260301-0001", "BR-20260310-0001",
-  "BR-20260401-0004", "BR-20260401-0005", "BR-20260401-0006",
-  "BR-20260401-0007", "BR-20260401-0008", "BR-20260401-0009",
-  "BR-20260401-0010",
-]
-
 const EMP_TYPES: EmploymentType[] = [
   "full_time", "full_time", "full_time", "part_time", "contract",
   "internship", "full_time", "full_time", "contract", "full_time",
@@ -149,20 +120,22 @@ const EMP_TYPES: EmploymentType[] = [
 
 export function createEmployee(index: number): Employee {
   const n = index + 1
-  const orgIdx = index % ORG_IDS.length
-  const orgId = ORG_IDS[orgIdx]!
+  // Identity (id, name, email, empCode, org, branch) is owned by employee-identity.ts —
+  // never re-derived here, or the directory and the store drift apart again.
+  const identity = getEmployeeIdentityByIndex(index)
+  const orgId = identity.orgId
   const orgDepts = DEPARTMENTS_BY_ORG[orgId] ?? []
   const orgTiers = TIERS_BY_ORG[orgId] ?? []
   const dept = orgDepts.length > 0 ? orgDepts[index % orgDepts.length]! : undefined
   const tier = orgTiers.length > 0 ? orgTiers[index % orgTiers.length]! : undefined
   const role = tier?.roles?.length ? tier.roles[index % tier.roles.length] : undefined
   return {
-    id: `EMP-20260115-${String(n).padStart(4, "0")}`,
+    id: identity.id,
     orgId,
-    branchId: BRANCH_IDS[orgIdx]!,
-    name: NAMES[index] ?? `Employee ${n}`,
-    email: `${(NAMES[index] ?? `employee${n}`).toLowerCase().replace(/\s+/g, ".")}@company.com`,
-    empCode: `EMP-${String(n).padStart(3, "0")}`,
+    branchId: identity.branchId,
+    name: identity.name,
+    email: identity.email,
+    empCode: identity.empCode,
     departmentId: dept?.id,
     department: dept?.name,
     role,

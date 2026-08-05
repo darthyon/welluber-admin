@@ -99,12 +99,12 @@ interface EmployeeClaimsTabProps {
 }
 
 export function EmployeeClaimsTab({ employeeId }: EmployeeClaimsTabProps) {
-  void employeeId;
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<ClaimStatus | "all">("all");
 
   const filteredClaims = useMemo(() => {
     return MOCK_EMPLOYEE_CLAIMS.filter((claim) => {
+      if (claim.employeeId !== employeeId) return false;
       const matchesSearch =
         searchQuery === "" ||
         claim.voucherCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -113,7 +113,7 @@ export function EmployeeClaimsTab({ employeeId }: EmployeeClaimsTabProps) {
       const matchesStatus = statusFilter === "all" || claim.status === statusFilter;
       return matchesSearch && matchesStatus;
     });
-  }, [searchQuery, statusFilter]);
+  }, [employeeId, searchQuery, statusFilter]);
 
   const totalAmount = filteredClaims.reduce((sum, c) => sum + c.amount, 0);
   const confirmedCount = filteredClaims.filter((c) => c.status === "confirmed").length;

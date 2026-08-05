@@ -1,9 +1,24 @@
 import type { Benefit, BenefitGroup, BenefitPolicy } from "@/types/policy"
 import type { BeneficiaryUsage } from "@/features/employees/types"
+import {
+  deriveUsage,
+  type BeneficiaryAllocation,
+} from "@/lib/entitlement/derive-usage"
+import { MOCK_EMPLOYEE_CLAIMS } from "@/lib/mock-data"
+
+/** What a policy GRANTS an employee and their dependents. Allocations only —
+ *  consumption is not declared here, it is folded in from claims. */
+interface AssignedPolicySource {
+  policy: BenefitPolicy
+  groups: BenefitGroup[]
+  benefits: Benefit[]
+  allocations: BeneficiaryAllocation[]
+}
 
 /** One assigned policy + its groups/benefits + the employee's runtime consumption.
  *  Drives the Entitlement → Usage view. Everything but `usage` is the real policy
- *  domain model; `usage` is the consumption overlay. Flexi services only. */
+ *  domain model; `usage` is the consumption overlay, DERIVED from
+ *  `MOCK_EMPLOYEE_CLAIMS` via `deriveUsage()`. Flexi services only. */
 export interface AssignedPolicyEntitlement {
   policy: BenefitPolicy
   groups: BenefitGroup[]
@@ -34,7 +49,7 @@ const AHMAD_CHILD_FIVE = "DEP-0006-6"
 
 // ── Policy A — Employee-only individual pool ──
 const A = "POL-20260115-0001"
-const policyA: AssignedPolicyEntitlement = {
+const policyA: AssignedPolicySource = {
   policy: {
     id: A,
     code: "BEN-ESS-26",
@@ -83,34 +98,28 @@ const policyA: AssignedPolicyEntitlement = {
       coPayment: { required: false, type: "Percentage", value: 0 },
     },
   ],
-  usage: [
+  allocations: [
     {
       beneficiaryId: ROBERT,
       benefitId: `${A}-B1`,
       allocated: 600,
-      balance: 420,
-      spent: 180,
     },
     {
       beneficiaryId: ROBERT,
       benefitId: `${A}-B2`,
       allocated: 500,
-      balance: 500,
-      spent: 0,
     },
     {
       beneficiaryId: ROBERT,
       benefitId: `${A}-B3`,
       allocated: 400,
-      balance: 280,
-      spent: 120,
     },
   ],
 }
 
 // ── Policy B — C2: Individual pool + Individual dependent wallets (Jenny Wilson) ──
 const B = "POL-20260115-0002"
-const policyB: AssignedPolicyEntitlement = {
+const policyB: AssignedPolicySource = {
   policy: {
     id: B,
     code: "BEN-FAM-26",
@@ -181,12 +190,12 @@ const policyB: AssignedPolicyEntitlement = {
       coPayment: { required: true, type: "Percentage", value: 10 },
     },
   ],
-  usage: [
+  allocations: [
     // Employee — her own dedicated wallet
-    { beneficiaryId: JENNY, benefitId: `${B}-B1`, allocated: 300, balance: 120, spent: 180 },
-    { beneficiaryId: JENNY, benefitId: `${B}-B2`, allocated: 200, balance: 160, spent: 40 },
-    { beneficiaryId: JENNY, benefitId: `${B}-B3`, allocated: 400, balance: 280, spent: 120 },
-    { beneficiaryId: JENNY, benefitId: `${B}-B4`, allocated: 400, balance: 320, spent: 80 },
+    { beneficiaryId: JENNY, benefitId: `${B}-B1`, allocated: 300 },
+    { beneficiaryId: JENNY, benefitId: `${B}-B2`, allocated: 200 },
+    { beneficiaryId: JENNY, benefitId: `${B}-B3`, allocated: 400 },
+    { beneficiaryId: JENNY, benefitId: `${B}-B4`, allocated: 400 },
     // Spouse — own dedicated wallet (Individual dep pool)
     {
       beneficiaryId: JENNY_SPOUSE,
@@ -194,8 +203,6 @@ const policyB: AssignedPolicyEntitlement = {
       relationship: "Spouse",
       benefitId: `${B}-B1`,
       allocated: 200,
-      balance: 200,
-      spent: 0,
     },
     {
       beneficiaryId: JENNY_SPOUSE,
@@ -203,8 +210,6 @@ const policyB: AssignedPolicyEntitlement = {
       relationship: "Spouse",
       benefitId: `${B}-B2`,
       allocated: 150,
-      balance: 130,
-      spent: 20,
     },
     // Child — own dedicated wallet (Individual dep pool)
     {
@@ -213,8 +218,6 @@ const policyB: AssignedPolicyEntitlement = {
       relationship: "Child",
       benefitId: `${B}-B1`,
       allocated: 200,
-      balance: 190,
-      spent: 10,
     },
     {
       beneficiaryId: JENNY_CHILD,
@@ -222,15 +225,13 @@ const policyB: AssignedPolicyEntitlement = {
       relationship: "Child",
       benefitId: `${B}-B2`,
       allocated: 150,
-      balance: 150,
-      spent: 0,
     },
   ],
 }
 
 // ── Policy C — C3: Individual pool + SharedWithEmployee (Combined Pool) (Michael Tan) ──
 const C = "POL-20260115-0009"
-const policyC: AssignedPolicyEntitlement = {
+const policyC: AssignedPolicySource = {
   policy: {
     id: C,
     code: "BEN-NUT-03",
@@ -278,10 +279,10 @@ const policyC: AssignedPolicyEntitlement = {
       coPayment: { required: false, type: "Percentage", value: 0 },
     },
   ],
-  usage: [
+  allocations: [
     // Employee — individual wallet
-    { beneficiaryId: MICHAEL, benefitId: `${C}-B1`, allocated: 800, balance: 300, spent: 500 },
-    { beneficiaryId: MICHAEL, benefitId: `${C}-B2`, allocated: 800, balance: 800, spent: 0 },
+    { beneficiaryId: MICHAEL, benefitId: `${C}-B1`, allocated: 800 },
+    { beneficiaryId: MICHAEL, benefitId: `${C}-B2`, allocated: 800 },
     // Dependents — share employee's pool (SharedWithEmployee = Combined Pool)
     // allocated/balance shown as 0; UI renders these as "—"
     {
@@ -290,8 +291,6 @@ const policyC: AssignedPolicyEntitlement = {
       relationship: "Spouse",
       benefitId: `${C}-B1`,
       allocated: 0,
-      balance: 0,
-      spent: 150,
     },
     {
       beneficiaryId: MICHAEL_CHILD,
@@ -299,8 +298,6 @@ const policyC: AssignedPolicyEntitlement = {
       relationship: "Child",
       benefitId: `${C}-B1`,
       allocated: 0,
-      balance: 0,
-      spent: 100,
     },
     {
       beneficiaryId: MICHAEL_SPOUSE,
@@ -308,15 +305,13 @@ const policyC: AssignedPolicyEntitlement = {
       relationship: "Spouse",
       benefitId: `${C}-B2`,
       allocated: 0,
-      balance: 0,
-      spent: 0,
     },
   ],
 }
 
 // ── Policy D — Executive employee pool + individual dependent pools ──
 const D = "POL-20260115-0010"
-const policyD: AssignedPolicyEntitlement = {
+const policyD: AssignedPolicySource = {
   policy: {
     id: D,
     code: "BEN-EXEC-26",
@@ -411,13 +406,11 @@ const policyD: AssignedPolicyEntitlement = {
       dependentCoPayment: { required: true, type: "Percentage", value: 20 },
     },
   ],
-  usage: [
+  allocations: [
     {
       beneficiaryId: AHMAD,
       benefitId: `${D}-B1`,
       allocated: 1500,
-      balance: 900,
-      spent: 600,
     },
     {
       beneficiaryId: AHMAD_SPOUSE,
@@ -425,8 +418,6 @@ const policyD: AssignedPolicyEntitlement = {
       relationship: "Spouse",
       benefitId: `${D}-B1`,
       allocated: 1000,
-      balance: 700,
-      spent: 300,
     },
     {
       beneficiaryId: AHMAD_CHILD,
@@ -434,8 +425,6 @@ const policyD: AssignedPolicyEntitlement = {
       relationship: "Child",
       benefitId: `${D}-B1`,
       allocated: 1000,
-      balance: 1000,
-      spent: 0,
     },
     {
       beneficiaryId: AHMAD_CHILD_TWO,
@@ -443,8 +432,6 @@ const policyD: AssignedPolicyEntitlement = {
       relationship: "Child",
       benefitId: `${D}-B1`,
       allocated: 1000,
-      balance: 820,
-      spent: 180,
     },
     {
       beneficiaryId: AHMAD_CHILD_THREE,
@@ -452,8 +439,6 @@ const policyD: AssignedPolicyEntitlement = {
       relationship: "Child",
       benefitId: `${D}-B1`,
       allocated: 1000,
-      balance: 910,
-      spent: 90,
     },
     {
       beneficiaryId: AHMAD_CHILD_FOUR,
@@ -461,8 +446,6 @@ const policyD: AssignedPolicyEntitlement = {
       relationship: "Child",
       benefitId: `${D}-B1`,
       allocated: 1000,
-      balance: 1000,
-      spent: 0,
     },
     {
       beneficiaryId: AHMAD_CHILD_FIVE,
@@ -470,15 +453,11 @@ const policyD: AssignedPolicyEntitlement = {
       relationship: "Child",
       benefitId: `${D}-B1`,
       allocated: 1000,
-      balance: 650,
-      spent: 350,
     },
     {
       beneficiaryId: AHMAD,
       benefitId: `${D}-B2`,
       allocated: 500,
-      balance: 500,
-      spent: 0,
     },
     {
       beneficiaryId: AHMAD_SPOUSE,
@@ -486,8 +465,6 @@ const policyD: AssignedPolicyEntitlement = {
       relationship: "Spouse",
       benefitId: `${D}-B2`,
       allocated: 500,
-      balance: 300,
-      spent: 200,
     },
     {
       beneficiaryId: AHMAD_CHILD,
@@ -495,15 +472,11 @@ const policyD: AssignedPolicyEntitlement = {
       relationship: "Child",
       benefitId: `${D}-B2`,
       allocated: 500,
-      balance: 500,
-      spent: 0,
     },
     {
       beneficiaryId: AHMAD,
       benefitId: `${D}-B3`,
       allocated: 800,
-      balance: 500,
-      spent: 300,
     },
     {
       beneficiaryId: AHMAD_SPOUSE,
@@ -511,8 +484,6 @@ const policyD: AssignedPolicyEntitlement = {
       relationship: "Spouse",
       benefitId: `${D}-B3`,
       allocated: 400,
-      balance: 400,
-      spent: 0,
     },
     {
       beneficiaryId: AHMAD_CHILD,
@@ -520,15 +491,11 @@ const policyD: AssignedPolicyEntitlement = {
       relationship: "Child",
       benefitId: `${D}-B3`,
       allocated: 400,
-      balance: 300,
-      spent: 100,
     },
     {
       beneficiaryId: AHMAD,
       benefitId: `${D}-B4`,
       allocated: 400,
-      balance: 200,
-      spent: 200,
     },
     {
       beneficiaryId: AHMAD_SPOUSE,
@@ -536,8 +503,6 @@ const policyD: AssignedPolicyEntitlement = {
       relationship: "Spouse",
       benefitId: `${D}-B4`,
       allocated: 200,
-      balance: 200,
-      spent: 0,
     },
     {
       beneficiaryId: AHMAD_CHILD,
@@ -545,15 +510,11 @@ const policyD: AssignedPolicyEntitlement = {
       relationship: "Child",
       benefitId: `${D}-B4`,
       allocated: 200,
-      balance: 150,
-      spent: 50,
     },
     {
       beneficiaryId: AHMAD,
       benefitId: `${D}-B5`,
       allocated: 300,
-      balance: 180,
-      spent: 120,
     },
     {
       beneficiaryId: AHMAD_SPOUSE,
@@ -561,8 +522,6 @@ const policyD: AssignedPolicyEntitlement = {
       relationship: "Spouse",
       benefitId: `${D}-B5`,
       allocated: 200,
-      balance: 200,
-      spent: 0,
     },
     {
       beneficiaryId: AHMAD_CHILD,
@@ -570,15 +529,13 @@ const policyD: AssignedPolicyEntitlement = {
       relationship: "Child",
       benefitId: `${D}-B5`,
       allocated: 200,
-      balance: 200,
-      spent: 0,
     },
   ],
 }
 
 // ── Policy E — C4: Individual pool + Shared dependent pool (Marvin McKinney) ──
 const E = "POL-20260115-0011"
-const policyE: AssignedPolicyEntitlement = {
+const policyE: AssignedPolicySource = {
   policy: {
     id: E,
     code: "BEN-CON-26",
@@ -624,10 +581,10 @@ const policyE: AssignedPolicyEntitlement = {
       coPayment: { required: false, type: "Percentage", value: 0 },
     },
   ],
-  usage: [
+  allocations: [
     // Employee — individual wallet
-    { beneficiaryId: MARVIN, benefitId: `${E}-B1`, allocated: 300, balance: 180, spent: 120 },
-    { beneficiaryId: MARVIN, benefitId: `${E}-B2`, allocated: 300, balance: 300, spent: 0 },
+    { beneficiaryId: MARVIN, benefitId: `${E}-B1`, allocated: 300 },
+    { beneficiaryId: MARVIN, benefitId: `${E}-B2`, allocated: 300 },
     // Dependents — share one pool separately from employee (Shared dep pool)
     // allocated reflects the shared dep cap (400); UI renders sub-rows as "—"
     {
@@ -636,8 +593,6 @@ const policyE: AssignedPolicyEntitlement = {
       relationship: "Spouse",
       benefitId: `${E}-B1`,
       allocated: 400,
-      balance: 250,
-      spent: 80,
     },
     {
       beneficiaryId: MARVIN_CHILD,
@@ -645,15 +600,13 @@ const policyE: AssignedPolicyEntitlement = {
       relationship: "Child",
       benefitId: `${E}-B1`,
       allocated: 400,
-      balance: 250,
-      spent: 70,
     },
   ],
 }
 
 // ── Policy F — C5: Shared family pot — employee + dependents share one pool (Jason Teh) ──
 const F = "POL-20260115-0012"
-const policyF: AssignedPolicyEntitlement = {
+const policyF: AssignedPolicySource = {
   policy: {
     id: F,
     code: "BEN-SCR-26",
@@ -696,18 +649,16 @@ const policyF: AssignedPolicyEntitlement = {
       coPayment: { required: false, type: "Percentage", value: 0 },
     },
   ],
-  usage: [
+  allocations: [
     // All draw from one shared family pot — allocated = total family ceiling
-    { beneficiaryId: JASON, benefitId: `${F}-B1`, allocated: 2000, balance: 1350, spent: 350 },
-    { beneficiaryId: JASON, benefitId: `${F}-B2`, allocated: 2000, balance: 1350, spent: 200 },
+    { beneficiaryId: JASON, benefitId: `${F}-B1`, allocated: 2000 },
+    { beneficiaryId: JASON, benefitId: `${F}-B2`, allocated: 2000 },
     {
       beneficiaryId: JASON_SPOUSE,
       beneficiaryName: "Mei Teh",
       relationship: "Spouse",
       benefitId: `${F}-B1`,
       allocated: 2000,
-      balance: 1350,
-      spent: 50,
     },
     {
       beneficiaryId: JASON_CHILD,
@@ -715,14 +666,12 @@ const policyF: AssignedPolicyEntitlement = {
       relationship: "Child",
       benefitId: `${F}-B1`,
       allocated: 2000,
-      balance: 1350,
-      spent: 50,
     },
   ],
 }
 
 /** One employee → one assigned policy. C1–C5 on rows 1–5 + Ahmad Faizal as extended case. */
-const BY_EMPLOYEE: Record<string, AssignedPolicyEntitlement> = {
+const BY_EMPLOYEE: Record<string, AssignedPolicySource> = {
   "EMP-20260115-0001": policyA, // C1 — Individual pool, no deps (Robert Fox)
   "EMP-20260115-0002": policyB, // C2 — Individual pool, Individual deps (Jenny Wilson)
   "EMP-20260115-0003": policyC, // C3 — Individual pool, SharedWithEmployee / Combined Pool (Michael Tan)
@@ -731,10 +680,23 @@ const BY_EMPLOYEE: Record<string, AssignedPolicyEntitlement> = {
   "EMP-20260115-0006": policyD, // Extended — Individual pool, Individual deps, split amounts (Ahmad Faizal)
 }
 
+/**
+ * The employee's assigned policy with consumption folded in from claims.
+ *
+ * Returns `null` for an employee with no assigned policy. It used to fall back
+ * to `policyA`, so an unknown id silently rendered Robert Fox's entitlement —
+ * callers must handle the empty state instead.
+ */
 export function getEmployeeEntitlement(
   employeeId: string
-): AssignedPolicyEntitlement {
-  return BY_EMPLOYEE[employeeId] ?? policyA
+): AssignedPolicyEntitlement | null {
+  const source = BY_EMPLOYEE[employeeId]
+  if (!source) return null
+  const { allocations, ...rest } = source
+  return {
+    ...rest,
+    usage: deriveUsage(employeeId, MOCK_EMPLOYEE_CLAIMS, allocations),
+  }
 }
 
 // ── REMOVED (invalid cases): policyG, policyH, policyI (EMP-0007–0009) ──

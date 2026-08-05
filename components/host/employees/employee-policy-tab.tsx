@@ -16,7 +16,6 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import { getEmployeeEntitlement } from "./employee-entitlements-mock"
-import { getEmployeeEntitlements } from "@/lib/mock-data/factories/entitlement"
 
 interface EmployeePolicyTabProps {
   employeeId: string
@@ -50,7 +49,7 @@ function formatRefreshCycle(refreshCycle?: string) {
 }
 
 function formatPoolSummary(
-  policy: ReturnType<typeof getEmployeeEntitlement>["policy"]
+  policy: NonNullable<ReturnType<typeof getEmployeeEntitlement>>["policy"]
 ) {
   if (policy.benefitPoolType === "Shared") {
     return {
@@ -76,7 +75,7 @@ function formatPoolSummary(
 }
 
 function formatPoolStructure(
-  policy: ReturnType<typeof getEmployeeEntitlement>["policy"]
+  policy: NonNullable<ReturnType<typeof getEmployeeEntitlement>>["policy"]
 ) {
   const summary = formatPoolSummary(policy)
   return `${summary.label} · ${summary.badge}`
@@ -89,8 +88,23 @@ export function EmployeePolicyTab({
   const [showPolicyModal, setShowPolicyModal] = useState(false)
 
   // Summary reads the same source as the Usage section so the two never drift.
-  const { policy, groups } = getEmployeeEntitlement(employeeId)
-  const entitlementsSummary = getEmployeeEntitlements(employeeId)
+  const entitlement = getEmployeeEntitlement(employeeId)
+
+  if (!entitlement) {
+    return (
+      <div className="rounded-lg border border-dashed border-border p-8 text-center">
+        <p className="text-body font-medium text-foreground">
+          No Benefit Policy Assigned
+        </p>
+        <p className="mt-1 text-label text-muted-foreground">
+          This employee has no assigned benefit policy, so there is no
+          entitlement to display.
+        </p>
+      </div>
+    )
+  }
+
+  const { policy, groups } = entitlement
   const poolSummary = formatPoolSummary(policy)
   const summary = {
     name: policy.name,

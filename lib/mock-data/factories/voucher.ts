@@ -1,23 +1,29 @@
 import type { GeneratedVoucher } from "@/features/voucher-packages/types"
 import type { TopupTransaction } from "@/features/manual-topup/types"
+import { requireEmployeeIdentity } from "../employee-identity"
 
-const GV_ROWS = [
-  { voucherPackageId: "VCH-20260201-0001", voucherPackageName: "Monthly Yoga Pass", code: "PACSP000010001-A1B2", employeeName: "Ahmad Faizal", employeeId: "EMP-20260115-0001", amount: 250, status: "active" as const, generatedAt: "2026-03-01T10:00:00Z", expiresAt: "2026-04-01T10:00:00Z" },
-  { voucherPackageId: "VCH-20260201-0001", voucherPackageName: "Monthly Yoga Pass", code: "PACSP000010001-C3D4", employeeName: "Sarah Lim", employeeId: "EMP-20260115-0002", amount: 250, status: "redeemed" as const, generatedAt: "2026-03-05T09:30:00Z", redeemedAt: "2026-03-15T14:00:00Z", expiresAt: "2026-04-05T09:30:00Z" },
-  { voucherPackageId: "VCH-20260201-0001", voucherPackageName: "Monthly Yoga Pass", code: "PACSP000010001-E5F6", employeeName: "Michael Tan", employeeId: "EMP-20260115-0003", amount: 250, status: "expired" as const, generatedAt: "2026-02-01T10:00:00Z", expiresAt: "2026-03-01T10:00:00Z" },
-  { voucherPackageId: "VCH-20260201-0001", voucherPackageName: "Monthly Yoga Pass", code: "PACSP000010001-G7H8", employeeName: "Nurul Huda", employeeId: "EMP-20260115-0004", amount: 250, status: "cancelled" as const, generatedAt: "2026-03-10T08:00:00Z", expiresAt: "2026-04-10T08:00:00Z" },
-  { voucherPackageId: "VCH-20260201-0002", voucherPackageName: "Individual Therapy Session", code: "PACSP000020001-I9J0", employeeName: "Ahmad Faizal", employeeId: "EMP-20260115-0001", amount: 200, status: "active" as const, generatedAt: "2026-03-12T11:00:00Z", expiresAt: "2026-06-12T11:00:00Z" },
-  { voucherPackageId: "VCH-20260201-0002", voucherPackageName: "Individual Therapy Session", code: "PACSP000020001-K1L2", employeeName: "Kevin Tan", employeeId: "EMP-20260115-0005", amount: 200, status: "redeemed" as const, generatedAt: "2026-02-20T14:00:00Z", redeemedAt: "2026-03-10T10:00:00Z", expiresAt: "2026-05-20T14:00:00Z" },
-  { voucherPackageId: "VCH-20260201-0002", voucherPackageName: "Individual Therapy Session", code: "PACSP000020001-M3N4", employeeName: "Priya Raj", employeeId: "EMP-20260115-0006", amount: 200, status: "active" as const, generatedAt: "2026-04-01T09:00:00Z", expiresAt: "2026-07-01T09:00:00Z" },
-  { voucherPackageId: "VCH-20260201-0001", voucherPackageName: "Monthly Yoga Pass", code: "PACSP000010001-O5P6", employeeName: "Robert Fox", employeeId: "EMP-20260115-0007", amount: 250, status: "active" as const, generatedAt: "2026-04-05T08:00:00Z", expiresAt: "2026-05-05T08:00:00Z" },
-  { voucherPackageId: "VCH-20260201-0002", voucherPackageName: "Individual Therapy Session", code: "PACSP000020001-Q7R8", employeeName: "Jenny Wilson", employeeId: "EMP-20260115-0008", amount: 200, status: "expired" as const, generatedAt: "2026-01-10T10:00:00Z", expiresAt: "2026-04-10T10:00:00Z" },
-  { voucherPackageId: "VCH-20260201-0001", voucherPackageName: "Monthly Yoga Pass", code: "PACSP000010001-S9T0", employeeName: "Ahmad Razif", employeeId: "EMP-20260115-0009", amount: 250, status: "redeemed" as const, generatedAt: "2026-03-20T11:00:00Z", redeemedAt: "2026-04-01T09:00:00Z", expiresAt: "2026-04-20T11:00:00Z" },
+/** Voucher facts only — `employeeName` is resolved from `employee-identity.ts`. */
+const GV_ROWS: Omit<GeneratedVoucher, "id" | "employeeName">[] = [
+  { voucherPackageId: "VCH-20260201-0001", voucherPackageName: "Monthly Yoga Pass", code: "PACSP000010001-A1B2", employeeId: "EMP-20260115-0001", amount: 250, status: "active", generatedAt: "2026-03-01T10:00:00Z", expiresAt: "2026-04-01T10:00:00Z" },
+  { voucherPackageId: "VCH-20260201-0001", voucherPackageName: "Monthly Yoga Pass", code: "PACSP000010001-C3D4", employeeId: "EMP-20260115-0002", amount: 250, status: "redeemed", generatedAt: "2026-03-05T09:30:00Z", redeemedAt: "2026-03-15T14:00:00Z", expiresAt: "2026-04-05T09:30:00Z" },
+  { voucherPackageId: "VCH-20260201-0001", voucherPackageName: "Monthly Yoga Pass", code: "PACSP000010001-E5F6", employeeId: "EMP-20260115-0003", amount: 250, status: "expired", generatedAt: "2026-02-01T10:00:00Z", expiresAt: "2026-03-01T10:00:00Z" },
+  { voucherPackageId: "VCH-20260201-0001", voucherPackageName: "Monthly Yoga Pass", code: "PACSP000010001-G7H8", employeeId: "EMP-20260115-0004", amount: 250, status: "cancelled", generatedAt: "2026-03-10T08:00:00Z", expiresAt: "2026-04-10T08:00:00Z" },
+  { voucherPackageId: "VCH-20260201-0002", voucherPackageName: "Individual Therapy Session", code: "PACSP000020001-I9J0", employeeId: "EMP-20260115-0001", amount: 200, status: "active", generatedAt: "2026-03-12T11:00:00Z", expiresAt: "2026-06-12T11:00:00Z" },
+  { voucherPackageId: "VCH-20260201-0002", voucherPackageName: "Individual Therapy Session", code: "PACSP000020001-K1L2", employeeId: "EMP-20260115-0005", amount: 200, status: "redeemed", generatedAt: "2026-02-20T14:00:00Z", redeemedAt: "2026-03-10T10:00:00Z", expiresAt: "2026-05-20T14:00:00Z" },
+  { voucherPackageId: "VCH-20260201-0002", voucherPackageName: "Individual Therapy Session", code: "PACSP000020001-M3N4", employeeId: "EMP-20260115-0006", amount: 200, status: "active", generatedAt: "2026-04-01T09:00:00Z", expiresAt: "2026-07-01T09:00:00Z" },
+  { voucherPackageId: "VCH-20260201-0001", voucherPackageName: "Monthly Yoga Pass", code: "PACSP000010001-O5P6", employeeId: "EMP-20260115-0007", amount: 250, status: "active", generatedAt: "2026-04-05T08:00:00Z", expiresAt: "2026-05-05T08:00:00Z" },
+  { voucherPackageId: "VCH-20260201-0002", voucherPackageName: "Individual Therapy Session", code: "PACSP000020001-Q7R8", employeeId: "EMP-20260115-0008", amount: 200, status: "expired", generatedAt: "2026-01-10T10:00:00Z", expiresAt: "2026-04-10T10:00:00Z" },
+  { voucherPackageId: "VCH-20260201-0001", voucherPackageName: "Monthly Yoga Pass", code: "PACSP000010001-S9T0", employeeId: "EMP-20260115-0009", amount: 250, status: "redeemed", generatedAt: "2026-03-20T11:00:00Z", redeemedAt: "2026-04-01T09:00:00Z", expiresAt: "2026-04-20T11:00:00Z" },
 ]
 
 export function createGeneratedVoucher(index: number): GeneratedVoucher {
   const n = index + 1
   const row = GV_ROWS[index]!
-  return { id: `GV-20260301-${String(n).padStart(4, "0")}`, ...row }
+  return {
+    id: `GV-20260301-${String(n).padStart(4, "0")}`,
+    ...row,
+    employeeName: requireEmployeeIdentity(row.employeeId).name,
+  }
 }
 
 const ACC_IDS = [
