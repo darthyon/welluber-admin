@@ -1,4 +1,5 @@
 import type { Organization } from "@/features/organizations/types"
+import type { Address } from "@/types/address"
 import { MALAYSIAN_BANKS } from "@/lib/constants/banks"
 
 const GENERATED_ORGS = [
@@ -13,6 +14,24 @@ const GENERATED_ORGS = [
 
 const BANKS = MALAYSIAN_BANKS
 
+/** Plausible city + postcode per state, so generated orgs get a complete address. */
+const STATE_LOCALITY: Record<string, { city: string; postalCode: string }> = {
+  "Selangor": { city: "Petaling Jaya", postalCode: "47800" },
+  "Johor": { city: "Johor Bahru", postalCode: "80000" },
+  "Sarawak": { city: "Kuching", postalCode: "93000" },
+  "Wilayah Persekutuan": { city: "Kuala Lumpur", postalCode: "50450" },
+  "Kuala Lumpur": { city: "Kuala Lumpur", postalCode: "50450" },
+  "Penang": { city: "George Town", postalCode: "10000" },
+  "Putrajaya": { city: "Putrajaya", postalCode: "62000" },
+  "Sabah": { city: "Kota Kinabalu", postalCode: "88000" },
+  "Singapore": { city: "Singapore", postalCode: "018956" },
+}
+
+function buildAddress(line: string, state: string, country: string): Address {
+  const locality = STATE_LOCALITY[state] ?? { city: state, postalCode: "50000" }
+  return { line, city: locality.city, state, postalCode: locality.postalCode, country }
+}
+
 export function createOrganization(index: number): Organization {
   if (index === 0) return {
     id: "ORG-20260115-0001",
@@ -25,8 +44,7 @@ export function createOrganization(index: number): Organization {
     subscription: { plan: "enterprise", billingInformation: "Acme Finance Dept", paymentMethod: "bank_transfer", startDate: "2026-01-15T10:00:00Z", status: "active" },
     status: "active",
     tinNumber: "TR-882910-01",
-    state: "Wilayah Persekutuan",
-    country: "Malaysia",
+    address: { line: "Level 15, Menara Southpoint, Mid Valley City", city: "Kuala Lumpur", state: "Wilayah Persekutuan", postalCode: "59200", country: "Malaysia", lat: 3.1178, lon: 101.6774 },
     bankAccountDetails: { bankName: "Maybank Berhad", accountNumber: "5140 1234 5678", accountName: "Acme Corporation Sdn Bhd" },
     employeeCount: 450,
     picId: "USR-20260101-0001",
@@ -69,8 +87,7 @@ export function createOrganization(index: number): Organization {
     subscription: { plan: "standard", billingInformation: "GT Logistics Finance", paymentMethod: "credit_card", startDate: "2026-03-01T10:00:00Z", status: "active" },
     status: "deactivated",
     tinNumber: "TR-993021-02",
-    state: "Selangor",
-    country: "Malaysia",
+    address: buildAddress("Unit 8-3, Jalan SS 15/4B", "Selangor", "Malaysia"),
     bankAccountDetails: { bankName: "CIMB Bank", accountNumber: "8001 2233 4455", accountName: "Global Tech Solutions" },
     employeeCount: 120,
     picId: null,
@@ -109,8 +126,7 @@ export function createOrganization(index: number): Organization {
     subscription: { plan: "premium", billingInformation: "Nexus Accounts", paymentMethod: "bank_transfer", startDate: "2026-02-10T10:00:00Z", status: "deactivated" },
     status: "deactivated",
     tinNumber: "TR-554433-03",
-    state: "Singapore",
-    country: "Singapore",
+    address: buildAddress("10 Anson Road, International Plaza", "Singapore", "Singapore"),
     bankAccountDetails: { bankName: "Public Bank", accountNumber: "3112 5544 3322", accountName: "Nexus Innovations" },
     employeeCount: 850,
     picId: "USR-20260115-0002",
@@ -146,8 +162,7 @@ export function createOrganization(index: number): Organization {
     subscription: { plan: d.plan, billingInformation: "Finance Dept", paymentMethod: "bank_transfer", startDate: "2026-04-01T10:00:00Z", status: d.status },
     status: d.status,
     tinNumber: `TR-${10000 + g * 111}-0${n}`,
-    state: d.state,
-    country: d.country,
+    address: buildAddress(`Lot ${10 + g}, Jalan Perusahaan ${1 + g}`, d.state, d.country),
     bankAccountDetails: { bankName: BANKS[g % BANKS.length]!, accountNumber: `5140 ${1000 + g} ${5678 + g}`, accountName: d.name },
     employeeCount: d.empCount,
     picId: "USR-20260101-0001",
@@ -186,8 +201,7 @@ interface NewOrganizationOverrides {
   type?: Organization["type"]
   financialYearStart?: string
   tinNumber?: string
-  state?: string
-  country?: string
+  address?: Address
   bankAccountDetails?: Organization["bankAccountDetails"]
   subscription?: Partial<Organization["subscription"]>
   accountLimit?: number
@@ -208,8 +222,7 @@ export function createNewOrganization(overrides: NewOrganizationOverrides = {}):
     type: overrides.type ?? "sdn_bhd",
     financialYearStart: overrides.financialYearStart ?? "2026-01-01T00:00:00Z",
     tinNumber: overrides.tinNumber ?? "",
-    state: overrides.state ?? "Kuala Lumpur",
-    country: overrides.country ?? "Malaysia",
+    address: overrides.address ?? buildAddress("", "Kuala Lumpur", "Malaysia"),
     bankAccountDetails: overrides.bankAccountDetails ?? {
       bankName: "",
       accountNumber: "",

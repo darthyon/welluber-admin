@@ -73,8 +73,8 @@ export const MOCK_DEPARTMENTS = [
 ]
 
 export const MOCK_TIERS = [
-  { id: "TC-001", name: "Executive" },
-  { id: "TC-002", name: "Senior Manager" },
-  { id: "TC-003", name: "Manager" },
-  { id: "TC-004", name: "Associate" },
+  { id: "TC-001", name: "Executive", roles: ["CEO", "CTO", "CFO", "COO"] },
+  { id: "TC-002", name: "Senior Manager", roles: ["Engineering Manager", "Product Manager", "Marketing Manager", "Operations Manager"] },
+  { id: "TC-003", name: "Manager", roles: ["Team Lead", "Project Manager", "Account Manager", "Sales Manager"] },
+  { id: "TC-004", name: "Associate", roles: ["Software Engineer", "Product Designer", "Marketing Specialist", "Business Analyst"] },
 ]

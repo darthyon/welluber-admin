@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { addressFormSchema } from "@/types/address"
 
 // ─── SP Account ───────────────────────────────────────────────────────────────
 
@@ -22,15 +23,7 @@ export const createSpSchema = z.object({
       accountName: z.string().min(1, "Account name is required"),
     })
     .optional(),
-  address: z
-    .object({
-      line: z.string().min(1, "Address is required"),
-      city: z.string().min(1, "City is required"),
-      state: z.string().min(1, "State is required"),
-      country: z.string().min(1, "Country is required"),
-      postalCode: z.string().min(1, "Postal code is required"),
-    })
-    .optional(),
+  address: addressFormSchema.optional(),
   needsEInvoiceSubmission: z.boolean().default(false),
   appointedForEInvoice: z.boolean().default(false),
   expiredCommissionFee: z.number().min(0).default(0),
@@ -45,7 +38,6 @@ export const createSpSchema = z.object({
           .number()
           .min(0, "Rate must be 0 or more")
           .max(1, "Rate cannot exceed 100%"),
-        subsequentLevelQty: z.number().min(0, "Quantity must be 0 or more"),
         subsequentLevelRate: z
           .number()
           .min(0, "Rate must be 0 or more")
@@ -177,15 +169,7 @@ const operatingHoursSchema = z.object({
 export const createBranchSchema = z.object({
   name: z.string().min(1, "Branch name is required"),
   services: z.array(serviceLineSchema).min(1, "Select at least one service"),
-  address: z.object({
-    line: z.string().min(1, "Address is required"),
-    city: z.string().min(1, "City is required"),
-    state: z.string().min(1, "State is required"),
-    country: z.string().min(1, "Country is required"),
-    postalCode: z.string().min(1, "Postal code is required"),
-    lat: z.coerce.number().optional(),
-    lon: z.coerce.number().optional(),
-  }),
+  address: addressFormSchema,
   contacts: z.array(branchContactSchema).min(1, "Add at least one PIC"),
   administrators: z.array(branchAdminSchema).default([]),
   booking: branchBookingSchema,
@@ -326,7 +310,6 @@ export const commissionSchemaSchema = z.object({
       mainService: z.string(),
       firstLevelQty: z.number().min(0),
       firstLevelRate: z.number().min(0).max(1),
-      subsequentLevelQty: z.number().min(0),
       subsequentLevelRate: z.number().min(0).max(1),
       effectiveFrom: z.string().optional(),
     })

@@ -195,6 +195,16 @@ export function DirectorySubTab({ orgId, onBulkUpload }: DirectorySubTabProps) {
                 ),
               },
               {
+                header: "Role",
+                accessorKey: "role",
+                sortable: true,
+                render: (emp) => (
+                  <span className="text-label font-medium text-foreground">
+                    {emp.role || "—"}
+                  </span>
+                ),
+              },
+              {
                 header: "Employment Type",
                 accessorKey: "employmentType",
                 sortable: true,

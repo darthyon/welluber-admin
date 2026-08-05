@@ -88,6 +88,10 @@ export default function OrgEmployeesPage() {
       render: (e) => <span className="text-body text-subtle">{e.tier}</span>,
     },
     {
+      header: "Role",
+      render: (e) => <span className="text-body text-subtle">{e.role || "—"}</span>,
+    },
+    {
       header: "Joined Date",
       render: (e) => <span className="text-label text-subtle font-medium whitespace-nowrap">{e.joinDate}</span>,
     },

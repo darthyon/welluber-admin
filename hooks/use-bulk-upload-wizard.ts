@@ -11,7 +11,7 @@ export type BulkRecord = {
   gender: string
   mobile: string
   department: string
-  role: string
+  role?: string
   date: string
   policies: string
   status: string

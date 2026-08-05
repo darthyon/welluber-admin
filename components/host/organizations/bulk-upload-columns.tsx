@@ -174,7 +174,7 @@ export function buildBulkUploadColumns(args: BuildColumnsArgs): Column<BulkRecor
       header: "Role",
       render: (row) => (
         <EditableCell
-          value={row.role}
+          value={row.role ?? ""}
           onChange={(v) => handleFieldChange(row.id, "role", v)}
           className="text-muted-foreground"
         />

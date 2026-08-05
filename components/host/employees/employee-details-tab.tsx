@@ -32,7 +32,7 @@ interface EmployeeDetailsTabProps {
     employmentType: string;
     nationality: string;
     department: string;
-    designation: string;
+    role?: string;
     tier?: string;
     isProbation?: boolean;
   };
@@ -118,14 +118,14 @@ export function EmployeeDetailsTab({ employee }: EmployeeDetailsTabProps) {
             value={employee.department} 
             icon={<Buildings size={16} />}
           />
-          <DetailField 
-            label="Designation" 
-            value={employee.designation} 
+          <DetailField
+            label="Role"
+            value={employee.role}
             icon={<User size={16} />}
           />
-          <DetailField 
-            label="Tier / Level" 
-            value={employee.tier || "—"} 
+          <DetailField
+            label="Tier"
+            value={employee.tier || "—"}
             icon={<Buildings size={16} />}
           />
           <DetailField 

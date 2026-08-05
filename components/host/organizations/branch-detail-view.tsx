@@ -57,17 +57,15 @@ export function BranchDetailView({
     name: branchId === "br_1" ? "ACME HQ (Kuala Lumpur)" : "ACME Subang Jaya",
     type: branchId === "br_1" ? "Headquarters (HQ)" : "Branch Office",
     status: "Active",
+    timezone: "GMT +8:00",
     address: {
       line: "Level 12, Menara South",
       city: "Kuala Lumpur",
       state: "Wilayah Persekutuan",
       country: "Malaysia",
       postalCode: "50450",
-      timezone: "GMT +8:00",
-      coordinates: {
-        lat: "3.1390",
-        lng: "101.7036",
-      },
+      lat: 3.1390,
+      lon: 101.7036,
     },
   }
 
@@ -139,7 +137,7 @@ export function BranchDetailView({
               </div>
               <DetailField
                 label="Timezone"
-                value={branchData.address.timezone}
+                value={branchData.timezone}
               />
             </div>
           </DetailSection>
@@ -193,7 +191,7 @@ export function BranchDetailView({
                     />
                     <div className="absolute top-0 right-0 flex items-center gap-1.5 rounded-full border border-primary/10 bg-primary/5 px-2 py-0.5 text-label font-medium text-primary/60 opacity-0 transition-all duration-300 select-none group-hover/tz:opacity-100">
                       <Clock size={10} weight="bold" />
-                      <span>{branchData.address.timezone}</span>
+                      <span>{branchData.timezone}</span>
                     </div>
                   </div>
                 </div>
@@ -202,7 +200,7 @@ export function BranchDetailView({
                     label="Latitude"
                     value={
                       <span className="font-mono text-body text-foreground">
-                        {branchData.address.coordinates.lat}
+                        {branchData.address.lat}
                       </span>
                     }
                   />
@@ -210,7 +208,7 @@ export function BranchDetailView({
                     label="Longitude"
                     value={
                       <span className="font-mono text-body text-foreground">
-                        {branchData.address.coordinates.lng}
+                        {branchData.address.lon}
                       </span>
                     }
                   />

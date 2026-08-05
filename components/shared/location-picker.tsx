@@ -11,16 +11,9 @@ import { cn } from "@/lib/utils";
 import { MOCK_LOCATION_SUGGESTIONS } from "@/lib/mock-data";
 import { FormSelect } from "@/components/shared/form-select";
 import { LocationPickerMapPanel } from "@/components/shared/location-picker-map-panel";
+import type { Address } from "@/types/address";
 
-export interface LocationData {
-  line: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  country: string;
-  lat?: number | string;
-  lon?: number | string;
-}
+export type LocationData = Address;
 
 interface LocationPickerProps {
   value: LocationData;
@@ -90,8 +83,8 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
   }, [coordsEditing, latDraft, lonDraft]);
 
   const openCoords = () => {
-    setLatDraft(value.lat !== undefined && value.lat !== "" ? String(value.lat) : "");
-    setLonDraft(value.lon !== undefined && value.lon !== "" ? String(value.lon) : "");
+    setLatDraft(value.lat !== undefined ? String(value.lat) : "");
+    setLonDraft(value.lon !== undefined ? String(value.lon) : "");
     setCoordsEditing(true);
   };
 
@@ -101,9 +94,9 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
     const lon = parseFloat(lonDraft);
     if (Number.isFinite(lat) && Number.isFinite(lon)) {
       const geo = reverseGeocode(lat, lon) ?? {};
-      onChange({ ...value, ...geo, lat: latDraft, lon: lonDraft });
+      onChange({ ...value, ...geo, lat, lon });
     } else {
-      onChange({ ...value, lat: latDraft, lon: lonDraft });
+      onChange({ ...value });
     }
   };
 
@@ -174,8 +167,8 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
         city: "Kuala Lumpur",
         state: "Kuala Lumpur",
         postalCode: "55100",
-        lat: "3.1390",
-        lon: "101.7036"
+        lat: 3.1390,
+        lon: 101.7036
       };
       onChange({ ...value, ...mockResult });
       setIsSearching(false);
@@ -269,8 +262,9 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
 
         <div className="space-y-4">
           <div className="space-y-1.5">
-            <label className="text-body font-medium text-foreground">Street Address <span className="text-destructive">*</span></label>
+            <label htmlFor="address-line" className="text-body font-medium text-foreground">Street Address <span className="text-destructive">*</span></label>
             <input
+              id="address-line"
               value={value.line}
               onChange={(e) => handleChange("line", e.target.value)}
               placeholder="e.g. Lot 1.02, Pavilion KL"
@@ -286,6 +280,7 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
           <div className="space-y-1.5">
             <label className="text-body font-medium text-foreground">Country <span className="text-destructive">*</span></label>
             <FormSelect
+              ariaLabel="Country"
               value={value.country || "Malaysia"}
               onChange={(v) => handleChange("country", v)}
               options={COUNTRIES.map((c) => ({ label: c, value: c }))}
@@ -293,8 +288,9 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-body font-medium text-foreground">Postal Code <span className="text-destructive">*</span></label>
+            <label htmlFor="address-postal-code" className="text-body font-medium text-foreground">Postal Code <span className="text-destructive">*</span></label>
             <input
+              id="address-postal-code"
               value={value.postalCode}
               onChange={(e) => handleChange("postalCode", e.target.value)}
               onBlur={handlePostalBlur}
@@ -306,8 +302,9 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-body font-medium text-foreground">City <span className="text-destructive">*</span></label>
+              <label htmlFor="address-city" className="text-body font-medium text-foreground">City <span className="text-destructive">*</span></label>
               <input
+                id="address-city"
                 value={value.city}
                 onChange={(e) => handleChange("city", e.target.value)}
                 placeholder="Kuala Lumpur"
@@ -317,6 +314,7 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
             <div className="space-y-1.5">
               <label className="text-body font-medium text-foreground">State <span className="text-destructive">*</span></label>
               <FormSelect
+                ariaLabel="State"
                 value={value.state}
                 onChange={(v) => handleChange("state", v)}
                 options={[

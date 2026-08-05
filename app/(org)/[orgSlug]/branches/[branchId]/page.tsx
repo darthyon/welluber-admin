@@ -14,6 +14,7 @@ import { DetailField } from "@/components/shared/detail-field"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { BackButton } from "@/components/shared/back-button"
 import { routes } from "@/lib/navigation"
+import type { Address } from "@/types/address"
 
 type Branch = {
   id: string
@@ -22,7 +23,7 @@ type Branch = {
   accountModel: string
   accountName?: string
   accountId?: string
-  address: { city: string; state: string; street?: string }
+  address: Address
   employeesCount: number
   status: string
   cashBalance: number
@@ -38,7 +39,7 @@ const ACME_BRANCHES: Branch[] = [
     accountModel: "New",
     accountName: "KL HQ Account",
     accountId: "ACC-20260115-0001",
-    address: { city: "Kuala Lumpur", state: "Wilayah Persekutuan", street: "No. 1, Jalan Ampang" },
+    address: { line: "No. 1, Jalan Ampang", city: "Kuala Lumpur", state: "Wilayah Persekutuan", postalCode: "50450", country: "Malaysia" },
     employeesCount: 1240,
     status: "Active",
     cashBalance: 45000,
@@ -52,7 +53,7 @@ const ACME_BRANCHES: Branch[] = [
     accountModel: "Existing",
     accountName: "Acme Shared Account",
     accountId: "ACC-20260115-0002",
-    address: { city: "Subang Jaya", state: "Selangor", street: "No. 5, Jalan SS 15/8" },
+    address: { line: "No. 5, Jalan SS 15/8", city: "Subang Jaya", state: "Selangor", postalCode: "47500", country: "Malaysia" },
     employeesCount: 450,
     status: "Active",
     cashBalance: 12500,
@@ -118,10 +119,10 @@ export default function BranchDetailPage() {
             label="State"
             value={branch.address.state}
           />
-          {branch.address.street && (
+          {branch.address.line && (
             <DetailField
               label="Address"
-              value={branch.address.street}
+              value={branch.address.line}
             />
           )}
           <DetailField

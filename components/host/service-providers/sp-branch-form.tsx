@@ -30,6 +30,7 @@ import { DEFAULT_OPERATING_HOURS } from "@/features/providers/constants"
 import { buildBranchServiceCatalog } from "@/features/providers/service-taxonomy"
 import { SuccessModal } from "@/components/shared/success-modal"
 import { LocationPicker } from "@/components/shared/location-picker"
+import type { Address } from "@/types/address"
 import { ServiceToggleCard } from "@/components/shared/service-toggle-card"
 import {
   FormStepIndicator,
@@ -308,21 +309,19 @@ export function SpBranchForm({
         : "border-border focus:border-foreground/30 focus:bg-muted/30"
     )
 
-  const normalizedAddress = {
+  const normalizedAddress: Address = {
     line: addressValue?.line ?? "",
     city: addressValue?.city ?? "",
     state: addressValue?.state ?? "",
     country: addressValue?.country ?? "Malaysia",
     postalCode: addressValue?.postalCode ?? "",
     lat:
-      typeof addressValue?.lat === "string" ||
-      typeof addressValue?.lat === "number"
-        ? addressValue.lat
+      addressValue?.lat != null && addressValue.lat !== ""
+        ? Number(addressValue.lat)
         : undefined,
     lon:
-      typeof addressValue?.lon === "string" ||
-      typeof addressValue?.lon === "number"
-        ? addressValue.lon
+      addressValue?.lon != null && addressValue.lon !== ""
+        ? Number(addressValue.lon)
         : undefined,
   }
 

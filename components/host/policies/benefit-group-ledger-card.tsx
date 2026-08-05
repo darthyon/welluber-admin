@@ -16,7 +16,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { CaretDown, Info, TreeStructure } from "@phosphor-icons/react"
+import { CaretDown, Info, NotePencil, TreeStructure } from "@phosphor-icons/react"
 import type {
   Benefit,
   BenefitGroup,
@@ -45,12 +45,14 @@ interface BenefitGroupLedgerCardProps {
   policy: BenefitPolicy
   group: BenefitGroup
   benefits: Benefit[]
+  onEdit?: () => void
 }
 
 export function BenefitGroupLedgerCard({
   policy,
   group,
   benefits,
+  onEdit,
 }: BenefitGroupLedgerCardProps) {
   const coverageScope = group.coverageScope ?? "Employee"
 
@@ -59,6 +61,19 @@ export function BenefitGroupLedgerCard({
       title={group.name}
       description={formatGroupMeta(group, coverageScope, benefits.length)}
       icon={<TreeStructure size={18} weight="duotone" />}
+      action={
+        onEdit ? (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onEdit}
+            className="flex h-7 items-center gap-1.5 text-label font-medium text-muted-foreground hover:text-foreground"
+          >
+            <NotePencil size={13} weight="bold" />
+            Edit
+          </Button>
+        ) : undefined
+      }
     >
       <div className="space-y-5">
         {group.description ? (

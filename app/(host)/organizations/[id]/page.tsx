@@ -10,14 +10,12 @@ import {
 } from "@/hooks/use-tab-persistence"
 import { PencilSimpleLine, Plus } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
-import { Breadcrumbs } from "@/components/shared/breadcrumbs"
 import { BranchSheet } from "@/components/host/organizations/branch-sheet"
 import { InviteAdminModal } from "@/components/host/organizations/invite-admin-modal"
 import { Button } from "@/components/ui/button"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { VoucherDetailSheet } from "@/components/shared/voucher-detail-sheet"
 import { EntityAvatar } from "@/components/shared/entity-avatar"
-import { PostAssignPolicyModal } from "@/components/host/organizations/post-assign-policy-modal"
 import { ErrorBoundary } from "@/components/shared/error-boundary"
 import { TabErrorState } from "@/components/shared/tab-error-state"
 import { ProfileTab } from "@/components/host/organizations/tabs/profile-tab"
@@ -31,7 +29,6 @@ import { VouchersTab } from "@/components/host/organizations/tabs/vouchers-tab"
 import { SettingsTab } from "@/components/host/organizations/tabs/settings-tab"
 import {
   TABS,
-  OTHER_ORGS,
   ORG_FTU_ORG_ID,
   type TabId,
   type AssignedPolicy,
@@ -151,8 +148,6 @@ function OrganizationDetailContent() {
   const [assignedPolicies, setAssignedPolicies] = useState<AssignedPolicy[]>(
     buildAssignedPoliciesForOrg(orgId, mockOrg)
   )
-  const [showPostAssignModal, setShowPostAssignModal] = useState(false)
-  const [lastAssignedPolicyName, setLastAssignedPolicyName] = useState("")
   const [selectedVoucherClaim, setSelectedVoucherClaim] =
     useState<FlatClaimRow | null>(null)
 
@@ -162,60 +157,8 @@ function OrganizationDetailContent() {
     policies: assignedPolicies.map((p) => p.name),
   } as import("@/features/organizations/types").Organization
 
-  const handleAssignPolicy = (policyId: string) => {
-    const newPolicy: AssignedPolicy = {
-      id: policyId,
-      organizationId: orgId,
-      name: POLICY_NAMES[policyId] || "Selected Policy",
-      code: `WP-${policyId.split("_")[1]?.toUpperCase() ?? "NEW"}-2026`,
-      description: "Automatically assigned benefit policy.",
-      eligibleEmploymentTypes: ["full-time"],
-      dependentCoverages: [],
-      benefitPoolType: "Individual" as const,
-      utilisationMode: "Fixed" as const,
-      refreshCycle: "Yearly" as const,
-      refreshStartReference: "financial_year" as const,
-      status: "active" as const,
-      assignedTo: "All Branches",
-      employeeCount: 0,
-      lastUpdated: new Date().toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      }),
-    }
-    setAssignedPolicies((prev) => [...prev, newPolicy])
-    setToastMessage("Policy assigned successfully")
-    setLastAssignedPolicyName(newPolicy.name)
-    setShowPostAssignModal(true)
-  }
-
-  const handleUnassignPolicy = (id: string) => {
-    setAssignedPolicies((prev) => prev.filter((p) => p.id !== id))
-    setToastMessage("Policy unassigned from organisation")
-  }
-
   return (
     <div className="pb-12">
-      <PostAssignPolicyModal
-        isOpen={showPostAssignModal}
-        policyName={lastAssignedPolicyName}
-        onAutoMatch={() => {
-          setShowPostAssignModal(false)
-          setActiveTab("employees")
-          setIsBulkUploading("true")
-          setToastMessage(
-            "Opened employee import with policy auto-match suggestion"
-          )
-        }}
-        onManual={() => {
-          setShowPostAssignModal(false)
-          setActiveTab("employees")
-          setToastMessage("Open Employees to assign this policy manually")
-        }}
-        onLater={() => setShowPostAssignModal(false)}
-      />
-
       <BranchSheet
         isOpen={isBranchSheetOpen === "true"}
         onClose={() => setIsBranchSheetOpen(null)}
@@ -231,17 +174,6 @@ function OrganizationDetailContent() {
       {/* Header Banner */}
       <div className="relative z-30 -mx-6 -mt-6 bg-card px-6 pt-6">
         <div className="py-6 lg:px-2">
-          <Breadcrumbs
-            items={[
-              { label: "Organisations", href: "/organizations" },
-              {
-                label: orgName,
-                options: OTHER_ORGS.filter((o) => o.label !== orgName),
-              },
-            ]}
-            className="mb-4"
-          />
-
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
             <div className="flex items-start gap-5">
               <EntityAvatar name={orgName} size="xl" />
@@ -304,7 +236,6 @@ function OrganizationDetailContent() {
                       employeeId: null,
                       bulkUpload: null,
                       subTab: null,
-                      assignPolicy: null,
                       addPolicy: null,
                       viewingPolicyId: null,
                       editingPolicyId: null,
@@ -387,8 +318,6 @@ function OrganizationDetailContent() {
             <PoliciesTab
               orgId={orgId}
               assignedPolicies={assignedPolicies}
-              onAssign={handleAssignPolicy}
-              onUnassign={handleUnassignPolicy}
               onToast={setToastMessage}
             />
           </ErrorBoundary>

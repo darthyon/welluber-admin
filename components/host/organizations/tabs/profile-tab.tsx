@@ -92,13 +92,13 @@ export function ProfileTab({
         <div className="grid grid-cols-1 gap-x-6 gap-y-8 md:grid-cols-2">
           <DetailField
             label="Address Line"
-            value="Level 15, Menara Southpoint, Mid Valley City"
+            value={mockOrg?.address?.line ?? "—"}
           />
           <div className="grid grid-cols-2 gap-4">
-            <DetailField label="Country" value="Malaysia" />
-            <DetailField label="Postal Code" value="59200" />
-            <DetailField label="City" value="Kuala Lumpur" />
-            <DetailField label="State" value="W.P. Kuala Lumpur" />
+            <DetailField label="Country" value={mockOrg?.address?.country ?? "—"} />
+            <DetailField label="Postal Code" value={mockOrg?.address?.postalCode ?? "—"} />
+            <DetailField label="City" value={mockOrg?.address?.city ?? "—"} />
+            <DetailField label="State" value={mockOrg?.address?.state ?? "—"} />
           </div>
         </div>
       </DetailSection>

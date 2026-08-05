@@ -25,14 +25,12 @@ interface AssignedPolicy {
 
 interface AssignedPolicyListProps {
   policies: AssignedPolicy[]
-  onUnassign: (policyId: string) => void
   onView: (policyId: string) => void
   onEdit: (policyId: string) => void
 }
 
 export function AssignedPolicyList({
   policies,
-  onUnassign,
   onView,
   onEdit,
 }: AssignedPolicyListProps) {
@@ -132,11 +130,6 @@ export function AssignedPolicyList({
             actions={[
               { label: "View Policy", onClick: () => onView(policy.id) },
               { label: "Edit Policy", onClick: () => onEdit(policy.id) },
-              {
-                label: "Unassign Policy",
-                isDanger: true,
-                onClick: () => onUnassign(policy.id),
-              },
             ]}
           />
         </div>

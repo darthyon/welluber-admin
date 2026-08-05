@@ -70,7 +70,7 @@ export default function EditOrganizationPage() {
       address: {
         line: "Level 15, Menara Southpoint, Mid Valley City",
         city: "Kuala Lumpur",
-        state: "W.P. Kuala Lumpur",
+        state: "Kuala Lumpur",
         country: "Malaysia",
         postalCode: "59200"
       },

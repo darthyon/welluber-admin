@@ -12,7 +12,6 @@ import {
 import { useServiceTaxonomyStore, ICON_LIBRARY } from "@/hooks/use-service-taxonomy-store";
 import { useTabPersistence } from "@/hooks/use-tab-persistence";
 import { Button } from "@/components/ui/button";
-import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { DetailSection } from "@/components/shared/detail-section";
 import { DetailField } from "@/components/shared/detail-field";
 import { cn } from "@/lib/utils";
@@ -55,14 +54,6 @@ function ServiceCategoryContent({ categoryName }: { categoryName: string }) {
       {/* Full-bleed header — matches org detail page pattern */}
       <div className="relative z-30 -mx-6 -mt-6 bg-card px-6 pt-6">
         <div className="py-6 lg:px-2">
-          <Breadcrumbs
-            items={[
-              { label: "Services", href: "/services" },
-              { label: category.category },
-            ]}
-            className="mb-4"
-          />
-
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
             <div className="flex items-start gap-5">
               {/* Category icon avatar */}

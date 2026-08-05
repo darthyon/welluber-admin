@@ -12,7 +12,6 @@ import {
 } from "@phosphor-icons/react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ConfirmationModal } from "@/components/shared/confirmation-modal";
 import { Button } from "@/components/ui/button";
@@ -32,11 +31,6 @@ const TABS = [
 ] as const;
 
 type TabId = typeof TABS[number]["id"];
-
-const OTHER_SPS = MOCK_SPS.slice(0, 5).map((s) => ({
-  label: s.name,
-  href: `/service-providers/${s.id}`,
-}));
 
 export default function ServiceProviderDetailPage() {
   const params = useParams();
@@ -118,18 +112,10 @@ export default function ServiceProviderDetailPage() {
     },
   } as const;
 
-  const breadcrumbs = [
-    { label: "Service Providers", href: "/service-providers" },
-    { label: sp.name, href: `/service-providers/${sp.id}`, options: OTHER_SPS },
-    { label: TABS.find((t) => t.id === activeTab)?.label ?? "Details" },
-  ];
-
   return (
     <div className="pb-12">
       <div className="bg-card border-b border-border -mx-6 -mt-6 px-6 pt-6 relative z-30">
         <div className="py-6 lg:px-2">
-          <Breadcrumbs items={breadcrumbs} className="mb-4" />
-
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
             <div className="flex items-start gap-5">
               <div className="w-15 h-15 rounded-lg bg-muted/80 flex items-center justify-center text-muted-foreground border border-border/60 transition-all">

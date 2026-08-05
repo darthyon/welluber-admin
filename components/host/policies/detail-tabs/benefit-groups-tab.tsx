@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { EmptyState } from "@/components/shared/empty-state"
 import { BenefitGroupLedgerCard } from "../benefit-group-ledger-card"
-import { NotePencil, TreeStructure } from "@phosphor-icons/react"
+import { NotePencil, Plus, TreeStructure } from "@phosphor-icons/react"
 import type { Benefit, BenefitGroup, BenefitPolicy } from "@/types/policy"
 
 interface BenefitGroupsTabProps {
@@ -55,8 +55,8 @@ export function BenefitGroupsTab({
           onClick={editGroups}
           className="flex h-8 items-center gap-2 text-label font-medium"
         >
-          <NotePencil size={14} weight="bold" />
-          Edit Groups
+          <Plus size={14} weight="bold" />
+          Add Group
         </Button>
       </div>
 
@@ -72,6 +72,7 @@ export function BenefitGroupsTab({
               benefits={benefits.filter(
                 (benefit) => benefit.groupId === group.id
               )}
+              onEdit={editGroups}
             />
           ))}
         </div>

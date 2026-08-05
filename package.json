@@ -12,6 +12,7 @@
     "lint:design": "node .agents/scripts/design-lint.js",
     "format": "prettier --write \"**/*.{ts,tsx}\"",
     "test:unit": "vitest run",
+    "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit",
     "check:policy": "tsx scripts/check-policy-integrity.ts",
     "setup:worktree": "bash scripts/worktree-setup.sh"

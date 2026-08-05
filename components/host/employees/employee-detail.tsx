@@ -67,7 +67,7 @@ export function EmployeeDetail({ employee, onEdit }: EmployeeDetailProps) {
                 </h2>
               </div>
               <p className="mt-1 text-body font-medium text-muted-foreground">
-                {[employee.designation, employee.department, employee.tier]
+                {[employee.role, employee.department, employee.tier]
                   .filter(Boolean)
                   .join(" • ")}
               </p>
@@ -126,7 +126,7 @@ export function EmployeeDetail({ employee, onEdit }: EmployeeDetailProps) {
               employmentType: employee.employmentType || "—",
               nationality: employee.nationality,
               department: employee.department || "—",
-              designation: employee.designation,
+              role: employee.role,
               tier: employee.tier,
               isProbation: employee.isProbation,
             }}

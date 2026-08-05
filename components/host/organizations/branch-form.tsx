@@ -19,20 +19,13 @@ import {
 } from "@/components/shared/form-step-wizard"
 import { LocationPicker } from "@/components/shared/location-picker"
 import type { LocationData } from "@/components/shared/location-picker"
+import type { Address } from "@/types/address"
 import { SuccessCelebration } from "@/components/shared/success-celebration"
 import { MOCK_ACCOUNTS } from "@/lib/mock-data"
 
 export interface BranchFormData {
   name: string
-  address: {
-    city: string
-    country: string
-    lat: string
-    line: string
-    lon: string
-    postalCode: string
-    state: string
-  }
+  address: Address
 }
 
 interface BranchFormProps {
@@ -88,9 +81,9 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
     address: {
       city: branchId ? "Kuala Lumpur" : "",
       country: "Malaysia",
-      lat: branchId ? "3.1390" : "",
+      lat: branchId ? 3.1390 : undefined,
       line: branchId ? "Level 12, Menara South" : "",
-      lon: branchId ? "101.7036" : "",
+      lon: branchId ? 101.7036 : undefined,
       postalCode: branchId ? "55100" : "",
       state: branchId ? "Wilayah Persekutuan" : "",
     },
@@ -316,12 +309,12 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
                       })
                       setValue(
                         "address.lat",
-                        addr.lat !== undefined ? String(addr.lat) : "",
+                        addr.lat !== undefined ? Number(addr.lat) : undefined,
                         { shouldDirty: true }
                       )
                       setValue(
                         "address.lon",
-                        addr.lon !== undefined ? String(addr.lon) : "",
+                        addr.lon !== undefined ? Number(addr.lon) : undefined,
                         { shouldDirty: true }
                       )
                     }}

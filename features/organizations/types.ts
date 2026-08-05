@@ -5,21 +5,15 @@ export type OrganizationSubscription = "standard" | "premium" | "enterprise";
 // ISO 8601 Date String
 export type ISODate = string;
 
+import type { Address } from "@/types/address";
+
 export interface OrganizationBranch {
   id: string;
   orgId: string;
   branchCode: string;
   name: string;
   type: "hq" | "branch";
-  address: {
-    line: string;
-    city: string;
-    state: string;
-    country: string;
-    postalCode: string;
-    lat?: number;
-    lon?: number;
-  };
+  address: Address;
   timezone: string;
   active: boolean;
   pics: {
@@ -63,8 +57,7 @@ export interface Organization {
   };
   status: OrganizationStatus;
   tinNumber: string;
-  state: string;
-  country: string;
+  address: Address;
   bankAccountDetails: {
     bankName: string;
     accountNumber: string;
@@ -93,6 +86,7 @@ export interface OrgTierConfig {
   id: string;
   name: string;
   code?: string;
+  roles?: string[];
 }
 
 export interface OrgDepartmentConfig {

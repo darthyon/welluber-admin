@@ -110,11 +110,11 @@ export default function OrgSettingsPage() {
           )}
           <DetailField
             label="State"
-            value={org.state}
+            value={org.address.state}
           />
           <DetailField
             label="Country"
-            value={org.country}
+            value={org.address.country}
           />
         </div>
       </DetailSection>

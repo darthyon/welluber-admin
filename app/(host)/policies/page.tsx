@@ -198,8 +198,6 @@ function PoliciesContent() {
             initialTab={(activeTabParam as TabId | null) ?? "overview"}
             onEdit={() => router.push(`/policies/${policy.id}/edit?source=global`)}
             onClone={() => handleClone(policy)}
-            onDeactivate={() => handleDeactivate(policy)}
-            onDelete={() => handleDelete(policy)}
             onEditVersion={(versionId) =>
               router.push(`/policies/${versionId}/edit?source=global`)
             }

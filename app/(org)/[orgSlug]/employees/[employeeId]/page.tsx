@@ -2,6 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation"
 import {
+  User,
   Users,
   Envelope,
   Buildings,
@@ -85,6 +86,11 @@ export default function EmployeeDetailPage() {
             label="Tier"
             value={employee.tier}
             icon={<IdentificationCard size={14} weight="duotone" />}
+          />
+          <DetailField
+            label="Role"
+            value={employee.role || "—"}
+            icon={<User size={14} weight="duotone" />}
           />
           <DetailField
             label="Employment Type"

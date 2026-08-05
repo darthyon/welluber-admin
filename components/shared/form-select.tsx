@@ -29,6 +29,8 @@ interface FormSelectProps {
   size?: "xs" | "sm" | "default";
   error?: boolean;
   searchable?: boolean;
+  /** Accessible name for the trigger when no associated <label> can point at it. */
+  ariaLabel?: string;
 }
 
 export function FormSelect({
@@ -42,6 +44,7 @@ export function FormSelect({
   size = "default",
   error,
   searchable,
+  ariaLabel,
 }: FormSelectProps) {
   const validOptions = options.filter((opt) => opt.value !== "");
   const isSearchable = searchable ?? validOptions.length > SEARCH_THRESHOLD;
@@ -67,6 +70,7 @@ export function FormSelect({
     <Select value={value || ""} onValueChange={onChange} disabled={disabled}>
       <SelectTrigger
         size={size}
+        aria-label={ariaLabel}
         className={cn(
           "w-full px-3 py-2 bg-background border border-border rounded-lg font-medium text-foreground transition-all",
           size === "xs" ? "text-xs" : "text-body",

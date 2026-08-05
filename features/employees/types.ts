@@ -14,6 +14,7 @@ export interface EmployeeDirectoryItem {
   department?: string
   tierId?: string
   tier?: string
+  role?: string
   employmentType?: string
   benefitPolicies: {
     /** FK — canonical reference to BenefitPolicy.id */
@@ -44,7 +45,6 @@ export interface EmployeeDetailRecord extends EmployeeDirectoryItem {
   idNumber: string
   mobile: string
   nationality: string
-  designation: string
   gender?: string
   residencyStatus?: string
   isProbation?: boolean
