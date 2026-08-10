@@ -139,7 +139,10 @@ export function EmployeeDetail({ employee, onEdit }: EmployeeDetailProps) {
               employeeId={employee.id}
               employeeName={employee.name}
             />
-            <EmployeeEntitlementsTab employeeId={employee.id} />
+            <EmployeeEntitlementsTab
+              employeeId={employee.id}
+              employeeName={employee.name}
+            />
           </div>
         )}
 

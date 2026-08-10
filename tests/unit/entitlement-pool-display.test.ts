@@ -1,9 +1,15 @@
 import { describe, expect, it } from "vitest"
 import {
   buildEntitlementGroupPoolDisplay,
+  getIndividualDependentPoolCeiling,
   getSharedDependentPoolCeiling,
 } from "@/features/employees/entitlement-pool-display"
 import { getEmployeeEntitlement } from "@/components/host/employees/employee-entitlements-mock"
+import {
+  buildEntitlementAllocationDetail,
+  buildEntitlementServiceAllocation,
+  resolveEmployeeEntitlement,
+} from "@/features/employees/entitlement-resolver"
 
 function entitlementFor(employeeId: string) {
   const entitlement = getEmployeeEntitlement(employeeId)
@@ -41,10 +47,10 @@ describe("entitlement pool display model — one kind per policy shape", () => {
     const display = groupDisplay("EMP-20260115-0002")
 
     expect(display?.kind).toBe("individual")
-    expect(display?.beneficiaries).toHaveLength(2)
+    expect(display?.beneficiaries).toHaveLength(3)
     expect(
       display?.beneficiaries.map((beneficiary) => beneficiary.name)
-    ).toEqual(["Daniel Wilson", "Emma Wilson"])
+    ).toEqual(["Employee", "Daniel Wilson", "Emma Wilson"])
   })
 
   it("combined: employee and dependents draw on one pot", () => {
@@ -64,16 +70,16 @@ describe("entitlement pool display model — one kind per policy shape", () => {
 
     expect(display).toMatchObject({
       kind: "shared",
-      allocated: 400,
-      used: 150,
-      left: 250,
+      allocated: 1000,
+      used: 270,
+      left: 730,
+      employeeAllocated: 600,
+      dependentAllocated: 400,
       employeeUsed: 120,
     })
     expect(
-      display?.beneficiaries.every(
-        (beneficiary) => beneficiary.beneficiaryType === "dependent"
-      )
-    ).toBe(true)
+      display?.beneficiaries.map((beneficiary) => beneficiary.name)
+    ).toEqual(["Employee", "Linda McKinney", "Tyler McKinney"])
   })
 
   it("treats benefitPoolType 'Shared' as a combined pot, not individual wallets", () => {
@@ -152,41 +158,269 @@ describe("dependent pool ceiling precedence", () => {
   })
 
   it("falls back to the supplied allocation when no cap is declared", () => {
-    const ceiling = getSharedDependentPoolCeiling(base as never, [] as never, 250)
+    const ceiling = getSharedDependentPoolCeiling(
+      base as never,
+      [] as never,
+      250
+    )
     expect(ceiling).toBe(250)
+  })
+})
+
+describe("policy-level total allocation", () => {
+  it("adds independent dependent wallets once per beneficiary", () => {
+    const entitlement = entitlementFor("EMP-20260115-0006")
+
+    expect(
+      getIndividualDependentPoolCeiling(entitlement.policy, entitlement.usage)
+    ).toBe(7600)
+  })
+
+  it("keeps combined pools at one shared ceiling", () => {
+    expect(
+      resolveEmployeeEntitlement("EMP-20260115-0003")?.summary
+    ).toMatchObject({
+      allocated: 800,
+      used: 750,
+      left: 50,
+    })
+  })
+
+  it("adds a separate shared dependent ceiling to the employee ceiling", () => {
+    expect(
+      resolveEmployeeEntitlement("EMP-20260115-0004")?.summary
+    ).toMatchObject({
+      allocated: 1000,
+      used: 270,
+      left: 730,
+    })
+  })
+
+  it("includes individual dependent wallets in the total", () => {
+    expect(
+      resolveEmployeeEntitlement("EMP-20260115-0002")?.summary
+    ).toMatchObject({
+      allocated: 2200,
+      used: 450,
+      left: 1750,
+    })
   })
 })
 
 describe("employee entitlement summary segments across all profiles", () => {
   it("builds correct segments for Robert Fox (EMP-0001: Employee only, no dependents)", () => {
     const entitlement = entitlementFor("EMP-20260115-0001")
-    const employeeSpent = entitlement.usage.filter(u => !u.relationship).reduce((s, u) => s + u.spent, 0)
-    const dependentSpent = entitlement.usage.filter(u => u.relationship).reduce((s, u) => s + u.spent, 0)
+    const employeeSpent = entitlement.usage
+      .filter((u) => !u.relationship)
+      .reduce((s, u) => s + u.spent, 0)
+    const dependentSpent = entitlement.usage
+      .filter((u) => u.relationship)
+      .reduce((s, u) => s + u.spent, 0)
     expect(employeeSpent).toBeGreaterThan(0)
     expect(dependentSpent).toBe(0)
   })
 
   it("builds correct 2-tone segments for Jenny Wilson (EMP-0002: Individual dependent wallets)", () => {
     const entitlement = entitlementFor("EMP-20260115-0002")
-    const employeeSpent = entitlement.usage.filter(u => !u.relationship).reduce((s, u) => s + u.spent, 0)
-    const dependentSpent = entitlement.usage.filter(u => u.relationship).reduce((s, u) => s + u.spent, 0)
+    const employeeSpent = entitlement.usage
+      .filter((u) => !u.relationship)
+      .reduce((s, u) => s + u.spent, 0)
+    const dependentSpent = entitlement.usage
+      .filter((u) => u.relationship)
+      .reduce((s, u) => s + u.spent, 0)
     expect(employeeSpent).toBe(420)
     expect(dependentSpent).toBe(30)
   })
 
   it("builds correct 2-tone segments for Michael Tan (EMP-0003: Combined pool)", () => {
     const entitlement = entitlementFor("EMP-20260115-0003")
-    const employeeSpent = entitlement.usage.filter(u => !u.relationship).reduce((s, u) => s + u.spent, 0)
-    const dependentSpent = entitlement.usage.filter(u => u.relationship).reduce((s, u) => s + u.spent, 0)
+    const employeeSpent = entitlement.usage
+      .filter((u) => !u.relationship)
+      .reduce((s, u) => s + u.spent, 0)
+    const dependentSpent = entitlement.usage
+      .filter((u) => u.relationship)
+      .reduce((s, u) => s + u.spent, 0)
     expect(employeeSpent).toBe(500)
     expect(dependentSpent).toBe(250)
   })
 
   it("builds correct 2-tone segments for Ahmad Faizal (EMP-0006: 6 Dependents)", () => {
     const entitlement = entitlementFor("EMP-20260115-0006")
-    const employeeSpent = entitlement.usage.filter(u => !u.relationship).reduce((s, u) => s + u.spent, 0)
-    const dependentSpent = entitlement.usage.filter(u => u.relationship).reduce((s, u) => s + u.spent, 0)
+    const employeeSpent = entitlement.usage
+      .filter((u) => !u.relationship)
+      .reduce((s, u) => s + u.spent, 0)
+    const dependentSpent = entitlement.usage
+      .filter((u) => u.relationship)
+      .reduce((s, u) => s + u.spent, 0)
     expect(employeeSpent).toBe(1220)
     expect(dependentSpent).toBe(1270)
+  })
+})
+
+describe("entitlement allocation detail rows", () => {
+  it("keeps the overall employee and dependent rows in one individual view", () => {
+    const entitlement = resolveEmployeeEntitlement("EMP-20260115-0002")
+    if (!entitlement) throw new Error("Expected entitlement")
+
+    const detail = buildEntitlementAllocationDetail(
+      entitlement,
+      { type: "overall" },
+      "Jenny Wilson"
+    )
+
+    expect(detail.kind).toBe("individual")
+    expect(detail.summary).toMatchObject({
+      allocated: 2200,
+      used: 450,
+      left: 1750,
+    })
+    expect(detail.rows.map((row) => row.name)).toEqual([
+      "Jenny Wilson",
+      "Daniel Wilson",
+      "Emma Wilson",
+    ])
+    expect(detail.rows.slice(1).every((row) => row.allocated !== null)).toBe(
+      true
+    )
+  })
+
+  it("does not create duplicate balances for shared and combined dependents", () => {
+    const shared = resolveEmployeeEntitlement("EMP-20260115-0004")
+    const combined = resolveEmployeeEntitlement("EMP-20260115-0003")
+    if (!shared || !combined) throw new Error("Expected entitlements")
+
+    const sharedDetail = buildEntitlementAllocationDetail(
+      shared,
+      { type: "overall" },
+      "Ahmad Faizal"
+    )
+    const combinedDetail = buildEntitlementAllocationDetail(
+      combined,
+      { type: "overall" },
+      "Michael Tan"
+    )
+
+    expect(
+      sharedDetail.rows.slice(1).every((row) => row.allocated === null)
+    ).toBe(true)
+    expect(
+      combinedDetail.rows.slice(1).every((row) => row.allocated === null)
+    ).toBe(true)
+    expect(sharedDetail.summary.allocated).toBe(1000)
+    expect(combinedDetail.summary.allocated).toBe(800)
+  })
+
+  it("builds a service-scoped detail view from the same usage rows", () => {
+    const entitlement = resolveEmployeeEntitlement("EMP-20260115-0004")
+    if (!entitlement) throw new Error("Expected entitlement")
+    const group = entitlement.groups[0]!
+    const benefit = entitlement.benefits.find(
+      (candidate) => candidate.groupId === group.id
+    )
+    if (!benefit) throw new Error("Expected benefit")
+
+    const detail = buildEntitlementAllocationDetail(
+      entitlement,
+      { type: "service", groupId: group.id, benefitId: benefit.id },
+      "Ahmad Faizal"
+    )
+
+    expect(detail.scope).toEqual({
+      type: "service",
+      groupId: group.id,
+      benefitId: benefit.id,
+    })
+    expect(detail.rows[0]).toMatchObject({
+      name: "Ahmad Faizal",
+      beneficiaryType: "employee",
+    })
+    expect(detail.rows.some((row) => row.beneficiaryType === "dependent")).toBe(
+      true
+    )
+  })
+
+  it("keeps each eligible person visible in a combined service allocation", () => {
+    const entitlement = resolveEmployeeEntitlement("EMP-20260115-0003")
+    if (!entitlement) throw new Error("Expected entitlement")
+    const group = entitlement.groups[0]!
+    const benefit = entitlement.benefits.find(
+      (candidate) => candidate.groupId === group.id
+    )
+    if (!benefit) throw new Error("Expected benefit")
+
+    const allocation = buildEntitlementServiceAllocation(
+      entitlement,
+      group.id,
+      benefit.id,
+      "Michael Tan"
+    )
+
+    expect(allocation.rows.map((row) => row.name)).toEqual([
+      "Michael Tan",
+      "Adam Tan",
+      "Siti Rahmah",
+    ])
+    expect(allocation.summary).toMatchObject({
+      allocated: 800,
+      used: 750,
+      left: 50,
+    })
+    expect(
+      allocation.rows
+        .filter((row) => row.beneficiaryType === "dependent")
+        .every((row) => row.allocated === null && row.balance === null)
+    ).toBe(true)
+  })
+
+  it("keeps a shared dependent service pool from being counted once per dependent", () => {
+    const entitlement = resolveEmployeeEntitlement("EMP-20260115-0004")
+    if (!entitlement) throw new Error("Expected entitlement")
+    const group = entitlement.groups[0]!
+    const benefit = entitlement.benefits.find(
+      (candidate) => candidate.groupId === group.id
+    )
+    if (!benefit) throw new Error("Expected benefit")
+
+    const allocation = buildEntitlementServiceAllocation(
+      entitlement,
+      group.id,
+      benefit.id,
+      "Marvin McKinney"
+    )
+
+    expect(allocation.rows.map((row) => row.name)).toEqual([
+      "Marvin McKinney",
+      "Linda McKinney",
+      "Tyler McKinney",
+    ])
+    expect(allocation.summary.dependentAllocated).toBe(400)
+    expect(
+      allocation.rows
+        .filter((row) => row.beneficiaryType === "dependent")
+        .every((row) => row.allocated === null && row.balance === null)
+    ).toBe(true)
+  })
+
+  it("includes eligible benefit groups and services on overall person rows", () => {
+    const entitlement = resolveEmployeeEntitlement("EMP-20260115-0003")
+    if (!entitlement) throw new Error("Expected entitlement")
+
+    const detail = buildEntitlementAllocationDetail(
+      entitlement,
+      { type: "overall" },
+      "Michael Tan"
+    )
+
+    expect(detail.rows[0]?.benefitGroups).toEqual([
+      {
+        groupId: "POL-20260115-0009-G1",
+        groupName: "Nutrition & Recovery",
+        serviceNames: ["Nutritional Counselling", "Sports Recovery"],
+      },
+    ])
+    expect(detail.rows[1]?.benefitGroups[0]?.serviceNames).toEqual([
+      "Nutritional Counselling",
+      "Sports Recovery",
+    ])
   })
 })

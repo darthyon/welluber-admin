@@ -1,12 +1,11 @@
 "use client"
 
-import { ArrowClockwise } from "@phosphor-icons/react"
-import { Button } from "@/components/ui/button"
 import { EntitlementPools } from "@/components/shared/entitlement-pools"
 import { resolveEmployeeEntitlement } from "@/features/employees/entitlement-resolver"
 
 interface EmployeeEntitlementsTabProps {
   employeeId: string
+  employeeName?: string
 }
 
 /**
@@ -20,6 +19,7 @@ interface EmployeeEntitlementsTabProps {
  */
 export function EmployeeEntitlementsTab({
   employeeId,
+  employeeName,
 }: EmployeeEntitlementsTabProps) {
   const entitlement = resolveEmployeeEntitlement(employeeId)
 
@@ -38,15 +38,9 @@ export function EmployeeEntitlementsTab({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-title font-semibold text-foreground">Usage</h2>
-        <Button variant="outline" size="sm" className="h-9 gap-2 font-medium">
-          <ArrowClockwise size={14} weight="bold" />
-          Refresh All
-        </Button>
-      </div>
+      <h2 className="text-title font-semibold text-foreground">Usage</h2>
 
-      <EntitlementPools entitlement={entitlement} />
+      <EntitlementPools employeeName={employeeName} entitlement={entitlement} />
     </div>
   )
 }

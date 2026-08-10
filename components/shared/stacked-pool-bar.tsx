@@ -27,7 +27,10 @@ export function StackedPoolBar({
   className,
 }: StackedPoolBarProps) {
   const totalSpent = segments.reduce((s, seg) => s + seg.spent, 0)
-  const pct = allocated > 0 ? Math.min(Math.round((totalSpent / allocated) * 100), 100) : 0
+  const pct =
+    allocated > 0
+      ? Math.min(Math.round((totalSpent / allocated) * 100), 100)
+      : 0
   const legend = showLegend ?? segments.length > 1
 
   return (
@@ -35,11 +38,15 @@ export function StackedPoolBar({
       <div className="flex items-center gap-2">
         <div className="relative flex h-2 w-full overflow-hidden rounded-full bg-muted">
           {segments.map((seg, i) => {
-            const w = allocated > 0 ? Math.min((seg.spent / allocated) * 100, 100) : 0
+            const w =
+              allocated > 0 ? Math.min((seg.spent / allocated) * 100, 100) : 0
             return (
               <div
                 key={i}
-                className={cn("h-full transition-all duration-700", seg.className)}
+                className={cn(
+                  "h-full transition-all duration-700",
+                  seg.className
+                )}
                 style={{ width: `${w}%` }}
               />
             )
@@ -47,11 +54,11 @@ export function StackedPoolBar({
         </div>
         <span
           className={cn(
-            "shrink-0 whitespace-nowrap pl-1 text-right text-micro font-medium tabular-nums",
+            "shrink-0 pl-1 text-right text-micro font-medium whitespace-nowrap tabular-nums",
             pct > 80 ? "text-rose-600 dark:text-rose-400" : "text-foreground"
           )}
         >
-          {pct}% Utilised
+          {pct}% Used
         </span>
       </div>
       {legend && (
