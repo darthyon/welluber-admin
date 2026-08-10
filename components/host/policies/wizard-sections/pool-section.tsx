@@ -5,8 +5,18 @@ import { FormSelect } from "@/components/shared/form-select"
 import { MonthPickerField } from "@/components/shared/month-picker-field"
 import { cn } from "@/lib/utils"
 import type { ProrateUnit, RefreshCycle } from "@/types/policy"
-import { DEPENDENTS_POOL_OPTIONS, PRORATE_UNITS, REFRESH_CYCLES, getAvailableRefreshCycles } from "../wizard-constants"
-import { SectionHeader, FieldLabel, ErrorText, HelpText } from "../wizard-shared-ui"
+import {
+  DEPENDENTS_POOL_OPTIONS,
+  PRORATE_UNITS,
+  REFRESH_CYCLES,
+  getAvailableRefreshCycles,
+} from "../wizard-constants"
+import {
+  SectionHeader,
+  FieldLabel,
+  ErrorText,
+  HelpText,
+} from "../wizard-shared-ui"
 import type { PolicyWizardCtx } from "../wizard-section-types"
 
 const DEPENDENT_TYPES = [
@@ -32,6 +42,7 @@ interface PoolSectionProps {
 }
 export function PoolSection({ ctx }: PoolSectionProps) {
   const { policyData, setPolicyData, validationErrors } = ctx
+  const employeePoolIsShared = policyData.benefitPoolType === "Shared"
   const availableCycles = getAvailableRefreshCycles(
     policyData.utilisationMode ?? "Fixed",
     policyData.prorateUnit
@@ -59,17 +70,22 @@ export function PoolSection({ ctx }: PoolSectionProps) {
             onChange={(e) =>
               setPolicyData({
                 ...policyData,
-                totalCapAmount: e.target.value === "" ? undefined : parseFloat(e.target.value),
+                totalCapAmount:
+                  e.target.value === ""
+                    ? undefined
+                    : parseFloat(e.target.value),
               })
             }
           />
           <HelpText>
-            Optional. Maximum total an employee can claim under this policy per cycle.
+            Optional. Maximum total an employee can claim under this policy per
+            cycle.
           </HelpText>
           {(policyData.dependentCoverages?.length ?? 0) > 0 &&
-            policyData.dependentsPoolType === "SharedWithEmployee" && (
+            (employeePoolIsShared ||
+              policyData.dependentsPoolType === "SharedWithEmployee") && (
               <p className="text-micro text-faint">
-                Dependents share this employee amount
+                Dependents share the employee policy amount
                 {typeof policyData.totalCapAmount === "number"
                   ? ` (RM ${policyData.totalCapAmount.toFixed(2)})`
                   : ""}
@@ -93,9 +109,13 @@ export function PoolSection({ ctx }: PoolSectionProps) {
                       ? policyData.dependentCoverages
                       : DEPENDENT_TYPES.map((t) => ({ type: t.value }))
                     : [],
-                  dependentsPoolType: e.target.checked
-                    ? (policyData.dependentsPoolType ?? "SharedWithEmployee")
-                    : undefined,
+                  dependentsPoolType:
+                    e.target.checked && !employeePoolIsShared
+                      ? (policyData.dependentsPoolType ?? "SharedWithEmployee")
+                      : undefined,
+                  dependentCapAmount: employeePoolIsShared
+                    ? undefined
+                    : policyData.dependentCapAmount,
                 })
               }
               className="h-4 w-4 rounded border-border text-primary focus:ring-ring"
@@ -117,10 +137,16 @@ export function PoolSection({ ctx }: PoolSectionProps) {
                           ...policyData,
                           dependentCoverages: allSelected
                             ? []
-                            : DEPENDENT_TYPES.map((t) => ({ type: t.value, capAmount: undefined })),
+                            : DEPENDENT_TYPES.map((t) => ({
+                                type: t.value,
+                                capAmount: undefined,
+                              })),
                           dependentsPoolType: allSelected
                             ? undefined
-                            : (policyData.dependentsPoolType ?? "SharedWithEmployee"),
+                            : employeePoolIsShared
+                              ? undefined
+                              : (policyData.dependentsPoolType ??
+                                "SharedWithEmployee"),
                         })
                       }
                       className={cn(
@@ -130,12 +156,20 @@ export function PoolSection({ ctx }: PoolSectionProps) {
                           : "border-border bg-background text-muted-foreground hover:border-primary/30"
                       )}
                     >
-                      {allSelected && <Check size={11} weight="bold" className="mr-1.5 inline" />}
+                      {allSelected && (
+                        <Check
+                          size={11}
+                          weight="bold"
+                          className="mr-1.5 inline"
+                        />
+                      )}
                       All
                     </button>
                     {DEPENDENT_TYPES.map((opt) => {
                       const isSelected =
-                        policyData.dependentCoverages?.some((c) => c.type === opt.value) ?? false
+                        policyData.dependentCoverages?.some(
+                          (c) => c.type === opt.value
+                        ) ?? false
                       return (
                         <button
                           key={opt.value}
@@ -153,8 +187,9 @@ export function PoolSection({ ctx }: PoolSectionProps) {
                               ...policyData,
                               dependentCoverages: next,
                               dependentsPoolType:
-                                next.length > 0
-                                  ? (policyData.dependentsPoolType ?? "SharedWithEmployee")
+                                next.length > 0 && !employeePoolIsShared
+                                  ? (policyData.dependentsPoolType ??
+                                    "SharedWithEmployee")
                                   : undefined,
                             })
                           }}
@@ -165,7 +200,13 @@ export function PoolSection({ ctx }: PoolSectionProps) {
                               : "border-border bg-background text-muted-foreground hover:border-primary/30"
                           )}
                         >
-                          {isSelected && <Check size={11} weight="bold" className="mr-1.5 inline" />}
+                          {isSelected && (
+                            <Check
+                              size={11}
+                              weight="bold"
+                              className="mr-1.5 inline"
+                            />
+                          )}
                           {opt.label}
                         </button>
                       )
@@ -183,29 +224,64 @@ export function PoolSection({ ctx }: PoolSectionProps) {
             <FieldLabel required helpKey="dependentsPooling">
               Dependents Pool Type
             </FieldLabel>
-            {validationErrors.dependentsPoolType && (
-              <ErrorText>{validationErrors.dependentsPoolType}</ErrorText>
+            {employeePoolIsShared ? (
+              <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3">
+                <p className="text-body font-medium text-foreground">
+                  Combined With Employee
+                </p>
+                <p className="mt-1 text-label text-muted-foreground">
+                  Dependents draw from the employee policy amount. A separate
+                  dependent pool is not needed.
+                </p>
+              </div>
+            ) : (
+              <>
+                {validationErrors.dependentsPoolType && (
+                  <ErrorText>{validationErrors.dependentsPoolType}</ErrorText>
+                )}
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+                  {DEPENDENTS_POOL_OPTIONS.map((opt) => (
+                    <ChoiceCard
+                      key={opt.value}
+                      title={opt.title}
+                      description={opt.description}
+                      icon={opt.icon}
+                      selected={policyData.dependentsPoolType === opt.value}
+                      onSelect={() =>
+                        setPolicyData({
+                          ...policyData,
+                          dependentsPoolType: opt.value,
+                          dependentCapAmount:
+                            opt.value === "Shared"
+                              ? policyData.dependentCapAmount
+                              : undefined,
+                          dependentCoverages:
+                            opt.value === "Individual"
+                              ? policyData.dependentCoverages
+                              : policyData.dependentCoverages?.map(
+                                  (coverage) => ({
+                                    ...coverage,
+                                    capAmount: undefined,
+                                  })
+                                ),
+                        })
+                      }
+                    />
+                  ))}
+                </div>
+              </>
             )}
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-              {DEPENDENTS_POOL_OPTIONS.map((opt) => (
-                <ChoiceCard
-                  key={opt.value}
-                  title={opt.title}
-                  description={opt.description}
-                  icon={opt.icon}
-                  selected={policyData.dependentsPoolType === opt.value}
-                  onSelect={() => setPolicyData({ ...policyData, dependentsPoolType: opt.value })}
-                />
-              ))}
-            </div>
           </div>
         )}
 
         {/* Dependent Pool Amount (Shared) */}
         {(policyData.dependentCoverages?.length ?? 0) > 0 &&
+          !employeePoolIsShared &&
           policyData.dependentsPoolType === "Shared" && (
             <div className="animate-in space-y-1.5 duration-300 fade-in slide-in-from-top-1">
-              <FieldLabel helpKey="spendingCap">Dependent Pool Amount</FieldLabel>
+              <FieldLabel helpKey="spendingCap">
+                Dependent Pool Amount
+              </FieldLabel>
               <input
                 type="number"
                 min={0}
@@ -216,16 +292,21 @@ export function PoolSection({ ctx }: PoolSectionProps) {
                   setPolicyData({
                     ...policyData,
                     dependentCapAmount:
-                      e.target.value === "" ? undefined : parseFloat(e.target.value),
+                      e.target.value === ""
+                        ? undefined
+                        : parseFloat(e.target.value),
                   })
                 }
               />
-              <HelpText>Total shared pool for all dependents per cycle.</HelpText>
+              <HelpText>
+                Total shared pool for all dependents per cycle.
+              </HelpText>
             </div>
           )}
 
         {/* Dependent Amounts (Individual) */}
         {(policyData.dependentCoverages?.length ?? 0) > 0 &&
+          !employeePoolIsShared &&
           policyData.dependentsPoolType === "Individual" && (
             <div className="animate-in space-y-3 duration-300 fade-in slide-in-from-top-1">
               <FieldLabel required helpKey="spendingCap">
@@ -251,12 +332,16 @@ export function PoolSection({ ctx }: PoolSectionProps) {
                       onChange={(e) =>
                         setPolicyData((prev) => ({
                           ...prev,
-                          dependentCoverages: (prev.dependentCoverages ?? []).map((c) =>
+                          dependentCoverages: (
+                            prev.dependentCoverages ?? []
+                          ).map((c) =>
                             c.type === coverage.type
                               ? {
                                   ...c,
                                   capAmount:
-                                    e.target.value === "" ? undefined : parseFloat(e.target.value),
+                                    e.target.value === ""
+                                      ? undefined
+                                      : parseFloat(e.target.value),
                                 }
                               : c
                           ),
@@ -280,7 +365,8 @@ export function PoolSection({ ctx }: PoolSectionProps) {
           <div className="space-y-3">
             <FieldLabel helpKey="utilisationMode">Utilisation Mode</FieldLabel>
             <HelpText>
-              This will be the default for all benefit groups, which can be overridden per group.
+              This will be the default for all benefit groups, which can be
+              overridden per group.
             </HelpText>
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               <ChoiceCard
@@ -289,7 +375,11 @@ export function PoolSection({ ctx }: PoolSectionProps) {
                 icon={Gear}
                 selected={policyData.utilisationMode === "Fixed"}
                 onSelect={() =>
-                  setPolicyData({ ...policyData, utilisationMode: "Fixed", prorateUnit: undefined })
+                  setPolicyData({
+                    ...policyData,
+                    utilisationMode: "Fixed",
+                    prorateUnit: undefined,
+                  })
                 }
               />
               <ChoiceCard
@@ -346,7 +436,12 @@ export function PoolSection({ ctx }: PoolSectionProps) {
             <FieldLabel helpKey="refreshCycle">Refresh Cycle</FieldLabel>
             <FormSelect
               value={policyData.refreshCycle}
-              onChange={(v) => setPolicyData({ ...policyData, refreshCycle: v as RefreshCycle })}
+              onChange={(v) =>
+                setPolicyData({
+                  ...policyData,
+                  refreshCycle: v as RefreshCycle,
+                })
+              }
               options={availableCycles.map((c) => ({ label: c, value: c }))}
               error={!!validationErrors.refreshCycle}
               triggerClassName="max-w-[240px]"
@@ -388,7 +483,10 @@ export function PoolSection({ ctx }: PoolSectionProps) {
               icon={Calendar}
               selected={policyData.refreshStartReference === "calendar_year"}
               onSelect={() =>
-                setPolicyData({ ...policyData, refreshStartReference: "calendar_year" })
+                setPolicyData({
+                  ...policyData,
+                  refreshStartReference: "calendar_year",
+                })
               }
             />
           </div>
@@ -402,7 +500,9 @@ export function PoolSection({ ctx }: PoolSectionProps) {
             )}
             <MonthPickerField
               value={policyData.refreshStartMonth}
-              onChange={(m) => setPolicyData({ ...policyData, refreshStartMonth: m })}
+              onChange={(m) =>
+                setPolicyData({ ...policyData, refreshStartMonth: m })
+              }
               error={!!validationErrors.refreshStartMonth}
             />
           </div>

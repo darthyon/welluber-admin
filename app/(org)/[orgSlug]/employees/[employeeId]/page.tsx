@@ -35,13 +35,18 @@ export default function EmployeeDetailPage() {
   const employeeId = params.employeeId as string
 
   const employee = MOCK_EMPLOYEES.find((e) => e.id === employeeId)
-  const utilisation = MOCK_EMPLOYEE_UTILISATION.filter((r) => r.id === employeeId)
+  const utilisation = MOCK_EMPLOYEE_UTILISATION.filter(
+    (r) => r.id === employeeId
+  )
   const entitlement = resolveEmployeeEntitlement(employeeId)
 
   if (!employee) {
     return (
       <div className="space-y-4">
-        <BackButton label="Employees" onClick={() => router.push(routes.org.employees(orgSlug))} />
+        <BackButton
+          label="Employees"
+          onClick={() => router.push(routes.org.employees(orgSlug))}
+        />
         <p className="text-muted-foreground">Employee not found.</p>
       </div>
     )
@@ -50,17 +55,27 @@ export default function EmployeeDetailPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-start gap-4">
-        <BackButton label="Employees" onClick={() => router.push(routes.org.employees(orgSlug))} />
+        <BackButton
+          label="Employees"
+          onClick={() => router.push(routes.org.employees(orgSlug))}
+        />
         <div>
-          <h1 className="text-2xl font-semibold text-foreground">{employee.name}</h1>
-          <div className="flex items-center gap-2 mt-1">
-            <span className="text-label font-mono text-faint">{employee.empCode}</span>
+          <h1 className="text-2xl font-semibold text-foreground">
+            {employee.name}
+          </h1>
+          <div className="mt-1 flex items-center gap-2">
+            <span className="font-mono text-label text-faint">
+              {employee.empCode}
+            </span>
           </div>
         </div>
       </div>
 
       {/* Profile */}
-      <DetailSection title="Employee Profile" icon={<Users size={16} weight="duotone" />}>
+      <DetailSection
+        title="Employee Profile"
+        icon={<Users size={16} weight="duotone" />}
+      >
         <div className="grid grid-cols-2 gap-6 md:grid-cols-3">
           <DetailField
             label="Full Name"
@@ -77,10 +92,7 @@ export default function EmployeeDetailPage() {
             value={employee.branch}
             icon={<Buildings size={14} weight="duotone" />}
           />
-          <DetailField
-            label="Department"
-            value={employee.department}
-          />
+          <DetailField label="Department" value={employee.department} />
           <DetailField
             label="Tier"
             value={employee.tier}
@@ -93,17 +105,18 @@ export default function EmployeeDetailPage() {
           />
           <DetailField
             label="Employment Type"
-            value={EMPLOYMENT_TYPE_LABELS[employee.employmentType ?? ""] ?? employee.employmentType ?? "—"}
+            value={
+              EMPLOYMENT_TYPE_LABELS[employee.employmentType ?? ""] ??
+              employee.employmentType ??
+              "—"
+            }
           />
           <DetailField
             label="Joined"
             value={employee.joinDate}
             icon={<Calendar size={14} weight="duotone" />}
           />
-          <DetailField
-            label="Last Active"
-            value={employee.lastActive}
-          />
+          <DetailField label="Last Active" value={employee.lastActive} />
         </div>
       </DetailSection>
 
@@ -114,17 +127,25 @@ export default function EmployeeDetailPage() {
         description="Assigned policy, beneficiary allocations, and benefit group wallets"
       >
         {!entitlement ? (
-          <p className="text-body text-muted-foreground py-4">No benefit policies assigned.</p>
+          <p className="py-4 text-body text-muted-foreground">
+            No benefit policies assigned.
+          </p>
         ) : (
           <div className="space-y-6">
             {/* Tier 1: Assigned Policy Header */}
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between rounded-lg border border-border bg-card p-4 shadow-xs">
+            <div className="flex flex-col gap-2 rounded-lg border border-border bg-card p-4 shadow-xs sm:flex-row sm:items-center sm:justify-between">
               <div className="space-y-1">
-                <p className="text-label font-medium text-muted-foreground">Assigned Benefit Policy</p>
-                <p className="text-heading font-semibold text-foreground">{entitlement.policy.name}</p>
+                <p className="text-label font-medium text-muted-foreground">
+                  Assigned Benefit Policy
+                </p>
+                <p className="text-heading font-semibold text-foreground">
+                  {entitlement.policy.name}
+                </p>
                 <p className="text-label font-medium text-subtle">
-                  {entitlement.policy.code ?? entitlement.policy.id} · {entitlement.policy.version ?? "V1.0"} ·{" "}
-                  {entitlement.groups.length} benefit {entitlement.groups.length === 1 ? "group" : "groups"}
+                  {entitlement.policy.code ?? entitlement.policy.id} ·{" "}
+                  {entitlement.policy.version ?? "V1.0"} ·{" "}
+                  {entitlement.groups.length} benefit{" "}
+                  {entitlement.groups.length === 1 ? "group" : "groups"}
                 </p>
               </div>
               <Button
@@ -139,14 +160,21 @@ export default function EmployeeDetailPage() {
 
             {/* Tiers 2 + 3 — the same component the host console renders, so the
                 two consoles cannot report different numbers for one employee. */}
-            <EntitlementPools entitlement={entitlement} />
+            <EntitlementPools
+              employeeName={employee.name}
+              entitlement={entitlement}
+            />
           </div>
         )}
       </DetailSection>
 
       {/* Claims */}
       {utilisation.length > 0 && (
-        <DetailSection title="Claims History" icon={<Shield size={16} weight="duotone" />} ghost>
+        <DetailSection
+          title="Claims History"
+          icon={<Shield size={16} weight="duotone" />}
+          ghost
+        >
           <UtilisationClaimsTable data={utilisation} />
         </DetailSection>
       )}

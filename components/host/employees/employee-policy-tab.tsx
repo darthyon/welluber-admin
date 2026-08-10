@@ -1,20 +1,12 @@
 "use client"
 
-import { useState } from "react"
-import {
-  ArrowSquareOut,
-  TreeStructure,
-} from "@phosphor-icons/react"
+import { useState, type ReactNode } from "react"
+import { ArrowSquareOut, TreeStructure } from "@phosphor-icons/react"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { StatusBadge } from "@/components/shared/status-badge"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog"
+import { Sheet } from "@/components/ui/sheet"
 import { getEmployeeEntitlement } from "./employee-entitlements-mock"
 
 interface EmployeePolicyTabProps {
@@ -24,7 +16,7 @@ interface EmployeePolicyTabProps {
 
 const EMPLOYEE_POOL_LABEL: Record<string, string> = {
   SharedWithEmployee: "Combined",
-  Shared: "Shared",
+  Shared: "Combined",
   Individual: "Individual",
 }
 
@@ -54,7 +46,7 @@ function formatPoolSummary(
   if (policy.benefitPoolType === "Shared") {
     return {
       label: "Employee + Dependents",
-      badge: "Shared",
+      badge: "Combined",
     }
   }
 
@@ -173,138 +165,122 @@ export function EmployeePolicyTab({
         </CardContent>
       </Card>
 
-      {/* Policy summary modal */}
-      <Dialog open={showPolicyModal} onOpenChange={setShowPolicyModal}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>{summary.name}</DialogTitle>
-            <div className="mt-1 flex items-center gap-2 text-label font-medium text-muted-foreground">
-              <StatusBadge status={summary.status} variant="emerald" />
-              <span>·</span>
-              <span>{summary.version}</span>
-              <span>·</span>
-              <span>{summary.utilisationMode}</span>
-              <span>·</span>
-              <span>{summary.refreshCycle}</span>
-              <span>·</span>
-              <span>{summary.poolLabel}</span>
-              <span className="rounded-4xl border border-primary/15 bg-primary/8 px-2 py-0.5 text-micro font-medium text-primary">
-                {summary.poolBadge}
-              </span>
-            </div>
-            <p className="mt-0.5 text-label text-subtle">
-              {summary.orgName} · {summary.code}
-            </p>
-          </DialogHeader>
-
-          {/* Employee pool */}
-          <div>
-            <p className="mb-2 text-label font-semibold text-muted-foreground">
-              Employee Pool
-            </p>
-            <div className="grid grid-cols-2 gap-3 rounded-lg border border-border bg-muted/30 p-4">
-              <div>
-                <p className="text-micro font-medium text-muted-foreground">
-                  Pool Type
-                </p>
-                <p className="mt-0.5 text-label font-semibold text-foreground">
-                  {EMPLOYEE_POOL_LABEL[
-                    policy.dependentsPoolType ?? policy.benefitPoolType
-                  ] ?? "Individual"}
-                </p>
-              </div>
-              <div>
-                <p className="text-micro font-medium text-muted-foreground">
-                  Utilisation Mode
-                </p>
-                <p className="mt-0.5 text-label font-semibold text-foreground">
-                  {formatUtilisationMode(
-                    policy.utilisationMode,
-                    policy.prorateUnit
-                  )}
-                </p>
-              </div>
-              <div>
-                <p className="text-micro font-medium text-muted-foreground">
-                  Refresh Cycle
-                </p>
-                <p className="mt-0.5 text-label font-semibold text-foreground">
-                  {formatRefreshCycle(policy.refreshCycle)}
-                </p>
-              </div>
-              <div>
-                <p className="text-micro font-medium text-muted-foreground">
-                  Employee Cap
-                </p>
-                <p className="mt-0.5 text-label font-semibold text-foreground">
-                  {policy.totalCapAmount != null
-                    ? `RM ${policy.totalCapAmount.toLocaleString()} / Cycle`
-                    : "Not Set"}
-                </p>
-              </div>
-            </div>
+      <Sheet
+        isOpen={showPolicyModal}
+        onClose={() => setShowPolicyModal(false)}
+        title={summary.name}
+        description={`${summary.orgName} · ${summary.code}`}
+        size="lg"
+        footer={
+          <>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowPolicyModal(false)}
+            >
+              Close
+            </Button>
+            <Button asChild className="gap-2">
+              <Link href={`/policies/${policy.id}`}>
+                Open Full Policy
+                <ArrowSquareOut size={14} />
+              </Link>
+            </Button>
+          </>
+        }
+      >
+        <div data-testid="employee-policy-details-drawer" className="space-y-6">
+          <div className="flex flex-wrap items-center gap-2 text-label font-medium text-muted-foreground">
+            <StatusBadge status={summary.status} variant="emerald" />
+            <span>·</span>
+            <span>{summary.version}</span>
+            <span>·</span>
+            <span>{summary.utilisationMode}</span>
+            <span>·</span>
+            <span>{summary.refreshCycle}</span>
+            <span>·</span>
+            <span>{summary.poolLabel}</span>
+            <span className="rounded-4xl border border-primary/15 bg-primary/8 px-2 py-0.5 text-micro font-medium text-primary">
+              {summary.poolBadge}
+            </span>
           </div>
 
-          {/* Dependent coverage */}
-          <div>
-            <p className="mb-2 text-label font-semibold text-muted-foreground">
-              Dependent Coverage
-            </p>
-            <div className="grid grid-cols-2 gap-3 rounded-lg border border-border bg-muted/30 p-4">
-              <div>
-                <p className="text-micro font-medium text-muted-foreground">
-                  Covered Types
-                </p>
-                <p className="mt-0.5 text-label font-semibold text-foreground">
-                  {(policy.dependentCoverages?.length ?? 0) > 0
+          <PolicyDetailSection title="Employee Pool">
+            <PolicyDetailGrid>
+              <PolicyDetailItem
+                label="Pool Type"
+                value={
+                  EMPLOYEE_POOL_LABEL[
+                    policy.dependentsPoolType ?? policy.benefitPoolType
+                  ] ?? "Individual"
+                }
+              />
+              <PolicyDetailItem
+                label="Utilisation Mode"
+                value={formatUtilisationMode(
+                  policy.utilisationMode,
+                  policy.prorateUnit
+                )}
+              />
+              <PolicyDetailItem
+                label="Refresh Cycle"
+                value={formatRefreshCycle(policy.refreshCycle)}
+              />
+              <PolicyDetailItem
+                label="Employee Cap"
+                value={
+                  policy.totalCapAmount != null
+                    ? `RM ${policy.totalCapAmount.toLocaleString()} / Cycle`
+                    : "Not Set"
+                }
+              />
+            </PolicyDetailGrid>
+          </PolicyDetailSection>
+
+          <PolicyDetailSection title="Dependent Coverage">
+            <PolicyDetailGrid>
+              <PolicyDetailItem
+                label="Covered Types"
+                value={
+                  (policy.dependentCoverages?.length ?? 0) > 0
                     ? policy
                         .dependentCoverages!.map(
                           (c) =>
                             c.type.charAt(0).toUpperCase() + c.type.slice(1)
                         )
                         .join(", ")
-                    : "Employee Only"}
-                </p>
-              </div>
-              <div>
-                <p className="text-micro font-medium text-muted-foreground">
-                  Dependents Pool Type
-                </p>
-                <p className="mt-0.5 text-label font-semibold text-foreground">
-                  {(policy.dependentCoverages?.length ?? 0) > 0
+                    : "Employee Only"
+                }
+              />
+              <PolicyDetailItem
+                label="Dependents Pool Type"
+                value={
+                  (policy.dependentCoverages?.length ?? 0) > 0
                     ? formatPoolStructure(policy)
-                    : "Not Applicable"}
-                </p>
-              </div>
+                    : "Not Applicable"
+                }
+              />
               {policy.dependentCapAmount != null && (
-                <div>
-                  <p className="text-micro font-medium text-muted-foreground">
-                    Dependent Cap
-                  </p>
-                  <p className="mt-0.5 text-label font-semibold text-foreground">
-                    RM {policy.dependentCapAmount.toLocaleString()} / Cycle
-                  </p>
-                </div>
+                <PolicyDetailItem
+                  label="Dependent Cap"
+                  value={`RM ${policy.dependentCapAmount.toLocaleString()} / Cycle`}
+                />
               )}
-            </div>
-          </div>
+            </PolicyDetailGrid>
+          </PolicyDetailSection>
 
-          {/* Benefit groups */}
-          <div>
-            <p className="mb-2 text-label font-semibold text-muted-foreground">
-              Benefit Groups · {groups.length}
-            </p>
+          <PolicyDetailSection title={`Benefit Groups · ${groups.length}`}>
             <div className="divide-y divide-border overflow-hidden rounded-lg border border-border">
               {groups.map((g) => (
-                <div key={g.id} className="flex items-center gap-3 px-3 py-2.5">
-                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-primary/20 bg-primary/10 text-primary">
-                    <TreeStructure size={14} weight="duotone" />
+                <div key={g.id} className="flex items-center gap-3 px-3 py-3">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-primary/20 bg-primary/10 text-primary">
+                    <TreeStructure size={16} weight="duotone" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-label font-semibold text-foreground">
+                    <p className="truncate text-body font-semibold text-foreground">
                       {g.name}
                     </p>
-                    <p className="text-micro text-muted-foreground">
+                    <p className="mt-0.5 text-label text-muted-foreground">
                       {g.coverageScope ?? "Employee"} ·{" "}
                       {g.distributionType === "SharedAmount"
                         ? "Shared Amount"
@@ -314,18 +290,41 @@ export function EmployeePolicyTab({
                 </div>
               ))}
             </div>
-          </div>
+          </PolicyDetailSection>
+        </div>
+      </Sheet>
+    </div>
+  )
+}
 
-          <DialogFooter showCloseButton>
-            <Button asChild className="gap-2">
-              <a href={`/policies/${policy.id}`}>
-                Open Full Policy
-                <ArrowSquareOut size={14} />
-              </a>
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+function PolicyDetailSection({
+  children,
+  title,
+}: {
+  children: ReactNode
+  title: string
+}) {
+  return (
+    <section className="space-y-2">
+      <h3 className="text-body font-semibold text-foreground">{title}</h3>
+      {children}
+    </section>
+  )
+}
+
+function PolicyDetailGrid({ children }: { children: ReactNode }) {
+  return (
+    <div className="grid grid-cols-1 gap-3 rounded-lg border border-border bg-muted/30 p-4 sm:grid-cols-2">
+      {children}
+    </div>
+  )
+}
+
+function PolicyDetailItem({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-micro font-medium text-muted-foreground">{label}</p>
+      <p className="mt-0.5 text-label font-semibold text-foreground">{value}</p>
     </div>
   )
 }

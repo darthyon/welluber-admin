@@ -20,9 +20,13 @@ export interface EntitlementBeneficiaryRow {
 
 export interface EntitlementGroupPoolDisplay {
   kind: EntitlementPoolKind
+  /** Total unique capacity represented by this benefit group. */
   allocated: number
   used: number
   left: number
+  /** Separate ceilings used by the group table and shared-pool summaries. */
+  employeeAllocated: number
+  dependentAllocated: number
   employeeUsed: number
   dependentUsed: number
   beneficiaries: EntitlementBeneficiaryRow[]
@@ -175,6 +179,48 @@ export function getIndividualDependentCaps(policy: BenefitPolicy) {
   return caps
 }
 
+/**
+ * Policy-level ceiling for individual dependent wallets.
+ *
+ * Individual wallets remain independent, but a dependent type cap is a
+ * policy-level ceiling. Aggregate each beneficiary across groups first, then
+ * apply that cap once so a spouse cannot be counted above their policy limit
+ * merely because the policy contains several benefit groups.
+ */
+export function getIndividualDependentPoolCeiling(
+  policy: BenefitPolicy,
+  usage: BeneficiaryUsage[]
+) {
+  const caps = getIndividualDependentCaps(policy)
+  const byBeneficiary = new Map<
+    string,
+    { relationship?: string; allocated: number }
+  >()
+
+  for (const row of usage) {
+    if (!row.relationship) continue
+    const current = byBeneficiary.get(row.beneficiaryId)
+    if (current) {
+      current.allocated += row.allocated
+      continue
+    }
+    byBeneficiary.set(row.beneficiaryId, {
+      relationship: row.relationship,
+      allocated: row.allocated,
+    })
+  }
+
+  return Array.from(byBeneficiary.values()).reduce((sum, beneficiary) => {
+    const cap = caps.get(coverageKey(beneficiary.relationship) ?? "")
+    return (
+      sum +
+      (typeof cap === "number"
+        ? Math.min(beneficiary.allocated, cap)
+        : beneficiary.allocated)
+    )
+  }, 0)
+}
+
 export function buildEntitlementGroupPoolDisplay({
   policy,
   group,
@@ -198,17 +244,22 @@ export function buildEntitlementGroupPoolDisplay({
   const dependentUsed = sumUsage(dependentRows)
 
   if (!dependentRows.length) {
-    const allocated = capToPolicyCeiling(policy, combinedAllocated(employeeRows))
+    const employeeAllocated = capToPolicyCeiling(
+      policy,
+      combinedAllocated(employeeRows)
+    )
     return {
       kind: "employee",
-      allocated,
+      allocated: employeeAllocated,
       used: employeeUsed,
-      left: Math.max(allocated - employeeUsed, 0),
+      left: Math.max(employeeAllocated - employeeUsed, 0),
+      employeeAllocated,
+      dependentAllocated: 0,
       employeeUsed,
       dependentUsed: 0,
       beneficiaries: aggregateBeneficiaries(
         employeeRows,
-        allocated,
+        employeeAllocated,
         employeeId
       ),
     }
@@ -229,6 +280,8 @@ export function buildEntitlementGroupPoolDisplay({
       allocated,
       used,
       left: Math.max(allocated - used, 0),
+      employeeAllocated: allocated,
+      dependentAllocated: 0,
       employeeUsed,
       dependentUsed,
       beneficiaries: aggregateBeneficiaries(rows, allocated, employeeId),
@@ -236,19 +289,23 @@ export function buildEntitlementGroupPoolDisplay({
   }
 
   if (policy.dependentsPoolType === "Shared") {
-    const allocated = sharedAllocated(policy, group, dependentRows)
+    const employeeAllocated = capToPolicyCeiling(
+      policy,
+      combinedAllocated(employeeRows)
+    )
+    const dependentAllocated = sharedAllocated(policy, group, dependentRows)
+    const allocated = employeeAllocated + dependentAllocated
+    const used = employeeUsed + dependentUsed
     return {
       kind: "shared",
       allocated,
-      used: dependentUsed,
-      left: Math.max(allocated - dependentUsed, 0),
+      used,
+      left: Math.max(allocated - used, 0),
+      employeeAllocated,
+      dependentAllocated,
       employeeUsed,
       dependentUsed,
-      beneficiaries: aggregateBeneficiaries(
-        dependentRows,
-        allocated,
-        employeeId
-      ),
+      beneficiaries: aggregateBeneficiaries(rows, allocated, employeeId),
     }
   }
 
@@ -256,29 +313,45 @@ export function buildEntitlementGroupPoolDisplay({
   // dependent type declares, so a spouse cap cannot be exceeded by summing the
   // per-benefit allocations.
   const caps = getIndividualDependentCaps(policy)
-  const beneficiaries = aggregateBeneficiaries(dependentRows, 0, employeeId).map(
-    (beneficiary) => {
-      const cap = caps.get(coverageKey(beneficiary.relationship) ?? "")
-      if (typeof cap !== "number") return beneficiary
-      const allocated = Math.min(beneficiary.allocated, cap)
-      return {
-        ...beneficiary,
-        allocated,
-        left: Math.max(allocated - beneficiary.used, 0),
-      }
-    }
+  const employeeAllocated = capToPolicyCeiling(
+    policy,
+    combinedAllocated(employeeRows)
   )
+  const employeeBeneficiaries = aggregateBeneficiaries(
+    employeeRows,
+    employeeAllocated,
+    employeeId
+  )
+  const dependentBeneficiaries = aggregateBeneficiaries(
+    dependentRows,
+    0,
+    employeeId
+  ).map((beneficiary) => {
+    const cap = caps.get(coverageKey(beneficiary.relationship) ?? "")
+    if (typeof cap !== "number") return beneficiary
+    const allocated = Math.min(beneficiary.allocated, cap)
+    return {
+      ...beneficiary,
+      allocated,
+      left: Math.max(allocated - beneficiary.used, 0),
+    }
+  })
+  const dependentAllocated = dependentBeneficiaries.reduce(
+    (sum, beneficiary) => sum + beneficiary.allocated,
+    0
+  )
+  const allocated = employeeAllocated + dependentAllocated
+  const used = employeeUsed + dependentUsed
 
   return {
     kind: "individual",
-    allocated: beneficiaries.reduce(
-      (sum, beneficiary) => sum + beneficiary.allocated,
-      0
-    ),
-    used: dependentUsed,
-    left: beneficiaries.reduce((sum, beneficiary) => sum + beneficiary.left, 0),
+    allocated,
+    used,
+    left: Math.max(allocated - used, 0),
+    employeeAllocated,
+    dependentAllocated,
     employeeUsed,
     dependentUsed,
-    beneficiaries,
+    beneficiaries: [...employeeBeneficiaries, ...dependentBeneficiaries],
   }
 }
