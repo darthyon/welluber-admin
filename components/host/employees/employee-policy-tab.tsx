@@ -14,15 +14,9 @@ interface EmployeePolicyTabProps {
   employeeName: string
 }
 
-const EMPLOYEE_POOL_LABEL: Record<string, string> = {
-  SharedWithEmployee: "Combined",
-  Shared: "Combined",
-  Individual: "Individual",
-}
-
 const DEPENDENT_POOL_LABEL: Record<string, string> = {
-  SharedWithEmployee: "Combined",
-  Shared: "Shared",
+  SharedWithEmployee: "Combined With Employee",
+  Shared: "Shared Between Dependents",
   Individual: "Individual",
 }
 
@@ -46,7 +40,7 @@ function formatPoolSummary(
   if (policy.benefitPoolType === "Shared") {
     return {
       label: "Employee + Dependents",
-      badge: "Combined",
+      badge: "Combined With Employee",
     }
   }
 
@@ -71,6 +65,15 @@ function formatPoolStructure(
 ) {
   const summary = formatPoolSummary(policy)
   return `${summary.label} · ${summary.badge}`
+}
+
+function formatEmployeePoolType(
+  policy: NonNullable<ReturnType<typeof getEmployeeEntitlement>>["policy"]
+) {
+  return policy.benefitPoolType === "Shared" ||
+    policy.dependentsPoolType === "SharedWithEmployee"
+    ? "Combined With Employee"
+    : "Individual"
 }
 
 export function EmployeePolicyTab({
@@ -121,8 +124,7 @@ export function EmployeePolicyTab({
           Entitlement
         </h2>
         <p className="mt-1 text-body text-muted-foreground">
-          View assigned benefit policy, policy details, entitlement, and pool
-          management.
+          View the assigned policy and how its benefits are allocated and used.
         </p>
       </div>
 
@@ -149,7 +151,7 @@ export function EmployeePolicyTab({
               </div>
               <p className="text-label font-medium text-subtle">
                 {summary.orgName} · {summary.code} · {summary.groupCount}{" "}
-                benefit {summary.groupCount === 1 ? "group" : "groups"}
+                Benefit Group{summary.groupCount === 1 ? "" : "s"}
               </p>
             </div>
             <Button
@@ -209,11 +211,7 @@ export function EmployeePolicyTab({
             <PolicyDetailGrid>
               <PolicyDetailItem
                 label="Pool Type"
-                value={
-                  EMPLOYEE_POOL_LABEL[
-                    policy.dependentsPoolType ?? policy.benefitPoolType
-                  ] ?? "Individual"
-                }
+                value={formatEmployeePoolType(policy)}
               />
               <PolicyDetailItem
                 label="Utilisation Mode"
