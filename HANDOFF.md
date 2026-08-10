@@ -15,9 +15,11 @@
 - `tsc --noEmit` and `eslint` clean. **Unit and e2e were not run this session.**
 
 ## Next
-1. **Rotate the Mapbox token.** Still outstanding from the previous session — `gitleaks`
-   found it hardcoded in 5 places in history (`ba26ba5`, `09d9071`, +3). Current tree is
-   clean; history is not. Revoke at account.mapbox.com, reissue URL-restricted.
+1. ~~Rotate the Mapbox token~~ — **done.** Deleted at account.mapbox.com and the default
+   public token refreshed. The string still sits in history (`ba26ba5`, `09d9071`, +2) but
+   is now dead. No code references Mapbox at all — maps are `components/shared/location-map.tsx`,
+   backed by static CARTO Positron tiles in `public/map-tiles` (no key, no runtime request).
+   History scrub is optional and cosmetic; it would rewrite every SHA and break open PRs.
 2. ~~Restore the gitleaks pre-push hook~~ — **it is present and working.** Lives at
    `.githooks/pre-push` via `core.hooksPath=.githooks`, not `.husky`. Ran clean on the
    PR #48 push. It scans `--all --not --remotes`, so commits already on the remote (where

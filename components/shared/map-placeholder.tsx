@@ -2,7 +2,7 @@
 
 import { MapPin } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
-import { SvgMap } from "@/components/shared/svg-map";
+import { LocationMap } from "@/components/shared/location-map";
 
 interface MapPlaceholderProps {
   lat?: number;
@@ -26,7 +26,7 @@ export function MapPlaceholder({ lat, lon, address, className }: MapPlaceholderP
     >
       {hasCoords ? (
         <div className="relative aspect-[3/1] w-full">
-          <SvgMap lat={lat} lon={lon} showPin showCoordinates />
+          <LocationMap lat={lat} lon={lon} showPin showCoordinates />
           <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-background/40 to-transparent" />
         </div>
       ) : (

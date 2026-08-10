@@ -10,7 +10,7 @@ import {
   MapTrifold,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
-import { SvgMap } from "@/components/shared/svg-map";
+import { LocationMap } from "@/components/shared/location-map";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import type { LocationData } from "@/components/shared/location-picker";
 import { MOCK_LOCATION_SUGGESTIONS } from "@/lib/mock-data";
@@ -44,11 +44,9 @@ export function LocationPickerMapPanel({
     <div className="space-y-4">
       <div className="relative group h-full">
         <div className="relative flex min-h-[350px] items-center justify-center overflow-hidden rounded-lg border-2 border-border bg-muted/30 shadow-sm transition-all duration-500 group-hover:border-primary/20 aspect-[16/10] lg:h-full lg:aspect-auto">
-          <div className="absolute inset-0 grayscale transition-all duration-1000 group-hover:grayscale-0">
-            <SvgMap />
+          <div className="absolute inset-0 saturate-[0.85] transition-all duration-700 group-hover:saturate-100">
+            <LocationMap />
           </div>
-          <div className="absolute inset-0 bg-primary/5 transition-colors duration-700 group-hover:bg-transparent" />
-          <div className="absolute inset-0 opacity-[0.05] bg-[radial-gradient(#000000_1px,transparent_1px)] [background-size:16px_16px]" />
 
           <div className="absolute top-4 right-4 z-20">
             <TooltipProvider>
