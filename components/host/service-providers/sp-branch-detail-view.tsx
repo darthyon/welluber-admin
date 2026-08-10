@@ -15,6 +15,7 @@ import {
   WhatsappLogo,
 } from "@phosphor-icons/react"
 import { DetailField } from "@/components/shared/detail-field"
+import { SvgMap } from "@/components/shared/svg-map"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { StatusBadge } from "@/components/shared/status-badge"
@@ -165,12 +166,9 @@ export function SpBranchDetailView({
                   <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
                     {/* Map Preview */}
                     <div className="group/map relative aspect-[16/10] min-h-[300px] overflow-hidden rounded-lg border border-border bg-muted/30 shadow-sm lg:aspect-auto lg:h-full">
-                      <div
-                        className="absolute inset-0 bg-cover bg-center grayscale transition-all duration-1000 group-hover/map:grayscale-0"
-                        style={{
-                          backgroundImage: `url('https://api.mapbox.com/styles/v1/mapbox/light-v10/static/101.7036,3.1390,12/800x400?access_token=${process.env.NEXT_PUBLIC_MAPBOX_TOKEN}')`,
-                        }}
-                      />
+                      <div className="absolute inset-0 grayscale transition-all duration-1000 group-hover/map:grayscale-0">
+                        <SvgMap />
+                      </div>
                       <div className="absolute inset-0 bg-primary/5 transition-colors duration-700 group-hover/map:bg-transparent" />
                       <div className="absolute inset-0 bg-[radial-gradient(#000000_1px,transparent_1px)] [background-size:16px_16px] opacity-10" />
 
