@@ -18,8 +18,10 @@
 1. **Rotate the Mapbox token.** Still outstanding from the previous session — `gitleaks`
    found it hardcoded in 5 places in history (`ba26ba5`, `09d9071`, +3). Current tree is
    clean; history is not. Revoke at account.mapbox.com, reissue URL-restricted.
-2. **Restore the gitleaks pre-push hook** (added in `2ba6f97`, now gone — no `.husky`, no
-   `.git/hooks`). Binary is installed. This is why the leak only surfaced on a manual check.
+2. ~~Restore the gitleaks pre-push hook~~ — **it is present and working.** Lives at
+   `.githooks/pre-push` via `core.hooksPath=.githooks`, not `.husky`. Ran clean on the
+   PR #48 push. It scans `--all --not --remotes`, so commits already on the remote (where
+   the Mapbox token sits) are never rescanned — which is why item 1 stays open.
 3. Run `pnpm test:unit` and `pnpm test:e2e`. Members work has no test coverage yet.
 4. Decide whether members should link to employee records — `MEM-…` has no mapping to
    `EMP-…`, so claims, vouchers, and entitlements cannot surface on a member.
