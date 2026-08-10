@@ -1,14 +1,16 @@
 "use client"
 
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import {
+  ArrowCounterClockwise,
   ArrowLeft,
   Buildings,
   CalendarBlank,
   Clock,
   DeviceMobile,
   EnvelopeSimple,
+  Prohibit,
   TreeStructure,
   User,
   UserCircle,
@@ -24,6 +26,8 @@ import {
   ActivityTimeline,
   type ActivityType,
 } from "@/components/shared/activity-timeline"
+import { ActionPopover } from "@/components/shared/action-popover"
+import { RevokeMemberAccessDialog } from "@/components/host/users/revoke-member-access-dialog"
 import { useMembers } from "@/hooks/data-hooks"
 import { MOCK_MEMBER_ACTIVITY } from "@/lib/mock-data"
 import type { Member, MemberActivityType } from "@/features/users/types"
@@ -48,7 +52,9 @@ export default function MemberDetailPage() {
   const router = useRouter()
   const id = params.id as string
 
-  const { members } = useMembers()
+  const { members, update } = useMembers()
+  const [revokeTarget, setRevokeTarget] = useState<Member | null>(null)
+
   const member = useMemo(
     () => members.find((m) => m.id === id) ?? null,
     [members, id]
@@ -107,40 +113,63 @@ export default function MemberDetailPage() {
 
       {/* Header card */}
       <div className="rounded-xl border border-border bg-card p-6">
-        <div className="flex items-start gap-5">
-          <EntityAvatar name={member.name} size="xl" />
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start gap-5">
+            <EntityAvatar name={member.name} size="xl" />
 
-          <div className="space-y-2 pt-0.5">
-            <div className="flex flex-wrap items-center gap-3">
-              <h1 className="text-title font-semibold text-foreground">
-                {member.name}
-              </h1>
-              <StatusBadge
-                status={member.status}
-                variant={statusVariant(member.status)}
-              />
-              <Badge
-                variant="secondary"
-                className="text-label font-medium whitespace-nowrap"
-              >
-                {member.type}
-              </Badge>
-            </div>
-            <div className="flex items-center gap-1.5 text-body text-subtle">
-              <EnvelopeSimple size={14} className="shrink-0" />
-              <span className="font-mono tracking-tight">{member.email}</span>
-            </div>
-            <div className="flex flex-wrap items-center gap-4 text-label font-medium text-subtle">
-              <span className="flex items-center gap-1.5">
-                <Buildings size={14} className="text-faint" />
-                {member.organization.name}
-              </span>
-              <span className="flex items-center gap-1.5">
-                <TreeStructure size={14} className="text-faint" />
-                {member.branch?.name || "No branch assigned"}
-              </span>
+            <div className="space-y-2 pt-0.5">
+              <div className="flex flex-wrap items-center gap-3">
+                <h1 className="text-title font-semibold text-foreground">
+                  {member.name}
+                </h1>
+                <StatusBadge
+                  status={member.status}
+                  variant={statusVariant(member.status)}
+                />
+                <Badge
+                  variant="secondary"
+                  className="text-label font-medium whitespace-nowrap"
+                >
+                  {member.type}
+                </Badge>
+              </div>
+              <div className="flex items-center gap-1.5 text-body text-subtle">
+                <EnvelopeSimple size={14} className="shrink-0" />
+                <span className="font-mono tracking-tight">{member.email}</span>
+              </div>
+              <div className="flex flex-wrap items-center gap-4 text-label font-medium text-subtle">
+                <span className="flex items-center gap-1.5">
+                  <Buildings size={14} className="text-faint" />
+                  {member.organization.name}
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <TreeStructure size={14} className="text-faint" />
+                  {member.branch?.name || "No branch assigned"}
+                </span>
+              </div>
             </div>
           </div>
+
+          <ActionPopover
+            actions={
+              member.status === "Inactive"
+                ? [
+                    {
+                      label: "Restore Access",
+                      icon: <ArrowCounterClockwise size={16} />,
+                      onClick: () => update(member.id, { status: "Active" }),
+                    },
+                  ]
+                : [
+                    {
+                      label: "Revoke Access",
+                      icon: <Prohibit size={16} />,
+                      isDanger: true,
+                      onClick: () => setRevokeTarget(member),
+                    },
+                  ]
+            }
+          />
         </div>
       </div>
 
@@ -224,6 +253,11 @@ export default function MemberDetailPage() {
           </DetailSection>
         </div>
       </div>
+
+      <RevokeMemberAccessDialog
+        member={revokeTarget}
+        onClose={() => setRevokeTarget(null)}
+      />
     </div>
   )
 }

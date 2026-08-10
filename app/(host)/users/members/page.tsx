@@ -7,6 +7,8 @@ import {
   MagnifyingGlass,
   DownloadSimple,
   Eye,
+  Prohibit,
+  ArrowCounterClockwise,
 } from "@phosphor-icons/react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -24,12 +26,14 @@ import { EmptyState } from "@/components/shared/empty-state"
 import { EntityAvatar } from "@/components/shared/entity-avatar"
 import { Badge } from "@/components/ui/badge"
 import { ActionPopover } from "@/components/shared/action-popover"
+import { RevokeMemberAccessDialog } from "@/components/host/users/revoke-member-access-dialog"
 
 export default function MembersPage() {
   const mounted = useMounted()
   const router = useRouter()
-  const { members } = useMembers()
+  const { members, update } = useMembers()
   const [viewMode, setViewMode] = useState<ViewMode>("list")
+  const [revokeTarget, setRevokeTarget] = useState<Member | null>(null)
 
   const [searchQuery, setSearchQuery] = useState("")
   const [typeFilter, setTypeFilter] = useState("all")
@@ -169,6 +173,18 @@ export default function MembersPage() {
                 icon: <Eye size={16} />,
                 onClick: () => router.push(`/users/members/${row.id}`),
               },
+              row.status === "Inactive"
+                ? {
+                    label: "Restore access",
+                    icon: <ArrowCounterClockwise size={16} />,
+                    onClick: () => update(row.id, { status: "Active" }),
+                  }
+                : {
+                    label: "Revoke access",
+                    icon: <Prohibit size={16} />,
+                    isDanger: true,
+                    onClick: () => setRevokeTarget(row),
+                  },
             ]}
           />
         </div>
@@ -293,7 +309,12 @@ export default function MembersPage() {
             className="grid animate-in grid-cols-1 gap-6 duration-200 fade-in slide-in-from-bottom-2 md:grid-cols-2 lg:grid-cols-3"
           >
             {filteredMembers.map((member) => (
-              <MemberCard key={member.id} member={member} />
+              <MemberCard
+                key={member.id}
+                member={member}
+                onRevokeAccess={setRevokeTarget}
+                onRestoreAccess={(m) => update(m.id, { status: "Active" })}
+              />
             ))}
             {filteredMembers.length === 0 && (
               <div className="col-span-full py-12">{emptyState}</div>
@@ -315,6 +336,11 @@ export default function MembersPage() {
           </div>
         )}
       </div>
+
+      <RevokeMemberAccessDialog
+        member={revokeTarget}
+        onClose={() => setRevokeTarget(null)}
+      />
     </div>
   )
 }
