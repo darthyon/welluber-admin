@@ -5,8 +5,10 @@ import {
   Buildings,
   TreeStructure,
   Clock,
-  UserCircle
+  UserCircle,
+  Eye
 } from "@phosphor-icons/react";
+import { useRouter } from "next/navigation";
 import { Member } from "@/features/users/types";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { ActionPopover } from "@/components/shared/action-popover";
@@ -18,9 +20,14 @@ interface MemberCardProps {
 }
 
 export function MemberCard({ member }: MemberCardProps) {
+  const router = useRouter();
+
   const actions = [
-    { label: "View profile", href: `/users/members/${member.id}` },
-    { label: "Policies", href: `/users/members/${member.id}/policies` },
+    {
+      label: "View member",
+      icon: <Eye size={16} />,
+      onClick: () => router.push(`/users/members/${member.id}`),
+    },
   ];
 
   return (

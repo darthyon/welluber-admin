@@ -24,6 +24,7 @@ import {
 } from "./factories/voucher"
 import { createAccount } from "./factories/account"
 import { createAuditLog } from "./factories/audit-log"
+import { createAllMemberActivity } from "./factories/member-activity"
 import { createDependent } from "./factories/dependent"
 import { createEntitlement } from "./factories/entitlement"
 import {
@@ -126,6 +127,7 @@ function seedAll() {
     createTopupTransaction(i)
   )
   const auditLogs = Array.from({ length: 10 }, (_, i) => createAuditLog(i))
+  const memberActivity = createAllMemberActivity(members)
   const dependents = Array.from({ length: 10 }, (_, i) => createDependent(i))
   const entitlements = Array.from({ length: 8 }, (_, i) => createEntitlement(i))
 
@@ -160,6 +162,7 @@ function seedAll() {
     accounts,
     topupHistory,
     auditLogs,
+    memberActivity,
     dependents,
     entitlements,
   }
@@ -181,6 +184,7 @@ export const MOCK_GENERATED_VOUCHERS = SEED.generatedVouchers
 export const MOCK_ACCOUNTS = SEED.accounts
 export const MOCK_TOPUP_HISTORY = SEED.topupHistory
 export const MOCK_AUDIT_LOGS = SEED.auditLogs
+export const MOCK_MEMBER_ACTIVITY = SEED.memberActivity
 export const MOCK_DEPENDENTS = SEED.dependents
 export const MOCK_ENTITLEMENTS = SEED.entitlements
 
