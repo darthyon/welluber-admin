@@ -35,6 +35,16 @@ test.describe("Employee Entitlement Allocation", () => {
     await expect(breakdown.getByText("Breakdown")).toBeVisible()
     await expect(breakdown.getByText("Allocation Type")).not.toBeVisible()
     await breakdown.getByRole("button", { name: "Show Breakdown" }).click()
+    const allocationTable = breakdown.getByTestId(
+      "entitlement-allocation-table"
+    )
+    await expect(allocationTable).toBeVisible()
+    await expect(
+      allocationTable.getByRole("columnheader", { name: "Beneficiary" })
+    ).toBeVisible()
+    await expect(
+      allocationTable.getByText("Employee Policy Amount")
+    ).toBeVisible()
     await expect(
       breakdown.getByTestId("allocation-person-employee")
     ).toBeVisible()
@@ -122,6 +132,9 @@ test.describe("Employee Entitlement Allocation", () => {
     const cards = group.getByTestId(
       "service-allocation-cards-POL-20260115-0009-B1"
     )
+    await expect(
+      cards.getByTestId("entitlement-allocation-table")
+    ).toBeVisible()
     await expect(cards.getByTestId("allocation-person-employee")).toBeVisible()
     await expect(
       cards.getByTestId("allocation-person-DEP-0003-1")

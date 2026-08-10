@@ -117,6 +117,7 @@ export function EntitlementPools({
         <EntitlementBreakdownTable
           kind={summaryDetail.kind}
           rows={summaryDetail.rows}
+          summary={summaryDetail.summary}
           onPersonClick={setSelectedPerson}
         />
       </Card>

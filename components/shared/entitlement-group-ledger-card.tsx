@@ -12,7 +12,7 @@ import {
   resolveMainServiceId,
 } from "@/lib/mock-data/service-catalog"
 import { getMainServiceIcon } from "@/components/host/policies/detail-tabs/policy-detail-helpers"
-import { EntitlementAllocationPersonCard } from "@/components/shared/entitlement-allocation-person-card"
+import { EntitlementAllocationTable } from "@/components/shared/entitlement-allocation-table"
 import type {
   EntitlementServiceAllocation,
   EntitlementSummary,
@@ -143,15 +143,14 @@ function ServiceRow({
               />
               <div
                 data-testid={`service-allocation-cards-${benefit.id}`}
-                className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3"
+                className="min-w-0"
               >
-                {serviceAllocation.rows.map((row) => (
-                  <EntitlementAllocationPersonCard
-                    key={row.beneficiaryId}
-                    compact
-                    row={row}
-                  />
-                ))}
+                <EntitlementAllocationTable
+                  kind={serviceAllocation.kind}
+                  rows={serviceAllocation.rows}
+                  summary={serviceAllocation.summary}
+                  scopeLabel="Service Allocation"
+                />
               </div>
             </>
           ) : (

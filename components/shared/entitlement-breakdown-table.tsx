@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { CaretDown } from "@phosphor-icons/react"
-import { EntitlementAllocationPersonCard } from "@/components/shared/entitlement-allocation-person-card"
+import { EntitlementAllocationTable } from "@/components/shared/entitlement-allocation-table"
 import { EntitlementAllocationRuleNote } from "@/components/shared/entitlement-allocation-rule-note"
 import {
   Collapsible,
@@ -12,17 +12,20 @@ import {
 import type {
   EntitlementAllocationRow,
   EntitlementPoolKind,
+  EntitlementSummary,
 } from "@/features/employees/entitlement-resolver"
 
 interface EntitlementBreakdownTableProps {
   kind: EntitlementPoolKind
   rows: EntitlementAllocationRow[]
+  summary: EntitlementSummary
   onPersonClick: (row: EntitlementAllocationRow) => void
 }
 
 export function EntitlementBreakdownTable({
   kind,
   rows,
+  summary,
   onPersonClick,
 }: EntitlementBreakdownTableProps) {
   const [open, setOpen] = useState(false)
@@ -56,19 +59,13 @@ export function EntitlementBreakdownTable({
       <CollapsibleContent>
         <div className="mt-3 space-y-3 border-t border-border/60 pt-3">
           <EntitlementAllocationRuleNote kind={kind} />
-          <div
-            data-testid="entitlement-breakdown-cards"
-            className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3"
-          >
-            {rows.map((row) => (
-              <EntitlementAllocationPersonCard
-                key={row.beneficiaryId}
-                compact
-                onClick={() => onPersonClick(row)}
-                row={row}
-              />
-            ))}
-          </div>
+          <EntitlementAllocationTable
+            kind={kind}
+            rows={rows}
+            summary={summary}
+            onPersonClick={onPersonClick}
+            scopeLabel="People and Allocations"
+          />
         </div>
       </CollapsibleContent>
     </Collapsible>
