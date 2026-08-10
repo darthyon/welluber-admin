@@ -1,8 +1,7 @@
 "use client"
 
-import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
-import { EntitlementAllocationDrawer } from "@/components/shared/entitlement-allocation-drawer"
+import { EntitlementAllocationRuleBadge } from "@/components/shared/entitlement-allocation-rule-note"
 import { EntitlementBreakdownTable } from "@/components/shared/entitlement-breakdown-table"
 import { EntitlementGroupLedgerCard } from "@/components/shared/entitlement-group-ledger-card"
 import { EntitlementUsageTooltip } from "@/components/shared/entitlement-usage-tooltip"
@@ -14,7 +13,6 @@ import {
 import {
   buildEntitlementAllocationDetail,
   buildEntitlementServiceAllocation,
-  type EntitlementAllocationRow,
   type EntitlementServiceAllocation,
   type ResolvedEntitlement,
 } from "@/features/employees/entitlement-resolver"
@@ -30,15 +28,12 @@ interface EntitlementPoolsProps {
 /**
  * Shared entitlement view for the host console and org portal.
  *
- * The page remains an overview. Person-specific allocation details open from
- * the employee and dependent cards in the breakdown.
+ * The page remains an overview with static allocation tables for each scope.
  */
 export function EntitlementPools({
   employeeName,
   entitlement,
 }: EntitlementPoolsProps) {
-  const [selectedPerson, setSelectedPerson] =
-    useState<EntitlementAllocationRow | null>(null)
   const summaryDetail = buildEntitlementAllocationDetail(
     entitlement,
     { type: "overall" },
@@ -60,13 +55,16 @@ export function EntitlementPools({
     <div className="space-y-6">
       <Card data-testid="entitlement-summary">
         <CardContent className="space-y-4 p-5">
-          <div>
-            <h3 className="text-lead font-semibold text-foreground">
-              Allocation Summary
-            </h3>
-            <p className="mt-1 text-label text-muted-foreground">
-              Total capacity and consuming spend across this entitlement.
-            </p>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h3 className="text-lead font-semibold text-foreground">
+                Allocation Summary
+              </h3>
+              <p className="mt-1 text-label text-muted-foreground">
+                Total allowance and usage for this entitlement.
+              </p>
+            </div>
+            <EntitlementAllocationRuleBadge kind={summaryDetail.kind} />
           </div>
 
           <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:items-center lg:gap-8">
@@ -115,10 +113,9 @@ export function EntitlementPools({
           )}
         </CardContent>
         <EntitlementBreakdownTable
+          dependentAllocated={summaryDetail.summary.dependentAllocated}
           kind={summaryDetail.kind}
           rows={summaryDetail.rows}
-          summary={summaryDetail.summary}
-          onPersonClick={setSelectedPerson}
         />
       </Card>
 
@@ -138,18 +135,11 @@ export function EntitlementPools({
             benefits={entitlement.benefits.filter(
               (benefit) => benefit.groupId === pool.group.id
             )}
-            display={pool.display}
             group={pool.group}
             serviceAllocations={serviceAllocations}
           />
         ))}
       </div>
-
-      <EntitlementAllocationDrawer
-        isOpen={selectedPerson !== null}
-        onClose={() => setSelectedPerson(null)}
-        row={selectedPerson}
-      />
     </div>
   )
 }

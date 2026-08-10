@@ -110,7 +110,7 @@ function relationshipLabel(
 }
 
 function allocationLabel(kind: EntitlementPoolKind) {
-  if (kind === "shared") return "Shared Dependent Pool"
+  if (kind === "shared") return "Shared Between Dependents"
   if (kind === "combined") return "Combined With Employee"
   return undefined
 }
@@ -247,7 +247,7 @@ function buildOverallRows(
       used: entitlement.summary.employeeUsed,
       balance:
         kind === "combined"
-          ? null
+          ? entitlement.summary.left
           : Math.max(
               entitlement.summary.employeeAllocated -
                 entitlement.summary.employeeUsed,
@@ -478,26 +478,31 @@ export function buildEntitlementServiceAllocation(
     kind,
     serviceRows,
   })
+  const summary = buildServiceSummary({
+    group: group ?? {
+      id: groupId,
+      policyId: entitlement.policy.id,
+      name: "Benefit Group",
+      coverageScope: "Employee",
+      distributionType: "IndividualBenefitAmount",
+    },
+    groupRows,
+    kind,
+    policy: entitlement.policy,
+    rows,
+    serviceRows,
+  })
 
   return {
     benefitId,
     serviceId: benefit?.serviceId ?? "",
     kind,
-    summary: buildServiceSummary({
-      group: group ?? {
-        id: groupId,
-        policyId: entitlement.policy.id,
-        name: "Benefit Group",
-        coverageScope: "Employee",
-        distributionType: "IndividualBenefitAmount",
-      },
-      groupRows,
-      kind,
-      policy: entitlement.policy,
-      rows,
-      serviceRows,
-    }),
-    rows,
+    summary,
+    rows: rows.map((row) =>
+      row.beneficiaryType === "employee" && kind === "combined"
+        ? { ...row, balance: summary.left }
+        : row
+    ),
   }
 }
 
@@ -525,17 +530,22 @@ export function buildEntitlementAllocationDetail(
     employeeName,
   })
   const kind = pool?.display.kind ?? "employee"
+  const summary = detailSummary(
+    rows,
+    kind,
+    pool?.display.dependentAllocated,
+    pool?.display.employeeAllocated
+  )
 
   return {
     scope,
     kind,
-    summary: detailSummary(
-      rows,
-      kind,
-      pool?.display.dependentAllocated,
-      pool?.display.employeeAllocated
+    summary,
+    rows: rows.map((row) =>
+      row.beneficiaryType === "employee" && kind === "combined"
+        ? { ...row, balance: summary.left }
+        : row
     ),
-    rows,
   }
 }
 

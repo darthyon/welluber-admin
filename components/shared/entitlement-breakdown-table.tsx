@@ -3,7 +3,6 @@
 import { useState } from "react"
 import { CaretDown } from "@phosphor-icons/react"
 import { EntitlementAllocationTable } from "@/components/shared/entitlement-allocation-table"
-import { EntitlementAllocationRuleNote } from "@/components/shared/entitlement-allocation-rule-note"
 import {
   Collapsible,
   CollapsibleContent,
@@ -12,21 +11,18 @@ import {
 import type {
   EntitlementAllocationRow,
   EntitlementPoolKind,
-  EntitlementSummary,
 } from "@/features/employees/entitlement-resolver"
 
 interface EntitlementBreakdownTableProps {
+  dependentAllocated: number
   kind: EntitlementPoolKind
   rows: EntitlementAllocationRow[]
-  summary: EntitlementSummary
-  onPersonClick: (row: EntitlementAllocationRow) => void
 }
 
 export function EntitlementBreakdownTable({
+  dependentAllocated,
   kind,
   rows,
-  summary,
-  onPersonClick,
 }: EntitlementBreakdownTableProps) {
   const [open, setOpen] = useState(false)
 
@@ -58,13 +54,10 @@ export function EntitlementBreakdownTable({
 
       <CollapsibleContent>
         <div className="mt-3 space-y-3 border-t border-border/60 pt-3">
-          <EntitlementAllocationRuleNote kind={kind} />
           <EntitlementAllocationTable
+            dependentAllocated={dependentAllocated}
             kind={kind}
             rows={rows}
-            summary={summary}
-            onPersonClick={onPersonClick}
-            scopeLabel="People and Allocations"
           />
         </div>
       </CollapsibleContent>

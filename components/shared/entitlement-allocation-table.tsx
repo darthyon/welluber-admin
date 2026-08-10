@@ -1,155 +1,210 @@
 "use client"
 
-import { CaretRight } from "@phosphor-icons/react"
-import { StatusBadge } from "@/components/shared/status-badge"
 import type {
   EntitlementAllocationRow,
   EntitlementPoolKind,
-  EntitlementSummary,
 } from "@/features/employees/entitlement-resolver"
 import { cn } from "@/lib/utils"
 
 interface EntitlementAllocationTableProps {
+  dependentAllocated: number
   kind: EntitlementPoolKind
   rows: EntitlementAllocationRow[]
-  summary: EntitlementSummary
-  onPersonClick?: (row: EntitlementAllocationRow) => void
-  scopeLabel?: string
 }
 
 export function EntitlementAllocationTable({
+  dependentAllocated,
   kind,
   rows,
-  summary,
-  onPersonClick,
-  scopeLabel = "Allocation Breakdown",
 }: EntitlementAllocationTableProps) {
-  const hasDependentColumn = kind !== "employee"
+  const employeeRows = rows.filter((row) => row.beneficiaryType === "employee")
+  const dependentRows = rows.filter(
+    (row) => row.beneficiaryType === "dependent"
+  )
 
   return (
     <div
       data-testid="entitlement-allocation-table"
       className="overflow-hidden rounded-lg border border-border bg-card"
     >
-      <div className="border-b border-border bg-muted/20 px-4 py-3">
-        <div className="min-w-0">
-          <p className="text-label font-medium text-muted-foreground">
-            {scopeLabel}
-          </p>
-          <p className="mt-0.5 text-body font-semibold text-foreground">
-            {tableTitle(kind)}
-          </p>
-        </div>
-      </div>
-
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[680px] border-separate border-spacing-0 text-left">
-          <caption className="sr-only">
-            {scopeLabel} for {tableTitle(kind)}
-          </caption>
-          <thead className="bg-muted/40">
-            <tr>
-              <th className="w-[28%] px-4 py-3 text-label font-medium text-muted-foreground">
-                Beneficiary
-              </th>
-              <th className="px-4 py-3 text-label font-medium text-muted-foreground">
-                <ColumnHeading
-                  label="Employee Policy Amount"
-                  value={formatRM(summary.employeeAllocated)}
-                />
-              </th>
-              {hasDependentColumn && (
-                <th className="px-4 py-3 text-label font-medium text-muted-foreground">
-                  <ColumnHeading
-                    label={dependentColumnTitle(kind)}
-                    value={dependentColumnValue(kind, summary)}
-                  />
-                </th>
-              )}
-              <th className="px-4 py-3 text-label font-medium text-muted-foreground">
-                Used
-              </th>
-              <th className="px-4 py-3 text-label font-medium text-muted-foreground">
-                Balance
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={hasDependentColumn ? 5 : 4}
-                  className="px-4 py-8 text-center text-label text-muted-foreground"
-                >
-                  No allocation rows available.
-                </td>
-              </tr>
-            ) : (
-              rows.map((row) => (
-                <AllocationTableRow
-                  key={row.beneficiaryId}
-                  kind={kind}
-                  row={row}
-                  hasDependentColumn={hasDependentColumn}
-                  onClick={onPersonClick}
-                />
-              ))
-            )}
-          </tbody>
-        </table>
+        <div className="min-w-[640px]">
+          {employeeRows.length > 0 && (
+            <AllocationSectionTable
+              dependentAllocated={dependentAllocated}
+              kind={kind}
+              rows={employeeRows}
+              section="employee"
+            />
+          )}
+          {dependentRows.length > 0 && (
+            <AllocationSectionTable
+              dependentAllocated={dependentAllocated}
+              kind={kind}
+              rows={dependentRows}
+              section="dependent"
+            />
+          )}
+          {rows.length === 0 && (
+            <p className="px-4 py-8 text-center text-label text-muted-foreground">
+              No allocation rows available.
+            </p>
+          )}
+        </div>
       </div>
     </div>
   )
 }
 
-function AllocationTableRow({
-  hasDependentColumn,
+function AllocationSectionTable({
+  dependentAllocated,
   kind,
-  onClick,
-  row,
+  rows,
+  section,
 }: {
-  hasDependentColumn: boolean
+  dependentAllocated: number
   kind: EntitlementPoolKind
-  onClick?: (row: EntitlementAllocationRow) => void
-  row: EntitlementAllocationRow
+  rows: EntitlementAllocationRow[]
+  section: "employee" | "dependent"
 }) {
+  const isEmployeeSection = section === "employee"
+  const label = isEmployeeSection ? "Employee" : "Dependents"
+  const beneficiaryLabel = isEmployeeSection ? "Employee" : "Dependent"
+
   return (
-    <tr className="group transition-colors hover:bg-accent/30">
+    <section
+      data-testid={`allocation-section-${section}`}
+      className={cn(section === "dependent" && "border-t border-border/70")}
+    >
+      <table className="w-full table-fixed border-separate border-spacing-0 text-left">
+        <caption className="sr-only">
+          {label} allocation table for {tableTitle(kind)}
+        </caption>
+        <colgroup>
+          <col className="w-2/5" />
+          <col className="w-1/5" />
+          <col className="w-1/5" />
+          <col className="w-1/5" />
+        </colgroup>
+        <thead className="bg-muted/40">
+          <tr>
+            <th className="px-4 py-3 text-label font-medium text-muted-foreground">
+              {beneficiaryLabel}
+            </th>
+            <th className="px-4 py-3 text-label font-medium text-muted-foreground">
+              Allocation
+            </th>
+            <th className="px-4 py-3 text-label font-medium text-muted-foreground">
+              Used
+            </th>
+            <th className="px-4 py-3 text-label font-medium text-muted-foreground">
+              Balance
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {!isEmployeeSection && (
+            <DependentPoolSummaryRow
+              dependentAllocated={dependentAllocated}
+              kind={kind}
+              rows={rows}
+            />
+          )}
+          {rows.map((row) => (
+            <AllocationTableRow
+              key={row.beneficiaryId}
+              kind={kind}
+              row={row}
+              section={section}
+            />
+          ))}
+        </tbody>
+      </table>
+    </section>
+  )
+}
+
+function DependentPoolSummaryRow({
+  dependentAllocated,
+  kind,
+  rows,
+}: {
+  dependentAllocated: number
+  kind: EntitlementPoolKind
+  rows: EntitlementAllocationRow[]
+}) {
+  const dependentUsed = rows.reduce((total, row) => total + row.used, 0)
+  const dependentBalance = Math.max(dependentAllocated - dependentUsed, 0)
+  const isCombined = kind === "combined"
+
+  return (
+    <tr className="bg-muted/20">
       <td className="border-t border-border/70 px-4 py-3">
-        <PersonIdentity row={row} onClick={onClick} />
-      </td>
-      <td className="border-t border-border/70 px-4 py-3 align-middle">
-        <PoolValue value={employeePoolValue(row)} />
-      </td>
-      {hasDependentColumn && (
-        <td className="border-t border-border/70 px-4 py-3 align-middle">
-          <PoolValue value={dependentPoolValue(row, kind)} />
-        </td>
-      )}
-      <td className="border-t border-border/70 px-4 py-3 align-middle">
-        <MetricValue value={formatRM(row.used)} />
+        <div className="min-w-0">
+          <p className="text-body font-semibold text-foreground">
+            All Dependents
+          </p>
+          <p className="mt-0.5 text-label text-muted-foreground">
+            {isCombined ? "Combined Pool" : "Dependent Pool"}
+          </p>
+        </div>
       </td>
       <td className="border-t border-border/70 px-4 py-3 align-middle">
         <PoolValue
           value={
-            row.balance === null ? balanceLabel(kind) : formatRM(row.balance)
+            isCombined ? "Combined With Employee" : formatRM(dependentAllocated)
           }
-          muted={row.balance === null}
+        />
+      </td>
+      <td className="border-t border-border/70 px-4 py-3 align-middle">
+        <MetricValue value={formatRM(dependentUsed)} />
+      </td>
+      <td className="border-t border-border/70 px-4 py-3 align-middle">
+        <PoolValue
+          value={
+            isCombined ? "Combined With Employee" : formatRM(dependentBalance)
+          }
         />
       </td>
     </tr>
   )
 }
 
-function PersonIdentity({
-  onClick,
+function AllocationTableRow({
+  kind,
   row,
+  section,
 }: {
-  onClick?: (row: EntitlementAllocationRow) => void
+  kind: EntitlementPoolKind
   row: EntitlementAllocationRow
+  section: "employee" | "dependent"
 }) {
+  return (
+    <tr className="group transition-colors hover:bg-accent/30">
+      <td className="border-t border-border/70 px-4 py-3">
+        <PersonIdentity row={row} />
+      </td>
+      <td className="border-t border-border/70 px-4 py-3 align-middle">
+        <PoolValue
+          value={
+            section === "employee"
+              ? employeePoolValue(row)
+              : dependentPoolValue(row, kind)
+          }
+        />
+      </td>
+      <td className="border-t border-border/70 px-4 py-3 align-middle">
+        <MetricValue value={formatRM(row.used)} />
+      </td>
+      <td className="border-t border-border/70 px-4 py-3 align-middle">
+        <PoolValue value={balanceValue(row, kind)} />
+      </td>
+    </tr>
+  )
+}
+
+function PersonIdentity({ row }: { row: EntitlementAllocationRow }) {
   const isEmployee = row.beneficiaryType === "employee"
-  const relationship = isEmployee ? "Employee" : row.relationship
   const identity = (
     <>
       <span
@@ -163,61 +218,27 @@ function PersonIdentity({
         {initials(row.name)}
       </span>
       <span className="min-w-0">
-        <span className="flex flex-wrap items-center gap-2">
+        <span className="flex items-center gap-2">
           <span className="truncate text-body font-semibold text-foreground">
             {row.name}
           </span>
-          <StatusBadge
-            status={relationship}
-            variant={isEmployee ? "primary" : "zinc"}
-            className="font-semibold"
-          />
         </span>
-        <span className="mt-0.5 block text-label text-muted-foreground">
-          {isEmployee ? "Policy Holder" : row.relationship}
-        </span>
+        {!isEmployee && (
+          <span className="mt-0.5 block text-label text-muted-foreground">
+            {row.relationship}
+          </span>
+        )}
       </span>
     </>
   )
 
-  if (!onClick) {
-    return (
-      <div
-        data-testid={`allocation-person-${row.beneficiaryId}`}
-        className="flex min-w-0 items-center gap-3"
-      >
-        {identity}
-      </div>
-    )
-  }
-
   return (
-    <button
-      type="button"
+    <div
       data-testid={`allocation-person-${row.beneficiaryId}`}
-      aria-haspopup="dialog"
-      aria-label={`View allocation details for ${row.name}`}
-      onClick={() => onClick(row)}
-      className="flex min-w-0 items-center gap-3 rounded-4xl px-1.5 py-1 text-left transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+      className="flex min-w-0 items-center gap-3"
     >
       {identity}
-      <CaretRight
-        size={14}
-        className="ml-auto shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5"
-        aria-hidden="true"
-      />
-    </button>
-  )
-}
-
-function ColumnHeading({ label, value }: { label: string; value: string }) {
-  return (
-    <span className="flex min-w-32 flex-col gap-0.5">
-      <span>{label}</span>
-      <span className="text-body font-semibold text-foreground tabular-nums">
-        {value}
-      </span>
-    </span>
+    </div>
   )
 }
 
@@ -229,55 +250,29 @@ function MetricValue({ value }: { value: string }) {
   )
 }
 
-function PoolValue({
-  muted = false,
-  value,
-}: {
-  muted?: boolean
-  value: string
-}) {
+function PoolValue({ value }: { value: string }) {
   return (
-    <span
-      className={cn(
-        "text-label font-semibold tabular-nums",
-        muted ? "text-muted-foreground" : "text-foreground"
-      )}
-    >
+    <span className="text-label font-semibold text-foreground tabular-nums">
       {value}
     </span>
   )
 }
 
 function employeePoolValue(row: EntitlementAllocationRow) {
-  return row.beneficiaryType === "employee" && row.allocated !== null
-    ? formatRM(row.allocated)
-    : "—"
+  return row.allocated === null ? "—" : formatRM(row.allocated)
 }
 
 function dependentPoolValue(
   row: EntitlementAllocationRow,
   kind: EntitlementPoolKind
 ) {
-  if (row.beneficiaryType === "employee") return "—"
   if (kind === "individual" && row.allocated !== null) {
     return formatRM(row.allocated)
   }
-  return kind === "shared" ? "Shared" : "Combined"
-}
-
-function dependentColumnTitle(kind: EntitlementPoolKind) {
-  if (kind === "individual") return "Dependent (Individual)"
-  if (kind === "shared") return "Dependent (Shared)"
-  return "Shared With Employee"
-}
-
-function dependentColumnValue(
-  kind: EntitlementPoolKind,
-  summary: EntitlementSummary
-) {
-  if (kind === "individual") return formatRM(summary.dependentAllocated)
-  if (kind === "shared") return `${formatRM(summary.dependentAllocated)} pool`
-  return "Uses employee pool"
+  if (kind === "combined") return "—"
+  return kind === "shared"
+    ? "Shared Between Dependents"
+    : "Combined With Employee"
 }
 
 function balanceLabel(kind: EntitlementPoolKind) {
@@ -286,9 +281,24 @@ function balanceLabel(kind: EntitlementPoolKind) {
   return "—"
 }
 
+function balanceValue(
+  row: EntitlementAllocationRow,
+  kind: EntitlementPoolKind
+) {
+  if (row.beneficiaryType === "dependent" && kind === "shared") {
+    return "Shared Between Dependents"
+  }
+  if (row.beneficiaryType === "dependent" && kind === "combined") {
+    return "—"
+  }
+  if (row.balance !== null) return formatRM(row.balance)
+  if (row.beneficiaryType === "dependent") return "—"
+  return balanceLabel(kind)
+}
+
 function tableTitle(kind: EntitlementPoolKind) {
   if (kind === "individual") return "Separate Individual Allocations"
-  if (kind === "shared") return "Shared Dependent Pool"
+  if (kind === "shared") return "Shared Between Dependents"
   if (kind === "combined") return "Combined With Employee"
   return "Employee Policy Allocation"
 }

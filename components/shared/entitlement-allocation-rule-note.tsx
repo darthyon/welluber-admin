@@ -1,59 +1,64 @@
 "use client"
 
-import { Info } from "@phosphor-icons/react"
+import { StatusBadge } from "@/components/shared/status-badge"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import type { EntitlementPoolKind } from "@/features/employees/entitlement-resolver"
 
-export function EntitlementAllocationRuleNote({
+export function EntitlementAllocationRuleBadge({
   kind,
 }: {
   kind: EntitlementPoolKind
 }) {
   return (
-    <div
-      data-testid="entitlement-allocation-rule"
-      className="flex items-center gap-3 rounded-lg border border-border bg-muted/30 px-3 py-3"
-    >
-      <Info
-        size={16}
-        weight="duotone"
-        className="shrink-0 self-center text-primary"
-        aria-hidden="true"
-      />
-      <div className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1">
-        <span className="text-body text-muted-foreground">Allocation Rule</span>
-        <span className="text-body text-muted-foreground" aria-hidden="true">
-          ·
-        </span>
-        <span className="text-body font-semibold text-foreground">
-          {kindLabel(kind)}
-        </span>
-        <span className="text-body text-muted-foreground" aria-hidden="true">
-          —
-        </span>
-        <span className="text-body leading-normal text-muted-foreground">
+    <TooltipProvider delayDuration={200}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            type="button"
+            data-testid="entitlement-allocation-rule"
+            aria-label={`Allocation Rule: ${kindLabel(kind)}`}
+            className="rounded-4xl focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+          >
+            <StatusBadge
+              status={kindLabel(kind)}
+              variant="primary"
+              className="border-primary/40 bg-primary/15 px-2.5 py-1 font-semibold"
+            />
+          </button>
+        </TooltipTrigger>
+        <TooltipContent
+          side="top"
+          align="end"
+          className="max-w-[300px] text-label leading-relaxed"
+        >
           {kindDescription(kind)}
-        </span>
-      </div>
-    </div>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   )
 }
 
 function kindLabel(kind: EntitlementPoolKind) {
   if (kind === "individual") return "Individual"
-  if (kind === "shared") return "Shared"
+  if (kind === "shared") return "Shared Between Dependents"
   if (kind === "combined") return "Combined With Employee"
   return "Employee Only"
 }
 
 function kindDescription(kind: EntitlementPoolKind) {
   if (kind === "individual") {
-    return "Employee and each dependent have a separate allocation. Balances are tracked per person."
+    return "Employee and dependents have separate allocations."
   }
   if (kind === "shared") {
-    return "Dependents share one allocation. The employee's allocation remains separate."
+    return "Dependents share one pool; the employee has an individual allocation."
   }
   if (kind === "combined") {
-    return "Employee and dependents share one allocation. Dependent spend reduces the same balance."
+    return "Employee and dependents share from one combined pool."
   }
-  return "The employee has one individual policy allocation."
+  return "The employee has one individual allocation."
 }

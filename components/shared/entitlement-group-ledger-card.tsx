@@ -1,7 +1,7 @@
 "use client"
 
 import { CaretDown, TreeStructure } from "@phosphor-icons/react"
-import { StatusBadge } from "@/components/shared/status-badge"
+import { EntitlementUsageTooltip } from "@/components/shared/entitlement-usage-tooltip"
 import {
   Collapsible,
   CollapsibleContent,
@@ -13,6 +13,10 @@ import {
 } from "@/lib/mock-data/service-catalog"
 import { getMainServiceIcon } from "@/components/host/policies/detail-tabs/policy-detail-helpers"
 import { EntitlementAllocationTable } from "@/components/shared/entitlement-allocation-table"
+import {
+  StackedPoolBar,
+  type PoolSegment,
+} from "@/components/shared/stacked-pool-bar"
 import type {
   EntitlementServiceAllocation,
   EntitlementSummary,
@@ -22,18 +26,15 @@ import type {
   BenefitGroup,
   BenefitGroupCoverageScope,
 } from "@/types/policy"
-import type { EntitlementGroupPoolDisplay } from "@/features/employees/entitlement-pool-display"
 
 interface EntitlementGroupLedgerCardProps {
   benefits: Benefit[]
-  display: EntitlementGroupPoolDisplay
   group: BenefitGroup
   serviceAllocations: Map<string, EntitlementServiceAllocation>
 }
 
 export function EntitlementGroupLedgerCard({
   benefits,
-  display,
   group,
   serviceAllocations,
 }: EntitlementGroupLedgerCardProps) {
@@ -56,11 +57,6 @@ export function EntitlementGroupLedgerCard({
             {formatGroupMeta(group, coverageScope, benefits.length)}
           </p>
         </div>
-        <StatusBadge
-          status={poolBadgeLabel(display.kind)}
-          variant="primary"
-          className="border-primary/40 bg-primary/15 px-2.5 py-1 font-semibold"
-        />
       </div>
 
       <div className="space-y-5 p-4">
@@ -146,10 +142,11 @@ function ServiceRow({
                 className="min-w-0"
               >
                 <EntitlementAllocationTable
+                  dependentAllocated={
+                    serviceAllocation.summary.dependentAllocated
+                  }
                   kind={serviceAllocation.kind}
                   rows={serviceAllocation.rows}
-                  summary={serviceAllocation.summary}
-                  scopeLabel="Service Allocation"
                 />
               </div>
             </>
@@ -164,6 +161,38 @@ function ServiceRow({
   )
 }
 
+function AllocationSummary({
+  "data-testid": dataTestId,
+  summary,
+}: {
+  "data-testid"?: string
+  summary: AllocationSummaryValues
+}) {
+  return (
+    <div data-testid={dataTestId} className="border-b border-border px-4 py-4">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:items-center lg:gap-8">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <MetricValue label="Allocated" value={formatRM(summary.allocated)} />
+          <MetricValue label="Used" value={formatRM(summary.used)} />
+          <MetricValue label="Balance Left" value={formatRM(summary.left)} />
+        </div>
+
+        <div className="min-w-0">
+          <div className="mb-2 flex items-center gap-1.5 text-label text-muted-foreground">
+            <span>Usage</span>
+            <EntitlementUsageTooltip />
+          </div>
+          <StackedPoolBar
+            allocated={summary.allocated}
+            segments={buildSummarySegments(summary)}
+            showLegend={summary.used > 0}
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function ServiceSummary({
   benefitId,
   summary,
@@ -172,29 +201,46 @@ function ServiceSummary({
   summary: EntitlementSummary
 }) {
   return (
-    <div
+    <AllocationSummary
       data-testid={`service-allocation-summary-${benefitId}`}
-      className="grid grid-cols-1 gap-3 rounded-lg border border-border/70 bg-card px-3 py-3 sm:grid-cols-3"
-    >
-      <MetricValue
-        label="Total Allocated"
-        value={formatRM(summary.allocated)}
-      />
-      <MetricValue label="Total Used" value={formatRM(summary.used)} />
-      <MetricValue label="Balance Left" value={formatRM(summary.left)} />
-    </div>
+      summary={summary}
+    />
   )
 }
+
+type AllocationSummaryValues = Pick<
+  EntitlementSummary,
+  "allocated" | "used" | "left" | "employeeUsed" | "dependentUsed"
+>
 
 function MetricValue({ label, value }: { label: string; value: string }) {
   return (
     <div className="min-w-0">
-      <p className="text-micro text-muted-foreground">{label}</p>
-      <p className="mt-1 truncate text-label font-semibold text-foreground tabular-nums">
+      <p className="text-label font-medium text-muted-foreground">{label}</p>
+      <p className="mt-1 truncate text-lead font-semibold text-foreground tabular-nums">
         {value}
       </p>
     </div>
   )
+}
+
+function buildSummarySegments(summary: AllocationSummaryValues): PoolSegment[] {
+  const segments: PoolSegment[] = []
+  if (summary.employeeUsed > 0) {
+    segments.push({
+      label: "Employee Used",
+      spent: summary.employeeUsed,
+      className: "bg-primary",
+    })
+  }
+  if (summary.dependentUsed > 0) {
+    segments.push({
+      label: "Dependents Used",
+      spent: summary.dependentUsed,
+      className: "bg-teal-500 dark:bg-teal-400",
+    })
+  }
+  return segments
 }
 
 function formatRM(amount: number) {
@@ -202,13 +248,6 @@ function formatRM(amount: number) {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`
-}
-
-function poolBadgeLabel(kind: EntitlementGroupPoolDisplay["kind"]) {
-  if (kind === "shared") return "Shared"
-  if (kind === "individual") return "Individual"
-  if (kind === "combined") return "Combined"
-  return "Employee"
 }
 
 function formatGroupMeta(
