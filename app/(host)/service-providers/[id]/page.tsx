@@ -44,11 +44,40 @@ export default function ServiceProviderDetailPage() {
   const [isTogglingStatus, setIsTogglingStatus] = useState(false);
 
   useEffect(() => {
+    const branchView = searchParams.get("branchView")
+    const branchId = searchParams.get("branchId")
+
+    if (branchView === "add") {
+      router.replace(`/service-providers/${spId}/branches/new`)
+      return
+    }
+    if (branchView === "edit" && branchId) {
+      router.replace(
+        `/service-providers/${spId}/branches/${encodeURIComponent(branchId)}/edit`
+      )
+      return
+    }
+
+    const voucherView = searchParams.get("voucherView")
+    const voucherId = searchParams.get("voucherId")
+
+    if (voucherView === "add") {
+      router.replace(`/service-providers/${spId}/voucher-packages/new`)
+      return
+    }
+    if (voucherView === "edit" && voucherId) {
+      router.replace(
+        `/service-providers/${spId}/voucher-packages/${voucherId}/edit`
+      )
+      return
+    }
     if (searchParams.has("voucherView")) {
       setActiveTab("vouchers");
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (searchParams.has("branchView")) {
+      setActiveTab("branches")
+    }
+  }, [router, searchParams, setActiveTab, spId]);
   const [isRemoveSubmitting, setIsRemoveSubmitting] = useState(false);
   const [isDangerModalOpen, setIsDangerModalOpen] = useState(false);
   const [dangerAction, setDangerAction] = useState<"status" | "remove" | null>(null);

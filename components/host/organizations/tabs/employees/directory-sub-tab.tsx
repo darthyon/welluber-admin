@@ -69,7 +69,7 @@ export function DirectorySubTab({ orgId, onBulkUpload }: DirectorySubTabProps) {
             variant="secondary"
             size="sm"
             className="h-8 gap-1.5 text-label font-medium"
-            onClick={() => router.push(`/employees/new?org=${orgId}`)}
+            onClick={() => router.push(`/organizations/${encodeURIComponent(orgId)}/employees/new`)}
           >
             <span className="inline-flex items-center gap-1.5">
               <Plus size={14} weight="bold" /> Add Employee
@@ -119,7 +119,7 @@ export function DirectorySubTab({ orgId, onBulkUpload }: DirectorySubTabProps) {
                 key={emp.id}
                 employee={emp}
                 onView={(id) => router.push(`/employees/${id}?from=${orgId}`)}
-                onEdit={(id) => router.push(`/employees/${id}/edit`)}
+                onEdit={(id) => router.push(`/organizations/${encodeURIComponent(orgId)}/employees/${encodeURIComponent(id)}/edit`)}
               />
             ))}
           </div>
@@ -253,7 +253,7 @@ export function DirectorySubTab({ orgId, onBulkUpload }: DirectorySubTabProps) {
                       },
                       {
                         label: "Edit Employee",
-                        onClick: () => router.push(`/employees/${emp.id}/edit`),
+                        onClick: () => router.push(`/organizations/${encodeURIComponent(orgId)}/employees/${encodeURIComponent(emp.id)}/edit`),
                       },
                       { label: "Terminate Link", isDanger: true },
                     ]}

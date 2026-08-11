@@ -14,6 +14,7 @@ export interface VersionWizardState {
   isSuccess: boolean
   goNext: () => void
   goPrev: () => void
+  goToStep: (step: 1 | 2 | 3) => void
   handleSubmit: () => Promise<void>
 }
 
@@ -176,6 +177,9 @@ export function useVersionWizard(options: VersionWizardProps): VersionWizardStat
   }
 
   const goPrev = () => setCurrentStep((s) => s - 1)
+  const goToStep = (step: 1 | 2 | 3) => {
+    if (step <= currentStep) setCurrentStep(step)
+  }
 
   const handleSubmit = async () => {
     setIsSubmitting(true)
@@ -236,5 +240,5 @@ export function useVersionWizard(options: VersionWizardProps): VersionWizardStat
     toggleAllConfirmed,
   }
 
-  return { ctx, currentStep, isSubmitting, isSuccess, goNext, goPrev, handleSubmit }
+  return { ctx, currentStep, isSubmitting, isSuccess, goNext, goPrev, goToStep, handleSubmit }
 }

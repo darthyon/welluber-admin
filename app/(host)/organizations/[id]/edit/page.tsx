@@ -6,9 +6,7 @@ import { useForm, Controller, useWatch, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format, isValid, parse } from "date-fns";
 import {
-  CaretLeft,
   Buildings,
-  NavigationArrow,
   WarningCircle,
   IdentificationCard,
   MapPin,
@@ -24,21 +22,19 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { createOrganizationSchema, CreateOrganizationData } from "@/features/organizations/schemas";
-import { Button } from "@/components/ui/button";
-import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav";
+import { FormActionBar, FormStepIndicator, type FormWizardStep } from "@/components/shared/form-step-wizard";
 import { LocationPicker } from "@/components/shared/location-picker";
 import { DocumentUploadSection } from "@/components/shared/document-upload-section";
 import { FormSelect } from "@/components/shared/form-select";
 import { MALAYSIAN_BANKS } from "@/lib/constants/banks";
-import { Spinner } from "@/components/shared/spinner";
 import { toast } from "sonner";
 
-const ANCHOR_ITEMS = [
-  { id: "org-profile", label: "Organisation Profile" },
-  { id: "registration-compliance", label: "Registration & Compliance" },
-  { id: "business-address", label: "Business Address" },
-  { id: "payment-details", label: "Payment Details" },
-];
+const ORGANIZATION_EDIT_STEPS = [
+  { id: 1, label: "Organisation Profile" },
+  { id: 2, label: "Registration And Compliance" },
+  { id: 3, label: "Business Address" },
+  { id: 4, label: "Payment Details" },
+] as const satisfies readonly FormWizardStep<1 | 2 | 3 | 4>[];
 
 const ORG_TYPES = [
   { id: "sole_proprietorship", label: "Sole Proprietorship", docs: "Form D / MyCoID" },
@@ -55,6 +51,7 @@ export default function EditOrganizationPage() {
   const orgId = params.id as string;
   
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(1);
   const [fyPickerOpen, setFyPickerOpen] = useState(false);
 
   const { register, handleSubmit, control, setValue, formState: { errors } } = useForm<CreateOrganizationData>({
@@ -124,35 +121,28 @@ export default function EditOrganizationPage() {
 
   return (
     <div className="pb-24 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start">
-
-        {/* Left Column: Navigation */}
-        <aside className="hidden xl:block w-52 shrink-0 sticky top-20 self-start">
-          <FloatingAnchorNav items={ANCHOR_ITEMS} />
-        </aside>
-
-        {/* Right Column: Form Content */}
-        <div className="flex-1">
+      <div className="mx-auto max-w-[1120px]">
           <div className="flex flex-col gap-6">
             
             {/* Header */}
             <div className="flex flex-col gap-4">
-              <button
-                onClick={() => router.back()}
-                className="inline-flex items-center gap-1.5 text-body font-medium text-subtle hover:text-foreground transition-colors w-fit"
-              >
-                <CaretLeft size={16} /> Back
-              </button>
               <div>
                 <h1 className="text-heading font-semibold text-foreground text-balance">Edit Organisation</h1>
                 <p className="text-subtle text-body mt-1">Make changes to the corporate client&apos;s core identity.</p>
               </div>
             </div>
 
+            <FormStepIndicator
+              currentStep={currentStep}
+              onStepClick={setCurrentStep}
+              steps={ORGANIZATION_EDIT_STEPS}
+              allowStepJumping
+            />
+
             <form id="editOrgForm" onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               
               {/* Section: Organisation Profile */}
-              <div id="org-profile" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-24">
+              {currentStep === 1 && <div id="org-profile" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-24">
                 <div className="p-6 space-y-6">
                   <div className="flex items-center gap-2 pb-2">
                     <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
@@ -238,10 +228,10 @@ export default function EditOrganizationPage() {
                     </div>
                   </div>
                 </div>
-              </div>
+              </div>}
 
               {/* Section: Registration & Compliance */}
-              <div id="registration-compliance" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
+              {currentStep === 2 && <div id="registration-compliance" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
                 <div className="p-6 space-y-6">
                   <div className="flex items-center gap-2 pb-2">
                     <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
@@ -299,10 +289,10 @@ export default function EditOrganizationPage() {
                     </div>
                   </div>
                 </div>
-              </div>
+              </div>}
 
               {/* Section: Business Address */}
-              <div id="business-address" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
+              {currentStep === 3 && <div id="business-address" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
                 <div className="p-6 space-y-6">
                   <div className="flex items-center gap-2 pb-2">
                     <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
@@ -328,10 +318,10 @@ export default function EditOrganizationPage() {
                     />
                   </div>
                 </div>
-              </div>
+              </div>}
 
               {/* Section: Payment Details */}
-              <div id="payment-details" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
+              {currentStep === 4 && <div id="payment-details" className="bg-card border border-border rounded-lg shadow-sm overflow-hidden scroll-mt-32">
                 <div className="p-6 space-y-8">
                   <div className="flex items-center gap-2 pb-2 border-b border-border/40">
                     <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
@@ -373,39 +363,21 @@ export default function EditOrganizationPage() {
                     </div>
                   </div>
                 </div>
-              </div>
+              </div>}
 
-              {/* Floating Action Bar */}
-              <div className="fixed bottom-8 left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[calc(50%+104px)] z-50 flex items-center gap-4 p-2 px-6 bg-background/80 backdrop-blur-2xl border border-border shadow-lg rounded-full animate-in slide-in-from-bottom-10 duration-700 ease-out">
-                <Button variant="ghost" size="lg" className="text-body font-semibold px-6 transition-colors" onClick={() => router.back()}>
-                  Cancel
-                </Button>
-                <div className="w-px h-6 bg-border/40" />
-                <Button 
-                  type="submit"
-                  disabled={isSubmitting}
-                  size="lg"
-                  className="text-body font-semibold px-8 flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Spinner size="sm" variant="white" />
-                      Saving...
-                    </>
-                  ) : (
-                    <>
-                      Save Changes
-                      <NavigationArrow size={14} weight="bold" className="rotate-90" />
-                    </>
-                  )}
-                </Button>
-              </div>
-
-              {/* Spacer */}
-              <div className="h-[60vh]" />
+              <FormActionBar
+                currentStep={currentStep}
+                totalSteps={4}
+                mode="edit"
+                onCancel={() => router.back()}
+                onBack={() => setCurrentStep((step) => Math.max(1, step - 1) as 1 | 2 | 3 | 4)}
+                onNext={() => setCurrentStep((step) => Math.min(4, step + 1) as 1 | 2 | 3 | 4)}
+                onSave={() => void handleSubmit(onSubmit)()}
+                primaryLabel="Save Changes"
+                isSubmitting={isSubmitting}
+              />
             </form>
           </div>
-        </div>
       </div>
     </div>
   );

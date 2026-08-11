@@ -33,8 +33,8 @@ import {
 import {
   VoucherFormHeader,
   VoucherStepIndicator,
-  VoucherWizardActionBar,
 } from "@/components/host/service-providers/sp-voucher-form-frame"
+import { FormActionBar } from "@/components/shared/form-step-wizard"
 import {
   VoucherConfigurationSection,
   VoucherManageServicesSection,
@@ -50,6 +50,7 @@ interface SpVoucherFormProps {
     booking: SpBranchBookingSettings
   }[]
   voucher?: SpVoucher
+  providerName?: string
   onSuccess: () => void
   onCancel: () => void
 }
@@ -90,6 +91,7 @@ export function SpVoucherForm({
   spServiceCategories,
   spBranches,
   voucher,
+  providerName,
   onSuccess,
   onCancel,
 }: SpVoucherFormProps) {
@@ -202,10 +204,26 @@ export function SpVoucherForm({
     3: ["serviceLines"],
   }
 
-  const goNext = async () => {
+  const validateStep = async (step: 1 | 2 | 3) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const valid = await trigger(STEP_FIELDS[currentStep] as any)
-    if (valid) setCurrentStep((s) => (s + 1) as 1 | 2 | 3)
+    return trigger(STEP_FIELDS[step] as any)
+  }
+
+  const goToStep = async (targetStep: 1 | 2 | 3) => {
+    if (isEditing) {
+      setCurrentStep(targetStep)
+      return
+    }
+
+    for (let step = currentStep; step < targetStep; step += 1) {
+      if (!(await validateStep(step as 1 | 2 | 3))) return
+    }
+
+    setCurrentStep(targetStep)
+  }
+
+  const goNext = async () => {
+    await goToStep((currentStep + 1) as 1 | 2 | 3)
   }
 
   const goPrev = () => setCurrentStep((s) => (s - 1) as 1 | 2 | 3)
@@ -265,9 +283,9 @@ export function SpVoucherForm({
       onSubmit={handleSubmit(onSave)}
       className="animate-in space-y-8 duration-500 fade-in slide-in-from-bottom-4"
     >
-      <VoucherFormHeader isEditing={isEditing} onCancel={onCancel} />
+      <VoucherFormHeader isEditing={isEditing} providerName={providerName} />
 
-      <VoucherStepIndicator currentStep={currentStep} onStepClick={setCurrentStep} />
+      <VoucherStepIndicator currentStep={currentStep} onStepClick={goToStep} allowStepJumping={isEditing} />
 
       <div className="min-w-0">
         {/* Step 1 — Details */}
@@ -501,17 +519,22 @@ export function SpVoucherForm({
         )}
       </div>
 
-      <VoucherWizardActionBar
+      <FormActionBar
         currentStep={currentStep}
-        formIsSubmitting={formIsSubmitting}
-        isEditing={isEditing}
-        isPublishing={isPublishing}
-        isSubmitting={isSubmitting}
-        onBack={goPrev}
+        totalSteps={3}
+        mode={isEditing ? "edit" : "create"}
         onCancel={onCancel}
+        onBack={goPrev}
         onNext={goNext}
-        onPublish={onPublish}
-        voucher={voucher}
+        onSave={isEditing ? () => void handleSubmit(onSave)() : undefined}
+        primaryLabel={isEditing ? "Save Changes" : "Add Voucher"}
+        primaryIcon={isEditing ? "none" : "plus"}
+        isSubmitting={isSubmitting || isPublishing || formIsSubmitting}
+        secondaryAction={
+          isEditing && voucher?.status === "draft"
+            ? { label: "Publish", onClick: () => void onPublish(), isLoading: isPublishing }
+            : undefined
+        }
       />
     </form>
   )

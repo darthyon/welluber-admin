@@ -134,6 +134,15 @@ Line-height and letter-spacing are baked into each token — do not override the
 
 **Rule:** `variant="outline"` is NOT the default secondary — use `ghost` for most secondary actions.
 
+#### Button Icon Policy
+- Use an icon only when it clarifies the action or communicates direction. Do not add icons to every labeled button.
+- Keep the text label as the source of meaning. Never use an icon-only button when the action is not universally recognizable; icon-only buttons require an accessible name.
+- Workflow navigation uses one directional icon family consistently: `ArrowLeft` before `Back` and `ArrowRight` after `Next` or `Review`. Reserve chevrons for disclosure, select, and breadcrumb affordances.
+- Use semantic icons for high-intent actions when they add clarity: `Plus` before `Create` or `Add`, `Check` before `Confirm`.
+- `Save Changes` is text-only by default. Do not use `PaperPlaneTilt` for saving; reserve send or publish icons for send/publish actions.
+- Decorative icons must be `aria-hidden="true"`; icon-only controls must provide `aria-label` or an equivalent accessible name.
+- Use Phosphor Icons at the shared button default size. Keep icon placement and weight consistent within an action family.
+
 ### Cards & Containers
 - **Standard Card:** `bg-card border border-border rounded-lg shadow-sm`
 - **Glass Card:** `.glass-card` (`border border-border/50 bg-card/60 backdrop-blur-md`) — use for floating panels or overlays

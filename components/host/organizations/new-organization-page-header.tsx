@@ -27,9 +27,6 @@ export function NewOrganizationPageHeader({
           <h1 className="text-heading font-semibold text-foreground text-balance">
             {step === 1 ? "Add New Organisation" : "Set Up HQ Branch"}
           </h1>
-          <span className="rounded-full border border-border bg-muted/50 px-2 py-0.5 text-label font-semibold text-muted-foreground">
-            Step {step} of 2
-          </span>
         </div>
         <p className="text-body text-subtle">
           {step === 1

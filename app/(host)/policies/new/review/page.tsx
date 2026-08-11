@@ -89,7 +89,7 @@ function NewPolicyReviewPageContent() {
   const effectiveOrgContext = orgIdFromQuery ?? orgContext;
   const reviewBackHref =
     source === "org" && effectiveOrgContext
-      ? `/policies/new?source=org&orgId=${effectiveOrgContext}`
+      ? `/organizations/${encodeURIComponent(effectiveOrgContext)}/policies/new`
       : "/policies/new?source=global";
   const doneHref =
     source === "org" && effectiveOrgContext

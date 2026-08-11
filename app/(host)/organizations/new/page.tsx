@@ -6,7 +6,6 @@ import { useForm, Controller, type Resolver } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
   Buildings,
-  NavigationArrow,
   WarningCircle,
   IdentificationCard,
   MapPin,
@@ -35,8 +34,7 @@ import { orgStore, accountStore } from "@/lib/mock-data/store"
 import { Registry } from "@/lib/mock-data/registry"
 import type { Organization } from "@/features/organizations/types"
 import type { Account } from "@/features/accounts/types"
-import { Button } from "@/components/ui/button"
-import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav"
+import { FormActionBar, FormStepIndicator, type FormWizardStep } from "@/components/shared/form-step-wizard"
 import { LocationPicker } from "@/components/shared/location-picker"
 import type { LocationData } from "@/components/shared/location-picker"
 import { DocumentUploadSection } from "@/components/shared/document-upload-section"
@@ -46,18 +44,10 @@ import { toast } from "sonner"
 import { NewOrganizationStepTwo } from "@/components/host/organizations/new-organization-step-two"
 import { NewOrganizationPageHeader } from "@/components/host/organizations/new-organization-page-header"
 
-const STEP1_ANCHORS = [
-  { id: "org-profile", label: "Organisation Profile" },
-  { id: "registration-compliance", label: "Registration & Compliance" },
-  { id: "business-address", label: "Business Address" },
-  { id: "payment-details", label: "Payment Details" },
-]
-
-const STEP2_ANCHORS = [
-  { id: "hq-identity", label: "HQ Branch Identity" },
-  { id: "hq-location", label: "Location Mapping" },
-  { id: "hq-account", label: "Account Configuration" },
-]
+const ORGANIZATION_STEPS = [
+  { id: 1, label: "Organization Details" },
+  { id: 2, label: "HQ Branch And Account" },
+] as const satisfies readonly FormWizardStep<1 | 2>[]
 
 const ORG_TYPES = [
   {
@@ -130,6 +120,14 @@ export default function NewOrganizationPage() {
     setBranchName(data.name ? `${data.name} HQ` : "")
     setStep(2)
     window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
+  const goToStep = (targetStep: 1 | 2) => {
+    if (targetStep === 1) {
+      setStep(1)
+      return
+    }
+    void handleSubmit(onStep1Submit)()
   }
 
   const handleConfirm = async () => {
@@ -248,22 +246,15 @@ export default function NewOrganizationPage() {
 
   return (
     <div className="animate-in pb-24 duration-500 fade-in slide-in-from-bottom-4">
-      <div className="flex flex-col items-start gap-12 lg:flex-row lg:gap-16">
-        {/* Left Column: Navigation */}
-        <aside className="sticky top-20 hidden w-52 shrink-0 self-start xl:block">
-          <FloatingAnchorNav
-            items={step === 1 ? STEP1_ANCHORS : STEP2_ANCHORS}
-          />
-        </aside>
-
-        {/* Right Column */}
-        <div className="min-w-0 flex-1">
+      <div className="mx-auto max-w-[1120px]">
           <div className="flex flex-col gap-6">
             <NewOrganizationPageHeader
               onBack={() => (step === 1 ? router.back() : setStep(1))}
               orgName={pendingOrgData?.name}
               step={step}
             />
+
+            <FormStepIndicator currentStep={step} onStepClick={goToStep} steps={ORGANIZATION_STEPS} />
 
             {/* ── STEP 1 ── */}
             {step === 1 && (
@@ -572,32 +563,6 @@ export default function NewOrganizationPage() {
                   </div>
                 </div>
 
-                {/* Floating Action Bar — Step 1 */}
-                <div className="fixed bottom-8 left-1/2 z-50 flex -translate-x-1/2 animate-in items-center gap-4 rounded-full border border-border bg-background/80 p-2 px-6 shadow-lg backdrop-blur-2xl duration-700 ease-out slide-in-from-bottom-10 lg:left-[calc(50%+104px)] lg:translate-x-0">
-                  <Button
-                    variant="ghost"
-                    size="lg"
-                    className="px-6 text-body font-semibold transition-colors"
-                    onClick={() => router.back()}
-                  >
-                    Cancel
-                  </Button>
-                  <div className="h-6 w-px bg-border/40" />
-                  <Button
-                    type="submit"
-                    size="lg"
-                    className="flex items-center gap-2 px-8 text-body font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
-                  >
-                    Next
-                    <NavigationArrow
-                      size={14}
-                      weight="bold"
-                      className="rotate-90"
-                    />
-                  </Button>
-                </div>
-
-                <div className="h-[60vh]" />
               </form>
             )}
 
@@ -608,18 +573,28 @@ export default function NewOrganizationPage() {
                 branchAddress={branchAddress}
                 branchName={branchName}
                 creditLimit={creditLimit}
-                isSubmitting={isSubmitting}
                 labelCls={labelCls}
                 onAccountNameChange={setAccountName}
-                onBack={() => setStep(1)}
                 onBranchAddressChange={setBranchAddress}
                 onBranchNameChange={setBranchName}
-                onConfirm={handleConfirm}
                 onCreditLimitChange={setCreditLimit}
               />
             )}
+
+            <FormActionBar
+              currentStep={step}
+              totalSteps={2}
+              mode="create"
+              onCancel={() => (step === 1 ? router.back() : setStep(1))}
+              onBack={() => setStep(1)}
+              onNext={() => void handleSubmit(onStep1Submit)()}
+              onSave={step === 2 ? handleConfirm : undefined}
+              primaryLabel="Confirm And Create"
+              primaryIcon="check"
+              formId={step === 1 ? "newOrgForm" : undefined}
+              isSubmitting={isSubmitting}
+            />
           </div>
-        </div>
       </div>
     </div>
   )

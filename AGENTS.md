@@ -70,6 +70,7 @@ Use CSS custom properties from `globals.css` exclusively.
 
 ### 2.4 Component Patterns
 - **Buttons:** `rounded-4xl` for pill shape. Variants: `default` (CTAs), `ghost` (secondary), `outline` (filters/danger), `destructive`.
+- **Button icons:** Use icons only when they clarify direction or intent. Workflow navigation uses one family: `Back` uses a leading `ArrowLeft`, `Next`/`Review` a trailing `ArrowRight`; reserve chevrons for disclosure, select, and breadcrumb affordances. `Create`/`Add` uses a leading `Plus`, and `Confirm` a `Check`. `Save Changes` is text-only by default; do not use a send icon for saving. Labeled buttons remain understandable without the icon, and decorative icons use `aria-hidden="true"`.
 - **Cards:** `bg-card border border-border rounded-lg`
 - **Inputs:** `bg-muted/50 border border-border rounded-lg focus:ring-1 focus:ring-ring`
 - **Nav items:** `text-[13px] rounded-md px-3 py-1.5`
@@ -284,6 +285,15 @@ Hard rules:
 
 - Write tests in Playwright (E2E) + Vitest (unit).
 - Never run tests during chat. Output terminal command for me to run.
+- Use impact-based testing during development: run the unit files and E2E flows
+  affected by the change, not the unrelated full suite.
+- Changes to a shared component or utility expand the targeted set to every
+  known consumer. `FormActionBar` and `FormStepIndicator` changes require
+  coverage across all create/edit form modules that use them.
+- Run `pnpm test:unit` and `pnpm test:e2e` as full-suite checks at merge or
+  release checkpoints.
+- Keep unrelated failures separate and visible; do not weaken or skip a test
+  just to make an unrelated change green.
 - When I paste failure output, diagnose and fix only what's broken.
 - No screenshot-based visual testing. No browser preview.
 - Playwright MCP only when I explicitly ask. Never fire it proactively.

@@ -90,13 +90,13 @@ function PoliciesContent() {
   const handleCreateNew = (orgId?: string) =>
     router.push(
       orgId
-        ? `/policies/new?source=org&orgId=${encodeURIComponent(orgId)}`
+        ? `/organizations/${encodeURIComponent(orgId)}/policies/new`
         : "/policies/new?source=global"
     );
   const handleCreateFromTemplate = (templateId: string, orgId?: string) =>
     router.push(
       orgId
-        ? `/policies/new?source=org&template=${encodeURIComponent(templateId)}&orgId=${encodeURIComponent(orgId)}`
+        ? `/organizations/${encodeURIComponent(orgId)}/policies/new?template=${encodeURIComponent(templateId)}`
         : `/policies/new?source=global&template=${encodeURIComponent(templateId)}`
     );
 

@@ -4,7 +4,6 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import {
   Building,
-  CaretLeft,
   CheckCircle,
   IdentificationCard,
   MapPin,
@@ -15,7 +14,7 @@ import { FormSelect } from "@/components/shared/form-select"
 import {
   FormStepIndicator,
   type FormWizardStep,
-  WizardActionBar,
+  FormActionBar,
 } from "@/components/shared/form-step-wizard"
 import { LocationPicker } from "@/components/shared/location-picker"
 import type { LocationData } from "@/components/shared/location-picker"
@@ -104,6 +103,11 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
   const formData = watch()
 
   const goToStep = async (step: 1 | 2) => {
+    if (isEditing) {
+      setCurrentStep(step)
+      return
+    }
+
     if (step <= currentStep) {
       setCurrentStep(step)
       return
@@ -192,15 +196,6 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
       noValidate
     >
       <div className="flex flex-col gap-4">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="inline-flex w-fit items-center gap-1.5 text-body font-medium text-subtle transition-colors hover:text-foreground"
-        >
-          <CaretLeft size={16} />
-          Back
-        </button>
-
         <div>
           <h1 className="text-heading font-semibold text-balance text-foreground">
             {isEditing ? "Edit Branch" : "Add New Branch"}
@@ -216,6 +211,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
         currentStep={currentStep}
         onStepClick={goToStep}
         steps={BRANCH_WIZARD_STEPS}
+        allowStepJumping={isEditing}
       />
 
       <div className="min-w-0">
@@ -555,16 +551,17 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
         )}
       </div>
 
-      <WizardActionBar
-        createLabel="Create Branch"
+      <FormActionBar
         currentStep={currentStep}
-        isEditing={isEditing}
-        isSubmitting={isSubmitting}
+        totalSteps={2}
+        mode={isEditing ? "edit" : "create"}
+        onCancel={onCancel}
         onBack={() => setCurrentStep(1)}
         onNext={goNext}
         onSave={handleFinalStepSave}
-        saveLabel="Save Changes"
-        totalSteps={2}
+        primaryLabel={isEditing ? "Save Changes" : "Create Branch"}
+        primaryIcon={isEditing ? "none" : "plus"}
+        isSubmitting={isSubmitting}
       />
     </form>
   )

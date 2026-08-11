@@ -23,6 +23,7 @@ export default function NewServiceCategoryPage() {
   return (
     <CategoryWizardForm
       mode="create"
+      onCancel={() => router.push("/services")}
       validateCategoryName={validateCategoryName}
       onSave={handleSave}
     />
