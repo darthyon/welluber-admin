@@ -1,45 +1,30 @@
 # Session Handoff
 
 ## State
-- **PR #48** `members-detail-page` → base `playground` (6 commits). Members, administrators,
-  and maps. Merges after #47.
-- Both user modules had gaps behind working-looking UI: members had no detail route at all
-  (actions were `console.log`, cards linked to routes that 404'd); administrator editing was
-  stubbed the same way. Both now built.
-- Members: detail route with **Member Details / App Activity / Settings** tabs, revoke and
-  restore in the settings danger zone, `uuid` / `device` / seeded activity on `Member`.
-- Administrators: **Administrator Details / Audit Log / Settings** tabs, inline detail
-  editing, `mobile` field, Send Reset Link dialog, and an Access section with a module
-  checkbox catalog (`features/users/module-catalog.ts`) mirroring the sidebar groups.
-- Maps: Mapbox gone. `components/shared/location-map.tsx` renders 15 static CARTO Positron
-  tiles in `public/map-tiles` — no key, no runtime request, works offline.
-- Shared: `EntityAvatar` gained a `shape` prop; employee, member, and admin headers all use
-  the square variant, so they can no longer drift. Breadcrumbs resolve member and admin
-  names. Redundant back buttons removed.
-- `tsc --noEmit` and `eslint` clean. **Unit and e2e have not been run on this branch.**
+- Completed shared `FormActionBar` and configurable `FormStepIndicator` with gated create navigation and direct-access edit navigation.
+- `FormActionBar` is a bottom-pinned dock that spans the browser viewport, tracks expanded/collapsed sidebar width, and keeps a max-width inner rail with responsive mobile stacking and safe-area padding.
+- Button icon policy is documented in `docs/design.md` and applied to the shared action bar: directional icons for navigation, semantic icons for create/confirm, and text-only save actions.
+- Standardized all core create/edit flows: organization, employee, benefit policy, service provider, voucher package, brand, service category, organization branch, service provider branch, policy groups, policy version, and policy impact review.
+- Remaining multi-step edit flows allow direct step access and Save Changes from every step; create flows remain validation-gated.
+- Existing routes, including query-driven provider branch routes, were preserved in this milestone.
+- Next milestone started: host breadcrumbs now resolve contextual organization/provider tabs and entity names from the route; service-provider branch add/edit uses canonical nested subpages.
+- Legacy service-provider branch query URLs redirect to canonical subpages, and global voucher actions now use canonical nested edit routes.
+- Added `tests/e2e/contextual-navigation.spec.ts` for contextual breadcrumbs and branch redirects; updated the address E2E for the canonical branch URL.
+- Added a development-only `WELLUBER_DEV_AUTH_BYPASS=1` switch for local route verification and Playwright, without changing production auth.
+- Frontend plus mock/seeded data only; no backend work.
+- `FloatingAnchorNav` has zero active usages in app/components/features.
+- Verification passed: `pnpm typecheck`, `pnpm lint:design`, and `git diff --check`; the Codex browser reached the contextual employee creation route.
+- Unit and e2e tests were not run per repository instructions.
 
 ## Next
-1. Run `pnpm test:unit` and `pnpm test:e2e` before merging. `Member` now *requires* `uuid`,
-   which is the likeliest fixture breakage. None of the new work has coverage.
-2. Decide whether members should link to employee records — `MEM-…` has no mapping to
-   `EMP-…`, so claims, vouchers, and entitlements cannot surface on a member and the
-   activity timeline stays seeded rather than real.
-3. Module access is presentational only. If it should gate anything, that is unbuilt, and
-   `MODULE_CATALOG` is hand-mirrored from `app-sidebar.tsx` — they drift silently.
-4. `components/host/users/admin-view-dialog.tsx` is dead code, zero references.
+1. Adopt the documented impact-based testing workflow: targeted unit/E2E checks during development, full suite at merge/release checkpoints.
+2. Add a dedicated form-navigation E2E suite for shared footer behavior, step gating/jumping, save-from-every-edit-step, mobile wrapping, and validation errors across all form consumers.
+3. Resolve the existing entitlement unit failures separately from the navigation milestones.
+4. Continue the contextual route audit for any remaining legacy query entry points, then run the targeted navigation E2E suite outside chat.
 
 ## Blockers / decisions
-- **Members is read-only by design.** No edit tab — workforce edits belong in Employees.
-  Revoking does not write to the activity timeline; that feed is seeded, no store behind it.
-- **Send Reset Link does not update the record** when you change the recipient address. The
-  dialog says so. Change this only if the product wants the opposite.
-- Mapbox token was deleted and the default refreshed. The dead string remains in history
-  (`ba26ba5`, `09d9071`, +2); a scrub is cosmetic and would rewrite every SHA. `gitleaks`
-  runs from `.githooks/pre-push` via `core.hooksPath` — it only scans unpushed commits.
-- **Open product question**: for `individual` dependent wallets, `summary.allocated` counts
-  only the employee ceiling while `summary.used` includes dependent spend. Ahmad reads
-  5000/2490/2510 but his groups allocate 8600. Needs a decision, not a code fix.
-- **Two dependent ID schemes**: `factories/dependent.ts` emits `DEP-20260115-0001`;
-  entitlement fixtures use `DEP-0002-1`. Biggest remaining data gap.
-- Don't rename "Benefit Policy". Never edit `components/ui/`. Claims/Vouchers tabs stay
-  separate. Mock data: Retail/Tech/Logistics, flexi benefits, no healthcare.
+- Edit flows allow direct step selection and Save Changes from every step.
+- Policy edits always route through the affected-employee review before confirmation.
+- Contextual subpage migration is incremental: organization employee/policy/branch routes and provider voucher routes already existed; provider branch routes were added in this milestone.
+- Testing strategy is impact-based during development and full-suite at merge/release; shared component changes expand to all consumers.
+- Existing unrelated lint warnings may remain; no design violations were introduced.
