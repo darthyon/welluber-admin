@@ -1,7 +1,14 @@
 export type UserRole = "HostAdmin" | "OrgAdmin" | "SPAdmin" | "Employee" | "Dependent";
 
+export interface MemberDevice {
+  model: string;
+  os: string;
+}
+
 export interface Member {
   id: string;
+  /** Stable app-side identifier. Distinct from the human-readable `id`. */
+  uuid: string;
   name: string;
   email: string;
   type: "Employee" | "Dependent";
@@ -16,12 +23,31 @@ export interface Member {
   status: "Active" | "Inactive" | "Pending";
   joinedDate: string;
   lastActive: string;
+  /** Last device the member signed in from. Absent until first app login. */
+  device?: MemberDevice;
+}
+
+export type MemberActivityType =
+  | "Signup"
+  | "Login"
+  | "VoucherPurchased"
+  | "VoucherRedeemed"
+  | "ProfileUpdated";
+
+export interface MemberActivityEntry {
+  id: string;
+  memberId: string;
+  type: MemberActivityType;
+  title: string;
+  description: string;
+  timestamp: string;
 }
 
 export interface Administrator {
   id: string;
   name: string;
   email: string;
+  mobile?: string;
   role: "HostAdmin" | "OrgAdmin" | "SPAdmin";
   entity?: {
     id: string;
@@ -32,4 +58,9 @@ export interface Administrator {
   joinedDate: string;
   lastLogin: string;
   lastActive: string;
+  /**
+   * Ids of the modules this administrator can reach, from MODULE_CATALOG.
+   * Presentational only — nothing enforces these yet.
+   */
+  moduleAccess?: string[];
 }

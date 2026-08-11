@@ -7,12 +7,14 @@ import {
   MagnifyingGlass,
   DownloadSimple,
   Eye,
-  PencilSimple,
+  Prohibit,
+  ArrowCounterClockwise,
 } from "@phosphor-icons/react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { SharedDataTable, Column } from "@/components/shared/data-table"
 import { StatusBadge } from "@/components/shared/status-badge"
-import { MOCK_MEMBERS } from "@/lib/mock-data"
+import { useMembers } from "@/hooks/data-hooks"
 import { Member } from "@/features/users/types"
 import { DataFilterBar } from "@/components/shared/data-filter-bar"
 import { FilterItem } from "@/components/shared/filter-item"
@@ -24,10 +26,14 @@ import { EmptyState } from "@/components/shared/empty-state"
 import { EntityAvatar } from "@/components/shared/entity-avatar"
 import { Badge } from "@/components/ui/badge"
 import { ActionPopover } from "@/components/shared/action-popover"
+import { RevokeMemberAccessDialog } from "@/components/host/users/revoke-member-access-dialog"
 
 export default function MembersPage() {
   const mounted = useMounted()
+  const router = useRouter()
+  const { members, update } = useMembers()
   const [viewMode, setViewMode] = useState<ViewMode>("list")
+  const [revokeTarget, setRevokeTarget] = useState<Member | null>(null)
 
   const [searchQuery, setSearchQuery] = useState("")
   const [typeFilter, setTypeFilter] = useState("all")
@@ -36,7 +42,7 @@ export default function MembersPage() {
   const [branchFilter, setBranchFilter] = useState("all")
 
   const filteredMembers = useMemo(() => {
-    return MOCK_MEMBERS.filter((member) => {
+    return members.filter((member) => {
       const matchesSearch =
         member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         member.email.toLowerCase().includes(searchQuery.toLowerCase())
@@ -57,7 +63,7 @@ export default function MembersPage() {
         matchesBranch
       )
     })
-  }, [searchQuery, typeFilter, statusFilter, orgFilter, branchFilter])
+  }, [members, searchQuery, typeFilter, statusFilter, orgFilter, branchFilter])
 
   const columns: Column<Member>[] = [
     {
@@ -165,19 +171,47 @@ export default function MembersPage() {
               {
                 label: "View member",
                 icon: <Eye size={16} />,
-                onClick: () => console.log("view", row.id),
+                onClick: () => router.push(`/users/members/${row.id}`),
               },
-              {
-                label: "Edit member",
-                icon: <PencilSimple size={16} />,
-                onClick: () => console.log("edit", row.id),
-              },
+              row.status === "Inactive"
+                ? {
+                    label: "Restore access",
+                    icon: <ArrowCounterClockwise size={16} />,
+                    onClick: () => update(row.id, { status: "Active" }),
+                  }
+                : {
+                    label: "Revoke access",
+                    icon: <Prohibit size={16} />,
+                    isDanger: true,
+                    onClick: () => setRevokeTarget(row),
+                  },
             ]}
           />
         </div>
       ),
     },
   ]
+
+  const clearFilters = () => {
+    setSearchQuery("")
+    setStatusFilter("all")
+    setTypeFilter("all")
+    setOrgFilter("all")
+    setBranchFilter("all")
+  }
+
+  const emptyState = (
+    <EmptyState
+      icon={<MagnifyingGlass size={32} weight="light" />}
+      title="No members match your filters"
+      description="Try adjusting your search or filters to find what you're looking for."
+      action={
+        <Button variant="ghost" onClick={clearFilters}>
+          Clear All Filters
+        </Button>
+      }
+    />
+  )
 
   return (
     <div className="space-y-6">
@@ -275,30 +309,15 @@ export default function MembersPage() {
             className="grid animate-in grid-cols-1 gap-6 duration-200 fade-in slide-in-from-bottom-2 md:grid-cols-2 lg:grid-cols-3"
           >
             {filteredMembers.map((member) => (
-              <MemberCard key={member.id} member={member} />
+              <MemberCard
+                key={member.id}
+                member={member}
+                onRevokeAccess={setRevokeTarget}
+                onRestoreAccess={(m) => update(m.id, { status: "Active" })}
+              />
             ))}
             {filteredMembers.length === 0 && (
-              <div className="col-span-full py-12">
-                <EmptyState
-                  icon={<MagnifyingGlass size={32} weight="light" />}
-                  title="No members match your filters"
-                  description="Try adjusting your search or filters to find what you're looking for."
-                  action={
-                    <Button
-                      variant="ghost"
-                      onClick={() => {
-                        setSearchQuery("")
-                        setStatusFilter("all")
-                        setTypeFilter("all")
-                        setOrgFilter("")
-                        setBranchFilter("")
-                      }}
-                    >
-                      Clear All Filters
-                    </Button>
-                  }
-                />
-              </div>
+              <div className="col-span-full py-12">{emptyState}</div>
             )}
           </div>
         ) : (
@@ -311,10 +330,17 @@ export default function MembersPage() {
               freezeLast
               data={filteredMembers}
               columns={columns}
+              emptyState={emptyState}
+              onRowClick={(row) => router.push(`/users/members/${row.id}`)}
             />
           </div>
         )}
       </div>
+
+      <RevokeMemberAccessDialog
+        member={revokeTarget}
+        onClose={() => setRevokeTarget(null)}
+      />
     </div>
   )
 }

@@ -3,21 +3,25 @@
 import { Shield, Buildings, Storefront, EnvelopeSimple, Clock } from "@phosphor-icons/react";
 import { Administrator } from "@/features/users/types";
 import { StatusBadge } from "@/components/shared/status-badge";
-import { ActionPopover } from "@/components/shared/action-popover";
+import { ActionPopover, type ActionItem } from "@/components/shared/action-popover";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 
 interface AdminCardProps {
   admin: Administrator;
+  onDeactivate: (admin: Administrator) => void;
+  onActivate: (admin: Administrator) => void;
 }
 
-export function AdminCard({ admin }: AdminCardProps) {
+export function AdminCard({ admin, onDeactivate, onActivate }: AdminCardProps) {
   const router = useRouter();
-  const actions = [
+  const actions: ActionItem[] = [
     { label: "View Details", onClick: () => router.push(`/users/administrators/${admin.id}`) },
-    { label: "Edit permissions", onClick: () => console.log("Permissions"), className: "opacity-50 cursor-not-allowed" },
-    { label: "Revoke access", onClick: () => console.log("Revoke"), className: "text-destructive" },
+    { label: "Edit administrator", onClick: () => router.push(`/users/administrators/${admin.id}?tab=settings`) },
+    admin.status === "Active"
+      ? { label: "Deactivate", isDanger: true, onClick: () => onDeactivate(admin) }
+      : { label: "Activate", onClick: () => onActivate(admin), className: "text-primary" },
   ];
 
   const getRoleStyle = (role: string) => {

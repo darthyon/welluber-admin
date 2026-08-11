@@ -6,7 +6,12 @@ import {
   Breadcrumbs,
   type BreadcrumbItem,
 } from "@/components/shared/breadcrumbs"
-import { MOCK_EMPLOYEES, MOCK_ORGS } from "@/lib/mock-data"
+import {
+  MOCK_ADMINS,
+  MOCK_EMPLOYEES,
+  MOCK_MEMBERS,
+  MOCK_ORGS,
+} from "@/lib/mock-data"
 
 type Portal = "host" | "org" | "serviceprovider"
 
@@ -62,6 +67,20 @@ function getSegmentLabel(segment: string, previousSegment?: string) {
     return (
       MOCK_ORGS.find((org) => org.id === segment)?.name ??
       "Organization Details"
+    )
+  }
+
+  if (previousSegment === "members") {
+    return (
+      MOCK_MEMBERS.find((member) => member.id === segment)?.name ??
+      "Member Details"
+    )
+  }
+
+  if (previousSegment === "administrators") {
+    return (
+      MOCK_ADMINS.find((admin) => admin.id === segment)?.name ??
+      "Administrator Details"
     )
   }
 

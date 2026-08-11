@@ -5,22 +5,49 @@ import {
   Buildings,
   TreeStructure,
   Clock,
-  UserCircle
+  UserCircle,
+  Eye,
+  Prohibit,
+  ArrowCounterClockwise
 } from "@phosphor-icons/react";
+import { useRouter } from "next/navigation";
 import { Member } from "@/features/users/types";
 import { StatusBadge } from "@/components/shared/status-badge";
-import { ActionPopover } from "@/components/shared/action-popover";
+import { ActionPopover, type ActionItem } from "@/components/shared/action-popover";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 interface MemberCardProps {
   member: Member;
+  onRevokeAccess: (member: Member) => void;
+  onRestoreAccess: (member: Member) => void;
 }
 
-export function MemberCard({ member }: MemberCardProps) {
-  const actions = [
-    { label: "View profile", href: `/users/members/${member.id}` },
-    { label: "Policies", href: `/users/members/${member.id}/policies` },
+export function MemberCard({
+  member,
+  onRevokeAccess,
+  onRestoreAccess,
+}: MemberCardProps) {
+  const router = useRouter();
+
+  const actions: ActionItem[] = [
+    {
+      label: "View member",
+      icon: <Eye size={16} />,
+      onClick: () => router.push(`/users/members/${member.id}`),
+    },
+    member.status === "Inactive"
+      ? {
+          label: "Restore access",
+          icon: <ArrowCounterClockwise size={16} />,
+          onClick: () => onRestoreAccess(member),
+        }
+      : {
+          label: "Revoke access",
+          icon: <Prohibit size={16} />,
+          isDanger: true,
+          onClick: () => onRevokeAccess(member),
+        },
   ];
 
   return (

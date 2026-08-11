@@ -4,7 +4,6 @@ import {
   PencilSimpleLine,
   User,
   Shield,
-  CreditCard,
   SealCheck,
   Ticket,
   Users,
@@ -14,6 +13,7 @@ import { useQueryState } from "@/hooks/use-tab-persistence"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { StatusBadge } from "@/components/shared/status-badge"
+import { EntityAvatar } from "@/components/shared/entity-avatar"
 import { ActionPopover } from "@/components/shared/action-popover"
 import { SegmentedTabs } from "@/components/shared/segmented-tabs"
 import { DetailSection } from "@/components/shared/detail-section"
@@ -44,22 +44,13 @@ export function EmployeeDetail({ employee, onEdit }: EmployeeDetailProps) {
   const [tab, setTab] = useQueryState("tab", "profile")
   const activeTab = VALID_TABS.has(tab || "") ? (tab as string) : "profile"
 
-  const initials = (() => {
-    const parts = employee.name.trim().split(/\s+/).filter(Boolean)
-    return parts.length >= 2
-      ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
-      : parts[0]?.substring(0, 2).toUpperCase() || "?"
-  })()
-
   return (
     <div className="animate-in space-y-8 duration-500 fade-in slide-in-from-bottom-4">
       {/* Header */}
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-lg border border-primary/20 bg-primary/10 text-heading font-semibold text-primary shadow-sm">
-              {initials}
-            </div>
+            <EntityAvatar name={employee.name} size="lg" shape="square" />
             <div>
               <div className="flex items-center gap-3">
                 <h2 className="text-title font-semibold tracking-tight text-foreground">
