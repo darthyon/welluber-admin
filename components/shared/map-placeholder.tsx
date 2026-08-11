@@ -2,6 +2,7 @@
 
 import { MapPin } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
+import { LocationMap } from "@/components/shared/location-map";
 
 interface MapPlaceholderProps {
   lat?: number;
@@ -11,28 +12,21 @@ interface MapPlaceholderProps {
 }
 
 /**
- * View-mode map placeholder using Mapbox static image.
- * No API hooks — renders a static map image with a pin overlay.
- * Falls back to a generic location placeholder when coordinates are missing.
+ * View-mode map placeholder. Renders a stylised SVG map with a pin — no
+ * network request, no API token. Falls back to a generic location placeholder
+ * when coordinates are missing.
  */
 export function MapPlaceholder({ lat, lon, address, className }: MapPlaceholderProps) {
   const hasCoords = lat != null && lon != null;
 
-  const mapUrl = hasCoords
-    ? `https://api.mapbox.com/styles/v1/mapbox/light-v10/static/pin-s+4338CA(${lon},${lat})/${lon},${lat},15/600x300@2x?access_token=${process.env.NEXT_PUBLIC_MAPBOX_TOKEN}`
-    : null;
-
   return (
-    <div className={cn("relative rounded-lg border border-border overflow-hidden bg-muted/20", className)}>
-      {mapUrl ? (
+    <div
+      className={cn("relative rounded-lg border border-border overflow-hidden bg-muted/20", className)}
+      aria-label={address || "Location map"}
+    >
+      {hasCoords ? (
         <div className="relative aspect-[3/1] w-full">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={mapUrl}
-            alt={address || "Location map"}
-            className="absolute inset-0 w-full h-full object-cover"
-            loading="lazy"
-          />
+          <LocationMap lat={lat} lon={lon} showPin showCoordinates />
           <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-background/40 to-transparent" />
         </div>
       ) : (

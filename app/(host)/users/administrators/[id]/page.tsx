@@ -1,29 +1,38 @@
 "use client"
 
-import { useMemo } from "react"
+import { Suspense, useMemo } from "react"
 import { useParams, useRouter } from "next/navigation"
 import {
-  Shield,
   Buildings,
   Storefront,
-  EnvelopeSimple,
+  IdentificationBadge,
   Clock,
-  CalendarBlank,
   User,
-  ArrowLeft,
-  LockKey,
-  PencilSimple,
+  Gear,
+  ClockCounterClockwise,
 } from "@phosphor-icons/react"
-import { MOCK_ADMINS, MOCK_AUDIT_LOGS } from "@/lib/mock-data"
+import { MOCK_AUDIT_LOGS } from "@/lib/mock-data"
+import { useAdmins } from "@/hooks/data-hooks"
+import { useQueryState } from "@/hooks/use-tab-persistence"
+import { AdministratorDetailsTab } from "@/components/host/users/administrator-details-tab"
+import { AdministratorSettingsTab } from "@/components/host/users/administrator-settings-tab"
 import { StatusBadge } from "@/components/shared/status-badge"
+import { EntityAvatar } from "@/components/shared/entity-avatar"
+import { SegmentedTabs } from "@/components/shared/segmented-tabs"
 import { DetailSection } from "@/components/shared/detail-section"
-import { DetailField } from "@/components/shared/detail-field"
 import { ActivityTimeline, type ActivityType } from "@/components/shared/activity-timeline"
 import { EmptyState } from "@/components/shared/empty-state"
-import { ActionPopover } from "@/components/shared/action-popover"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import type { Administrator } from "@/features/users/types"
+
+const DETAIL_TABS = [
+  { id: "details", label: "Administrator Details", icon: User },
+  { id: "audit", label: "Audit Log", icon: ClockCounterClockwise },
+  { id: "settings", label: "Settings", icon: Gear },
+] as const
+
+const VALID_TABS = new Set<string>(DETAIL_TABS.map((t) => t.id))
 
 function getRoleBadgeClass(role: Administrator["role"]) {
   switch (role) {
@@ -43,18 +52,19 @@ function getRoleLabel(role: Administrator["role"]) {
   }
 }
 
-function getScopeIcon(admin: Administrator) {
-  if (!admin.entity) return <Shield size={20} weight="fill" />
-  if (admin.entity.type === "Organization") return <Buildings size={20} weight="fill" />
-  return <Storefront size={20} weight="fill" />
-}
-
-export default function AdminDetailPage() {
+function AdminDetail() {
   const params = useParams()
   const router = useRouter()
   const id = params.id as string
 
-  const admin = useMemo(() => MOCK_ADMINS.find((a) => a.id === id) ?? null, [id])
+  const { admins } = useAdmins()
+  const [tab, setTab] = useQueryState("tab", "details")
+  const activeTab = VALID_TABS.has(tab) ? tab : "details"
+
+  const admin = useMemo(
+    () => admins.find((a) => a.id === id) ?? null,
+    [admins, id]
+  )
 
   const auditLogs = useMemo(() => {
     if (!admin) return []
@@ -66,9 +76,6 @@ export default function AdminDetailPage() {
   if (!admin) {
     return (
       <div className="space-y-6">
-        <Button variant="ghost" size="sm" onClick={() => router.back()} className="gap-2 text-subtle">
-          <ArrowLeft size={16} /> Administrators
-        </Button>
         <EmptyState
           icon={<User size={32} weight="light" />}
           title="Administrator not found"
@@ -85,30 +92,11 @@ export default function AdminDetailPage() {
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      {/* Back nav */}
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => router.push("/users/administrators")}
-        className="gap-2 text-subtle h-8 px-2"
-      >
-        <ArrowLeft size={16} />
-        <span className="text-label font-medium">Administrators</span>
-      </Button>
-
-      {/* Header card */}
-      <div className="bg-card border border-border rounded-xl p-6">
+      {/* Header */}
+      <div className="flex flex-col gap-4">
         <div className="flex items-start justify-between gap-4">
-          <div className="flex items-start gap-5">
-            {/* Avatar slot */}
-            <div className="relative shrink-0">
-              <div className="w-16 h-16 rounded-xl border-2 border-dashed border-border bg-muted/30 flex items-center justify-center text-faint">
-                <User size={28} weight="light" />
-              </div>
-              <p className="text-micro text-faint mt-1.5 text-center max-w-[64px] leading-tight">
-                Upload after invite
-              </p>
-            </div>
+          <div className="flex items-start gap-4">
+            <EntityAvatar name={admin.name} size="lg" shape="square" />
 
             {/* Identity */}
             <div className="space-y-2 pt-0.5">
@@ -126,8 +114,8 @@ export default function AdminDetailPage() {
                 </span>
               </div>
               <div className="flex items-center gap-1.5 text-body text-subtle">
-                <EnvelopeSimple size={14} className="shrink-0" />
-                <span className="font-mono tracking-tight">{admin.email}</span>
+                <IdentificationBadge size={14} className="shrink-0" />
+                <span className="font-mono tracking-tight">{admin.id}</span>
               </div>
               {admin.entity && (
                 <div className="flex items-center gap-1.5 text-label text-subtle font-medium">
@@ -139,98 +127,20 @@ export default function AdminDetailPage() {
               )}
             </div>
           </div>
-
-          {/* Actions */}
-          <ActionPopover
-            actions={[
-              {
-                label: "Edit details",
-                icon: <PencilSimple size={14} />,
-                onClick: () => console.log("Edit admin", admin.id),
-                className: "opacity-50 cursor-not-allowed",
-              },
-              {
-                label: "Manage Access",
-                icon: <LockKey size={14} />,
-                onClick: () => console.log("Manage access", admin.id),
-                className: "opacity-50 cursor-not-allowed",
-              },
-              {
-                label: admin.status === "Active" ? "Deactivate" : "Activate",
-                onClick: () => console.log("Toggle status", admin.id),
-                className: admin.status === "Active" ? "text-destructive" : "text-primary",
-              },
-            ]}
-          />
         </div>
       </div>
 
-      {/* Two-column layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Profile details */}
-        <div className="lg:col-span-1 space-y-4">
-          <DetailSection title="Profile" icon={<User size={16} />}>
-            <div className="grid grid-cols-1 gap-3">
-              <DetailField
-                label="Access Scope"
-                value={
-                  admin.entity?.type === "Organization" ? "Organization" :
-                  admin.entity?.type === "ServiceProvider" ? "Service Provider" :
-                  "Welluber Platform"
-                }
-                icon={getScopeIcon(admin)}
-              />
-              <DetailField
-                label="Assigned Entity"
-                value={admin.entity?.name ?? "Welluber Team"}
-              />
-              <DetailField
-                label="Role"
-                value={
-                  <span className={cn(
-                    "inline-flex items-center px-2 py-0.5 rounded-md text-label font-medium border",
-                    getRoleBadgeClass(admin.role)
-                  )}>
-                    {getRoleLabel(admin.role)}
-                  </span>
-                }
-              />
-              <DetailField
-                label="Admin ID"
-                value={
-                  <span className="font-mono text-label text-subtle tracking-tight">{admin.id}</span>
-                }
-              />
-            </div>
-          </DetailSection>
+      {/* Tab nav */}
+      <SegmentedTabs tabs={DETAIL_TABS} activeTab={activeTab} onChange={setTab} />
 
-          <DetailSection title="Activity" icon={<Clock size={16} />}>
-            <div className="grid grid-cols-1 gap-3">
-              <DetailField
-                label="Joined Date"
-                value={admin.joinedDate}
-                icon={<CalendarBlank size={14} />}
-              />
-              <DetailField
-                label="Last Login"
-                value={admin.lastLogin}
-                icon={<Clock size={14} />}
-              />
-              <DetailField
-                label="Last Active"
-                value={admin.lastActive}
-                icon={<Clock size={14} />}
-              />
-            </div>
-          </DetailSection>
-        </div>
+      {activeTab === "details" && <AdministratorDetailsTab admin={admin} />}
 
-        {/* Audit log */}
-        <div className="lg:col-span-2">
+      {activeTab === "audit" && (
+        <div className="animate-in fade-in">
           <DetailSection
             title="Audit Log"
             description="Recent actions performed by this administrator."
-            icon={<Clock size={16} />}
+            icon={<Clock size={18} weight="duotone" />}
           >
             {auditLogs.length === 0 ? (
               <EmptyState
@@ -252,7 +162,17 @@ export default function AdminDetailPage() {
             )}
           </DetailSection>
         </div>
-      </div>
+      )}
+
+      {activeTab === "settings" && <AdministratorSettingsTab admin={admin} />}
     </div>
+  )
+}
+
+export default function AdminDetailPage() {
+  return (
+    <Suspense fallback={null}>
+      <AdminDetail />
+    </Suspense>
   )
 }

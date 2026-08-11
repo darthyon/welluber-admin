@@ -13,7 +13,8 @@ import {
 import { Button } from "@/components/ui/button"
 import { SharedDataTable, Column } from "@/components/shared/data-table"
 import { StatusBadge } from "@/components/shared/status-badge"
-import { MOCK_ADMINS } from "@/lib/mock-data"
+import { useAdmins } from "@/hooks/data-hooks"
+import { DeactivateAdminDialog } from "@/components/host/users/deactivate-admin-dialog"
 import { Administrator } from "@/features/users/types"
 import { DataFilterBar } from "@/components/shared/data-filter-bar"
 import { FilterItem } from "@/components/shared/filter-item"
@@ -24,7 +25,7 @@ import Link from "next/link"
 import { EmptyState } from "@/components/shared/empty-state"
 import { InviteAdministratorDialog } from "@/components/host/users/invite-administrator-dialog"
 import { ActionPopover } from "@/components/shared/action-popover"
-import { Eye, PencilSimple, LockKey } from "@phosphor-icons/react"
+import { Eye, PencilSimple, Prohibit, ArrowCounterClockwise } from "@phosphor-icons/react"
 import { useRouter } from "next/navigation"
 
 export default function AdministratorsPage() {
@@ -34,9 +35,11 @@ export default function AdministratorsPage() {
   const [statusFilter, setStatusFilter] = useState("all")
   const [entityFilter, setEntityFilter] = useState("all")
   const [isInviteOpen, setIsInviteOpen] = useState(false)
+  const { admins, update } = useAdmins()
+  const [deactivateTarget, setDeactivateTarget] = useState<Administrator | null>(null)
 
   const filteredAdmins = useMemo(() => {
-    return MOCK_ADMINS.filter((admin) => {
+    return admins.filter((admin) => {
       const matchesSearch =
         admin.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         admin.email.toLowerCase().includes(searchQuery.toLowerCase())
@@ -50,7 +53,7 @@ export default function AdministratorsPage() {
 
       return matchesSearch && matchesStatus && matchesEntity
     })
-  }, [searchQuery, statusFilter, entityFilter])
+  }, [admins, searchQuery, statusFilter, entityFilter])
 
   const columns: Column<Administrator>[] = [
     {
@@ -142,15 +145,24 @@ export default function AdministratorsPage() {
                 onClick: () => router.push(`/users/administrators/${row.id}`),
               },
               {
-                label: "Edit",
+                label: "Edit administrator",
                 icon: <PencilSimple size={16} />,
-                className: "opacity-50 cursor-not-allowed",
+                onClick: () =>
+                  router.push(`/users/administrators/${row.id}?tab=settings`),
               },
-              {
-                label: "Manage Access",
-                icon: <LockKey size={16} />,
-                className: "opacity-50 cursor-not-allowed",
-              },
+              row.status === "Active"
+                ? {
+                    label: "Deactivate",
+                    icon: <Prohibit size={16} />,
+                    isDanger: true,
+                    onClick: () => setDeactivateTarget(row),
+                  }
+                : {
+                    label: "Activate",
+                    icon: <ArrowCounterClockwise size={16} />,
+                    onClick: () => update(row.id, { status: "Active" }),
+                    className: "text-primary",
+                  },
             ]}
           />
         </div>
@@ -243,7 +255,12 @@ export default function AdministratorsPage() {
             className="grid animate-in grid-cols-1 gap-6 duration-200 fade-in slide-in-from-bottom-2 md:grid-cols-2 lg:grid-cols-3"
           >
             {filteredAdmins.map((admin) => (
-              <AdminCard key={admin.id} admin={admin} />
+              <AdminCard
+                key={admin.id}
+                admin={admin}
+                onDeactivate={setDeactivateTarget}
+                onActivate={(a) => update(a.id, { status: "Active" })}
+              />
             ))}
             {filteredAdmins.length === 0 && (
               <div className="col-span-full py-12">
@@ -289,6 +306,11 @@ export default function AdministratorsPage() {
       <InviteAdministratorDialog
         open={isInviteOpen}
         onOpenChange={setIsInviteOpen}
+      />
+
+      <DeactivateAdminDialog
+        admin={deactivateTarget}
+        onClose={() => setDeactivateTarget(null)}
       />
     </div>
   )

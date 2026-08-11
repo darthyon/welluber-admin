@@ -16,6 +16,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { DetailSection } from "@/components/shared/detail-section"
 import { DetailField } from "@/components/shared/detail-field"
+import { LocationMap } from "@/components/shared/location-map"
 import { SegmentedTabs } from "@/components/shared/segmented-tabs"
 import { ActionPopover } from "@/components/shared/action-popover"
 import { InviteAdminModal } from "./invite-admin-modal"
@@ -149,14 +150,9 @@ export function BranchDetailView({
           >
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
               <div className="group/map relative aspect-[16/10] min-h-[300px] overflow-hidden rounded-lg border border-border bg-muted/30 shadow-sm lg:aspect-auto lg:h-full">
-                <div
-                  className="absolute inset-0 bg-cover bg-center grayscale transition-all duration-1000 group-hover/map:grayscale-0"
-                  style={{
-                    backgroundImage: `url('https://api.mapbox.com/styles/v1/mapbox/light-v10/static/101.7036,3.1390,12/800x400?access_token=${process.env.NEXT_PUBLIC_MAPBOX_TOKEN}')`,
-                  }}
-                />
-                <div className="absolute inset-0 bg-primary/5 transition-colors duration-700 group-hover/map:bg-transparent" />
-                <div className="absolute inset-0 bg-[radial-gradient(#000000_1px,transparent_1px)] [background-size:16px_16px] opacity-10" />
+                <div className="absolute inset-0 saturate-[0.85] transition-all duration-700 group-hover/map:saturate-100">
+                  <LocationMap />
+                </div>
                 <div className="absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-2">
                   <div className="relative">
                     <div className="flex h-10 w-10 items-center justify-center rounded-full border border-primary/30 bg-primary/20 p-1.5">
