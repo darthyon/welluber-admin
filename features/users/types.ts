@@ -47,6 +47,7 @@ export interface Administrator {
   id: string;
   name: string;
   email: string;
+  mobile?: string;
   role: "HostAdmin" | "OrgAdmin" | "SPAdmin";
   entity?: {
     id: string;
@@ -57,4 +58,9 @@ export interface Administrator {
   joinedDate: string;
   lastLogin: string;
   lastActive: string;
+  /**
+   * Ids of the modules this administrator can reach, from MODULE_CATALOG.
+   * Presentational only — nothing enforces these yet.
+   */
+  moduleAccess?: string[];
 }

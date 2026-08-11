@@ -1,16 +1,15 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { Suspense, useMemo, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import {
-  ArrowCounterClockwise,
-  ArrowLeft,
   Buildings,
   CalendarBlank,
   Clock,
   DeviceMobile,
   EnvelopeSimple,
-  Prohibit,
+  Gear,
+  IdentificationBadge,
   TreeStructure,
   User,
   UserCircle,
@@ -19,6 +18,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { EntityAvatar } from "@/components/shared/entity-avatar"
+import { SegmentedTabs } from "@/components/shared/segmented-tabs"
 import { DetailSection } from "@/components/shared/detail-section"
 import { DetailField } from "@/components/shared/detail-field"
 import { EmptyState } from "@/components/shared/empty-state"
@@ -26,11 +26,20 @@ import {
   ActivityTimeline,
   type ActivityType,
 } from "@/components/shared/activity-timeline"
-import { ActionPopover } from "@/components/shared/action-popover"
 import { RevokeMemberAccessDialog } from "@/components/host/users/revoke-member-access-dialog"
 import { useMembers } from "@/hooks/data-hooks"
+import { useQueryState } from "@/hooks/use-tab-persistence"
 import { MOCK_MEMBER_ACTIVITY } from "@/lib/mock-data"
+import { cn } from "@/lib/utils"
 import type { Member, MemberActivityType } from "@/features/users/types"
+
+const DETAIL_TABS = [
+  { id: "details", label: "Member Details", icon: UserCircle },
+  { id: "activity", label: "App Activity", icon: Clock },
+  { id: "settings", label: "Settings", icon: Gear },
+] as const
+
+const VALID_TABS = new Set<string>(DETAIL_TABS.map((t) => t.id))
 
 function statusVariant(status: Member["status"]) {
   if (status === "Active") return "emerald" as const
@@ -47,13 +56,15 @@ const ACTIVITY_TYPE_MAP: Record<MemberActivityType, ActivityType> = {
   ProfileUpdated: "Update",
 }
 
-export default function MemberDetailPage() {
+function MemberDetail() {
   const params = useParams()
   const router = useRouter()
   const id = params.id as string
 
   const { members, update } = useMembers()
   const [revokeTarget, setRevokeTarget] = useState<Member | null>(null)
+  const [tab, setTab] = useQueryState("tab", "details")
+  const activeTab = VALID_TABS.has(tab) ? tab : "details"
 
   const member = useMemo(
     () => members.find((m) => m.id === id) ?? null,
@@ -74,22 +85,11 @@ export default function MemberDetailPage() {
     [id]
   )
 
-  const backButton = (
-    <Button
-      variant="ghost"
-      size="sm"
-      onClick={() => router.push("/users/members")}
-      className="h-8 gap-2 px-2 text-subtle"
-    >
-      <ArrowLeft size={16} />
-      <span className="text-label font-medium">Members</span>
-    </Button>
-  )
+  const isRevoked = member?.status === "Inactive"
 
   if (!member) {
     return (
       <div className="space-y-6">
-        {backButton}
         <EmptyState
           icon={<User size={32} weight="light" />}
           title="Member not found"
@@ -109,13 +109,11 @@ export default function MemberDetailPage() {
 
   return (
     <div className="animate-in space-y-6 duration-500 fade-in slide-in-from-bottom-4">
-      {backButton}
-
-      {/* Header card */}
-      <div className="rounded-xl border border-border bg-card p-6">
+      {/* Header */}
+      <div className="flex flex-col gap-4">
         <div className="flex items-start justify-between gap-4">
-          <div className="flex items-start gap-5">
-            <EntityAvatar name={member.name} size="xl" />
+          <div className="flex items-start gap-4">
+            <EntityAvatar name={member.name} size="lg" shape="square" />
 
             <div className="space-y-2 pt-0.5">
               <div className="flex flex-wrap items-center gap-3">
@@ -134,54 +132,26 @@ export default function MemberDetailPage() {
                 </Badge>
               </div>
               <div className="flex items-center gap-1.5 text-body text-subtle">
-                <EnvelopeSimple size={14} className="shrink-0" />
-                <span className="font-mono tracking-tight">{member.email}</span>
-              </div>
-              <div className="flex flex-wrap items-center gap-4 text-label font-medium text-subtle">
-                <span className="flex items-center gap-1.5">
-                  <Buildings size={14} className="text-faint" />
-                  {member.organization.name}
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <TreeStructure size={14} className="text-faint" />
-                  {member.branch?.name || "No branch assigned"}
-                </span>
+                <IdentificationBadge size={14} className="shrink-0" />
+                <span className="font-mono tracking-tight">{member.id}</span>
               </div>
             </div>
           </div>
 
-          <ActionPopover
-            actions={
-              member.status === "Inactive"
-                ? [
-                    {
-                      label: "Restore Access",
-                      icon: <ArrowCounterClockwise size={16} />,
-                      onClick: () => update(member.id, { status: "Active" }),
-                    },
-                  ]
-                : [
-                    {
-                      label: "Revoke Access",
-                      icon: <Prohibit size={16} />,
-                      isDanger: true,
-                      onClick: () => setRevokeTarget(member),
-                    },
-                  ]
-            }
-          />
         </div>
       </div>
 
-      {/* Two-column layout */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-1">
+      {/* Tab nav */}
+      <SegmentedTabs tabs={DETAIL_TABS} activeTab={activeTab} onChange={setTab} />
+
+      {activeTab === "details" && (
+        <div className="animate-in fade-in">
           <DetailSection
             title="Member Details"
             description="Read-only. Workforce details are managed in the Employees module."
-            icon={<UserCircle size={16} />}
+            icon={<UserCircle size={18} weight="duotone" />}
           >
-            <div className="grid grid-cols-1 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <DetailField
                 label="Member Type"
                 value={
@@ -193,6 +163,15 @@ export default function MemberDetailPage() {
                     />
                   </span>
                 }
+              />
+              <DetailField
+                label="Email"
+                value={
+                  <span className="font-mono text-label tracking-tight break-all text-subtle">
+                    {member.email}
+                  </span>
+                }
+                icon={<EnvelopeSimple size={14} />}
               />
               <DetailField
                 label="Organisation"
@@ -234,12 +213,14 @@ export default function MemberDetailPage() {
             </div>
           </DetailSection>
         </div>
+      )}
 
-        <div className="lg:col-span-2">
+      {activeTab === "activity" && (
+        <div className="animate-in fade-in">
           <DetailSection
             title="App Activity"
             description="Logins, voucher transactions, and profile changes made in the app."
-            icon={<Clock size={16} />}
+            icon={<Clock size={18} weight="duotone" />}
           >
             {activity.length === 0 ? (
               <EmptyState
@@ -252,12 +233,66 @@ export default function MemberDetailPage() {
             )}
           </DetailSection>
         </div>
-      </div>
+      )}
+
+      {activeTab === "settings" && (
+        <div className="animate-in fade-in">
+          <DetailSection
+            title="Danger Zone"
+            icon={<Gear size={18} weight="duotone" />}
+            description="Confirm how you want to change this member's app access."
+          >
+            <div className="space-y-4">
+              <div className="rounded-lg border border-border bg-muted/20 p-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="space-y-1">
+                    <p className="text-body font-medium text-foreground">
+                      {isRevoked
+                        ? "Restore App Access"
+                        : "Revoke App Access"}
+                    </p>
+                    <p className="text-label text-muted-foreground">
+                      {isRevoked
+                        ? "Let this member sign in to the app again."
+                        : "Sign the member out on all devices and block the app. Records are kept."}
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className={cn(
+                      "h-9 text-label",
+                      isRevoked
+                        ? "border-primary/30 text-primary hover:bg-primary/5"
+                        : "border-destructive/30 text-destructive hover:bg-destructive/5"
+                    )}
+                    onClick={() =>
+                      isRevoked
+                        ? update(member.id, { status: "Active" })
+                        : setRevokeTarget(member)
+                    }
+                  >
+                    {isRevoked ? "Restore Access" : "Revoke Access"}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </DetailSection>
+        </div>
+      )}
 
       <RevokeMemberAccessDialog
         member={revokeTarget}
         onClose={() => setRevokeTarget(null)}
       />
     </div>
+  )
+}
+
+export default function MemberDetailPage() {
+  return (
+    <Suspense fallback={null}>
+      <MemberDetail />
+    </Suspense>
   )
 }
