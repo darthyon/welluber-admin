@@ -182,7 +182,6 @@ export function usePolicyWizardContent({
       benefits,
       groups,
       groupsOnly,
-      mode,
       policyData,
     })
     setValidationErrors(errors)

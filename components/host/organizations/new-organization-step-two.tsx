@@ -1,16 +1,12 @@
 "use client"
 
 import {
-  ArrowLeft,
   Building,
   CheckCircle,
   MapPin,
-  NavigationArrow,
   Wallet,
 } from "@phosphor-icons/react"
-import { Button } from "@/components/ui/button"
 import { LocationPicker } from "@/components/shared/location-picker"
-import { Spinner } from "@/components/shared/spinner"
 import type { LocationData } from "@/components/shared/location-picker"
 
 interface NewOrganizationStepTwoProps {
@@ -18,13 +14,10 @@ interface NewOrganizationStepTwoProps {
   branchAddress: LocationData
   branchName: string
   creditLimit: string
-  isSubmitting: boolean
   labelCls: string
   onAccountNameChange: (value: string) => void
-  onBack: () => void
   onBranchAddressChange: (value: LocationData) => void
   onBranchNameChange: (value: string) => void
-  onConfirm: () => void
   onCreditLimitChange: (value: string) => void
 }
 
@@ -33,13 +26,10 @@ export function NewOrganizationStepTwo({
   branchAddress,
   branchName,
   creditLimit,
-  isSubmitting,
   labelCls,
   onAccountNameChange,
-  onBack,
   onBranchAddressChange,
   onBranchNameChange,
-  onConfirm,
   onCreditLimitChange,
 }: NewOrganizationStepTwoProps) {
   return (
@@ -188,39 +178,6 @@ export function NewOrganizationStepTwo({
         </div>
       </div>
 
-      <div className="fixed bottom-8 left-1/2 z-50 flex -translate-x-1/2 animate-in items-center gap-4 rounded-full border border-border bg-background/80 p-2 px-6 shadow-lg backdrop-blur-2xl duration-700 ease-out slide-in-from-bottom-10 lg:left-[calc(50%+104px)] lg:translate-x-0">
-        <Button
-          variant="ghost"
-          size="lg"
-          className="flex items-center gap-2 px-6 text-body font-semibold transition-colors"
-          onClick={onBack}
-          disabled={isSubmitting}
-        >
-          <ArrowLeft size={14} weight="bold" />
-          Back
-        </Button>
-        <div className="h-6 w-px bg-border/40" />
-        <Button
-          size="lg"
-          onClick={onConfirm}
-          disabled={isSubmitting}
-          className="flex items-center gap-2 px-8 text-body font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
-        >
-          {isSubmitting ? (
-            <>
-              <Spinner size="sm" variant="white" />
-              Creating...
-            </>
-          ) : (
-            <>
-              Confirm & Create
-              <NavigationArrow size={14} weight="bold" className="rotate-90" />
-            </>
-          )}
-        </Button>
-      </div>
-
-      <div className="h-[60vh]" />
     </div>
   )
 }

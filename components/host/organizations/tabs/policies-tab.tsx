@@ -74,7 +74,7 @@ export function PoliciesTab({
   useEffect(() => {
     if (isAddingPolicy === "true") {
       router.replace(
-        `/policies/new?source=org&orgId=${encodeURIComponent(orgId)}`
+        `/organizations/${encodeURIComponent(orgId)}/policies/new`
       )
     }
   }, [isAddingPolicy, orgId, router])
@@ -82,7 +82,7 @@ export function PoliciesTab({
   useEffect(() => {
     if (editingPolicyId) {
       router.replace(
-        `/policies/${encodeURIComponent(editingPolicyId)}/edit?source=org&orgId=${encodeURIComponent(orgId)}`
+        `/organizations/${encodeURIComponent(orgId)}/policies/${encodeURIComponent(editingPolicyId)}/edit`
       )
     }
   }, [editingPolicyId, orgId, router])
@@ -103,7 +103,7 @@ export function PoliciesTab({
           employees={employees}
           onEdit={() =>
             router.push(
-              `/policies/${encodeURIComponent(viewingPolicyId)}/edit?source=org&orgId=${encodeURIComponent(orgId)}`
+              `/organizations/${encodeURIComponent(orgId)}/policies/${encodeURIComponent(viewingPolicyId)}/edit`
             )
           }
           onClone={() => {
@@ -155,12 +155,12 @@ export function PoliciesTab({
               hideOrgPicker
               onManual={(oid) =>
                 router.push(
-                  `/policies/new?source=org&orgId=${encodeURIComponent(oid ?? orgId)}`
+                  `/organizations/${encodeURIComponent(oid ?? orgId)}/policies/new`
                 )
               }
               onTemplate={(tid, oid) =>
                 router.push(
-                  `/policies/new?source=org&template=${encodeURIComponent(tid)}&orgId=${encodeURIComponent(oid ?? orgId)}`
+                  `/organizations/${encodeURIComponent(oid ?? orgId)}/policies/new?template=${encodeURIComponent(tid)}`
                 )
               }
             />
@@ -242,7 +242,7 @@ export function PoliciesTab({
           }}
           onEdit={(id) => {
             router.push(
-              `/policies/${encodeURIComponent(id)}/edit?source=org&orgId=${encodeURIComponent(orgId)}`
+              `/organizations/${encodeURIComponent(orgId)}/policies/${encodeURIComponent(id)}/edit`
             )
           }}
         />

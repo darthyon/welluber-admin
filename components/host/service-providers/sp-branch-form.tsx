@@ -35,7 +35,7 @@ import { ServiceToggleCard } from "@/components/shared/service-toggle-card"
 import {
   FormStepIndicator,
   type FormWizardStep,
-  WizardActionBar,
+  FormActionBar,
 } from "@/components/shared/form-step-wizard"
 import type { SpBranch, CommissionSchemaRow } from "@/types/provider"
 import { toast } from "sonner"
@@ -253,6 +253,11 @@ export function SpBranchForm({
   }
 
   const goToStep = async (targetStep: 1 | 2 | 3) => {
+    if (isEditing) {
+      setCurrentStep(targetStep)
+      return
+    }
+
     if (targetStep <= currentStep) {
       setCurrentStep(targetStep)
       return
@@ -286,10 +291,8 @@ export function SpBranchForm({
     })
   }
 
-  const handleFinalStepSave = async () => {
-    const isValid = await validateStep(3)
-
-    if (!isValid) {
+  const handleSave = async () => {
+    if (!isEditing && !(await validateStep(3))) {
       return
     }
 
@@ -360,13 +363,14 @@ export function SpBranchForm({
           `Form incomplete: Missing or invalid data in ${errorFields.join(", ")}.`
         )
       })}
-      className="animate-in space-y-8 duration-500 fade-in slide-in-from-bottom-4"
+      className="animate-in space-y-8 pb-28 duration-500 fade-in slide-in-from-bottom-4"
     >
-      <BranchFormHeader isEditing={isEditing} onCancel={onCancel} />
+      <BranchFormHeader isEditing={isEditing} />
       <FormStepIndicator
         currentStep={currentStep}
         onStepClick={goToStep}
         steps={BRANCH_WIZARD_STEPS}
+        allowStepJumping={isEditing}
       />
 
       <div className="min-w-0">
@@ -643,20 +647,17 @@ export function SpBranchForm({
         </div>
       </div>
 
-      <WizardActionBar
-        createLabel="Create Branch"
+      <FormActionBar
         currentStep={currentStep}
-        isEditing={isEditing}
-        isSubmitting={isSubmitting}
-        onBack={() =>
-          setCurrentStep((step) => Math.max(1, step - 1) as 1 | 2 | 3)
-        }
-        onNext={goNext}
-        onSave={() => {
-          void handleFinalStepSave()
-        }}
-        saveLabel="Save Branch"
         totalSteps={3}
+        mode={isEditing ? "edit" : "create"}
+        onCancel={onCancel}
+        onBack={() => setCurrentStep((step) => Math.max(1, step - 1) as 1 | 2 | 3)}
+        onNext={goNext}
+        onSave={handleSave}
+        primaryLabel={isEditing ? "Save Changes" : "Create Branch"}
+        primaryIcon={isEditing ? "none" : "plus"}
+        isSubmitting={isSubmitting}
       />
     </form>
   )

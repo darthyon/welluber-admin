@@ -3,7 +3,6 @@
 import {
   Article,
   Bank,
-  CaretLeft,
   Globe,
   IdentificationCard,
   MapPin,
@@ -47,17 +46,9 @@ interface EditServiceProviderSectionsProps {
   setValue: UseFormSetValue<SpFormValues>
 }
 
-export function EditServiceProviderHeader({ onBack }: { onBack: () => void }) {
+export function EditServiceProviderHeader() {
   return (
     <div className="flex flex-col gap-4">
-      <button
-        type="button"
-        onClick={onBack}
-        className="inline-flex w-fit items-center gap-1.5 text-body font-medium text-subtle transition-colors hover:text-foreground"
-      >
-        <CaretLeft size={16} />
-        Back
-      </button>
       <div>
         <h1 className="text-heading font-semibold text-balance text-foreground">
           Edit Service Provider

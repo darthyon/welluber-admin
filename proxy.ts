@@ -10,11 +10,14 @@ export async function proxy(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_URL &&
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   )
+  const isDevAuthBypass =
+    process.env.NODE_ENV === "development" &&
+    process.env.WELLUBER_DEV_AUTH_BYPASS === "1"
   const hasAuthCookie = request.cookies
     .getAll()
     .some(({ name }) => name.startsWith("sb-") && name.includes("auth-token"))
 
-  if (!hasCredentials) {
+  if (isDevAuthBypass || !hasCredentials) {
     return NextResponse.next({ request })
   }
 

@@ -54,6 +54,7 @@ interface EmployeeFormContentProps {
   isSubmitting: boolean
   departments?: { id: string; name: string }[]
   tiers?: { id: string; name: string }[]
+  currentStep?: 1 | 2 | 3 | 4
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -64,6 +65,7 @@ export function EmployeeFormContent({
   isSubmitting,
   departments,
   tiers,
+  currentStep = 1,
 }: EmployeeFormContentProps) {
   void mode
   void isSubmitting
@@ -122,24 +124,30 @@ export function EmployeeFormContent({
 
   return (
     <form id="employeeForm" onSubmit={handleFormSubmit} className="space-y-6">
-      <PersonalDetailsSection formData={formData} setFormData={patch} idTypes={idTypes} />
-      <EmploymentDetailsSection
-        formData={formData}
-        setFormData={patch}
-        idTypes={idTypes}
-        resolvedDepts={resolvedDepts}
-        resolvedTiers={resolvedTiers}
-        isContractType={isContractType}
-        generateEmpCode={generateEmpCode}
-      />
-      <BenefitPolicySection
-        assignedPolicies={assignedPolicies}
-        setAssignedPolicies={setAssignedPolicies}
-      />
-      <DependentDetailsSection
-        dependents={dependents}
-        setDependents={setDependents}
-      />
+      {currentStep === 1 && <PersonalDetailsSection formData={formData} setFormData={patch} idTypes={idTypes} />}
+      {currentStep === 2 && (
+        <EmploymentDetailsSection
+          formData={formData}
+          setFormData={patch}
+          idTypes={idTypes}
+          resolvedDepts={resolvedDepts}
+          resolvedTiers={resolvedTiers}
+          isContractType={isContractType}
+          generateEmpCode={generateEmpCode}
+        />
+      )}
+      {currentStep === 3 && (
+        <BenefitPolicySection
+          assignedPolicies={assignedPolicies}
+          setAssignedPolicies={setAssignedPolicies}
+        />
+      )}
+      {currentStep === 4 && (
+        <DependentDetailsSection
+          dependents={dependents}
+          setDependents={setDependents}
+        />
+      )}
     </form>
   )
 }

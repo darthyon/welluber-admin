@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Plus, Ticket } from "@phosphor-icons/react"
 import { formatDateTime, getCurrencyLabel } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -42,7 +43,8 @@ const STATUS_VARIANT: Record<SpVoucherStatus, "emerald" | "zinc" | "rose"> = {
 }
 
 export function SpVouchersTab({ sp }: SpVouchersTabProps) {
-  const [view, setView] = useQueryState("voucherView", "list")
+  const router = useRouter()
+  const [view] = useQueryState("voucherView", "list")
   const [selectedVoucherId] = useQueryState("voucherId")
   const updateQueryParams = useUpdateQueryParams()
 
@@ -74,19 +76,13 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
   }
 
   const handleEdit = (voucher: SpVoucher) => {
-    updateQueryParams({
-      voucherView: "edit",
-      voucherId: voucher.id,
-      voucherReadOnly: null,
-    })
+    router.push(
+      `/service-providers/${sp.id}/voucher-packages/${voucher.id}/edit`
+    )
   }
 
   const handleAdd = () => {
-    updateQueryParams({
-      voucherView: "add",
-      voucherId: null,
-      voucherReadOnly: null,
-    })
+    router.push(`/service-providers/${sp.id}/voucher-packages/new`)
   }
 
   const handleBack = () => {
@@ -104,7 +100,7 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
         serviceCategories={sp.serviceCategories}
         branchNames={branchNames}
         onBack={handleBack}
-        onEdit={() => setView("edit")}
+        onEdit={() => handleEdit(selectedVoucher)}
       />
     )
   }
@@ -117,6 +113,7 @@ export function SpVouchersTab({ sp }: SpVouchersTabProps) {
       <div className="animate-in duration-400 fade-in slide-in-from-bottom-2">
         <SpVoucherForm
           spId={sp.id}
+          providerName={sp.name}
           spServiceCategories={sp.serviceCategories}
           spBranches={branchNames}
           voucher={view === "edit" ? selectedVoucher : undefined}

@@ -1,5 +1,6 @@
 "use client"
 
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { Plus, GitBranch } from "@phosphor-icons/react"
 import { Button } from "@/components/ui/button"
@@ -14,7 +15,6 @@ import { DataFilterBar } from "@/components/shared/data-filter-bar"
 import { ViewToggle, type ViewMode } from "@/components/shared/view-toggle"
 import { SpBranchCard } from "./sp-branch-card"
 import { SpBranchDetailView } from "./sp-branch-detail-view"
-import { SpBranchForm } from "./sp-branch-form"
 import type { ServiceProvider, SpBranch } from "@/types/provider"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { ActionPopover } from "@/components/shared/action-popover"
@@ -27,7 +27,8 @@ interface SpBranchesTabProps {
 type BranchStatusFilter = "all" | "active" | "inactive"
 
 export function SpBranchesTab({ sp }: SpBranchesTabProps) {
-  const [view, setView] = useQueryState("branchView", "list")
+  const router = useRouter()
+  const [view] = useQueryState("branchView", "list")
   const [selectedBranchId] = useQueryState("branchId")
   const updateQueryParams = useUpdateQueryParams()
   const [branchesView, setBranchesView] = useState<ViewMode>("list")
@@ -61,17 +62,15 @@ export function SpBranchesTab({ sp }: SpBranchesTabProps) {
   }
 
   const handleEdit = (branch: SpBranch) => {
-    updateQueryParams({
-      branchView: "edit",
-      branchId: branch.id,
-    })
+    router.push(
+      `/service-providers/${encodeURIComponent(sp.id)}/branches/${encodeURIComponent(branch.id)}/edit`
+    )
   }
 
   const handleAdd = () => {
-    updateQueryParams({
-      branchView: "add",
-      branchId: null,
-    })
+    router.push(
+      `/service-providers/${encodeURIComponent(sp.id)}/branches/new`
+    )
   }
 
   const handleBack = () => {
@@ -87,24 +86,8 @@ export function SpBranchesTab({ sp }: SpBranchesTabProps) {
         branch={selectedBranch}
         serviceCategories={sp.serviceCategories}
         onBack={handleBack}
-        onEdit={() => setView("edit")}
+        onEdit={() => handleEdit(selectedBranch)}
       />
-    )
-  }
-
-  if (view === "add" || (view === "edit" && selectedBranch)) {
-    return (
-      <div className="space-y-4">
-        <SpBranchForm
-          spId={sp.id}
-          serviceCategories={sp.serviceCategories}
-          mainServices={sp.mainServices}
-          portfolio={sp.commissionSchema}
-          branch={view === "edit" ? selectedBranch : undefined}
-          onSuccess={handleBack}
-          onCancel={handleBack}
-        />
-      </div>
     )
   }
 

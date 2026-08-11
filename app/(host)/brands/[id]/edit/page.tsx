@@ -3,7 +3,7 @@
 import { useParams, useRouter } from "next/navigation"
 import { useState } from "react"
 import { BrandForm, type BrandFormData } from "@/components/host/brands/brand-form"
-import { CaretLeft } from "@phosphor-icons/react"
+import { FormActionBar } from "@/components/shared/form-step-wizard"
 import { MOCK_BRANDS } from "@/lib/mock-data"
 
 export default function EditBrandPage() {
@@ -43,20 +43,9 @@ export default function EditBrandPage() {
   }
 
   return (
-    <div className="animate-in pb-12 duration-500 fade-in slide-in-from-bottom-4">
+    <div className="animate-in pb-28 duration-500 fade-in slide-in-from-bottom-4">
       {/* Header */}
-      <div className="mb-8 space-y-4">
-        <button
-          onClick={() => router.back()}
-          className="group flex items-center gap-1.5 text-body font-medium text-subtle transition-colors hover:text-primary"
-        >
-          <CaretLeft
-            size={16}
-            className="transition-transform group-hover:-translate-x-0.5"
-          />
-          Back
-        </button>
-
+      <div className="mb-8">
         <div>
           <h1 className="tracking-tight text-title font-semibold text-foreground">
             Edit Brand
@@ -69,8 +58,21 @@ export default function EditBrandPage() {
 
       <BrandForm
         initialData={brand}
+        formId="editBrandForm"
+        showFooter={false}
         onSubmit={handleSubmit}
         onCancel={() => router.push(`/brands/${brandId}`)}
+        isSubmitting={isSubmitting}
+      />
+
+      <FormActionBar
+        currentStep={1}
+        totalSteps={1}
+        mode="edit"
+        onCancel={() => router.back()}
+        onBack={() => router.back()}
+        primaryLabel="Save Changes"
+        formId="editBrandForm"
         isSubmitting={isSubmitting}
       />
     </div>

@@ -8,7 +8,7 @@ import { Breadcrumbs } from "@/components/shared/breadcrumbs"
 import {
   FormStepIndicator,
   type FormWizardStep,
-  WizardActionBar,
+  FormActionBar,
 } from "@/components/shared/form-step-wizard"
 import {
   ICON_LIBRARY,
@@ -22,6 +22,7 @@ interface ServiceItem {
 }
 interface CategoryWizardFormProps {
   mode: "create" | "edit"
+  onCancel: () => void
   initialCategory?: CategoryEntry
   initialSpecs?: Record<string, string[]>
   validateCategoryName: (name: string, excludeName?: string) => boolean
@@ -67,6 +68,7 @@ export function CategoryWizardForm({
   mode,
   initialCategory,
   initialSpecs = {},
+  onCancel,
   validateCategoryName,
   onSave,
 }: CategoryWizardFormProps) {
@@ -164,6 +166,11 @@ export function CategoryWizardForm({
   }
 
   const goToStep = (step: 1 | 2) => {
+    if (mode === "edit") {
+      setCurrentStep(step)
+      return
+    }
+
     if (step <= currentStep) {
       setCurrentStep(step)
       return
@@ -267,6 +274,7 @@ export function CategoryWizardForm({
           currentStep={currentStep}
           onStepClick={goToStep}
           steps={CATEGORY_WIZARD_STEPS}
+          allowStepJumping={mode === "edit"}
         />
 
         <div className="min-w-0">
@@ -500,16 +508,17 @@ export function CategoryWizardForm({
         </div>
       </div>
 
-      <WizardActionBar
-        createLabel="Save Category"
+      <FormActionBar
         currentStep={currentStep}
-        isEditing={mode === "edit"}
-        isSubmitting={isSubmitting}
+        totalSteps={2}
+        mode={mode}
+        onCancel={onCancel}
         onBack={() => setCurrentStep(1)}
         onNext={goNext}
         onSave={handleSave}
-        saveLabel="Save Category"
-        totalSteps={2}
+        primaryLabel={mode === "edit" ? "Save Changes" : "Create Category"}
+        primaryIcon={mode === "edit" ? "none" : "plus"}
+        isSubmitting={isSubmitting}
       />
     </form>
   )

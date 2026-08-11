@@ -77,7 +77,7 @@ export default function VoucherPackagesPage() {
 
   const handleProviderSelect = (provider: ServiceProvider) => {
     setIsProviderModalOpen(false)
-    router.push(`/service-providers/${provider.id}?voucherView=add`)
+    router.push(`/service-providers/${provider.id}/voucher-packages/new`)
   }
 
   return (
@@ -165,7 +165,7 @@ export default function VoucherPackagesPage() {
           }
           onEdit={(voucher) =>
             router.push(
-              `/service-providers/${voucher.spId}?voucherView=edit&voucherId=${voucher.id}`
+              `/service-providers/${voucher.spId}/voucher-packages/${voucher.id}/edit`
             )
           }
           onViewGenerated={(voucher) =>

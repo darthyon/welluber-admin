@@ -31,12 +31,12 @@ export default defineConfig({
     url: "http://127.0.0.1:3000",
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
-    // proxy.ts skips its auth guard when Supabase credentials are absent, so
-    // blanking them lets e2e hit guarded routes directly. The app runs on mock
-    // data, so nothing else depends on a live Supabase connection.
+    // Keep E2E on mock data and explicitly bypass the real Supabase auth guard
+    // in development. This also works when a developer already has .env.local.
     env: {
       NEXT_PUBLIC_SUPABASE_URL: "",
       NEXT_PUBLIC_SUPABASE_ANON_KEY: "",
+      WELLUBER_DEV_AUTH_BYPASS: "1",
     },
   },
 });

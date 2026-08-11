@@ -1,10 +1,10 @@
-import { redirect } from "next/navigation";
+import { NewPolicyCreateFlow } from "@/components/host/policies/new-policy-create-flow"
 
-export default async function NewOrgPolicyPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
-  redirect(`/policies/new?source=org&orgId=${encodeURIComponent(id)}`);
+interface OrganizationNewPolicyPageProps {
+  params: Promise<{ id: string }>
+}
+
+export default async function OrganizationNewPolicyPage({ params }: OrganizationNewPolicyPageProps) {
+  const { id } = await params
+  return <NewPolicyCreateFlow organizationId={id} />
 }

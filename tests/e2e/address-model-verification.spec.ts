@@ -240,8 +240,9 @@ test.describe("ADDRESS-05: Org Profile Tab Address", () => {
 
 test.describe("ADDRESS-06: SP Branch Form Address Normalization", () => {
   test("ADDRESS-06-01: SP branch form accepts full address", async ({ page }) => {
-    // SP branch form is a query-state view inside the SP detail Branches tab
+    // Legacy query-state URLs redirect to the canonical branch subpage.
     await page.goto(`/service-providers/${SP_ID}?tab=branches&branchView=add`);
+    await expect(page).toHaveURL(`/service-providers/${SP_ID}/branches/new`);
 
     const branchName = page.getByPlaceholder("e.g. Zenith KLCC");
     await expect(branchName).toBeVisible({ timeout: 15000 });

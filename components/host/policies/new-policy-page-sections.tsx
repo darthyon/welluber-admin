@@ -1,20 +1,15 @@
 "use client";
 
-import { Barbell, Brain, CaretLeft, Circle, Copy, NavigationArrow, PencilSimpleLine } from "@phosphor-icons/react";
+import { Barbell, Brain, CaretLeft, Circle, Copy, PencilSimpleLine } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
+import { FormActionBar } from "@/components/shared/form-step-wizard";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { TargetingPreviewCard } from "@/components/host/policies/targeting-preview-card";
 import { UnsavedChangesDialog } from "@/components/shared/unsaved-changes-dialog";
 import type { Benefit, BenefitGroup, BenefitPolicy } from "@/types/policy";
 
 const ICON_MAP: Record<string, React.ElementType> = { Barbell, Brain, Circle, PencilSimpleLine };
-
-export const NEW_POLICY_ANCHOR_ITEMS = [
-  { id: "policy-details", label: "Policy Details" },
-  { id: "pool-cycle", label: "Pool & Cycle" },
-];
 
 export type NewPolicyDraftShape = {
   policy: Partial<BenefitPolicy>;
@@ -23,19 +18,16 @@ export type NewPolicyDraftShape = {
 };
 
 export function NewPolicySidebar({
-  anchorItemsWithErrors,
   issues,
   jumpToIssue,
   targeting,
 }: {
-  anchorItemsWithErrors: Array<{ id: string; label: string; errorCount: number }>;
   issues: Array<{ key: string; label: string; target: string }>;
   jumpToIssue: (target: string) => void;
   targeting: { organizationId?: string; employmentTypes: string[]; tierIds: string[]; departmentIds: string[] };
 }) {
   return (
     <aside className="sticky top-20 hidden w-52 shrink-0 flex-col gap-4 self-start xl:flex">
-      <FloatingAnchorNav items={anchorItemsWithErrors} />
       <TargetingPreviewCard
         organizationId={targeting.organizationId}
         employmentTypes={targeting.employmentTypes}
@@ -150,16 +142,20 @@ export function PolicySetupBanner({
   );
 }
 
-export function NewPolicyPageActionBar({ onCancel, onReview }: { onCancel: () => void; onReview: () => void; }) {
+export function NewPolicyPageActionBar({ currentStep, onBack, onCancel, onNext }: { currentStep: 1 | 2 | 3; onBack: () => void; onCancel: () => void; onNext: () => void }) {
   return (
-    <div className="sticky bottom-8 z-50 mx-auto flex w-fit animate-in items-center gap-4 rounded-full border border-border bg-background/80 p-2 px-6 shadow-lg backdrop-blur-2xl duration-700 ease-out slide-in-from-bottom-10">
-      <Button type="button" variant="ghost" size="lg" className="px-6 text-body font-medium transition-colors" onClick={onCancel}>Cancel</Button>
-      <div className="h-6 w-px bg-border/40" />
-      <Button type="submit" form="policyWizardForm" size="lg" className="flex items-center gap-2 px-8 text-body font-medium transition-all hover:scale-[1.02] active:scale-[0.98]" onClick={onReview}>
-        Review
-        <NavigationArrow size={14} weight="bold" className="rotate-90" />
-      </Button>
-    </div>
+    <FormActionBar
+      currentStep={currentStep}
+      totalSteps={3}
+      mode="create"
+      onCancel={onCancel}
+      onBack={onBack}
+      onNext={onNext}
+      primaryLabel="Review"
+      primaryIcon="arrow-right"
+      formId="policyWizardForm"
+      contentClassName="max-w-[1280px]"
+    />
   );
 }
 

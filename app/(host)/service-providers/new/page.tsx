@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,21 +9,25 @@ import {
   CaretLeft,
   Tag,
   Plus,
-  NavigationArrow,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { createSpSchema } from "@/features/providers/schemas";
 import { createSp } from "@/features/providers/actions";
-import { Button } from "@/components/ui/button";
 import { MASTER_SERVICE_TAXONOMY } from "@/features/providers/service-taxonomy";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MOCK_BRANDS } from "@/lib/mock-data";
 import { BrandSelectionModal } from "@/components/host/service-providers/brand-selection-modal";
 import { Brand } from "@/types/brand";
-import { FloatingAnchorNav } from "@/components/shared/floating-anchor-nav";
+import { FormActionBar, FormStepIndicator, type FormWizardStep } from "@/components/shared/form-step-wizard";
 
 type Step = "selection" | "details";
 type BrandType = "new" | "existing";
+
+const PROVIDER_STEPS = [
+  { id: 1, label: "Provider Profile" },
+  { id: 2, label: "Compliance And Address" },
+  { id: 3, label: "Settlement And Services" },
+] as const satisfies readonly FormWizardStep<1 | 2 | 3>[];
 
 import { BrandIdentitySection } from "@/components/host/service-providers/form-sections/brand-identity-section";
 import { ProviderProfileSection } from "@/components/host/service-providers/form-sections/provider-profile-section";
@@ -36,6 +40,7 @@ import { SuccessModal } from "@/components/shared/success-modal";
 export default function NewServiceProviderPage() {
   const router = useRouter();
   const [step, setStep] = useState<Step>("selection");
+  const [detailsStep, setDetailsStep] = useState<1 | 2 | 3>(1);
   const [brandType, setBrandType] = useState<BrandType | null>(null);
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -68,20 +73,6 @@ export default function NewServiceProviderPage() {
   });
 
   const businessType = useWatch({ control, name: "businessType" });
-
-  const ANCHOR_ITEMS = useMemo(() => {
-    const items = [
-      { id: "provider-profile", label: "Provider Profile" },
-      { id: "registration-compliance", label: "Registration & Compliance" },
-      { id: "business-address", label: "Business Address" },
-      { id: "settlement-tax", label: "Settlement & Tax" },
-      { id: "service-portfolio", label: "Service Portfolio" },
-    ];
-    if (brandType === "new") {
-      items.unshift({ id: "brand-identity", label: "Brand Identity" });
-    }
-    return items;
-  }, [brandType]);
 
   const onSubmit = async (data: (z.input<typeof createSpSchema>) & { brandName?: string }) => {
     setIsSubmitting(true);
@@ -121,8 +112,11 @@ export default function NewServiceProviderPage() {
     setSelectedBrand(brand);
     setBrandCategories(brand.serviceCategories || []);
     setIsBrandModalOpen(false);
+    setDetailsStep(1);
     setStep("details");
   };
+
+  const goNext = () => setDetailsStep((current) => Math.min(3, current + 1) as 1 | 2 | 3);
 
   const inputCls = (hasError?: boolean) =>
     cn(
@@ -195,14 +189,7 @@ export default function NewServiceProviderPage() {
 
   return (
     <div className="pb-24 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start">
-        {/* Left Column: Navigation */}
-        <aside className="hidden xl:block w-52 shrink-0 sticky top-20 self-start">
-          <FloatingAnchorNav items={ANCHOR_ITEMS} />
-        </aside>
-
-        {/* Right Column: Form Content */}
-        <div className="flex-1">
+      <div className="mx-auto max-w-[1120px]">
           <div className="flex flex-col gap-6">
             {/* Header */}
             <div className="flex flex-col gap-4">
@@ -231,8 +218,17 @@ export default function NewServiceProviderPage() {
               </div>
             </div>
 
-            <form id="newSpForm" onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              {brandType === "new" && (
+            <FormStepIndicator currentStep={detailsStep} onStepClick={setDetailsStep} steps={PROVIDER_STEPS} />
+
+            <form
+              id="newSpForm"
+              onSubmit={detailsStep === 3 ? handleSubmit(onSubmit) : (event) => {
+                event.preventDefault();
+                goNext();
+              }}
+              className="space-y-6"
+            >
+              {detailsStep === 1 && brandType === "new" && (
                 <BrandIdentitySection 
                   register={register} 
                   control={control} 
@@ -242,14 +238,14 @@ export default function NewServiceProviderPage() {
                 />
               )}
 
-              <ProviderProfileSection 
+              {detailsStep === 1 && <ProviderProfileSection
                 register={register} 
                 errors={errors} 
                 labelCls={labelCls} 
                 inputCls={inputCls} 
-              />
+              />}
 
-              <RegistrationComplianceSection 
+              {detailsStep === 2 && <RegistrationComplianceSection
                 register={register} 
                 control={control} 
                 errors={errors} 
@@ -257,55 +253,43 @@ export default function NewServiceProviderPage() {
                 businessType={businessType} 
                 labelCls={labelCls} 
                 inputCls={inputCls} 
-              />
+              />}
 
-              <RegisteredAddressSection 
+              {detailsStep === 2 && <RegisteredAddressSection
                 control={control} 
                 errors={errors} 
-              />
+              />}
 
-              <SettlementTaxSection 
+              {detailsStep === 3 && <SettlementTaxSection
                 register={register} 
                 control={control} 
                 setValue={setValue}
                 errors={errors} 
                 labelCls={labelCls} 
                 inputCls={inputCls} 
-              />
+              />}
 
-              <ServicePortfolioSection
+              {detailsStep === 3 && <ServicePortfolioSection
                 control={control}
                 selectedMainServices={selectedMainServices}
                 brandCategories={brandCategories}
                 handleServicesChange={handleServicesChange}
                 errors={errors}
                 servicePortfolioTaxonomy={SERVICE_PORTFOLIO_TAXONOMY}
-              />
+              />}
 
-              {/* Floating Action Bar */}
-              <div className="fixed bottom-8 left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[calc(50%+104px)] z-50 flex items-center gap-4 p-2.5 px-6 bg-background/80 backdrop-blur-2xl border border-border/50 shadow-lg rounded-full animate-in slide-in-from-bottom-10 duration-700 ease-out">
-                <Button variant="ghost" className="text-body font-semibold rounded-full h-10 px-6 hover:bg-black/5 transition-colors" onClick={() => router.back()}>
-                  Cancel
-                </Button>
-                <div className="w-px h-6 bg-border/40" />
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="text-body font-semibold rounded-full h-10 px-8 flex items-center gap-2 bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all hover:scale-[1.02] active:scale-[0.98]"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Creating...
-                    </>
-                  ) : (
-                    <>
-                      Create Provider
-                      <NavigationArrow size={14} weight="bold" className="rotate-90" />
-                    </>
-                  )}
-                </Button>
-              </div>
+              <FormActionBar
+                currentStep={detailsStep}
+                totalSteps={3}
+                mode="create"
+                onCancel={() => router.back()}
+                onBack={() => setDetailsStep((current) => Math.max(1, current - 1) as 1 | 2 | 3)}
+                onNext={goNext}
+                primaryLabel="Create Provider"
+                primaryIcon="plus"
+                formId="newSpForm"
+                isSubmitting={isSubmitting}
+              />
             </form>
             
             <SuccessModal
@@ -315,7 +299,7 @@ export default function NewServiceProviderPage() {
               message={`${createdSpName} has been successfully created. Next, add their first branch to make them operational.`}
               primaryAction={{
                 label: "Add First Branch",
-                onClick: () => router.push(`/service-providers/${createdSpId}?tab=branches&branchView=add`),
+                onClick: () => router.push(`/service-providers/${createdSpId}/branches/new`),
               }}
               secondaryAction={{
                 label: "View Profile",
@@ -323,7 +307,6 @@ export default function NewServiceProviderPage() {
               }}
             />
           </div>
-        </div>
       </div>
     </div>
   );

@@ -5,8 +5,6 @@ import {
   Check,
   ClipboardText,
   MagnifyingGlass,
-  NavigationArrow,
-  PencilSimpleLine,
   Users,
   Warning,
   X,
@@ -16,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { TargetingFilterBar } from "@/components/host/policies/targeting-filter-bar";
 import { PolicyReviewCards } from "@/components/host/policies/policy-wizard-content";
+import { FormActionBar } from "@/components/shared/form-step-wizard";
 import type { EmployeeDirectoryItem } from "@/features/employees/types";
 import { cn } from "@/lib/utils";
 import type { Benefit, BenefitGroup, BenefitPolicy } from "@/types/policy";
@@ -293,36 +292,21 @@ export function PolicyReviewAssignmentSection({
         </Collapsible>
       </section>
 
-      <div className="sticky bottom-8 z-50 mx-auto flex w-fit animate-in items-center gap-4 rounded-full border border-border bg-background/80 p-2 px-6 shadow-lg backdrop-blur-2xl duration-700 ease-out slide-in-from-bottom-10">
-        <Button type="button" variant="ghost" size="lg" className="px-6 text-body font-medium transition-colors" onClick={routerBack}>
-          Back to Edit
-        </Button>
-        <div className="h-6 w-px bg-border/40" />
-        <Button type="button" variant="ghost" size="lg" disabled={isSubmitting} className="px-6 text-body font-medium transition-colors" onClick={onSaveDraft}>
-          <PencilSimpleLine size={14} weight="bold" className="mr-1.5" />
-          Save as Draft
-        </Button>
-        <div className="h-6 w-px bg-border/40" />
-        <Button
-          type="button"
-          size="lg"
-          disabled={isSubmitting}
-          onClick={onConfirm}
-          className="flex items-center gap-2 px-8 text-body font-medium transition-all hover:scale-[1.02] active:scale-[0.98]"
-        >
-          {isSubmitting ? (
-            <>
-              <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-              Saving...
-            </>
-          ) : (
-            <>
-              Confirm
-              <NavigationArrow size={14} weight="bold" className="rotate-90" />
-            </>
-          )}
-        </Button>
-      </div>
+      <FormActionBar
+        currentStep={1}
+        totalSteps={1}
+        mode="create"
+        onCancel={routerBack}
+        onBack={routerBack}
+        onSave={onConfirm}
+        primaryLabel="Confirm"
+        primaryIcon="check"
+        isSubmitting={isSubmitting}
+        secondaryAction={{
+          label: "Save As Draft",
+          onClick: onSaveDraft,
+        }}
+      />
     </>
   );
 }

@@ -11,8 +11,8 @@ import { updateSp } from "@/features/providers/actions"
 import { MASTER_SERVICE_TAXONOMY } from "@/features/providers/service-taxonomy"
 import {
   FormStepIndicator,
+  FormActionBar,
   type FormWizardStep,
-  WizardActionBar,
 } from "@/components/shared/form-step-wizard"
 import { MOCK_BRANDS, MOCK_SPS } from "@/lib/mock-data"
 import { ServicePortfolioSection } from "@/components/host/service-providers/form-sections/service-portfolio-section"
@@ -163,18 +163,6 @@ export default function EditServiceProviderPage() {
   }
 
   const goToStep = async (targetStep: 1 | 2 | 3) => {
-    if (targetStep <= currentStep) {
-      setCurrentStep(targetStep)
-      return
-    }
-
-    for (let step = currentStep; step < targetStep; step += 1) {
-      const isValid = await validateStep(step as 1 | 2 | 3)
-      if (!isValid) {
-        return
-      }
-    }
-
     setCurrentStep(targetStep)
   }
 
@@ -185,8 +173,8 @@ export default function EditServiceProviderPage() {
     }
   }
 
-  const handleFinalStepSave = async () => {
-    const isValid = await validateStep(3)
+  const handleSave = async () => {
+    const isValid = await trigger()
 
     if (!isValid) {
       return
@@ -222,11 +210,12 @@ export default function EditServiceProviderPage() {
     <div className="animate-in pb-24 duration-500 fade-in slide-in-from-bottom-4">
       <div className="flex-1">
         <div className="flex flex-col gap-6">
-          <EditServiceProviderHeader onBack={() => router.back()} />
+          <EditServiceProviderHeader />
           <FormStepIndicator
             currentStep={currentStep}
             onStepClick={goToStep}
             steps={EDIT_SP_WIZARD_STEPS}
+            allowStepJumping
           />
 
           <form
@@ -266,20 +255,20 @@ export default function EditServiceProviderPage() {
               />
             )}
 
-            <WizardActionBar
-              createLabel="Save Changes"
+            <FormActionBar
               currentStep={currentStep}
-              isEditing
-              isSubmitting={isSubmitting}
+              totalSteps={3}
+              mode="edit"
+              onCancel={() => router.back()}
               onBack={() =>
                 setCurrentStep((step) => Math.max(1, step - 1) as 1 | 2 | 3)
               }
               onNext={goNext}
               onSave={() => {
-                void handleFinalStepSave()
+                void handleSave()
               }}
-              saveLabel="Save Changes"
-              totalSteps={3}
+              primaryLabel="Save Changes"
+              isSubmitting={isSubmitting}
             />
           </form>
         </div>

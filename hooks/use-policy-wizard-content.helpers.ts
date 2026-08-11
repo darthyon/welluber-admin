@@ -57,7 +57,6 @@ interface ValidatePolicyWizardInput {
   benefits: Benefit[]
   groups: BenefitGroup[]
   groupsOnly: boolean
-  mode: "create" | "edit"
   policyData: Partial<BenefitPolicy>
 }
 
@@ -65,7 +64,6 @@ export function validatePolicyWizard({
   benefits,
   groups,
   groupsOnly,
-  mode,
   policyData,
 }: ValidatePolicyWizardInput): Record<string, string> {
   const errors: Record<string, string> = {}
@@ -119,7 +117,7 @@ export function validatePolicyWizard({
     }
   }
 
-  if (mode !== "create" || groupsOnly) {
+  {
     if (groups.length === 0) errors.groups = "Add at least one benefit group"
 
     groups.forEach((group, index) => {

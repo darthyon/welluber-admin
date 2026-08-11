@@ -42,6 +42,7 @@ export default function EditServiceCategoryPage({ params }: EditCategoryPageProp
       mode="edit"
       initialCategory={categoryEntry}
       initialSpecs={store.specsByService}
+      onCancel={() => router.push("/services")}
       validateCategoryName={validateCategoryName}
       onSave={handleSave}
     />

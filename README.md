@@ -70,16 +70,45 @@ All 70+ wellness services share a single canonical catalog in `features/provider
 
 ## Verification
 
-Run all of these before committing:
+Run the fast global checks for every change:
 
 ```bash
-pnpm dev          # Start dev server (Turbopack)
-pnpm build        # Production build
 pnpm lint         # ESLint check
 pnpm lint:design  # Design system guardrails
 pnpm typecheck    # TypeScript strict check
-pnpm format       # Prettier formatting
 ```
+
+### Impact-Based Testing
+
+Run behavioral tests based on the code and user flow changed. Do not run
+unrelated unit or end-to-end suites for every edit.
+
+```bash
+# Target the unit file that covers the changed logic.
+pnpm test:unit tests/unit/entitlement-pool-display.test.ts
+
+# Target the E2E flow affected by the change.
+pnpm test:e2e tests/e2e/benefit-policy.spec.ts
+```
+
+- Unit tests cover deterministic business logic and data transformations.
+- E2E tests cover the affected user journey, validation, navigation, and
+  error states in a real browser.
+- Changes to shared components expand testing to every consumer. For example,
+  changes to `FormActionBar` or `FormStepIndicator` require coverage across
+  the organization, employee, policy, provider, voucher, brand, category, and
+  branch flows.
+- Run the complete suite at merge and release checkpoints:
+
+```bash
+pnpm build
+pnpm test:unit
+pnpm test:e2e
+```
+
+An unrelated failing suite should be reported separately from the targeted
+verification for the current change; it should not be silently skipped or
+made less strict.
 
 ## Pre-Submit Checklist
 
