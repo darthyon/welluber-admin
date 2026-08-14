@@ -168,6 +168,7 @@ export function FormActionBar<TStep extends number = number>({
 
   return (
     <div
+      data-testid="form-action-bar"
       className="fixed inset-x-0 bottom-0 z-40 w-full border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80"
     >
       <div

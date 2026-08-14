@@ -40,6 +40,12 @@ export function LocationPickerMapPanel({
   suggestions,
   value,
 }: LocationPickerMapPanelProps) {
+  const hasCoordinates =
+    typeof value.lat === "number" &&
+    Number.isFinite(value.lat) &&
+    typeof value.lon === "number" &&
+    Number.isFinite(value.lon);
+
   return (
     <div className="space-y-4">
       <div className="relative group h-full">
@@ -80,13 +86,13 @@ export function LocationPickerMapPanel({
               <MapPin
                 size={48}
                 weight="fill"
-                className={cn("drop-shadow-lg transition-colors duration-500", value.lat && value.lon ? "text-primary" : "text-faint")}
+                className={cn("drop-shadow-lg transition-colors duration-500", hasCoordinates ? "text-primary" : "text-faint")}
               />
-              {value.lat && value.lon && !isSearching ? (
+              {hasCoordinates && !isSearching ? (
                 <div className="absolute -top-1 -right-1 h-3 w-3 rounded-full border-2 border-background bg-emerald-500 shadow-sm dark:bg-emerald-400" />
               ) : null}
             </div>
-            <div className={cn("rounded-full border border-border/50 bg-background/90 px-3 py-1 shadow-lg backdrop-blur-sm transition-all", value.lat && value.lon ? "scale-100 opacity-100" : "scale-90 opacity-0")}>
+            <div className={cn("rounded-full border border-border/50 bg-background/90 px-3 py-1 shadow-lg backdrop-blur-sm transition-all", hasCoordinates ? "scale-100 opacity-100" : "scale-90 opacity-0")}>
               <span className="whitespace-nowrap text-label font-medium text-primary">
                 {isSearching ? "Locating..." : "Pinned Location"}
               </span>

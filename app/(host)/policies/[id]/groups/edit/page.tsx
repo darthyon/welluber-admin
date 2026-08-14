@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, use } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { FormActionBar } from "@/components/shared/form-step-wizard";
 import { PolicyWizardContent } from "@/components/host/policies/policy-wizard-content";
 import { BenefitPolicy, BenefitGroup, Benefit } from "@/types/policy";
@@ -9,7 +9,12 @@ import { BenefitPolicy, BenefitGroup, Benefit } from "@/types/policy";
 export default function EditGroupsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const organizationId = searchParams.get("orgId");
   const draftKey = `policy-groups-draft-${id}`;
+  const returnHref = organizationId
+    ? `/organizations/${encodeURIComponent(organizationId)}?tab=policies`
+    : `/policies?policyId=${id}&mode=view&wizard=open`;
 
   const initialData = useMemo<{ policy: Partial<BenefitPolicy>; groups: BenefitGroup[]; benefits: Benefit[] } | undefined>(() => {
     if (typeof window === "undefined") return undefined;
@@ -23,7 +28,7 @@ export default function EditGroupsPage({ params }: { params: Promise<{ id: strin
     if (typeof window !== "undefined") {
       sessionStorage.removeItem(draftKey);
     }
-    router.push(`/policies?policyId=${id}&mode=view&wizard=open`);
+    router.push(returnHref);
   };
 
   return (
@@ -53,8 +58,8 @@ export default function EditGroupsPage({ params }: { params: Promise<{ id: strin
               currentStep={1}
               totalSteps={1}
               mode="edit"
-              onCancel={() => router.back()}
-              onBack={() => router.back()}
+              onCancel={() => router.push(returnHref)}
+              onBack={() => router.push(returnHref)}
               primaryLabel="Save Changes"
               formId="policyWizardForm"
             />

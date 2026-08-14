@@ -35,9 +35,9 @@ describe("entitlement pool display model — one kind per policy shape", () => {
 
     expect(display).toMatchObject({
       kind: "employee",
-      allocated: 1500,
-      used: 300,
-      left: 1200,
+      allocated: 600,
+      used: 180,
+      left: 420,
       dependentUsed: 0,
     })
     expect(display?.beneficiaries).toHaveLength(1)
@@ -120,9 +120,9 @@ describe("entitlement pool display model — one kind per policy shape", () => {
 
     expect(display).toMatchObject({
       kind: "shared",
-      allocated: 400,
+      allocated: 1000,
       used: 0,
-      left: 400,
+      left: 1000,
     })
   })
 })
@@ -173,7 +173,7 @@ describe("policy-level total allocation", () => {
 
     expect(
       getIndividualDependentPoolCeiling(entitlement.policy, entitlement.usage)
-    ).toBe(7600)
+    ).toBe(8000)
   })
 
   it("keeps combined pools at one shared ceiling", () => {

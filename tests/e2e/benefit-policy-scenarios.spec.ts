@@ -22,7 +22,7 @@ async function openWizard(page: import("@playwright/test").Page) {
   await expect(page.getByPlaceholder("e.g. Wellness Premium 2026")).toBeVisible({ timeout: 10000 });
 }
 
-// Fill minimum valid policy fields (groups not available in create mode — added post-creation via edit)
+// Fill minimum valid policy fields, including the required first benefit group.
 async function fillMinimalValidPolicy(page: import("@playwright/test").Page, name: string) {
   await page.getByPlaceholder("e.g. Wellness Premium 2026").fill(name);
   // Select org if not already locked via URL param
@@ -31,11 +31,34 @@ async function fillMinimalValidPolicy(page: import("@playwright/test").Page, nam
     await orgSelect.click();
     await page.getByRole("option", { name: /Acme Corporation/ }).click();
   }
-  // Employment types default to all selected — no action needed
-  // Scroll to Pool & Cycle section and explicitly select January start month
-  // (refreshStartMonth defaults to 1 in state but must be visible to the validator)
-  await page.getByText("Pool & Cycle").first().scrollIntoViewIfNeeded();
-  await page.getByRole("button", { name: "Jan" }).first().click();
+
+  // The redesigned wizard renders one step at a time. Advance to Pool And
+  // Cycle before interacting with its controls, then advance to the final
+  // step before submitting for review.
+  const actionBar = page.getByTestId("form-action-bar");
+  await actionBar.getByRole("button", { name: "Next", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "2 Pool And Cycle" })
+  ).toHaveAttribute("aria-current", "step");
+
+  // Employment types default to all selected — no action needed.
+  // The current flow selects the refresh reference, not a month button.
+  await page.getByRole("heading", { name: "Financial Year" }).click();
+  await actionBar.getByRole("button", { name: "Next", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "3 Benefit Groups And Services" })
+  ).toHaveAttribute("aria-current", "step");
+
+  await page.getByRole("button", { name: "Add Group", exact: true }).click();
+  const groupCard = page.locator('[id^="group-"]').last();
+  await groupCard.locator('input[placeholder="Group Name"]').fill("Fitness Benefits");
+  await groupCard.getByText("Gym Access", { exact: true }).first().click();
+  await groupCard.getByRole("button", { name: /Gym Access.*Set amount/ }).click();
+  await groupCard
+    .locator("label")
+    .filter({ hasText: "Employee Amount (RM)" })
+    .locator("xpath=following-sibling::input")
+    .fill("200");
 }
 
 // ─── ADD: Create Benefit Policy ──────────────────────────────────────────────
@@ -79,12 +102,13 @@ test.describe("BP-ADD: Create Benefit Policy", () => {
     await expect(page).not.toHaveURL(/\/policies\/new\/review/);
   });
 
-  test("BP-ADD-06: Groups section absent in create mode — added post-creation", async ({ page }) => {
+  test("BP-ADD-06: Groups section is available in create mode", async ({ page }) => {
     await openWizard(page);
-    // Benefit Groups SECTION intentionally hidden in create mode — groups added post-creation
-    // Check that the section heading and Add Group action are absent
-    await expect(page.getByRole("heading", { name: "Benefit Groups" })).not.toBeVisible();
-    await expect(page.locator("button").filter({ hasText: "Add Group" })).not.toBeVisible();
+    const actionBar = page.getByTestId("form-action-bar");
+    await actionBar.getByRole("button", { name: "Next", exact: true }).click();
+    await actionBar.getByRole("button", { name: "Next", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Benefit Groups" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Add Group", exact: true })).toBeVisible();
   });
 });
 

@@ -140,7 +140,7 @@ export default function NewServiceProviderPage() {
       <div className="space-y-6 pb-12">
         <div>
           <button
-            onClick={() => router.back()}
+            onClick={() => router.push("/service-providers")}
             className="inline-flex items-center gap-1.5 text-body font-medium text-subtle hover:text-foreground transition-colors mb-4"
           >
             <CaretLeft size={16} /> Back
@@ -282,7 +282,7 @@ export default function NewServiceProviderPage() {
                 currentStep={detailsStep}
                 totalSteps={3}
                 mode="create"
-                onCancel={() => router.back()}
+                onCancel={() => router.push("/service-providers")}
                 onBack={() => setDetailsStep((current) => Math.max(1, current - 1) as 1 | 2 | 3)}
                 onNext={goNext}
                 primaryLabel="Create Provider"

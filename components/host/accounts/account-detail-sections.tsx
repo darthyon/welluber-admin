@@ -32,6 +32,7 @@ interface AccountTransactionsSectionProps {
   activePeriod: "By Month" | "By Quarter" | "By Year";
   filteredTransactions: AccountTransaction[];
   onOpenDangerAction: (action: "suspend" | "terminate") => void;
+  onOpenStatement: () => void;
   onOpenRecordTopup: () => void;
   onOpenUpdateBalance: () => void;
   onPeriodChange: (period: "By Month" | "By Quarter" | "By Year") => void;
@@ -44,6 +45,7 @@ export function AccountTransactionsSection({
   activePeriod,
   filteredTransactions,
   onOpenDangerAction,
+  onOpenStatement,
   onOpenRecordTopup,
   onOpenUpdateBalance,
   onPeriodChange,
@@ -117,7 +119,7 @@ export function AccountTransactionsSection({
               <PopoverContent className="w-44 p-1.5" align="end">
                 <div className="flex flex-col gap-0.5">
                   <button
-                    onClick={() => {}}
+                    onClick={onOpenStatement}
                     className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-body font-medium text-subtle transition-colors hover:bg-muted hover:text-foreground"
                   >
                     <DownloadSimple size={14} className="text-faint" />

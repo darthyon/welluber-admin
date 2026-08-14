@@ -119,7 +119,6 @@ const EMP_TYPES: EmploymentType[] = [
 ]
 
 export function createEmployee(index: number): Employee {
-  const n = index + 1
   // Identity (id, name, email, empCode, org, branch) is owned by employee-identity.ts —
   // never re-derived here, or the directory and the store drift apart again.
   const identity = getEmployeeIdentityByIndex(index)

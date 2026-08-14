@@ -157,7 +157,9 @@ test.describe("Employee Entitlement Allocation", () => {
     await expect(
       table.getByTestId("entitlement-allocation-table")
     ).toBeVisible()
-    await expect(table.getByTestId("allocation-person-employee")).toBeVisible()
+    await expect(
+      table.getByTestId("allocation-person-EMP-20260115-0003")
+    ).toBeVisible()
     await expect(
       table.getByTestId("allocation-person-DEP-0003-1")
     ).toBeVisible()

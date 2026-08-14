@@ -155,6 +155,9 @@ test.describe("ADDRESS-02: Org Edit Address Pre-fill", () => {
 
     await waitForAnimation(page);
 
+    // Organisation edit is a four-step flow; address fields live on step 3.
+    await page.getByRole("button", { name: "3 Business Address" }).click();
+
     // Address line should be pre-filled from the org record
     const addressLine = page.getByLabel(/Street Address/i);
     await expect(addressLine).toBeVisible();
@@ -309,6 +312,9 @@ test.describe("ADDRESS-07: Address Round-Trip", () => {
   test("ADDRESS-07-02: Edit page maps every stored address field into the form", async ({ page }) => {
     await page.goto(`/organizations/${ORG_ID}/edit`);
     await expect(page.getByRole("heading", { name: "Edit Organisation" })).toBeVisible({ timeout: 15000 });
+
+    // Address fields live on step 3 of the edit flow.
+    await page.getByRole("button", { name: "3 Business Address" }).click();
 
     // Hardcoded on purpose — these must match the org's stored address exactly.
     await expect(page.getByLabel(/Street Address/i)).toHaveValue("Level 15, Menara Southpoint, Mid Valley City");

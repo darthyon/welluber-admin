@@ -37,6 +37,12 @@ export function EmployeeCreateFlow({ returnPath }: EmployeeCreateFlowProps) {
     setShowSuccess(true)
   }
 
+  const goNext = () => {
+    const form = document.getElementById("employeeForm")
+    if (form instanceof HTMLFormElement && !form.reportValidity()) return
+    setCurrentStep((step) => Math.min(4, step + 1) as 1 | 2 | 3 | 4)
+  }
+
   return (
     <div className="pb-24 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="mx-auto flex max-w-[1120px] flex-col gap-6">
@@ -62,7 +68,7 @@ export function EmployeeCreateFlow({ returnPath }: EmployeeCreateFlowProps) {
           mode="create"
           onCancel={goBack}
           onBack={() => setCurrentStep((step) => Math.max(1, step - 1) as 1 | 2 | 3 | 4)}
-          onNext={() => setCurrentStep((step) => Math.min(4, step + 1) as 1 | 2 | 3 | 4)}
+          onNext={goNext}
           primaryLabel="Create Employee"
           primaryIcon="plus"
           formId="employeeForm"
@@ -83,8 +89,8 @@ export function EmployeeCreateFlow({ returnPath }: EmployeeCreateFlowProps) {
           },
         }}
         secondaryAction={{
-          label: returnPath ? "Back to Employees" : "View Employee",
-          onClick: () => (returnPath ? router.push(returnPath) : router.push("/employees/emp_new")),
+          label: "Back To Employees",
+          onClick: () => router.push(returnPath ?? "/employees"),
         }}
       />
     </div>

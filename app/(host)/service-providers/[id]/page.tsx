@@ -13,6 +13,7 @@ import {
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { StatusBadge } from "@/components/shared/status-badge";
+import { EmptyState } from "@/components/shared/empty-state";
 import { ConfirmationModal } from "@/components/shared/confirmation-modal";
 import { Button } from "@/components/ui/button";
 import { SpInviteAdminModal } from "@/components/host/service-providers/sp-invite-admin-modal";
@@ -32,11 +33,14 @@ const TABS = [
 
 type TabId = typeof TABS[number]["id"];
 
-export default function ServiceProviderDetailPage() {
-  const params = useParams();
+function ServiceProviderDetailContent({
+  spId,
+  sp,
+}: {
+  spId: string;
+  sp: (typeof MOCK_SPS)[number];
+}) {
   const router = useRouter();
-  const spId = params.id as string;
-  const sp = MOCK_SPS.find((s) => s.id === spId) ?? MOCK_SPS[0];
 
   const [activeTab, setActiveTab] = useTabPersistence<TabId>("details");
   const searchParams = useSearchParams();
@@ -286,4 +290,32 @@ export default function ServiceProviderDetailPage() {
       )}
     </div>
   );
+}
+
+function ServiceProviderNotFound() {
+  const router = useRouter()
+
+  return (
+    <EmptyState
+      isPageLevel
+      icon={<Storefront size={48} weight="duotone" />}
+      title="Service Provider Not Found"
+      description="The service provider you are looking for does not exist or is no longer available."
+      action={
+        <Button className="rounded-4xl" onClick={() => router.push("/service-providers")}>
+          Back To Service Providers
+        </Button>
+      }
+    />
+  )
+}
+
+export default function ServiceProviderDetailPage() {
+  const params = useParams()
+  const spId = params.id as string
+  const sp = MOCK_SPS.find((provider) => provider.id === spId)
+
+  if (!sp) return <ServiceProviderNotFound />
+
+  return <ServiceProviderDetailContent spId={spId} sp={sp} />
 }

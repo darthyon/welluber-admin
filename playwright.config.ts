@@ -1,4 +1,12 @@
 import { defineConfig, devices } from "@playwright/test";
+const playwrightPort = Number(process.env.PLAYWRIGHT_PORT ?? 3000);
+
+if (!Number.isInteger(playwrightPort) || playwrightPort < 1024 || playwrightPort > 65535) {
+  throw new Error("PLAYWRIGHT_PORT must be an integer between 1024 and 65535");
+}
+
+const baseURL = `http://127.0.0.1:${playwrightPort}`;
+const manageWebServer = !!process.env.CI || process.env.PLAYWRIGHT_MANAGE_SERVER === "1";
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -9,9 +17,9 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  reporter: "html",
+  reporter: process.env.CI ? "html" : "list",
   use: {
-    baseURL: "http://127.0.0.1:3000",
+    baseURL,
     trace: "on-first-retry",
     screenshot: "only-on-failure",
   },
@@ -26,17 +34,21 @@ export default defineConfig({
       },
     },
   ],
-  webServer: {
-    command: "pnpm dev",
-    url: "http://127.0.0.1:3000",
-    reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
-    // Keep E2E on mock data and explicitly bypass the real Supabase auth guard
-    // in development. This also works when a developer already has .env.local.
-    env: {
-      NEXT_PUBLIC_SUPABASE_URL: "",
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: "",
-      WELLUBER_DEV_AUTH_BYPASS: "1",
-    },
-  },
+  ...(manageWebServer
+    ? {
+        webServer: {
+          command: `pnpm dev --port ${playwrightPort}`,
+          url: `${baseURL}/login/host`,
+          reuseExistingServer: false,
+          timeout: 120 * 1000,
+          // Keep CI E2E on mock data and explicitly bypass the real Supabase
+          // auth guard, even when the repository has environment defaults.
+          env: {
+            NEXT_PUBLIC_SUPABASE_URL: "",
+            NEXT_PUBLIC_SUPABASE_ANON_KEY: "",
+            WELLUBER_DEV_AUTH_BYPASS: "1",
+          },
+        },
+      }
+    : {}),
 });

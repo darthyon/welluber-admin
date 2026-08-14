@@ -78,7 +78,6 @@ function formatEmployeePoolType(
 
 export function EmployeePolicyTab({
   employeeId,
-  employeeName,
 }: EmployeePolicyTabProps) {
   const [showPolicyModal, setShowPolicyModal] = useState(false)
 

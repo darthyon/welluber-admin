@@ -1,7 +1,7 @@
 "use client";
 
 import { use } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { CaretLeft, TreeStructure } from "@phosphor-icons/react";
 import { VersionWizard } from "@/components/host/policies/version-wizard";
 import { MOCK_POLICIES, MOCK_POLICY_DATA_MAP } from "@/lib/mock-data";
@@ -11,6 +11,11 @@ import { MOCK_EMPLOYEES } from "@/lib/mock-data";
 export default function NewVersionPage({ params }: { params: Promise<{ id: string }> }) {
   const { id: parentId } = use(params);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const organizationId = searchParams.get("orgId");
+  const returnHref = organizationId
+    ? `/organizations/${encodeURIComponent(organizationId)}?tab=policies`
+    : `/policies?policyId=${parentId}&mode=view&wizard=open`;
 
   const parent = MOCK_POLICIES.find(p => p.id === parentId);
   const parentData = MOCK_POLICY_DATA_MAP[parentId];
@@ -38,7 +43,7 @@ export default function NewVersionPage({ params }: { params: Promise<{ id: strin
           Create versions from a parent policy only.
         </p>
         <button
-          onClick={() => router.push(`/policies?policyId=${parent.id}&mode=view&wizard=open`)}
+          onClick={() => router.push(returnHref)}
           className="mt-4 text-body font-medium text-primary hover:underline"
         >
           Return to policy
@@ -87,9 +92,9 @@ export default function NewVersionPage({ params }: { params: Promise<{ id: strin
         orgTierConfigs={orgTierConfigs}
         orgDepartmentConfigs={orgDepartmentConfigs}
         onSuccess={() =>
-          router.push(`/policies?policyId=${parentId}&mode=view&wizard=open`)
+          router.push(returnHref)
         }
-        onCancel={() => router.back()}
+        onCancel={() => router.push(returnHref)}
       />
     </div>
   );

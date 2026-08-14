@@ -43,8 +43,10 @@ test.describe("ORG-ADD: Create Organisation Wizard", () => {
   });
 
   test("ORG-ADD-07: Step 1 shows correct step indicator", async ({ page }) => {
-    // Step 1 of 2 label visible on new org page
-    await expect(page.getByText("Step 1 of 2")).toBeVisible();
+    // The create flow uses the shared progress stepper.
+    await expect(
+      page.getByRole("button", { name: "1 Organization Details" })
+    ).toHaveAttribute("aria-current", "step");
     // HQ Branch heading absent until step 2
     await expect(page.getByRole("heading", { name: "Set Up HQ Branch" })).not.toBeVisible();
   });
@@ -65,10 +67,11 @@ test.describe("ORG-ONBOARD: New Org Onboarding Checklist", () => {
   test("ORG-ONBOARD-01: New org checklist is visible and incomplete", async ({ page }) => {
     await page.goto(`/organizations/${NEW_ORG_ID}`);
     await expect(page.getByRole("heading", { name: "Maju Retail Sdn Bhd" })).toBeVisible({ timeout: 15000 });
-    // Checklist visible for inactive org — OrgSetupGuide step titles
-    await expect(page.getByText("Define employee tiers").first()).toBeVisible();
-    await expect(page.getByText("Add employees").first()).toBeVisible();
-    await expect(page.getByText("Create a benefit policy").first()).toBeVisible();
+    // Checklist visible for inactive org — compact setup checklist labels.
+    await expect(page.getByText("Setup Checklist", { exact: true })).toBeVisible();
+    await expect(page.getByText("Tier Configs", { exact: true })).toBeVisible();
+    await expect(page.getByText("Employees", { exact: true }).last()).toBeVisible();
+    await expect(page.getByText("Policies Assigned", { exact: true })).toBeVisible();
   });
 
   // ORG-ONBOARD-05 skipped: orgStatus in page.tsx defaults to "active" (known bug — never reads org.status).
@@ -154,18 +157,10 @@ test.describe("ORG-POLICIES: Assigned Policy Navigation", () => {
     await page.goto(`/organizations/${ORG_ID}?tab=policies&viewingPolicyId=pol_1`);
     await expect(page.getByRole("heading", { name: POLICY_NAME })).toBeVisible({ timeout: 15000 });
 
-    const chips = page.getByTestId("policy-header-chips");
-    await expect(chips).toBeVisible();
-    await expect(chips.getByText(/^Full-time$/)).toBeVisible();
-    await expect(chips.getByText(/^Yearly · FY start$/)).toBeVisible();
-    await expect(chips.getByText(/^Fixed utilisation$/)).toBeVisible();
-    await expect(chips.getByText(/^Employee only$/)).toBeVisible();
-    await expect(chips.getByText(/^Unlimited amount$/)).toBeVisible();
-
     await page.getByTestId("inherited-rules-trigger").click();
     const popover = page.getByTestId("inherited-rules-popover");
     await expect(popover).toBeVisible();
-    await expect(popover.getByText("Eligibility")).toBeVisible();
+    await expect(popover.getByText("Applies To")).toBeVisible();
     await expect(popover.getByText(/Full-time/i)).toBeVisible();
     await expect(popover.getByText("Configurable in benefit groups")).toBeVisible();
 

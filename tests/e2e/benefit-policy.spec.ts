@@ -106,14 +106,17 @@ test.describe("Policy Detail View", () => {
 
   test("DV-01: Header shows status badge and cadence", async ({ page }) => {
     await expect(page.getByText("Active", { exact: true }).first()).toBeVisible();
-    await expect(page.getByText(/Yearly refresh/)).toBeVisible();
-    await expect(page.getByText(/Fixed allocation/)).toBeVisible();
+    await expect(page.getByText("Refresh Cycle", { exact: true }).first()).toBeVisible();
+    await expect(page.getByText("Yearly", { exact: true }).first()).toBeVisible();
+    await expect(page.getByText("Utilisation Mode", { exact: true }).first()).toBeVisible();
+    await expect(page.getByText("Fixed Allocation", { exact: true }).first()).toBeVisible();
   });
 
   test("DV-04: Overview tab shows sections", async ({ page }) => {
-    await expect(page.getByText("Policy Overview")).toBeVisible();
-    await expect(page.getByText("Pool & Cycle")).toBeVisible();
-    await expect(page.getByText("Benefit Groups")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Policy Identity" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Employee Pool" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Dependent Coverage" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Eligibility" })).toBeVisible();
   });
 
   test("DV-07: Versions tab is visible and clickable", async ({ page }) => {
@@ -126,15 +129,17 @@ test.describe("Policy Detail View", () => {
     await expect(page.getByText("Assigned Employees").first()).toBeVisible();
   });
 
-  test("DV-09: Audit Log tab shows empty state", async ({ page }) => {
+  test("DV-09: Audit Log tab shows policy activity", async ({ page }) => {
     await page.getByText("Audit Log").click();
-    await expect(page.getByText("No audit events yet")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Audit Log" })).toBeVisible();
+    await expect(page.getByText("Created", { exact: true })).toBeVisible();
+    await expect(page.getByText(/Policy created from template/)).toBeVisible();
   });
 
   test("DV-10: Edit button opens wizard", async ({ page }) => {
     await page.getByRole("button", { name: "Edit Policy" }).click();
     await page.waitForURL(/\/policies\/.+\/edit/);
-    await expect(page.getByText("Edit Benefit Policy")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Edit Benefit Policy" })).toBeVisible();
   });
 });
 

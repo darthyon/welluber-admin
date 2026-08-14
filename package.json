@@ -15,6 +15,7 @@
     "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit",
     "check:policy": "tsx scripts/check-policy-integrity.ts",
+    "check:all": "pnpm lint:design && pnpm typecheck && pnpm lint && pnpm test:unit",
     "setup:worktree": "bash scripts/worktree-setup.sh"
   },
   "dependencies": {

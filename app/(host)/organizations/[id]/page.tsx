@@ -8,12 +8,13 @@ import {
   useQueryState,
   useUpdateQueryParams,
 } from "@/hooks/use-tab-persistence"
-import { PencilSimpleLine, Plus } from "@phosphor-icons/react"
+import { Buildings, PencilSimpleLine, Plus } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { BranchSheet } from "@/components/host/organizations/branch-sheet"
 import { InviteAdminModal } from "@/components/host/organizations/invite-admin-modal"
 import { Button } from "@/components/ui/button"
 import { StatusBadge } from "@/components/shared/status-badge"
+import { EmptyState } from "@/components/shared/empty-state"
 import { VoucherDetailSheet } from "@/components/shared/voucher-detail-sheet"
 import { EntityAvatar } from "@/components/shared/entity-avatar"
 import { ErrorBoundary } from "@/components/shared/error-boundary"
@@ -125,14 +126,16 @@ function buildAssignedPoliciesForOrg(
   }))
 }
 
-function OrganizationDetailContent() {
-  const params = useParams()
+function OrganizationDetailContent({
+  orgId,
+  mockOrg,
+}: {
+  orgId: string
+  mockOrg: Organization
+}) {
   const router = useRouter()
-  const orgId = params.id as string
-  const { organizations } = useOrganizations()
-  const mockOrg = organizations.find((o) => o.id === orgId)
-  const orgName = mockOrg?.name ?? orgId
-  const orgTierConfigs = mockOrg?.tierConfigs ?? []
+  const orgName = mockOrg.name
+  const orgTierConfigs = mockOrg.tierConfigs ?? []
 
   const [activeTab, setActiveTab] = useTabPersistence<TabId>("profile")
   const [isInviteModalOpen, setIsInviteModalOpen] = useQueryState("inviteAdmin")
@@ -143,16 +146,16 @@ function OrganizationDetailContent() {
 
   const [toastMessage, setToastMessage] = useState<string | null>(null)
   const [orgStatus, setOrgStatus] = useState<OrganizationStatus>(
-    mockOrg?.status ?? "active"
+    mockOrg.status
   )
-  const [assignedPolicies, setAssignedPolicies] = useState<AssignedPolicy[]>(
+  const [assignedPolicies] = useState<AssignedPolicy[]>(
     buildAssignedPoliciesForOrg(orgId, mockOrg)
   )
   const [selectedVoucherClaim, setSelectedVoucherClaim] =
     useState<FlatClaimRow | null>(null)
 
   const orgForSetup = {
-    ...(mockOrg ?? {}),
+    ...mockOrg,
     id: orgId,
     policies: assignedPolicies.map((p) => p.name),
   } as import("@/features/organizations/types").Organization
@@ -369,6 +372,35 @@ function OrganizationDetailContent() {
   )
 }
 
+function OrganizationNotFound() {
+  const router = useRouter()
+
+  return (
+    <EmptyState
+      isPageLevel
+      icon={<Buildings size={48} weight="duotone" />}
+      title="Organisation Not Found"
+      description="The organisation you are looking for does not exist or is no longer available."
+      action={
+        <Button className="rounded-4xl" onClick={() => router.push("/organizations")}>
+          Back To Organisations
+        </Button>
+      }
+    />
+  )
+}
+
+function OrganizationDetailRoute() {
+  const params = useParams()
+  const { organizations } = useOrganizations()
+  const orgId = params.id as string
+  const mockOrg = organizations.find((organization) => organization.id === orgId)
+
+  if (!mockOrg) return <OrganizationNotFound />
+
+  return <OrganizationDetailContent orgId={orgId} mockOrg={mockOrg} />
+}
+
 export default function OrganizationDetailPage() {
   return (
     <Suspense
@@ -378,7 +410,7 @@ export default function OrganizationDetailPage() {
         </div>
       }
     >
-      <OrganizationDetailContent />
+      <OrganizationDetailRoute />
     </Suspense>
   )
 }

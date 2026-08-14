@@ -2,6 +2,9 @@
 
 import { useParams, useRouter } from "next/navigation"
 import { EmployeeDetail } from "@/components/host/employees/employee-detail"
+import { EmptyState } from "@/components/shared/empty-state"
+import { Button } from "@/components/ui/button"
+import { ArrowLeft, UserCircle } from "@phosphor-icons/react"
 import { MOCK_EMPLOYEES } from "@/lib/mock-data"
 import type { EmployeeDetailRecord } from "@/features/employees/types"
 
@@ -144,10 +147,10 @@ const DEFAULT_EMPLOYEE_DETAILS = {
   ],
 } satisfies Omit<EmployeeDetailRecord, keyof (typeof MOCK_EMPLOYEES)[number]>
 
-function buildEmployeeDetail(employeeId: string): EmployeeDetailRecord {
-  const baseEmployee =
-    MOCK_EMPLOYEES.find((employee) => employee.id === employeeId) ??
-    MOCK_EMPLOYEES[0]
+function buildEmployeeDetail(employeeId: string): EmployeeDetailRecord | null {
+  const baseEmployee = MOCK_EMPLOYEES.find((employee) => employee.id === employeeId)
+  if (!baseEmployee) return null
+
   const override =
     EMPLOYEE_DETAIL_OVERRIDES[baseEmployee.id] ?? DEFAULT_EMPLOYEE_DETAILS
 
@@ -162,6 +165,23 @@ export default function EmployeePage() {
   const router = useRouter()
   const employeeId = params.id as string
   const employee = buildEmployeeDetail(employeeId)
+
+  if (!employee) {
+    return (
+      <EmptyState
+        isPageLevel
+        icon={<UserCircle size={48} weight="duotone" />}
+        title="Employee Not Found"
+        description="The employee profile you are looking for does not exist or is no longer available."
+        action={
+          <Button className="rounded-4xl" onClick={() => router.push("/employees")}>
+            <ArrowLeft size={16} aria-hidden="true" />
+            Back To Employees
+          </Button>
+        }
+      />
+    )
+  }
 
   return (
     <div className="p-6 pb-12 lg:p-8">

@@ -16,7 +16,6 @@ import { DashboardTopPolicies } from "@/components/org/dashboard-top-policies"
 import { DashboardTopCentres } from "@/components/org/dashboard-top-centres"
 import { ManualTopUpModal } from "@/components/host/organizations/manual-topup-modal"
 import {
-  MOCK_ORGS,
   MOCK_EMPLOYEE_UTILISATION,
   MOCK_CLAIMS_TIMESERIES,
   MOCK_BENEFIT_GROUP_USAGE,
@@ -27,20 +26,27 @@ import {
   MOCK_EMPLOYEE_TIER_UTILISATION,
   MOCK_VOUCHER_COUNTS,
 } from "@/lib/mock-data"
-
-const ORG_BY_SLUG: Record<string, string> = {
-  "acme-corporation": "ORG-20260115-0001",
-}
+import { getOrganizationBySlug } from "@/lib/org-portal"
+import { OrgPortalNotFound } from "@/components/org/org-portal-not-found"
+import { WidgetErrorBoundary } from "@/components/shared/widget-error-boundary"
 
 export default function OrgDashboardPage() {
   const params = useParams()
   const orgSlug = params.orgSlug as string
-
-  const orgId = ORG_BY_SLUG[orgSlug]
-  const org = MOCK_ORGS.find((o) => o.id === orgId) ?? MOCK_ORGS[0]!
-
   const [selectedBranch, setSelectedBranch] = useState<string>("all")
   const [topUpAccountId, setTopUpAccountId] = useState<string | null>(null)
+
+  const topUpAccount = useMemo(
+    () =>
+      MOCK_BRANCH_ACCOUNTS.find(
+        (account) => account.accountId === topUpAccountId
+      ) ?? null,
+    [topUpAccountId]
+  )
+
+  const org = getOrganizationBySlug(orgSlug)
+
+  if (!org) return <OrgPortalNotFound />
 
   const orgUtilRows = MOCK_EMPLOYEE_UTILISATION.filter((r) =>
     r.branch.includes("ACME")
@@ -72,14 +78,6 @@ export default function OrgDashboardPage() {
     (claim) => claim.status === "pre-auth"
   ).length
   const confirmedClaimsCount = confirmedClaims.length
-
-  const topUpAccount = useMemo(
-    () =>
-      MOCK_BRANCH_ACCOUNTS.find(
-        (account) => account.accountId === topUpAccountId
-      ) ?? null,
-    [topUpAccountId]
-  )
 
   return (
     <div className="space-y-8 pb-8">
@@ -122,17 +120,21 @@ export default function OrgDashboardPage() {
       />
 
       {/* ── Claims Trend ─────────────────────────────────────────────────────── */}
-      <DashboardClaimsChart
-        data={MOCK_CLAIMS_TIMESERIES}
-        selectedBranch={selectedBranch}
-        accounts={MOCK_BRANCH_ACCOUNTS}
-      />
+      <WidgetErrorBoundary title="Claims Trend Unavailable">
+        <DashboardClaimsChart
+          data={MOCK_CLAIMS_TIMESERIES}
+          selectedBranch={selectedBranch}
+          accounts={MOCK_BRANCH_ACCOUNTS}
+        />
+      </WidgetErrorBoundary>
 
       {/* ── Benefit Utilisation By Category ──────────────────────────────────── */}
-      <DashboardBenefitChart
-        data={MOCK_BENEFIT_GROUP_USAGE}
-        selectedBranch={selectedBranch}
-      />
+      <WidgetErrorBoundary title="Benefit Utilisation Unavailable">
+        <DashboardBenefitChart
+          data={MOCK_BENEFIT_GROUP_USAGE}
+          selectedBranch={selectedBranch}
+        />
+      </WidgetErrorBoundary>
 
       {/* ── Policy Performance + Top Wellness Centres ────────────────────────── */}
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">

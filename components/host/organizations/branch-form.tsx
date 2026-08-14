@@ -100,7 +100,8 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
     mode: "onTouched",
   })
 
-  const formData = watch()
+  const branchName = watch("name")
+  const branchAddress = watch("address")
 
   const goToStep = async (step: 1 | 2) => {
     if (isEditing) {
@@ -180,8 +181,8 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
             title={isEditing ? "Changes Saved!" : "Branch Created!"}
             message={
               isEditing
-                ? `${formData.name} has been successfully updated.`
-                : `A new chapter begins for ${formData.name}. Top up the account from the branch detail page.`
+                ? `${branchName} has been successfully updated.`
+                : `A new chapter begins for ${branchName}. Top up the account from the branch detail page.`
             }
           />
         </div>
@@ -274,7 +275,7 @@ export function BranchForm({ branchId, onCancel, onSubmit }: BranchFormProps) {
                 <div className="p-1">
                   <LocationPicker
                     value={
-                      (formData.address as LocationData) ?? {
+                      (branchAddress as LocationData) ?? {
                         line: "",
                         city: "",
                         state: "",
