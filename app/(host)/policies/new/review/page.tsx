@@ -326,10 +326,16 @@ function NewPolicyReviewPageContent() {
         title="Policy Created"
         message={`${createdPolicyName} has been saved as a draft.`}
         primaryAction={{
-          label: "Add Benefit Groups",
+          label: source === "org" ? "Back To Organisation" : "Add Benefit Groups",
           onClick: () => {
             setShowSuccess(false);
-            router.push(createdPolicyId ? `/policies?policyId=${createdPolicyId}&wizard=open&mode=view&tab=benefit-groups` : "/policies");
+            router.push(
+              source === "org" && effectiveOrgContext
+                ? doneHref
+                : createdPolicyId
+                  ? `/policies?policyId=${createdPolicyId}&wizard=open&mode=view&tab=benefit-groups`
+                  : "/policies"
+            );
           },
         }}
         secondaryAction={{

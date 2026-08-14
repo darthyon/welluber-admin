@@ -44,6 +44,7 @@ interface PolicyDetailViewProps {
    * - `embedded`: compact header for org-scoped policy viewing.
    */
   headerVariant?: "standalone" | "embedded"
+  organizationId?: string
   onEdit: () => void
   onClone: () => void
   onEditVersion?: (id: string) => void
@@ -63,6 +64,7 @@ export function PolicyDetailView({
   employees,
   initialTab,
   headerVariant = "standalone",
+  organizationId,
   onEdit,
   onClone,
   onEditVersion,
@@ -117,7 +119,9 @@ export function PolicyDetailView({
         onEdit={onEdit}
         onGoToParent={() =>
           router.push(
-            `/policies?policyId=${policy.parentPolicyId}&mode=view&wizard=open`
+            organizationId
+              ? `/organizations/${encodeURIComponent(organizationId)}?tab=policies&viewingPolicyId=${encodeURIComponent(policy.parentPolicyId ?? "")}`
+              : `/policies?policyId=${policy.parentPolicyId}&mode=view&wizard=open`
           )
         }
         onSelectTab={setSelectedTab}
@@ -167,6 +171,7 @@ export function PolicyDetailView({
               policy={policy}
               groups={groups}
               benefits={benefits}
+              organizationId={organizationId}
             />
           )}
           {!isVersion && activeTab === "versions" && (
@@ -175,13 +180,29 @@ export function PolicyDetailView({
               versions={versions}
               overrideCounts={versionOverrideCounts}
               onCreateVersion={() =>
-                router.push(`/policies/${policy.id}/versions/new`)
+                router.push(
+                  `/policies/${policy.id}/versions/new${
+                    organizationId
+                      ? `?orgId=${encodeURIComponent(organizationId)}`
+                      : ""
+                  }`
+                )
               }
               onViewVersion={(id) =>
-                router.push(`/policies?policyId=${id}&mode=view&wizard=open`)
+                router.push(
+                  organizationId
+                    ? `/organizations/${encodeURIComponent(organizationId)}?tab=policies&viewingPolicyId=${encodeURIComponent(id)}`
+                    : `/policies?policyId=${id}&mode=view&wizard=open`
+                )
               }
               onEditVersion={
-                onEditVersion ?? ((id) => router.push(`/policies/${id}/edit`))
+                onEditVersion ??
+                  ((id) =>
+                    router.push(
+                      organizationId
+                        ? `/organizations/${encodeURIComponent(organizationId)}/policies/${encodeURIComponent(id)}/edit`
+                        : `/policies/${id}/edit`
+                    ))
               }
               onRemoveVersion={onRemoveVersion ?? (() => {})}
             />

@@ -146,7 +146,6 @@ export function EmploymentDetailsSection({
               <FormSelect
                 value={formData.tier}
                 onChange={(v) => {
-                  const selectedTier = resolvedTiers.find((t) => t.name === v)
                   setFormData({
                     tier: v,
                     role: "", // Reset role when tier changes

@@ -14,6 +14,7 @@ import { TopupTransaction } from "@/features/manual-topup/types";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { format } from "date-fns";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface TopUpHistoryModalProps {
   isOpen: boolean;
@@ -24,6 +25,7 @@ interface TopUpHistoryModalProps {
 
 export function TopUpHistoryModal({ isOpen, onClose, branchId, branchName }: TopUpHistoryModalProps) {
   const [history, setHistory] = useState<TopupTransaction[] | null>(null);
+  const [selectedAttachment, setSelectedAttachment] = useState<TopupTransaction | null>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -138,7 +140,14 @@ export function TopUpHistoryModal({ isOpen, onClose, branchId, branchName }: Top
                       <StatusBadge status={txn.status} variant={getStatusVariant(txn.status)} />
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-muted" title="View Attachment">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 w-7 p-0 hover:bg-muted"
+                        title="View Attachment"
+                        aria-label={`View attachment for ${txn.referenceNo || txn.id}`}
+                        onClick={() => setSelectedAttachment(txn)}
+                      >
                         <DownloadSimple size={14} className="text-muted-foreground group-hover:text-foreground" />
                       </Button>
                     </td>
@@ -157,7 +166,35 @@ export function TopUpHistoryModal({ isOpen, onClose, branchId, branchName }: Top
           </div>
         </div>
       </div>
+
+      <Dialog open={selectedAttachment !== null} onOpenChange={(open) => !open && setSelectedAttachment(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Top-Up Attachment</DialogTitle>
+            <DialogDescription>
+              Proof-of-payment record for {selectedAttachment?.referenceNo || selectedAttachment?.id}.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="rounded-lg border border-border bg-muted/20 p-4 text-body text-subtle">
+            {selectedAttachment?.attachmentUrl ? (
+              <Button
+                variant="ghost"
+                className="rounded-4xl px-0 font-medium text-primary underline underline-offset-4"
+                onClick={() => window.open(selectedAttachment.attachmentUrl, "_blank", "noopener,noreferrer")}
+              >
+                Open Attached Document
+              </Button>
+            ) : (
+              <p>No attachment was included in this seeded transaction.</p>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" className="rounded-4xl" onClick={() => setSelectedAttachment(null)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
-

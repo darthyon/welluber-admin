@@ -216,7 +216,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   )}
                   <DropdownMenuSeparator className="bg-border/50" />
                   <DropdownMenuGroup>
-                    <DropdownMenuItem className="flex items-center gap-3 px-3 py-2 cursor-pointer focus:bg-primary/5 group/settings">
+                    <DropdownMenuItem onClick={() => router.push("/settings")} className="flex items-center gap-3 px-3 py-2 cursor-pointer focus:bg-primary/5 group/settings">
                       <div className="flex aspect-square size-7 items-center justify-center rounded-lg bg-muted/30 text-muted-foreground group-hover/settings:bg-primary/5 group-hover/settings:text-primary transition-colors border border-transparent group-hover/settings:border-primary/10">
                         <Gear size={15} weight="fill" />
                       </div>

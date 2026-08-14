@@ -101,6 +101,7 @@ export function PoliciesTab({
             )
           )}
           employees={employees}
+          organizationId={orgId}
           onEdit={() =>
             router.push(
               `/organizations/${encodeURIComponent(orgId)}/policies/${encodeURIComponent(viewingPolicyId)}/edit`

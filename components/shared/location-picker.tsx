@@ -58,6 +58,10 @@ function reverseGeocode(lat: number, lon: number): Partial<LocationData> | null 
   return { country: "Malaysia" };
 }
 
+function isFiniteCoordinate(value: number | undefined): value is number {
+  return typeof value === "number" && Number.isFinite(value);
+}
+
 export function LocationPicker({ value, onChange, errors, className }: LocationPickerProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
@@ -83,8 +87,8 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
   }, [coordsEditing, latDraft, lonDraft]);
 
   const openCoords = () => {
-    setLatDraft(value.lat !== undefined ? String(value.lat) : "");
-    setLonDraft(value.lon !== undefined ? String(value.lon) : "");
+    setLatDraft(isFiniteCoordinate(value.lat) ? String(value.lat) : "");
+    setLonDraft(isFiniteCoordinate(value.lon) ? String(value.lon) : "");
     setCoordsEditing(true);
   };
 
@@ -96,7 +100,7 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
       const geo = reverseGeocode(lat, lon) ?? {};
       onChange({ ...value, ...geo, lat, lon });
     } else {
-      onChange({ ...value });
+      onChange({ ...value, lat: undefined, lon: undefined });
     }
   };
 
@@ -250,7 +254,7 @@ export function LocationPicker({ value, onChange, errors, className }: LocationP
               onClick={openCoords}
               className="group inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-border/60 bg-muted/20 text-label text-faint hover:text-primary hover:border-primary/30 transition-all font-mono"
             >
-              {value.lat && value.lon ? (
+              {isFiniteCoordinate(value.lat) && isFiniteCoordinate(value.lon) ? (
                 <span>{String(value.lat)}, {String(value.lon)}</span>
               ) : (
                 <span className="not-italic">Set coordinates</span>

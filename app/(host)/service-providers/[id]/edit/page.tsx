@@ -6,6 +6,9 @@ import { type FieldPath, useForm, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { cn } from "@/lib/utils"
+import { EmptyState } from "@/components/shared/empty-state"
+import { Button } from "@/components/ui/button"
+import { ArrowLeft, Storefront } from "@phosphor-icons/react"
 import { createSpSchema } from "@/features/providers/schemas"
 import { updateSp } from "@/features/providers/actions"
 import { MASTER_SERVICE_TAXONOMY } from "@/features/providers/service-taxonomy"
@@ -52,11 +55,14 @@ const STEP_FIELDS: Record<1 | 2 | 3, SpFieldPath[]> = {
   3: ["mainServices", "commissionSchema"],
 }
 
-export default function EditServiceProviderPage() {
+function EditServiceProviderContent({
+  spId,
+  sp,
+}: {
+  spId: string
+  sp: (typeof MOCK_SPS)[number]
+}) {
   const router = useRouter()
-  const params = useParams()
-  const spId = params.id as string
-  const sp = MOCK_SPS.find((provider) => provider.id === spId) ?? MOCK_SPS[0]
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1)
@@ -259,7 +265,7 @@ export default function EditServiceProviderPage() {
               currentStep={currentStep}
               totalSteps={3}
               mode="edit"
-              onCancel={() => router.back()}
+              onCancel={() => router.push(`/service-providers/${encodeURIComponent(spId)}`)}
               onBack={() =>
                 setCurrentStep((step) => Math.max(1, step - 1) as 1 | 2 | 3)
               }
@@ -275,4 +281,30 @@ export default function EditServiceProviderPage() {
       </div>
     </div>
   )
+}
+
+export default function EditServiceProviderPage() {
+  const params = useParams()
+  const router = useRouter()
+  const spId = params.id as string
+  const sp = MOCK_SPS.find((provider) => provider.id === spId)
+
+  if (!sp) {
+    return (
+      <EmptyState
+        isPageLevel
+        icon={<Storefront size={48} weight="duotone" />}
+        title="Service Provider Not Found"
+        description="The service provider you are trying to edit could not be loaded."
+        action={
+          <Button className="rounded-4xl" onClick={() => router.push("/service-providers")}>
+            <ArrowLeft size={16} aria-hidden="true" />
+            Back To Service Providers
+          </Button>
+        }
+      />
+    )
+  }
+
+  return <EditServiceProviderContent spId={spId} sp={sp} />
 }

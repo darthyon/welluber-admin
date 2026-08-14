@@ -21,12 +21,15 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
+import { EmptyState } from "@/components/shared/empty-state";
+import { Button } from "@/components/ui/button";
 import { createOrganizationSchema, CreateOrganizationData } from "@/features/organizations/schemas";
 import { FormActionBar, FormStepIndicator, type FormWizardStep } from "@/components/shared/form-step-wizard";
 import { LocationPicker } from "@/components/shared/location-picker";
 import { DocumentUploadSection } from "@/components/shared/document-upload-section";
 import { FormSelect } from "@/components/shared/form-select";
 import { MALAYSIAN_BANKS } from "@/lib/constants/banks";
+import { MOCK_ORGS } from "@/lib/mock-data";
 import { toast } from "sonner";
 
 const ORGANIZATION_EDIT_STEPS = [
@@ -45,10 +48,8 @@ const ORG_TYPES = [
   { id: "clbg", label: "CLBG", docs: "Memorandum & Articles" },
 ];
 
-export default function EditOrganizationPage() {
+function EditOrganizationContent({ orgId }: { orgId: string }) {
   const router = useRouter();
-  const params = useParams();
-  const orgId = params.id as string;
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(1);
@@ -369,7 +370,7 @@ export default function EditOrganizationPage() {
                 currentStep={currentStep}
                 totalSteps={4}
                 mode="edit"
-                onCancel={() => router.back()}
+                onCancel={() => router.push(`/organizations/${encodeURIComponent(orgId)}`)}
                 onBack={() => setCurrentStep((step) => Math.max(1, step - 1) as 1 | 2 | 3 | 4)}
                 onNext={() => setCurrentStep((step) => Math.min(4, step + 1) as 1 | 2 | 3 | 4)}
                 onSave={() => void handleSubmit(onSubmit)()}
@@ -381,4 +382,28 @@ export default function EditOrganizationPage() {
       </div>
     </div>
   );
+}
+
+export default function EditOrganizationPage() {
+  const router = useRouter();
+  const params = useParams();
+  const orgId = params.id as string;
+
+  if (!MOCK_ORGS.some((organization) => organization.id === orgId)) {
+    return (
+      <EmptyState
+        isPageLevel
+        icon={<Buildings size={48} weight="duotone" />}
+        title="Organisation Not Found"
+        description="The organisation you are trying to edit could not be loaded."
+        action={
+          <Button className="rounded-4xl" onClick={() => router.push("/organizations")}>
+            Back To Organisations
+          </Button>
+        }
+      />
+    );
+  }
+
+  return <EditOrganizationContent orgId={orgId} />;
 }

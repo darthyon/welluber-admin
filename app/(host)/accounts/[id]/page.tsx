@@ -10,6 +10,7 @@ import { ConfirmationModal } from "@/components/shared/confirmation-modal";
 import { useState, Suspense } from "react";
 import { UpdateBalanceModal } from "@/components/host/accounts/update-balance-modal";
 import { RecordTopupModal } from "@/components/host/accounts/record-topup-modal";
+import { AccountStatementModal } from "@/components/host/accounts/account-statement-modal";
 import { cn } from "@/lib/utils";
 import {
   AccountOverviewSection,
@@ -36,6 +37,7 @@ function AccountDetailContent() {
   // Modal States
   const [isUpdateBalanceOpen, setIsUpdateBalanceOpen] = useState(false);
   const [isRecordTopupOpen, setIsRecordTopupOpen] = useState(false);
+  const [isStatementOpen, setIsStatementOpen] = useState(false);
 
   const wallet = accounts.find(w => w.id === accountId);
 
@@ -157,6 +159,7 @@ function AccountDetailContent() {
             activePeriod={period}
             filteredTransactions={filteredTransactions}
             onOpenDangerAction={openDangerAction}
+            onOpenStatement={() => setIsStatementOpen(true)}
             onOpenRecordTopup={() => setIsRecordTopupOpen(true)}
             onOpenUpdateBalance={() => setIsUpdateBalanceOpen(true)}
             onPeriodChange={setPeriod}
@@ -212,6 +215,12 @@ function AccountDetailContent() {
             onClose={() => setIsRecordTopupOpen(false)}
             accountId={wallet.id}
             accountName={wallet.name}
+          />
+          <AccountStatementModal
+            accountName={wallet.name}
+            isOpen={isStatementOpen}
+            onClose={() => setIsStatementOpen(false)}
+            transactions={filteredTransactions}
           />
         </>
       )}

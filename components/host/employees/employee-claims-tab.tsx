@@ -119,6 +119,30 @@ export function EmployeeClaimsTab({ employeeId }: EmployeeClaimsTabProps) {
   const confirmedCount = filteredClaims.filter((c) => c.status === "confirmed").length;
   const preAuthCount = filteredClaims.filter((c) => c.status === "pre-auth").length;
 
+  const exportClaims = () => {
+    const headers = ["Voucher", "Service", "Provider", "Location", "Date", "Amount", "Status"]
+    const rows = filteredClaims.map((claim) => [
+      claim.voucherCode,
+      claim.service,
+      claim.provider,
+      claim.location,
+      claim.date,
+      claim.amount,
+      claim.status,
+    ])
+    const csv = [headers, ...rows]
+      .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))
+      .join("\n")
+    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8;" }))
+    const link = document.createElement("a")
+    link.href = url
+    link.download = `employee-claims-${employeeId}.csv`
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <div className="space-y-8">
       <div>
@@ -187,7 +211,7 @@ export function EmployeeClaimsTab({ employeeId }: EmployeeClaimsTabProps) {
           />
         }
         actions={
-          <Button variant="ghost" className="gap-2 text-label" onClick={() => {}}>
+          <Button variant="ghost" className="gap-2 text-label" onClick={exportClaims}>
             <Download size={14} />
             Export CSV
           </Button>

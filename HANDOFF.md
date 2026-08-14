@@ -14,13 +14,26 @@
 - Frontend plus mock/seeded data only; no backend work.
 - `FloatingAnchorNav` has zero active usages in app/components/features.
 - Verification passed: `pnpm typecheck`, `pnpm lint:design`, and `git diff --check`; the Codex browser reached the contextual employee creation route.
+- Added targeted `tests/e2e/form-navigation.spec.ts` coverage for create gating, edit step jumping, save availability, and mobile footer overflow.
+- Employee create now uses native form validity before advancing from the first step.
+- Employee flow audit milestone completed: global creation now returns to the employee directory, invalid employee detail no longer falls back to the first seed, and invalid edit routes return to their correct directory context.
+- Added targeted E2E cases for invalid employee detail and invalid global edit routing.
+- Policy context milestone completed: organization-created policy confirmation stays in the organization policy tab, and organization policy edit, group-edit, version, and version-view routes preserve context.
+- Added targeted E2E coverage for contextual policy review, group-edit completion, and version cancellation.
+- Organization/provider flow milestone completed: organization branch and edit flows now use explicit parent destinations, provider edit/create cancellation is explicit, and provider/organization/provider-branch/voucher routes no longer silently use invalid records.
+- Added proper not-found states for invalid organization, organization branch, service provider, provider branch, and voucher creation/edit routes.
+- Added targeted E2E coverage for contextual branch/provider cancellation and invalid contextual records.
+- Finance and organization-portal audit milestone completed: `/invoices` and `/settlements` now resolve to intentional Coming Soon pages, and invalid organization portal slugs show a not-found state instead of Acme seed data.
+- Added shared organization-slug lookup and targeted E2E coverage for finance placeholders and invalid organization portal slugs.
+- Visible-action audit milestone completed: employee claims export filtered CSV, account statements open as read-only seeded data with CSV download, top-up attachment actions open a record state, and Account Settings now routes to `/settings`.
+- Added targeted E2E coverage for claims export, account statements, top-up attachments, and Account Settings navigation.
 - Unit and e2e tests were not run per repository instructions.
 
 ## Next
-1. Adopt the documented impact-based testing workflow: targeted unit/E2E checks during development, full suite at merge/release checkpoints.
-2. Add a dedicated form-navigation E2E suite for shared footer behavior, step gating/jumping, save-from-every-edit-step, mobile wrapping, and validation errors across all form consumers.
-3. Resolve the existing entitlement unit failures separately from the navigation milestones.
-4. Continue the contextual route audit for any remaining legacy query entry points, then run the targeted navigation E2E suite outside chat.
+1. Audit remaining organization portal list/detail fallbacks and visible no-op actions outside the original findings.
+2. Resolve the existing entitlement unit failures separately from the navigation milestones.
+3. Run targeted E2E suites outside chat; full suites remain a merge/release checkpoint.
+4. Prepare the accumulated audit/navigation work for commit and PR review.
 
 ## Blockers / decisions
 - Edit flows allow direct step selection and Save Changes from every step.

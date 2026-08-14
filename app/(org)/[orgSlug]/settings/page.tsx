@@ -16,12 +16,9 @@ import { StatusBadge } from "@/components/shared/status-badge"
 import { OrgStructureConfig } from "@/components/host/organizations/org-structure-config"
 import { InviteOrgAdminModal } from "@/components/org/invite-org-admin-modal"
 import { Button } from "@/components/ui/button"
-import { MOCK_ORGS } from "@/lib/mock-data"
 import type { OrganizationAdmin } from "@/features/organizations/types"
-
-const ORG_BY_SLUG: Record<string, string> = {
-  "acme-corporation": "ORG-20260115-0001",
-}
+import { getOrganizationBySlug } from "@/lib/org-portal"
+import { OrgPortalNotFound } from "@/components/org/org-portal-not-found"
 
 const MOCK_ORG_ADMINS: OrganizationAdmin[] = [
   {
@@ -70,8 +67,11 @@ export default function OrgSettingsPage() {
   const orgSlug = params.orgSlug as string
   const [inviteOpen, setInviteOpen] = useState(false)
 
-  const orgId = ORG_BY_SLUG[orgSlug] ?? "ORG-20260115-0001"
-  const org = MOCK_ORGS.find((o) => o.id === orgId) ?? MOCK_ORGS[0]!
+  const org = getOrganizationBySlug(orgSlug)
+
+  if (!org) return <OrgPortalNotFound />
+
+  const orgId = org.id
   const admins = MOCK_ORG_ADMINS.filter((a) => a.orgId === orgId)
 
   return (

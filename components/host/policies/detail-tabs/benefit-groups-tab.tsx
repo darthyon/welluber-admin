@@ -12,12 +12,14 @@ interface BenefitGroupsTabProps {
   policy: BenefitPolicy
   groups: BenefitGroup[]
   benefits: Benefit[]
+  organizationId?: string
 }
 
 export function BenefitGroupsTab({
   policy,
   groups,
   benefits,
+  organizationId,
 }: BenefitGroupsTabProps) {
   const router = useRouter()
 
@@ -28,7 +30,10 @@ export function BenefitGroupsTab({
         JSON.stringify({ policy, groups, benefits })
       )
     }
-    router.push(`/policies/${policy.id}/groups/edit`)
+    const context = organizationId
+      ? `?orgId=${encodeURIComponent(organizationId)}`
+      : ""
+    router.push(`/policies/${policy.id}/groups/edit${context}`)
   }
 
   return (
