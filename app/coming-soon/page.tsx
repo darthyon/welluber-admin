@@ -1,6 +1,6 @@
 import Link from "next/link"
 import type { Metadata } from "next"
-import { WelluberLogo } from "@/components/shared/welluber-logo"
+import { WelluberLogo } from "@/components/brand/welluber-logo"
 
 export const metadata: Metadata = {
   title: "Coming Soon · WellUber",

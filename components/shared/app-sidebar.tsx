@@ -22,8 +22,8 @@ import {
 } from "@phosphor-icons/react"
 import { useRouter } from "next/navigation"
 
-import { WelluberLogo } from "@/components/shared/welluber-logo"
-import { WelluberMark } from "@/components/shared/welluber-mark"
+import { WelluberLogo } from "@/components/brand/welluber-logo"
+import { WelluberMark } from "@/components/brand/welluber-mark"
 import { useSession } from "@/lib/session"
 import { NavMain } from "@/components/nav-main"
 import type { NavMainItem } from "@/components/nav-main"

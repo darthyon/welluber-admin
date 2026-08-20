@@ -1,6 +1,6 @@
 import { Buildings, Receipt, Shield } from "@phosphor-icons/react/dist/ssr"
 
-import { WelluberLogo } from "@/components/shared/welluber-logo"
+import { WelluberLogo } from "@/components/brand/welluber-logo"
 import type { UserRole } from "@/lib/session"
 
 interface Quote {

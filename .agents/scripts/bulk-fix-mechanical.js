@@ -26,13 +26,13 @@ for (const relPath of files) {
   let changed = false
 
   // 1. bg-white → bg-background (conservative: not in welluber logo/mark)
-  if (!relPath.includes("welluber-logo") && !relPath.includes("welluber-mark")) {
+  if (!relPath.includes("brand/welluber-logo") && !relPath.includes("brand/welluber-mark")) {
     const next = content.replace(/\bbg-white\b(?!\/[0-9])/g, "bg-background")
     if (next !== content) { content = next; changed = true; }
   }
 
   // 2. text-white → text-primary-foreground (conservative)
-  if (!relPath.includes("welluber-logo") && !relPath.includes("welluber-mark")) {
+  if (!relPath.includes("brand/welluber-logo") && !relPath.includes("brand/welluber-mark")) {
     const next = content.replace(/\btext-white\b(?!\/[0-9])/g, "text-primary-foreground")
     if (next !== content) { content = next; changed = true; }
   }

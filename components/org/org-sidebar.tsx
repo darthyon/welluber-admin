@@ -17,8 +17,8 @@ import {
   SignOut,
 } from "@phosphor-icons/react"
 import { useRouter } from "next/navigation"
-import { WelluberLogo } from "@/components/shared/welluber-logo"
-import { WelluberMark } from "@/components/shared/welluber-mark"
+import { WelluberLogo } from "@/components/brand/welluber-logo"
+import { WelluberMark } from "@/components/brand/welluber-mark"
 import { useSession } from "@/lib/session"
 import { routes } from "@/lib/navigation"
 import { NavMain } from "@/components/nav-main"

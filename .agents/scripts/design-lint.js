@@ -17,7 +17,7 @@ const TARGET_DIRS = ["app", "components", "features"]
 const EXTENSIONS = new Set([".tsx", ".ts", ".jsx", ".js"])
 
 // Files exempt from certain rules
-const BRAND_SVGS = ["welluber-logo.tsx", "welluber-mark.tsx"]
+const BRAND_SVGS = ["brand/welluber-logo.tsx", "brand/welluber-mark.tsx"]
 
 const BANNED = [
   {
